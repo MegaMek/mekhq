@@ -45,6 +45,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -54,7 +55,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -69,7 +69,7 @@ import mekhq.campaign.universe.Planet;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable {
+public class Person implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
@@ -224,11 +224,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int daysToWaitForHealing;
 
     // Our rank
+    private RankSystem rankSystem;
     private int rank;
     private int rankLevel;
-    // If this Person uses a custom rank system (-1 for no)
-    private int rankSystem;
-    private Ranks ranks;
 
     private ManeiDominiClass maneiDominiClass;
     private ManeiDominiRank maneiDominiRank;
@@ -359,9 +357,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         xp = 0;
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        rank = 0;
-        rankLevel = 0;
-        rankSystem = -1;
+        setRankSystem(campaign.getRanks());
+        setRank(0);
+        setRankLevel(0);
         maneiDominiRank = ManeiDominiRank.NONE;
         maneiDominiClass = ManeiDominiClass.NONE;
         nTasks = 0;
@@ -1656,8 +1654,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return extraData;
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    //region File IO
+    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
@@ -1744,13 +1742,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
-            // Always save a person's rank
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
-            if (rankLevel != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankLevel", rankLevel);
+            if (!getRankSystem().getRankSystemCode().equals(campaign.getRanks().getRankSystemCode())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", getRankSystem().getRankSystemCode());
             }
-            if (rankSystem != -1) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", rankSystem);
+            // Always save a person's rank
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", getRankNumeric());
+            if (rankLevel != 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankLevel", getRankLevel());
             }
             if (maneiDominiRank != ManeiDominiRank.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank.name());
@@ -1985,12 +1983,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    retVal.rank = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.rankLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                    retVal.setRankSystem(Integer.parseInt(wn2.getTextContent()));
+                    if (version.isLowerThan("0.49.0")) {
+                        retVal.setRankSystemDirect(Ranks.getRankSystemFromCode(PersonMigrator
+                                .migrateRankSystemCode(Integer.parseInt(wn2.getTextContent().trim()))));
+                    } else {
+                        retVal.setRankSystemDirect(Ranks.getRankSystemFromCode(wn2.getTextContent().trim()));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                    retVal.setRank(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
+                    retVal.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
                     retVal.maneiDominiRank = ManeiDominiRank.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
@@ -2253,11 +2256,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             // Ensure the Genealogy Origin Id is set to the proper id
             retVal.getGenealogy().setOrigin(retVal.getId());
-
-            // Prisoner and Bondsman updating
-            if (retVal.rank < 0) {
-                retVal.setRankNumeric(0);
-            }
         } catch (Exception e) {
             MekHQ.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
             retVal = null;
@@ -2265,6 +2263,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return retVal;
     }
+    //endregion File IO
 
     public void setSalary(Money s) {
         salary = s;
@@ -2343,13 +2342,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    //region Ranks
+    public RankSystem getRankSystem() {
+        return rankSystem;
+    }
+
+    public void setRankSystem(final RankSystem rankSystem) {
+        setRankSystemDirect(rankSystem);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    private void setRankSystemDirect(final RankSystem rankSystem) {
+        this.rankSystem = rankSystem;
+    }
+
     public int getRankNumeric() {
         return rank;
     }
 
-    public void setRankNumeric(int r) {
-        rank = r;
-        rankLevel = 0; // Always reset to 0 so that a call to setRankLevel() isn't mandatory.
+    public void setRank(final int rank) {
+        this.rank = rank;
+        // FIXME : Windchild I should be in a rank validator, not here
+        setRankLevel(0); // Always reset to 0 so that a call to setRankLevel() isn't mandatory
     }
 
     public int getRankLevel() {

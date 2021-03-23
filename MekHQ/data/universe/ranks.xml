@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Each Rank System consists of the following fields:
+System Code: The unique String code for the system.
+System Name: The display name for the system.
+Rank:
+	Rank Names:
+	Officer:
+	Pay Multiplier: 
+-->
 <rankSystems>
 	<rankSystem>
-		<systemId>0</systemId>
-		<systemName>Second Star League</systemName>
+		<systemCode>SSLDF</systemCode>
+		<systemName>Second Star League Defense Force</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -260,8 +269,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>1</systemId>
-		<systemName>Federated Suns</systemName>
+		<systemCode>AFFS</systemCode>
+		<systemName>Armed Forces of the Federated Suns</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -519,7 +528,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>2</systemId>
+		<systemCode>AFFC</systemCode>
 		<systemName>Federated Commonwealth</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -778,8 +787,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>3</systemId>
-		<systemName>Lyran Commonwealth</systemName>
+		<systemCode>LCAF</systemCode>
+		<systemName>Lyran Commonwealth Armed Forces</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1037,7 +1046,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>4</systemId>
+		<systemCode>LAAF</systemCode>
 		<systemName>Lyran Alliance</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -1296,7 +1305,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>5</systemId>
+		<systemCode>FWLM</systemCode>
 		<systemName>Free Worlds League</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -1555,7 +1564,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>6</systemId>
+		<systemCode>CCAF</systemCode>
 		<systemName>Capellan Confederation</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -1814,7 +1823,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>7</systemId>
+		<systemCode>CCWH</systemCode>
 		<systemName>Capellan Confederation Warrior House</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -2073,7 +2082,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>8</systemId>
+		<systemCode>DCMS</systemCode>
 		<systemName>Draconis Combine</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -2332,7 +2341,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>9</systemId>
+		<systemCode>CLAN</systemCode>
 		<systemName>Clan</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -2591,7 +2600,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>10</systemId>
+		<systemCode>CG</systemCode>
 		<systemName>ComStar</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -2850,8 +2859,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>11</systemId>
-		<systemName>Word of Blake</systemName>
+		<systemCode>WOBM</systemCode>
+		<systemName>Word of Blake Militia</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3109,266 +3118,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>12</systemId>
-		<systemName>Custom</systemName>
-		<rank>
-			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E0 "None" -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E1 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E2 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E3 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E4 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E5 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E6 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E7 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E8 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E9 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E10 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E11 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E12 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E13 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E14 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E15 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E16 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E17 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E18 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E19 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- E20 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO1 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO2 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO3 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO4 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO5 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO6 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO7 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO8 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO9 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>false</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- WO10 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O1 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O2 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O3 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O4 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O5 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O6 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O7 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O8 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O9 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O10 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O11 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O12 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O13 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O14 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O15 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O16 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O17 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O18 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O19 -->
-		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
-		</rank> <!-- O20 -->
-	</rankSystem>
-	<rankSystem>
-		<systemId>13</systemId>
+		<systemCode>MAF</systemCode>
 		<systemName>Magistracy of Canopus</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -3627,7 +3377,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>14</systemId>
+		<systemCode>TDF</systemCode>
 		<systemName>Taurian Concordat</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -3886,7 +3636,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>15</systemId>
+		<systemCode>MHAF</systemCode>
 		<systemName>Marian Hegemony</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -4145,7 +3895,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>16</systemId>
+		<systemCode>AMC</systemCode>
 		<systemName>Outworlds Alliance</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -4404,7 +4154,7 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>17</systemId>
+		<systemCode>KA</systemCode>
 		<systemName>Free Rasalhague Republic</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
@@ -4663,8 +4413,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>18</systemId>
-		<systemName>Aurigan Coalition</systemName>
+		<systemCode>ACM</systemCode>
+		<systemName>Aurigan Coalition Military</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4922,8 +4672,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemId>19</systemId>
-		<systemName>First Star League</systemName>
+		<systemCode>SLDF</systemCode>
+		<systemName>Star League Defense Force</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>

@@ -76,8 +76,7 @@ public class RankSorter implements Comparator<String>, Serializable {
             }
             return Integer.compare(p0.getRankNumeric(), p1.getRankNumeric());
         } catch (Exception e) {
-            MekHQ.getLogger().debug(this, String.format("[DEBUG] RankSorter Exception, s0: %s, s1: %s", s00, s11));
-            MekHQ.getLogger().error(getClass(), "compare", e);
+            MekHQ.getLogger().error(String.format("RankSorter Exception, s0: %s, s1: %s", s00, s11), e);
             return 0;
         }
     }
