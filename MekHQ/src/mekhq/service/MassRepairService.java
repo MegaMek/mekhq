@@ -172,7 +172,7 @@ public class MassRepairService {
 
         campaign.addReport(msg);
 
-        List<Person> techs = campaign.getTechs(false);
+        List<Person> techs = campaign.getTechs();
 
         if (!techs.isEmpty()) {
             List<IPartWork> parts = unit.getPartsNeedingService(true);
@@ -302,7 +302,7 @@ public class MassRepairService {
                 "Units with unfixable limbs:", campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
-            List<Person> techs = campaign.getTechs(false);
+            List<Person> techs = campaign.getTechs();
 
             if (!techs.isEmpty()) {
                 int count = 0;

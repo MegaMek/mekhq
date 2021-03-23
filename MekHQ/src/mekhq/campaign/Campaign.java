@@ -1883,7 +1883,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
      */
     public List<Person> getTechs() {
-        return getTechs(false, null, true, false);
+        return getTechs(false);
     }
 
     public List<Person> getTechs(boolean noZeroMinute) {
@@ -1893,19 +1893,12 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Returns a list of active technicians.
      *
-     * @param noZeroMinute
-     *            If TRUE, then techs with no time remaining will be excluded from
-     *            the list.
-     * @param firstTechId
-     *            The ID of the tech that should appear first in the list (assuming
-     *            active and satisfies the noZeroMinute argument)
-     * @param sorted
-     *            If TRUE, then return the list sorted from worst to best
-     * @param eliteFirst
-     *            If TRUE and sorted also TRUE, then return the list sorted from
-     *            best to worst
-     * @return The list of active {@link Person}s who qualify as technicians
-     *         ({@link Person#isTech()}).
+     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
+     * @param firstTechId The ID of the tech that should appear first in the list (assuming
+     *                    active and satisfies the noZeroMinute argument)
+     * @param sorted If TRUE, then return the list sorted from worst to best
+     * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
+     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
     public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
@@ -1929,65 +1922,23 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        // Return the tech collection sorted worst to best
-        // Reverse the sort if we've been asked for best to worst
+        // Return the tech collection sorted worst to best Skill Level, or reversed if we want
+        // elites first
         if (sorted) {
-            // First order by the amount of time the person has remaining, based on the sorting order
-            // comparison changes because locations that use elite first will want the person with
-            // the most remaining time at the top of the list while locations that don't will want it
-            // at the bottom of the list
+            Comparator<Person> techSorter = Comparator.comparingInt(person ->
+                    person.getExperienceLevel(!person.isTechPrimary() && person.isTechSecondary()));
+
             if (eliteFirst) {
-                // We want the highest amount of remaining time at the top of the list, as that
-                // makes it easy to compare between the two
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+                techSorter = techSorter.reversed().thenComparing(Comparator
+                        .comparingInt(Person::getDailyAvailableTechTime).reversed());
             } else {
-                // Otherwise, we want the highest amount of time being at the bottom of the list
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+                techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
             }
-            // Then sort by the skill level, which puts Elite personnel first or last dependant on
-            // the eliteFirst value
-            techs.sort((person1, person2) -> {
-                // default to 0, which means they're equal
-                int retVal = 0;
 
-                // Set up booleans to know if the tech is secondary only
-                // this is to get the skill from getExperienceLevel(boolean) properly
-                boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
-                boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
-
-                if (person1.getExperienceLevel(p1Secondary) > person2.getExperienceLevel(p2Secondary)) {
-                    // Person 1 is better than Person 2.
-                    retVal = 1;
-                } else if (person1.getExperienceLevel(p1Secondary) < person2.getExperienceLevel(p2Secondary)) {
-                    // Person 2 is better than Person 1
-                    retVal = -1;
-                }
-
-                // Return, swapping the value if we're looking to have Elites ordered first
-                return eliteFirst ? -retVal : retVal;
-            });
+            techs.sort(techSorter);
         }
 
         return techs;
-    }
-
-    /**
-     * Gets a list of all techs of a specific role type
-     * @param roleType The filter role type
-     * @return Collection of all techs that match the given tech role
-     */
-    public List<Person> getTechsByRole(int roleType) {
-        List<Person> techs = getTechs(false, null, false, false);
-        List<Person> retval = new ArrayList<>();
-
-        for (Person tech : techs) {
-            if((tech.getPrimaryRole() == roleType) ||
-               (tech.getSecondaryRole() == roleType)) {
-                retval.add(tech);
-            }
-        }
-
-        return retval;
     }
 
     public List<Person> getAdmins() {
@@ -5291,7 +5242,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getAstechNeed() {
-        return (getTechs().size() * 6) - getNumberAstechs();
+        return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6)
+                - getNumberAstechs();
     }
 
     public void increaseAstechPool(int i) {
