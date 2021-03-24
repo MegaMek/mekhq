@@ -61,7 +61,6 @@ public class RankSystem implements Serializable {
     public static final int RPROF_NAVAL = 3;
     public static final int RPROF_INF   = 4;
     public static final int RPROF_TECH  = 5;
-    public static final int RPROF_NUM   = 6;
 
     private String rankSystemCode;
     private String rankSystemName;
