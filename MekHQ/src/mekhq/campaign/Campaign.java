@@ -4322,6 +4322,7 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, getLocalDate());
     }
 
+    //region Ranks
     public RankSystem getRanks() {
         return ranks;
     }
@@ -4330,26 +4331,31 @@ public class Campaign implements Serializable, ITechManager {
         this.ranks = ranks;
     }
 
-    @Deprecated
-    public List<String> getAllRankNamesFor(int p) {
-        List<String> retVal = new ArrayList<>();
-        for (Rank rank : getRanks().getRanks()) {
-            // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--")) {
-                if (rank.getName(p).equals("--")) {
-                    p = getRanks().getAlternateProfession(p);
-                } else if (rank.getName(p).startsWith("--")) {
-                    p = getRanks().getAlternateProfession(rank.getName(p));
-                }
-            }
-            if (rank.getName(p).equals("-")) {
-                continue;
-            }
+    public void changeRank(Person person, int rank, int rankLevel, boolean report) {
+        int oldRank = person.getRankNumeric();
+        int oldRankLevel = person.getRankLevel();
+        person.setRank(rank);
+        person.setRankLevel(rankLevel);
 
-            retVal.add(rank.getName(p));
+        if (getCampaignOptions().getUseTimeInRank()) {
+            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
+                person.setLastRankChangeDate(getLocalDate());
+            } else {
+                person.setLastRankChangeDate(null);
+            }
         }
-        return retVal;
+
+        personUpdated(person);
+
+        if (report) {
+            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
+                ServiceLogger.promotedTo(person, getLocalDate());
+            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
+                ServiceLogger.demotedTo(person, getLocalDate());
+            }
+        }
     }
+    //endregion Ranks
 
     public ArrayList<Force> getAllForces() {
         return new ArrayList<>(forceIds.values());
@@ -5397,35 +5403,6 @@ public class Campaign implements Serializable, ITechManager {
     public void decreaseMedicPool(int i) {
         medicPool = Math.max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
-    }
-
-    public void changeRank(Person person, int rank, boolean report) {
-        changeRank(person, rank, 0, report);
-    }
-
-    public void changeRank(Person person, int rank, int rankLevel, boolean report) {
-        int oldRank = person.getRankNumeric();
-        int oldRankLevel = person.getRankLevel();
-        person.setRank(rank);
-        person.setRankLevel(rankLevel);
-
-        if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
-                person.setLastRankChangeDate(getLocalDate());
-            } else {
-                person.setLastRankChangeDate(null);
-            }
-        }
-
-        personUpdated(person);
-
-        if (report) {
-            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(person, getLocalDate());
-            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(person, getLocalDate());
-            }
-        }
     }
 
     public GameOptions getGameOptions() {

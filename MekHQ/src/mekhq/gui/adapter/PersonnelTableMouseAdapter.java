@@ -56,6 +56,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
+import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
@@ -133,7 +134,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RANSOM = "RANSOM";
 
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String HYPHEN = "-"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -1155,34 +1155,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // lets fill the pop up menu
         if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resourceMap.getString("changeRank.text"));
-            for (int rankOrder = 0; rankOrder < RankSystem.RC_NUM; rankOrder++) {
-                final Rank rank = person.getRankSystem().getRanks().get(rankOrder);
-                int profession = person.getProfession();
+            for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(
+                    person.getRankSystem(), person.getProfession())) {
+                final Rank rank = person.getRankSystem().getRank(rankDisplay.getRankNumeric());
+                final int profession = person.getRankSystem().getProfession(rank, person.getProfession());
+                final int rankLevels = rank.getRankLevels(profession);
 
-                // Empty professions need swapped before the continuation
-                profession = person.getRankSystem().getBaseProfession(profession);
-
-                if (rank.getName(profession).equals(HYPHEN)) {
-                    continue;
-                }
-
-                // re-route through any profession redirections,
-                // starting with the empty profession check
-                while (rank.getName(profession).startsWith("--") && (profession != RankSystem.RPROF_MW)) {
-                    if (rank.getName(profession).equals("--")) {
-                        profession = person.getRankSystem().getAlternateProfession(profession);
-                    } else if (rank.getName(profession).startsWith("--")) {
-                        profession = person.getRankSystem().getAlternateProfession(rank.getName(profession));
-                    }
-                }
-
-                if (rank.getRankLevels(profession) > 0) {
-                    submenu = new JMenu(rank.getName(profession));
-                    for (int level = 0; level <= rank.getRankLevels(profession); level++) {
+                if (rankLevels > 0) {
+                    submenu = new JMenu(rankDisplay.toString());
+                    for (int level = 0; level <= rankLevels; level++) {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)
                                 + Utilities.getRomanNumeralsFromArabicNumber(level, true));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder), String.valueOf(level)));
-                        if ((person.getRankNumeric() == rankOrder) && (person.getRankLevel() == level)) {
+                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK,
+                                String.valueOf(rankDisplay.getRankNumeric()), String.valueOf(level)));
+                        if ((person.getRankNumeric() == rankDisplay.getRankNumeric())
+                                && (person.getRankLevel() == level)) {
                             cbMenuItem.setSelected(true);
                         }
                         cbMenuItem.addActionListener(this);
@@ -1190,9 +1177,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     JMenuHelpers.addMenuIfNonEmpty(menu, submenu);
                 } else {
-                    cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder)));
-                    if (person.getRankNumeric() == rankOrder) {
+                    cbMenuItem = new JCheckBoxMenuItem(rankDisplay.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.getRankNumeric())));
+                    if (person.getRankNumeric() == rankDisplay.getRankNumeric()) {
                         cbMenuItem.setSelected(true);
                     }
                     cbMenuItem.addActionListener(this);

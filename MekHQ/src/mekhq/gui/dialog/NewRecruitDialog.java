@@ -25,13 +25,15 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class NewRecruitDialog extends javax.swing.JDialog {
+public class NewRecruitDialog extends JDialog {
     /**
      * This dialog is used to both hire new pilots and to edit existing ones
      */
@@ -40,7 +42,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private CampaignGUI hqView;
 
-    private JComboBox<String> choiceRanks;
+    private JComboBox<RankDisplay> choiceRanks;
 
     private JScrollPane scrollView;
 
@@ -197,8 +199,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     private void createNewRecruit() {
         person = hqView.getCampaign().newPerson(person.getPrimaryRole());
         refreshRanksCombo();
-        hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
-                person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
     }
 
     private void randomName() {
@@ -250,22 +251,14 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void changeRank() {
-        hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
-                person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
         refreshView();
     }
 
     private void refreshRanksCombo() {
-        DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<>();
-
-        // Determine correct profession to pass into the loop
-        int profession = person.getProfession();
-        while (hqView.getCampaign().getRanks().isEmptyProfession(profession)) {
-            profession = hqView.getCampaign().getRanks().getAlternateProfession(profession);
-        }
-        for (String rankName : hqView.getCampaign().getAllRankNamesFor(profession)) {
-            ranksModel.addElement(rankName);
-        }
+        DefaultComboBoxModel<RankDisplay> ranksModel = new DefaultComboBoxModel<>();
+        ranksModel.addAll(RankDisplay.getRankDisplaysForSystem(person.getRankSystem(),
+                person.getProfession()));
         choiceRanks.setModel(ranksModel);
         choiceRanks.setSelectedIndex(0);
     }

@@ -258,34 +258,6 @@ public class RankSystem implements Serializable {
                 return RPROF_MW;
         }
     }
-
-    @Deprecated
-    public int getRankNumericFromNameAndProfession(int profession, String name) {
-        while (isEmptyProfession(profession)) {
-            profession = getAlternateProfession(profession);
-        }
-
-        for (int i = 0; i < RC_NUM; i++) {
-            Rank rank = getRanks().get(i);
-            int p = profession;
-
-            // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && (p != RPROF_MW)) {
-                if (rank.getName(p).equals("--")) {
-                    p = getAlternateProfession(p);
-                } else if (rank.getName(p).startsWith("--")) {
-                    p = getAlternateProfession(rank.getName(p));
-                }
-            }
-
-            // Check it...
-            if (rank.getName(p).equals(name)) {
-                return i;
-            }
-        }
-
-        return 0;
-    }
     //endregion Professions
 
     //region Table Model
