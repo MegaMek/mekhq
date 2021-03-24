@@ -361,8 +361,8 @@ public class Person implements Serializable {
         setRankSystem(campaign.getRanks());
         setRank(0);
         setRankLevel(0);
-        maneiDominiRank = ManeiDominiRank.NONE;
-        maneiDominiClass = ManeiDominiClass.NONE;
+        setManeiDominiClassDirect(ManeiDominiClass.NONE);
+        setManeiDominiRankDirect(ManeiDominiRank.NONE);
         nTasks = 0;
         doctorId = null;
         salary = Money.of(-1);
@@ -1744,18 +1744,18 @@ public class Person implements Serializable {
             // Always save the person's gender, as it would otherwise get confusing fast
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
             if (!getRankSystem().getRankSystemCode().equals(campaign.getRanks().getRankSystemCode())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", getRankSystem().getRankSystemCode());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "rankSystem", getRankSystem().getRankSystemCode());
             }
             // Always save a person's rank
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", getRankNumeric());
-            if (rankLevel != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankLevel", getRankLevel());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rank", getRankNumeric());
+            if (getRankLevel() != 0) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rankLevel", getRankLevel());
             }
-            if (maneiDominiRank != ManeiDominiRank.NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank.name());
+            if (!getManeiDominiClass().isNone()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "maneiDominiClass", getManeiDominiClass().name());
             }
-            if (maneiDominiClass != ManeiDominiClass.NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass.name());
+            if (!getManeiDominiRank().isNone()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "maneiDominiRank", getManeiDominiRank().name());
             }
             if (nTasks > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
@@ -1995,10 +1995,10 @@ public class Person implements Serializable {
                     retVal.setRank(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
                     retVal.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
-                    retVal.maneiDominiRank = ManeiDominiRank.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    retVal.maneiDominiClass = ManeiDominiClass.parseFromString(wn2.getTextContent().trim());
+                    retVal.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
+                    retVal.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.doctorId = UUID.fromString(wn2.getTextContent());
@@ -2367,8 +2367,6 @@ public class Person implements Serializable {
 
     public void setRank(final int rank) {
         this.rank = rank;
-        // FIXME : Windchild I should be in a rank validator, not here
-        setRankLevel(0); // Always reset to 0 so that a call to setRankLevel() isn't mandatory
     }
 
     public int getRankLevel() {
@@ -2418,15 +2416,13 @@ public class Person implements Serializable {
 
         // Manei Domini Additions
         if (getRankSystem().isWoBMilitia()) {
-            if (maneiDominiClass != ManeiDominiClass.NONE) {
-                rankName = maneiDominiClass + " " + rankName;
+            if (!getManeiDominiClass().isNone()) {
+                rankName = getManeiDominiClass() + " " + rankName;
             }
-            if (maneiDominiRank != ManeiDominiRank.NONE) {
-                rankName += " " + maneiDominiRank;
+
+            if (!getManeiDominiRank().isNone()) {
+                rankName += " " + getManeiDominiRank();
             }
-        } else {
-            maneiDominiClass = ManeiDominiClass.NONE;
-            maneiDominiRank = ManeiDominiRank.NONE;
         }
 
         if (getRankSystem().isCGOrWoBM()) {
@@ -2434,11 +2430,8 @@ public class Person implements Serializable {
         }
 
         // If we have a rankLevel, add it
-        if (rankLevel > 0) {
-            if (getRank().getRankLevels(profession) > 0)
-                rankName += Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true);
-            else // Oops! Our rankLevel didn't get correctly cleared, they's remedy that.
-                rankLevel = 0;
+        if (getRankLevel() > 0) {
+            rankName += Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true);
         }
 
         if (rankName.equalsIgnoreCase("None")) {
@@ -2457,18 +2450,26 @@ public class Person implements Serializable {
         return maneiDominiClass;
     }
 
-    public void setManeiDominiClass(ManeiDominiClass maneiDominiClass) {
-        this.maneiDominiClass = maneiDominiClass;
+    public void setManeiDominiClass(final ManeiDominiClass maneiDominiClass) {
+        setManeiDominiClassDirect(maneiDominiClass);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    private void setManeiDominiClassDirect(final ManeiDominiClass maneiDominiClass) {
+        this.maneiDominiClass = maneiDominiClass;
     }
 
     public ManeiDominiRank getManeiDominiRank() {
         return maneiDominiRank;
     }
 
-    public void setManeiDominiRank(ManeiDominiRank maneiDominiRank) {
-        this.maneiDominiRank = maneiDominiRank;
+    public void setManeiDominiRank(final ManeiDominiRank maneiDominiRank) {
+        setManeiDominiRankDirect(maneiDominiRank);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    private void setManeiDominiRankDirect(final ManeiDominiRank maneiDominiRank) {
+        this.maneiDominiRank = maneiDominiRank;
     }
 
     /**
@@ -2478,7 +2479,7 @@ public class Person implements Serializable {
      * @param other The <code>Person</code> to compare ranks with
      * @return      true if <code>other</code> has a lower rank, or if <code>other</code> is null.
      */
-    public boolean outRanks(@Nullable Person other) {
+    public boolean outRanks(final @Nullable Person other) {
         if (null == other) {
             return true;
         } else if (getRankNumeric() == other.getRankNumeric()) {

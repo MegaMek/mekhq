@@ -229,21 +229,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_MANEI_DOMINI_RANK: {
-                ManeiDominiRank maneiDominiRank = ManeiDominiRank.parseFromString(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiRank(maneiDominiRank);
-                }
-                break;
-            }
             case CMD_MANEI_DOMINI_CLASS: {
                 try {
-                    ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
+                    final ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
                     for (Person person : people) {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
                     MekHQ.getLogger().error("Failed to assign Manei Domini Class", e);
+                }
+                break;
+            }
+            case CMD_MANEI_DOMINI_RANK: {
+                final ManeiDominiRank maneiDominiRank = ManeiDominiRank.valueOf(data[1]);
+                for (Person person : people) {
+                    person.setManeiDominiRank(maneiDominiRank);
                 }
                 break;
             }
@@ -1223,19 +1223,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         if (StaticChecks.areAllWoBMilitia(selected)) {
-            // MD Ranks
-            menu = new JMenu(resourceMap.getString("changeMDRank.text"));
-            for (ManeiDominiRank maneiDominiRank : ManeiDominiRank.values()) {
-                cbMenuItem = new JCheckBoxMenuItem(maneiDominiRank.toString());
-                cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, maneiDominiRank.name()));
-                cbMenuItem.addActionListener(this);
-                if (person.getManeiDominiRank() == maneiDominiRank) {
-                    cbMenuItem.setSelected(true);
-                }
-                menu.add(cbMenuItem);
-            }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
-
             // MD Classes
             menu = new JMenu(resourceMap.getString("changeMDClass.text"));
             for (ManeiDominiClass maneiDominiClass : ManeiDominiClass.values()) {
@@ -1247,7 +1234,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 menu.add(cbMenuItem);
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+
+            // MD Ranks
+            menu = new JMenu(resourceMap.getString("changeMDRank.text"));
+            for (ManeiDominiRank maneiDominiRank : ManeiDominiRank.values()) {
+                cbMenuItem = new JCheckBoxMenuItem(maneiDominiRank.toString());
+                cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, maneiDominiRank.name()));
+                cbMenuItem.addActionListener(this);
+                if (person.getManeiDominiRank() == maneiDominiRank) {
+                    cbMenuItem.setSelected(true);
+                }
+                menu.add(cbMenuItem);
+            }
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
         if (StaticChecks.areAllWoBMilitiaOrComGuard(selected)) {

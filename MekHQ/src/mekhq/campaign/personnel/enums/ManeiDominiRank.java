@@ -37,8 +37,7 @@ public enum ManeiDominiRank {
 
     //region Variable Declarations
     private final String rankName;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -47,11 +46,13 @@ public enum ManeiDominiRank {
     }
     //endregion Constructors
 
-    @Override
-    public String toString() {
-        return rankName;
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
     }
+    //endregion Boolean Comparison Methods
 
+    //region File IO
     public static ManeiDominiRank parseFromString(String information) {
         // Parse based on the enum name
         try {
@@ -71,9 +72,15 @@ public enum ManeiDominiRank {
 
         }
 
-        MekHQ.getLogger().error(ManeiDominiRank.class, "parseFromString",
-                "Unable to parse " + information + "into a ManeiDominiRank. Returning NONE.");
+        MekHQ.getLogger().error("Unable to parse " + information + "into a ManeiDominiRank. Returning NONE.");
 
-        return ManeiDominiRank.NONE;
+        return NONE;
     }
+    //endregion File IO
+
+    @Override
+    public String toString() {
+        return rankName;
+    }
+
 }

@@ -38,8 +38,7 @@ public enum ManeiDominiClass {
 
     //region Variable Declarations
     private final String className;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -48,11 +47,13 @@ public enum ManeiDominiClass {
     }
     //endregion Constructors
 
-    @Override
-    public String toString() {
-        return className;
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
     }
+    //endregion Boolean Comparison Methods
 
+    //region File IO
     public static ManeiDominiClass parseFromString(String information) {
         // Parse based on the enum name
         try {
@@ -72,9 +73,14 @@ public enum ManeiDominiClass {
 
         }
 
-        MekHQ.getLogger().error(ManeiDominiClass.class, "parseFromString",
-                "Unable to parse " + information + "into a ManeiDominiClass. Returning NONE.");
+        MekHQ.getLogger().error("Unable to parse " + information + "into a ManeiDominiClass. Returning NONE.");
 
-        return ManeiDominiClass.NONE;
+        return NONE;
+    }
+    //endregion File IO
+
+    @Override
+    public String toString() {
+        return className;
     }
 }
