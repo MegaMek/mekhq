@@ -1160,9 +1160,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int profession = person.getProfession();
 
                 // Empty professions need swapped before the continuation
-                while (person.getRankSystem().isEmptyProfession(profession)) {
-                    profession = person.getRankSystem().getAlternateProfession(profession);
-                }
+                profession = person.getRankSystem().getBaseProfession(profession);
 
                 if (rank.getName(profession).equals(HYPHEN)) {
                     continue;

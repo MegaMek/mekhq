@@ -54,7 +54,7 @@ public class RankSystem implements Serializable {
     // Total
     public static final int RC_NUM	= 51; // Same as RO_MAX+1
 
-    // Rank Profession Codes
+    // Rank Profession Codes - TODO : Enum swapover
     public static final int RPROF_MW    = 0;
     public static final int RPROF_ASF   = 1;
     public static final int RPROF_VEE   = 2;
@@ -144,6 +144,122 @@ public class RankSystem implements Serializable {
     }
 
     //region Professions
+    /**
+     * This takes the initial profession, converts it into a base profession, and then calls
+     * getProfessionFromBase to determine the profession to use for the provided rank.
+     *
+     * @param rank the rank to determine the profession for
+     * @param initialProfession the initial profession to determine the profession for
+     * @return the determined profession
+     */
+    public int getProfession(final Rank rank, final int initialProfession) {
+        return getProfessionFromBase(rank, getBaseProfession(initialProfession));
+    }
+
+    /**
+     * This takes the base profession and uses it to determine the determine the profession to use
+     * for the provided rank.
+     *
+     * @param rank the rank to determine the profession for
+     * @param baseProfession the base profession to determine the profession for
+     * @return the determined profession
+     */
+    public int getProfessionFromBase(final Rank rank, final int baseProfession) {
+        int profession = baseProfession;
+
+        // This runs if the rank is empty or indicates an alternative system
+        for (boolean empty = rank.isEmpty(profession); empty || rank.indicatesAlternativeSystem(profession);
+             empty = rank.isEmpty(profession)) {
+            if (empty) {
+                profession = getAlternateProfession(profession);
+            } else {
+                profession = getAlternateProfession(rank, profession);
+            }
+        }
+
+        return profession;
+    }
+
+    /**
+     * This is used to get the base profession for the rank column following any required redirects
+     * based on the provided initial profession.
+     *
+     * @param initialProfession the initial profession (normally a person's individual profession)
+     * @return the final base profession for this rank system based on the initial profession
+     */
+    public int getBaseProfession(final int initialProfession) {
+        int baseProfession = initialProfession;
+        while (isEmptyProfession(baseProfession)) {
+            baseProfession = getAlternateProfession(baseProfession);
+        }
+        return baseProfession;
+    }
+
+    public boolean isEmptyProfession(final int profession) {
+        // MechWarrior profession cannot be empty
+        // TODO : I should be allowed to be empty, and have my default replaced by another column,
+        // TODO : albeit with the validator properly run before to ensure the rank system is valid.
+        // TODO : The default return for getAlternativeProfession would not need to change in this case
+        if (profession == RPROF_MW) {
+            return false;
+        }
+
+        // Check the first rank to ensure it is either empty or indicates an alternative rank system,
+        // as otherwise the rank system is not empty.
+        final Rank rank = getRanks().get(0);
+        if (!rank.indicatesAlternativeSystem(profession) && !rank.isEmpty(profession)) {
+            return false;
+        } else if (getRanks().size() == 1) {
+            return true;
+        }
+
+        // Return true if all ranks except the first are empty
+        return getRanks().subList(1, getRanks().size()).stream().allMatch(r -> r.isEmpty(profession));
+    }
+
+    /**
+     * Determines the alternative profession to use based on the initial rank value
+     * @param profession the profession to determine the alternative for
+     * @return the alternative profession determined
+     */
+    public int getAlternateProfession(final int profession) {
+        return getAlternateProfession(getRanks().get(0), profession);
+    }
+
+    /**
+     * Determines the alternative profession to use based on the provided rank
+     * @param rank the rank to determine the alternative profession for
+     * @param profession the profession to determine the alternative for
+     * @return the alternative profession determined
+     */
+    public int getAlternateProfession(final Rank rank, final int profession) {
+        return getAlternateProfession(rank.getName(profession));
+    }
+
+    /**
+     * Determines the alternative profession to use based on the name of a rank
+     * @param name the name of the rank to use in determining the alternative profession
+     * @return the alternative profession determined
+     */
+    public int getAlternateProfession(final String name) {
+        switch (name.replaceAll("--", "")) {
+            case "ASF":
+                return RPROF_ASF;
+            case "VEE":
+                return RPROF_VEE;
+            case "NAVAL":
+                return RPROF_NAVAL;
+            case "INF":
+                return RPROF_INF;
+            case "TECH":
+                return RPROF_TECH;
+            case "MW":
+            default:
+                return RPROF_MW;
+        }
+    }
+
+    @Deprecated
     public int getRankNumericFromNameAndProfession(int profession, String name) {
         while (isEmptyProfession(profession)) {
             profession = getAlternateProfession(profession);
@@ -169,50 +285,6 @@ public class RankSystem implements Serializable {
         }
 
         return 0;
-    }
-
-    public boolean isEmptyProfession(int profession) {
-        // MechWarrior profession cannot be empty
-        if (profession == RPROF_MW) {
-            return false;
-        }
-
-        // Check the profession
-        for (int i = 0; i < RC_NUM; i++) {
-            // If our first Rank is an indicator of an alternate system, skip it.
-            if ((i == 0) && ranks.get(0).getName(profession).startsWith("--")) {
-                continue;
-            }
-
-            if (!ranks.get(i).getName(profession).equals("-")) {
-                return false;
-            }
-        }
-
-        // It's empty...
-        return true;
-    }
-
-    public int getAlternateProfession(int profession) {
-        return getAlternateProfession(ranks.get(0).getName(profession));
-    }
-
-    public int getAlternateProfession(String name) {
-        switch (name.replaceAll("--", "")) {
-            case "ASF":
-                return RPROF_ASF;
-            case "VEE":
-                return RPROF_VEE;
-            case "NAVAL":
-                return RPROF_NAVAL;
-            case "INF":
-                return RPROF_INF;
-            case "TECH":
-                return RPROF_TECH;
-            case "MW":
-            default:
-                return RPROF_MW;
-        }
     }
     //endregion Professions
 

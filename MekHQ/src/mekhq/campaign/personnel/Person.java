@@ -1743,7 +1743,7 @@ public class Person implements Serializable {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
-            if (!getRankSystem().getRankSystemCode().equals(campaign.getRanks().getRankSystemCode())) {
+            if (!getRankSystem().equals(campaign.getRanks())) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "rankSystem", getRankSystem().getRankSystemCode());
             }
             // Always save a person's rank
@@ -2257,6 +2257,11 @@ public class Person implements Serializable {
 
             // Ensure the Genealogy Origin Id is set to the proper id
             retVal.getGenealogy().setOrigin(retVal.getId());
+
+            // Fixing Prisoner Ranks - 0.47.X Fix
+            if (retVal.getRankNumeric() < 0) {
+                retVal.setRank(0);
+            }
         } catch (Exception e) {
             MekHQ.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
             retVal = null;
@@ -2379,40 +2384,8 @@ public class Person implements Serializable {
 
     public String getRankName() {
         String rankName;
-        int profession = getProfession();
 
-        /* Track number of times the profession has been redirected so we don't get caught
-         * in a loop by self-reference or loops due to bad configuration */
-        int redirects = 0;
-
-        // If we're using an "empty" profession, default to MechWarrior
-        while (getRankSystem().isEmptyProfession(profession) && (redirects < RankSystem.RPROF_NUM)) {
-            profession = getRankSystem().getAlternateProfession(profession);
-            redirects++;
-        }
-
-        // If we're set to a rank that no longer exists, demote ourself
-        while (getRank().getName(profession).equals("-") && (rank > 0)) {
-            --rank;
-        }
-
-        redirects = 0;
-        // re-route through any profession redirections
-        while (getRank().getName(profession).startsWith("--") && (profession != RankSystem.RPROF_MW)
-                && (redirects < RankSystem.RPROF_NUM)) {
-            // We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
-            if (getRank().getName(profession).equals("--")) {
-                profession = getRankSystem().getAlternateProfession(profession);
-            } else if (getRank().getName(profession).startsWith("--")) {
-                profession = getRankSystem().getAlternateProfession(getRank().getName(profession));
-            }
-            redirects++;
-        }
-        if (getRank().getName(profession).startsWith("--")) {
-            profession = RankSystem.RPROF_MW;
-        }
-
-        rankName = getRank().getName(profession);
+        rankName = getRank().getName(getRankSystem().getProfession(getRank(), getProfession()));
 
         // Manei Domini Additions
         if (getRankSystem().isWoBMilitia()) {
@@ -2429,18 +2402,15 @@ public class Person implements Serializable {
             rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
-        // If we have a rankLevel, add it
+        // Rank Level Modifications
         if (getRankLevel() > 0) {
             rankName += Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true);
         }
 
-        if (rankName.equalsIgnoreCase("None")) {
-            if (!getPrisonerStatus().getTitleExtension().equals("")) {
-                rankName = getPrisonerStatus().getTitleExtension();
-            }
-        } else {
-            rankName = getPrisonerStatus().getTitleExtension() + rankName;
-        }
+        // Prisoner Status Modifications
+        rankName = rankName.equalsIgnoreCase("None")
+                ? getPrisonerStatus().getTitleExtension()
+                : getPrisonerStatus().getTitleExtension() + rankName;
 
         // We have our name, return it
         return rankName;
@@ -2729,9 +2699,7 @@ public class Person implements Serializable {
     public String getFullTitle() {
         String rank = getRankName();
 
-        if (rank.equalsIgnoreCase("None")) {
-            rank = "";
-        } else {
+        if (!rank.isBlank()) {
             rank = rank.trim() + " ";
         }
 

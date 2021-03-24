@@ -4330,11 +4330,12 @@ public class Campaign implements Serializable, ITechManager {
         this.ranks = ranks;
     }
 
+    @Deprecated
     public List<String> getAllRankNamesFor(int p) {
         List<String> retVal = new ArrayList<>();
         for (Rank rank : getRanks().getRanks()) {
             // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != RankSystem.RPROF_MW) {
+            while (rank.getName(p).startsWith("--")) {
                 if (rank.getName(p).equals("--")) {
                     p = getRanks().getAlternateProfession(p);
                 } else if (rank.getName(p).startsWith("--")) {
