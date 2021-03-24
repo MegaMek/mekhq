@@ -306,7 +306,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         while (number > 0) {
             Person p = campaign.newPerson(((PersonTypeItem) choiceType.getSelectedItem()).id);
-            p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(),
+            p.setRank(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(),
                     (String) choiceRanks.getSelectedItem()));
             int age = p.getAge(today);
             if (useAge) {
@@ -349,7 +349,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
 
         int profession = Person.getProfessionFromPrimaryRole((primaryRoleId));
-        while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+        while (campaign.getRanks().isEmptyProfession(profession)) {
             profession = campaign.getRanks().getAlternateProfession(profession);
         }
 

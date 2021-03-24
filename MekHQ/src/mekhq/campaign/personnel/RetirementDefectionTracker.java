@@ -34,6 +34,7 @@ import java.util.UUID;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -417,16 +418,17 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @return	The amount in C-bills required to get a bonus to the retirement/defection roll
      */
     public static Money getBonusCost(Person person) {
+        final boolean isMechWarriorProfession = person.getProfession() == RankSystem.RPROF_MW;
         switch (person.getExperienceLevel(false)) {
             case SkillType.EXP_ELITE:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
+                return Money.of(isMechWarriorProfession ? 300000 : 150000);
             case SkillType.EXP_VETERAN:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
+                return Money.of(isMechWarriorProfession ? 150000 : 50000);
             case SkillType.EXP_REGULAR:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
+                return Money.of(isMechWarriorProfession ? 50000 : 20000);
             case SkillType.EXP_GREEN:
             default:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
+                return Money.of(isMechWarriorProfession ? 20000 : 10000);
         }
     }
 
@@ -490,7 +492,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     p.getSecondaryRole() == Person.T_AERO_PILOT)) {
                 stolenUnit = true;
             } else {
-                if (p.getProfession() == Ranks.RPROF_INF) {
+                if (p.getProfession() == RankSystem.RPROF_INF) {
                     if (p.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
@@ -501,7 +503,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
                 if (!shareSystem &&
-                        ((p.getProfession() == Ranks.RPROF_MW) || (p.getProfession() == Ranks.RPROF_ASF))
+                        ((p.getProfession() == RankSystem.RPROF_MW) || (p.getProfession() == RankSystem.RPROF_ASF))
                         && (p.getOriginalUnitWeight() > 0)) {
                     weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
                     if (roll <= 1) {

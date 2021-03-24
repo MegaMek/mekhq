@@ -38,10 +38,6 @@ public class RankSystem implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = -6037712487121208137L;
 
-    private String rankSystemCode;
-    private String rankSystemName;
-    private List<Rank> ranks;
-
     // Rank Size Codes
     // Enlisted
     public static final int RE_MIN	= 0; // Rank "None"
@@ -66,6 +62,10 @@ public class RankSystem implements Serializable {
     public static final int RPROF_INF   = 4;
     public static final int RPROF_TECH  = 5;
     public static final int RPROF_NUM   = 6;
+
+    private String rankSystemCode;
+    private String rankSystemName;
+    private List<Rank> ranks;
     //endregion Variable Declarations
 
     //region Constructors
@@ -109,6 +109,10 @@ public class RankSystem implements Serializable {
     //endregion Getters/Setters
 
     //region Boolean Comparison Methods
+    public boolean isCustom() {
+        return !Ranks.getBaseRankSystems().containsKey(getRankSystemCode());
+    }
+
     public boolean isWoBMilitia() {
         return "WOBM".equals(getRankSystemCode());
     }
@@ -141,7 +145,7 @@ public class RankSystem implements Serializable {
 
     //region Professions
     public int getRankNumericFromNameAndProfession(int profession, String name) {
-        while ((profession != RPROF_MW) && isEmptyProfession(profession)) {
+        while (isEmptyProfession(profession)) {
             profession = getAlternateProfession(profession);
         }
 
@@ -260,7 +264,7 @@ public class RankSystem implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
 
         // Only write out the ranks if we're using a custom system
-        if (!Ranks.getBaseRankSystems().containsKey(getRankSystemCode())) {
+        if (isCustom()) {
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent);
                 pw.println(getRankPostTag(i));
@@ -302,7 +306,7 @@ public class RankSystem implements Serializable {
 
                 if (Stream.of("system", "rankSystem", "systemId").anyMatch(s -> wn.getNodeName().equalsIgnoreCase(s))) { // Legacy, 0.49.0 removal
                     rankSystemId = Integer.parseInt(wn.getTextContent().trim());
-                    if (!initialLoad && (rankSystemId != 12) && (rankSystemId != -1)) {
+                    if (!initialLoad && (rankSystemId != 12)) {
                         return Ranks.getRankSystemFromCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
                     }
                 } else if (wn.getNodeName().equalsIgnoreCase("systemCode")) {
@@ -328,5 +332,21 @@ public class RankSystem implements Serializable {
     @Override
     public String toString() {
         return rankSystemName;
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof RankSystem)) {
+            return false;
+        } else {
+            return getRankSystemCode().equals(((RankSystem) object).getRankSystemCode());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getRankSystemCode().hashCode();
     }
 }

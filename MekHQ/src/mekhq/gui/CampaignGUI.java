@@ -2051,15 +2051,14 @@ public class CampaignGUI extends JPanel {
 
             ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // Start the XML root.
-            pw.println("<personnel version=\""
-                    + resourceMap.getString("Application.version") + "\">");
+            pw.println("<personnel version=\"" + resourceMap.getString("Application.version") + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXml(pw, 1);
+                    people[i].writeToXML(getCampaign(), pw, 1);
                 }
             } else {
-                selectedPerson.writeToXml(pw, 1);
+                selectedPerson.writeToXML(getCampaign(), pw, 1);
             }
             // Okay, we're done.
             // Close everything out and be done with it.

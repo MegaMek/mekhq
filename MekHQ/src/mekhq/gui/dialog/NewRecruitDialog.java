@@ -15,25 +15,21 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
 import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.CampaignGUI;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 public class NewRecruitDialog extends javax.swing.JDialog {
     /**
@@ -264,7 +260,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
         // Determine correct profession to pass into the loop
         int profession = person.getProfession();
-        while (hqView.getCampaign().getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+        while (hqView.getCampaign().getRanks().isEmptyProfession(profession)) {
             profession = hqView.getCampaign().getRanks().getAlternateProfession(profession);
         }
         for (String rankName : hqView.getCampaign().getAllRankNamesFor(profession)) {

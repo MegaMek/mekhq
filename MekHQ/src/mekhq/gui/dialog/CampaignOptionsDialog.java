@@ -39,6 +39,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -87,6 +88,7 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -106,7 +108,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -382,7 +383,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     //region Rank System Tab
     private JPanel panRank;
-    private JComboBox<Ranks> comboRanks;
+    private JComboBox<RankSystem> comboRanks;
     @SuppressWarnings("unused")
     private JButton btnAddRank; // FIXME: Unused
     @SuppressWarnings("unused")
@@ -3083,25 +3084,27 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region Rank System Tab
         panRank.setName("panRank");
-        panRank.setLayout(new java.awt.GridBagLayout());
+        panRank.setLayout(new GridBagLayout());
 
         JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
         lblRank.setName("lblRank");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);
 
-        DefaultComboBoxModel<Ranks> rankModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Ranks.RS_NUM; i++) {
-            final Ranks ranks = Ranks.getRanksFromSystem(i);
-            if (ranks != null) {
-                rankModel.addElement(ranks);
-            }
+        final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
+        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getBaseRankSystems().values());
+        if (campaign.getRanks().isCustom()) {
+            rankSystems.add(campaign.getRanks());
         }
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        rankSystems.sort((systemA, systemB) -> naturalOrderComparator.compare(systemA.toString(), systemB.toString()));
+        rankModel.addAll(rankSystems);
         comboRanks = new JComboBox<>(rankModel);
         comboRanks.setName("comboRanks");
+        comboRanks.setSelectedItem(campaign.getRanks());
         comboRanks.addActionListener(evt -> fillRankInfo());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -3128,25 +3131,20 @@ public class CampaignOptionsDialog extends JDialog {
                 column.setCellEditor(new SpinnerEditor());
             }
         }
-        tableRanks.getSelectionModel().addListSelectionListener(this::tableRanksValueChanged);
         scrRanks.setViewportView(tableRanks);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         panRank.add(scrRanks, gridBagConstraints);
-
-        //scrRanks.setMinimumSize(new Dimension(500, 500));
-        //scrRanks.setPreferredSize(new Dimension(500, 500));
-        //scrRanks.setMaximumSize(new Dimension(500, 500));
 
         JTextArea txtInstructionsRanks = new JTextArea();
         txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
@@ -3158,16 +3156,15 @@ public class CampaignOptionsDialog extends JDialog {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtInstructionsRanks.setOpaque(false);
         txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        //txtInstructionsRanks.setMinimumSize(new Dimension(400, 400));
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panRank.add(txtInstructionsRanks, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank);
@@ -4221,7 +4218,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        final Ranks ranks = (Ranks) comboRanks.getSelectedItem();
+        final RankSystem ranks = (RankSystem) comboRanks.getSelectedItem();
         if (ranks != null) {
             ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
             TableColumn column;
@@ -4660,45 +4657,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Initialization
 
-    @SuppressWarnings(value = "unused") // FIXME:
-    private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        int row = tableRanks.getSelectedRow();
-        //btnDeleteRank.setEnabled(row != -1);
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void addRank() {
-        Object[] rank = {"Unknown", false, 1.0};
-        int row = tableRanks.getSelectedRow();
-        if (row == -1) {
-            if (ranksModel.getRowCount() > 0) {
-                rank[1] = ranksModel.getValueAt(ranksModel.getRowCount() - 1, 1);
-            }
-            ranksModel.addRow(rank);
-            tableRanks.setRowSelectionInterval(tableRanks.getRowCount() - 1, tableRanks.getRowCount() - 1);
-        } else {
-            rank[1] = ranksModel.getValueAt(row, 1);
-            ranksModel.insertRow(row + 1, rank);
-            tableRanks.setRowSelectionInterval(row + 1, row + 1);
-        }
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void removeRank() {
-        int row = tableRanks.getSelectedRow();
-        if (row > -1) {
-            ranksModel.removeRow(row);
-        }
-        if (tableRanks.getRowCount() == 0) {
-            return;
-        }
-        if (tableRanks.getRowCount() > row) {
-            tableRanks.setRowSelectionInterval(row, row);
-        } else {
-            tableRanks.setRowSelectionInterval(row - 1, row - 1);
-        }
-    }
-
     private void btnLoadActionPerformed() {
         List<GamePreset> presets = GamePreset.getGamePresetsIn();
 
@@ -4785,7 +4743,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRanks((Ranks) Objects.requireNonNull(comboRanks.getSelectedItem()));
+        campaign.setRanks((RankSystem) Objects.requireNonNull(comboRanks.getSelectedItem()));
         if (campaign.getRanks().isCustom()) {
             campaign.getRanks().setRanksFromModel(ranksModel);
         }

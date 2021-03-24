@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -212,7 +213,7 @@ public class Campaign implements Serializable, ITechManager {
     private String factionCode;
     private int techFactionCode;
     private String retainerEmployerCode; //AtB
-    private Ranks ranks;
+    private RankSystem ranks;
 
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
@@ -291,7 +292,7 @@ public class Campaign implements Serializable, ITechManager {
         factionCode = "MERC";
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
-        ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
+        setRanks(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
         lances = new Hashtable<>();
@@ -1529,7 +1530,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Officers have better chance; no penalty for non-officer
-            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+            bloodnameTarget += Math.min(0, getRanks().getOfficerCut() - person.getRankNumeric());
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
@@ -4048,8 +4049,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retainerEmployerCode", retainerEmployerCode);
         }
 
-        // Ranks
-        ranks.writeToXml(pw1, indent + 1);
+        getRanks().writeToXML(pw1, indent + 1);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nameGen",
                 RandomNameGenerator.getInstance().getChosenFaction());
@@ -4098,7 +4098,13 @@ public class Campaign implements Serializable, ITechManager {
 
         // Lists of objects:
         units.writeToXml(pw1, indent, "units"); // Units
-        writeMapToXml(pw1, indent, "personnel", personnel); // Personnel
+
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "personnel");
+        for (final Person person : getPersonnel()) {
+            person.writeToXML(this, pw1, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "personnel");
+
         writeMapToXml(pw1, indent, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
@@ -4135,8 +4141,7 @@ public class Campaign implements Serializable, ITechManager {
 
         writeGameOptions(pw1);
 
-        // Personnel Market
-        personnelMarket.writeToXml(pw1, indent);
+        getPersonnelMarket().writeToXML(this, pw1, indent);
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
@@ -4317,19 +4322,19 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, getLocalDate());
     }
 
-    public void setRanks(Ranks r) {
-        ranks = r;
+    public RankSystem getRanks() {
+        return ranks;
     }
 
-    public Ranks getRanks() {
-        return ranks;
+    public void setRanks(final RankSystem ranks) {
+        this.ranks = ranks;
     }
 
     public List<String> getAllRankNamesFor(int p) {
         List<String> retVal = new ArrayList<>();
-        for (Rank rank : getRanks().getAllRanks()) {
+        for (Rank rank : getRanks().getRanks()) {
             // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+            while (rank.getName(p).startsWith("--") && p != RankSystem.RPROF_MW) {
                 if (rank.getName(p).equals("--")) {
                     p = getRanks().getAlternateProfession(p);
                 } else if (rank.getName(p).startsWith("--")) {
@@ -5400,7 +5405,7 @@ public class Campaign implements Serializable, ITechManager {
     public void changeRank(Person person, int rank, int rankLevel, boolean report) {
         int oldRank = person.getRankNumeric();
         int oldRankLevel = person.getRankLevel();
-        person.setRankNumeric(rank);
+        person.setRank(rank);
         person.setRankLevel(rankLevel);
 
         if (getCampaignOptions().getUseTimeInRank()) {

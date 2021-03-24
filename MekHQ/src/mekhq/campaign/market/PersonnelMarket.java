@@ -208,10 +208,10 @@ public class PersonnelMarket {
         paidRecruitType = pr;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<personnelMarket>");
         for (Person p : personnel) {
-            p.writeToXml(pw1, indent + 1);
+            p.writeToXML(campaign, pw1, indent + 1);
         }
         if (null != method) {
             method.writeToXml(pw1, indent);

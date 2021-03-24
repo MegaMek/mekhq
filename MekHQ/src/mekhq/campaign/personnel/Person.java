@@ -40,6 +40,7 @@ import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.*;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
@@ -2356,6 +2357,10 @@ public class Person implements Serializable {
         this.rankSystem = rankSystem;
     }
 
+    public Rank getRank() {
+        return getRankSystem().getRank(getRankNumeric());
+    }
+
     public int getRankNumeric() {
         return rank;
     }
@@ -2367,47 +2372,11 @@ public class Person implements Serializable {
     }
 
     public int getRankLevel() {
-        // If we're somehow above the max level for this rank, drop to that level
-        int profession = getProfession();
-        while ((profession != Ranks.RPROF_MW) && getRanks().isEmptyProfession(profession)) {
-            profession = getRanks().getAlternateProfession(profession);
-        }
-
-        if (rankLevel > getRank().getRankLevels(profession)) {
-            rankLevel = getRank().getRankLevels(profession);
-        }
-
         return rankLevel;
     }
 
     public void setRankLevel(int level) {
         rankLevel = level;
-    }
-
-    public int getRankSystem() {
-        return (rankSystem == -1) ? campaign.getRanks().getRankSystem() : rankSystem;
-    }
-
-    public void setRankSystem(int system) {
-        rankSystem = (system == campaign.getRanks().getRankSystem()) ? -1 : system;
-        ranks = (rankSystem == -1) ? null : Ranks.getRanksFromSystem(rankSystem);
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    public Ranks getRanks() {
-        if (rankSystem != -1) {
-            // Null protection
-            if (ranks == null) {
-                ranks = Ranks.getRanksFromSystem(rankSystem);
-            }
-            return ranks;
-        }
-        return campaign.getRanks();
-    }
-
-    public Rank getRank() {
-        final Ranks system = (rankSystem == -1) ? campaign.getRanks() : Ranks.getRanksFromSystem(rankSystem);
-        return Objects.requireNonNull(system, "Error: Failed to get a valid rank system").getRank(rank);
     }
 
     public String getRankName() {
@@ -2419,36 +2388,36 @@ public class Person implements Serializable {
         int redirects = 0;
 
         // If we're using an "empty" profession, default to MechWarrior
-        while (getRanks().isEmptyProfession(profession) && (redirects < Ranks.RPROF_NUM)) {
-            profession = campaign.getRanks().getAlternateProfession(profession);
+        while (getRankSystem().isEmptyProfession(profession) && (redirects < RankSystem.RPROF_NUM)) {
+            profession = getRankSystem().getAlternateProfession(profession);
             redirects++;
         }
 
         // If we're set to a rank that no longer exists, demote ourself
         while (getRank().getName(profession).equals("-") && (rank > 0)) {
-            setRankNumeric(--rank);
+            --rank;
         }
 
         redirects = 0;
         // re-route through any profession redirections
-        while (getRank().getName(profession).startsWith("--") && (profession != Ranks.RPROF_MW)
-                && (redirects < Ranks.RPROF_NUM)) {
+        while (getRank().getName(profession).startsWith("--") && (profession != RankSystem.RPROF_MW)
+                && (redirects < RankSystem.RPROF_NUM)) {
             // We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
             if (getRank().getName(profession).equals("--")) {
-                profession = getRanks().getAlternateProfession(profession);
+                profession = getRankSystem().getAlternateProfession(profession);
             } else if (getRank().getName(profession).startsWith("--")) {
-                profession = getRanks().getAlternateProfession(getRank().getName(profession));
+                profession = getRankSystem().getAlternateProfession(getRank().getName(profession));
             }
             redirects++;
         }
         if (getRank().getName(profession).startsWith("--")) {
-            profession = Ranks.RPROF_MW;
+            profession = RankSystem.RPROF_MW;
         }
 
         rankName = getRank().getName(profession);
 
         // Manei Domini Additions
-        if (getRankSystem() == Ranks.RS_WOB) {
+        if (getRankSystem().isWoBMilitia()) {
             if (maneiDominiClass != ManeiDominiClass.NONE) {
                 rankName = maneiDominiClass + " " + rankName;
             }
@@ -2460,7 +2429,7 @@ public class Person implements Serializable {
             maneiDominiRank = ManeiDominiRank.NONE;
         }
 
-        if ((getRankSystem() == Ranks.RS_COM) || (getRankSystem() == Ranks.RS_WOB)) {
+        if (getRankSystem().isCGOrWoBM()) {
             rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
@@ -2512,12 +2481,13 @@ public class Person implements Serializable {
     public boolean outRanks(@Nullable Person other) {
         if (null == other) {
             return true;
-        }
-        if (getRankNumeric() == other.getRankNumeric()) {
+        } else if (getRankNumeric() == other.getRankNumeric()) {
             return getRankLevel() > other.getRankLevel();
+        } else {
+            return getRankNumeric() > other.getRankNumeric();
         }
-        return getRankNumeric() > other.getRankNumeric();
     }
+    //endregion Ranks
 
     public String getSkillSummary() {
         return SkillType.getExperienceLevelName(getExperienceLevel(false));
@@ -3667,21 +3637,21 @@ public class Person implements Serializable {
         switch (role) {
             case T_AERO_PILOT:
             case T_CONV_PILOT:
-                return Ranks.RPROF_ASF;
+                return RankSystem.RPROF_ASF;
             case T_GVEE_DRIVER:
             case T_NVEE_DRIVER:
             case T_VTOL_PILOT:
             case T_VEE_GUNNER:
             case T_VEHICLE_CREW:
-                return Ranks.RPROF_VEE;
+                return RankSystem.RPROF_VEE;
             case T_BA:
             case T_INFANTRY:
-                return Ranks.RPROF_INF;
+                return RankSystem.RPROF_INF;
             case T_SPACE_PILOT:
             case T_SPACE_CREW:
             case T_SPACE_GUNNER:
             case T_NAVIGATOR:
-                return Ranks.RPROF_NAVAL;
+                return RankSystem.RPROF_NAVAL;
             case T_MECH_TECH:
             case T_MECHANIC:
             case T_AERO_TECH:
@@ -3691,13 +3661,13 @@ public class Person implements Serializable {
             case T_ADMIN_LOG:
             case T_ADMIN_TRA:
             case T_ADMIN_HR:
-                return Ranks.RPROF_TECH;
+                return RankSystem.RPROF_TECH;
             case T_MECHWARRIOR:
             case T_PROTO_PILOT:
             case T_DOCTOR:
             case T_MEDIC:
             default:
-                return Ranks.RPROF_MW;
+                return RankSystem.RPROF_MW;
         }
     }
 
@@ -3765,10 +3735,9 @@ public class Person implements Serializable {
         shares += Math.max(-1, getExperienceLevel(false) - 2);
 
         if (getRank().isOfficer()) {
-            Ranks ranks = getRanks();
-            int rankOrder = ranks.getOfficerCut();
-            while ((rankOrder <= getRankNumeric()) && (rankOrder < Ranks.RC_NUM)) {
-                Rank rank = ranks.getAllRanks().get(rankOrder);
+            int rankOrder = getRankSystem().getOfficerCut();
+            while ((rankOrder <= getRankNumeric()) && (rankOrder < RankSystem.RC_NUM)) {
+                Rank rank = getRankSystem().getRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
                     shares++;
                 }
