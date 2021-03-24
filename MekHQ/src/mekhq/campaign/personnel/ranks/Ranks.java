@@ -46,7 +46,7 @@ public class Ranks {
     // Rank System Codes
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
 
-    private static Map<String, RankSystem> baseRankSystems;
+    private static Map<String, RankSystem> rankSystems;
     //endregion Variable Declarations
 
     //region Constructors
@@ -56,17 +56,17 @@ public class Ranks {
     //endregion Constructors
 
     //region Getters/Setters
-    public static Map<String, RankSystem> getBaseRankSystems() {
-        return baseRankSystems;
+    public static Map<String, RankSystem> getRankSystems() {
+        return rankSystems;
     }
 
-    protected static void setBaseRankSystems(final Map<String, RankSystem> baseRankSystems) {
-        Ranks.baseRankSystems = baseRankSystems;
+    protected static void setRankSystems(final Map<String, RankSystem> rankSystems) {
+        Ranks.rankSystems = rankSystems;
     }
 
     public static @Nullable RankSystem getRankSystemFromCode(final String code) {
-        final RankSystem ranks = getBaseRankSystems().get(code);
-        return (ranks == null) ? getBaseRankSystems().get(DEFAULT_SYSTEM_CODE) : ranks;
+        final RankSystem ranks = getRankSystems().get(code);
+        return (ranks == null) ? getRankSystems().get(DEFAULT_SYSTEM_CODE) : ranks;
     }
     //endregion Getters/Setters
 
@@ -75,7 +75,7 @@ public class Ranks {
         MekHQ.getLogger().info("Starting load of Rank Systems from XML...");
 
         // Initialize variables
-        setBaseRankSystems(new HashMap<>());
+        setRankSystems(new HashMap<>());
 
         final Document xmlDoc;
 
@@ -88,13 +88,8 @@ public class Ranks {
         }
 
         final Element ranksEle = xmlDoc.getDocumentElement();
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML. At least this cleans it up.
         ranksEle.normalize();
-
         final NodeList nl = ranksEle.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
 
@@ -104,7 +99,7 @@ public class Ranks {
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem value = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true);
-                getBaseRankSystems().put(value.getRankSystemCode(), value);
+                getRankSystems().put(value.getRankSystemCode(), value);
             }
         }
         MekHQ.getLogger().info("Done loading Rank Systems");

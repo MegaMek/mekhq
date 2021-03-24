@@ -41,6 +41,7 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.gui.dialog.*;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -579,26 +580,39 @@ public class CampaignGUI extends JPanel {
 
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
-        // A, C, F, P
-        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        // A, C, F, I, P, R
+        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
         menuImport.setMnemonic(KeyEvent.VK_I);
 
-        JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
+        JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text"));
         miImportOptions.setMnemonic(KeyEvent.VK_C);
         miImportOptions.addActionListener(this::miImportOptionsActionPerformed);
         menuImport.add(miImportOptions);
 
-        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
         miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.addActionListener(this::miImportPersonActionPerformed);
         menuImport.add(miImportPerson);
 
-        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        JMenuItem miImportIndividualRankSystem = new JMenuItem(resourceMap.getString("miImportIndividualRankSystem.text"));
+        miImportIndividualRankSystem.setToolTipText(resourceMap.getString("miImportIndividualRankSystem.toolTipText"));
+        miImportIndividualRankSystem.setName("miImportIndividualRankSystem");
+        miImportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
+        miImportIndividualRankSystem.addActionListener(evt -> {
+            final RankSystem rankSystem = RankSystem.generateInstanceFromXML(
+                    FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
+            if (rankSystem != null) {
+                getCampaign().setRanks(rankSystem);
+            }
+        });
+        menuImport.add(miImportIndividualRankSystem);
+
+        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text"));
         miImportParts.setMnemonic(KeyEvent.VK_A);
         miImportParts.addActionListener(this::miImportPartsActionPerformed);
         menuImport.add(miImportParts);
 
-        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text"));
         miLoadForces.setMnemonic(KeyEvent.VK_F);
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
         menuImport.add(miLoadForces);
@@ -639,13 +653,20 @@ public class CampaignGUI extends JPanel {
         //region XML Export
         // The XML menu uses the following Mnemonic keys as of 19-March-2020:
         // C, P
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
-        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text"));
         miExportOptions.setMnemonic(KeyEvent.VK_C);
         miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
         miExportXMLFile.add(miExportOptions);
+
+        JMenuItem miExportIndividualRankSystem = new JMenuItem(resourceMap.getString("miExportIndividualRankSystem.text"));
+        miExportIndividualRankSystem.setName("miExportIndividualRankSystem");
+        miExportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
+        miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRanks()
+                .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null)));
+        miExportXMLFile.add(miExportIndividualRankSystem);
 
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);

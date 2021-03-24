@@ -67,6 +67,7 @@ public final class MekHqConstants {
     //region File Paths
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
     public static final String AWARDS_DIRECTORY_PATH = "awardsDirectoryPath";
+    public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     //endregion File Paths
 
     //region Miscellaneous Options

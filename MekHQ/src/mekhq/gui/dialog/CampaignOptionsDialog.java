@@ -3095,7 +3095,7 @@ public class CampaignOptionsDialog extends JDialog {
         panRank.add(lblRank, gridBagConstraints);
 
         final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
-        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getBaseRankSystems().values());
+        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
         if (campaign.getRanks().isCustom()) {
             rankSystems.add(campaign.getRanks());
         }

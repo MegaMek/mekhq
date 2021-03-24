@@ -51,7 +51,6 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
-import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
@@ -4049,7 +4048,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retainerEmployerCode", retainerEmployerCode);
         }
 
-        getRanks().writeToXML(pw1, indent + 1);
+        getRanks().writeToXML(pw1, indent + 1, false);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nameGen",
                 RandomNameGenerator.getInstance().getChosenFaction());

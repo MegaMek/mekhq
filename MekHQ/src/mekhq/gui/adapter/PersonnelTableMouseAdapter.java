@@ -1196,7 +1196,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 
-        for (final RankSystem rankSystem : Ranks.getBaseRankSystems().values()) {
+        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
             cbMenuItem = new JCheckBoxMenuItem(rankSystem.getRankSystemName());
             cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getRankSystemCode()));
             cbMenuItem.addActionListener(this);

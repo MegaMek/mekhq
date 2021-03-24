@@ -215,6 +215,14 @@ public final class MekHQOptions {
     public void setAwardsDirectoryPath(String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
     }
+
+    public String getIndividualRankSystemPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, "userData/");
+    }
+
+    public void setIndividualRankSystemPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
+    }
     //endregion File Paths
 
     //region Miscellaneous Options

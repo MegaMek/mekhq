@@ -24,13 +24,23 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.gui.model.RankTableModel;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.stream.Stream;
 
@@ -73,8 +83,8 @@ public class RankSystem implements Serializable {
     }
 
     public RankSystem(final String rankSystemCode, final String rankSystemName) {
-        this.rankSystemCode = rankSystemCode;
-        this.rankSystemName = rankSystemName;
+        setRankSystemCode(rankSystemCode);
+        setRankSystemName(rankSystemName);
 
         final RankSystem system = Ranks.getRankSystemFromCode(rankSystemCode);
         setRanks((system == null) ? new ArrayList<>() : new ArrayList<>(system.getRanks()));
@@ -109,7 +119,7 @@ public class RankSystem implements Serializable {
 
     //region Boolean Comparison Methods
     public boolean isCustom() {
-        return !Ranks.getBaseRankSystems().containsKey(getRankSystemCode());
+        return !Ranks.getRankSystems().containsKey(getRankSystemCode());
     }
 
     public boolean isWoBMilitia() {
@@ -301,13 +311,37 @@ public class RankSystem implements Serializable {
     //endregion Table Model
 
     //region File IO
-    public void writeToXML(final PrintWriter pw, int indent) {
+    public void writeToFile(File file) {
+        if (file == null) {
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".xml")) {
+            path += ".xml";
+            file = new File(path);
+        }
+
+        try (OutputStream fos = new FileOutputStream(file);
+             OutputStream bos = new BufferedOutputStream(fos);
+             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
+            // Then save it out to that file.
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<individualRankSystem version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version") + "\">");
+            writeToXML(pw, 1, true);
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
+
+    public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemCode", getRankSystemCode());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
 
-        // Only write out the ranks if we're using a custom system
-        if (isCustom()) {
+        // Only write out the ranks if we are exporting the system or we are using a custom system
+        if (export || isCustom()) {
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent);
                 pw.println(getRankPostTag(i));
@@ -333,6 +367,33 @@ public class RankSystem implements Serializable {
 
         // Yuck, we've got nada!
         return "";
+    }
+
+    public static @Nullable RankSystem generateInstanceFromXML(final @Nullable File file) {
+        if (file == null) {
+            return null;
+        }
+
+        final Element element;
+
+        // Open up the file.
+        try (InputStream is = new FileInputStream(file)) {
+            element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
+        } catch (Exception e) {
+            MekHQ.getLogger().error("Failed to open file, returning null", e);
+            return null;
+        }
+        element.normalize();
+        final Version version = new Version(element.getAttribute("version"));
+        final NodeList nl = element.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            final Node wn = nl.item(i);
+            if ("rankSystem".equals(wn.getNodeName()) && wn.hasChildNodes()) {
+                return generateInstanceFromXML(wn.getChildNodes(), version, false);
+            }
+        }
+        MekHQ.getLogger().error("Failed to parse file, returning null");
+        return null;
     }
 
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
