@@ -26,6 +26,7 @@ import java.util.Set;
 import megamek.common.Compute;
 import megamek.common.Minefield;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -306,8 +307,8 @@ public class StratconRulesManager {
         // if there is a VP to burn, burn it and we're done
         // now, roll 2d6 + lance commander tactics
         // 9+ = deploy
-        // 6+ = deploy, if lance != fight, track scenario odds up
-        // 2+ = apply negative modifier to scenario
+        // 6+ = deploy, apply negative modifier to scenario
+        // 2+ = fail to deploy, apply negative modifier to scenario; if fight lance, treat as 6+
 
         if ((reinforcementType == ReinforcementEligibilityType.FightLance) ||
                 (reinforcementType == ReinforcementEligibilityType.SupportPoint)) {
@@ -329,12 +330,12 @@ public class StratconRulesManager {
                     scenario.getName(), tactics, result));
 
             // fail to reinforce
-            if (result < 6) {
+            if ((result < 6) && (reinforcementType != ReinforcementEligibilityType.FightLance)) {
                 reportStatus.append(" - reinforcement attempt failed.");
                 campaign.addReport(reportStatus.toString());
                 return false;
             // succeed but get an extra negative event added to the scenario
-            } else if ((result < 9) && (reinforcementType != ReinforcementEligibilityType.FightLance)) {
+            } else if (result < 9) {
                 MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
                 AtBScenarioModifier scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
 
@@ -802,9 +803,10 @@ public class StratconRulesManager {
      * a) have not been assigned to a track
      * b) are combat-capable
      * c) are not deployed to a scenario
+     * d) if attempting to deploy as reinforcements, haven't already failed to deploy
      */
     public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack,
-            boolean reinforcements) {
+            boolean reinforcements, @Nullable StratconScenario currentScenario) {
         List<Integer> retVal = new ArrayList<>();
 
         Set<Integer> forcesInTracks = new HashSet<>();
@@ -817,6 +819,12 @@ public class StratconRulesManager {
                     }
                 }
             }
+        }
+        
+        // if there's an existing scenario and we're doing reinforcements,
+        // prevent forces that failed to deploy from trying to deploy again
+        if (reinforcements && (currentScenario != null)) {
+            forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
         for (int key : campaign.getLances().keySet()) {

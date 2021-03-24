@@ -16,8 +16,10 @@ package mekhq.campaign.stratcon;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlTransient;
@@ -71,6 +73,7 @@ public class StratconScenario implements IStratconDisplayable {
     private LocalDate returnDate;
     private StratconCoords coords;
     private int numDefensivePoints;
+    private Set<Integer> failedReinforcements = new HashSet<>();
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -302,5 +305,17 @@ public class StratconScenario implements IStratconDisplayable {
     
     public void useDefensivePoint() {
         numDefensivePoints--;
+    }
+
+    public Set<Integer> getFailedReinforcements() {
+        return failedReinforcements;
+    }
+
+    public void setFailedReinforcements(Set<Integer> failedReinforcements) {
+        this.failedReinforcements = failedReinforcements;
+    }
+    
+    public void addFailedReinforcements(int forceID) {
+        failedReinforcements.add(forceID);
     }
 }

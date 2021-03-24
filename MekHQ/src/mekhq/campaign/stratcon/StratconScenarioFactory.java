@@ -123,7 +123,7 @@ public class StratconScenarioFactory {
      * Retrieves a specific scenario given the key (file name)
      */
     public static ScenarioTemplate getSpecificScenario(String name) {
-        return dynamicScenarioNameMap.get(name);
+        return dynamicScenarioNameMap.get(name).clone();
     }
     
     /**

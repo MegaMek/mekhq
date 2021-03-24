@@ -242,7 +242,8 @@ public class StratconScenarioWizard extends JDialog {
         lanceModel = new ScenarioWizardLanceModel(campaign, 
                 StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), 
                         campaign, currentTrackState,
-                        forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS));
+                        (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
+                        currentScenario));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -434,7 +435,12 @@ public class StratconScenarioWizard extends JDialog {
                 if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
                     ReinforcementEligibilityType reinforcementType = 
                             StratconRulesManager.getReinforcementType(force.getId(), currentTrackState, campaign);
-                    StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState, currentScenario, campaign);
+                    
+                    // if we failed to deploy as reinforcements, move on to the next force
+                    if (!StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState, currentScenario, campaign)) {
+                        currentScenario.addFailedReinforcements(force.getId());
+                        continue;
+                    }
                 }
                 
                 currentScenario.addForce(force.getId(), templateID);
