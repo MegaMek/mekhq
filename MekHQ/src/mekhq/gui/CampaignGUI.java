@@ -1573,12 +1573,11 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getTechs().size() > 0) {
+        } else if (getCampaign().getActivePersonnel().stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
             String skillLvl;
-            int TimePerDay;
 
             List<Person> techs = getCampaign().getTechs(false, null, true, true);
             int lastRightTech = 0;
@@ -1587,23 +1586,10 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
-                    TimePerDay = 240 - tech.getMaintenanceTimeUsing();
-                } else {
-                    TimePerDay = 480 - tech.getMaintenanceTimeUsing();
-                }
                 skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
-                name = tech.getFullName()
-                        + ", "
-                        + skillLvl
-                        + " "
-                        + tech.getPrimaryRoleDesc()
-                        + " ("
-                        + getCampaign().getTargetFor(r, tech).getValueAsString()
-                        + "+)"
-                        + ", "
-                        + tech.getMinutesLeft() + "/" + TimePerDay
-                        + " minutes";
+                name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
+                        + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
+                        + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1624,11 +1610,10 @@ public class CampaignGUI extends JPanel {
 
             if (!selectedTech.isRightTechTypeFor(r)) {
                 if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
-                    "This tech is not appropriate for this unit. Would you like to continue?",
-                    "pending battle",
-                    JOptionPane.YES_NO_OPTION)) {
-                        return;
-                    }
+                        "This tech is not appropriate for this unit. Would you like to continue?",
+                        "Incorrect Tech Type", JOptionPane.YES_NO_OPTION)) {
+                    return;
+                }
             }
 
             r.setTech(selectedTech);
