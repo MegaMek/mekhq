@@ -529,7 +529,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>AFFC</systemCode>
-		<systemName>Federated Commonwealth</systemName>
+		<systemName>Armed Forces of the Federated Commonwealth</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1047,7 +1047,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>LAAF</systemCode>
-		<systemName>Lyran Alliance</systemName>
+		<systemName>Lyran Alliance Armed Forces</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1306,7 +1306,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>FWLM</systemCode>
-		<systemName>Free Worlds League</systemName>
+		<systemName>Free Worlds League Military</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1565,7 +1565,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>CCAF</systemCode>
-		<systemName>Capellan Confederation</systemName>
+		<systemName>Capellan Confederation Armed Forces</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2083,7 +2083,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>DCMS</systemCode>
-		<systemName>Draconis Combine</systemName>
+		<systemName>Draconis Combine Mustered Soldiery</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2601,7 +2601,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>CG</systemCode>
-		<systemName>ComStar</systemName>
+		<systemName>Com Guard</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3119,7 +3119,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>MAF</systemCode>
-		<systemName>Magistracy of Canopus</systemName>
+		<systemName>Magistracy Armed Forces</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3378,7 +3378,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>TDF</systemCode>
-		<systemName>Taurian Concordat</systemName>
+		<systemName>Taurian Defense Force</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3637,7 +3637,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>MHAF</systemCode>
-		<systemName>Marian Hegemony</systemName>
+		<systemName>Marian Hegemony Armed Forces</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3896,7 +3896,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>AMC</systemCode>
-		<systemName>Outworlds Alliance</systemName>
+		<systemName>Alliance Military Corps</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4155,7 +4155,7 @@ Rank:
 	</rankSystem>
 	<rankSystem>
 		<systemCode>KA</systemCode>
-		<systemName>Free Rasalhague Republic</systemName>
+		<systemName>KungsArmé</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
