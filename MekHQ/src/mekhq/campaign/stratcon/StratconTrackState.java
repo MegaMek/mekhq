@@ -51,6 +51,7 @@ public class StratconTrackState {
     private Map<StratconCoords, HashSet<Integer>> assignedCoordForces; 
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
+    private Set<Integer> stickyForces;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
     private Set<StratconCoords> revealedCoords;
 
@@ -69,6 +70,7 @@ public class StratconTrackState {
         assignedCoordForces = new HashMap<>();
         setAssignedForceReturnDatesForStorage(new HashMap<>());
         revealedCoords = new HashSet<>();
+        stickyForces = new HashSet<>();
     }
     
     public String getDisplayableName() {
@@ -189,12 +191,16 @@ public class StratconTrackState {
     /**
      * Handles the assignment of a force to the given coordinates on this track on the given date.
      */
-    public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
+    public void assignForce(int forceID, StratconCoords coords, LocalDate date, boolean sticky) {
         assignedForceCoords.put(forceID, coords);
         assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
         
         assignedCoordForces.putIfAbsent(coords, new HashSet<>());
         assignedCoordForces.get(coords).add(forceID);
+        
+        if (sticky) {
+            addStickyForce(forceID);
+        }
         
         getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
     }
@@ -207,6 +213,7 @@ public class StratconTrackState {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);
             assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
             getAssignedForceReturnDatesForStorage().remove(forceID);
         }
     }
@@ -330,5 +337,21 @@ public class StratconTrackState {
     @Override
     public String toString() {
         return getDisplayableName();
+    }
+
+    public Set<Integer> getStickyForces() {
+        return stickyForces;
+    }
+
+    public void setStickyForces(Set<Integer> stickyForces) {
+        this.stickyForces = stickyForces;
+    }
+    
+    public void addStickyForce(int forceID) {
+        stickyForces.add(forceID);
+    }
+    
+    public void removeStickyForce(int forceID) {
+        stickyForces.remove(forceID);
     }
 }

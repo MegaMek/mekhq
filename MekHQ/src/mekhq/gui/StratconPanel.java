@@ -30,6 +30,7 @@ import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -63,6 +64,8 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
     private static final String RCLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
+    private static final String RCLICK_COMMAND_STICKY_FORCE = "StickyForce";
+    private static final String RCLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
 
     /**
      * What to do when drawing a hex
@@ -116,8 +119,6 @@ public class StratconPanel extends JPanel implements ActionListener {
         scenarioWizard = new StratconScenarioWizard(campaign);
         this.infoArea = infoArea;
         
-        buildRightClickMenu(null);
-        
         assignmentUI = new TrackForceAssignmentUI(this);
         assignmentUI.setVisible(false);
         
@@ -135,38 +136,56 @@ public class StratconPanel extends JPanel implements ActionListener {
     public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
         this.campaignState = campaignState;
         currentTrack = track;
-        
-        menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
-        
         repaint();
     }
     
     /**
      * Constructs the right-click context menu, optionally for a scenario
      */
-    private void buildRightClickMenu(StratconScenario scenario) {
+    private void buildRightClickMenu(StratconCoords coords) {
         rightClickMenu = new JPopupMenu();
         
-        menuItemManageForceAssignments = new JMenuItem();
-        menuItemManageForceAssignments.setText("Manage Force Assignments");
-        menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
-        menuItemManageForceAssignments.addActionListener(this);
-        rightClickMenu.add(menuItemManageForceAssignments);
+        StratconScenario scenario = getSelectedScenario();
         
-        menuItemManageScenario = new JMenuItem();
-        menuItemManageScenario.setText("Manage Scenario");
-        menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
-        menuItemManageScenario.addActionListener(this);
-        rightClickMenu.add(menuItemManageScenario);
-            
-            
-        rightClickMenu.addSeparator();
+        if (scenario == null) {
+            menuItemManageForceAssignments = new JMenuItem();
+            menuItemManageForceAssignments.setText("Manage Force Assignments");
+            menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
+            menuItemManageForceAssignments.addActionListener(this);
+            rightClickMenu.add(menuItemManageForceAssignments);
+        }
         
-        menuItemGMReveal = new JMenuItem();
-        menuItemGMReveal.setText("Reveal Track");
-        menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
-        menuItemGMReveal.addActionListener(this);
-        rightClickMenu.add(menuItemGMReveal);
+        if (scenario != null) {
+            menuItemManageScenario = new JMenuItem();
+            menuItemManageScenario.setText("Manage Scenario");
+            menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
+            menuItemManageScenario.addActionListener(this);
+            rightClickMenu.add(menuItemManageScenario);
+        }
+        
+        if ((currentTrack != null) && currentTrack.getAssignedCoordForces().containsKey(coords)) {
+            for (int forceID : currentTrack.getAssignedCoordForces().get(coords)) {
+                String forceName = campaign.getForce(forceID).getName();
+                
+                JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
+                stickyForceItem.setText(String.format("%s - remain deployed", forceName));
+                stickyForceItem.setActionCommand(RCLICK_COMMAND_STICKY_FORCE);
+                stickyForceItem.putClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID, forceID);
+                stickyForceItem.addActionListener(this);
+                stickyForceItem.setSelected(currentTrack.getStickyForces().contains(forceID));
+                rightClickMenu.add(stickyForceItem);
+            }
+        }
+            
+        if ((currentTrack != null) && campaign.isGM()) {
+            rightClickMenu.addSeparator();
+            
+            menuItemGMReveal = new JMenuItem();
+            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
+            menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
+            menuItemGMReveal.addActionListener(this);
+            rightClickMenu.add(menuItemGMReveal);
+        }
     }
 
     /**
@@ -503,24 +522,16 @@ public class StratconPanel extends JPanel implements ActionListener {
             repaint();
         // right button generally pops up a context menu
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            clickedPoint = new Point(e.getX(), e.getY());
-            boolean pointFoundOnBoard = detectClickedHex();
-
+            clickedPoint = e.getPoint();
+            detectClickedHex();
+            
             StratconCoords selectedCoords = boardState.getSelectedCoords();
             if (selectedCoords == null) {
                 return;
             }
             
-            StratconScenario selectedScenario = null;
-            if (pointFoundOnBoard) {
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-            }
-             
-            menuItemManageForceAssignments.setEnabled(selectedScenario == null);
-            menuItemManageScenario.setEnabled(selectedScenario != null);            
-            menuItemGMReveal.setEnabled(campaign.isGM());
-            
             repaint();
+            buildRightClickMenu(selectedCoords);
             rightClickMenu.show(this, e.getX(), e.getY());
         }
     }
@@ -545,7 +556,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
                 Force force = campaign.getForce(forceID);
-                infoBuilder.append(force.getName()).append(" assigned<br/>");
+                infoBuilder.append(force.getName()).append(" assigned");
+                
+                if (currentTrack.getStickyForces().contains(forceID)) {
+                    infoBuilder.append(" - remain deployed");
+                }
+                
+                infoBuilder.append("<br/>");
+                
                 infoBuilder.append("Returns on ").append(currentTrack.getAssignedForceReturnDates().get(forceID));
                 infoBuilder.append("<br/>");
             }
@@ -585,7 +603,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Data structure containing current state of the board.
      */
-    private class BoardState {
+    private static class BoardState {
         public Integer selectedX;
         public Integer selectedY;
         
@@ -623,6 +641,17 @@ public class StratconPanel extends JPanel implements ActionListener {
         case RCLICK_COMMAND_REVEAL_TRACK:
             currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
             menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
+            break;
+        case RCLICK_COMMAND_STICKY_FORCE:
+            JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+            int forceID = (int) source.getClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID);
+            
+            if (source.isSelected()) {
+                currentTrack.addStickyForce(forceID);
+            } else {
+                currentTrack.removeStickyForce(forceID);
+            }
+            
             break;
         }
         

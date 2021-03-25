@@ -124,7 +124,8 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
                 btnConfirm.setEnabled(false);                
                 for (Force force : availableForceList.getSelectedValuesList()) {
                     StratconRulesManager.deployForceToCoords(selectedCoords, force.getId(), 
-                            campaign, currentCampaignState.getContract(), currentCampaignState.getTrack(currentTrackIndex));
+                            campaign, currentCampaignState.getContract(), 
+                            currentCampaignState.getTrack(currentTrackIndex), false);
                 }
                 setVisible(false);
                 ownerPanel.repaint();

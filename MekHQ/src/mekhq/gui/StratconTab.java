@@ -284,6 +284,7 @@ public class StratconTab extends CampaignGuiTab {
             }
         }
         
+        @Override
         public int hashCode() {
             return Objects.hash(this.contract, this.track);
         }

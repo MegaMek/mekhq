@@ -224,7 +224,7 @@ public class StratconScenarioWizard extends JDialog {
         availableInfantryUnits.addListSelectionListener(new ListSelectionListener() { 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                availableInfantrySelectorChanged(e, lblDefensiveMinefieldCount);
+                availableInfantrySelectorChanged(lblDefensiveMinefieldCount);
             }
         });
         
@@ -465,7 +465,8 @@ public class StratconScenarioWizard extends JDialog {
         
         // every force that's been deployed to this scenario gets assigned to the track
         for (int forceID : currentScenario.getAssignedForces()) {
-            StratconRulesManager.processForceDeployment(currentScenario.getCoords(), forceID, campaign, currentTrackState);
+            StratconRulesManager.processForceDeployment(currentScenario.getCoords(), 
+                    forceID, campaign, currentTrackState, false);
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now
@@ -559,9 +560,9 @@ public class StratconScenarioWizard extends JDialog {
      * Specific event handler for logic related to available infantry units.
      * Updates the defensive minefield count
      */
-    private void availableInfantrySelectorChanged(ListSelectionEvent e, JLabel defensiveMineCountLabel) {
+    private void availableInfantrySelectorChanged(JLabel defensiveMineCountLabel) {
         defensiveMineCountLabel.setText(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"), 
-                getNumMinefields()));        
+                getNumMinefields()));
     }
     
     /**

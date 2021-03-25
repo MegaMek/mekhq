@@ -133,7 +133,7 @@ public class StratconRulesManager {
 
                 // if we're auto-assigning lances, deploy the force to the track as well
                 if (autoAssignLances) {
-                    processForceDeployment(scenarioCoords, randomForceID, campaign, track);
+                    processForceDeployment(scenarioCoords, randomForceID, campaign, track, false);
                 }
             }
         }
@@ -168,13 +168,14 @@ public class StratconRulesManager {
     /**
      * Deploys a force to the given coordinates on the given track as a result of explicit player action.
      */
-    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track) {
+    public static void deployForceToCoords(StratconCoords coords, int forceID, 
+            Campaign campaign, AtBContract contract, StratconTrackState track, boolean sticky) {
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords, depending on force role
         // 2. if coords are a hostile facility, we get a facility mission
         // 3. if coords are empty, we *may* get a mission
 
-        processForceDeployment(coords, forceID, campaign, track);
+        processForceDeployment(coords, forceID, campaign, track, sticky);
 
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
@@ -271,7 +272,8 @@ public class StratconRulesManager {
     /**
      * Process the deployment of a force to the given coordinates on the given track.
      */
-    public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign, StratconTrackState track) {
+    public static void processForceDeployment(StratconCoords coords, int forceID, 
+            Campaign campaign, StratconTrackState track, boolean sticky) {
         track.getRevealedCoords().add(coords);
         StratconFacility facility = track.getFacility(coords);
         if (facility != null) {
@@ -293,7 +295,7 @@ public class StratconRulesManager {
 
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
-        track.assignForce(forceID, coords, campaign.getLocalDate());
+        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
     }
 
     /**
@@ -1018,9 +1020,12 @@ public class StratconRulesManager {
     public static void processTrackForceReturnDates(StratconTrackState track, LocalDate date) {
         List<Integer> forcesToUndeploy = new ArrayList<>();
 
+        // for each force on the track, if the return date is today or in the past,
+        // "return to base", unless it's been told to stay in the field
         for (int forceID : track.getAssignedForceReturnDates().keySet()) {
-            if (track.getAssignedForceReturnDates().get(forceID).equals(date) ||
-                    track.getAssignedForceReturnDates().get(forceID).isBefore(date)) {
+            if ((track.getAssignedForceReturnDates().get(forceID).equals(date) ||
+                    track.getAssignedForceReturnDates().get(forceID).isBefore(date)) &&
+                    !track.getStickyForces().contains(forceID)) {
                 forcesToUndeploy.add(forceID);
             }
         }
