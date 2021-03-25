@@ -329,7 +329,7 @@ public class AtBScenarioModifierApplicator {
     /**
      * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
      */
-    public static void applyExtraEvent(AtBDynamicScenario scenario, Campaign campaign, boolean goodEvent) {
+    public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
         scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(), 
                 (Boolean) goodEvent));
     }

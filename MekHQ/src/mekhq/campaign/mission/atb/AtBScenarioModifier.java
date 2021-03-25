@@ -147,7 +147,7 @@ public class AtBScenarioModifier implements Cloneable {
             }
             
             if(getNumExtraEvents() != null && getNumExtraEvents() > 0) {
-                AtBScenarioModifierApplicator.applyExtraEvent(scenario, campaign, getEventRecipient() == ForceAlignment.Allied);
+                AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
             }
         }
     }

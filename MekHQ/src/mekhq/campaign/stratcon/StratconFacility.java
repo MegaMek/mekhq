@@ -59,7 +59,8 @@ public class StratconFacility implements Cloneable {
     private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
-    private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
+    //TODO: post-MVP
+    //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
     
     /**

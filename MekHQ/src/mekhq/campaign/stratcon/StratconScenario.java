@@ -118,10 +118,9 @@ public class StratconScenario implements IStratconDisplayable {
     }
     
     /**
-     * This method triggers the performance of all operations specific to this scenario 
-     * that should occur after the player has committed the primary forces to this scenario.
+     * This convenience method sets the scenario's current state to PRIMARY_FORCES_COMMITTED
      */
-    public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
+    public void commitPrimaryForces() {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
     }
 
@@ -133,11 +132,12 @@ public class StratconScenario implements IStratconDisplayable {
         currentState = state;
     }
 
+    @Override
     public String getInfo() {
-        return getInfo(true, true);
+        return getInfo(true);
     }
     
-    public String getInfo(boolean includeForces, boolean html) {
+    public String getInfo(boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
 
         if(this.isStrategicObjective) {
@@ -182,21 +182,7 @@ public class StratconScenario implements IStratconDisplayable {
             stateBuilder.append("Return Date: ");
             stateBuilder.append(returnDate.toString());
             stateBuilder.append("<br/>");
-        }
-        
-        /*if(includeForces) {
-            List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
-            
-            if(!unitIDs.isEmpty()) {
-                stateBuilder.append("<br/><br/>Assigned Units:<br/>");
-                
-                for(UUID unitID : unitIDs) {
-                    stateBuilder.append("&nbsp;&nbsp;");
-                    stateBuilder.append(currentCampaign.getUnit(unitID).getName());
-                    stateBuilder.append("<br/>");
-                }
-            }
-        }*/        
+        }    
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();

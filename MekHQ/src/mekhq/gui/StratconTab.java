@@ -266,9 +266,8 @@ public class StratconTab extends CampaignGuiTab {
     /**
      * Data structure to hold necessary information about a track drop down item.
      * @author NickAragua
-     *
      */
-    private class TrackDropdownItem {
+    private static class TrackDropdownItem {
         AtBContract contract;
         StratconTrackState track;
         

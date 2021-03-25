@@ -124,7 +124,7 @@ public class StratconRulesManager {
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
                     track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
-                    assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords), sortedAvailableForceIDs, campaign);
+                    assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords), sortedAvailableForceIDs);
                     continue;
                 }
 
@@ -200,7 +200,7 @@ public class StratconRulesManager {
             boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
             ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
             scenario = generateScenario(campaign, contract, track, forceID, coords, template);
-            setupFacilityScenario(scenario, track, coords, facility);
+            setupFacilityScenario(scenario, facility);
         } else {
             scenario = generateScenario(campaign, contract, track, forceID, coords);
 
@@ -211,7 +211,7 @@ public class StratconRulesManager {
                         StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
                 facility.setVisible(true);
                 track.addFacility(coords, facility);
-                setupFacilityScenario(scenario, track, coords, facility);
+                setupFacilityScenario(scenario, facility);
             }
         }
 
@@ -221,7 +221,7 @@ public class StratconRulesManager {
     /**
      * carries out tasks relevant to facility scenarios
      */
-    private static void setupFacilityScenario(StratconScenario scenario, StratconTrackState track, StratconCoords coords, StratconFacility facility) {
+    private static void setupFacilityScenario(StratconScenario scenario, StratconFacility facility) {
         // this includes:
         // for hostile facilities
         // - add a destroy objective (always the option to level the facility)
@@ -368,11 +368,9 @@ public class StratconRulesManager {
 
     /**
      * Assigns a force to the scenario such that the majority of the force can be deployed
-     * @param scenario
-     * @param sortedAvailableForceIDs
      */
     private static void assignAppropriateExtraForceToScenario(StratconScenario scenario,
-            Map<MapLocation, List<Integer>> sortedAvailableForceIDs, Campaign campaign) {
+            Map<MapLocation, List<Integer>> sortedAvailableForceIDs) {
         // the goal of this function is to avoid assigning ground units to air battles
         // and ground units/conventional fighters to space battle
 
@@ -440,7 +438,7 @@ public class StratconRulesManager {
             force.setScenarioId(scenario.getBackingScenarioID());
         }
 
-        scenario.commitPrimaryForces(campaign, contract);
+        scenario.commitPrimaryForces();
     }
 
     /**
