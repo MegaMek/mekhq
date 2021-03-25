@@ -74,6 +74,7 @@ public class StratconScenario implements IStratconDisplayable {
     private StratconCoords coords;
     private int numDefensivePoints;
     private Set<Integer> failedReinforcements = new HashSet<>();
+    private Set<Integer> primaryForceIDs = new HashSet<>();
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -113,8 +114,25 @@ public class StratconScenario implements IStratconDisplayable {
         return backingScenario.getForceIDs();
     }
     
-    public List<Integer> getPrimaryPlayerForceIDs() {
-        return backingScenario.getPrimaryPlayerForceIDs();
+    /**
+     * These are all of the force IDs that have been matched up to a template
+     * Note: since there's a default Reinforcements template, this is all forces
+     * that have been assigned to this scenario
+     */
+    public List<Integer> getPlayerTemplateForceIDs() {
+        return backingScenario.getPlayerTemplateForceIDs();
+    }
+    
+    /**
+     * These are all the "primary" force IDs, meaning forces that have been used
+     * by the scenario to drive the generation of the OpFor.
+     */
+    public Set<Integer> getPrimaryForceIDs() {
+        return primaryForceIDs;
+    }
+    
+    public void setPrimaryForceIDs(Set<Integer> primaryForceIDs) {
+        this.primaryForceIDs = primaryForceIDs;
     }
     
     /**
@@ -122,6 +140,11 @@ public class StratconScenario implements IStratconDisplayable {
      */
     public void commitPrimaryForces() {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
+        getPrimaryForceIDs().clear();
+        
+        for (int forceID : backingScenario.getPlayerTemplateForceIDs()) {
+            getPrimaryForceIDs().add(forceID);
+        }
     }
 
     public ScenarioState getCurrentState() {

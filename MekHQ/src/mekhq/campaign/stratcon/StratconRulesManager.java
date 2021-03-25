@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
 
 import megamek.common.Compute;
 import megamek.common.Minefield;
@@ -153,7 +155,7 @@ public class StratconRulesManager {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
 
             if(!autoAssignLances) {
-                for(int forceID : scenario.getPrimaryPlayerForceIDs()) {
+                for(int forceID : scenario.getPlayerTemplateForceIDs()) {
                     scenario.getBackingScenario().removeForce(forceID);
                 }
 
@@ -432,7 +434,7 @@ public class StratconRulesManager {
             scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, tactics * 2);
         }
 
-        for (int forceID : scenario.getPrimaryPlayerForceIDs()) {
+        for (int forceID : scenario.getPlayerTemplateForceIDs()) {
             Force force = campaign.getForce(forceID);
             force.clearScenarioIds(campaign, true);
             force.setScenarioId(scenario.getBackingScenarioID());
@@ -849,7 +851,6 @@ public class StratconRulesManager {
 
     /**
      * Returns a list of individual units eligible for deployment in scenarios run by "Defend" lances
-     * @param campaign
      * @return List of unit IDs.
      */
     public static List<Unit> getEligibleDefensiveUnits(Campaign campaign) {
@@ -883,6 +884,123 @@ public class StratconRulesManager {
         }
 
         return retVal;
+    }
+    
+    /**
+     * Returns a list of individual units eligible for deployment in scenarios
+     * that result from the lance leader having a leadership score
+     * @return List of unit IDs.
+     */
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs) {
+        List<Unit> retVal = new ArrayList<>();
+
+        // The criteria are as follows:
+        // - unit is of a different unit type than the primary unit type of the force 
+        // - unit has a lower BV than the force's lowest BV unit
+        
+        // units deployed to a track are not eligible for repairs
+
+        // lance role assignment on stratcon UI?
+        
+        Integer lowestBV = getLowestBV(campaign, forceIDs);
+        
+        // no units assigned, the rest is meaningless.
+        if (lowestBV == null) {
+            return retVal;
+        }
+        
+        int primaryUnitType = getPrimaryUnitType(campaign, forceIDs);
+        
+        for (Unit u : campaign.getUnits()) {
+            if ((primaryUnitType != u.getEntity().getUnitType()) &&
+                    !u.isDeployed() &&
+                    !u.isMothballed() &&
+                    u.isFunctional() &&
+                    (u.getEntity().calculateBattleValue() < lowestBV)) {
+                
+                boolean unitsForceIsDeployed = false;
+                
+                // check if the unit's force (if one exists) has been deployed to
+                // a stratcon track
+                // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
+                for (Contract contract : campaign.getActiveContracts()) {
+                    if((contract instanceof AtBContract) &&
+                            ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
+                        unitsForceIsDeployed = true;
+                        break;
+                    }
+                }
+                
+                if (!unitsForceIsDeployed) {
+                    retVal.add(u);
+                }
+            }
+        }
+
+        return retVal;
+    }
+    
+    /**
+     * Given a campaign and a list of force IDs, calculate the unit with the lowest BV.
+     */
+    private static Integer getLowestBV(Campaign campaign, Set<Integer> forceIDs) {
+        Integer lowestBV = null;
+        
+        for (int forceID : forceIDs) {
+            Force force = campaign.getForce(forceID);
+            if (force == null) {
+                continue;
+            }
+            
+            for (UUID id : force.getUnits()) {
+                if (campaign.getUnit(id) == null) {
+                    continue;
+                }
+                
+                int currentBV = campaign.getUnit(id).getEntity().calculateBattleValue();
+                
+                if ((lowestBV == null) || (currentBV < lowestBV)) {
+                    lowestBV = currentBV;
+                }
+            }
+        }
+        
+        return lowestBV;
+    }
+    
+    /**
+     * Calculates the majority unit type for the forces given the IDs.
+     */
+    private static int getPrimaryUnitType(Campaign campaign, Set<Integer> forceIDs) {
+        Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
+        int biggestBucketID = -1;
+        int biggestBucketCount = 0;
+        
+        for (int forceID : forceIDs) {
+            Force force = campaign.getForce(forceID);
+            if (force == null) {
+                continue;
+            }
+        
+            for (UUID id : force.getUnits()) {
+                Unit unit = campaign.getUnit(id);
+                if ((unit == null) || 
+                        (unit.getEntity() == null)) {
+                    continue;
+                }
+                
+                int unitType = unit.getEntity().getUnitType();
+    
+                unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
+                
+                if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
+                    biggestBucketCount = unitTypeBuckets.get(unitType);
+                    biggestBucketID = unitType;
+                }
+            }
+        }
+        
+        return biggestBucketID;
     }
 
     /**

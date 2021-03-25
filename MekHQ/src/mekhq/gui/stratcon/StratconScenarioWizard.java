@@ -68,6 +68,7 @@ public class StratconScenarioWizard extends JDialog {
     Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
     
     JList<Unit> availableInfantryUnits = new JList<>();
+    JList<Unit> availableLeadershipUnits = new JList<>();
     JLabel defensiveOptionStatus = new JLabel();
     
     JButton btnCommit;
@@ -113,6 +114,18 @@ public class StratconScenarioWizard extends JDialog {
                 gbc.gridy++;
                 setAssignForcesUI(gbc, true);
                 gbc.gridy++;
+                
+                List<Unit> eligibleLeadershipUnits = 
+                        StratconRulesManager.getEligibleLeadershipUnits(campaign, 
+                        currentScenario.getPrimaryForceIDs());
+                int leadershipSkill = 
+                        currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
+                
+                if ((eligibleLeadershipUnits.size() > 0) && (leadershipSkill > 0)) {                
+                    setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+                    gbc.gridy++;
+                }
+                
                 if (currentScenario.getNumDefensivePoints() > 0) {
                     setDefensiveUI(gbc);
                     gbc.gridy++;
@@ -229,6 +242,17 @@ public class StratconScenarioWizard extends JDialog {
         });
         
         getContentPane().add(lblDefensiveMinefieldCount, gbc);
+    }
+    
+    private void setLeadershipUI(GridBagConstraints gbc, List<Unit> eligibleUnits, int leadershipSkill) {
+        gbc.anchor = GridBagConstraints.WEST;
+        JLabel lblLeadershipInstructions = new JLabel(resourceMap.getString("lblLeadershipInstructions.Text"));
+        getContentPane().add(lblLeadershipInstructions, gbc);
+        
+        gbc.gridy++;
+        availableLeadershipUnits =
+                addIndividualUnitSelector(
+                        eligibleUnits, gbc, leadershipSkill);
     }
     
     /**
@@ -458,6 +482,12 @@ public class StratconScenarioWizard extends JDialog {
         }
         
         for (Unit unit : availableInfantryUnits.getSelectedValuesList()) {
+            currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+            unit.setScenarioId(currentScenario.getBackingScenarioID());
+            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
+        }
+        
+        for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
             currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
             unit.setScenarioId(currentScenario.getBackingScenarioID());
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));

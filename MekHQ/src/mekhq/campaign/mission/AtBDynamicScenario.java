@@ -174,7 +174,7 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Adds a bot force to this dynamic scenario.
+     * Adds a bot force to this fenario.
      * @param botForce
      * @param forceTemplate
      */
@@ -280,9 +280,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
     /**
      * A list of all the force IDs associated with pre-defined scenario templates
-     * @return
      */
-    public List<Integer> getPrimaryPlayerForceIDs() {
+    public List<Integer> getPlayerTemplateForceIDs() {
         List<Integer> retval = new ArrayList<>();
 
         for (int forceID : getForceIDs()) {
@@ -390,7 +389,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Dynamic Scenario";
+        return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
+                getTemplate().name : "Dynamic Scenario";
     }
 
     @Override
