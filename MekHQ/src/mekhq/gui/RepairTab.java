@@ -50,6 +50,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -904,6 +905,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(StratconDeploymentEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 

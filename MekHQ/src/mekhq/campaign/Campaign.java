@@ -1643,10 +1643,13 @@ public class Campaign implements Serializable, ITechManager {
         return patients;
     }
 
+    /**
+     * List of all units that can show up in the repair bay.
+     */
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
-            if (u.isAvailable() && u.isServiceable()) {
+            if (u.isAvailable() && u.isServiceable() && !StratconRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }
         }

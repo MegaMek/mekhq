@@ -79,6 +79,8 @@ public class StratconTab extends CampaignGuiTab {
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
         this.add(scrollPane, gbc);
         
+        // TODO: lance role assignment UI here?
+        
         initializeInfoPanel();
         gbc.gridx = 4;
         gbc.gridwidth = 1;

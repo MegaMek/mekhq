@@ -137,6 +137,7 @@ public class StratconScenario implements IStratconDisplayable {
     
     /**
      * This convenience method sets the scenario's current state to PRIMARY_FORCES_COMMITTED
+     * and fixes the forces that were assigned to this scenario prior as "primary".
      */
     public void commitPrimaryForces() {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;

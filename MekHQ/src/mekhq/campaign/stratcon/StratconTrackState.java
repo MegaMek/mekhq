@@ -25,7 +25,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**

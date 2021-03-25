@@ -36,6 +36,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -298,6 +299,7 @@ public class StratconRulesManager {
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
     }
 
     /**
@@ -898,10 +900,6 @@ public class StratconRulesManager {
         // - unit is of a different unit type than the primary unit type of the force 
         // - unit has a lower BV than the force's lowest BV unit
         
-        // units deployed to a track are not eligible for repairs
-
-        // lance role assignment on stratcon UI?
-        
         Integer lowestBV = getLowestBV(campaign, forceIDs);
         
         // no units assigned, the rest is meaningless.
@@ -916,28 +914,32 @@ public class StratconRulesManager {
                     !u.isDeployed() &&
                     !u.isMothballed() &&
                     u.isFunctional() &&
-                    (u.getEntity().calculateBattleValue() < lowestBV)) {
-                
-                boolean unitsForceIsDeployed = false;
-                
-                // check if the unit's force (if one exists) has been deployed to
-                // a stratcon track
-                // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
-                for (Contract contract : campaign.getActiveContracts()) {
-                    if((contract instanceof AtBContract) &&
-                            ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
-                        unitsForceIsDeployed = true;
-                        break;
-                    }
-                }
-                
-                if (!unitsForceIsDeployed) {
-                    retVal.add(u);
-                }
+                    (u.getEntity().calculateBattleValue() < lowestBV) &&
+                    !isUnitDeployedToStratCon(u)) {
+                retVal.add(u);
             }
         }
 
         return retVal;
+    }
+    
+    /**
+     * Check if the unit's force (if one exists) has been deployed to a StratCon track
+     */
+    public static boolean isUnitDeployedToStratCon(Unit u) {
+        if (!u.getCampaign().getCampaignOptions().getUseStratCon()) {
+            return false;
+        }
+        
+        //this is a little inefficient, but probably there aren't too many active AtB contracts at a time
+        for (Contract contract : u.getCampaign().getActiveContracts()) {
+            if((contract instanceof AtBContract) &&
+                    ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     /**
