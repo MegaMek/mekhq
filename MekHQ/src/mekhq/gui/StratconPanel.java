@@ -546,7 +546,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     private String buildSelectedHexInfo() {
         StringBuilder infoBuilder = new StringBuilder();
-        infoBuilder.append("<html>");
+        infoBuilder.append("<html><br/>");
         
         boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {

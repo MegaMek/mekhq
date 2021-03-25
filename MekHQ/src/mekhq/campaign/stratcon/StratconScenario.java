@@ -144,6 +144,7 @@ public class StratconScenario implements IStratconDisplayable {
             stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
         }
         
+        stateBuilder.append("Scenario: ");
         stateBuilder.append(backingScenario.getName());
         stateBuilder.append(html ? "<br/>" : "");
         stateBuilder.append(backingScenario.getTemplate().shortBriefing);

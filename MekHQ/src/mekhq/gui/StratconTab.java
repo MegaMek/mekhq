@@ -71,6 +71,8 @@ public class StratconTab extends CampaignGuiTab {
         gbc.gridy = 0;
         gbc.gridwidth = 4;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.ipadx = 5;
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
@@ -80,6 +82,7 @@ public class StratconTab extends CampaignGuiTab {
         initializeInfoPanel();
         gbc.gridx = 4;
         gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.NORTH;
         this.add(infoPanel, gbc);
         
         MekHQ.registerHandler(this);
@@ -95,19 +98,21 @@ public class StratconTab extends CampaignGuiTab {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
         
         infoPanel.add(new JLabel("Current Campaign Status:"), gbc);
         
-        gbc.gridwidth = 1;
         gbc.gridy++;
         
         infoPanel.add(campaignStatusText, gbc);        
         gbc.gridy++;
         
+        gbc.gridwidth = 1;
+        gbc.gridheight = 2;
         JLabel lblCurrentTrack = new JLabel("Current Track:");
         infoPanel.add(lblCurrentTrack, gbc);
         gbc.gridx = 1;
-        
+                
         cboCurrentTrack = new JComboBox<>();
         repopulateTrackList();
         cboCurrentTrack.addItemListener(new ItemListener() {
@@ -124,7 +129,10 @@ public class StratconTab extends CampaignGuiTab {
         	trackSelectionHandler();
         }
         
-        gbc.gridy++;
+        gbc.gridy += 2;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
         infoPanel.add(infoPanelText, gbc);
     }
     
