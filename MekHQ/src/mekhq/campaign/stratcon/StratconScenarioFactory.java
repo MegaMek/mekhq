@@ -128,24 +128,32 @@ public class StratconScenarioFactory {
     
     /**
      * Retrieves a random scenario template appropriate for the given unit type.
+     * This includes the more general ATB_MIX and ATB_AERO_MIX where appropriate
      * @param unitType The desired unit type, as per megamek.common.UnitType
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(int unitType) {
-        int actualUnitType = unitType;
+        int generalUnitType = convertSpecificUnitTypeToGeneral(unitType);
         
         // if the specific unit type doesn't have any scenario templates for it
-        // then try a more generic unit type.
-        if (!dynamicScenarioUnitTypeMap.containsKey(unitType)) {
-            actualUnitType = convertSpecificUnitTypeToGeneral(unitType);
-            
-            if (!dynamicScenarioUnitTypeMap.containsKey(actualUnitType)) {            
+        // then we can't generate a scenario.
+        if (!dynamicScenarioUnitTypeMap.containsKey(unitType) &&
+            !dynamicScenarioUnitTypeMap.containsKey(generalUnitType)) {
                 MekHQ.getLogger().warning(String.format("No scenarios configured for unit type %d", unitType));
                 return null;
-            }
         }
         
-        return Utilities.getRandomItem(dynamicScenarioUnitTypeMap.get(actualUnitType)).clone();
+        List<ScenarioTemplate> jointList = new ArrayList<>();
+        
+        if (dynamicScenarioUnitTypeMap.containsKey(unitType)) {
+            jointList.addAll(dynamicScenarioUnitTypeMap.get(unitType));
+        }
+        
+        if (dynamicScenarioUnitTypeMap.containsKey(generalUnitType)) {
+            jointList.addAll(dynamicScenarioUnitTypeMap.get(generalUnitType));
+        }
+        
+        return Utilities.getRandomItem(jointList).clone();
     }
     
     /**

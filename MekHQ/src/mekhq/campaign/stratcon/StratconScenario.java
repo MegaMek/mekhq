@@ -26,8 +26,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import mekhq.adapter.DateAdapter;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -73,6 +71,7 @@ public class StratconScenario implements IStratconDisplayable {
     private LocalDate returnDate;
     private StratconCoords coords;
     private int numDefensivePoints;
+    private boolean ignoreForceAutoAssignment;
     private Set<Integer> failedReinforcements = new HashSet<>();
     private Set<Integer> primaryForceIDs = new HashSet<>();
 
@@ -328,5 +327,13 @@ public class StratconScenario implements IStratconDisplayable {
     
     public void addFailedReinforcements(int forceID) {
         failedReinforcements.add(forceID);
+    }
+
+    public boolean ignoreForceAutoAssignment() {
+        return ignoreForceAutoAssignment;
+    }
+
+    public void setIgnoreForceAutoAssignment(boolean ignoreForceAutoAssignment) {
+        this.ignoreForceAutoAssignment = ignoreForceAutoAssignment;
     }
 }

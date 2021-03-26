@@ -95,8 +95,8 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
-    private static final int[] validBotAABombs = { BombType.B_RL };
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, BombType.B_LG, BombType.B_TAG };
+    private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
     private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
@@ -156,6 +156,17 @@ public class AtBDynamicScenarioFactory {
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+            
+            // the default template should not allow the user to deploy ground units as 
+            // reinforcements to aerospace battles
+            // space battles are even more restrictive
+            if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
+                defaultReinforcements.setAllowedUnitType(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
+            } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
+                defaultReinforcements.setAllowedUnitType(UnitType.AERO);
+            }
+            
+            
             template.scenarioForces.put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
@@ -310,7 +321,7 @@ public class AtBDynamicScenarioFactory {
                 quality = scenario.getEffectiveOpforQuality();
                 break;
             default:
-                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
+                MekHQ.getLogger().warning(
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
@@ -398,14 +409,17 @@ public class AtBDynamicScenarioFactory {
             // no reason to go into an endless loop if we can't generate a lance
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
+                MekHQ.getLogger().warning(
                         String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
 
             if (forceTemplate.getAllowAeroBombs()) {
-                boolean isAeroMap = scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain;
+                MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
+                boolean isAeroMap = (mapLocation == MapLocation.LowAtmosphere) ||
+                        (mapLocation == MapLocation.Space);
+                        
                 populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
 
@@ -1288,8 +1302,8 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, ex);
+            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+            MekHQ.getLogger().error(ex);
             return null;
         }
 
@@ -1726,7 +1740,7 @@ public class AtBDynamicScenarioFactory {
         // if so, we log a warning, then generate what we can.
         // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
         if (unitTypeSize > weights.length()) {
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class,
+            MekHQ.getLogger().error(
                     String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
             unitTypeSize = weights.length();
         }
@@ -2132,7 +2146,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class, "Deployment Turn - Staggered by Lance not implemented");
+        MekHQ.getLogger().warning("Deployment Turn - Staggered by Lance not implemented");
     }
 
     /**
@@ -2311,7 +2325,7 @@ public class AtBDynamicScenarioFactory {
             if (entity.isBomber()) {
                 // if this entity has no guns (e.g. is a Boeing Jump Bomber)
                 if (entity.getIndividualWeaponList().size() == 0) {
-                    loadBombs(entity, validBombChoices);
+                    loadBombs(entity, validBombChoices, campaign.getGameYear());
                     continue;
                 }
 
@@ -2319,18 +2333,33 @@ public class AtBDynamicScenarioFactory {
                     break;
                 }
 
-                loadBombs(entity, validBombChoices);
+                loadBombs(entity, validBombChoices, campaign.getGameYear());
                 numBombers++;
             }
         }
     }
 
-    // todo: determine how many bombs can fit on this entity, and either pick
-    // a random amount or fill 'er up
-    private static void loadBombs(Entity entity, int[] validBombChoices) {
+    /**
+     * Worker function that takes an entity and an array of bomb types
+     * and loads it up with a random amount of bombs that it's capable of holding
+     */
+    private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
         int[] bombChoices = new int[BombType.B_NUM];
+        
+        // remove bomb choices if they're not era-appropriate
+        List<Integer> actualBombChoices = new ArrayList<>();
+        for (int x = 0; x < validBombChoices.length; x++) {
+            String typeName = BombType.getBombInternalName(validBombChoices[x]);
+            
+            // hack: make rocket launcher pods available before 3055
+            if (validBombChoices[x] == BombType.B_RL ||
+                    BombType.get(typeName).isAvailableIn(year)) {
+                actualBombChoices.add(validBombChoices[x]);
+            }
+        }
+        
         int numBombs = (int) (entity.getWeight() / 5);
-        int bombIndex = validBombChoices[(Compute.randomInt(validBombChoices.length))];
+        int bombIndex = actualBombChoices.get(Compute.randomInt(actualBombChoices.size()));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);

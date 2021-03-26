@@ -113,9 +113,20 @@ public class StratconRulesManager {
 
                 StratconCoords scenarioCoords = new StratconCoords(x, y);
 
+                // if forces are already assigned to these coordinates, use those instead
+                // of randomly-selected ones
+                if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
+                    StratconScenario scenario = generateScenarioForExistingForces(scenarioCoords,
+                            track.getAssignedCoordForces().get(scenarioCoords), 
+                            contract, campaign, track);
+                    generatedScenarios.add(scenario);
+                    continue;
+                }
+                
+                // otherwise, pick a random force from the avail
                 int randomForceIndex = Compute.randomInt(availableForceIDs.size());
                 int randomForceID = availableForceIDs.get(randomForceIndex);
-
+                
                 // remove the force from the available lists so we don't designate it as primary twice
                 availableForceIDs.remove(randomForceIndex);
 
@@ -155,7 +166,7 @@ public class StratconRulesManager {
         for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
 
-            if(!autoAssignLances) {
+            if(!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
                 for(int forceID : scenario.getPlayerTemplateForceIDs()) {
                     scenario.getBackingScenario().removeForce(forceID);
                 }
@@ -166,6 +177,30 @@ public class StratconRulesManager {
                 commitPrimaryForces(campaign, contract, scenario, track);
             }
         }
+    }
+    
+    /**
+     * Given a set of force IDs and coordinates, generate a scenario
+     * Useful for when we want to generate scenarios 
+     * for forces already deployed to a track
+     */
+    public static StratconScenario generateScenarioForExistingForces(StratconCoords scenarioCoords, 
+            Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratconTrackState track) {
+        boolean firstForce = true;
+        StratconScenario scenario = null;
+        
+        for (int forceID : forceIDs) {
+            if (firstForce) {
+                scenario = setupScenario(scenarioCoords, forceID, campaign, contract, track);
+                firstForce = false;
+            } else {
+                scenario.incrementRequiredPlayerLances();
+                scenario.addPrimaryForce(forceID);
+            }
+        }
+        
+        scenario.setIgnoreForceAutoAssignment(true);
+        return scenario;
     }
 
     /**
@@ -549,6 +584,9 @@ public class StratconRulesManager {
         StratconScenario scenario = new StratconScenario();
         scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
         scenario.setCoords(coords);
+        
+        // by default, certain conditions may make this bigger
+        scenario.setRequiredPlayerLances(1);
 
         // do an appropriate allied force if the contract calls for it
         // do any attached or integrated units

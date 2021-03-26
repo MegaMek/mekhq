@@ -56,6 +56,8 @@ import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratconScenarioWizard extends JDialog {
+    private static final long serialVersionUID = 4447095364826529579L;
+    
     StratconScenario currentScenario;
     Campaign campaign;
     StratconTrackState currentTrackState;
@@ -186,10 +188,11 @@ public class StratconScenarioWizard extends JDialog {
             localGbc.gridx = 0;
             localGbc.gridy = 0;
             
-            int forceLimit = reinforcements ? 
-                    currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign) : 1;               
+            String labelText = reinforcements ?
+                    resourceMap.getString("selectReinforcementsForTemplate.Text") :
+                    String.format(resourceMap.getString("selectForceForTemplate.Text"), currentScenario.getRequiredPlayerLances());
             
-            JLabel assignForceListInstructions = new JLabel(String.format(resourceMap.getString("selectForceForTemplate.Text"), forceLimit));
+            JLabel assignForceListInstructions = new JLabel(labelText);
             forcePanel.add(assignForceListInstructions, localGbc);
             
             localGbc.gridy = 1;
@@ -199,7 +202,7 @@ public class StratconScenarioWizard extends JDialog {
             availableForceList.addListSelectionListener(new ListSelectionListener() { 
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
-                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements, forceLimit);
+                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
                 }
             });
             
@@ -524,7 +527,7 @@ public class StratconScenarioWizard extends JDialog {
      * Event handler for when the user makes a selection on the available force selector.
      * @param e The event fired. 
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements, int forceLimit) {
+    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
         if (!(e.getSource() instanceof JList<?>)) {
             return;
         }

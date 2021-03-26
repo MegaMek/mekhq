@@ -273,7 +273,7 @@ public class AtBScenarioModifier implements Cloneable {
         }
         
         int modIndex = Compute.randomInt(keyList.size());
-        return getScenarioModifier(groundBattleModifierKeys.get(modIndex));
+        return getScenarioModifier(keyList.get(modIndex));
     }
     
     static {
