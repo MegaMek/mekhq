@@ -281,6 +281,7 @@ public class AtBGameThread extends GameThread {
                     }
 
                     entity.setDeployRound(deploymentRound);
+                    entities.add(entity);
                 }
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
@@ -403,7 +404,7 @@ public class AtBGameThread extends GameThread {
                 String forceName = botClient.getLocalPlayer().getName() + "|1";
                 var entities = new ArrayList<Entity>();
                 for (Entity entity : botForce.getEntityList()) {
-                    if (entity == null) {
+                    if (null == entity) {
                         continue;
                     }
                     entity.setOwner(botClient.getLocalPlayer());

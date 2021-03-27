@@ -119,7 +119,6 @@ class GameThread extends Thread implements CloseClientListener {
 
                 var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
-                    // Translate to MegaMek's Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
