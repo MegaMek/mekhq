@@ -1,0 +1,36 @@
+Windchild's Guide to Ranks in MekHQ
+Written 25-Mar-2021
+MekHQ version 0.49.0
+
+How Rank.xml Loading Works:
+Ranks located within the default rank folder (data/universe/ranks.xml) are loaded first, followed by any player created customs from the userdata folder (userdata/data/universe/ranks.xml). Any duplicated system codes are logged as duplicates, and are then discarded during this load. All loaded rank systems are then run against a validator. If it detects an infinite loop scenario or any other invalid setup, it will write errors into the log file and not add the system to the list of systems.
+
+The campaign file may contain a custom rank system that is not one of the rank systems loaded above. In this case the system will be written to and loaded from the campaign save file including all rank levels instead of merely writing and reading the system code.
+
+If you want to run a campaign with entirely custom ranks, remove all rank systems EXCEPT the SSLDF-coded rank system. That system is used as a default value within the code base and removing it may cause unexpected issues. However, you may change the system name and all ranks within it, the specific code is all that is required.
+
+
+How to Write a Custom Rank System:
+The following clarifies some terms before I will start on how to write a custom rank system.
+{ "MW", "ASF", "VEE", "NAVAL", "INF", "TECH" } are the columns used for each rank name, in that order. These are henceforth referred to as professions. If there is a typo on the first tier it will default to using the MW profession, which may not be empty.
+"--" followed by a profession code (capitalization required) means that the rank is designating an alternate profession to use for that rank tier (e.g. "--MW", "--INF") for that profession. This is referred to as "alternate profession".
+"-" means that the rank is empty for that tier for the specific profession. This is referred to as "empty".
+
+First, you need to specify a unique system code and a system name for the rank system. These are used to track the rank system internally and in displays.
+
+Second, each rank system requires a rank entry for every one of the E0-E20, WO1-WO10, and O1-O20 ranks. To discount an entry from internal processing, fill all professions with empty. The first tier (E0) must have a valid initial value (non-empty and not designating an alternate profession) in one or more of the professions. All others on that tier must be declared as designating an alternate profession. If a profession is completely empty (all name values are empty) outside of having an alternate profession in the first tier, is is considered to be an empty profession. It will then used the value in the first tier to determine the alternate profession to use, repeating until the final profession is determined. Following these rules, fill in each rank starting with the name, then whether the rank is to be considered to be an officer rank or not, and finally add a pay multiplier (1 for no changes).
+
+Third, you will need to add the now complete system to the userdata rank file. Ensure the whole system is wrapped with rankSystem tags, then add it to the bottom of the file. You can then, through campaign options, reload the rank systems from file, or it will be automatically loaded when loading a campaign file.
+
+
+How Ranks Are Handled Internally:
+Ranks.java: This is a static class that is used to load and store rank systems. This is not to be instatiated nor used for any other purpose. 
+RankSystem.java: This class contains the information for a single rank system, namely the system's code, the system's name, and a list of all ranks within that system (which currently must include a rank for all possible rank tiers).
+Rank.java: This class contains the information regarding a single rank level, namely the rank names, the pay multiplier, and whether that level is to be considered officers. The numeric for this rank is currently the index on the rank system's list, however this will be changed in the near future.
+RankValidator.java: This is a static class that is used to validate the rank system and each rank tier within. It is called on any load to prevent duplication of primary keys, infinite loop setups, and other illegal rank setups.
+RankDisplay.java: This is a display wrapper class that is used to track an individual rank for visual display (as one cannot merely override toString given the different returns on the name based on a number of factors, largely relating to the profession), and ensures that all ranks on the display are filtered properly for the profession provided.
+ranks.xml: This contains all default rank systems used in MekHQ, with a required minimum content of the SSLDF-coded rank system.
+User Data ranks.xml: This contains all custom user ranks, which are loaded and treated internally as equivalent to the default rank systems.
+Campaign.java: This contains the base campaign rank system, which may be a completely custom rank system that is not tracked in either of the rank files.
+Person.java: Person contains the person's rank system (with a default of the campaign rank system), their rank (saved as a numeric for now), their rank level (if applicable), their Manei Domini classification (requires WOBM for their rank system), and ROM Designation (requiring CG or WOBM).
+
