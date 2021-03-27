@@ -43,6 +43,7 @@ import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -186,6 +187,7 @@ public class AtBGameThread extends GameThread {
                     }
                 }
 
+                var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
@@ -225,11 +227,12 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    // Add Mek to game
-                    client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Force force = campaign.getForceFor(unit);
+                    entity.setForceString(force.getFullMMName());
+                    entities.add(entity);
                 }
+                client.sendAddEntity(entities);
+                
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
                 for (Unit unit : units) {
@@ -252,6 +255,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 /* Add player-controlled ally units */
+                entities.clear();
                 for (Entity entity : scenario.getAlliesPlayer()) {
                     if (null == entity) {
                         continue;
@@ -277,10 +281,8 @@ public class AtBGameThread extends GameThread {
                     }
 
                     entity.setDeployRound(deploymentRound);
-                    client.sendAddEntity(entity);
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
-
+                client.sendAddEntity(entities);
                 client.sendPlayerInfo();
 
                 /* Add bots */
@@ -397,15 +399,18 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
-
+                
+                String forceName = botClient.getLocalPlayer().getName() + "|1";
+                var entities = new ArrayList<Entity>();
                 for (Entity entity : botForce.getEntityList()) {
-                    if (null == entity) {
+                    if (entity == null) {
                         continue;
                     }
                     entity.setOwner(botClient.getLocalPlayer());
-                    botClient.sendAddEntity(entity);
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    entity.setForceString(forceName);
+                    entities.add(entity);
                 }
+                botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
