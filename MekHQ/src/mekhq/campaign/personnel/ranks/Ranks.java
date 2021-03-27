@@ -73,36 +73,40 @@ public class Ranks {
     //region File IO
     public static void initializeRankSystems() {
         MekHQ.getLogger().info("Starting load of Rank Systems from XML...");
-
-        // Initialize variables
         setRankSystems(new HashMap<>());
+        loadRankSystemsFromPath(MekHQ.getMekHQOptions().getRanksDirectoryPath(), false);
+        loadRankSystemsFromPath(MekHQ.getMekHQOptions().getUserRanksDirectoryPath(), true);
+        MekHQ.getLogger().info("Done load of Rank Systems");
+    }
 
+    private static void loadRankSystemsFromPath(final String path, final boolean userData) {
         final Document xmlDoc;
 
-        // TODO : Remove inline file path
-        try (InputStream is = new FileInputStream("data/universe/ranks.xml")) {
+        try (InputStream is = new FileInputStream(path)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
             return;
         }
 
-        final Element ranksEle = xmlDoc.getDocumentElement();
-        ranksEle.normalize();
-        final NodeList nl = ranksEle.getChildNodes();
+        final Element element = xmlDoc.getDocumentElement();
+        element.normalize();
+        final NodeList nl = element.getChildNodes();
+        final RankValidator rankValidator = new RankValidator();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
 
-            if (!wn.getParentNode().equals(ranksEle) || (wn.getNodeType() != Node.ELEMENT_NODE)) {
+            if (!wn.getParentNode().equals(element) || (wn.getNodeType() != Node.ELEMENT_NODE)) {
                 continue;
             }
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem value = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true);
-                getRankSystems().put(value.getRankSystemCode(), value);
+                if (rankValidator.validate(value, userData)) {
+                    getRankSystems().put(value.getRankSystemCode(), value);
+                }
             }
         }
-        MekHQ.getLogger().info("Done loading Rank Systems");
     }
     //endregion File IO
 }

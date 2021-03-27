@@ -242,7 +242,7 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
         choiceExp.addActionListener(e -> {
-            personnelFilter.setExpLevel(((PersonTypeItem) choiceExp.getSelectedItem()).getId());
+            personnelFilter.setExpLevel(((PersonTypeItem) Objects.requireNonNull(choiceExp.getSelectedItem())).getId());
             updatePersonnelTable();
         });
         panel.add(choiceExp);
@@ -252,6 +252,7 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
         personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
 
+        // TODO : Windchild : Ranks rework
         Object[][] ranks = campaign.getRanks().getRanksForModel();
         for (int i = 0; i < ranks.length; i++) {
             StringBuilder rankName = new StringBuilder(((String) ranks[i][0]).trim());
@@ -263,7 +264,7 @@ public final class BatchXPDialog extends JDialog {
         choiceRank.setModel(personRankModel);
         choiceRank.setSelectedIndex(0);
         choiceRank.addActionListener(e -> {
-            personnelFilter.setRank(((PersonTypeItem) choiceRank.getSelectedItem()).getId());
+            personnelFilter.setRank(((PersonTypeItem) Objects.requireNonNull(choiceRank.getSelectedItem())).getId());
             updatePersonnelTable();
         });
         panel.add(choiceRank);

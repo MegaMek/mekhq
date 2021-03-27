@@ -204,6 +204,12 @@ public class RankSystem implements Serializable {
         return baseProfession;
     }
 
+    /**
+     * This is used to determine if a profession is empty, which means the first rank is an
+     * alternative system while every other rank tier is empty.
+     * @param profession the profession to determine the emptiness status
+     * @return whether the profession is empty or not
+     */
     public boolean isEmptyProfession(final int profession) {
         // MechWarrior profession cannot be empty
         // TODO : I should be allowed to be empty, and have my default replaced by another column,
@@ -213,13 +219,11 @@ public class RankSystem implements Serializable {
             return false;
         }
 
-        // Check the first rank to ensure it is either empty or indicates an alternative rank system,
-        // as otherwise the rank system is not empty.
+        // Check the first rank to ensure it indicates an alternative rank system, as otherwise the
+        // rank system is not empty.
         final Rank rank = getRanks().get(0);
-        if (!rank.indicatesAlternativeSystem(profession) && !rank.isEmpty(profession)) {
+        if (!rank.indicatesAlternativeSystem(profession)) {
             return false;
-        } else if (getRanks().size() == 1) {
-            return true;
         }
 
         // Return true if all ranks except the first are empty
@@ -338,10 +342,11 @@ public class RankSystem implements Serializable {
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemCode", getRankSystemCode());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
 
-        // Only write out the ranks if we are exporting the system or we are using a custom system
+        // Only write out any other information if we are exporting the system or we are using a
+        // custom system
         if (export || isCustom()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent);
                 pw.println(getRankPostTag(i));
@@ -404,7 +409,8 @@ public class RankSystem implements Serializable {
         rankSystem.setRanks(new ArrayList<>());
 
         try {
-            int rankSystemId = -1; // migration
+            int rankSystemId = -1; // migration, 0.49.X
+
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn = nl.item(x);
 
@@ -418,7 +424,7 @@ public class RankSystem implements Serializable {
                 } else if (wn.getNodeName().equalsIgnoreCase("systemName")) {
                     rankSystem.setRankSystemName(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
-                    rankSystem.ranks.add(Rank.generateInstanceFromXML(wn));
+                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn));
                 }
             }
 
