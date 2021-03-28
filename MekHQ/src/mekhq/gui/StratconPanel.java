@@ -85,7 +85,7 @@ public class StratconPanel extends JPanel implements ActionListener {
          * Pretend we're drawing a hex, but don't actually do it, useful for 
          * figuring out which hex a mouse click landed in, etc.
          */
-        Dryrun
+        DryRun
     }
 
     private float scale = 1f;
@@ -114,7 +114,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
-    StratconPanel(CampaignGUI gui, JLabel infoArea) {
+    public StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
         scenarioWizard = new StratconScenarioWizard(campaign);
         this.infoArea = infoArea;
@@ -194,7 +194,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (campaignState == null || currentTrack == null) {
+        if ((campaignState == null) || (currentTrack == null)) {
             return;
         }
         
@@ -226,7 +226,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * This method contains a dirty secret hack, but I forget what it is.
+     * This method contains a dirty secret hack, described on line 253-258
      * The point of it is to draw all the hexes for the board. 
      * If it's a "dry run", we don't actually draw the hexes, we just pretend to
      * until we "draw" one that encompasses the clicked point.
@@ -239,12 +239,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         int yRadius = HEX_Y_RADIUS;
         boolean pointFound = false;
 
-        graphHex.addPoint(-xRadius/2, -yRadius);
+        graphHex.addPoint(-xRadius / 2, -yRadius);
         graphHex.addPoint(-xRadius, 0);
-        graphHex.addPoint(-xRadius/2, yRadius);
-        graphHex.addPoint(xRadius/2, yRadius);
+        graphHex.addPoint(-xRadius / 2, yRadius);
+        graphHex.addPoint(xRadius / 2, yRadius);
         graphHex.addPoint(xRadius, 0);
-        graphHex.addPoint(xRadius/2, -yRadius);
+        graphHex.addPoint(xRadius / 2, -yRadius);
 
         graphHex.translate(xRadius, yRadius);
 
@@ -267,12 +267,12 @@ public class StratconPanel extends JPanel implements ActionListener {
             
             // now we translate to the starting point of where we're drawing and then go down a hex
             translatedClickedPoint.translate((int) g2D.getTransform().getTranslateX(), (int) g2D.getTransform().getTranslateY());
-            translatedClickedPoint.translate(0, -(HEX_Y_RADIUS * 2));
+            translatedClickedPoint.translate(0, HEX_Y_RADIUS * -2);
         }
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                if(drawHexType == DrawHexType.Outline) {
+                if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(new Color(0, 0, 0));
                     g2D.drawPolygon(graphHex);                    
                 } else if (drawHexType == DrawHexType.Hex) {
@@ -284,7 +284,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
                     g2D.fillPolygon(graphHex);
                     
-                    if (translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
+                    if ((translatedClickedPoint != null) && graphHex.contains(translatedClickedPoint)) {
                         g2D.setColor(Color.WHITE);
                         BasicStroke s = new BasicStroke((float) 8.0);
                         Stroke push = g2D.getStroke();
@@ -296,8 +296,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                         pointFound = true;
                         g2D.setStroke(push);
                     }
-                } else if (drawHexType == DrawHexType.Dryrun) {
-                    if (translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
+                } else if (drawHexType == DrawHexType.DryRun) {
+                    if ((translatedClickedPoint != null) && graphHex.contains(translatedClickedPoint)) {
                         boardState.selectedX = x;
                         boardState.selectedY = y;
                         pointFound = true;
@@ -313,7 +313,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 graphHex.translate(downwardVector[0], downwardVector[1]);
             }
 
-            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            int[] translationVector = getRightAndUpVector(x % 2 == 0);
             graphHex.translate(translationVector[0], translationVector[1]);
         }
 
@@ -344,7 +344,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         ((scenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
-                    if(currentTrack.getFacility(currentCoords) == null) {
+                    if (currentTrack.getFacility(currentCoords) == null) {
                         drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
                     }
                 }
@@ -353,7 +353,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 scenarioMarker.translate(downwardVector[0], downwardVector[1]);
             }
 
-            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            int[] translationVector = getRightAndUpVector(x % 2 == 0);
             scenarioMarker.translate(translationVector[0], translationVector[1]);
         }
     }
@@ -386,7 +386,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 facilityMarker.translate(downwardVector[0], downwardVector[1]);
             }
 
-            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            int[] translationVector = getRightAndUpVector(x % 2 == 0);
             facilityMarker.translate(translationVector[0], translationVector[1]);
         }
     }
@@ -420,7 +420,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 forceMarker.translate(downwardVector[0], downwardVector[1]);
             }
 
-            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            int[] translationVector = getRightAndUpVector(x % 2 == 0);
             forceMarker.translate(translationVector[0], translationVector[1]);
         }
     }
@@ -443,8 +443,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         g2D.drawString(text, (int) endPointX, (int) midPointY);
         
         // register that we drew text off of this hex
-        verticalOffsetIndex++;
-        numIconsInHex.put(coords, verticalOffsetIndex);
+        numIconsInHex.put(coords, ++verticalOffsetIndex);
     }
 
     /**
@@ -452,7 +451,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * @return Two dimensional array with the first element being the x vector and the second being the y vector
      */
     private int[] getDownwardYVector() {
-        return new int[] { 0, (int) (HEX_Y_RADIUS * 2) };
+        return new int[] { 0, HEX_Y_RADIUS * 2 };
     }
 
     /**
@@ -461,7 +460,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * @param evenColumn Whether the column we're currently in is odd or even
      * @return Two dimensional array with the first element being the x vector and the second being the y vector
      */
-    private int[] getRightAndUPVector(boolean evenColumn) {
+    private int[] getRightAndUpVector(boolean evenColumn) {
         int yRadius = (int) (HEX_Y_RADIUS);
         int xRadius = (int) (HEX_X_RADIUS);
 
@@ -472,7 +471,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             yTranslation -= yRadius;
         }
 
-        return new int[] {(int) (xRadius * 1.5), -yTranslation};
+        return new int[] { (int) Math.floor(xRadius * 1.5), -yTranslation};
     }
 
     /**
@@ -496,7 +495,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         Graphics2D g2D = (Graphics2D) getGraphics();
         AffineTransform transform = g2D.getTransform();
         performInitialTransform(g2D);
-        boolean pointFoundOnBoard = drawHexes(g2D, DrawHexType.Dryrun);
+        boolean pointFoundOnBoard = drawHexes(g2D, DrawHexType.DryRun);
         g2D.setTransform(transform);
 
         return pointFoundOnBoard;
@@ -506,7 +505,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Event handler for when a mouse button is released.
      */
     public void mouseReleasedHandler(MouseEvent e) {
-        if(e.getSource() != this) {
+        if (e.getSource() != this) {
             return;
         }
 
@@ -515,7 +514,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             clickedPoint = e.getPoint();
             boolean pointFoundOnBoard = detectClickedHex();
             
-            if(pointFoundOnBoard) {
+            if (pointFoundOnBoard) {
                 infoArea.setText(buildSelectedHexInfo());
             }
 
@@ -562,25 +561,25 @@ public class StratconPanel extends JPanel implements ActionListener {
                     infoBuilder.append(" - remain deployed");
                 }
                 
-                infoBuilder.append("<br/>");
-                
-                infoBuilder.append("Returns on ").append(currentTrack.getAssignedForceReturnDates().get(forceID));
-                infoBuilder.append("<br/>");
+                infoBuilder.append("<br/>")
+                    .append("Returns on ")
+                    .append(currentTrack.getAssignedForceReturnDates().get(forceID))
+                    .append("<br/>");
             }
         }
         
         if (coordsRevealed || currentTrack.isGmRevealed()) {
             StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
             
-            if((facility != null) && (facility.getFacilityType() != null)) {
+            if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>", 
                             facility.getOwner() == ForceAlignment.Allied ? "green" : "red"));
                 }
-                infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>");
-                infoBuilder.append("<br/>");
-                infoBuilder.append(facility.getFormattedDisplayableName());
-                infoBuilder.append("<span>");
+                infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>")
+                    .append("<br/>")
+                    .append(facility.getFormattedDisplayableName())
+                    .append("<span>");
             }
             
         } else {
@@ -608,7 +607,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         public Integer selectedY;
         
         public StratconCoords getSelectedCoords() {
-            if((selectedX == null) || (selectedY == null)) {
+            if ((selectedX == null) || (selectedY == null)) {
                 return null;
             } else {
                 return new StratconCoords(selectedX, selectedY);
@@ -622,37 +621,36 @@ public class StratconPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         StratconCoords selectedCoords = boardState.getSelectedCoords();
-        if(selectedCoords == null) {
+        if (selectedCoords == null) {
             return;
         }
         
-        switch(e.getActionCommand()) {
-        case RCLICK_COMMAND_MANAGE_FORCES:
-            assignmentUI.display(campaign, campaignState, 0, selectedCoords);
-            assignmentUI.setVisible(true);
-            break;
-        case RCLICK_COMMAND_MANAGE_SCENARIO:
-            scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                    currentTrack,
-                    campaignState);
-            scenarioWizard.toFront();
-            scenarioWizard.setVisible(true);
-            break;
-        case RCLICK_COMMAND_REVEAL_TRACK:
-            currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
-            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
-            break;
-        case RCLICK_COMMAND_STICKY_FORCE:
-            JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-            int forceID = (int) source.getClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID);
-            
-            if (source.isSelected()) {
-                currentTrack.addStickyForce(forceID);
-            } else {
-                currentTrack.removeStickyForce(forceID);
-            }
-            
-            break;
+        switch (e.getActionCommand()) {
+            case RCLICK_COMMAND_MANAGE_FORCES:
+                assignmentUI.display(campaign, campaignState, 0, selectedCoords);
+                assignmentUI.setVisible(true);
+                break;
+            case RCLICK_COMMAND_MANAGE_SCENARIO:
+                scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
+                        currentTrack, campaignState);
+                scenarioWizard.toFront();
+                scenarioWizard.setVisible(true);
+                break;
+            case RCLICK_COMMAND_REVEAL_TRACK:
+                currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
+                menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
+                break;
+            case RCLICK_COMMAND_STICKY_FORCE:
+                JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+                int forceID = (int) source.getClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID);
+                
+                if (source.isSelected()) {
+                    currentTrack.addStickyForce(forceID);
+                } else {
+                    currentTrack.removeStickyForce(forceID);
+                }
+                
+                break;
         }
         
         repaint();
@@ -660,9 +658,9 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     @Override
     public Dimension getPreferredSize() {
-        if(currentTrack != null) {
-            int xDimension = (int) (HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
-            int yDimension = (int) (HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
+        if (currentTrack != null) {
+            int xDimension = (int) Math.floor(HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
+            int yDimension = (int) Math.floor(HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
             
             return new Dimension(xDimension, yDimension);
         } else {

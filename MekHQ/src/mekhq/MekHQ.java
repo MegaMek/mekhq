@@ -688,9 +688,9 @@ public class MekHQ implements GameListener {
 	private void initEventHandlers() {
 	    EVENT_BUS.register(new XPHandler());
 	    
-	    StratconRulesManager srm = new StratconRulesManager();
-	    srm.startup();
-	    EVENT_BUS.register(srm);	    
+        StratconRulesManager srm = new StratconRulesManager();
+        srm.startup();
+        EVENT_BUS.register(srm);	    
 	}
 
     private static void setLookAndFeel(String themeName) {

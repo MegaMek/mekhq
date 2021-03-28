@@ -58,22 +58,19 @@ import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType
 public class StratconScenarioWizard extends JDialog {
     private static final long serialVersionUID = 4447095364826529579L;
     
-    StratconScenario currentScenario;
-    Campaign campaign;
-    StratconTrackState currentTrackState;
-    StratconCampaignState currentCampaignState;
-    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon");
+    private StratconScenario currentScenario;
+    private final Campaign campaign;
+    private StratconTrackState currentTrackState;
+    private StratconCampaignState currentCampaignState;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon");
 
-    JLabel lblTotalBV = new JLabel();
+    private Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
     
-    Map<String, JList<Force>> availableForceLists = new HashMap<>();
-    Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
+    private JList<Unit> availableInfantryUnits = new JList<>();
+    private JList<Unit> availableLeadershipUnits = new JList<>();
     
-    JList<Unit> availableInfantryUnits = new JList<>();
-    JList<Unit> availableLeadershipUnits = new JList<>();
-    JLabel defensiveOptionStatus = new JLabel();
-    
-    JButton btnCommit;
+    private JButton btnCommit;
     
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
@@ -253,9 +250,7 @@ public class StratconScenarioWizard extends JDialog {
         getContentPane().add(lblLeadershipInstructions, gbc);
         
         gbc.gridy++;
-        availableLeadershipUnits =
-                addIndividualUnitSelector(
-                        eligibleUnits, gbc, leadershipSkill);
+        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, leadershipSkill);
     }
     
     /**
@@ -419,7 +414,7 @@ public class StratconScenarioWizard extends JDialog {
             costBuilder.append("lanceInFightRole.text");
             break;
         default:
-            costBuilder.append("yikes");
+            costBuilder.append("Error: Invalid Reinforcement Type");
             break;
         }
         

@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.Board;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
@@ -111,6 +112,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         /**
          * Get a force alignment value given an int
          */
+        @Nullable
         public static ForceAlignment getForceAlignment(int ordinal) {
             for (ForceAlignment fe : values()) {
                 if (fe.ordinal() == ordinal) {
@@ -412,7 +414,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         useArtillery = forceDefinition.useArtillery;
         deployOffBoard = forceDefinition.deployOffBoard;
         objectiveLinkedForces = new ArrayList<String>();
-        for(String force : forceDefinition.objectiveLinkedForces) {
+        
+        for (String force : forceDefinition.objectiveLinkedForces) {
             objectiveLinkedForces.add(force);
         }
     }

@@ -204,7 +204,7 @@ public class AtBScenarioModifierApplicator {
      * Only capable of being applied to opfor.
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
-        if(eventRecipient != ForceAlignment.Opposing) {
+        if (eventRecipient != ForceAlignment.Opposing) {
             MekHQ.getLogger().warning( "Can only adjust opfor unit quality");
             return;
         }

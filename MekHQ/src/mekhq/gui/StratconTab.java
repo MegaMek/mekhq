@@ -36,10 +36,11 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconTrackState;
 
+/**
+ * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
+ * @author NickAragua
+ */
 public class StratconTab extends CampaignGuiTab {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8179754409939346465L;
     
     private StratconPanel stratconPanel;
@@ -120,14 +121,14 @@ public class StratconTab extends CampaignGuiTab {
         cboCurrentTrack.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-            	trackSelectionHandler();
+                trackSelectionHandler();
             }
         });
 
         infoPanel.add(cboCurrentTrack, gbc);
         
         // have a default selected
-        if(cboCurrentTrack.getItemCount() > 0) {
+        if (cboCurrentTrack.getItemCount() > 0) {
         	trackSelectionHandler();
         }
         
@@ -186,11 +187,10 @@ public class StratconTab extends CampaignGuiTab {
         StratconCampaignState campaignState = currentContract.getStratconCampaignState();
         
         StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
-        
-        sb.append(currentContract.getMissionTypeName()).append(": ").append(currentContract.getName());
-        sb.append("<br/>");
-        sb.append(campaignState.getBriefingText());
+        sb.append("<html>")
+            .append(currentContract.getMissionTypeName()).append(": ").append(currentContract.getName())
+            .append("<br/>")
+            .append(campaignState.getBriefingText());
         
         // avoid confusing users by showing strategic objectives when there are none to show
         if (!campaignState.strategicObjectivesBehaveAsVPs()) {
@@ -198,13 +198,11 @@ public class StratconTab extends CampaignGuiTab {
                 .append("/").append(campaignState.getPendingStrategicObjectiveCount());
         }
         
-        sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints());
-        
-        sb.append("<br/>Support Points: ").append(campaignState.getSupportPoints());
-        
-        sb.append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime()).append(" days");
-        
-        sb.append("</html>");
+        sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints())
+            .append("<br/>Support Points: ").append(campaignState.getSupportPoints())
+            .append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime())
+            .append(" days")
+            .append("</html>");
         
         campaignStatusText.setText(sb.toString());
     }

@@ -35,8 +35,8 @@ import mekhq.MekHqXmlUtil;
  */
 @XmlRootElement(name="facilityManifest")
 public class StratconFacilityManifest {
-    @XmlElementWrapper(name="facilityFileNames")
-    @XmlElement(name="facilityFileName")
+    @XmlElementWrapper(name = "facilityFileNames")
+    @XmlElement(name = "facilityFileName")
     public List<String> facilityFileNames;
     
     /**
