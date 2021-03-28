@@ -53,9 +53,6 @@ import mekhq.gui.stratcon.TrackForceAssignmentUI;
  * @author NickAragua
  */
 public class StratconPanel extends JPanel implements ActionListener {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 7405934788894417292L;
     
     public static final int HEX_X_RADIUS = 42;
