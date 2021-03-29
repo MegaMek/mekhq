@@ -37,7 +37,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
-import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
@@ -347,11 +346,11 @@ public class AtBScenarioModifier implements Cloneable {
                 if (modifier != null) {
                     scenarioModifiers.put(fileName, modifier);
                     scenarioModifierKeys.add(fileName);
-
+                    
                     if (modifier.getModifierName() == null) {
                         modifier.setModifierName(fileName);
                     }
-				}
+                }
             } catch (Exception e) {
                 MekHQ.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
             }
