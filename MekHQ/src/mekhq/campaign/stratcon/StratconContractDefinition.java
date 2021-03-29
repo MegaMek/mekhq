@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.stratcon;
@@ -44,9 +44,8 @@ import mekhq.MekHqXmlUtil;
  * This class holds data relevant to the various types of contract
  * that can occur in the StratCon campaign system.
  * @author NickAragua
- *
  */
-@XmlRootElement(name="StratconContractDefinition")
+@XmlRootElement(name = "StratconContractDefinition")
 public class StratconContractDefinition {
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final int COUNT_SCALED = -1;
@@ -221,8 +220,8 @@ public class StratconContractDefinition {
         this.hostileFacilityCount = hostileFacilityCount;
     }
 
-    @XmlElementWrapper(name="allowedScenarios")
-    @XmlElement(name="allowedScenario")
+    @XmlElementWrapper(name = "allowedScenarios")
+    @XmlElement(name = "allowedScenario")
     public List<String> getAllowedScenarios() {
         return allowedScenarios;
     }
@@ -231,8 +230,8 @@ public class StratconContractDefinition {
         this.allowedScenarios = allowedScenarios;
     }
 
-    @XmlElementWrapper(name="forbiddenScenarios")
-    @XmlElement(name="forbiddenScenario")
+    @XmlElementWrapper(name = "forbiddenScenarios")
+    @XmlElement(name = "forbiddenScenario")
     public List<String> getForbiddenScenarios() {
         return forbiddenScenarios;
     }
@@ -241,8 +240,8 @@ public class StratconContractDefinition {
         this.forbiddenScenarios = forbiddenScenarios;
     }
     
-    @XmlElementWrapper(name="objectiveParameters")
-    @XmlElement(name="objectiveParameter")
+    @XmlElementWrapper(name = "objectiveParameters")
+    @XmlElement(name = "objectiveParameter")
     public List<ObjectiveParameters> getObjectiveParameters() {
         return objectiveParameters;
     }
@@ -259,8 +258,8 @@ public class StratconContractDefinition {
         this.objectivesBehaveAsVPs = objectivesBehaveAsVPs;
     }
 
-    @XmlElementWrapper(name="scenarioOdds")
-    @XmlElement(name="scenarioOdds")
+    @XmlElementWrapper(name = "scenarioOdds")
+    @XmlElement(name = "scenarioOdds")
     public List<Integer> getScenarioOdds() {
         return scenarioOdds;
     }
@@ -269,8 +268,8 @@ public class StratconContractDefinition {
         this.scenarioOdds = scenarioOdds;
     }
 
-    @XmlElementWrapper(name="deploymentTimes")
-    @XmlElement(name="deploymentTimes")
+    @XmlElementWrapper(name = "deploymentTimes")
+    @XmlElement(name = "deploymentTimes")
     public List<Integer> getDeploymentTimes() {
         return deploymentTimes;
     }
@@ -287,7 +286,7 @@ public class StratconContractDefinition {
         /**
          * The type of objective this is; 
          */
-        @XmlElement(name="objectiveType")
+        @XmlElement(name = "objectiveType")
         StrategicObjectiveType objectiveType;
         
         /**
@@ -295,47 +294,25 @@ public class StratconContractDefinition {
          * 0 means none. A number less than zero indicates that the number of strategic objectives 
          * should be scaled to the number of lances required by the contract, and multiplied by that factor. 
          */
-        @XmlElement(name="objectiveCount")
+        @XmlElement(name = "objectiveCount")
         double objectiveCount;
         
         /**
          * List of IDs (file names) of specific scenarios to use for this objective.
          * Ignored for AnyScenarioVictory or AlliedFacilityControl objective types
          */
-        @XmlElementWrapper(name="objectiveScenarios")
-        @XmlElement(name="objectiveScenario")
+        @XmlElementWrapper(name = "objectiveScenarios")
+        @XmlElement(name = "objectiveScenario")
         List<String> objectiveScenarios;
         
         /**
          * If a particular scenario being generated is a strategic objective, it will have
          * these modifiers applied to it
          */
-        @XmlElementWrapper(name="objectiveScenarioModifiers")
-        @XmlElement(name="objectiveScenarioModifier")
+        @XmlElementWrapper(name = "objectiveScenarioModifiers")
+        @XmlElement(name = "objectiveScenarioModifier")
         List<String> objectiveScenarioModifiers;
     }
-    
-    // Garrison Duty: Defend X facilities
-    // Cadre Duty: Victory in X Training Exercise scenarios
-    // Security Duty: Defend X facilities
-    // Riot Duty: Defend X facilities, Riot Suppression scenarios
-    // Planetary Assault: Destroy or Capture and Hold X facilities
-    // Relief Duty: Hold X facilities (on hostile world!)
-    // Guerilla Warfare: Victory in X scenarios, soft time limit (reinforcements) on all scenarios
-    // Pirate Hunting: Victory in X scenarios 
-    // Diversionary Warfare: Victory in X scenarios
-    // Objective Raid: Destroy X facilities
-    // Extraction Raid: Extract from X facilities, victory in X capture scenarios
-    // Recon Raid: Recon on X facilities
-    // 
-    // future expansion:
-    // Assassination: Victory in X Assassination scenarios
-    // Terrorism: Victory in X "Riot Suppression" scenarios
-    // Bounty Hunt: Victory in X Assassination, X Capture scenarios
-    // Mole Hunting: ?
-    // Espionage: ?
-    // Sabotage: ?
-    // Observation Raid: ?
     
     /**
      * Serialize this instance of a scenario template to a File
@@ -381,10 +358,10 @@ public class StratconContractDefinition {
      * A manifest containing IDs and file names of scenario template definitions
      * @author NickAragua
      */
-    @XmlRootElement(name="contractDefinitionManifest")
+    @XmlRootElement(name = "contractDefinitionManifest")
     private static class ContractDefinitionManifest {
-        @XmlElementWrapper(name="contractDefinitions")
-        @XmlElement(name="contractDefinition")
+        @XmlElementWrapper(name = "contractDefinitions")
+        @XmlElement(name = "contractDefinition")
         public Map<Integer, String> definitionFileNames;
         
         /**

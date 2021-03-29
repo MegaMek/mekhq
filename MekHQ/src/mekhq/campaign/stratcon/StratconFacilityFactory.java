@@ -29,7 +29,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 /**
  * This class handles functionality related to loading and stratcon facility definitions.
  * @author NickAragua
- *
  */
 public class StratconFacilityFactory {
     // loaded facility definitions
@@ -65,11 +64,11 @@ public class StratconFacilityFactory {
         // load user-specified scenario list
         StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize(MekHqConstants.STRATCON_USER_FACILITY_MANIFEST);
         
-        if(facilityManifest != null) {
+        if (facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
         }
         
-        if(userManifest != null) {
+        if (userManifest != null) {
             loadFacilitiesFromManifest(userManifest);
         }
     }
@@ -79,27 +78,27 @@ public class StratconFacilityFactory {
      * @param manifest The manifest to process
      */
     private static void loadFacilitiesFromManifest(StratconFacilityManifest manifest) {
-        if(manifest == null) {
+        if (manifest == null) {
             return;
         }
         
-        for(String fileName : manifest.facilityFileNames) {
+        for (String fileName : manifest.facilityFileNames) {
             String filePath = Paths.get(MekHqConstants.STRATCON_FACILITY_PATH, fileName.trim()).toString();
             
             try {
                 StratconFacility facility = StratconFacility.deserialize(filePath);
                 
-                if(facility != null) {
+                if (facility != null) {
                     stratconFacilityList.add(facility);
                     stratconFacilityMap.put(fileName.trim(), facility);
                     
-                    if(facility.getOwner() == ForceAlignment.Allied) {
+                    if (facility.getOwner() == ForceAlignment.Allied) {
                         alliedFacilities.add(facility);
                     } else {
                         hostileFacilities.add(facility);
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 MekHQ.getLogger().error(String.format("Error loading file: %s", filePath), e);
             }
         }

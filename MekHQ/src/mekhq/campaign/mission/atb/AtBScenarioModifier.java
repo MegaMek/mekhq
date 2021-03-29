@@ -41,6 +41,7 @@ import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -97,13 +98,11 @@ public class AtBScenarioModifier implements Cloneable {
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
-     * @param scenario
-     * @param campaign
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if(eventTiming == getEventTiming()) {
-            if (getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
+        if (eventTiming == getEventTiming()) {
+            if ((getAdditionalBriefingText() != null) && getAdditionalBriefingText().length() > 0) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
                         String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
             }
@@ -112,41 +111,41 @@ public class AtBScenarioModifier implements Cloneable {
                 AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
             }
             
-            if (getSkillAdjustment() != null && getEventRecipient() != null) {
+            if ((getSkillAdjustment() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
             }
             
-            if (getQualityAdjustment() != null && getEventRecipient() != null) {
+            if ((getQualityAdjustment() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
             }
             
-            if (getBattleDamageIntensity() != null && getEventRecipient() != null) {
+            if ((getBattleDamageIntensity() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
             }
             
-            if (getAmmoExpenditureIntensity() != null && getEventRecipient() != null) {
+            if ((getAmmoExpenditureIntensity() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
             }
             
-            if (getUnitRemovalCount() != null && getEventRecipient() != null) {
+            if ((getUnitRemovalCount() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
             }
             
-            if (getUseAmbushLogic() != null && getEventRecipient() != null) {
+            if ((getUseAmbushLogic() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
             }
             
-            if (getSwitchSides() != null && getEventRecipient() != null) {
+            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
             }
             
-            if(getObjectives() != null && getObjectives().size() > 0) {
-                for(ScenarioObjective objective : getObjectives()) {
+            if ((getObjectives() != null) && (getObjectives().size() > 0)) {
+                for (ScenarioObjective objective : getObjectives()) {
                     AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
                 }
             }
             
-            if(getNumExtraEvents() != null && getNumExtraEvents() > 0) {
+            if ((getNumExtraEvents() != null) && (getNumExtraEvents() > 0)) {
                 AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
             }
         }
@@ -214,19 +213,15 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomHostileFacilityModifier() {
-        int modIndex = Compute.randomInt(hostileFacilityModifierKeys.size());
-        
-        return getScenarioModifier(hostileFacilityModifierKeys.get(modIndex));
+        return getScenarioModifier(Utilities.getRandomItem(hostileFacilityModifierKeys));
     }
     
     /**
-     * Convenience method to get a random allied  facility modifier
+     * Convenience method to get a random allied facility modifier
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomAlliedFacilityModifier() {
-        int modIndex = Compute.randomInt(alliedFacilityModifierKeys.size());
-        
-        return getScenarioModifier(alliedFacilityModifierKeys.get(modIndex));
+        return getScenarioModifier(Utilities.getRandomItem(alliedFacilityModifierKeys));
     }
     
     /**
@@ -244,36 +239,34 @@ public class AtBScenarioModifier implements Cloneable {
         List<String> keyList = null;
         
         switch (mapLocation) {
-        case Space:
-        case LowAtmosphere:
-            if (beneficial == null) {
-                keyList = airBattleModifierKeys;
-            } else if (beneficial) {
-                keyList = positiveAirBattleModifierKeys;
-            } else if (!beneficial) {
-                keyList = negativeAirBattleModifierKeys;
-            }
-            break;
-        case AllGroundTerrain:
-        case SpecificGroundTerrain:
-        default:
-            if (beneficial == null) {
-                keyList = groundBattleModifierKeys;
-            } else if (beneficial) {
-                keyList = positiveGroundBattleModifierKeys;
-            } else if (!beneficial) {
-                keyList = negativeGroundBattleModifierKeys;
-            }
-            break;
-        
+            case Space:
+            case LowAtmosphere:
+                if (beneficial == null) {
+                    keyList = airBattleModifierKeys;
+                } else if (beneficial) {
+                    keyList = positiveAirBattleModifierKeys;
+                } else if (!beneficial) {
+                    keyList = negativeAirBattleModifierKeys;
+                }
+                break;
+            case AllGroundTerrain:
+            case SpecificGroundTerrain:
+            default:
+                if (beneficial == null) {
+                    keyList = groundBattleModifierKeys;
+                } else if (beneficial) {
+                    keyList = positiveGroundBattleModifierKeys;
+                } else if (!beneficial) {
+                    keyList = negativeGroundBattleModifierKeys;
+                }
+                break;
         }
         
-        if(keyList == null) {
+        if (keyList == null) {
             return null;
         }
         
-        int modIndex = Compute.randomInt(keyList.size());
-        return getScenarioModifier(keyList.get(modIndex));
+        return getScenarioModifier(Utilities.getRandomItem(keyList));
     }
     
     static {
@@ -298,7 +291,7 @@ public class AtBScenarioModifier implements Cloneable {
         ScenarioModifierManifest manifest = ScenarioModifierManifest.Deserialize(manifestFileName);
         
         // add trimmed versions of each file name to the given collection
-        for(String modifierName : manifest.fileNameList) {
+        for (String modifierName : manifest.fileNameList) {
             keyCollection.add(modifierName.trim());
         }
     }
@@ -307,12 +300,12 @@ public class AtBScenarioModifier implements Cloneable {
      * Divides the given modifiers into a positive and negative bucket.
      */
     private static void initializePositiveNegativeManifests(List<String> modifiers, List<String> positiveKeyCollection, List<String> negativeKeyCollection) {
-        for(String modifier : modifiers) {
-            if(!scenarioModifiers.containsKey(modifier)) {
+        for (String modifier : modifiers) {
+            if (!scenarioModifiers.containsKey(modifier)) {
                 continue;
             }
             
-            if(scenarioModifiers.get(modifier).benefitsPlayer) {
+            if (scenarioModifiers.get(modifier).benefitsPlayer) {
                 positiveKeyCollection.add(modifier);
             } else {
                 negativeKeyCollection.add(modifier);
@@ -328,12 +321,12 @@ public class AtBScenarioModifier implements Cloneable {
         
         // load user-specified modifier list
         ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml");
-        if(userModList != null) {
+        if (userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
         
         // go through each entry and clean it up for preceding/trailing white space
-        for(int x = 0; x < scenarioModifierManifest.fileNameList.size(); x++) {
+        for (int x = 0; x < scenarioModifierManifest.fileNameList.size(); x++) {
             scenarioModifierManifest.fileNameList.set(x, scenarioModifierManifest.fileNameList.get(x).trim());
         }
     }
@@ -345,26 +338,25 @@ public class AtBScenarioModifier implements Cloneable {
         scenarioModifiers = new HashMap<>();
         scenarioModifierKeys = new ArrayList<String>();
         
-        for(String fileName : scenarioModifierManifest.fileNameList) {
+        for (String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/scenariomodifiers/%s", fileName);
             
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
                 
-                if(modifier != null) {
+                if (modifier != null) {
                     scenarioModifiers.put(fileName, modifier);
                     scenarioModifierKeys.add(fileName);
-                    
-                    if(modifier.getModifierName() == null) {
+
+                    if (modifier.getModifierName() == null) {
                         modifier.setModifierName(fileName);
                     }
 				}
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 MekHQ.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
             }
         }
-        
+
         scenarioModifierKeys.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -385,7 +377,7 @@ public class AtBScenarioModifier implements Cloneable {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
-            if(!xmlFile.exists()) {
+            if (!xmlFile.exists()) {
                 MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
@@ -395,7 +387,7 @@ public class AtBScenarioModifier implements Cloneable {
                 JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
@@ -414,7 +406,7 @@ public class AtBScenarioModifier implements Cloneable {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error(e);
         }
     }
@@ -543,8 +535,8 @@ public class AtBScenarioModifier implements Cloneable {
         this.unitRemovalCount = unitRemovalCount;
     }
 
-    @XmlElementWrapper(name="allowedMapLocations")
-    @XmlElement(name="allowedMapLocation")
+    @XmlElementWrapper(name = "allowedMapLocations")
+    @XmlElement(name = "allowedMapLocation")
     public List<MapLocation> getAllowedMapLocations() {
         return allowedMapLocations;
     }
@@ -569,8 +561,8 @@ public class AtBScenarioModifier implements Cloneable {
         this.switchSides = switchSides;
     }
     
-    @XmlElementWrapper(name="objectives")
-    @XmlElement(name="objective")
+    @XmlElementWrapper(name = "objectives")
+    @XmlElement(name = "objective")
     public List<ScenarioObjective> getObjectives() {
         return objectives;
     }
@@ -601,10 +593,10 @@ public class AtBScenarioModifier implements Cloneable {
  * @author NickAragua
  *
  */
-@XmlRootElement(name="scenarioModifierManifest")
+@XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
-    @XmlElementWrapper(name="modifiers")
-    @XmlElement(name="modifier")
+    @XmlElementWrapper(name = "modifiers")
+    @XmlElement(name = "modifier")
     public List<String> fileNameList = new ArrayList<>();
     
     /**
@@ -619,7 +611,7 @@ class ScenarioModifierManifest {
             JAXBContext context = JAXBContext.newInstance(ScenarioModifierManifest.class);
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
-            if(!xmlFile.exists()) {
+            if (!xmlFile.exists()) {
                 MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }

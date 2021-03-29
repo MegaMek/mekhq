@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Additional allied mechs are approaching the area.</additionalBriefingText>
+	<additionalBriefingText>Additional allied Mechs are approaching the area.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>

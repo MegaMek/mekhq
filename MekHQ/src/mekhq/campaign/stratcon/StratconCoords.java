@@ -52,9 +52,9 @@ public class StratconCoords extends Coords {
         Coords coords = translated(direction);
         int y = coords.getY();
         
-        if (isXOdd() && coords.getX() != getX()) {
+        if (isXOdd() && (coords.getX() != getX())) {
             y--;
-        } else if (!isXOdd() && coords.getX() != getX()) {
+        } else if (!isXOdd() && (coords.getX() != getX())) {
             y++;
         }
         
@@ -81,6 +81,7 @@ public class StratconCoords extends Coords {
         } else if ((object == null) || (getClass() != object.getClass())) {
             return false;
         }
+        
         StratconCoords other = (StratconCoords) object;
         return (other.getX() == this.getX()) && (other.getY() == this.getY());
     }

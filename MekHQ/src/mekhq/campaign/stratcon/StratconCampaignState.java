@@ -10,7 +10,7 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -42,7 +42,7 @@ import mekhq.campaign.mission.AtBContract;
  * Contract-level state object for a StratCon campaign.
  * @author NickAragua
  */
-@XmlRootElement(name="StratconCampaignState")
+@XmlRootElement(name = "StratconCampaignState")
 public class StratconCampaignState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratconCampaignState";
     
@@ -61,8 +61,8 @@ public class StratconCampaignState {
     // these are applied to any scenario generated in the campaign; use sparingly
     private List<String> globalScenarioModifiers = new ArrayList<>(); 
     
-    @XmlElementWrapper(name="campaignTracks")
-    @XmlElement(name="campaignTrack")
+    @XmlElementWrapper(name = "campaignTracks")
+    @XmlElement(name = "campaignTrack")
     private List<StratconTrackState> tracks;
 
     @XmlTransient
@@ -195,7 +195,7 @@ public class StratconCampaignState {
      */
     public boolean isForceDeployedHere(int forceID) {
         for (StratconTrackState trackState : tracks) {
-            if(trackState.getAssignedForceCoords().containsKey(forceID)) {
+            if (trackState.getAssignedForceCoords().containsKey(forceID)) {
                 return true;
             }
         }

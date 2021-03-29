@@ -46,10 +46,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author NickAragua
  */
 public class AtBDynamicScenario extends AtBScenario {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 4671466413188687036L;
 
     // by convention, this is the ID specified in the template for the primary player force
@@ -140,6 +136,9 @@ public class AtBDynamicScenario extends AtBScenario {
         playerUnitTemplates.remove(unitID);
     }
 
+    /**
+     * The Board.START_X constant representing the starting zone for the player's primary force
+     */
     @Override
     public int getStart() {
         // If we've assigned at least one force
@@ -174,9 +173,7 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Adds a bot force to this fenario.
-     * @param botForce
-     * @param forceTemplate
+     * Adds a bot force to this scenario.
      */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);

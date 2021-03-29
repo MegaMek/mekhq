@@ -33,10 +33,10 @@ import mekhq.MekHqXmlUtil;
  * A manifest containing IDs and file names of scenario template definitions
  * @author NickAragua
  */
-@XmlRootElement(name="scenarioManifest")
+@XmlRootElement(name = "scenarioManifest")
 public class AtBScenarioManifest {
-    @XmlElementWrapper(name="scenarioFileNames")
-    @XmlElement(name="scenarioFileName")
+    @XmlElementWrapper(name = "scenarioFileNames")
+    @XmlElement(name = "scenarioFileName")
     public Map<Integer, String> scenarioFileNames;
     
     /**
@@ -59,7 +59,7 @@ public class AtBScenarioManifest {
                 JAXBElement<AtBScenarioManifest> manifestElement = um.unmarshal(inputSource, AtBScenarioManifest.class);
                 resultingManifest = manifestElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error("Error Deserializing Scenario Manifest", e);
         }
 

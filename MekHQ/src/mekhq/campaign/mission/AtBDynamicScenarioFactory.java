@@ -1302,8 +1302,7 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.getLogger().error(ex);
+            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
             return null;
         }
 
@@ -2341,25 +2340,28 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function that takes an entity and an array of bomb types
-     * and loads it up with a random amount of bombs that it's capable of holding
+     * and loads it up with as many of a mostly period-appropriate random bomb type 
+     * as it's capable of holding
      */
     private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
         int[] bombChoices = new int[BombType.B_NUM];
         
         // remove bomb choices if they're not era-appropriate
-        List<Integer> actualBombChoices = new ArrayList<>();
+        List<Integer> actualValidBombChoices = new ArrayList<>();
         for (int x = 0; x < validBombChoices.length; x++) {
             String typeName = BombType.getBombInternalName(validBombChoices[x]);
             
             // hack: make rocket launcher pods available before 3055
-            if (validBombChoices[x] == BombType.B_RL ||
+            if ((validBombChoices[x] == BombType.B_RL) ||
                     BombType.get(typeName).isAvailableIn(year)) {
-                actualBombChoices.add(validBombChoices[x]);
+                actualValidBombChoices.add(validBombChoices[x]);
             }
         }
         
-        int numBombs = (int) (entity.getWeight() / 5);
-        int bombIndex = actualBombChoices.get(Compute.randomInt(actualBombChoices.size()));
+        // pick out the index in the BombType array
+        int bombIndex = actualValidBombChoices.get(Compute.randomInt(actualValidBombChoices.size()));
+        // # of bombs is the unit's weight / (bomb cost * 5)
+        int numBombs = (int) (entity.getWeight() / BombType.getBombCost(bombIndex) * 5);
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);

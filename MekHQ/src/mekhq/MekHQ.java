@@ -96,7 +96,8 @@ import mekhq.service.IAutosaveService;
 public class MekHQ implements GameListener {
     // TODO : This is intended as a debug/production type thing.
     // TODO : So it should be backed down to 1 for releases...
-    // TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
+    // TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be
+    // debug/informational.
     public static int VERBOSITY_LEVEL = 5;
     public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
     public static final String PRESET_DIR = "./mmconf/mhqPresets/";
@@ -121,13 +122,13 @@ public class MekHQ implements GameListener {
     private static ObservableString scenarioTemplatesDirectory;
     private static ObservableString financesDirectory;
 
-    //stuff related to MM games
+    // stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
     private Scenario currentScenario = null;
     private Client client = null;
 
-    //the actual campaign - this is where the good stuff is
+    // the actual campaign - this is where the good stuff is
     private CampaignController campaignController;
     private CampaignGUI campaigngui;
 
@@ -146,18 +147,18 @@ public class MekHQ implements GameListener {
             return LogLevel.OFF;
         }
         switch (verbosity) {
-            case 0:
-                return LogLevel.FATAL;
-            case 1:
-                return LogLevel.ERROR;
-            case 2:
-                return LogLevel.WARNING;
-            case 3:
-                return LogLevel.INFO;
-            case 4:
-                return LogLevel.DEBUG;
-            case 5:
-                return LogLevel.TRACE;
+        case 0:
+            return LogLevel.FATAL;
+        case 1:
+            return LogLevel.ERROR;
+        case 2:
+            return LogLevel.WARNING;
+        case 3:
+            return LogLevel.INFO;
+        case 4:
+            return LogLevel.DEBUG;
+        case 5:
+            return LogLevel.TRACE;
         }
         return LogLevel.INFO;
     }
@@ -170,8 +171,8 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * @return The logger that will handle log file output.  Will return the
-     * {@link DefaultMmLogger} if a different logger has not been set.
+     * @return The logger that will handle log file output. Will return the
+     *         {@link DefaultMmLogger} if a different logger has not been set.
      */
     public static MMLogger getLogger() {
         if (null == logger) {
@@ -251,12 +252,12 @@ public class MekHQ implements GameListener {
 
         showInfo();
 
-        //Setup user preferences
+        // Setup user preferences
         getPreferences().loadFromFile(PREFERENCES_FILE);
         setUserPreferences();
 
         initEventHandlers();
-        //create a start up frame and display it
+        // create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
     }
@@ -297,11 +298,8 @@ public class MekHQ implements GameListener {
     }
 
     public void exit() {
-        int savePrompt = JOptionPane.showConfirmDialog(null,
-                "Do you want to save the game before quitting MekHQ?",
-                "Save First?",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+        int savePrompt = JOptionPane.showConfirmDialog(null, "Do you want to save the game before quitting MekHQ?",
+                "Save First?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
         if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
             return;
         } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
@@ -326,14 +324,15 @@ public class MekHQ implements GameListener {
      */
     public static void main(String[] args) {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
 
-        // We need to reset both the MekHQ and MegaMek log files for now, as we route output to them
+        // We need to reset both the MekHQ and MegaMek log files for now, as we route
+        // output to them
         // both
-        String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory()
-                + File.separator + DEFAULT_LOG_FILE_NAME;
-        String logFileNameMM = PreferenceManager.getClientPreferences().getLogDirectory()
-                + File.separator + MegaMek.DEFAULT_LOG_FILE_NAME;
+        String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
+                + DEFAULT_LOG_FILE_NAME;
+        String logFileNameMM = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
+                + MegaMek.DEFAULT_LOG_FILE_NAME;
         getLogger().resetLogFile(logFileNameMHQ);
         getLogger().resetLogFile(logFileNameMM);
         // redirect output to log file
@@ -343,33 +342,34 @@ public class MekHQ implements GameListener {
     }
 
     private void showInfo() {
-        final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
-                + File.separator + "timestamp").lastModified();
+        final long TIMESTAMP = new File(
+                PreferenceManager.getClientPreferences().getLogDirectory() + File.separator + "timestamp")
+                        .lastModified();
         // echo some useful stuff
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl());
 
         StringBuilder msg = new StringBuilder();
-        msg.append("\t").append(resourceMap.getString("Application.name")).append(" ").append(resourceMap.getString("Application.version"));
+        msg.append("\t").append(resourceMap.getString("Application.name")).append(" ")
+                .append(resourceMap.getString("Application.version"));
         if (TIMESTAMP > 0) {
             msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP));
         }
-        msg.append("\n\tToday is ").append(LocalDate.now())
-                .append("\n\tJava vendor ").append(System.getProperty("java.vendor"))
-                .append("\n\tJava version ").append(System.getProperty("java.version"))
-                .append("\n\tPlatform ")
-                .append(System.getProperty("os.name")).append(" ").append(System.getProperty("os.version"))
-               .append(" (").append(System.getProperty("os.arch")).append(")");
+        msg.append("\n\tToday is ").append(LocalDate.now()).append("\n\tJava vendor ")
+                .append(System.getProperty("java.vendor")).append("\n\tJava version ")
+                .append(System.getProperty("java.version")).append("\n\tPlatform ")
+                .append(System.getProperty("os.name")).append(" ").append(System.getProperty("os.version")).append(" (")
+                .append(System.getProperty("os.arch")).append(")");
         msg.append("\n\tTotal memory available to MegaMek: ")
-                .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024))
-                .append(" kB");
+                .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024)).append(" kB");
         getLogger().info(msg.toString());
     }
 
     /**
-     * This function redirects the standard error and output streams to the
-     * given File name.
+     * This function redirects the standard error and output streams to the given
+     * File name.
      */
-    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide MegaMek's
+    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide
+                // MegaMek's
     // output to the console for dev builds
     private static void redirectOutput(String logFilename) {
         try {
@@ -386,8 +386,7 @@ public class MekHQ implements GameListener {
             System.setOut(ps);
             System.setErr(ps);
         } catch (Exception e) {
-            MekHQ.getLogger().error(MekHQ.class, "redirectOutput",
-                    "Unable to redirect output to mekhqlog.txt", e);
+            MekHQ.getLogger().error(MekHQ.class, "redirectOutput", "Unable to redirect output to mekhqlog.txt", e);
         }
     }
 
@@ -444,7 +443,7 @@ public class MekHQ implements GameListener {
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        //Start the game thread
+        // Start the game thread
         gameThread = new GameThread(playerName, client, this, meks, false);
         gameThread.start();
     }
@@ -466,7 +465,8 @@ public class MekHQ implements GameListener {
         final boolean register = hostDialog.isRegister();
         final String metaserver = register ? hostDialog.getMetaserver() : "";
 
-        // Force cleanup of the current modal, since we are (possibly) about to display a new one and MacOS
+        // Force cleanup of the current modal, since we are (possibly) about to display
+        // a new one and MacOS
         // seems to struggle with that (see https://github.com/MegaMek/mekhq/issues/953)
         hostDialog.dispose();
 
@@ -510,11 +510,11 @@ public class MekHQ implements GameListener {
 
     // Stop & send the close game event to the Server
     public synchronized void stopHost() {
-       if (getMyServer() != null) {
-           getMyServer().die();
-           myServer = null;
-       }
-       currentScenario = null;
+        if (getMyServer() != null) {
+            getMyServer().die();
+            myServer = null;
+        }
+        currentScenario = null;
     }
 
     @Override
@@ -576,14 +576,14 @@ public class MekHQ implements GameListener {
 
         try {
             boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
-                    "Did your side control the battlefield at the end of the scenario?",
-                    "Control of Battlefield?",
+                    "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
-            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
+            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true,
+                    tracker);
             resolveDialog.setVisible(true);
             if (campaigngui.getCampaign().getCampaignOptions().getUseAtB()
                     && (campaigngui.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
@@ -596,7 +596,7 @@ public class MekHQ implements GameListener {
                 }
             }
             gameThread.requestStop();
-            /*MegaMek dumps these in the deployment phase to free memory*/
+            /* MegaMek dumps these in the deployment phase to free memory */
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();
@@ -653,6 +653,7 @@ public class MekHQ implements GameListener {
 
     /**
      * Helper function that calculates the maximum screen width available locally.
+     * 
      * @return Maximum screen width.
      */
     public double calculateMaxScreenWidth() {
@@ -661,7 +662,7 @@ public class MekHQ implements GameListener {
         double maxWidth = 0;
         for (GraphicsDevice g : gs) {
             Rectangle b = g.getDefaultConfiguration().getBounds();
-            if (b.getWidth() > maxWidth) {   // Update the max size found on this monitor
+            if (b.getWidth() > maxWidth) { // Update the max size found on this monitor
                 maxWidth = b.getWidth();
             }
         }
@@ -684,14 +685,14 @@ public class MekHQ implements GameListener {
         EVENT_BUS.unregister(handler);
     }
 
-	// TODO: This needs to be way more flexible, but it will do for now.
-	private void initEventHandlers() {
-	    EVENT_BUS.register(new XPHandler());
-	    
+    // TODO: This needs to be way more flexible, but it will do for now.
+    private void initEventHandlers() {
+        EVENT_BUS.register(new XPHandler());
+
         StratconRulesManager srm = new StratconRulesManager();
         srm.startup();
-        EVENT_BUS.register(srm);	    
-	}
+        EVENT_BUS.register(srm);
+    }
 
     private static void setLookAndFeel(String themeName) {
         Runnable runnable = () -> {
@@ -704,17 +705,15 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
-                  }
+                }
                 for (Frame frame : Frame.getFrames()) {
                     SwingUtilities.updateComponentTreeUI(frame);
                 }
                 for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }
-            } catch (ClassNotFoundException |
-                    InstantiationException |
-                    IllegalAccessException |
-                    UnsupportedLookAndFeelException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
                 MekHQ.getLogger().error(e);
             }
         };

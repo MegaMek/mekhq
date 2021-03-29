@@ -34,9 +34,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 /**
  * This represents a facility in the StratCon context
  * @author NickAragua
- *
  */
-@XmlRootElement(name="StratconFacility")
+@XmlRootElement(name = "StratconFacility")
 public class StratconFacility implements Cloneable {
     public enum FacilityType {
         MekBase,
