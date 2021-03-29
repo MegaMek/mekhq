@@ -33,7 +33,7 @@ import mekhq.MekHqXmlUtil;
  * A manifest containing IDs and file names of stratcon facility definitions
  * @author NickAragua
  */
-@XmlRootElement(name="facilityManifest")
+@XmlRootElement(name = "facilityManifest")
 public class StratconFacilityManifest {
     @XmlElementWrapper(name = "facilityFileNames")
     @XmlElement(name = "facilityFileName")
