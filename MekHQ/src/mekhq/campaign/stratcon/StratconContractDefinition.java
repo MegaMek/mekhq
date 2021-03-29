@@ -280,7 +280,6 @@ public class StratconContractDefinition {
 
     /**
      * Data structure that deals with the characteristics that a StratCon scenario objective may have
-     *
      */
     public static class ObjectiveParameters {
         /**
