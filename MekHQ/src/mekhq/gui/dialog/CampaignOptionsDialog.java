@@ -382,17 +382,18 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
-    private JPanel panRank;
     private JComboBox<RankSystem> comboRanks;
-    @SuppressWarnings("unused")
-    private JButton btnAddRank; // FIXME: Unused
-    @SuppressWarnings("unused")
-    private JButton btnDeleteRank; // FIXME: Unused
+
+    // Ranks Table Panel
     private JTable tableRanks;
     private RankTableModel ranksModel;
-    private JScrollPane scrRanks;
-    // FIXME: Place in resource files
-    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
+
+    // Rank Buttons Panel
+    private JButton btnExportCurrentRankSystem;
+    private JButton btnExportCustomRankSystems;
+    private JButton btnImportIndividualRankSystem;
+    private JButton btnImportCustomRankSystems;
+    private JButton btnRefreshDirectory;
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
@@ -492,6 +493,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
     //endregion Against the Bot Tab
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
     //endregion Variable Declarations
 
     public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
@@ -536,7 +539,6 @@ public class CampaignOptionsDialog extends JDialog {
         panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
-        panRank = new JPanel();
         panXP = new JPanel();
         panSkill = new JPanel();
         panTech = new JPanel();
@@ -584,7 +586,6 @@ public class CampaignOptionsDialog extends JDialog {
         choiceTechLevel = new JComboBox<>();
         btnLoad = new JButton();
         btnCancel = new JButton();
-        scrRanks = new JScrollPane();
 
         usePlanetaryAcquisitions = new JCheckBox();
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
@@ -3082,93 +3083,9 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill);
         //endregion Skill Randomization Tab
 
-        //region Rank System Tab
-        panRank.setName("panRank");
-        panRank.setLayout(new GridBagLayout());
-
-        JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
-        lblRank.setName("lblRank");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(lblRank, gridBagConstraints);
-
-        final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
-        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
-        if (campaign.getRanks().isCustom()) {
-            rankSystems.add(campaign.getRanks());
-        }
-        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
-        rankSystems.sort((systemA, systemB) -> naturalOrderComparator.compare(systemA.toString(), systemB.toString()));
-        rankModel.addAll(rankSystems);
-        comboRanks = new JComboBox<>(rankModel);
-        comboRanks.setName("comboRanks");
-        comboRanks.setSelectedItem(campaign.getRanks());
-        comboRanks.addActionListener(evt -> fillRankInfo());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(comboRanks, gridBagConstraints);
-
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
-        tableRanks = new JTable(ranksModel);
-        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableRanks.setRowSelectionAllowed(false);
-        tableRanks.setColumnSelectionAllowed(false);
-        tableRanks.setCellSelectionEnabled(true);
-        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-        tableRanks.setShowGrid(false);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-        scrRanks.setViewportView(tableRanks);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        panRank.add(scrRanks, gridBagConstraints);
-
-        JTextArea txtInstructionsRanks = new JTextArea();
-        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
-        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panRank.add(txtInstructionsRanks, gridBagConstraints);
-
-        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank);
-        //endregion Rank System Tab
+        //region Rank Systems Tab
+        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab());
+        //endregion Rank Systems Tab
 
         //region Name and Portrait Generation Tab
         panNameGen.setName("panNameGen");
@@ -4209,6 +4126,94 @@ public class CampaignOptionsDialog extends JDialog {
 
         pack();
     }
+
+    //region Rank Systems Tab
+    private JPanel createRankSystemsTab() {
+        panRank.setName("panRank");
+        panRank.setLayout(new GridBagLayout());
+
+        JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
+        lblRank.setName("lblRank");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panRank.add(lblRank, gridBagConstraints);
+
+        final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
+        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
+        if (campaign.getRanks().isCustom()) {
+            rankSystems.add(campaign.getRanks());
+        }
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        rankSystems.sort((systemA, systemB) -> naturalOrderComparator.compare(systemA.toString(), systemB.toString()));
+        rankModel.addAll(rankSystems);
+        comboRanks = new JComboBox<>(rankModel);
+        comboRanks.setName("comboRanks");
+        comboRanks.setSelectedItem(campaign.getRanks());
+        comboRanks.addActionListener(evt -> fillRankInfo());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panRank.add(comboRanks, gridBagConstraints);
+
+        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
+        tableRanks = new JTable(ranksModel);
+        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableRanks.setRowSelectionAllowed(false);
+        tableRanks.setColumnSelectionAllowed(false);
+        tableRanks.setCellSelectionEnabled(true);
+        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tableRanks.setIntercellSpacing(new Dimension(0, 0));
+        tableRanks.setShowGrid(false);
+        TableColumn column;
+        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+            column = tableRanks.getColumnModel().getColumn(i);
+            column.setPreferredWidth(ranksModel.getColumnWidth(i));
+            column.setCellRenderer(ranksModel.getRenderer());
+            if (i == RankTableModel.COL_PAYMULT) {
+                column.setCellEditor(new SpinnerEditor());
+            }
+        }
+        scrRanks.setViewportView(tableRanks);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        panRank.add(scrRanks, gridBagConstraints);
+
+        JTextArea txtInstructionsRanks = new JTextArea();
+        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
+        txtInstructionsRanks.setEditable(false);
+        txtInstructionsRanks.setLineWrap(true);
+        txtInstructionsRanks.setWrapStyleWord(true);
+        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtInstructionsRanks.setOpaque(false);
+        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panRank.add(txtInstructionsRanks, gridBagConstraints);
+    }
+    //endregion Rank Systems Tab
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);

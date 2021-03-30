@@ -24,6 +24,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.personnel.enums.RankSystemType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,11 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This object will keep track of rank information. It will keep information
- * on a set of pre-fab rank structures and will hold info on the one chosen by the user.
- * It will also allow for the input of a user-created rank structure from a comma-delimited
- * set of names
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank
+ * system, if there is a custom one there.
  */
 public class Ranks {
     //region Variable Declarations
@@ -72,17 +70,17 @@ public class Ranks {
 
     //region File IO
     public static void initializeRankSystems() {
-        MekHQ.getLogger().info("Starting load of Rank Systems from XML...");
+        MekHQ.getLogger().info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
-        loadRankSystemsFromPath(MekHQ.getMekHQOptions().getRanksDirectoryPath(), false);
-        loadRankSystemsFromPath(MekHQ.getMekHQOptions().getUserRanksDirectoryPath(), true);
-        MekHQ.getLogger().info("Done load of Rank Systems");
+        loadRankSystemsFromPath(RankSystemType.DEFAULT);
+        loadRankSystemsFromPath(RankSystemType.USER_DATA);
+        MekHQ.getLogger().info("Completed Rank System XML Load");
     }
 
-    private static void loadRankSystemsFromPath(final String path, final boolean userData) {
+    private static void loadRankSystemsFromPath(final RankSystemType type) {
         final Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(path)) {
+        try (InputStream is = new FileInputStream(type.getFilePath())) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
@@ -101,9 +99,10 @@ public class Ranks {
             }
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
-                final RankSystem value = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true);
-                if (rankValidator.validate(value, userData)) {
-                    getRankSystems().put(value.getRankSystemCode(), value);
+                final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true, type);
+                if (rankValidator.validate(rankSystem)) {
+                    // This cannot be null, as the validator will ensure that is not the case.
+                    getRankSystems().put(rankSystem.getRankSystemCode(), rankSystem);
                 }
             }
         }

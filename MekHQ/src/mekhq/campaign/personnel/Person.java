@@ -21,51 +21,94 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.Compute;
+import megamek.common.ConvFighter;
+import megamek.common.Crew;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
+import megamek.common.Mech;
+import megamek.common.Protomech;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.VTOL;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.ExtraData;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.campaign.io.Migration.PersonMigrator;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.MedicalLogger;
+import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.Divorce;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.ModifierValue;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.work.IPartWork;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
-
-import megamek.client.generator.RandomNameGenerator;
-import megamek.common.*;
-import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
-import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
-import mekhq.campaign.*;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.io.CampaignXmlParser;
-import mekhq.campaign.io.Migration.PersonMigrator;
-import mekhq.campaign.log.*;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.Ranks;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -1985,11 +2028,17 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
+                    final RankSystem rankSystem;
+
                     if (version.isLowerThan("0.49.0")) {
-                        retVal.setRankSystemDirect(Ranks.getRankSystemFromCode(PersonMigrator
-                                .migrateRankSystemCode(Integer.parseInt(wn2.getTextContent().trim()))));
+                        rankSystem = Ranks.getRankSystemFromCode(PersonMigrator
+                                .migrateRankSystemCode(Integer.parseInt(wn2.getTextContent().trim())));
                     } else {
-                        retVal.setRankSystemDirect(Ranks.getRankSystemFromCode(wn2.getTextContent().trim()));
+                        rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
+                    }
+
+                    if (rankSystem != null) {
+                        retVal.setRankSystemDirect(rankSystem);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     retVal.setRank(Integer.parseInt(wn2.getTextContent().trim()));
@@ -2450,7 +2499,7 @@ public class Person implements Serializable {
      * @return      true if <code>other</code> has a lower rank, or if <code>other</code> is null.
      */
     public boolean outRanks(final @Nullable Person other) {
-        if (null == other) {
+        if (other == null) {
             return true;
         } else if (getRankNumeric() == other.getRankNumeric()) {
             return getRankLevel() > other.getRankLevel();

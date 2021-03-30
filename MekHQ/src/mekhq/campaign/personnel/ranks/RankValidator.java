@@ -4,14 +4,20 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 
 public class RankValidator {
+    public RankValidator() {
 
-    public boolean validate(final @Nullable RankSystem rankSystem, final boolean userData) {
+    }
+
+    public boolean validate(final @Nullable RankSystem rankSystem) {
+        // Null is never a valid rank system, but this catches some default returns whose errors are
+        // caught during the loading process. This MUST be the first check and CANNOT be removed.
         if (rankSystem == null) {
-            return false; // null is never a valid rank system
+            return false;
         }
 
+        // If the code is a duplicate, we've got a duplicate key error
         if (Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
-            if (userData) {
+            if (rankSystem.getType().isUserData()) {
                 MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
                         + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).getRankSystemName()
                         + " is duplicated by userData Rank System " + rankSystem.getRankSystemName());
@@ -20,7 +26,10 @@ public class RankValidator {
                         + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).getRankSystemName()
                         + " is duplicated by " + rankSystem.getRankSystemName());
             }
-            continue;
+            return false;
         }
+
+        // Validation has passed successfully
+        return true;
     }
 }

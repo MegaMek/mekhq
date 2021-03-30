@@ -23,6 +23,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.io.Migration.PersonMigrator;
+import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.gui.model.RankTableModel;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,18 +75,19 @@ public class RankSystem implements Serializable {
 
     private String rankSystemCode;
     private String rankSystemName;
+    private transient RankSystemType type; // no need to serialize
     private List<Rank> ranks;
     //endregion Variable Declarations
 
     //region Constructors
-    public RankSystem() {
-        this("UNK", "Unknown");
+    private RankSystem(final RankSystemType type) {
+        this("UNK", "Unknown", type);
     }
 
-    public RankSystem(final String rankSystemCode, final String rankSystemName) {
+    public RankSystem(final String rankSystemCode, final String rankSystemName, final RankSystemType type) {
         setRankSystemCode(rankSystemCode);
         setRankSystemName(rankSystemName);
-
+        setType(type);
         final RankSystem system = Ranks.getRankSystemFromCode(rankSystemCode);
         setRanks((system == null) ? new ArrayList<>() : new ArrayList<>(system.getRanks()));
     }
@@ -106,6 +108,14 @@ public class RankSystem implements Serializable {
 
     public void setRankSystemName(final String rankSystemName) {
         this.rankSystemName = rankSystemName;
+    }
+
+    public RankSystemType getType() {
+        return type;
+    }
+
+    public void setType(RankSystemType type) {
+        this.type = type;
     }
 
     public List<Rank> getRanks() {
@@ -301,9 +311,9 @@ public class RankSystem implements Serializable {
 
     public void setRanksFromModel(final RankTableModel model) {
         setRanks(new ArrayList<>());
-        @SuppressWarnings("rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
+        @SuppressWarnings(value = "rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
                 Vector<Vector> vectors = model.getDataVector();
-        for (@SuppressWarnings("rawtypes") Vector row : vectors) {
+        for (@SuppressWarnings(value = "rawtypes") Vector row : vectors) {
             String[] names = { (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
                     (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
                     (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH) };
@@ -374,7 +384,13 @@ public class RankSystem implements Serializable {
         return "";
     }
 
-    public static @Nullable RankSystem generateInstanceFromXML(final @Nullable File file) {
+    /**
+     * This generates a single Rank System from an XML file
+     * @param file the file to load, or null if none are to be loaded
+     * @return the single (or first) rank system located within the file, or null if no file is
+     * provided or there is an error
+     */
+    public static @Nullable RankSystem generateIndividualInstanceFromXML(final @Nullable File file) {
         if (file == null) {
             return null;
         }
@@ -394,17 +410,38 @@ public class RankSystem implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if ("rankSystem".equals(wn.getNodeName()) && wn.hasChildNodes()) {
-                return generateInstanceFromXML(wn.getChildNodes(), version, false);
+                // We can assume a RankSystemType of Campaign, as any other would be returned with
+                // the proper type through the already loaded rank systems
+                return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
         MekHQ.getLogger().error("Failed to parse file, returning null");
         return null;
     }
 
+    /**
+     * This loads a Rank System after the initial load of the rank system data.
+     * @param nl the node list to parse the rank system from
+     * @param version the version to parse the rank system at
+     * @return the unvalidated parsed rank system, or null if there is an issue in parsing
+     */
+    public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
+                                                               final @Nullable Version version) {
+        return generateInstanceFromXML(nl, version, false, RankSystemType.CAMPAIGN);
+    }
+
+    /**
+     * @param nl the node list to parse the rank system from
+     * @param version the version to parse the rank system at, or null to not check the version
+     * @param initialLoad whether this is the initial load or a later load
+     * @param type the type of rank system being loaded
+     * @return the unvalidated parsed rank system, or null if there is an issue in parsing
+     */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
                                                                final @Nullable Version version,
-                                                               final boolean initialLoad) {
-        final RankSystem rankSystem = new RankSystem();
+                                                               final boolean initialLoad,
+                                                               final RankSystemType type) {
+        final RankSystem rankSystem = new RankSystem(type);
         // Dump the ranks ArrayList so we can re-use it.
         rankSystem.setRanks(new ArrayList<>());
 
@@ -420,7 +457,14 @@ public class RankSystem implements Serializable {
                         return Ranks.getRankSystemFromCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
                     }
                 } else if (wn.getNodeName().equalsIgnoreCase("systemCode")) {
-                    rankSystem.setRankSystemCode(wn.getTextContent().trim());
+                    final String systemCode = wn.getTextContent().trim();
+                    // If this isn't the initial load and we already have a loaded system with the
+                    // provided key, just return the rank system saved by the key in question.
+                    // This does not need to be validated to ensure it is a proper rank system
+                    if (!initialLoad && Ranks.getRankSystems().containsKey(systemCode)) {
+                        return Ranks.getRankSystemFromCode(systemCode);
+                    }
+                    rankSystem.setRankSystemCode(systemCode);
                 } else if (wn.getNodeName().equalsIgnoreCase("systemName")) {
                     rankSystem.setRankSystemName(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
@@ -434,6 +478,7 @@ public class RankSystem implements Serializable {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+            return null;
         }
         return rankSystem;
     }

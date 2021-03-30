@@ -83,6 +83,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
@@ -705,11 +706,12 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
-                    if (!wn.hasChildNodes()) {
+                    if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;
                     }
-                    final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, false);
-                    if (rankSystem != null) {
+                    final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version);
+                    // If the system is valid, set it. Otherwise, keep the default
+                    if (new RankValidator().validate(rankSystem)) {
                         retVal.setRanks(rankSystem);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {

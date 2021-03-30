@@ -42,6 +42,7 @@ import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.gui.dialog.*;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -599,9 +600,9 @@ public class CampaignGUI extends JPanel {
         miImportIndividualRankSystem.setName("miImportIndividualRankSystem");
         miImportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
         miImportIndividualRankSystem.addActionListener(evt -> {
-            final RankSystem rankSystem = RankSystem.generateInstanceFromXML(
+            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
                     FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
-            if (rankSystem != null) {
+            if (new RankValidator().validate(rankSystem)) {
                 getCampaign().setRanks(rankSystem);
             }
         });
