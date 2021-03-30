@@ -19,7 +19,7 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>SpecificScenarioVictory</objectiveType>
-		<objectiveCount>-.5</objectiveCount>
+		<objectiveCount>-0.5</objectiveCount>
             <objectiveScenarios>
                 <objectiveScenario>Hostile Facility.xml</objectiveScenario>
             </objectiveScenarios>
@@ -29,7 +29,7 @@
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>SpecificScenarioVictory</objectiveType>
-		<objectiveCount>-.5</objectiveCount>
+		<objectiveCount>-0.5</objectiveCount>
             <objectiveScenarios>
                 <objectiveScenario>Recon.xml</objectiveScenario>
             </objectiveScenarios>
