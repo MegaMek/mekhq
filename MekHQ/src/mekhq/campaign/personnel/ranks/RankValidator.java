@@ -29,6 +29,14 @@ public class RankValidator {
             return false;
         }
 
+        // Default System Validation has passed successfully
+        if (rankSystem.getType().isDefault()) {
+            return true;
+        }
+
+        // Now for the more computationally intensive processing.
+
+
         // Validation has passed successfully
         return true;
     }

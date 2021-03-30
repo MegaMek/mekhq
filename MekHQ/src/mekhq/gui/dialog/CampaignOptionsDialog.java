@@ -387,7 +387,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JTable tableRanks;
     private RankTableModel ranksModel;
 
-    // Rank Buttons Panel
+    // Rank System Buttons Panel
     private JButton btnExportCurrentRankSystem;
     private JButton btnExportCustomRankSystems;
     private JButton btnImportIndividualRankSystem;
@@ -4127,6 +4127,18 @@ public class CampaignOptionsDialog extends JDialog {
 
     //region Rank Systems Tab
     private JPanel createRankSystemsTab() {
+
+    }
+
+    private JPanel createRanksTablePane() {
+
+    }
+
+    private JPanel createRankSystemButtonsPanel() {
+
+    }
+
+    private void legacyRankSystemCode() {
         panRank.setName("panRank");
         panRank.setLayout(new GridBagLayout());
 
@@ -4140,7 +4152,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
         final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
-        if (campaign.getRanks().isCustom()) {
+        if (campaign.getRanks().getType().isCampaign()) {
             rankSystems.add(campaign.getRanks());
         }
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
@@ -4747,7 +4759,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         campaign.setRanks((RankSystem) Objects.requireNonNull(comboRanks.getSelectedItem()));
-        if (campaign.getRanks().isCustom()) {
+        if (campaign.getRanks().getType().isCampaign()) {
             campaign.getRanks().setRanksFromModel(ranksModel);
         }
         campaign.setCamouflage(camouflage);

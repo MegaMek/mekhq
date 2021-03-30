@@ -73,7 +73,7 @@ public class RankSystem implements Serializable {
     public static final int RPROF_INF   = 4;
     public static final int RPROF_TECH  = 5;
 
-    private String rankSystemCode;
+    private String rankSystemCode; // Primary Key, must be unique
     private String rankSystemName;
     private transient RankSystemType type; // no need to serialize
     private List<Rank> ranks;
@@ -128,10 +128,6 @@ public class RankSystem implements Serializable {
     //endregion Getters/Setters
 
     //region Boolean Comparison Methods
-    public boolean isCustom() {
-        return !Ranks.getRankSystems().containsKey(getRankSystemCode());
-    }
-
     public boolean isWoBMilitia() {
         return "WOBM".equals(getRankSystemCode());
     }
@@ -354,8 +350,8 @@ public class RankSystem implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemCode", getRankSystemCode());
 
         // Only write out any other information if we are exporting the system or we are using a
-        // custom system
-        if (export || isCustom()) {
+        // campaign-specific custom system
+        if (export || getType().isCampaign()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent);
