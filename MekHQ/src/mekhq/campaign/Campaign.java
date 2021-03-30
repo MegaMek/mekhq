@@ -226,8 +226,7 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Camouflage.COLOUR_CAMOUFLAGE;
-    private String camoFileName = PlayerColour.BLUE.name();
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
 
     //unit icon
@@ -3960,24 +3959,12 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void setCamoCategory(String name) {
-        camoCategory = name;
-    }
-
-    public String getCamoCategory() {
-        return camoCategory;
-    }
-
-    public void setCamoFileName(String name) {
-        camoFileName = name;
-    }
-
-    public String getCamoFileName() {
-        return camoFileName;
-    }
-
     public Camouflage getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+        return camouflage;
+    }
+
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = camouflage;
     }
 
     public PlayerColour getColour() {
@@ -4063,8 +4050,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", camoCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", camoFileName);
+        if (!getCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
+        }
+        if (!getCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
