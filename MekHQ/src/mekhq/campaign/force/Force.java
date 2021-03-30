@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -67,6 +68,7 @@ public class Force implements Serializable {
     private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
+    private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
     private Force parentForce;
@@ -80,9 +82,10 @@ public class Force implements Serializable {
     //an ID so that forces can be tracked in Campaign hash
     private int id;
 
-    public Force(String n) {
-        this.name = n;
-        this.desc = "";
+    public Force(String name) {
+        setName(name);
+        setCamouflage(new Camouflage());
+        setDescription("");
         this.combatForce = true;
         this.parentForce = null;
         this.subForces = new Vector<>();
@@ -107,6 +110,18 @@ public class Force implements Serializable {
 
     public void setName(String n) {
         this.name = n;
+    }
+
+    public Camouflage getCamouflage() {
+        return camouflage;
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
+    }
+
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = camouflage;
     }
 
     public String getDescription() {
@@ -369,7 +384,16 @@ public class Force implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        if (!getCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageCategory", getCamouflage().getCategory());
+        }
+        if (!getCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageFilename", getCamouflage().getFilename());
+        }
+        // TODO : Java 11 : swap to isBlank
+        if (!getDescription().trim().isEmpty()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", iconCategory);
 
@@ -421,12 +445,16 @@ public class Force implements Serializable {
             NodeList nl = wn.getChildNodes();
             retVal.id = Integer.parseInt(idString);
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.setName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) {
+                    retVal.getCamouflage().setCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageFilename")) {
+                    retVal.getCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
+                    retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {

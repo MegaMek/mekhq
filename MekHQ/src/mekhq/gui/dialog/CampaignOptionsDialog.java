@@ -123,8 +123,7 @@ public class CampaignOptionsDialog extends JDialog {
     private RandomSkillPreferences rSkillPrefs;
     private LocalDate date;
     private JFrame frame;
-    private String camoCategory;
-    private String camoFileName;
+    private Camouflage camouflage;
     private PlayerColour colour;
     private String iconCategory;
     private String iconFileName;
@@ -500,8 +499,7 @@ public class CampaignOptionsDialog extends JDialog {
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
         this.date = campaign.getLocalDate();
-        this.camoCategory = campaign.getCamoCategory();
-        this.camoFileName = campaign.getCamoFileName();
+        this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
         this.iconCategory = campaign.getIconCategory();
         this.iconFileName = campaign.getIconFileName();
@@ -514,7 +512,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         initComponents();
         setOptions(c.getCampaignOptions(), c.getRandomSkillPreferences());
-        setCamoIcon();
+        btnCamo.setIcon(camouflage.getImageIcon());
         setForceIcon();
         setLocationRelativeTo(parent);
 
@@ -4798,8 +4796,7 @@ public class CampaignOptionsDialog extends JDialog {
         if (campaign.getRanks().isCustom()) {
             campaign.getRanks().setRanksFromModel(ranksModel);
         }
-        campaign.setCamoCategory(camoCategory);
-        campaign.setCamoFileName(camoFileName);
+        campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 
         campaign.setIconCategory(iconCategory);
@@ -5202,13 +5199,12 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChooserDialog ccd = new CamoChooserDialog(frame, new Camouflage(camoCategory, camoFileName));
+        CamoChooserDialog ccd = new CamoChooserDialog(frame, camouflage);
         if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
             return;
         }
-        camoCategory = ccd.getSelectedItem().getCategory();
-        camoFileName = ccd.getSelectedItem().getFilename();
-        setCamoIcon();
+        camouflage = ccd.getSelectedItem();
+        btnCamo.setIcon(camouflage.getImageIcon());
     }
 
     private Vector<String> getUnusedSPA() {
@@ -5299,10 +5295,6 @@ public class CampaignOptionsDialog extends JDialog {
         });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
-    }
-
-    public void setCamoIcon() {
-        btnCamo.setIcon(new Camouflage(camoCategory, camoFileName).getImageIcon());
     }
 
     public void setForceIcon() {
