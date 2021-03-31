@@ -19,11 +19,11 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>FacilityDestruction</objectiveType>
-		<objectiveCount>-.3</objectiveCount>
+		<objectiveCount>-0.3</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>AlliedFacilityControl</objectiveType>
-		<objectiveCount>-.3</objectiveCount>
+		<objectiveCount>-0.3</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>AnyScenarioVictory</objectiveType>
