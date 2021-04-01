@@ -1,7 +1,7 @@
 /*
  * MekHqConstants.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,9 +66,6 @@ public final class MekHqConstants {
 
     //region File Paths
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
-    public static final String AWARDS_DIRECTORY_PATH = "awardsDirectoryPath";
-    public static final String RANKS_DIRECTORY_PATH = "ranksDirectoryPath";
-    public static final String USER_RANKS_DIRECTORY_PATH = "userRanksDirectoryPath";
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     //endregion File Paths
 
@@ -78,7 +75,14 @@ public final class MekHqConstants {
     //endregion Miscellaneous Options
     //endregion MekHQ Options
 
-    /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
+    //region File Paths
+    // This holds all required file paths not saved as part of MekHQ Options
+    public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
+    public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
+    //endregion File Paths
+
+    // This is used in creating the name of save files, e.g. the MekHQ campaign file
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 
     public static final int MAXIMUM_D6_VALUE = 6;

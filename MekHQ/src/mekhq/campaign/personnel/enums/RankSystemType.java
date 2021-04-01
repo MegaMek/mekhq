@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 
 public enum RankSystemType {
     //region Enum Declarations
@@ -44,11 +45,12 @@ public enum RankSystemType {
     public String getFilePath() {
         switch (this) {
             case DEFAULT:
-                return MekHQ.getMekHQOptions().getRanksDirectoryPath();
+                return MekHqConstants.RANKS_FILE_PATH;
             case USER_DATA:
-                return MekHQ.getMekHQOptions().getUserRanksDirectoryPath();
+                return MekHqConstants.USER_RANKS_FILE_PATH;
             case CAMPAIGN:
             default:
+                MekHQ.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
                 return "";
         }
     }

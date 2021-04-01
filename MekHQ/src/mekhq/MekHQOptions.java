@@ -208,34 +208,19 @@ public final class MekHQOptions {
     //endregion Campaign XML Save Options
 
     //region File Paths
-    public String getAwardsDirectoryPath() {
-        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.AWARDS_DIRECTORY_PATH, "data/universe/awards/");
-    }
-
-    public void setAwardsDirectoryPath(String value) {
-        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
-    }
-
-    public String getRanksDirectoryPath() {
-        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.RANKS_DIRECTORY_PATH, "data/universe/ranks.xml");
-    }
-
-    public void setRanksDirectoryPath(final String value) {
-        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.RANKS_DIRECTORY_PATH, value);
-    }
-
-    public String getUserRanksDirectoryPath() {
-        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.USER_RANKS_DIRECTORY_PATH, "userdata/data/universe/ranks.xml");
-    }
-
-    public void setUserRanksDirectoryPath(final String value) {
-        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
-    }
-
+    /**
+     * @return the path of the folder to load when loading or saving an individual rank system
+     */
     public String getIndividualRankSystemPath() {
         return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, "userdata/data/universe/");
     }
 
+    /**
+     * This sets the path where one saves their individual rank system, as this is not required for
+     * any data but improves UX.
+     *
+     * @param value the path where the person saved their last individual rank system.
+     */
     public void setIndividualRankSystemPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
