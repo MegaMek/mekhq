@@ -39,7 +39,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
