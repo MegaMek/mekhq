@@ -19,14 +19,20 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -50,13 +56,9 @@ public class RankTableModel extends DefaultTableModel {
 
     //region Constructors
     public RankTableModel(final RankSystem rankSystem) {
-        setData(rankSystem);
+        setRanksFromSystem(rankSystem);
     }
     //endregion Constructors
-
-    public void setData(final RankSystem rankSystem) {
-        setDataVector(rankSystem.getRanksForModel(), resources.getString("RankTableModel.columnNames").split(","));
-    }
 
     @Override
     public boolean isCellEditable(final int row, final int column) {
@@ -133,6 +135,65 @@ public class RankTableModel extends DefaultTableModel {
             default:
                 return resources.getString("RankTableModel.defaultToolTip.toolTipText");
         }
+    }
+
+    public List<Rank> getRanks() {
+        try {
+            final List<Rank> ranks = new ArrayList<>();
+
+            // Java annoyingly doesn't have typed vectors in the DefaultTableModel, but we can just
+            // suppress the warnings this causes
+            @SuppressWarnings(value = "rawtypes") final Vector<Vector> vectors = getDataVector();
+            for (@SuppressWarnings(value = "rawtypes") Vector row : vectors) {
+                final String[] names = {(String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
+                        (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
+                        (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH)};
+                final boolean officer = (boolean) row.get(RankTableModel.COL_OFFICER);
+                final double paymentMultiplier = (double) row.get(RankTableModel.COL_PAYMULT);
+                ranks.add(new Rank(names, officer, paymentMultiplier));
+            }
+            return ranks;
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * @param rankSystem The system to set the ranks for. Null values are properly handled but are
+     *                   considered to be an unexpected error condition and thus do not change the
+     *                   underlying model.
+     */
+    public void setRanksFromSystem(final @Nullable RankSystem rankSystem) {
+        if (rankSystem == null) {
+            MekHQ.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
+            return;
+        }
+
+        final List<Rank> ranks = rankSystem.getRanks();
+        final Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
+        for (int i = 0; i < ranks.size(); i++) {
+            final Rank rank = ranks.get(i);
+            final String rating;
+            if (i > RankSystem.RWO_MAX) {
+                rating = "O" + (i - RankSystem.RWO_MAX);
+            } else if (i > RankSystem.RE_MAX) {
+                rating = "WO" + (i - RankSystem.RE_MAX);
+            } else {
+                rating = "E" + i;
+            }
+            array[i][RankTableModel.COL_NAME_RATE] = rating;
+            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(RankSystem.RPROF_MW);
+            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(RankSystem.RPROF_ASF);
+            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(RankSystem.RPROF_VEE);
+            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(RankSystem.RPROF_NAVAL);
+            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(RankSystem.RPROF_INF);
+            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(RankSystem.RPROF_TECH);
+            array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
+            array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
+        }
+
+        setDataVector(array, resources.getString("RankTableModel.columnNames").split(","));
     }
 
     public TableCellRenderer getRenderer() {

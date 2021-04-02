@@ -123,6 +123,18 @@ public class Rank implements Serializable {
         return rankLevels.get(profession);
     }
 
+    public String getRankNamesAsString(final String delimiter) {
+        StringJoiner joiner = new StringJoiner(delimiter);
+        for (final String name : getRankNames()) {
+            if (!rankLevels.isEmpty() && (rankLevels.get(getRankNames().indexOf(name)) > 0)) {
+                joiner.add(name + rankLevels.get(getRankNames().indexOf(name)).toString());
+            } else {
+                joiner.add(name);
+            }
+        }
+        return joiner.toString();
+    }
+
     //region Boolean Comparison Methods
     public boolean isEmpty(final int profession) {
         return getName(profession).equals("-");
@@ -136,22 +148,10 @@ public class Rank implements Serializable {
     //region File IO
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rank");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rank");
-    }
-
-    private String getRankNamesAsString() {
-        StringJoiner joiner = new StringJoiner(",");
-        for (String name : getRankNames()) {
-            if ((rankLevels.size() > 0) && (rankLevels.get(getRankNames().indexOf(name)) > 0)) {
-                joiner.add(name + rankLevels.get(getRankNames().indexOf(name)).toString());
-            } else {
-                joiner.add(name);
-            }
-        }
-        return joiner.toString();
     }
 
     public static @Nullable Rank generateInstanceFromXML(final Node wn) {

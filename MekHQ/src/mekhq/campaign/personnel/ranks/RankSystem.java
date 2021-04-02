@@ -42,7 +42,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Vector;
 import java.util.stream.Stream;
 
 public class RankSystem implements Serializable {
@@ -123,6 +122,11 @@ public class RankSystem implements Serializable {
     }
 
     public void setRanks(final List<Rank> ranks) {
+        // TODO : Windchild : I need to ensure the size is proper, and fix it if it is not... for now
+        setRanksDirect(ranks);
+    }
+
+    public void setRanksDirect(final List<Rank> ranks) {
         this.ranks = ranks;
     }
     //endregion Getters/Setters
@@ -159,6 +163,7 @@ public class RankSystem implements Serializable {
     }
 
     //region Professions
+    // TODO : Windchild : Move me into an enum
     /**
      * This takes the initial profession, converts it into a base profession, and then calls
      * getProfessionFromBase to determine the profession to use for the provided rank.
@@ -281,6 +286,7 @@ public class RankSystem implements Serializable {
 
     //region Table Model
     // TODO : Move this region into the Table Model, having it here is odd
+    @Deprecated
     public Object[][] getRanksForModel() {
         Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
         int i = 0;
@@ -303,20 +309,6 @@ public class RankSystem implements Serializable {
             i++;
         }
         return array;
-    }
-
-    public void setRanksFromModel(final RankTableModel model) {
-        setRanks(new ArrayList<>());
-        @SuppressWarnings(value = "rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
-                Vector<Vector> vectors = model.getDataVector();
-        for (@SuppressWarnings(value = "rawtypes") Vector row : vectors) {
-            String[] names = { (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
-                    (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
-                    (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH) };
-            Boolean officer = (Boolean) row.get(RankTableModel.COL_OFFICER);
-            double payMult = (Double) row.get(RankTableModel.COL_PAYMULT);
-            getRanks().add(new Rank(names, officer, payMult));
-        }
     }
     //endregion Table Model
 
@@ -362,22 +354,18 @@ public class RankSystem implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rankSystem");
     }
 
-    private String getRankPostTag(int rankNum) {
+    private String getRankPostTag(final int rankNum) {
         if (rankNum == 0) {
             return " <!-- E0 \"None\" -->";
-        }
-        if (rankNum < RE_NUM) {
+        } else if (rankNum < RE_NUM) {
             return " <!-- E" + rankNum + " -->";
-        }
-        if (rankNum < RWO_NUM) {
+        } else if (rankNum < RWO_NUM) {
             return " <!-- WO" + (rankNum - RE_MAX) + " -->";
-        }
-        if (rankNum < RO_NUM) {
+        } else if (rankNum < RO_NUM) {
             return " <!-- O" + (rankNum - RWO_MAX) + " -->";
+        } else {
+            return "";
         }
-
-        // Yuck, we've got nada!
-        return "";
     }
 
     /**
@@ -439,7 +427,7 @@ public class RankSystem implements Serializable {
                                                                final RankSystemType type) {
         final RankSystem rankSystem = new RankSystem(type);
         // Dump the ranks ArrayList so we can re-use it.
-        rankSystem.setRanks(new ArrayList<>());
+        rankSystem.setRanksDirect(new ArrayList<>());
 
         try {
             int rankSystemId = -1; // migration, 0.49.X
