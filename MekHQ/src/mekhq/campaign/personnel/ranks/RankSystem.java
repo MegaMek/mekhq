@@ -24,7 +24,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.RankSystemType;
-import mekhq.gui.model.RankTableModel;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -283,34 +282,6 @@ public class RankSystem implements Serializable {
         }
     }
     //endregion Professions
-
-    //region Table Model
-    // TODO : Move this region into the Table Model, having it here is odd
-    @Deprecated
-    public Object[][] getRanksForModel() {
-        Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
-        int i = 0;
-        for (Rank rank : ranks) {
-            String rating = "E" + i;
-            if (i > RWO_MAX) {
-                rating = "O" + (i - RWO_MAX);
-            } else if (i > RE_MAX) {
-                rating = "WO" + (i - RE_MAX);
-            }
-            array[i][RankTableModel.COL_NAME_RATE] = rating;
-            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(RPROF_MW);
-            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(RPROF_ASF);
-            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(RPROF_VEE);
-            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(RPROF_NAVAL);
-            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(RPROF_INF);
-            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(RPROF_TECH);
-            array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
-            array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
-            i++;
-        }
-        return array;
-    }
-    //endregion Table Model
 
     //region File IO
     public void writeToFile(File file) {
