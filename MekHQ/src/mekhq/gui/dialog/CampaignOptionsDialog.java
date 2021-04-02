@@ -28,6 +28,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -39,7 +40,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -88,7 +89,9 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -106,7 +109,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
-import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -381,18 +384,12 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
-    private JComboBox<RankSystem> comboRanks;
+    private JComboBox<RankSystem> comboRankSystems;
+    private boolean rankSystemChanged;
 
     // Ranks Table Panel
     private JTable tableRanks;
     private RankTableModel ranksModel;
-
-    // Rank System Buttons Panel
-    private JButton btnExportCurrentRankSystem;
-    private JButton btnExportCustomRankSystems;
-    private JButton btnImportIndividualRankSystem;
-    private JButton btnImportCustomRankSystems;
-    private JButton btnRefreshDirectory;
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
@@ -4126,126 +4123,254 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     //region Rank Systems Tab
-    private JPanel createRankSystemsTab() {
+    private JScrollPane createRankSystemsTab() {
+        final JPanel rankSystemsPanel = new JPanel(new GridBagLayout());
+        rankSystemsPanel.setName("rankSystemsPanel");
 
-    }
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
 
-    private JPanel createRanksTablePane() {
-
-    }
-
-    private JPanel createRankSystemButtonsPanel() {
-
-    }
-
-    private void legacyRankSystemCode() {
-        panRank.setName("panRank");
-        panRank.setLayout(new GridBagLayout());
-
-        JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
-        lblRank.setName("lblRank");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(lblRank, gridBagConstraints);
-
-        final DefaultComboBoxModel<RankSystem> rankModel = new DefaultComboBoxModel<>();
-        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
-        if (campaign.getRanks().getType().isCampaign()) {
-            rankSystems.add(campaign.getRanks());
-        }
-        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
-        rankSystems.sort((systemA, systemB) -> naturalOrderComparator.compare(systemA.toString(), systemB.toString()));
-        rankModel.addAll(rankSystems);
-        comboRanks = new JComboBox<>(rankModel);
-        comboRanks.setName("comboRanks");
-        comboRanks.setSelectedItem(campaign.getRanks());
-        comboRanks.addActionListener(evt -> fillRankInfo());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(comboRanks, gridBagConstraints);
-
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
-        tableRanks = new JTable(ranksModel);
-        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableRanks.setRowSelectionAllowed(false);
-        tableRanks.setColumnSelectionAllowed(false);
-        tableRanks.setCellSelectionEnabled(true);
-        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-        tableRanks.setShowGrid(false);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-        scrRanks.setViewportView(tableRanks);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        panRank.add(scrRanks, gridBagConstraints);
-
-        JTextArea txtInstructionsRanks = new JTextArea();
-        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
+        final JTextArea txtInstructionsRanks = new JTextArea(resources.getString("txtInstructionsRanks.text"));
         txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
+                BorderFactory.createTitledBorder(resources.getString("txtInstructionsRanks.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtInstructionsRanks.setOpaque(false);
         txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panRank.add(txtInstructionsRanks, gridBagConstraints);
+        txtInstructionsRanks.setEditable(false);
+        txtInstructionsRanks.setLineWrap(true);
+        txtInstructionsRanks.setWrapStyleWord(true);
+        rankSystemsPanel.add(txtInstructionsRanks, gbc);
+
+        gbc.gridy++;
+        rankSystemsPanel.add(createRankSystemPanel(), gbc);
+
+        gbc.gridy++;
+        rankSystemsPanel.add(createRanksTablePane(), gbc);
+
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        rankSystemsPanel.add(createRankSystemFileButtonsPanel(), gbc);
+
+        final JScrollPane rankSystemsPane = new JScrollPane(rankSystemsPanel);
+        rankSystemsPane.setPreferredSize(new Dimension(500, 400));
+
+        return rankSystemsPane;
     }
-    //endregion Rank Systems Tab
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);
+    private JPanel createRankSystemPanel() {
+        final JButton btnConvertRankSystemType = createButton(campaign.getRanks().getType().isUserData()
+                        ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text",
+                "btnConvertRankSystemType.toolTipText", "btnConvertRankSystemType",
+                evt -> {
+            final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+            if (rankSystem == null) {
+                return;
+            }
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
-    }
+            switch (rankSystem.getType()) {
+                case DEFAULT:
+                    MekHQ.getLogger().error("Error, tried to make a DEFAULT rank system into another type of rank system");
+                    return;
+                case USER_DATA:
+                    rankSystem.setType(RankSystemType.CAMPAIGN);
+                    break;
+                case CAMPAIGN:
+                    rankSystem.setType(RankSystemType.USER_DATA);
+                    break;
+                default:
+                    MekHQ.getLogger().error("Error, unknown rank system type.");
+                    return;
+            }
+            rankSystemChanged = true;
+        });
 
-    private void fillRankInfo() {
-        final RankSystem ranks = (RankSystem) comboRanks.getSelectedItem();
-        if (ranks != null) {
-            ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-            TableColumn column;
+        // Create Panel Components
+        final JLabel lblRankSystem = new JLabel(resources.getString("lblRankSystem.text"));
+        lblRankSystem.setName("lblRankSystem");
+
+        final Comparator<String> comparator = new NaturalOrderComparator();
+        final DefaultComboBoxModel<RankSystem> rankSystemModel = new SortedComboBoxModel<>(
+                (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()),
+                Ranks.getRankSystems().values());
+        if (campaign.getRanks().getType().isCampaign()) {
+            rankSystemModel.addElement(campaign.getRanks());
+        }
+        comboRankSystems = new JComboBox<>(rankSystemModel);
+        comboRankSystems.setName("comboRankSystems");
+        comboRankSystems.setSelectedItem(campaign.getRanks());
+        comboRankSystems.addActionListener(evt -> {
+            final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+            if (rankSystem == null) {
+                return;
+            }
+
+            ranksModel.setRanksFromSystem(rankSystem);
             for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-                column = tableRanks.getColumnModel().getColumn(i);
+                final TableColumn column = tableRanks.getColumnModel().getColumn(i);
                 column.setPreferredWidth(ranksModel.getColumnWidth(i));
                 column.setCellRenderer(ranksModel.getRenderer());
                 if (i == RankTableModel.COL_PAYMULT) {
                     column.setCellEditor(new SpinnerEditor());
                 }
             }
+
+            btnConvertRankSystemType.setEnabled(!campaign.getRanks().getType().isDefault());
+
+            rankSystemChanged = true;
+        });
+
+        btnConvertRankSystemType.setEnabled(!campaign.getRanks().getType().isDefault());
+
+        final JButton btnCreateCustomRankSystem = createButton("btnCreateCustomRankSystem.text",
+                "btnCreateCustomRankSystem.toolTipText", "btnCreateCustomRankSystem",
+                evt -> {
+
+        });
+
+        // Programmatically Assign Accessibility Labels
+        lblRankSystem.setLabelFor(comboRankSystems);
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("rankSystemPanel.title")));
+        panel.setName("rankSystemPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRankSystem)
+                                .addComponent(comboRankSystems)
+                                .addComponent(btnConvertRankSystemType)
+                                .addComponent(btnCreateCustomRankSystem, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRankSystem)
+                                .addComponent(comboRankSystems)
+                                .addComponent(btnConvertRankSystemType)
+                                .addComponent(btnCreateCustomRankSystem))
+        );
+
+        return panel;
+    }
+
+    private JScrollPane createRanksTablePane() {
+        // Create Model
+        ranksModel = new RankTableModel(campaign.getRanks());
+
+        // Create Table
+        tableRanks = new JTable(ranksModel);
+        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+        tableRanks.setRowSelectionAllowed(false);
+        tableRanks.setColumnSelectionAllowed(false);
+        tableRanks.setCellSelectionEnabled(true);
+        tableRanks.setIntercellSpacing(new Dimension(0, 0));
+        tableRanks.setShowGrid(false);
+
+        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+            final TableColumn column = tableRanks.getColumnModel().getColumn(i);
+            column.setPreferredWidth(ranksModel.getColumnWidth(i));
+            column.setCellRenderer(ranksModel.getRenderer());
+            if (i == RankTableModel.COL_PAYMULT) {
+                column.setCellEditor(new SpinnerEditor());
+            }
         }
+
+        // Create the Scroll Pane
+        final JScrollPane pane = new JScrollPane(tableRanks);
+        pane.setName("ranksTableScrollPane");
+
+        return pane;
+    }
+
+    private JPanel createRankSystemFileButtonsPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 3));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("rankSystemButtonsPanel.title")));
+        panel.setName("rankSystemFileButtonsPanel");
+
+        // Create the Buttons
+        panel.add(createButton("btnExportCurrentRankSystem.text",
+                "btnExportCurrentRankSystem.toolTipText", "btnExportCurrentRankSystem",
+                evt -> {
+
+        }));
+
+        panel.add(createButton("btnExportUserDataRankSystems.text",
+                "btnExportUserDataRankSystems.toolTipText", "btnExportUserDataRankSystems",
+                evt -> {
+
+        }));
+
+        panel.add(createButton("btnExportRankSystems.text",
+                "btnExportRankSystems.toolTipText", "btnExportRankSystems",
+                evt -> {
+
+        }));
+
+        panel.add(createButton("btnImportIndividualRankSystem.text",
+                "btnImportIndividualRankSystem.toolTipText", "btnImportIndividualRankSystem",
+                evt -> {
+            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
+                    FileDialogs.openIndividualRankSystem(frame).orElse(null));
+            if (new RankValidator().validate(rankSystem)) {
+
+            }
+        }));
+
+        panel.add(createButton("btnImportRankSystems.text",
+                "btnImportRankSystems.toolTipText", "btnImportRankSystems",
+                evt -> {
+
+        }));
+
+        panel.add(createButton("btnRefreshRankSystemsFromFile.text",
+                "btnRefreshRankSystemsFromFile.toolTipText", "btnRefreshRankSystemsFromFile",
+                evt -> {
+
+        }));
+
+        return panel;
+    }
+    //endregion Rank Systems Tab
+
+    /**
+     * This creates a standard button for use in the dialog. It is a temporary copy over from
+     * AbstractButtonDialog until I, Windchild, can move this dialog over to using that properly
+     *
+     * TODO : Remove me once I've been migrated to AbstractMHQDialog
+     *
+     * @param text the text resource string
+     * @param toolTipText the toolTipText resource string
+     * @param name the name of the button
+     * @param actionListener the {@link ActionListener} to assign to the button
+     * @return the created button
+     */
+    protected JButton createButton(final String text, final String toolTipText, final String name,
+                                   final ActionListener actionListener) {
+        final JButton button = new JButton(resources.getString(text));
+        button.setToolTipText(resources.getString(toolTipText));
+        button.setName(name);
+        button.addActionListener(actionListener);
+        return button;
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public void applyPreset(GamePreset gamePreset) {
@@ -4758,9 +4883,9 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRanks((RankSystem) Objects.requireNonNull(comboRanks.getSelectedItem()));
+        campaign.setRanks((RankSystem) Objects.requireNonNull(comboRankSystems.getSelectedItem()));
         if (campaign.getRanks().getType().isCampaign()) {
-            campaign.getRanks().setRanksFromModel(ranksModel);
+            campaign.getRanks().setRanks(ranksModel.getRanks());
         }
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
