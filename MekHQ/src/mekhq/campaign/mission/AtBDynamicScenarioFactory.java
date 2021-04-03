@@ -2358,7 +2358,7 @@ public class AtBDynamicScenarioFactory {
         // pick out the index in the BombType array
         int bombIndex = actualValidBombChoices.get(Compute.randomInt(actualValidBombChoices.size()));
         // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) (entity.getWeight() / BombType.getBombCost(bombIndex) * 5);
+        int numBombs = (int) (entity.getWeight() / (BombType.getBombCost(bombIndex) * 5));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);

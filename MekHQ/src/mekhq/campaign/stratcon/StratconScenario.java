@@ -34,9 +34,11 @@ import mekhq.campaign.mission.ScenarioTemplate;
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
  * @author NickAragua
- *
  */
 public class StratconScenario implements IStratconDisplayable {
+    /**
+     * Represents the possible states of a Stratcon scenario
+     */
     public enum ScenarioState {
         NONEXISTENT,
         UNRESOLVED,
@@ -45,18 +47,22 @@ public class StratconScenario implements IStratconDisplayable {
         COMPLETED,
         IGNORED,
         DEFEATED;
-    }
     
-    private final static Map<ScenarioState, String> scenarioStateNames;
-    
-    static {
-        scenarioStateNames = new HashMap<>();
-        scenarioStateNames.put(ScenarioState.NONEXISTENT, "Shouldn't be seen");
-        scenarioStateNames.put(ScenarioState.UNRESOLVED, "Unresolved");
-        scenarioStateNames.put(ScenarioState.PRIMARY_FORCES_COMMITTED, "Primary forces committed");
-        scenarioStateNames.put(ScenarioState.COMPLETED, "Victory");
-        scenarioStateNames.put(ScenarioState.IGNORED, "Ignored");
-        scenarioStateNames.put(ScenarioState.DEFEATED, "Defeat");
+        private final static Map<ScenarioState, String> scenarioStateNames;
+        
+        static {
+            scenarioStateNames = new HashMap<>();
+            scenarioStateNames.put(ScenarioState.NONEXISTENT, "Shouldn't be seen");
+            scenarioStateNames.put(ScenarioState.UNRESOLVED, "Unresolved");
+            scenarioStateNames.put(ScenarioState.PRIMARY_FORCES_COMMITTED, "Primary forces committed");
+            scenarioStateNames.put(ScenarioState.COMPLETED, "Victory");
+            scenarioStateNames.put(ScenarioState.IGNORED, "Ignored");
+            scenarioStateNames.put(ScenarioState.DEFEATED, "Defeat");
+        }
+        
+        public String getScenarioStateName() {
+            return scenarioStateNames.get(this);
+        }
     }
     
     private AtBDynamicScenario backingScenario;
@@ -85,8 +91,6 @@ public class StratconScenario implements IStratconDisplayable {
     
     /**
      * Add a force to the backing scenario, trying to associate it with the given template.
-     * @param forceID
-     * @param templateID
      */
     public void addForce(int forceID, String templateID) {
         backingScenario.addForce(forceID, templateID);
@@ -94,19 +98,9 @@ public class StratconScenario implements IStratconDisplayable {
     
     /**
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
-     * @param unitID
-     * @param templateID
      */
     public void addUnit(UUID unitID, String templateID) {
         backingScenario.addUnit(unitID, templateID);
-    }
-    
-    public void clearReinforcements() {
-        for(int forceID : backingScenario.getForceIDs()) {
-            if(!backingScenario.getPlayerForceTemplates().containsKey(forceID)) {
-                backingScenario.removeForce(forceID);
-            }
-        }
     }
 
     public List<Integer> getAssignedForces() {
@@ -163,48 +157,49 @@ public class StratconScenario implements IStratconDisplayable {
     public String getInfo(boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
 
-        if(this.isStrategicObjective) {
+        if (this.isStrategicObjective) {
             stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
         }
         
-        stateBuilder.append("Scenario: ");
-        stateBuilder.append(backingScenario.getName());
-        stateBuilder.append(html ? "<br/>" : "");
-        stateBuilder.append(backingScenario.getTemplate().shortBriefing);
-        stateBuilder.append(html ? "<br/>" : "");
+        stateBuilder.append("Scenario: ")
+            .append(backingScenario.getName())
+            .append(html ? "<br/>" : "")
+            .append(backingScenario.getTemplate().shortBriefing)
+            .append(html ? "<br/>" : "");
         
-        if(this.isRequiredScenario()) {
+        if (this.isRequiredScenario()) {
             stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "");
         }
         
-        stateBuilder.append("Status: ");
-        stateBuilder.append(scenarioStateNames.get(currentState));
-        stateBuilder.append("<br/>");
+        stateBuilder.append("Status: ")
+            .append(currentState.getScenarioStateName())
+            .append("<br/>");
         
         stateBuilder.append("Terrain: ");
-        if((backingScenario.getTerrainType() >= 0) && (backingScenario.getTerrainType() < AtBScenario.terrainTypes.length)) {
-            stateBuilder.append(AtBScenario.terrainTypes[backingScenario.getTerrainType()]);
-            stateBuilder.append(" : ");
-            stateBuilder.append(backingScenario.getMap());
+        if ((backingScenario.getTerrainType() >= 0) && 
+                (backingScenario.getTerrainType() < AtBScenario.terrainTypes.length)) {
+            stateBuilder.append(AtBScenario.terrainTypes[backingScenario.getTerrainType()])
+                .append(" : ")
+                .append(backingScenario.getMap());
         }
         stateBuilder.append("<br/>");
 
         if (deploymentDate != null) {
-            stateBuilder.append("Deployment Date: ");
-            stateBuilder.append(deploymentDate.toString());
-            stateBuilder.append("<br/>");
+            stateBuilder.append("Deployment Date: ")
+                .append(deploymentDate.toString())
+                .append("<br/>");
         }
         
         if (actionDate != null) {
-            stateBuilder.append("Battle Date: ");
-            stateBuilder.append(actionDate.toString());
-            stateBuilder.append("<br/>");
+            stateBuilder.append("Battle Date: ")
+                .append(actionDate.toString())
+                .append("<br/>");
         }
         
         if (returnDate != null) {
-            stateBuilder.append("Return Date: ");
-            stateBuilder.append(returnDate.toString());
-            stateBuilder.append("<br/>");
+            stateBuilder.append("Return Date: ")
+                .append(returnDate.toString())
+                .append("<br/>");
         }    
 
         stateBuilder.append("</html>");

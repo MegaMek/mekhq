@@ -105,8 +105,7 @@ public class StratconRulesManager {
         // and use the random force to drive opfor generation (#required lances multiplies the BV budget of all
         for (int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
             // if we haven't already used all the player forces and are required to randomly generate a scenario
-            if ((availableForceIDs.size() > 0) &&
-                    (Compute.randomInt(100) <= track.getScenarioOdds())) {
+            if ((availableForceIDs.size() > 0) && (Compute.randomInt(100) <= track.getScenarioOdds())) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -674,15 +673,15 @@ public class StratconRulesManager {
             alliedUnitOdds = 50;
         } else {
             switch(contract.getCommandRights()) {
-            case AtBContract.COM_INTEGRATED:
-                alliedUnitOdds = 50;
-                break;
-            case AtBContract.COM_HOUSE:
-                alliedUnitOdds = 30;
-                break;
-            case AtBContract.COM_LIAISON:
-                alliedUnitOdds = 10;
-                break;
+                case AtBContract.COM_INTEGRATED:
+                    alliedUnitOdds = 50;
+                    break;
+                case AtBContract.COM_HOUSE:
+                    alliedUnitOdds = 30;
+                    break;
+                case AtBContract.COM_LIAISON:
+                    alliedUnitOdds = 10;
+                    break;
             }
         }
 
@@ -723,26 +722,20 @@ public class StratconRulesManager {
         // if we're under non-independent command rights, a supervisor may come along
         switch (contract.getCommandRights()) {
             case AtBContract.COM_INTEGRATED:
-                if (airBattle) {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR));
-                } else {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
-                }
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
+                        ? AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
+                        : AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
                 break;
             case AtBContract.COM_HOUSE:
-                if (airBattle) {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR));
-                } else {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
-                }
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
+                        ? AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR
+                        : AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case AtBContract.COM_LIAISON:
                 if (scenario.isRequiredScenario()) {
-                    if(airBattle) {
-                        backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR));
-                    } else {
-                        backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
-                    }
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
+                            ? AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR
+                            : AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
                 }
                 break;
         }
@@ -819,8 +812,8 @@ public class StratconRulesManager {
         // first, we gather a set of all forces that are already deployed to a track so we eliminate those later
         Set<Integer> forcesInTracks = new HashSet<>();
         for (Contract contract : campaign.getActiveContracts()) {
-            if(contract instanceof AtBContract) {
-                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+            if (contract instanceof AtBContract) {
+                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
                 }
             }
@@ -830,7 +823,7 @@ public class StratconRulesManager {
         // deployed to a scenario and not in a track already
         for (int key : campaign.getLances().keySet()) {
             Force force = campaign.getForce(key);
-            if (force != null &&
+            if ((force != null) &&
                     !force.isDeployed() &&
                     !forcesInTracks.contains(force.getId())) {
                 retVal.add(force.getId());
@@ -912,9 +905,8 @@ public class StratconRulesManager {
                     u.isFunctional()) {
 
                 // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
-                for (Contract contract : campaign.getActiveContracts()) {
-                    if((contract instanceof AtBContract) &&
-                            ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    if (contract.getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
                         continue;
                     }
                 }
@@ -970,9 +962,8 @@ public class StratconRulesManager {
         }
         
         //this is a little inefficient, but probably there aren't too many active AtB contracts at a time
-        for (Contract contract : u.getCampaign().getActiveContracts()) {
-            if((contract instanceof AtBContract) &&
-                    ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
+        for (AtBContract contract : u.getCampaign().getActiveAtBContracts()) {
+            if (contract.getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
                 return true;
             }
         }

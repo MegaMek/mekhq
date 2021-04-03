@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.stratcon;
@@ -171,7 +171,7 @@ public class StratconContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
         
-        // todo: place terrain
+        // TODO: place terrain
         
         return retVal;
     }
@@ -187,7 +187,7 @@ public class StratconContractInitializer {
             int trackObjects = numObjects / numTracks;
             
             // if we are unevenly distributed, add an extra one
-            if(leftOver > 0) {
+            if (leftOver > 0) {
                 trackObjects++;
                 leftOver--;
             }
@@ -206,7 +206,15 @@ public class StratconContractInitializer {
      */
     private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities, ForceAlignment owner, 
             List<String> facilitySubset, boolean strategicObjective) {
+        
+        int trackSize = trackState.getWidth() * trackState.getHeight();
+        
         for (int fCount = 0; fCount < numFacilities; fCount++) {
+            // if there's no possible empty places to put down a new scenario, then move on
+            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= trackSize) { 
+                break;
+            }
+            
             StratconFacility sf =
                     facilitySubset == null ? 
                     StratconFacilityFactory.getRandomFacility() :
@@ -214,17 +222,7 @@ public class StratconContractInitializer {
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
             
-            int x = Compute.randomInt(trackState.getWidth());
-            int y = Compute.randomInt(trackState.getHeight());
-            StratconCoords coords = new StratconCoords(x, y);
-            
-            // make sure we don't put the facility down on top of anything else
-            while ((trackState.getFacility(coords) != null) ||
-                    (trackState.getScenario(coords) != null)) {
-                x = Compute.randomInt(trackState.getWidth());
-                y = Compute.randomInt(trackState.getHeight());
-                coords = new StratconCoords(x, y);
-            }
+            StratconCoords coords = getUnoccupiedCoords(trackState);
             
             trackState.addFacility(coords, sf);
             if (sf.getOwner() == ForceAlignment.Allied) {
@@ -247,24 +245,19 @@ public class StratconContractInitializer {
         // run generateScenario() to apply all the necessary mods
         // apply objective mods (?)
         
+        int trackSize = trackState.getWidth() * trackState.getHeight();
         
         for (int sCount = 0; sCount < numScenarios; sCount++) {
+            // if there's no possible empty places to put down a new scenario, then move on
+            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= trackSize) { 
+                break;
+            }
+            
             // pick
             ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario(
                     objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size())));
             
-            // plonk
-            int x = Compute.randomInt(trackState.getWidth());
-            int y = Compute.randomInt(trackState.getHeight());
-            StratconCoords coords = new StratconCoords(x, y);
-            
-            // make sure we don't put the facility down on top of anything else
-            while ((trackState.getFacility(coords) != null) ||
-                    (trackState.getScenario(coords) != null)) {
-                x = Compute.randomInt(trackState.getWidth());
-                y = Compute.randomInt(trackState.getHeight());
-                coords = new StratconCoords(x, y);
-            }
+            StratconCoords coords = getUnoccupiedCoords(trackState);
             
             // facility
             if (template.isFacilityScenario()) {
@@ -294,21 +287,41 @@ public class StratconContractInitializer {
     }
     
     /**
+     * Utility function that, given a track state, picks a random set of unoccupied coordinates.
+     */
+    private static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
+        // plonk
+        int x = Compute.randomInt(trackState.getWidth());
+        int y = Compute.randomInt(trackState.getHeight());
+        StratconCoords coords = new StratconCoords(x, y);
+        
+        // make sure we don't put the facility down on top of anything else
+        while ((trackState.getFacility(coords) != null) ||
+                (trackState.getScenario(coords) != null)) {
+            x = Compute.randomInt(trackState.getWidth());
+            y = Compute.randomInt(trackState.getHeight());
+            coords = new StratconCoords(x, y);
+        }
+        
+        return coords;
+    }
+    
+    /**
      * Generates additional instructional text based on the contract command rights
      */
     private static String generateCommandLevelText(AtBContract contract) {
         switch (contract.getCommandRights()) {
-        case AtBContract.COM_INTEGRATED:
-            return "Lance assignments will be made by the employer. "
-                    + "Complete required scenarios to fulfill contract conditions."; 
-        case AtBContract.COM_HOUSE:
-            return "Complete required scenarios to fulfill contract conditions.";
-        case AtBContract.COM_LIAISON:
-            return "Complete required scenarios and strategic objectives to fulfill contract conditions.";
-        case AtBContract.COM_INDEP:
-            return "Complete strategic objectives to fulfill contract conditions.";
-        default:
-            return "";
+            case AtBContract.COM_INTEGRATED:
+                return "Lance assignments will be made by the employer. "
+                        + "Complete required scenarios to fulfill contract conditions."; 
+            case AtBContract.COM_HOUSE:
+                return "Complete required scenarios to fulfill contract conditions.";
+            case AtBContract.COM_LIAISON:
+                return "Complete required scenarios and strategic objectives to fulfill contract conditions.";
+            case AtBContract.COM_INDEP:
+                return "Complete strategic objectives to fulfill contract conditions.";
+            default:
+                return "";
         }
     }
 
@@ -326,7 +339,7 @@ public class StratconContractInitializer {
                     for (StratconScenario scenario : track.getScenarios().values()) {
                         Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
                         
-                        if (campaignScenario != null && campaignScenario instanceof AtBDynamicScenario) {
+                        if ((campaignScenario != null) && campaignScenario instanceof AtBDynamicScenario) {
                             scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
                         } else {
                             MekHQ.getLogger().warning(String.format("Unable to set backing scenario for stratcon scenario in track %s ID %d", 

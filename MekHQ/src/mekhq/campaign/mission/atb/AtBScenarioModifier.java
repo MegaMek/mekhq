@@ -95,61 +95,6 @@ public class AtBScenarioModifier implements Cloneable {
     
     private Map<String, String> linkedModifiers = new HashMap<>(); 
     
-    /**
-     * Process this scenario modifier for a particular scenario, given a particular timing indicator.
-     * @param eventTiming Whether this is occurring before or after primary forces have been generated.
-     */
-    public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if (eventTiming == getEventTiming()) {
-            if ((getAdditionalBriefingText() != null) && getAdditionalBriefingText().length() > 0) {
-                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
-                        String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
-            }
-            
-            if (getForceDefinition() != null) {
-                AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
-            }
-            
-            if ((getSkillAdjustment() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
-            }
-            
-            if ((getQualityAdjustment() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
-            }
-            
-            if ((getBattleDamageIntensity() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
-            }
-            
-            if ((getAmmoExpenditureIntensity() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
-            }
-            
-            if ((getUnitRemovalCount() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
-            }
-            
-            if ((getUseAmbushLogic() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
-            }
-            
-            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
-            }
-            
-            if ((getObjectives() != null) && (getObjectives().size() > 0)) {
-                for (ScenarioObjective objective : getObjectives()) {
-                    AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
-                }
-            }
-            
-            if ((getNumExtraEvents() != null) && (getNumExtraEvents() > 0)) {
-                AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
-            }
-        }
-    }
-    
     // ----------------------------------------------------------------
     // This section contains static variables and methods
     // 
@@ -407,6 +352,61 @@ public class AtBScenarioModifier implements Cloneable {
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+        }
+    }
+    
+    /**
+     * Process this scenario modifier for a particular scenario, given a particular timing indicator.
+     * @param eventTiming Whether this is occurring before or after primary forces have been generated.
+     */
+    public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
+        if (eventTiming == getEventTiming()) {
+            if ((getAdditionalBriefingText() != null) && getAdditionalBriefingText().length() > 0) {
+                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
+                        String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
+            }
+            
+            if (getForceDefinition() != null) {
+                AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
+            }
+            
+            if ((getSkillAdjustment() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
+            }
+            
+            if ((getQualityAdjustment() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
+            }
+            
+            if ((getBattleDamageIntensity() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
+            }
+            
+            if ((getAmmoExpenditureIntensity() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
+            }
+            
+            if ((getUnitRemovalCount() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
+            }
+            
+            if ((getUseAmbushLogic() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
+            }
+            
+            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
+            }
+            
+            if ((getObjectives() != null) && (getObjectives().size() > 0)) {
+                for (ScenarioObjective objective : getObjectives()) {
+                    AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
+                }
+            }
+            
+            if ((getNumExtraEvents() != null) && (getNumExtraEvents() > 0)) {
+                AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
+            }
         }
     }
     

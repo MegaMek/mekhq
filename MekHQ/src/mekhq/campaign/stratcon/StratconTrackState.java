@@ -25,16 +25,15 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import mekhq.MekHQ;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * Track-level state object for a stratcon campaign.
  * @author NickAragua
  */
-@XmlRootElement(name="campaignTrack")
+@XmlRootElement(name = "campaignTrack")
 public class StratconTrackState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratconTrackState";
     
@@ -50,7 +49,7 @@ public class StratconTrackState {
     
     private Map<StratconCoords, StratconFacility> facilities;   
     private Map<StratconCoords, StratconScenario> scenarios;
-    private Map<StratconCoords, HashSet<Integer>> assignedCoordForces; 
+    private Map<StratconCoords, Set<Integer>> assignedCoordForces; 
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
     private Set<Integer> stickyForces;
@@ -99,8 +98,8 @@ public class StratconTrackState {
         this.height = height;
     }
 
-    @XmlElementWrapper(name="trackFacilities")
-    @XmlElement(name="facility")
+    @XmlElementWrapper(name = "trackFacilities")
+    @XmlElement(name = "facility")
     public Map<StratconCoords, StratconFacility> getFacilities() {
         return facilities;
     }
@@ -117,8 +116,8 @@ public class StratconTrackState {
      * Used for serialization/deserialization.
      * Do not manipulate directly, or things get unpleasant.
      */
-    @XmlElementWrapper(name="trackScenarios")
-    @XmlElement(name="scenario")
+    @XmlElementWrapper(name = "trackScenarios")
+    @XmlElement(name = "scenario")
     public Map<StratconCoords, StratconScenario> getScenarios() {
         return scenarios;
     }
@@ -141,7 +140,7 @@ public class StratconTrackState {
      * Updates an existing scenario on this track.
      */
     public void updateScenario(StratconScenario scenario) {
-        if(scenarios.containsKey(scenario.getCoords()) && (scenario.getBackingScenarioID() > 0)) {
+        if (scenarios.containsKey(scenario.getCoords()) && (scenario.getBackingScenarioID() > 0)) {
             getBackingScenariosMap().put(scenario.getBackingScenarioID(), scenario);
         }
     }
@@ -238,11 +237,11 @@ public class StratconTrackState {
     }
     
     @XmlTransient
-    public Map<StratconCoords, HashSet<Integer>> getAssignedCoordForces() {
+    public Map<StratconCoords, Set<Integer>> getAssignedCoordForces() {
         return assignedCoordForces;
     }
 
-    public void setAssignedCoordForces(Map<StratconCoords, HashSet<Integer>> assignedCoordForces) {
+    public void setAssignedCoordForces(Map<StratconCoords, Set<Integer>> assignedCoordForces) {
         this.assignedCoordForces = assignedCoordForces;
     }
     
@@ -296,6 +295,7 @@ public class StratconTrackState {
     /**
      * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the board.
      */
+    @Nullable
     public StratconCoords findClosestAlliedFacilityCoords(StratconCoords coords) {
         int minDistance = Integer.MAX_VALUE;
         StratconCoords closestFacilityCoords = null;

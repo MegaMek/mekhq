@@ -19,11 +19,11 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>FacilityDestruction</objectiveType>
-		<objectiveCount>-.5</objectiveCount>
+		<objectiveCount>-0.5</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>SpecificScenarioVictory</objectiveType>
-		<objectiveCount>-.5</objectiveCount>
+		<objectiveCount>-0.5</objectiveCount>
             <objectiveScenarios>
                 <objectiveScenario>Assassinate.xml</objectiveScenario>
                 <objectiveScenario>Convoy Attack.xml</objectiveScenario>

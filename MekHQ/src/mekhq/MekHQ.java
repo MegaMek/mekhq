@@ -130,7 +130,7 @@ public class MekHQ implements GameListener {
 
     // the actual campaign - this is where the good stuff is
     private CampaignController campaignController;
-    private CampaignGUI campaigngui;
+    private CampaignGUI campaignGUI;
 
     private IconPackage iconPackage = new IconPackage();
 
@@ -147,18 +147,18 @@ public class MekHQ implements GameListener {
             return LogLevel.OFF;
         }
         switch (verbosity) {
-        case 0:
-            return LogLevel.FATAL;
-        case 1:
-            return LogLevel.ERROR;
-        case 2:
-            return LogLevel.WARNING;
-        case 3:
-            return LogLevel.INFO;
-        case 4:
-            return LogLevel.DEBUG;
-        case 5:
-            return LogLevel.TRACE;
+            case 0:
+                return LogLevel.FATAL;
+            case 1:
+                return LogLevel.ERROR;
+            case 2:
+                return LogLevel.WARNING;
+            case 3:
+                return LogLevel.INFO;
+            case 4:
+                return LogLevel.DEBUG;
+            case 5:
+                return LogLevel.TRACE;
         }
         return LogLevel.INFO;
     }
@@ -308,15 +308,15 @@ public class MekHQ implements GameListener {
         }
 
         // Actually close MHQ
-        if (campaigngui != null) {
-            campaigngui.getFrame().dispose();
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
         }
         getPreferences().saveToFile(PREFERENCES_FILE);
         System.exit(0);
     }
 
     public void showNewView() {
-        campaigngui = new CampaignGUI(this);
+        campaignGUI = new CampaignGUI(this);
     }
 
     /**
@@ -369,8 +369,7 @@ public class MekHQ implements GameListener {
      * File name.
      */
     @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide
-                // MegaMek's
-    // output to the console for dev builds
+                // MegaMek's output to the console for dev builds
     private static void redirectOutput(String logFilename) {
         try {
             System.out.println("Redirecting output to mekhqlog.txt");
@@ -386,7 +385,7 @@ public class MekHQ implements GameListener {
             System.setOut(ps);
             System.setErr(ps);
         } catch (Exception e) {
-            MekHQ.getLogger().error(MekHQ.class, "redirectOutput", "Unable to redirect output to mekhqlog.txt", e);
+            MekHQ.getLogger().error("Unable to redirect output to mekhqlog.txt", e);
         }
     }
 
@@ -410,18 +409,18 @@ public class MekHQ implements GameListener {
      * @return the campaigngui
      */
     public CampaignGUI getCampaigngui() {
-        return campaigngui;
+        return campaignGUI;
     }
 
     /**
      * @param campaigngui the campaigngui to set
      */
     public void setCampaigngui(CampaignGUI campaigngui) {
-        this.campaigngui = campaigngui;
+        this.campaignGUI = campaigngui;
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
-        ConnectDialog joinGameDialog = new ConnectDialog(campaigngui.getFrame(), campaigngui.getCampaign().getName());
+        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getName());
         joinGameDialog.setVisible(true);
 
         if (!joinGameDialog.dataValidation("MegaMek.ConnectDialog.title")) {
@@ -449,7 +448,7 @@ public class MekHQ implements GameListener {
     }
 
     public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
-        HostDialog hostDialog = new HostDialog(campaigngui.getFrame(), getCampaign().getName());
+        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
         if (!hostDialog.dataValidation("MegaMek.HostGameAlert.title")) {
@@ -473,7 +472,7 @@ public class MekHQ implements GameListener {
         try {
             myServer = new Server(password, port, register, metaserver);
             if (loadSavegame) {
-                FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
+                FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 if (null != f.getFile()) {
@@ -575,28 +574,28 @@ public class MekHQ implements GameListener {
         }
 
         try {
-            boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
+            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
                     "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
-            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true,
+            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
                     tracker);
             resolveDialog.setVisible(true);
-            if (campaigngui.getCampaign().getCampaignOptions().getUseAtB()
-                    && (campaigngui.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
-                    && (campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
-                        (AtBContract) campaigngui.getCampaign().getMission(currentScenario.getMissionId()), false);
+            if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
+                    && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
+                    && (campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
+                        (AtBContract) campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
                 rdd.setVisible(true);
                 if (!rdd.wasAborted()) {
                     getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
                 }
             }
             gameThread.requestStop();
-            /* MegaMek dumps these in the deployment phase to free memory */
+            // MegaMek dumps these in the deployment phase to free memory
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();

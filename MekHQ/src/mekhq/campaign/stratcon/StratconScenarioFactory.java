@@ -138,9 +138,9 @@ public class StratconScenarioFactory {
         // if the specific unit type doesn't have any scenario templates for it
         // then we can't generate a scenario.
         if (!dynamicScenarioUnitTypeMap.containsKey(unitType) &&
-            !dynamicScenarioUnitTypeMap.containsKey(generalUnitType)) {
-                MekHQ.getLogger().warning(String.format("No scenarios configured for unit type %d", unitType));
-                return null;
+                !dynamicScenarioUnitTypeMap.containsKey(generalUnitType)) {
+            MekHQ.getLogger().warning(String.format("No scenarios configured for unit type %d", unitType));
+            return null;
         }
         
         List<ScenarioTemplate> jointList = new ArrayList<>();
