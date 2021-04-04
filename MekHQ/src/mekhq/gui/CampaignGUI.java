@@ -602,9 +602,7 @@ public class CampaignGUI extends JPanel {
         miImportIndividualRankSystem.addActionListener(evt -> {
             final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
                     FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
-            if (new RankValidator().validate(rankSystem)) {
-                getCampaign().setRanks(rankSystem);
-            }
+            getCampaign().setRankSystem(rankSystem);
         });
         menuImport.add(miImportIndividualRankSystem);
 
@@ -665,7 +663,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportIndividualRankSystem = new JMenuItem(resourceMap.getString("miExportIndividualRankSystem.text"));
         miExportIndividualRankSystem.setName("miExportIndividualRankSystem");
         miExportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
-        miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRanks()
+        miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRankSystem()
                 .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null)));
         miExportXMLFile.add(miExportIndividualRankSystem);
 

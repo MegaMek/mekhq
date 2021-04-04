@@ -401,7 +401,7 @@ public class Person implements Serializable {
         xp = 0;
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        setRankSystem(campaign.getRanks());
+        setRankSystem(campaign.getRankSystem());
         setRank(0);
         setRankLevel(0);
         setManeiDominiClassDirect(ManeiDominiClass.NONE);
@@ -1786,7 +1786,7 @@ public class Person implements Serializable {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
-            if (!getRankSystem().equals(campaign.getRanks())) {
+            if (!getRankSystem().equals(campaign.getRankSystem())) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "rankSystem", getRankSystem().getRankSystemCode());
             }
             // Always save a person's rank

@@ -20,6 +20,9 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+
+import java.util.Collection;
 
 public class RankValidator {
     public RankValidator() {
@@ -56,5 +59,10 @@ public class RankValidator {
 
         // Validation has passed successfully
         return true;
+    }
+
+    public void migratePersonnelRanks(final RankSystem oldRankSystem, final RankSystem newRankSystem,
+                                      final Collection<Person> personnel) {
+
     }
 }

@@ -1192,7 +1192,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resourceMap.getString("changeRankSystem.text"));
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text"));
-        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, gui.getCampaign().getRanks().getRankSystemCode()));
+        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, gui.getCampaign().getRankSystem().getRankSystemCode()));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 

@@ -233,7 +233,7 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
         personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
 
-        final List<Rank> ranks = campaign.getRanks().getRanks();
+        final List<Rank> ranks = campaign.getRankSystem().getRanks();
         for (int i = 0; i < ranks.size(); i++) {
             personRankModel.addElement(new PersonTypeItem(ranks.get(i).getRankNamesAsString(", "), i));
         }

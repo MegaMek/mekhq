@@ -324,9 +324,9 @@ public class HireBulkPersonnelDialog extends JDialog {
         // Determine correct profession to pass into the loop
         int primaryRoleId = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).id;
         if (0 == primaryRoleId) {
-            rankModel.addElement(new RankDisplay(0, campaign.getRanks().getRank(0).getName(0)));
+            rankModel.addElement(new RankDisplay(0, campaign.getRankSystem().getRank(0).getName(0)));
         } else {
-            rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRanks(),
+            rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
                     Person.getProfessionFromPrimaryRole(primaryRoleId)));
         }
 

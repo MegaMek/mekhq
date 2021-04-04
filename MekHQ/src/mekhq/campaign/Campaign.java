@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -290,7 +291,7 @@ public class Campaign implements Serializable, ITechManager {
         factionCode = "MERC";
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
-        setRanks(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
+        setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
         lances = new Hashtable<>();
@@ -1528,7 +1529,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Officers have better chance; no penalty for non-officer
-            bloodnameTarget += Math.min(0, getRanks().getOfficerCut() - person.getRankNumeric());
+            bloodnameTarget += Math.min(0, getRankSystem().getOfficerCut() - person.getRankNumeric());
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
@@ -4035,7 +4036,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retainerEmployerCode", retainerEmployerCode);
         }
 
-        getRanks().writeToXML(pw1, indent + 1, false);
+        getRankSystem().writeToXML(pw1, indent + 1, false);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nameGen",
                 RandomNameGenerator.getInstance().getChosenFaction());
@@ -4313,15 +4314,34 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     //region Ranks
-    public RankSystem getRanks() {
+    public RankSystem getRankSystem() {
         return rankSystem;
     }
 
-    public void setRanks(final RankSystem rankSystem) {
-        setRanksDirect(rankSystem);
+    public void setRankSystem(final @Nullable RankSystem rankSystem) {
+        // If they equal, there hasn't been a change and thus don't need to process further
+        if (getRankSystem().equals(rankSystem)) {
+            return;
+        }
+
+        // Then, we need to validate the rank system. Null isn't valid to be set but may be the
+        // result of a cancelled load, but validation will prevent that
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem)) {
+            return;
+        }
+
+        // We need to know the old campaign rank system for personnel processing
+        final RankSystem oldRankSystem = getRankSystem();
+
+        // And with that, we can set the rank system
+        setRankSystemDirect(rankSystem);
+
+        // Finally, we fix all personnel ranks
+        rankValidator.migratePersonnelRanks(oldRankSystem, rankSystem, getPersonnel());
     }
 
-    public void setRanksDirect(final RankSystem rankSystem) {
+    public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
     }
 
