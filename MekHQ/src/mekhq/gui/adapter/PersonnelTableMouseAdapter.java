@@ -224,8 +224,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     level = Integer.parseInt(data[2]);
                 }
 
-                for (Person person : people) {
-                    gui.getCampaign().changeRank(person, rank, level, true);
+                for (final Person person : people) {
+                    person.changeRank(gui.getCampaign(), rank, level, true);
                 }
                 break;
             }

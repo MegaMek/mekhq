@@ -4344,31 +4344,6 @@ public class Campaign implements Serializable, ITechManager {
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
     }
-
-    public void changeRank(Person person, int rank, int rankLevel, boolean report) {
-        int oldRank = person.getRankNumeric();
-        int oldRankLevel = person.getRankLevel();
-        person.setRank(rank);
-        person.setRankLevel(rankLevel);
-
-        if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
-                person.setLastRankChangeDate(getLocalDate());
-            } else {
-                person.setLastRankChangeDate(null);
-            }
-        }
-
-        personUpdated(person);
-
-        if (report) {
-            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(person, getLocalDate());
-            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(person, getLocalDate());
-            }
-        }
-    }
     //endregion Ranks
 
     public ArrayList<Force> getAllForces() {

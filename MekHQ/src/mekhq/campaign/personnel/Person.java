@@ -2,7 +2,7 @@
  * Person.java
  *
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -2427,8 +2427,35 @@ public class Person implements Serializable {
         return rankLevel;
     }
 
-    public void setRankLevel(int level) {
-        rankLevel = level;
+    public void setRankLevel(final int rankLevel) {
+        this.rankLevel = rankLevel;
+    }
+
+    public void changeRank(final Campaign campaign, final int rankNumeric, final int rankLevel,
+                           final boolean report) {
+        final int oldRankNumeric = getRankNumeric();
+        final int oldRankLevel = getRankLevel();
+        setRank(rankNumeric);
+        setRankLevel(rankLevel);
+
+        if (campaign.getCampaignOptions().getUseTimeInRank()) {
+            if (getPrisonerStatus().isFree() && !isDependent()) {
+                setLastRankChangeDate(campaign.getLocalDate());
+            } else {
+                setLastRankChangeDate(null);
+            }
+        }
+
+        campaign.personUpdated(this);
+
+        if (report) {
+            if ((rankNumeric > oldRankNumeric)
+                    || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
+                ServiceLogger.promotedTo(this, campaign.getLocalDate());
+            } else if ((rankNumeric < oldRankNumeric) || (rankLevel < oldRankLevel)) {
+                ServiceLogger.demotedTo(this, campaign.getLocalDate());
+            }
+        }
     }
 
     public String getRankName() {
