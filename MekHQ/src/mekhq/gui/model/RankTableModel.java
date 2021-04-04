@@ -40,6 +40,8 @@ public class RankTableModel extends DefaultTableModel {
     //region Variable Declarations
     private static final long serialVersionUID = 534443424190075264L;
 
+    private RankSystem rankSystem;
+
     public final static int COL_NAME_RATE	= 0;
     public final static int COL_NAME_MW		= 1;
     public final static int COL_NAME_ASF	= 2;
@@ -56,13 +58,62 @@ public class RankTableModel extends DefaultTableModel {
 
     //region Constructors
     public RankTableModel(final RankSystem rankSystem) {
-        setRanksFromSystem(rankSystem);
+        setRankSystem(rankSystem);
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    public RankSystem getRankSystem() {
+        return rankSystem;
+    }
+
+    /**
+     * @param rankSystem The system to set the model for. Null values are properly handled but are
+     *                   considered to be an unexpected error condition and thus do not change the
+     *                   underlying model.
+     */
+    public void setRankSystem(final @Nullable RankSystem rankSystem) {
+        if (rankSystem == null) {
+            MekHQ.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
+            return;
+        }
+
+        setRankSystemDirect(rankSystem);
+
+        final List<Rank> ranks = rankSystem.getRanks();
+        final Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
+        for (int i = 0; i < ranks.size(); i++) {
+            final Rank rank = ranks.get(i);
+            final String rating;
+            if (i > RankSystem.RWO_MAX) {
+                rating = "O" + (i - RankSystem.RWO_MAX);
+            } else if (i > RankSystem.RE_MAX) {
+                rating = "WO" + (i - RankSystem.RE_MAX);
+            } else {
+                rating = "E" + i;
+            }
+            array[i][RankTableModel.COL_NAME_RATE] = rating;
+            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(RankSystem.RPROF_MW);
+            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(RankSystem.RPROF_ASF);
+            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(RankSystem.RPROF_VEE);
+            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(RankSystem.RPROF_NAVAL);
+            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(RankSystem.RPROF_INF);
+            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(RankSystem.RPROF_TECH);
+            array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
+            array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
+        }
+
+        setDataVector(array, resources.getString("RankTableModel.columnNames").split(","));
+    }
+
+    public void setRankSystemDirect(final RankSystem rankSystem) {
+        this.rankSystem = rankSystem;
+    }
+    //endregion Getters/Setters
+
     @Override
     public boolean isCellEditable(final int row, final int column) {
-        return (column != COL_NAME_RATE) && (column != COL_OFFICER);
+        return !getRankSystem().getType().isDefault() && (column != COL_NAME_RATE) && (column != COL_OFFICER);
     }
 
     @Override
@@ -157,43 +208,6 @@ public class RankTableModel extends DefaultTableModel {
             MekHQ.getLogger().error(e);
             return new ArrayList<>();
         }
-    }
-
-    /**
-     * @param rankSystem The system to set the ranks for. Null values are properly handled but are
-     *                   considered to be an unexpected error condition and thus do not change the
-     *                   underlying model.
-     */
-    public void setRanksFromSystem(final @Nullable RankSystem rankSystem) {
-        if (rankSystem == null) {
-            MekHQ.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
-            return;
-        }
-
-        final List<Rank> ranks = rankSystem.getRanks();
-        final Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
-        for (int i = 0; i < ranks.size(); i++) {
-            final Rank rank = ranks.get(i);
-            final String rating;
-            if (i > RankSystem.RWO_MAX) {
-                rating = "O" + (i - RankSystem.RWO_MAX);
-            } else if (i > RankSystem.RE_MAX) {
-                rating = "WO" + (i - RankSystem.RE_MAX);
-            } else {
-                rating = "E" + i;
-            }
-            array[i][RankTableModel.COL_NAME_RATE] = rating;
-            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(RankSystem.RPROF_MW);
-            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(RankSystem.RPROF_ASF);
-            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(RankSystem.RPROF_VEE);
-            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(RankSystem.RPROF_NAVAL);
-            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(RankSystem.RPROF_INF);
-            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(RankSystem.RPROF_TECH);
-            array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
-            array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
-        }
-
-        setDataVector(array, resources.getString("RankTableModel.columnNames").split(","));
     }
 
     public TableCellRenderer getRenderer() {

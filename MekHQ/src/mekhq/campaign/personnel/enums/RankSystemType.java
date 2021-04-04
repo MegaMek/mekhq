@@ -18,15 +18,39 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
+import mekhq.campaign.personnel.ranks.RankSystem;
+
+import java.util.ResourceBundle;
 
 public enum RankSystemType {
     //region Enum Declarations
-    DEFAULT, // Default MekHQ rank system
-    USER_DATA, // User Data user custom rank system
-    CAMPAIGN; // Campaign custom rank system
+    DEFAULT("RankSystemType.DEFAULT.text", "RankSystemType.DEFAULT.toolTipText"),
+    USER_DATA("RankSystemType.USER_DATA.text", "RankSystemType.USER_DATA.toolTipText"),
+    CAMPAIGN("RankSystemType.CAMPAIGN.text", "RankSystemType.CAMPAIGN.toolTipText");
     //endregion Enum Declarations
+
+    //region Variable Declarations
+    private final String name;
+    private final String toolTipText;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
+    RankSystemType(final String name, final String toolTipText) {
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
+    }
+    //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
 
     //region Boolean Comparison Methods
     public boolean isDefault() {
@@ -53,5 +77,10 @@ public enum RankSystemType {
                 MekHQ.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
                 return "";
         }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

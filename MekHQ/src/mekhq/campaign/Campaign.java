@@ -212,7 +212,7 @@ public class Campaign implements Serializable, ITechManager {
     private String factionCode;
     private int techFactionCode;
     private String retainerEmployerCode; //AtB
-    private RankSystem ranks;
+    private RankSystem rankSystem;
 
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
@@ -4314,11 +4314,15 @@ public class Campaign implements Serializable, ITechManager {
 
     //region Ranks
     public RankSystem getRanks() {
-        return ranks;
+        return rankSystem;
     }
 
-    public void setRanks(final RankSystem ranks) {
-        this.ranks = ranks;
+    public void setRanks(final RankSystem rankSystem) {
+        setRanksDirect(rankSystem);
+    }
+
+    public void setRanksDirect(final RankSystem rankSystem) {
+        this.rankSystem = rankSystem;
     }
 
     public void changeRank(Person person, int rank, int rankLevel, boolean report) {

@@ -40,6 +40,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.EventObject;
@@ -385,6 +386,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     //region Rank System Tab
     private JComboBox<RankSystem> comboRankSystems;
+    private JButton btnConvertRankSystemType;
     private boolean rankSystemChanged;
 
     // Ranks Table Panel
@@ -4161,32 +4163,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createRankSystemPanel() {
-        final JButton btnConvertRankSystemType = createButton(campaign.getRanks().getType().isUserData()
-                        ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text",
-                "btnConvertRankSystemType.toolTipText", "btnConvertRankSystemType",
-                evt -> {
-            final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
-            if (rankSystem == null) {
-                return;
-            }
-
-            switch (rankSystem.getType()) {
-                case DEFAULT:
-                    MekHQ.getLogger().error("Error, tried to make a DEFAULT rank system into another type of rank system");
-                    return;
-                case USER_DATA:
-                    rankSystem.setType(RankSystemType.CAMPAIGN);
-                    break;
-                case CAMPAIGN:
-                    rankSystem.setType(RankSystemType.USER_DATA);
-                    break;
-                default:
-                    MekHQ.getLogger().error("Error, unknown rank system type.");
-                    return;
-            }
-            rankSystemChanged = true;
-        });
-
         // Create Panel Components
         final JLabel lblRankSystem = new JLabel(resources.getString("lblRankSystem.text"));
         lblRankSystem.setName("lblRankSystem");
@@ -4201,34 +4177,17 @@ public class CampaignOptionsDialog extends JDialog {
         comboRankSystems = new JComboBox<>(rankSystemModel);
         comboRankSystems.setName("comboRankSystems");
         comboRankSystems.setSelectedItem(campaign.getRanks());
-        comboRankSystems.addActionListener(evt -> {
-            final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
-            if (rankSystem == null) {
-                return;
-            }
+        comboRankSystems.addActionListener(evt -> comboRankSystemChanged());
 
-            ranksModel.setRanksFromSystem(rankSystem);
-            for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-                final TableColumn column = tableRanks.getColumnModel().getColumn(i);
-                column.setPreferredWidth(ranksModel.getColumnWidth(i));
-                column.setCellRenderer(ranksModel.getRenderer());
-                if (i == RankTableModel.COL_PAYMULT) {
-                    column.setCellEditor(new SpinnerEditor());
-                }
-            }
-
-            btnConvertRankSystemType.setEnabled(!campaign.getRanks().getType().isDefault());
-
-            rankSystemChanged = true;
-        });
-
+        btnConvertRankSystemType = createButton(campaign.getRanks().getType().isUserData()
+                        ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text",
+                "btnConvertRankSystemType.toolTipText", "btnConvertRankSystemType",
+                evt -> convertRankSystemType());
         btnConvertRankSystemType.setEnabled(!campaign.getRanks().getType().isDefault());
 
         final JButton btnCreateCustomRankSystem = createButton("btnCreateCustomRankSystem.text",
                 "btnCreateCustomRankSystem.toolTipText", "btnCreateCustomRankSystem",
-                evt -> {
-
-        });
+                evt -> createCustomRankSystem());
 
         // Programmatically Assign Accessibility Labels
         lblRankSystem.setLabelFor(comboRankSystems);
@@ -4372,6 +4331,80 @@ public class CampaignOptionsDialog extends JDialog {
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
+
+    //region Action Listeners
+    //region Rank Systems Tab
+    private void comboRankSystemChanged() {
+        final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+        if (rankSystem == null) {
+            return;
+        }
+
+        ranksModel.setRankSystem(rankSystem);
+        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+            final TableColumn column = tableRanks.getColumnModel().getColumn(i);
+            column.setPreferredWidth(ranksModel.getColumnWidth(i));
+            column.setCellRenderer(ranksModel.getRenderer());
+            if (i == RankTableModel.COL_PAYMULT) {
+                column.setCellEditor(new SpinnerEditor());
+            }
+        }
+
+        btnConvertRankSystemType.setText(resources.getString(rankSystem.getType().isUserData()
+                ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
+        btnConvertRankSystemType.setEnabled(!rankSystem.getType().isDefault());
+
+        rankSystemChanged = true;
+    }
+
+    private void convertRankSystemType() {
+        final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+        if (rankSystem == null) {
+            return;
+        }
+
+        switch (rankSystem.getType()) {
+            case DEFAULT:
+                MekHQ.getLogger().error("Error, tried to make a DEFAULT rank system into another type of rank system");
+                return;
+            case USER_DATA:
+                rankSystem.setType(RankSystemType.CAMPAIGN);
+                break;
+            case CAMPAIGN:
+                rankSystem.setType(RankSystemType.USER_DATA);
+                break;
+            default:
+                MekHQ.getLogger().error("Error, unknown rank system type.");
+                return;
+        }
+
+        btnConvertRankSystemType.setText(resources.getString(rankSystem.getType().isUserData()
+                ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
+        rankSystemChanged = true;
+    }
+
+    private void createCustomRankSystem() {
+        // We need to get the current Rank Systems from the rank system combo box for to ensure
+        // the data's uniqueness
+        final List<RankSystem> rankSystems = new ArrayList<>();
+        for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
+            rankSystems.add(comboRankSystems.getModel().getElementAt(i));
+        }
+
+        // Now we can show the dialog and check if it was confirmed
+        final CustomRankSystemCreationDialog dialog = new CustomRankSystemCreationDialog(frame, rankSystems,
+                ((RankSystem) Objects.requireNonNull(comboRankSystems.getSelectedItem())).getRanks());
+        if (dialog.showDialog().isConfirmed()) {
+            // If it was we add the new rank system to the model
+            comboRankSystems.addItem(dialog.getRankSystem());
+            // And select that item if that's intended
+            if (dialog.getChkSwapToRankSystem().isSelected()) {
+                comboRankSystems.setSelectedItem(dialog.getRankSystem());
+            }
+        }
+    }
+    //endregion Rank Systems Tab
+    //endregion Action Listeners
 
     public void applyPreset(GamePreset gamePreset) {
         // Handle CampaignOptions and RandomSkillPreferences
