@@ -61,8 +61,23 @@ public class RankValidator {
         return true;
     }
 
-    public void migratePersonnelRanks(final RankSystem oldRankSystem, final RankSystem newRankSystem,
-                                      final Collection<Person> personnel) {
+    public void changeCampaignRankSystem(final RankSystem oldRankSystem,
+                                         final RankSystem newRankSystem,
+                                         final Collection<Person> personnel) {
+        // We need to
+        for (final Person person : personnel) {
+
+        }
+
+        // Then, we need to check the indi
+        checkPersonnelRanks(personnel);
+    }
+
+    public void checkPersonnelRanks(final Collection<Person> personnel) {
+
+    }
+
+    public void checkPersonRank(final Person person) {
 
     }
 }

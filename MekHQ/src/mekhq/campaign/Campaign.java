@@ -4337,8 +4337,8 @@ public class Campaign implements Serializable, ITechManager {
         // And with that, we can set the rank system
         setRankSystemDirect(rankSystem);
 
-        // Finally, we fix all personnel ranks
-        rankValidator.migratePersonnelRanks(oldRankSystem, rankSystem, getPersonnel());
+        // Finally, we fix all personnel ranks and ensure they are properly set
+        rankValidator.changeCampaignRankSystem(oldRankSystem, rankSystem, getPersonnel());
     }
 
     public void setRankSystemDirect(final RankSystem rankSystem) {

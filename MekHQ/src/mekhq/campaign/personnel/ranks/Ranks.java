@@ -30,10 +30,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank
@@ -69,6 +74,27 @@ public class Ranks {
     //endregion Getters/Setters
 
     //region File IO
+    public static void exportRankSystemsToFile(final @Nullable File file, final RankSystem rankSystem) {
+        if (file == null) {
+            return;
+        }
+
+        final List<RankSystem> rankSystems = new ArrayList<>(getRankSystems().values());
+        if (!getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
+            rankSystems.add(rankSystem);
+        }
+        exportRankSystemsToFile(file, rankSystems);
+    }
+
+    public static void exportRankSystemsToFile(final @Nullable File file,
+                                               final Collection<RankSystem> rankSystems) {
+        if (file == null) {
+            return;
+        }
+
+        // TODO : Windchild : Implement me
+    }
+
     public static void initializeRankSystems() {
         MekHQ.getLogger().info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());

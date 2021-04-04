@@ -77,6 +77,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -385,9 +386,10 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
+    private RankSystem selectedRankSystem;
     private JComboBox<RankSystem> comboRankSystems;
+    private SortedComboBoxModel<RankSystem> rankSystemModel;
     private JButton btnConvertRankSystemType;
-    private boolean rankSystemChanged;
 
     // Ranks Table Panel
     private JTable tableRanks;
@@ -4167,23 +4169,25 @@ public class CampaignOptionsDialog extends JDialog {
         final JLabel lblRankSystem = new JLabel(resources.getString("lblRankSystem.text"));
         lblRankSystem.setName("lblRankSystem");
 
+        selectedRankSystem = campaign.getRankSystem();
+
         final Comparator<String> comparator = new NaturalOrderComparator();
-        final DefaultComboBoxModel<RankSystem> rankSystemModel = new SortedComboBoxModel<>(
+        rankSystemModel = new SortedComboBoxModel<>(
                 (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()),
                 Ranks.getRankSystems().values());
-        if (campaign.getRanks().getType().isCampaign()) {
-            rankSystemModel.addElement(campaign.getRanks());
+        if (selectedRankSystem.getType().isCampaign()) {
+            rankSystemModel.addElement(selectedRankSystem);
         }
         comboRankSystems = new JComboBox<>(rankSystemModel);
         comboRankSystems.setName("comboRankSystems");
-        comboRankSystems.setSelectedItem(campaign.getRanks());
+        comboRankSystems.setSelectedItem(selectedRankSystem);
         comboRankSystems.addActionListener(evt -> comboRankSystemChanged());
 
-        btnConvertRankSystemType = createButton(campaign.getRanks().getType().isUserData()
+        btnConvertRankSystemType = createButton(selectedRankSystem.getType().isUserData()
                         ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text",
                 "btnConvertRankSystemType.toolTipText", "btnConvertRankSystemType",
                 evt -> convertRankSystemType());
-        btnConvertRankSystemType.setEnabled(!campaign.getRanks().getType().isDefault());
+        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
 
         final JButton btnCreateCustomRankSystem = createButton("btnCreateCustomRankSystem.text",
                 "btnCreateCustomRankSystem.toolTipText", "btnCreateCustomRankSystem",
@@ -4225,7 +4229,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     private JScrollPane createRanksTablePane() {
         // Create Model
-        ranksModel = new RankTableModel(campaign.getRanks());
+        ranksModel = new RankTableModel(selectedRankSystem);
 
         // Create Table
         tableRanks = new JTable(ranksModel);
@@ -4263,19 +4267,32 @@ public class CampaignOptionsDialog extends JDialog {
         panel.add(createButton("btnExportCurrentRankSystem.text",
                 "btnExportCurrentRankSystem.toolTipText", "btnExportCurrentRankSystem",
                 evt -> {
-
+            if (selectedRankSystem != null) {
+                selectedRankSystem.writeToFile(FileDialogs.saveIndividualRankSystem(frame).orElse(null));
+            }
         }));
 
         panel.add(createButton("btnExportUserDataRankSystems.text",
                 "btnExportUserDataRankSystems.toolTipText", "btnExportUserDataRankSystems",
                 evt -> {
-
+            final List<RankSystem> rankSystems = new ArrayList<>();
+            for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
+                final RankSystem rankSystem = comboRankSystems.getModel().getElementAt(i);
+                if (rankSystem.getType().isUserData()) {
+                    rankSystems.add(rankSystem);
+                }
+            }
+            Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
         }));
 
         panel.add(createButton("btnExportRankSystems.text",
                 "btnExportRankSystems.toolTipText", "btnExportRankSystems",
                 evt -> {
-
+            final List<RankSystem> rankSystems = new ArrayList<>();
+            for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
+                rankSystems.add(comboRankSystems.getModel().getElementAt(i));
+            }
+            Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(frame).orElse(null), rankSystems);
         }));
 
         panel.add(createButton("btnImportIndividualRankSystem.text",
@@ -4283,8 +4300,9 @@ public class CampaignOptionsDialog extends JDialog {
                 evt -> {
             final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
                     FileDialogs.openIndividualRankSystem(frame).orElse(null));
+            // Validate on load, to ensure we don't have any display issues
             if (new RankValidator().validate(rankSystem)) {
-
+                comboRankSystems.addItem(rankSystem);
             }
         }));
 
@@ -4297,7 +4315,15 @@ public class CampaignOptionsDialog extends JDialog {
         panel.add(createButton("btnRefreshRankSystemsFromFile.text",
                 "btnRefreshRankSystemsFromFile.toolTipText", "btnRefreshRankSystemsFromFile",
                 evt -> {
-
+            selectedRankSystem = null;
+            Ranks.initializeRankSystems();
+            new RankValidator().checkPersonnelRanks(campaign.getPersonnel());
+            rankSystemModel.removeAllElements();
+            rankSystemModel.addAll(Ranks.getRankSystems().values());
+            if (campaign.getRankSystem().getType().isCampaign()) {
+                rankSystemModel.addElement(campaign.getRankSystem());
+            }
+            comboRankSystems.setSelectedItem(campaign.getRankSystem());
         }));
 
         return panel;
@@ -4335,12 +4361,19 @@ public class CampaignOptionsDialog extends JDialog {
     //region Action Listeners
     //region Rank Systems Tab
     private void comboRankSystemChanged() {
-        final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
-        if (rankSystem == null) {
+        // Update the now old rank system with the changes done to it in the model
+        if ((selectedRankSystem != null) && !selectedRankSystem.getType().isDefault()) {
+            selectedRankSystem.setRanks(ranksModel.getRanks());
+        }
+
+        // Then update the selected rank system, with null protection (although it shouldn't be null)
+        selectedRankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+        if (selectedRankSystem == null) {
             return;
         }
 
-        ranksModel.setRankSystem(rankSystem);
+        // Update the model with the new rank data
+        ranksModel.setRankSystem(selectedRankSystem);
         for (int i = 0; i < RankTableModel.COL_NUM; i++) {
             final TableColumn column = tableRanks.getColumnModel().getColumn(i);
             column.setPreferredWidth(ranksModel.getColumnWidth(i));
@@ -4350,37 +4383,31 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
 
-        btnConvertRankSystemType.setText(resources.getString(rankSystem.getType().isUserData()
+        // And the convert type button based on the new type
+        btnConvertRankSystemType.setText(resources.getString(selectedRankSystem.getType().isUserData()
                 ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
-        btnConvertRankSystemType.setEnabled(!rankSystem.getType().isDefault());
-
-        rankSystemChanged = true;
+        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
     }
 
     private void convertRankSystemType() {
-        final RankSystem rankSystem = (RankSystem) comboRankSystems.getSelectedItem();
-        if (rankSystem == null) {
-            return;
-        }
-
-        switch (rankSystem.getType()) {
+        switch (selectedRankSystem.getType()) {
             case DEFAULT:
                 MekHQ.getLogger().error("Error, tried to make a DEFAULT rank system into another type of rank system");
                 return;
             case USER_DATA:
-                rankSystem.setType(RankSystemType.CAMPAIGN);
+                selectedRankSystem.setType(RankSystemType.CAMPAIGN);
                 break;
             case CAMPAIGN:
-                rankSystem.setType(RankSystemType.USER_DATA);
+                selectedRankSystem.setType(RankSystemType.USER_DATA);
                 break;
             default:
                 MekHQ.getLogger().error("Error, unknown rank system type.");
                 return;
         }
 
-        btnConvertRankSystemType.setText(resources.getString(rankSystem.getType().isUserData()
+        btnConvertRankSystemType.setText(resources.getString(selectedRankSystem.getType().isUserData()
                 ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
-        rankSystemChanged = true;
+        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
     }
 
     private void createCustomRankSystem() {
@@ -4916,10 +4943,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRanks((RankSystem) Objects.requireNonNull(comboRankSystems.getSelectedItem()));
-        if (campaign.getRanks().getType().isCampaign()) {
-            campaign.getRanks().setRanks(ranksModel.getRanks());
-        }
+        campaign.setRankSystem((RankSystem) comboRankSystems.getSelectedItem());
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 
