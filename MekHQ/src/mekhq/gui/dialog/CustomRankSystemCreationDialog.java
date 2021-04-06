@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -28,11 +29,10 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Locale;
 
-/**
- * TODO : Add Validation
- */
 public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private final List<RankSystem> rankSystems;
@@ -195,11 +195,41 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
 
     //region Button Actions
     @Override
+    protected void okButtonActionPerformed(final ActionEvent evt) {
+        final String validationText = validateSystem();
+        if (validationText.isBlank()) {
+            okAction();
+            setResult(DialogResult.CONFIRMED);
+            setVisible(false);
+        } else if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(getFrame(),
+                validationText, resources.getString("CustomRankSystemCreationDialog.ValidationFailed.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+            cancelActionPerformed(evt);
+        }
+    }
+
+    @Override
     protected void okAction() {
         super.okAction();
-        setRankSystem(new RankSystem(getTxtRankSystemCode().getText(), getTxtRankSystemName().getText(),
-                (RankSystemType) getComboRankSystemType().getSelectedItem()));
+        setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
+                getTxtRankSystemName().getText(), (RankSystemType) getComboRankSystemType().getSelectedItem()));
         getRankSystem().setRanks(getRanks());
     }
     //endregion Button Actions
+
+    /**
+     * @return an empty string if the system is valid, or the text for the invalid rank system
+     */
+    private String validateSystem() {
+        if (getTxtRankSystemCode().getText().isBlank()) {
+            return resources.getString("CustomRankSystemCreationDialog.BlankRankSystemCode.text");
+        } else if (getTxtRankSystemName().getText().isBlank()) {
+            return resources.getString("CustomRankSystemCreationDialog.BlankRankSystemName.text");
+        } else if (getRankSystems().stream().noneMatch(rankSystem -> getTxtRankSystemCode().getText()
+                .equalsIgnoreCase(rankSystem.getRankSystemCode()))) {
+            return resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
+        } else {
+            return "";
+        }
+    }
 }
