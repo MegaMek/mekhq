@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
@@ -157,8 +156,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Unit(Entity en, Campaign c) {
         this.entity = en;
         if (entity != null) {
-            entity.setCamoCategory(null);
-            entity.setCamoFileName(null);
+            entity.setCamouflage(new Camouflage());
         }
         this.site = SITE_BAY;
         this.campaign = c;
@@ -265,7 +263,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //one gets some of the same things set
         if (null != this.entity) {
             en.setId(this.entity.getId());
-            en.duplicateMarker = this.entity.duplicateMarker;
+            en.setDuplicateMarker(this.entity.getDuplicateMarker());
+            en.generateShortName();
+            en.generateDisplayName();
         }
         this.entity = en;
     }
@@ -3145,7 +3145,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 jj--;
             }
         }
-        if (entity.isConventionalInfantry()) {
+
+        if (isConventionalInfantry()) {
             if ((null == motiveType) && (entity.getMovementMode() != EntityMovementMode.INF_LEG)) {
                 int number = entity.getOInternal(Infantry.LOC_INFANTRY);
                 if (((Infantry) entity).isMechanized()) {
@@ -3282,42 +3283,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (entity == null) ? new Camouflage() : entity.getCamouflage();
     }
 
-    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
-        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
-    }
-
-    public String getCamoCategory() {
-        if (null == entity) {
-            return "";
+    public Camouflage getUtilizedCamouflage(final Campaign campaign) {
+        if (getCamouflage().hasDefaultCategory()) {
+            final Force force = campaign.getForce(getForceId());
+            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage())
+                    : campaign.getCamouflage();
+        } else {
+            return getCamouflage();
         }
-
-        String category = getCampaign().getCamoCategory();
-        if (isEntityCamo()) {
-            category = entity.getCamoCategory();
-        }
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        return category;
-    }
-
-    public String getCamoFileName() {
-        if (null == getCampaign() || null == entity) {
-            return "";
-        }
-
-        String fileName = getCampaign().getCamoFileName();
-        if (isEntityCamo()) {
-            fileName = entity.getCamoFileName();
-        }
-
-        if (null == fileName) {
-            fileName = "";
-        }
-
-        return fileName;
     }
 
     public Image getImage(Component component) {
@@ -3325,7 +3298,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getCamouflageOrElse(getCampaign().getCamouflage()),
+        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
                 component, getEntity()).loadPreviewImage();
     }
 
@@ -4694,10 +4667,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return null;
     }
 
-    public boolean isEntityCamo() {
-        return !getCamouflage().hasDefaultCategory();
-    }
-
     public int getAvailability(int era) {
         //take the highest availability of all parts
         int availability = EquipmentType.RATING_A;
@@ -4890,8 +4859,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
-                || getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)
+                || isConventionalInfantry();
     }
 
     public boolean isUnderRepair() {
@@ -4920,8 +4889,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return en.getDamageLevel(false);
     }
 
-    public void resetParts() {
-        parts = new ArrayList<>();
+    /**
+     * Removes all of the parts from a unit.
+     * 
+     * NOTE: this puts the unit in an inconsistent state, and
+     *       the unit should not be used until its parts have
+     *       been re-assigned.
+     * 
+     */
+    public void removeParts() {
+        for (Part part : parts) {
+            part.setUnit(null);
+
+            if (campaign != null) {
+                campaign.getWarehouse().removePart(part);
+            }
+        }
+
+        parts.clear();
     }
 
     /**
@@ -4943,7 +4928,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * This requires the suit to not be destroyed and to have not missing equipment parts
      */
     public boolean isBattleArmorSuitOperable(int trooper) {
-        if (null == getEntity() || !(getEntity() instanceof BattleArmor)) {
+        if (!(getEntity() instanceof BattleArmor)) {
             return false;
         }
         if (getEntity().getInternal(trooper) < 0) {
@@ -4958,6 +4943,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return true;
     }
 
+    /**
+     * @return true if the unit is conventional infantry, otherwise false
+     */
+    public boolean isConventionalInfantry() {
+        return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
     public boolean isIntroducedBy(int year) {
         return null != entity && entity.getYear() <= year;
     }
@@ -4968,6 +4960,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return false;
     }
 
+    @Override
     public String toString() {
         String entName = "None";
         if (getEntity() != null) {

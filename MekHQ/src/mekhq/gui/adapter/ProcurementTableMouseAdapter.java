@@ -1,188 +1,212 @@
+/*
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
-import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.Entity;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 
-public class ProcurementTableMouseAdapter extends MouseInputAdapter {
-    private CampaignGUI gui;
+public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
+    //region Variable Declarations
+    private final CampaignGUI gui;
+    private final JTable table;
+    private final ProcurementTableModel model;
 
-    public ProcurementTableMouseAdapter(CampaignGUI gui) {
-        super();
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
+    protected ProcurementTableMouseAdapter(final CampaignGUI gui, final JTable table,
+                                           final ProcurementTableModel model) {
         this.gui = gui;
+        this.table = table;
+        this.model = model;
     }
+    //endregion Constructors
+
+    //region Initialization
+    public static void connect(final CampaignGUI gui, final JTable table, final ProcurementTableModel model) {
+        new ProcurementTableMouseAdapter(gui, table, model).connect(table);
+    }
+    //endregion Initialization
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+    protected Optional<JPopupMenu> createPopupMenu() {
+        if (table.getSelectedRowCount() == 0) {
+            return Optional.empty();
+        }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    @SuppressWarnings("serial")
-    private void maybeShowPopup(MouseEvent e) {
-        JPopupMenu popup = new JPopupMenu();
+        final JPopupMenu popup = new JPopupMenu();
         JMenuItem menuItem;
         JMenu menu;
-        final JTable table = (JTable) e.getSource();
-        final ProcurementTableModel model = (ProcurementTableModel) table
-                .getModel();
-        if (table.getSelectedRow() < 0) {
-            return;
-        }
-        if (table.getSelectedRowCount() == 0) {
-            return;
-        }
-        final int row = table
-                .convertRowIndexToModel(table.getSelectedRow());
         final int[] rows = table.getSelectedRows();
-        final boolean oneSelected = table.getSelectedRowCount() == 1;
-        
-        // GM Only (for now)
-        if (e.isPopupTrigger() && gui.getCampaign().isGM()) {
-            // **lets fill the pop up menu**//
-            // GM mode
-            menu = new JMenu("GM Mode");
+        final List<IAcquisitionWork> acquisitions = new ArrayList<>();
+        for (final int row : rows) {
+            if (row < 0) {
+                continue;
+            }
+            model.getAcquisition(table.convertRowIndexToModel(row)).ifPresent(acquisitions::add);
+        }
 
-            menuItem = new JMenuItem("Procure single item now");
-            menuItem.addActionListener(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (row < 0) {
-                        return;
-                    }
-                    if (oneSelected) {
-                        model.getAcquisition(row)
-                                .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
-                    } else {
-                        for (int curRow : rows) {
-                            if (curRow < 0) {
-                                continue;
-                            }
-                            model.getAcquisition(table.convertRowIndexToModel(curRow))
-                                    .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
-                        }
-                    }
-                }
-            });
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem("Procure all items now");
-            menuItem.addActionListener(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (row < 0) {
-                        return;
-                    }
-                    if (oneSelected) {
-                        model.getAcquisition(row)
-                                .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
-                    } else {
-                        for (int curRow : rows) {
-                            if (curRow < 0) {
-                                continue;
-                            }
-                            model.getAcquisition(table.convertRowIndexToModel(curRow))
-                                    .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
-                        }
-                    }
-                }
-            });
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem("Clear From the List");
-            menuItem.addActionListener(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (row < 0) {
-                        return;
-                    }
-                    if (oneSelected) {
-                        model.getAcquisition(row).ifPresent(a -> {
-                            model.removeRow(row);
-                            MekHQ.triggerEvent(new ProcurementEvent(a));
-                        });
-                    } else {
-                        for (int curRow : rows) {
-                            if (curRow < 0) {
-                                continue;
-                            }
-                            model.getAcquisition(table.convertRowIndexToModel(curRow))
-                                    .ifPresent(a -> {
-                                        model.removeRow(row);
-                                        MekHQ.triggerEvent(new ProcurementEvent(a));
-                                    });
-                        }
-                    }
-                }
-            });
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            // end
+        // Lets fill the popup menu
+        menuItem = new JMenuItem(resources.getString("miClearItems.text"));
+        menuItem.setToolTipText(resources.getString("miClearItems.toolTipText"));
+        menuItem.setName("miClearItems");
+        menuItem.addActionListener(evt -> {
+            for (final IAcquisitionWork acquisition : acquisitions) {
+                model.removeRow(acquisition);
+                MekHQ.triggerEvent(new ProcurementEvent(acquisition));
+            }
+        });
+        popup.add(menuItem);
+
+        //region GM Menu
+        if (gui.getCampaign().isGM()) {
             popup.addSeparator();
-            popup.add(menu);
-            popup.show(e.getComponent(), e.getX(), e.getY());
+
+            menu = new JMenu(resources.getString("GMMode.text"));
+            menu.setToolTipText(resources.getString("GMMode.toolTipText"));
+            menu.setName("menuGMMode");
+
+            menuItem = new JMenuItem(resources.getString("miProcureSingleItemImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miProcureSingleItemImmediately.toolTipText"));
+            menuItem.setName("miProcureSingleItemImmediately");
+            menuItem.addActionListener(evt -> {
+                for (final IAcquisitionWork acquisition : acquisitions) {
+                    tryProcureOneItem(acquisition);
+                }
+                model.fireTableDataChanged();
+            });
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("miAddSingleItemImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miAddSingleItemImmediately.toolTipText"));
+            menuItem.setName("miAddSingleItemImmediately");
+            menuItem.addActionListener(evt -> {
+                for (final IAcquisitionWork acquisition : acquisitions) {
+                    addOneItem(acquisition);
+                }
+                model.fireTableDataChanged();
+            });
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("miProcureAllItemsImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miProcureAllItemsImmediately.toolTipText"));
+            menuItem.setName("miProcureAllItemsImmediately");
+            menuItem.addActionListener(evt -> {
+                for (final IAcquisitionWork acquisition : acquisitions) {
+                    while (acquisition.getQuantity() > 0) {
+                        if (!tryProcureOneItem(acquisition)) {
+                            break;
+                        }
+                    }
+                }
+                model.fireTableDataChanged();
+            });
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("miAddAllItemsImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miAddAllItemsImmediately.toolTipText"));
+            menuItem.setName("miAddAllItemsImmediately");
+            menuItem.addActionListener(evt -> {
+                for (final IAcquisitionWork acquisition : acquisitions) {
+                    while (acquisition.getQuantity() > 0) {
+                        addOneItem(acquisition);
+                    }
+                }
+                model.fireTableDataChanged();
+            });
+            menu.add(menuItem);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
+        //endregion GM Menu
+
+        return Optional.of(popup);
     }
 
-    private void procureAllItems(IAcquisitionWork acquisition) {
-        while (acquisition.getQuantity() > 0) {
-            if (!tryProcureOneItem(acquisition)) {
-                break;
-            }
+    /**
+     * @param acquisition the
+     * @return whether the procurement attempt succeeded or not
+     */
+    private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
+        if (acquisition.getQuantity() <= 0) {
+            MekHQ.getLogger().info("Attempted to acquire item with no quantity remaining, ignoring the attempt.");
+            return false;
         }
-    }
-
-    private boolean tryProcureOneItem(IAcquisitionWork acquisition) {
-        Object equipment = acquisition.getNewEquipment();
-        int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+        final Object equipment = acquisition.getNewEquipment();
+        final int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+        final boolean success;
         if (equipment instanceof Part) {
-            if (gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime)) {
-                reportAcquisitionSuccess(acquisition);
-                acquisition.decrementQuantity();
-                return true;
-            } else {
-                reportAcquisitionFailure(acquisition);
-            }
+            success = gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime);
         } else if (equipment instanceof Entity) {
-            if (gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime)) {
-                reportAcquisitionSuccess(acquisition);
-                acquisition.decrementQuantity();
-                return true;
-            } else {
-                reportAcquisitionFailure(acquisition);
-            }
+            success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
+        } else {
+            MekHQ.getLogger().error("Attempted to acquire unknown equipment of " + acquisition.getAcquisitionName());
+            return false;
         }
 
-        return false;
+        if (success) {
+            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
+                    acquisition.getAcquisitionName()));
+            acquisition.decrementQuantity();
+        } else {
+            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
+                    acquisition.getAcquisitionName()));
+        }
+        return success;
     }
 
-    private void reportAcquisitionSuccess(IAcquisitionWork acquisition) {
-        gui.getCampaign()
-                .addReport(String.format("<font color='Green'><b>Procured %s</b></font>",
-                        acquisition.getAcquisitionName()));
-    }
+    private void addOneItem(final IAcquisitionWork acquisition) {
+        if (acquisition.getQuantity() <= 0) {
+            MekHQ.getLogger().info("Attempted to add item with no quantity remaining, ignoring the attempt.");
+            return;
+        }
 
-    private void reportAcquisitionFailure(IAcquisitionWork acquisition) {
-        gui.getCampaign()
-                .addReport(String.format("<font color='red'><b>You cannot afford to purchase %s</b></font>",
-                        acquisition.getAcquisitionName()));
+        final Object equipment = acquisition.getNewEquipment();
+        if (equipment instanceof Part) {
+            gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
+        } else if (equipment instanceof Entity) {
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0);
+        } else {
+            MekHQ.getLogger().error("Attempted to add unknown equipment of " + acquisition.getAcquisitionName());
+            return;
+        }
+
+        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report"),
+                acquisition.getAcquisitionName()));
+        acquisition.decrementQuantity();
     }
 }

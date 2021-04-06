@@ -107,8 +107,8 @@ public class EquipmentPart extends Part {
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
-        if (null != unit) {
-            equipTonnage = type.getTonnage(unit.getEntity(), size);
+        if ((u != null) && (type != null)) {
+            equipTonnage = type.getTonnage(u.getEntity(), size);
         }
     }
 
@@ -406,7 +406,7 @@ public class EquipmentPart extends Part {
             if (unit.isLocationBreached(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is breached.";
             }
-    
+
             if (unit.isLocationDestroyed(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is destroyed.";
             }
@@ -702,7 +702,7 @@ public class EquipmentPart extends Part {
         }
 
         // if we are still here then we need to check the other weapons, if any of them
-        // are usable then we should do the same thing. Otherwise all weapons are destroyed 
+        // are usable then we should do the same thing. Otherwise all weapons are destroyed
         // and we should mark the bay as unusuable.
         for (int wId : weaponBay.getBayWeapons()) {
             final Mounted m = unit.getEntity().getEquipment(wId);

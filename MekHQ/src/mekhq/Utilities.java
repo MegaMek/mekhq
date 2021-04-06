@@ -63,6 +63,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
@@ -181,8 +182,8 @@ public class Utilities {
      * can return <i>null</i> if the collection contains <i>null</i> items.
      *
      */
-    public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if ((null == collection) || collection.isEmpty()) {
+    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
+        if ((collection == null) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
@@ -580,8 +581,8 @@ public class Utilities {
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1154,7 +1155,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        
+
         Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {
@@ -1432,27 +1433,26 @@ public class Utilities {
      * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
+        TableModel model = table.getModel();
+        String[] columns = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            columns[i] = model.getColumnName(i);
+        }
 
+        String report;
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
+                    Object value = model.getValueAt(i, j);
                     // use regex to remove any HTML tags
-                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
+                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {

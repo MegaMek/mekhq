@@ -19,7 +19,6 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +26,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -36,14 +36,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
-import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
@@ -72,13 +73,14 @@ import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 
-public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
     private CampaignGUI gui;
     private JTable unitTable;
@@ -146,11 +148,30 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     //endregion Commands
     //endregion Variable Declarations
 
-    public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
-        super();
+    protected UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
         this.gui = gui;
         this.unitTable = unitTable;
         this.unitModel = unitModel;
+    }
+
+    public static void connect(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel, JSplitPane splitUnit) {
+        new UnitTableMouseAdapter(gui, unitTable, unitModel) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                    int width = splitUnit.getSize().width;
+                    int location = splitUnit.getDividerLocation();
+                    int size = splitUnit.getDividerSize();
+                    if ((width - location + size) < HangarTab.UNIT_VIEW_WIDTH) {
+                        // expand
+                        splitUnit.resetToPreferredSizes();
+                    } else {
+                        // collapse
+                        splitUnit.setDividerLocation(1.0);
+                    }
+                }
+            }
+        }.connect(unitTable);
     }
 
     @Override
@@ -398,13 +419,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (Unit u : units) {
-                if (u.isEntityCamo()) {
-                    u.getEntity().setCamoCategory(null);
-                    u.getEntity().setCamoFileName(null);
-                }
+                u.getEntity().setCamouflage(new Camouflage());
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(), gui.getCampaign().getCamouflage(), selectedUnit.getCamouflage());
+            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+                    selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
             if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
                 return;
             }
@@ -524,570 +543,559 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+    protected Optional<JPopupMenu> createPopupMenu() {
+        if (unitTable.getSelectedRowCount() == 0) {
+            return Optional.empty();
+        }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+        //region Variable Declarations and Instantiations
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem menuItem;
+        JMenu menu;
+        JCheckBoxMenuItem cbMenuItem;
 
-    private void maybeShowPopup(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-            // Immediately return if there are no units selected
-            if (unitTable.getSelectedRowCount() == 0) {
-                return;
+        boolean isGM = gui.getCampaign().isGM();
+
+        int[] rows = unitTable.getSelectedRows();
+        boolean oneSelected = unitTable.getSelectedRowCount() == 1;
+        Unit[] units = new Unit[rows.length];
+        for (int i = 0; i < rows.length; i++) {
+            units[i] = unitModel.getUnit(unitTable.convertRowIndexToModel(rows[i]));
+        }
+        Unit unit = units[0];
+
+        boolean nonePresent = true; // different menu if there is at least one present unit
+        for (Unit u : units) {
+            if (u.isPresent()) {
+                nonePresent = false;
+                break;
             }
+        }
+        //endregion Variable Declarations and Instantiations
 
-            //region Variable Declarations and Instantiations
-            JPopupMenu popup = new JPopupMenu();
-            JMenuItem menuItem;
-            JMenu menu;
-            JCheckBoxMenuItem cbMenuItem;
-
-            boolean isGM = gui.getCampaign().isGM();
-
-            int[] rows = unitTable.getSelectedRows();
-            boolean oneSelected = unitTable.getSelectedRowCount() == 1;
-            Unit[] units = new Unit[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                units[i] = unitModel.getUnit(unitTable.convertRowIndexToModel(rows[i]));
+        if (nonePresent) {
+            menuItem = new JMenuItem("Cancel This Delivery");
+            menuItem.setActionCommand(COMMAND_CANCEL_ORDER);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+            if (isGM) {
+                popup.addSeparator();
+                menu = new JMenu("GM Mode");
+                menuItem = new JMenuItem("Unit Arrives Immediately");
+                menuItem.setActionCommand(COMMAND_ARRIVE);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                popup.add(menu);
             }
-            Unit unit = units[0];
+        } else {
+            //region Determine if to Display
+            // this is used to determine whether or not to show parts of the GUI, especially for
+            // bulk selections
+            boolean oneMothballed = false; // If at least one unit is mothballed, we want to show unit activation
+            boolean oneMothballing = false; // If at least one unit is mothballing, we want to be able to cancel it
+            boolean oneActive = false; // If at least one unit is active, we want to enable mothballing
+            boolean oneDeployed = false; // If at least one unit is deployed, we want to show the remove deployment to GMs
+            boolean allDeployed = true; // don't show sell dialog if all units are deployed
+            boolean oneAvailableUnitBelowMaxCrew = false; // If one unit isn't fully crewed, enable bulk hiring
+            boolean oneNotPresent = false; // If a unit isn't present, enable instant arrival for GMs
+            boolean oneHasIndividualCamo = false; // If a unit has a unique camo, allow it to be removed
+            boolean oneHasCrew = false; // If a unit has crew, enable removing it
+            boolean allUnitsAreRepairable = true;  // If all units can be repaired, allow the repair flag to be selected
+            boolean areAllConventionalInfantry = true; // Conventional infantry can be disbanded, but no others
+            boolean noConventionalInfantry = true; // Conventional infantry can't be repaired/salvaged
+            boolean areAllRepairFlagged = true; // If everyone has the repair flag, then we show the repair flag box as selected
+            boolean areAllSalvageFlagged = true;  // Same as above, but with the salvage flag
+            boolean allRequireSameTechType = true; // If everyone requires the same tech type, we can allow bulk tech assignment
+            boolean allSameModel = true; // If everyone is the exact same unit and model of that unit
+            boolean oneRefitting = false; // If any one selected unit is refitting
+            boolean allAvailable = true; // If everyone is available
+            boolean allAvailableIgnoreRefit = true; // If everyone is available
 
-            boolean nonePresent = true; // different menu if there is at least one present unit
+            final String model = unit.getEntity().getShortNameRaw();
+            String skill = unit.determineUnitTechSkillType();
+            int maintenanceTime = 0;
             for (Unit u : units) {
-                if (u.isPresent()) {
-                    nonePresent = false;
-                    break;
+                if (u.isMothballed()) {
+                    oneMothballed = true;
+                } else if (u.isMothballing()) {
+                    oneMothballing = true;
+                } else {
+                    oneActive = true;
+                }
+
+                if ((u.getCrew().size() < u.getFullCrewSize()) && u.isAvailable()) {
+                    oneAvailableUnitBelowMaxCrew = true;
+                }
+
+                if (u.isDeployed()) {
+                    oneDeployed = true;
+                } else {
+                    allDeployed = false;
+                }
+
+                if (!u.isPresent()) {
+                    oneNotPresent = true;
+                }
+
+                if (allAvailableIgnoreRefit && !u.isAvailable(true)) {
+                    allAvailableIgnoreRefit = false;
+                    allAvailable = false;
+                } else if (allAvailable && !u.isAvailable()) {
+                    allAvailable = false;
+                }
+
+                if (!u.getCamouflage().hasDefaultCategory()) {
+                    oneHasIndividualCamo = true;
+                }
+
+                if (u.getCrew().size() > 0) {
+                    oneHasCrew = true;
+                }
+
+                if (!u.isRepairable()) {
+                    allUnitsAreRepairable = false;
+                }
+
+                if (u.isSalvage()) {
+                    areAllRepairFlagged = false;
+                } else {
+                    areAllSalvageFlagged = false;
+                }
+
+                if (u.isConventionalInfantry()) {
+                    noConventionalInfantry = false;
+                } else {
+                    areAllConventionalInfantry = false;
+                }
+
+                if (!StringUtil.isNullOrEmpty(skill)) {
+                    if (!skill.equals(u.determineUnitTechSkillType())) {
+                        allRequireSameTechType = false;
+                        skill = ""; //little performance saving hack
+                        continue;
+                    }
+                    maintenanceTime += u.getMaintenanceTime();
+                    if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                        skill = ""; //little performance saving hack
+                    }
+                }
+
+                if (!model.equals(u.getEntity().getShortNameRaw())) {
+                    allSameModel = false;
+                }
+
+                if (u.isRefitting()) {
+                    oneRefitting = true;
                 }
             }
-            //endregion Variable Declarations and Instantiations
+            //endregion Determine if to Display
 
-            if (nonePresent) {
-                menuItem = new JMenuItem("Cancel This Delivery");
-                menuItem.setActionCommand(COMMAND_CANCEL_ORDER);
+            // change the location
+            menu = new JMenu("Change site");
+            boolean allSameSite = StaticChecks.areAllSameSite(units);
+            for (int i = 0; i < Unit.SITE_N; i++) {
+                cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
+                if (allSameSite && unit.getSite() == i) {
+                    cbMenuItem.setSelected(true);
+                } else {
+                    cbMenuItem.setActionCommand(COMMAND_CHANGE_SITE + ":" + i);
+                    cbMenuItem.addActionListener(this);
+                }
+                menu.add(cbMenuItem);
+            }
+            menu.setEnabled(allAvailable);
+            popup.add(menu);
+
+            // swap ammo
+            if (oneSelected) {
+                if (unit.getEntity().usesWeaponBays()) {
+                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem.setActionCommand(COMMAND_LC_SWAP_AMMO);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else if (unit.getEntity().isSupportVehicle()
+                            && (unit.getEntity().getWeightClass() == EntityWeightClass.WEIGHT_SMALL_SUPPORT)) {
+                    // Small SVs can configure ammo only if they have weapons that have
+                    // inferno ammo available
+                    if (unit.getEntity().getWeaponList().stream()
+                            .anyMatch(m -> (m.getType() instanceof InfantryWeapon)
+                                    && ((InfantryWeapon) m.getType()).hasInfernoAmmo())) {
+                        menuItem = new JMenuItem("Swap ammo...");
+                        menuItem.setActionCommand(COMMAND_SMALL_SV_SWAP_AMMO);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+                } else {
+                    menu = new JMenu("Swap ammo");
+                    for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+                        JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
+                        AmmoType curType = ammo.getType();
+                        for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
+                                gui.getCampaign().getCampaignOptions().getTechLevel())) {
+                            cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                            if (atype.equals(curType)) {
+                                cbMenuItem.setSelected(true);
+                            } else {
+                                cbMenuItem.addActionListener(evt -> {
+                                    IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                    swapAmmoTypeAction.execute(gui.getCampaign(), unit);
+                                });
+                            }
+                            ammoMenu.add(cbMenuItem);
+                        }
+                        JMenuHelpers.addMenuIfNonEmpty(menu, ammoMenu);
+                    }
+                    menu.setEnabled(allAvailable);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+                }
+            }
+
+            // Select bombs
+            if (oneSelected && unit.getEntity().isBomber()) {
+                menuItem = new JMenuItem("Select Bombs");
+                menuItem.setActionCommand(COMMAND_BOMBS);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
-                if (isGM) {
-                    popup.addSeparator();
-                    menu = new JMenu("GM Mode");
+            }
+
+            // Salvage / Repair
+            if (noConventionalInfantry) {
+                menu = new JMenu("Repair Status");
+                cbMenuItem = new JCheckBoxMenuItem("Repair");
+                cbMenuItem.setSelected(areAllRepairFlagged);
+                cbMenuItem.setActionCommand(COMMAND_REPAIR);
+                cbMenuItem.addActionListener(this);
+                cbMenuItem.setEnabled(allUnitsAreRepairable);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem("Salvage");
+                cbMenuItem.setSelected(areAllSalvageFlagged);
+                cbMenuItem.setActionCommand(COMMAND_SALVAGE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                popup.add(menu);
+            }
+
+            if (oneActive) {
+                menuItem = new JMenuItem(oneSelected ? "Mothball" : "Mass Mothball");
+                menuItem.setActionCommand(COMMAND_MOTHBALL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneMothballed) {
+                menuItem = new JMenuItem(oneSelected ? "Activate" : "Mass Activate");
+                menuItem.setActionCommand(COMMAND_ACTIVATE);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneMothballing) {
+                menuItem = new JMenuItem("Cancel Mothballing/Activation");
+                menuItem.setActionCommand(COMMAND_CANCEL_MOTHBALL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (allRequireSameTechType && !StringUtil.isNullOrEmpty(skill)) {
+                menu = new JMenu("Assign Tech");
+                JMenu menuElite = new JMenu(SkillType.ELITE_NM);
+                JMenu menuVeteran = new JMenu(SkillType.VETERAN_NM);
+                JMenu menuRegular = new JMenu(SkillType.REGULAR_NM);
+                JMenu menuGreen = new JMenu(SkillType.GREEN_NM);
+                JMenu menuUltraGreen = new JMenu(SkillType.ULTRA_GREEN_NM);
+
+                int techsFound = 0;
+                for (Person tech : gui.getCampaign().getTechs()) {
+                    if (tech.hasSkill(skill)
+                            && (tech.getMaintenanceTimeUsing() + maintenanceTime)
+                                    <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
+
+                        String skillLvl = "Unknown";
+                        if (tech.getSkillForWorkingOn(unit) != null) {
+                            skillLvl = SkillType.getExperienceLevelName(
+                                    tech.getSkillForWorkingOn(unit).getExperienceLevel());
+                        }
+
+                        JMenu subMenu;
+                        switch (skillLvl) {
+                            case SkillType.ELITE_NM:
+                                subMenu = menuElite;
+                                break;
+                            case SkillType.VETERAN_NM:
+                                subMenu = menuVeteran;
+                                break;
+                            case SkillType.REGULAR_NM:
+                                subMenu = menuRegular;
+                                break;
+                            case SkillType.GREEN_NM:
+                                subMenu = menuGreen;
+                                break;
+                            case SkillType.ULTRA_GREEN_NM:
+                                subMenu = menuUltraGreen;
+                                break;
+                            default:
+                                subMenu = null;
+                                break;
+                        }
+
+                        if (subMenu != null) {
+                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle()
+                                    + " (" + tech.getMaintenanceTimeUsing() + "m)");
+                            cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
+
+                            if (tech.equals(unit.getTech())) {
+                                cbMenuItem.setSelected(true);
+                            } else {
+                                cbMenuItem.addActionListener(this);
+                            }
+
+                            subMenu.add(cbMenuItem);
+                            if (cbMenuItem.isSelected()) {
+                                subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
+                            }
+                            techsFound++;
+                        }
+                    }
+                }
+
+                if (techsFound > 0) {
+                    JMenuHelpers.addMenuIfNonEmpty(menu, menuElite);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, menuVeteran);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, menuRegular);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, menuGreen);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, menuUltraGreen);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+                }
+            }
+
+            if (oneSelected && unit.requiresMaintenance()) {
+                menuItem = new JMenuItem("Show Last Maintenance Report");
+                menuItem.setActionCommand(COMMAND_MAINTENANCE_REPORT);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected && !unit.isMothballed()
+                    && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
+                menuItem = new JMenuItem("Show Monthly Supply Cost Report");
+                menuItem.setActionCommand(COMMAND_SUPPLY_COST);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (areAllConventionalInfantry) {
+                menuItem = new JMenuItem("Disband");
+                menuItem.setActionCommand(COMMAND_DISBAND);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // Customize unit menu
+            if (allUnitsAreRepairable && allAvailableIgnoreRefit) {
+                menu = new JMenu("Customize");
+
+                // TODO : Should I be able to refit BA?
+                if (allSameModel && allAvailable
+                        && ((unit.getEntity() instanceof Mech)
+                        || (unit.getEntity() instanceof Tank)
+                        || (unit.getEntity() instanceof Aero)
+                        || ((unit.getEntity() instanceof Infantry)))) {
+                    menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
+                            : "Choose Refit Kit...");
+                    menuItem.setActionCommand(COMMAND_REFIT_KIT);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (allSameModel && allAvailable
+                        && ((unit.getEntity() instanceof Mech)
+                        || (unit.getEntity() instanceof Tank)
+                        || (unit.getEntity() instanceof Aero)
+                        || ((unit.getEntity() instanceof Infantry)
+                        || (unit.getEntity() instanceof Protomech)))) {
+                    menuItem = new JMenuItem("Refurbish Unit");
+                    menuItem.setActionCommand(COMMAND_REFURBISH);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (oneSelected && gui.hasTab(GuiTabType.MEKLAB)) {
+                    menuItem = new JMenuItem("Customize in Mek Lab...");
+                    menuItem.setActionCommand(COMMAND_CUSTOMIZE);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(allAvailable
+                            && !(unit.getEntity() instanceof GunEmplacement));
+                    menu.add(menuItem);
+                }
+
+                if (oneRefitting) {
+                    menuItem = new JMenuItem("Cancel Customization");
+                    menuItem.setActionCommand(COMMAND_CANCEL_CUSTOMIZE);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+
+                    if (isGM) {
+                        menuItem = new JMenuItem("Complete Refit (GM)");
+                        menuItem.setActionCommand(COMMAND_REFIT_GM_COMPLETE);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+                }
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            }
+
+            // fill with personnel
+            if (oneAvailableUnitBelowMaxCrew) {
+                menuItem = new JMenuItem(resourceMap.getString("hireMinimumComplement.text"));
+                menuItem.setActionCommand(COMMAND_HIRE_FULL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected) {
+                menuItem = new JMenuItem(gui.getResourceMap()
+                        .getString("customizeMenu.individualCamo.text"));
+                menuItem.setActionCommand(COMMAND_INDI_CAMO);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (!oneSelected && oneHasIndividualCamo) {
+                menuItem = new JMenuItem(gui.getResourceMap()
+                        .getString("customizeMenu.removeIndividualCamo.text"));
+                menuItem.setActionCommand(COMMAND_REMOVE_INDI_CAMO);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected && !gui.getCampaign().isCustom(unit)) {
+                menuItem = new JMenuItem("Tag as a custom unit");
+                menuItem.setActionCommand(COMMAND_TAG_CUSTOM);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected && gui.getCampaign().getCampaignOptions().useQuirks()) {
+                menuItem = new JMenuItem("Edit Quirks");
+                menuItem.setActionCommand(COMMAND_QUIRKS);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected) {
+                menuItem = new JMenuItem("Edit Unit History...");
+                menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // remove all personnel
+            if (oneHasCrew) {
+                popup.addSeparator();
+                menuItem = new JMenuItem("Remove all personnel");
+                menuItem.setActionCommand(COMMAND_REMOVE_ALL_PERSONNEL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected) {
+                menuItem = new JMenuItem("Name Unit");
+                menuItem.setActionCommand(COMMAND_FLUFF_NAME);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected) {
+                menuItem = new JMenuItem("Show BV Calculation");
+                menuItem.setActionCommand(COMMAND_SHOW_BV_CALC);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // sell unit
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
+                popup.addSeparator();
+                menuItem = new JMenuItem("Sell Unit");
+                menuItem.setActionCommand(COMMAND_SELL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            //region GM Mode
+            // GM mode - only show to GMs
+            if (isGM) {
+                popup.addSeparator();
+                menu = new JMenu("GM Mode");
+
+                menuItem = new JMenuItem("Remove Unit");
+                menuItem.setActionCommand(COMMAND_REMOVE);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem("Strip Unit");
+                menuItem.setActionCommand(COMMAND_STRIP_UNIT);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                if (oneActive) {
+                    menuItem = new JMenuItem(oneSelected ? "Mothball Unit" : "Mass Mothball Units");
+                    menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (oneMothballed) {
+                    menuItem = new JMenuItem(oneSelected ? "Activate Unit" : "Mass Activate Units");
+                    menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (oneDeployed) {
+                    menuItem = new JMenuItem("Undeploy Unit");
+                    menuItem.setActionCommand(COMMAND_UNDEPLOY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (oneAvailableUnitBelowMaxCrew) {
+                    menuItem = new JMenuItem(resourceMap.getString("addMinimumComplement.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                if (oneSelected) {
+                    menuItem = new JMenuItem("Edit Damage...");
+                    menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
+                menuItem = new JMenuItem("Restore Unit");
+                menuItem.setActionCommand(COMMAND_RESTORE_UNIT);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem("Set Quality...");
+                menuItem.setActionCommand(COMMAND_SET_QUALITY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                if (oneNotPresent) {
                     menuItem = new JMenuItem("Unit Arrives Immediately");
                     menuItem.setActionCommand(COMMAND_ARRIVE);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                    popup.add(menu);
-                }
-            } else {
-                //region Determine if to Display
-                // this is used to determine whether or not to show parts of the GUI, especially for
-                // bulk selections
-                boolean oneMothballed = false; // If at least one unit is mothballed, we want to show unit activation
-                boolean oneMothballing = false; // If at least one unit is mothballing, we want to be able to cancel it
-                boolean oneActive = false; // If at least one unit is active, we want to enable mothballing
-                boolean oneDeployed = false; // If at least one unit is deployed, we want to show the remove deployment to GMs
-                boolean allDeployed = true; // don't show sell dialog if all units are deployed
-                boolean oneAvailableUnitBelowMaxCrew = false; // If one unit isn't fully crewed, enable bulk hiring
-                boolean oneNotPresent = false; // If a unit isn't present, enable instant arrival for GMs
-                boolean oneHasIndividualCamo = false; // If a unit has a unique camo, allow it to be removed
-                boolean oneHasCrew = false; // If a unit has crew, enable removing it
-                boolean allUnitsAreRepairable = true;  // If all units can be repaired, allow the repair flag to be selected
-                boolean areAllConventionalInfantry = true; // Conventional infantry can be disbanded, but no others
-                boolean noConventionalInfantry = true; // Conventional infantry can't be repaired/salvaged
-                boolean areAllRepairFlagged = true; // If everyone has the repair flag, then we show the repair flag box as selected
-                boolean areAllSalvageFlagged = true;  // Same as above, but with the salvage flag
-                boolean allRequireSameTechType = true; // If everyone requires the same tech type, we can allow bulk tech assignment
-                boolean allSameModel = true; // If everyone is the exact same unit and model of that unit
-                boolean oneRefitting = false; // If any one selected unit is refitting
-                boolean allAvailable = true; // If everyone is available
-                boolean allAvailableIgnoreRefit = true; // If everyone is available
-
-                final String model = unit.getEntity().getShortNameRaw();
-                String skill = unit.determineUnitTechSkillType();
-                int maintenanceTime = 0;
-                for (Unit u : units) {
-                    if (u.isMothballed()) {
-                        oneMothballed = true;
-                    } else if (u.isMothballing()) {
-                        oneMothballing = true;
-                    } else {
-                        oneActive = true;
-                    }
-
-                    if ((u.getCrew().size() < u.getFullCrewSize()) && u.isAvailable()) {
-                        oneAvailableUnitBelowMaxCrew = true;
-                    }
-
-                    if (u.isDeployed()) {
-                        oneDeployed = true;
-                    } else {
-                        allDeployed = false;
-                    }
-
-                    if (!u.isPresent()) {
-                        oneNotPresent = true;
-                    }
-
-                    if (allAvailableIgnoreRefit && !u.isAvailable(true)) {
-                        allAvailableIgnoreRefit = false;
-                        allAvailable = false;
-                    } else if (allAvailable && !u.isAvailable()) {
-                        allAvailable = false;
-                    }
-
-                    if (u.isEntityCamo()) {
-                        oneHasIndividualCamo = true;
-                    }
-
-                    if (u.getCrew().size() > 0) {
-                        oneHasCrew = true;
-                    }
-
-                    if (!u.isRepairable()) {
-                        allUnitsAreRepairable = false;
-                    }
-
-                    if (u.isSalvage()) {
-                        areAllRepairFlagged = false;
-                    } else {
-                        areAllSalvageFlagged = false;
-                    }
-
-                    if (u.getEntity().isConventionalInfantry()) {
-                        noConventionalInfantry = false;
-                    } else {
-                        areAllConventionalInfantry = false;
-                    }
-
-                    if (!StringUtil.isNullOrEmpty(skill)) {
-                        if (!skill.equals(u.determineUnitTechSkillType())) {
-                            allRequireSameTechType = false;
-                            skill = ""; //little performance saving hack
-                            continue;
-                        }
-                        maintenanceTime += u.getMaintenanceTime();
-                        if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
-                            skill = ""; //little performance saving hack
-                        }
-                    }
-
-                    if (!model.equals(u.getEntity().getShortNameRaw())) {
-                        allSameModel = false;
-                    }
-
-                    if (u.isRefitting()) {
-                        oneRefitting = true;
-                    }
-                }
-                //endregion Determine if to Display
-
-                // change the location
-                menu = new JMenu("Change site");
-                boolean allSameSite = StaticChecks.areAllSameSite(units);
-                for (int i = 0; i < Unit.SITE_N; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
-                    if (allSameSite && unit.getSite() == i) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand(COMMAND_CHANGE_SITE + ":" + i);
-                        cbMenuItem.addActionListener(this);
-                    }
-                    menu.add(cbMenuItem);
-                }
-                menu.setEnabled(allAvailable);
-                popup.add(menu);
-
-                // swap ammo
-                if (oneSelected) {
-                    if (unit.getEntity().usesWeaponBays()) {
-                        menuItem = new JMenuItem("Swap ammo...");
-                        menuItem.setActionCommand(COMMAND_LC_SWAP_AMMO);
-                        menuItem.addActionListener(this);
-                        popup.add(menuItem);
-                    } else if (unit.getEntity().isSupportVehicle()
-                                && (unit.getEntity().getWeightClass() == EntityWeightClass.WEIGHT_SMALL_SUPPORT)) {
-                        // Small SVs can configure ammo only if they have weapons that have
-                        // inferno ammo available
-                        if (unit.getEntity().getWeaponList().stream()
-                                .anyMatch(m -> (m.getType() instanceof InfantryWeapon)
-                                        && ((InfantryWeapon) m.getType()).hasInfernoAmmo())) {
-                            menuItem = new JMenuItem("Swap ammo...");
-                            menuItem.setActionCommand(COMMAND_SMALL_SV_SWAP_AMMO);
-                            menuItem.addActionListener(this);
-                            popup.add(menuItem);
-                        }
-                    } else {
-                        menu = new JMenu("Swap ammo");
-                        for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                            JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
-                            AmmoType curType = ammo.getType();
-                            for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
-                                    gui.getCampaign().getCampaignOptions().getTechLevel())) {
-                                cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                                if (atype.equals(curType)) {
-                                    cbMenuItem.setSelected(true);
-                                } else {
-                                    cbMenuItem.addActionListener(evt -> {
-                                        IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
-                                        swapAmmoTypeAction.execute(gui.getCampaign(), unit);
-                                    });
-                                }
-                                ammoMenu.add(cbMenuItem);
-                            }
-                            JMenuHelpers.addMenuIfNonEmpty(menu, ammoMenu);
-                        }
-                        menu.setEnabled(allAvailable);
-                        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-                    }
                 }
 
-                // Select bombs
-                if (oneSelected && unit.getEntity().isBomber()) {
-                    menuItem = new JMenuItem("Select Bombs");
-                    menuItem.setActionCommand(COMMAND_BOMBS);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                // Salvage / Repair
-                if (noConventionalInfantry) {
-                    menu = new JMenu("Repair Status");
-                    cbMenuItem = new JCheckBoxMenuItem("Repair");
-                    cbMenuItem.setSelected(areAllRepairFlagged);
-                    cbMenuItem.setActionCommand(COMMAND_REPAIR);
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(allUnitsAreRepairable);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem("Salvage");
-                    cbMenuItem.setSelected(areAllSalvageFlagged);
-                    cbMenuItem.setActionCommand(COMMAND_SALVAGE);
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    popup.add(menu);
-                }
-
-                if (oneActive) {
-                    menuItem = new JMenuItem(oneSelected ? "Mothball" : "Mass Mothball");
-                    menuItem.setActionCommand(COMMAND_MOTHBALL);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneMothballed) {
-                    menuItem = new JMenuItem(oneSelected ? "Activate" : "Mass Activate");
-                    menuItem.setActionCommand(COMMAND_ACTIVATE);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneMothballing) {
-                    menuItem = new JMenuItem("Cancel Mothballing/Activation");
-                    menuItem.setActionCommand(COMMAND_CANCEL_MOTHBALL);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (allRequireSameTechType && !StringUtil.isNullOrEmpty(skill)) {
-                    menu = new JMenu("Assign Tech");
-                    JMenu menuElite = new JMenu(SkillType.ELITE_NM);
-                    JMenu menuVeteran = new JMenu(SkillType.VETERAN_NM);
-                    JMenu menuRegular = new JMenu(SkillType.REGULAR_NM);
-                    JMenu menuGreen = new JMenu(SkillType.GREEN_NM);
-                    JMenu menuUltraGreen = new JMenu(SkillType.ULTRA_GREEN_NM);
-
-                    int techsFound = 0;
-                    for (Person tech : gui.getCampaign().getTechs()) {
-                        if (tech.hasSkill(skill)
-                                && (tech.getMaintenanceTimeUsing() + maintenanceTime)
-                                        <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
-
-                            String skillLvl = "Unknown";
-                            if (tech.getSkillForWorkingOn(unit) != null) {
-                                skillLvl = SkillType.getExperienceLevelName(
-                                        tech.getSkillForWorkingOn(unit).getExperienceLevel());
-                            }
-
-                            JMenu subMenu;
-                            switch (skillLvl) {
-                                case SkillType.ELITE_NM:
-                                    subMenu = menuElite;
-                                    break;
-                                case SkillType.VETERAN_NM:
-                                    subMenu = menuVeteran;
-                                    break;
-                                case SkillType.REGULAR_NM:
-                                    subMenu = menuRegular;
-                                    break;
-                                case SkillType.GREEN_NM:
-                                    subMenu = menuGreen;
-                                    break;
-                                case SkillType.ULTRA_GREEN_NM:
-                                    subMenu = menuUltraGreen;
-                                    break;
-                                default:
-                                    subMenu = null;
-                                    break;
-                            }
-
-                            if (subMenu != null) {
-                                cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle()
-                                        + " (" + tech.getMaintenanceTimeUsing() + "m)");
-                                cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
-
-                                if (tech.equals(unit.getTech())) {
-                                    cbMenuItem.setSelected(true);
-                                } else {
-                                    cbMenuItem.addActionListener(this);
-                                }
-
-                                subMenu.add(cbMenuItem);
-                                if (cbMenuItem.isSelected()) {
-                                    subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
-                                }
-                                techsFound++;
-                            }
-                        }
-                    }
-
-                    if (techsFound > 0) {
-                        JMenuHelpers.addMenuIfNonEmpty(menu, menuElite);
-                        JMenuHelpers.addMenuIfNonEmpty(menu, menuVeteran);
-                        JMenuHelpers.addMenuIfNonEmpty(menu, menuRegular);
-                        JMenuHelpers.addMenuIfNonEmpty(menu, menuGreen);
-                        JMenuHelpers.addMenuIfNonEmpty(menu, menuUltraGreen);
-                        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-                    }
-                }
-
-                if (oneSelected && unit.requiresMaintenance()) {
-                    menuItem = new JMenuItem("Show Last Maintenance Report");
-                    menuItem.setActionCommand(COMMAND_MAINTENANCE_REPORT);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected && !unit.isMothballed()
-                        && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
-                    menuItem = new JMenuItem("Show Monthly Supply Cost Report");
-                    menuItem.setActionCommand(COMMAND_SUPPLY_COST);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (areAllConventionalInfantry) {
-                    menuItem = new JMenuItem("Disband");
-                    menuItem.setActionCommand(COMMAND_DISBAND);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                // Customize unit menu
-                if (allUnitsAreRepairable && allAvailableIgnoreRefit) {
-                    menu = new JMenu("Customize");
-
-                    // TODO : Should I be able to refit BA?
-                    if (allSameModel && allAvailable
-                            && ((unit.getEntity() instanceof Mech)
-                            || (unit.getEntity() instanceof Tank)
-                            || (unit.getEntity() instanceof Aero)
-                            || ((unit.getEntity() instanceof Infantry)))) {
-                        menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
-                                : "Choose Refit Kit...");
-                        menuItem.setActionCommand(COMMAND_REFIT_KIT);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (allSameModel && allAvailable
-                            && ((unit.getEntity() instanceof Mech)
-                            || (unit.getEntity() instanceof Tank)
-                            || (unit.getEntity() instanceof Aero)
-                            || ((unit.getEntity() instanceof Infantry)
-                            || (unit.getEntity() instanceof Protomech)))) {
-                        menuItem = new JMenuItem("Refurbish Unit");
-                        menuItem.setActionCommand(COMMAND_REFURBISH);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (oneSelected && gui.hasTab(GuiTabType.MEKLAB)) {
-                        menuItem = new JMenuItem("Customize in Mek Lab...");
-                        menuItem.setActionCommand(COMMAND_CUSTOMIZE);
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(allAvailable
-                                && !(unit.getEntity() instanceof GunEmplacement));
-                        menu.add(menuItem);
-                    }
-
-                    if (oneRefitting) {
-                        menuItem = new JMenuItem("Cancel Customization");
-                        menuItem.setActionCommand(COMMAND_CANCEL_CUSTOMIZE);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-
-                        if (isGM) {
-                            menuItem = new JMenuItem("Complete Refit (GM)");
-                            menuItem.setActionCommand(COMMAND_REFIT_GM_COMPLETE);
-                            menuItem.addActionListener(this);
-                            menu.add(menuItem);
-                        }
-                    }
-                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-                }
-
-                // fill with personnel
-                if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem(resourceMap.getString("hireMinimumComplement.text"));
-                    menuItem.setActionCommand(COMMAND_HIRE_FULL);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                // Camo
-                if (oneSelected && !unit.isEntityCamo()) {
-                    menuItem = new JMenuItem(gui.getResourceMap()
-                            .getString("customizeMenu.individualCamo.text"));
-                    menuItem.setActionCommand(COMMAND_INDI_CAMO);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-                if (oneHasIndividualCamo) {
-                    menuItem = new JMenuItem(gui.getResourceMap()
-                            .getString("customizeMenu.removeIndividualCamo.text"));
-                    menuItem.setActionCommand(COMMAND_REMOVE_INDI_CAMO);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected && !gui.getCampaign().isCustom(unit)) {
-                    menuItem = new JMenuItem("Tag as a custom unit");
-                    menuItem.setActionCommand(COMMAND_TAG_CUSTOM);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected && gui.getCampaign().getCampaignOptions().useQuirks()) {
-                    menuItem = new JMenuItem("Edit Quirks");
-                    menuItem.setActionCommand(COMMAND_QUIRKS);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected) {
-                    menuItem = new JMenuItem("Edit Unit History...");
-                    menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                // remove all personnel
-                if (oneHasCrew) {
-                    popup.addSeparator();
-                    menuItem = new JMenuItem("Remove all personnel");
-                    menuItem.setActionCommand(COMMAND_REMOVE_ALL_PERSONNEL);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected) {
-                    menuItem = new JMenuItem("Name Unit");
-                    menuItem.setActionCommand(COMMAND_FLUFF_NAME);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                if (oneSelected) {
-                    menuItem = new JMenuItem("Show BV Calculation");
-                    menuItem.setActionCommand(COMMAND_SHOW_BV_CALC);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                // sell unit
-                if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
-                    popup.addSeparator();
-                    menuItem = new JMenuItem("Sell Unit");
-                    menuItem.setActionCommand(COMMAND_SELL);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-
-                //region GM Mode
-                // GM mode - only show to GMs
-                if (isGM) {
-                    popup.addSeparator();
-                    menu = new JMenu("GM Mode");
-
-                    menuItem = new JMenuItem("Remove Unit");
-                    menuItem.setActionCommand(COMMAND_REMOVE);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-
-                    menuItem = new JMenuItem("Strip Unit");
-                    menuItem.setActionCommand(COMMAND_STRIP_UNIT);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-
-                    if (oneActive) {
-                        menuItem = new JMenuItem(oneSelected ? "Mothball Unit" : "Mass Mothball Units");
-                        menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (oneMothballed) {
-                        menuItem = new JMenuItem(oneSelected ? "Activate Unit" : "Mass Activate Units");
-                        menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (oneDeployed) {
-                        menuItem = new JMenuItem("Undeploy Unit");
-                        menuItem.setActionCommand(COMMAND_UNDEPLOY);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (oneAvailableUnitBelowMaxCrew) {
-                        menuItem = new JMenuItem(resourceMap.getString("addMinimumComplement.text"));
-                        menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    if (oneSelected) {
-                        menuItem = new JMenuItem("Edit Damage...");
-                        menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    menuItem = new JMenuItem("Restore Unit");
-                    menuItem.setActionCommand(COMMAND_RESTORE_UNIT);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-
-                    menuItem = new JMenuItem("Set Quality...");
-                    menuItem.setActionCommand(COMMAND_SET_QUALITY);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-
-                    if (oneNotPresent) {
-                        menuItem = new JMenuItem("Unit Arrives Immediately");
-                        menuItem.setActionCommand(COMMAND_ARRIVE);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-
-                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-                }
-                //endregion GM Mode
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
-            popup.show(e.getComponent(), e.getX(), e.getY());
+            //endregion GM Mode
         }
+
+        return Optional.of(popup);
     }
 
     private void addCustomUnitTag(Unit... units) {

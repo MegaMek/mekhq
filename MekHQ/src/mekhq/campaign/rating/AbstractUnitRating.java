@@ -146,24 +146,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setSuccessCount(0);
         setFailCount(0);
         setBreachCount(0);
-        for (Mission m : getCampaign().getMissions()) {
-
-            //Skip ongoing missions.
-            if (m.isActive()) {
-                continue;
-            }
-
-            if (m.getStatus() == Mission.S_SUCCESS) {
-                setSuccessCount(getSuccessCount() + 1);
-            } else if (m.getStatus() == Mission.S_FAILED) {
-                setFailCount(getFailCount() + 1);
-            } else if (m.getStatus() == Mission.S_BREACH) {
-                setBreachCount(getBreachCount() + 1);
+        for (Mission m : getCampaign().getCompletedMissions()) {
+            switch (m.getStatus()) {
+                case SUCCESS:
+                    setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case FAILED:
+                    setFailCount(getFailCount() + 1);
+                    break;
+                case BREACH:
+                    setBreachCount(getBreachCount() + 1);
+                    break;
+                default:
+                    break;
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) -
-               (getBreachCount() * 25);
+        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
@@ -387,16 +386,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfantry(u) &&
-            (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
-    }
-
-    boolean isConventionalInfantry(Unit u) {
-        return (u.getEntity() instanceof Infantry) &&
-               !(u.getEntity() instanceof BattleArmor);
     }
 
     /**

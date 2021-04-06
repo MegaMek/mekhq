@@ -230,7 +230,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
+        ScenarioTableMouseAdapter.connect(getCampaignGui(), scenarioTable, scenarioModel);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 
@@ -376,7 +376,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
         cmd.setVisible(true);
-        if (cmd.getStatus() <= Mission.S_ACTIVE) {
+        if (cmd.getStatus().isActive()) {
             return;
         }
 
@@ -419,18 +419,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaign().completeMission(mission.getId(), cmd.getStatus());
+        getCampaign().completeMission(mission, cmd.getStatus());
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
     }
 
     private void deleteMission() {
@@ -441,11 +438,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         getCampaign().removeMission(mission.getId());
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -777,21 +771,22 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(),
+                    "The following units could not be deployed:" + undeployed,
                     "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
     }
 
     public void refreshMissions() {
         choiceMission.removeAllItems();
-        for (Mission m : getCampaign().getSortedMissions()) {
+        List<Mission> missions = getCampaign().getSortedMissions();
+        for (Mission m : missions) {
             String desc = m.getName();
-            if (!m.isActive()) {
+            if (m.getStatus().isCompleted()) {
                 desc += " (Complete)";
             }
             choiceMission.addItem(desc);
@@ -799,8 +794,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 choiceMission.setSelectedItem(m.getName());
             }
         }
-        if (choiceMission.getSelectedIndex() == -1 && getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
+        if ((choiceMission.getSelectedIndex() == -1) && !missions.isEmpty()) {
+            selectedMission = missions.get(0).getId();
             choiceMission.setSelectedIndex(0);
         }
         changeMission();
@@ -874,23 +869,21 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.setEnabled(false);
         btnAddScenario.setEnabled(false);
         btnGMGenerateScenarios.setEnabled(false);
-        if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
-            Mission m = getCampaign().getSortedMissions().get(idx);
-            if (null != m) {
+        List<Mission> missions = getCampaign().getSortedMissions();
+        if ((idx >= 0) && (idx < missions.size())) {
+            Mission m = missions.get(idx);
+            if (m != null) {
                 selectedMission = m.getId();
                 scrollMissionView.setViewportView(new MissionViewPanel(m, scenarioTable, getCampaignGui()));
-                // This odd code is to make sure that the scrollbar stays at the
-                // top
-                // I can't just call it here, because it ends up getting reset
-                // somewhere later
+                // This odd code is to make sure that the scrollbar stays at the top
+                // I can't just call it here, because it ends up getting reset somewhere later
                 javax.swing.SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));
                 btnEditMission.setEnabled(true);
-                btnCompleteMission.setEnabled(m.isActive());
+                btnCompleteMission.setEnabled(m.getStatus().isActive());
                 btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.isActive());
-                btnGMGenerateScenarios.setEnabled(m.isActive() && getCampaign().isGM());
+                btnAddScenario.setEnabled(m.isActiveOn(getCampaign().getLocalDate()));
+                btnGMGenerateScenarios.setEnabled(m.isActiveOn(getCampaign().getLocalDate()) && getCampaign().isGM());
             }
-
         } else {
             selectedMission = -1;
             scrollMissionView.setViewportView(null);

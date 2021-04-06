@@ -52,12 +52,12 @@ import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Code copied heavily from PersonnelMarketDialog

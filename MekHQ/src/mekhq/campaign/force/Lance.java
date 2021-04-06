@@ -39,7 +39,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -91,17 +90,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         forceId = fid;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
-                break;
-            }
-            if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
-                    missionId = m.getId();
-                } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
-                }
-            }
+        for (AtBContract contract : c.getActiveAtBContracts()) {
+            missionId = ((contract.getParentContract() == null)
+                    ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }
@@ -227,7 +218,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public boolean isEligible(Campaign c) {
         // ensure the lance is marked as a combat force
-        if (!c.getForce(forceId).isCombatForce()) {
+        final Force force = c.getForce(forceId);
+        if ((force == null) || !force.isCombatForce()) {
             return false;
         }
 
@@ -247,7 +239,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
 
         boolean hasGround = false;
-        for (UUID id : c.getForce(forceId).getUnits()) {
+        for (UUID id : force.getUnits()) {
             Unit unit = c.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();

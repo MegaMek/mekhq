@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
+import megamek.common.MiscType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -641,11 +642,11 @@ public class MekLocation extends Part {
             }
 
             //certain other specific crits need to be left out (uggh, must be a better way to do this!)
-            if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                    && (slot.getIndex() == Mech.ACTUATOR_HIP
-                        || slot.getIndex() == Mech.ACTUATOR_SHOULDER
-                        || slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT
-                        || slot.getIndex() == Mech.SYSTEM_SENSORS)) {
+            if ((slot.getType() == CriticalSlot.TYPE_SYSTEM)
+                    && ((slot.getIndex() == Mech.ACTUATOR_HIP)
+                        || (slot.getIndex() == Mech.ACTUATOR_SHOULDER)
+                        || (slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT)
+                        || (slot.getIndex() == Mech.SYSTEM_SENSORS))) {
                 continue;
             }
 
@@ -663,6 +664,19 @@ public class MekLocation extends Part {
                         continue;
                     } else {
                         return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                }
+            }
+
+            if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
+                if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
+                    EquipmentType equipmentType = slot.getMount().getType();
+                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                            return "Null-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                        return "Void-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
+                        return "Chameleon shield must be salvaged or scrapped first.";
                     }
                 }
             }
