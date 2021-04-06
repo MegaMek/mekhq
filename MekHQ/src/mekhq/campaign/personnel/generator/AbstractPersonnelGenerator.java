@@ -135,7 +135,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().useDylansRandomXp()) {
+        if (campaign.getCampaignOptions().useDylansRandomXP()) {
             person.setXP(Utilities.generateRandomExp());
         }
     }

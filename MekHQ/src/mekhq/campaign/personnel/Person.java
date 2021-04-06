@@ -1402,7 +1402,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
                 }
-            } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+            } else if (campaign.getCampaignOptions().useProcreationNoRelationship()) {
                 // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
                 conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
             }
@@ -1575,7 +1575,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            Marriage.WEIGHTED.marry(this, potentials.get(Compute.randomInt(n)), campaign);
+            Marriage.WEIGHTED.marry(campaign, this, potentials.get(Compute.randomInt(n)));
         }
     }
 
@@ -2281,14 +2281,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         //if salary is negative, then use the standard amounts
-        Money primaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getPrimaryRole());
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
+        Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaryMoney(getPrimaryRole());
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(false)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
             primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        Money secondaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getSecondaryRole()).dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true)));
+        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaryMoney(getSecondaryRole()).dividedBy(2);
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(true)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getSecondaryRole() == T_INFANTRY || getSecondaryRole() == T_BA)) {
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
@@ -2547,7 +2547,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     /* Attempt to use higher precision averaging, but if it doesn't provide a clear result
                     due to non-standard experience thresholds then fall back on lower precision averaging
                     See Bug #140 */
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
                         );
@@ -2588,7 +2588,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             case T_AERO_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO)
                                     .getLevel()) / 2.0
@@ -2606,7 +2606,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             case T_CONV_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET)
                                     .getLevel()) / 2.0
@@ -2624,7 +2624,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             case T_BA:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH)
                                     .getLevel()) / 2.0
