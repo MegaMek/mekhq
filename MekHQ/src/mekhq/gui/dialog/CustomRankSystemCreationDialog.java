@@ -199,6 +199,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         super.okAction();
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText(), getTxtRankSystemName().getText(),
                 (RankSystemType) getComboRankSystemType().getSelectedItem()));
+        getRankSystem().setRanks(getRanks());
     }
     //endregion Button Actions
 }

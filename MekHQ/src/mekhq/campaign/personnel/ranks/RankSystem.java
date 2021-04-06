@@ -47,22 +47,6 @@ public class RankSystem implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = -6037712487121208137L;
 
-    // Rank Size Codes
-    // Enlisted
-    public static final int RE_MIN	= 0; // Rank "None"
-    public static final int RE_MAX	= 20;
-    public static final int RE_NUM	= 21;
-    // Warrant Officers
-    public static final int RWO_MIN	= 21;
-    public static final int RWO_MAX	= 30;
-    public static final int RWO_NUM	= 31; // Number that comes after RWO_MAX
-    // Officers
-    public static final int RO_MIN	= 31;
-    public static final int RO_MAX	= 50;
-    public static final int RO_NUM	= 51; // Number that comes after RO_MAX
-    // Total
-    public static final int RC_NUM	= 51; // Same as RO_MAX+1
-
     // Rank Profession Codes - TODO : Enum swapover
     public static final int RPROF_MW    = 0;
     public static final int RPROF_ASF   = 1;
@@ -316,26 +300,11 @@ public class RankSystem implements Serializable {
         if (export || getType().isCampaign()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
             for (int i = 0; i < getRanks().size(); i++) {
-                getRanks().get(i).writeToXML(pw, indent);
-                pw.println(getRankPostTag(i));
+                getRanks().get(i).writeToXML(pw, indent, i);
             }
         }
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rankSystem");
-    }
-
-    private String getRankPostTag(final int rankNum) {
-        if (rankNum == 0) {
-            return " <!-- E0 \"None\" -->";
-        } else if (rankNum < RE_NUM) {
-            return " <!-- E" + rankNum + " -->";
-        } else if (rankNum < RWO_NUM) {
-            return " <!-- WO" + (rankNum - RE_MAX) + " -->";
-        } else if (rankNum < RO_NUM) {
-            return " <!-- O" + (rankNum - RWO_MAX) + " -->";
-        } else {
-            return "";
-        }
     }
 
     /**

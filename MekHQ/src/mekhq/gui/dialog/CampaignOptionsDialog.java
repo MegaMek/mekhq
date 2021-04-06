@@ -44,9 +44,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -4268,6 +4268,7 @@ public class CampaignOptionsDialog extends JDialog {
                 "btnExportCurrentRankSystem.toolTipText", "btnExportCurrentRankSystem",
                 evt -> {
             if (selectedRankSystem != null) {
+                updateRankSystemRanks();
                 selectedRankSystem.writeToFile(FileDialogs.saveIndividualRankSystem(frame).orElse(null));
             }
         }));
@@ -4275,6 +4276,7 @@ public class CampaignOptionsDialog extends JDialog {
         panel.add(createButton("btnExportUserDataRankSystems.text",
                 "btnExportUserDataRankSystems.toolTipText", "btnExportUserDataRankSystems",
                 evt -> {
+            updateRankSystemRanks();
             final List<RankSystem> rankSystems = new ArrayList<>();
             for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
                 final RankSystem rankSystem = comboRankSystems.getModel().getElementAt(i);
@@ -4289,6 +4291,7 @@ public class CampaignOptionsDialog extends JDialog {
         panel.add(createButton("btnExportRankSystems.text",
                 "btnExportRankSystems.toolTipText", "btnExportRankSystems",
                 evt -> {
+            updateRankSystemRanks();
             final List<RankSystem> rankSystems = new ArrayList<>();
             for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
                 rankSystems.add(comboRankSystems.getModel().getElementAt(i));
@@ -4352,10 +4355,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region Action Listeners
     //region Rank Systems Tab
     private void comboRankSystemChanged() {
-        // Update the now old rank system with the changes done to it in the model
-        if ((selectedRankSystem != null) && !selectedRankSystem.getType().isDefault()) {
-            selectedRankSystem.setRanks(ranksModel.getRanks());
-        }
+        updateRankSystemRanks();
 
         // Then update the selected rank system, with null protection (although it shouldn't be null)
         selectedRankSystem = (RankSystem) comboRankSystems.getSelectedItem();
@@ -4378,6 +4378,13 @@ public class CampaignOptionsDialog extends JDialog {
         btnConvertRankSystemType.setText(resources.getString(selectedRankSystem.getType().isUserData()
                 ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
         btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
+    }
+
+    private void updateRankSystemRanks() {
+        // Update the now old rank system with the changes done to it in the model
+        if ((selectedRankSystem != null) && !selectedRankSystem.getType().isDefault()) {
+            selectedRankSystem.setRanks(ranksModel.getRanks());
+        }
     }
 
     private void convertRankSystemType() {
@@ -4410,8 +4417,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
 
         // Now we can show the dialog and check if it was confirmed
-        final CustomRankSystemCreationDialog dialog = new CustomRankSystemCreationDialog(frame, rankSystems,
-                ((RankSystem) Objects.requireNonNull(comboRankSystems.getSelectedItem())).getRanks());
+        final CustomRankSystemCreationDialog dialog = new CustomRankSystemCreationDialog(frame,
+                rankSystems, ranksModel.getRanks());
         if (dialog.showDialog().isConfirmed()) {
             // If it was we add the new rank system to the model
             comboRankSystems.addItem(dialog.getRankSystem());
@@ -4423,13 +4430,24 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void refreshRankSystems() {
+        // Clear the selected rank system and reinitialize
         selectedRankSystem = null;
         Ranks.reinitializeRankSystems(campaign);
+
+        // Then collect all of the campaign-type rank systems into a set, so we don't just throw
+        // them away
+        final Set<RankSystem> campaignRankSystems = new HashSet<>();
+        for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
+            final RankSystem rankSystem = comboRankSystems.getModel().getElementAt(i);
+            if (rankSystem.getType().isCampaign()) {
+                campaignRankSystems.add(rankSystem);
+            }
+        }
+
+        // Finally we can update the rank system model and the rank system combo box
         rankSystemModel.removeAllElements();
         rankSystemModel.addAll(Ranks.getRankSystems().values());
-        if (campaign.getRankSystem().getType().isCampaign()) {
-            rankSystemModel.addElement(campaign.getRankSystem());
-        }
+        rankSystemModel.addAll(campaignRankSystems);
         comboRankSystems.setSelectedItem(campaign.getRankSystem());
     }
     //endregion Rank Systems Tab
@@ -4945,7 +4963,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRankSystem((RankSystem) comboRankSystems.getSelectedItem());
+        campaign.setRankSystem(selectedRankSystem);
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 

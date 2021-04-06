@@ -85,10 +85,10 @@ public class RankTableModel extends DefaultTableModel {
         for (int i = 0; i < ranks.size(); i++) {
             final Rank rank = ranks.get(i);
             final String rating;
-            if (i > RankSystem.RWO_MAX) {
-                rating = "O" + (i - RankSystem.RWO_MAX);
-            } else if (i > RankSystem.RE_MAX) {
-                rating = "WO" + (i - RankSystem.RE_MAX);
+            if (i > Rank.RWO_MAX) {
+                rating = "O" + (i - Rank.RWO_MAX);
+            } else if (i > Rank.RE_MAX) {
+                rating = "WO" + (i - Rank.RE_MAX);
             } else {
                 rating = "E" + i;
             }

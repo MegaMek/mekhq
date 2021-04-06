@@ -40,6 +40,22 @@ public class Rank implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = 1677999967776587426L;
 
+    // Rank Size Codes
+    // Enlisted
+    public static final int RE_MIN	= 0; // Rank "None"
+    public static final int RE_MAX	= 20;
+    public static final int RE_NUM	= 21;
+    // Warrant Officers
+    public static final int RWO_MIN	= 21;
+    public static final int RWO_MAX	= 30;
+    public static final int RWO_NUM	= 31; // Number that comes after RWO_MAX
+    // Officers
+    public static final int RO_MIN	= 31;
+    public static final int RO_MAX	= 50;
+    public static final int RO_NUM	= 51; // Number that comes after RO_MAX
+    // Total
+    public static final int RC_NUM	= 51; // Same as RO_MAX+1
+
     private List<String> rankNames;
     private boolean officer;
     private double payMultiplier;
@@ -146,12 +162,28 @@ public class Rank implements Serializable {
     //endregion Boolean Comparison Methods
 
     //region File IO
-    public void writeToXML(final PrintWriter pw, int indent) {
+    public void writeToXML(final PrintWriter pw, int indent, final int index) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rank");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rank");
+        writeCloseTag(pw, --indent, index);
+    }
+
+    private void writeCloseTag(final PrintWriter pw, final int indent, final int rankIndex) {
+        final String tag;
+        if (rankIndex == 0) {
+            tag = "</rank> <!-- E0 \"None\" -->\n";
+        } else if (rankIndex < RE_NUM) {
+            tag = "</rank> <!-- E" + rankIndex + " -->\n";
+        } else if (rankIndex < RWO_NUM) {
+            tag = "</rank> <!-- WO" + (rankIndex - RE_MAX) + " -->\n";
+        } else if (rankIndex < RO_NUM) {
+            tag = "</rank> <!-- O" + (rankIndex - RWO_MAX) + " -->\n";
+        } else {
+            tag = "</rank>\n";
+        }
+        pw.print(MekHqXmlUtil.indentStr(indent) + tag);
     }
 
     public static @Nullable Rank generateInstanceFromXML(final Node wn) {

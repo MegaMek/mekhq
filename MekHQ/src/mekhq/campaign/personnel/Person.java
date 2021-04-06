@@ -3781,7 +3781,7 @@ public class Person implements Serializable {
 
         if (getRank().isOfficer()) {
             int rankOrder = getRankSystem().getOfficerCut();
-            while ((rankOrder <= getRankNumeric()) && (rankOrder < RankSystem.RC_NUM)) {
+            while ((rankOrder <= getRankNumeric()) && (rankOrder < Rank.RC_NUM)) {
                 Rank rank = getRankSystem().getRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
                     shares++;

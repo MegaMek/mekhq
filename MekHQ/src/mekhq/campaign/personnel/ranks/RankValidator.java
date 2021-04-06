@@ -56,7 +56,11 @@ public class RankValidator {
             return true;
         }
 
-        // Now for the more computationally intensive processing
+        // Now for the more computationally intensive processing, the rank validation
+        // Index 0 needs to be checked individually, as all systems MUST either be filled or indicate
+        // and alternative system
+
+        // The rest of the levels need to not be an infinite loop and valid
 
         // Validation has passed successfully
         return true;
