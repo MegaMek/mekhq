@@ -41,26 +41,23 @@ public enum BabySurnameStyle {
     //endregion Enum Declaration
 
     //region Variable Declarations
-    private String styleName;
-    private String styleToolTip;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final String name;
+    private final String toolTipText;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    BabySurnameStyle(String styleName, String styleToolTip) {
-        this.styleName = resources.getString(styleName);
-        this.styleToolTip = resources.getString(styleToolTip);
+    BabySurnameStyle(final String name, final String toolTipText) {
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
-    public String getStyleName() {
-        return styleName;
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
     }
-
-    public String getStyleToolTip() {
-        return styleToolTip;
-    }
+    //endregion Getters
 
     public String generateBabySurname(Person mother, Person father, Gender babyGender) {
         final boolean hasFather = (father != null);
@@ -210,6 +207,6 @@ public enum BabySurnameStyle {
 
     @Override
     public String toString() {
-        return getStyleName();
+        return name;
     }
 }

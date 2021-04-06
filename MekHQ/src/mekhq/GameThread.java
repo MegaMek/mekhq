@@ -105,8 +105,7 @@ class GameThread extends Thread implements CloseClientListener {
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
                 MekHQ.getLogger().info("Thread in lounge" );
-                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();

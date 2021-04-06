@@ -44,6 +44,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
@@ -418,13 +419,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (Unit u : units) {
-                if (u.isEntityCamo()) {
-                    u.getEntity().setCamoCategory(null);
-                    u.getEntity().setCamoFileName(null);
-                }
+                u.getEntity().setCamouflage(new Camouflage());
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(), gui.getCampaign().getCamouflage(), selectedUnit.getCamouflage());
+            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+                    selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
             if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
                 return;
             }
@@ -645,7 +644,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     allAvailable = false;
                 }
 
-                if (u.isEntityCamo()) {
+                if (!u.getCamouflage().hasDefaultCategory()) {
                     oneHasIndividualCamo = true;
                 }
 
@@ -954,15 +953,15 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            // Camo
-            if (oneSelected && !unit.isEntityCamo()) {
+            if (oneSelected) {
                 menuItem = new JMenuItem(gui.getResourceMap()
                         .getString("customizeMenu.individualCamo.text"));
                 menuItem.setActionCommand(COMMAND_INDI_CAMO);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
-            if (oneHasIndividualCamo) {
+
+            if (!oneSelected && oneHasIndividualCamo) {
                 menuItem = new JMenuItem(gui.getResourceMap()
                         .getString("customizeMenu.removeIndividualCamo.text"));
                 menuItem.setActionCommand(COMMAND_REMOVE_INDI_CAMO);
