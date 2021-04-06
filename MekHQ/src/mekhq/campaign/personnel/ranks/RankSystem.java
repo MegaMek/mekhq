@@ -84,10 +84,6 @@ public class RankSystem implements Serializable {
         this.rankSystemCode = rankSystemCode;
     }
 
-    public String getRankSystemName() {
-        return rankSystemName;
-    }
-
     public void setRankSystemName(final String rankSystemName) {
         this.rankSystemName = rankSystemName;
     }
@@ -296,7 +292,7 @@ public class RankSystem implements Serializable {
         // Only write out any other information if we are exporting the system or we are using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", getRankSystemName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", toString());
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent, i);
             }

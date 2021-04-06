@@ -41,12 +41,12 @@ public class RankValidator {
         if (checkCode && Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
             if (rankSystem.getType().isUserData()) {
                 MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).getRankSystemName()
-                        + " is duplicated by userData Rank System " + rankSystem.getRankSystemName());
+                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                        + " is duplicated by userData Rank System " + rankSystem.toString());
             } else {
                 MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).getRankSystemName()
-                        + " is duplicated by " + rankSystem.getRankSystemName());
+                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                        + " is duplicated by " + rankSystem.toString());
             }
             return false;
         }

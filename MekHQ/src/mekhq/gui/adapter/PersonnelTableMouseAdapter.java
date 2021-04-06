@@ -36,6 +36,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -1194,11 +1195,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 
-        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
+        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        rankSystems.sort((r1, r2) -> naturalOrderComparator.compare(r1.toString(), r2.toString()));
+        for (final RankSystem rankSystem : rankSystems) {
             if (rankSystem.equals(campaignRankSystem)) {
                 continue;
             }
-            cbMenuItem = new JCheckBoxMenuItem(rankSystem.getRankSystemName());
+            cbMenuItem = new JCheckBoxMenuItem(rankSystem.toString());
             cbMenuItem.setSelected(rankSystem.equals(person.getRankSystem()));
             cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getRankSystemCode()));
             cbMenuItem.addActionListener(this);
