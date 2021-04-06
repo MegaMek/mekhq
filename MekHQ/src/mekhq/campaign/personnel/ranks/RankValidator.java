@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 import java.util.Collection;
@@ -61,15 +62,29 @@ public class RankValidator {
         return true;
     }
 
+    public void checkAssignedRankSystems(final Campaign campaign) throws NullPointerException {
+        // First, we need to ensure the campaign's rank system was refreshed. This can be done by
+        // checking if the system is a campaign custom
+        if (!campaign.getRankSystem().getType().isCampaign()) {
+            // This ensures it properly changes, with fallback properly handled
+            campaign.setRankSystemDirect(Ranks.getRankSystemFromCode(campaign.getRankSystem().getRankSystemCode()));
+        }
+
+        // Then, we need to fix any old rank system assignments for personnel
+        for (final Person person : campaign.getPersonnel()) {
+
+        }
+    }
+
     public void changeCampaignRankSystem(final RankSystem oldRankSystem,
                                          final RankSystem newRankSystem,
                                          final Collection<Person> personnel) {
-        // We need to
+        // We need to swap over the previous rank system to the current one
         for (final Person person : personnel) {
 
         }
 
-        // Then, we need to check the indi
+        // Then, we need to check the ranks for the personnel
         checkPersonnelRanks(personnel);
     }
 

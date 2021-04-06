@@ -4283,6 +4283,7 @@ public class CampaignOptionsDialog extends JDialog {
                 }
             }
             Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
+            refreshRankSystems();
         }));
 
         panel.add(createButton("btnExportRankSystems.text",
@@ -4314,17 +4315,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         panel.add(createButton("btnRefreshRankSystemsFromFile.text",
                 "btnRefreshRankSystemsFromFile.toolTipText", "btnRefreshRankSystemsFromFile",
-                evt -> {
-            selectedRankSystem = null;
-            Ranks.initializeRankSystems();
-            new RankValidator().checkPersonnelRanks(campaign.getPersonnel());
-            rankSystemModel.removeAllElements();
-            rankSystemModel.addAll(Ranks.getRankSystems().values());
-            if (campaign.getRankSystem().getType().isCampaign()) {
-                rankSystemModel.addElement(campaign.getRankSystem());
-            }
-            comboRankSystems.setSelectedItem(campaign.getRankSystem());
-        }));
+                evt -> refreshRankSystems()));
 
         return panel;
     }
@@ -4429,6 +4420,17 @@ public class CampaignOptionsDialog extends JDialog {
                 comboRankSystems.setSelectedItem(dialog.getRankSystem());
             }
         }
+    }
+
+    private void refreshRankSystems() {
+        selectedRankSystem = null;
+        Ranks.reinitializeRankSystems(campaign);
+        rankSystemModel.removeAllElements();
+        rankSystemModel.addAll(Ranks.getRankSystems().values());
+        if (campaign.getRankSystem().getType().isCampaign()) {
+            rankSystemModel.addElement(campaign.getRankSystem());
+        }
+        comboRankSystems.setSelectedItem(campaign.getRankSystem());
     }
     //endregion Rank Systems Tab
     //endregion Action Listeners

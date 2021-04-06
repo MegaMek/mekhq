@@ -24,21 +24,28 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank
@@ -86,13 +93,30 @@ public class Ranks {
         exportRankSystemsToFile(file, rankSystems);
     }
 
-    public static void exportRankSystemsToFile(final @Nullable File file,
+    public static void exportRankSystemsToFile(@Nullable File file,
                                                final Collection<RankSystem> rankSystems) {
         if (file == null) {
             return;
         }
-
-        // TODO : Windchild : Implement me
+        String path = file.getPath();
+        if (!path.endsWith(".xml")) {
+            path += ".xml";
+            file = new File(path);
+        }
+        try (OutputStream fos = new FileOutputStream(file);
+             OutputStream bos = new BufferedOutputStream(fos);
+             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
+            // Then save it out to that file.
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<rankSystems version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version") + "\">");
+            for (final RankSystem rankSystem : rankSystems) {
+                rankSystem.writeToXML(pw, 1, true);
+            }
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
     }
 
     public static void initializeRankSystems() {
@@ -100,7 +124,23 @@ public class Ranks {
         setRankSystems(new HashMap<>());
         loadRankSystemsFromPath(RankSystemType.DEFAULT);
         loadRankSystemsFromPath(RankSystemType.USER_DATA);
+
+        if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
+            MekHQ.getLogger().fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
+                    + " system. Initialization failure, shutting MekHQ down.");
+            System.exit(-1);
+        }
+
         MekHQ.getLogger().info("Completed Rank System XML Load");
+    }
+
+    public static void reinitializeRankSystems(final Campaign campaign) {
+        // Initialization is setup up so that it will clear what exists
+        initializeRankSystems();
+        // Then, we need to check and fix any issues that may arise from the file load
+        final RankValidator rankValidator = new RankValidator();
+        rankValidator.checkAssignedRankSystems(campaign);
+        rankValidator.checkPersonnelRanks(campaign.getPersonnel());
     }
 
     private static void loadRankSystemsFromPath(final RankSystemType type) {

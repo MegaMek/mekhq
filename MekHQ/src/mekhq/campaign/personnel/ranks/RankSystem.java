@@ -293,7 +293,6 @@ public class RankSystem implements Serializable {
             path += ".xml";
             file = new File(path);
         }
-
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
