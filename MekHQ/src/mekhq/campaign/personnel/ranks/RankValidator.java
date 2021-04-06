@@ -57,8 +57,16 @@ public class RankValidator {
         }
 
         // Now for the more computationally intensive processing, the rank validation
+        // First, let's check the size, as we currently require a size equal to the total number of
+        // rank tiers
+        if (rankSystem.getRanks().size() != Rank.RC_NUM) {
+            MekHQ.getLogger().error(String.format("Illegal number of ranks of %d when %d is required",
+                    rankSystem.getRanks().size(), Rank.RC_NUM));
+            return false;
+        }
+
         // Index 0 needs to be checked individually, as all systems MUST either be filled or indicate
-        // and alternative system
+        // an alternative system
 
         // The rest of the levels need to not be an infinite loop and valid
 

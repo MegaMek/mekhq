@@ -105,7 +105,6 @@ public class RankSystem implements Serializable {
     }
 
     public void setRanks(final List<Rank> ranks) {
-        // TODO : Windchild : I need to ensure the size is proper, and fix it if it is not... for now
         setRanksDirect(ranks);
     }
 
@@ -146,7 +145,6 @@ public class RankSystem implements Serializable {
     }
 
     //region Professions
-    // TODO : Windchild : Move me into an enum
     /**
      * This takes the initial profession, converts it into a base profession, and then calls
      * getProfessionFromBase to determine the profession to use for the provided rank.
