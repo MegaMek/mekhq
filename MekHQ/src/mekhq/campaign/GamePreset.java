@@ -190,8 +190,7 @@ public class GamePreset implements MekHqXmlSerializable {
 
         // Legacy Parsing method for any presets created before 0.47.11, as they did not include a version
         final String versionString = optionsEle.getAttribute("version");
-        // TODO : Java 11 : Move to isBlank
-        Version version = new Version(versionString.trim().isEmpty() ? "0.47.11" : versionString);
+        Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {

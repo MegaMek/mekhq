@@ -499,14 +499,13 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
             if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
-
+                final Camouflage camouflage = scenario.getContract(campaign).getAllyCamouflage();
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
                     if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                        en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        en.setCamoFileName(scenario.getContract(campaign).getAllyColour().name());
+                        en.setCamouflage(camouflage.clone());
                     }
                 }
 
@@ -1746,13 +1745,11 @@ public class AtBDynamicScenarioFactory {
         if (forceAlignment == ScenarioForceTemplate.ForceAlignment.Allied) {
             generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getAllyColour());
-            generatedForce.setCamoCategory(contract.getAllyCamoCategory());
-            generatedForce.setCamoFileName(contract.getAllyCamoFileName());
+            generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
         } else if (forceAlignment == ScenarioForceTemplate.ForceAlignment.Opposing) {
             generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
-            generatedForce.setCamoCategory(contract.getEnemyCamoCategory());
-            generatedForce.setCamoFileName(contract.getEnemyCamoFileName());
+            generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
         } else {
             generatedForce.setName("Unknown Hostiles");
         }

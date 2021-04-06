@@ -156,7 +156,7 @@ public class ServiceLogger {
         if (force != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
         }
     }
 
@@ -168,8 +168,8 @@ public class ServiceLogger {
         if ((oldForce != null) && (newForce != null)) {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? oldForce.getFullName() : oldForce.getName(),
-                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? newForce.getFullName() : newForce.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? oldForce.getFullName() : oldForce.getName(),
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? newForce.getFullName() : newForce.getName())));
         } else if (oldForce == null) {
             addedToTOEForce(campaign, person, date, newForce);
         } else {
@@ -181,7 +181,7 @@ public class ServiceLogger {
         if (force != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
         }
     }
 }

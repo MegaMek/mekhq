@@ -27,6 +27,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -42,6 +43,7 @@ import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -181,7 +183,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private Map<String, Integer> duplicateNameHash = new HashMap<>();
+    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -224,8 +226,7 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Camouflage.COLOUR_CAMOUFLAGE;
-    private String camoFileName = PlayerColour.BLUE.name();
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
 
     //unit icon
@@ -502,7 +503,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -636,10 +637,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        final String METHOD_NAME = "purchaseShipSearchResult()";
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().error(this, "Cannot find entry for " + getShipSearchResult());
+            MekHQ.getLogger().error("Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -654,7 +654,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "Unable to load unit: " + ms.getEntryName(), ex);
+            MekHQ.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
             return;
         }
         Entity en = mechFileParser.getEntity();
@@ -857,6 +857,7 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    //region Missions/Contracts
     /**
      * Add a mission to the campaign
      *
@@ -890,6 +891,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * @param id the mission's id
+     * @return the mission in question
+     */
+    public Mission getMission(int id) {
+        return missions.get(id);
+    }
+
+    /**
      * @return an <code>Collection</code> of missions in the campaign
      */
     public Collection<Mission> getMissions() {
@@ -897,22 +906,77 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * @return missions ArrayList sorted with complete missions at the bottom
+     * @return missions List sorted with complete missions at the bottom
      */
-    public ArrayList<Mission> getSortedMissions() {
-        ArrayList<Mission> msns = new ArrayList<>(missions.values());
-        msns.sort((m1, m2) -> Boolean.compare(m2.isActive(), m1.isActive()));
+    public List<Mission> getSortedMissions() {
+        return getMissions().stream()
+                .sorted(Comparator.comparing(Mission::getStatus))
+                .collect(Collectors.toList());
+    }
 
-        return msns;
+    public List<Mission> getActiveMissions() {
+        return getMissions().stream()
+                .filter(m -> m.isActiveOn(getLocalDate()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Mission> getCompletedMissions() {
+        return getMissions().stream()
+                .filter(m -> m.getStatus().isCompleted())
+                .collect(Collectors.toList());
     }
 
     /**
-     * @param id the <code>int</code> id of the team
-     * @return a <code>SupportTeam</code> object
+     * @return a list of all currently active contracts
      */
-    public Mission getMission(int id) {
-        return missions.get(id);
+    public List<Contract> getActiveContracts() {
+        return getMissions().stream()
+                .filter(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()))
+                .map(c -> (Contract) c)
+                .collect(Collectors.toList());
     }
+
+    public List<AtBContract> getAtBContracts() {
+        return getMissions().stream()
+                .filter(c -> c instanceof AtBContract)
+                .map(c -> (AtBContract) c)
+                .collect(Collectors.toList());
+    }
+
+    public List<AtBContract> getActiveAtBContracts() {
+        return getActiveAtBContracts(false);
+    }
+
+    public List<AtBContract> getActiveAtBContracts(boolean excludeEndDateCheck) {
+        return getMissions().stream()
+                .filter(c -> (c instanceof AtBContract) && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
+                .map(c -> (AtBContract) c)
+                .collect(Collectors.toList());
+    }
+
+    public List<AtBContract> getCompletedAtBContracts() {
+        return getMissions().stream()
+                .filter(c -> (c instanceof AtBContract) && c.getStatus().isCompleted())
+                .map(c -> (AtBContract) c)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @return whether or not the current campaign has an active contract for the current date
+     */
+    public boolean hasActiveContract() {
+        return hasActiveContract;
+    }
+
+    /**
+     * This is used to check if the current campaign has one or more active contacts, and sets the
+     * value of hasActiveContract based on that check. This value should not be set elsewhere
+     */
+    public void setHasActiveContract() {
+        hasActiveContract = getMissions().stream()
+                .anyMatch(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()));
+    }
+    //endregion Missions/Contracts
 
     /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
@@ -1545,7 +1609,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getCampaignOptions().randomizeOrigin()) {
             RangedPlanetSelector selector =
                     new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                            getCampaignOptions().isOriginExtraRandom());
+                            getCampaignOptions().extraRandomOrigin());
             selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
             return selector;
         } else {
@@ -1823,7 +1887,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
      */
     public List<Person> getTechs() {
-        return getTechs(false, null, true, false);
+        return getTechs(false);
     }
 
     public List<Person> getTechs(boolean noZeroMinute) {
@@ -1833,19 +1897,12 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Returns a list of active technicians.
      *
-     * @param noZeroMinute
-     *            If TRUE, then techs with no time remaining will be excluded from
-     *            the list.
-     * @param firstTechId
-     *            The ID of the tech that should appear first in the list (assuming
-     *            active and satisfies the noZeroMinute argument)
-     * @param sorted
-     *            If TRUE, then return the list sorted from worst to best
-     * @param eliteFirst
-     *            If TRUE and sorted also TRUE, then return the list sorted from
-     *            best to worst
-     * @return The list of active {@link Person}s who qualify as technicians
-     *         ({@link Person#isTech()}).
+     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
+     * @param firstTechId The ID of the tech that should appear first in the list (assuming
+     *                    active and satisfies the noZeroMinute argument)
+     * @param sorted If TRUE, then return the list sorted from worst to best
+     * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
+     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
     public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
@@ -1869,65 +1926,23 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        // Return the tech collection sorted worst to best
-        // Reverse the sort if we've been asked for best to worst
+        // Return the tech collection sorted worst to best Skill Level, or reversed if we want
+        // elites first
         if (sorted) {
-            // First order by the amount of time the person has remaining, based on the sorting order
-            // comparison changes because locations that use elite first will want the person with
-            // the most remaining time at the top of the list while locations that don't will want it
-            // at the bottom of the list
+            Comparator<Person> techSorter = Comparator.comparingInt(person ->
+                    person.getExperienceLevel(!person.isTechPrimary() && person.isTechSecondary()));
+
             if (eliteFirst) {
-                // We want the highest amount of remaining time at the top of the list, as that
-                // makes it easy to compare between the two
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+                techSorter = techSorter.reversed().thenComparing(Comparator
+                        .comparingInt(Person::getDailyAvailableTechTime).reversed());
             } else {
-                // Otherwise, we want the highest amount of time being at the bottom of the list
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+                techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
             }
-            // Then sort by the skill level, which puts Elite personnel first or last dependant on
-            // the eliteFirst value
-            techs.sort((person1, person2) -> {
-                // default to 0, which means they're equal
-                int retVal = 0;
 
-                // Set up booleans to know if the tech is secondary only
-                // this is to get the skill from getExperienceLevel(boolean) properly
-                boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
-                boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
-
-                if (person1.getExperienceLevel(p1Secondary) > person2.getExperienceLevel(p2Secondary)) {
-                    // Person 1 is better than Person 2.
-                    retVal = 1;
-                } else if (person1.getExperienceLevel(p1Secondary) < person2.getExperienceLevel(p2Secondary)) {
-                    // Person 2 is better than Person 1
-                    retVal = -1;
-                }
-
-                // Return, swapping the value if we're looking to have Elites ordered first
-                return eliteFirst ? -retVal : retVal;
-            });
+            techs.sort(techSorter);
         }
 
         return techs;
-    }
-
-    /**
-     * Gets a list of all techs of a specific role type
-     * @param roleType The filter role type
-     * @return Collection of all techs that match the given tech role
-     */
-    public List<Person> getTechsByRole(int roleType) {
-        List<Person> techs = getTechs(false, null, false, false);
-        List<Person> retval = new ArrayList<>();
-
-        for (Person tech : techs) {
-            if((tech.getPrimaryRole() == roleType) ||
-               (tech.getSecondaryRole() == roleType)) {
-                retval.add(tech);
-            }
-        }
-
-        return retval;
     }
 
     public List<Person> getAdmins() {
@@ -2145,7 +2160,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public ShoppingList goShopping(ShoppingList sList) {
         // loop through shopping items and decrement days to wait
-        for (IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+        for (IAcquisitionWork shoppingItem : sList.getShoppingList()) {
             shoppingItem.decrementDaysToWait();
         }
 
@@ -2167,7 +2182,7 @@ public class Campaign implements Serializable, ITechManager {
      *         acquired.
      */
     private ShoppingList goShoppingAutomatically(ShoppingList sList) {
-        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getShoppingList());
 
         List<IAcquisitionWork> remainingItems = new ArrayList<>(currentList.size());
         for (IAcquisitionWork shoppingItem : currentList) {
@@ -2202,7 +2217,7 @@ public class Campaign implements Serializable, ITechManager {
             return sList;
         }
 
-        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getShoppingList());
         for (Person person : logisticsPersonnel) {
             if (currentList.isEmpty()) {
                 // Nothing left to shop for!
@@ -2246,7 +2261,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // we are shopping by planets, so more involved
-        List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+        List<IAcquisitionWork> currentList = sList.getShoppingList();
         LocalDate currentDate = getLocalDate();
 
         // a list of items than can be taken out of the search and put back on the
@@ -2945,11 +2960,12 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * @param contract an active AtBContract
+     * @return the current deployment deficit for the contract
+     */
     public int getDeploymentDeficit(AtBContract contract) {
-        if (!contract.isActive()) {
-            // Inactive contracts have no deficits.
-            return 0;
-        } else if (contract.getStartDate().compareTo(getLocalDate()) >= 0) {
+        if (contract.isActiveOn(getLocalDate())) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet
@@ -2975,10 +2991,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void processNewDayATBScenarios() {
-        for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getLocalDate().isBefore(((Contract) m).getStartDate())) {
-                continue;
-            }
+        // First, we get the list of all active AtBContracts
+        List<AtBContract> contracts = getActiveAtBContracts(true);
+
+        // Second, we process them and any already generated scenarios
+        for (AtBContract contract : contracts) {
             /*
              * Situations like a delayed start or running out of funds during transit can
              * delay arrival until after the contract start. In that case, shift the
@@ -2986,32 +3003,30 @@ public class Campaign implements Serializable, ITechManager {
              * unit is actually on route to the planet in case the user is using a custom
              * system for transport or splitting the unit, etc.
              */
-            if (!getLocation().isOnPlanet() &&
-                    !getLocation().getJumpPath().isEmpty() &&
-                    getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
-
+            if (!getLocation().isOnPlanet() && !getLocation().getJumpPath().isEmpty()
+                    && getLocation().getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
                 // transitTime is measured in days; so we round up to the next whole day
-                ((AtBContract) m).setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
-                addReport("The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
+                contract.setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
+                addReport("The start and end dates of " + contract.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = getDeploymentDeficit((AtBContract) m);
+                int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
-                    ((AtBContract) m).addPlayerMinorBreaches(deficit);
-                    addReport("Failure to meet " + m.getName() + " requirements resulted in " + deficit
+                    contract.addPlayerMinorBreaches(deficit);
+                    addReport("Failure to meet " + contract.getName() + " requirements resulted in " + deficit
                             + ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
                 }
             }
 
-            for (Scenario s : m.getScenarios()) {
+            for (Scenario s : contract.getScenarios()) {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
-                    ((AtBContract) m).addPlayerMinorBreach();
+                    contract.addPlayerMinorBreach();
                     addReport("Failure to deploy for " + s.getName()
                             + " resulted in defeat and a minor contract breach.");
                     s.generateStub(this);
@@ -3019,23 +3034,21 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
+        // Third, on Mondays we generate new scenarios for the week
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
-        for (Mission m : getMissions()) {
-            if (m.isActive() && (m instanceof AtBContract)
-                    && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
-                ((AtBContract) m).checkEvents(this);
-            }
-            /*
-             * If there is a standard battle set for today, deploy the lance.
-             */
-            for (Scenario s : m.getScenarios()) {
-                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
+        // Fourth, we look at deployments for pre-existing and new scenarios
+        for (AtBContract contract : contracts) {
+            contract.checkEvents(this);
+
+            // If there is a standard battle set for today, deploy the lance.
+            for (Scenario s : contract.getScenarios()) {
+                if ((s instanceof AtBScenario) && (s.getDate() != null)
+                        && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
-
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
@@ -3052,22 +3065,22 @@ public class Campaign implements Serializable, ITechManager {
                             s.addForces(forceId);
                             for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                                 Unit u = getHangar().getUnit(uid);
-                                if (null != u) {
+                                if (u != null) {
                                     u.setScenarioId(s.getId());
                                 }
                             }
 
                             addReport(MessageFormat.format(
-                                resources.getString("atbMissionTodayWithForce.format"),
-                                s.getName(), forceIds.get(forceId).getName()));
+                                    resources.getString("atbMissionTodayWithForce.format"),
+                                    s.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
                         } else {
                             addReport(MessageFormat.format(
-                                resources.getString("atbMissionToday.format"), s.getName()));
+                                    resources.getString("atbMissionToday.format"), s.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                            resources.getString("atbMissionToday.format"), s.getName()));
+                                resources.getString("atbMissionToday.format"), s.getName()));
                     }
                 }
             }
@@ -3076,12 +3089,8 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)
-                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
-                continue;
-            }
-            switch (((AtBContract) m).getMissionType()) {
+        for (AtBContract contract : getActiveAtBContracts()) {
+            switch (contract.getMissionType()) {
                 case AtBContract.MT_GARRISONDUTY:
                 case AtBContract.MT_SECURITYDUTY:
                 case AtBContract.MT_CADREDUTY:
@@ -3166,17 +3175,13 @@ public class Campaign implements Serializable, ITechManager {
             /*
              * First of the month; roll morale, track unit fatigue.
              */
-
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
-            for (Mission m : getMissions()) {
-                if (m.isActive() && (m instanceof AtBContract)
-                        && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
-                    ((AtBContract) m).checkMorale(getLocalDate(), getUnitRatingMod());
-                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName()
-                            + " on contract " + m.getName());
-                }
+            for (AtBContract contract : getActiveAtBContracts()) {
+                contract.checkMorale(getLocalDate(), getUnitRatingMod());
+                addReport("Enemy morale is now " + contract.getMoraleLevelName()
+                        + " on contract " + contract.getName());
             }
 
             // Account for fatigue
@@ -3251,14 +3256,14 @@ public class Campaign implements Serializable, ITechManager {
             // Procreation
             if (p.getGender().isFemale()) {
                 if (p.isPregnant()) {
-                    if (getCampaignOptions().useUnofficialProcreation()) {
+                    if (getCampaignOptions().useProcreation()) {
                         if (getLocalDate().compareTo((p.getDueDate())) == 0) {
                             p.birth(this);
                         }
                     } else {
                         p.removePregnancy();
                     }
-                } else if (getCampaignOptions().useUnofficialProcreation()) {
+                } else if (getCampaignOptions().useProcreation()) {
                     p.procreate(this);
                 }
             }
@@ -3447,53 +3452,6 @@ public class Campaign implements Serializable, ITechManager {
         return true;
     }
 
-    /**
-     * @return a list of all currently active contracts
-     */
-    public List<Contract> getActiveContracts() {
-        List<Contract> active = new ArrayList<>();
-        for (Mission mission : getMissions()) {
-            if (!(mission instanceof Contract)) {
-                continue;
-            }
-            Contract contract = (Contract) mission;
-            if (contract.isActive()
-                    && !getLocalDate().isAfter(contract.getEndingDate())
-                    && !getLocalDate().isBefore(contract.getStartDate())) {
-                active.add(contract);
-            }
-        }
-        return active;
-    }
-
-    /**
-     * @return whether or not the current campaign has an active contract for the current date
-     */
-    public boolean hasActiveContract() {
-        return hasActiveContract;
-    }
-
-    /**
-     * This is used to check if the current campaign has one or more active contacts, and sets the
-     * value of hasActiveContract based on that check. This value should not be set elsewhere
-     */
-    public void setHasActiveContract() {
-        hasActiveContract = false;
-        for (Mission mission : getMissions()) {
-            if (!(mission instanceof Contract)) {
-                continue;
-            }
-            Contract contract = (Contract) mission;
-
-            if (contract.isActive()
-                    && !getLocalDate().isAfter(contract.getEndingDate())
-                    && !getLocalDate().isBefore(contract.getStartDate())) {
-                hasActiveContract = true;
-                break;
-            }
-        }
-    }
-
     public Person getFlaggedCommander() {
         for (Person p : getPersonnel()) {
             if (p.isCommander()) {
@@ -3553,7 +3511,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        person.getGenealogy().clearGenealogy(this);
+        person.getGenealogy().clearGenealogy();
 
         Unit u = person.getUnit();
         if (null != u) {
@@ -3878,7 +3836,7 @@ public class Campaign implements Serializable, ITechManager {
         // Cleans non-existing spouses
         for (Person p : personnel.values()) {
             if (p.getGenealogy().hasSpouse()) {
-                if (!personnel.containsKey(p.getGenealogy().getSpouseId())) {
+                if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
                     p.getGenealogy().setSpouse(null);
                     if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                             && (p.getMaidenName() != null)) {
@@ -4006,24 +3964,12 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void setCamoCategory(String name) {
-        camoCategory = name;
-    }
-
-    public String getCamoCategory() {
-        return camoCategory;
-    }
-
-    public void setCamoFileName(String name) {
-        camoFileName = name;
-    }
-
-    public String getCamoFileName() {
-        return camoFileName;
-    }
-
     public Camouflage getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+        return camouflage;
+    }
+
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = camouflage;
     }
 
     public PlayerColour getColour() {
@@ -4109,8 +4055,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", camoCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", camoFileName);
+        if (!getCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
+        }
+        if (!getCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
@@ -4875,11 +4825,9 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
         // if this is an infantry refit, then automatic success
-        if (partWork instanceof Refit && null != partWork.getUnit()
-                && partWork.getUnit().getEntity() instanceof Infantry
-                && !(partWork.getUnit().getEntity() instanceof BattleArmor)) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS,
-                    "infantry refit");
+        if ((partWork instanceof Refit) && (partWork.getUnit() != null)
+                && partWork.getUnit().isConventionalInfantry()) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
         //if we are using the MoF rule, then we will ignore mode penalty here
@@ -5289,11 +5237,23 @@ public class Campaign implements Serializable, ITechManager {
         return medicPool;
     }
 
+    public int getAstechNeed() {
+        return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6)
+                - getNumberAstechs();
+    }
+
     public void increaseAstechPool(int i) {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
         MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
+    }
+
+    public void fillAstechPool() {
+        final int need = getAstechNeed();
+        if (need > 0) {
+            increaseAstechPool(need);
+        }
     }
 
     public void decreaseAstechPool(int i) {
@@ -5408,9 +5368,20 @@ public class Campaign implements Serializable, ITechManager {
         return medics;
     }
 
+    public int getMedicsNeed() {
+        return (getDoctors().size() * 4) - getNumberMedics();
+    }
+
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void fillMedicPool() {
+        final int need = getMedicsNeed();
+        if (need > 0) {
+            increaseMedicPool(need);
+        }
     }
 
     public void decreaseMedicPool(int i) {
@@ -5535,42 +5506,21 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * borrowed from megamek.client
      */
-    private void checkDuplicateNamesDuringAdd(Entity entity) {
-        if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), 1);
-        } else {
-            int count = duplicateNameHash.get(entity.getShortName());
-            count++;
-            duplicateNameHash.put(entity.getShortName(), count);
-            entity.duplicateMarker = count;
-            entity.generateShortName();
-            entity.generateDisplayName();
-        }
+    private synchronized void checkDuplicateNamesDuringAdd(Entity entity) {
+        unitNameTracker.add(entity);
     }
 
     /**
-     * If we remove a unit, we may need to update the duplicate identifier. TODO: This function is super slow :(
+     * If we remove a unit, we may need to update the duplicate identifier.
      *
      * @param entity This is the entity whose name is checked for any duplicates
      */
-    private void checkDuplicateNamesDuringDelete(Entity entity) {
-        Integer o = duplicateNameHash.get(entity.getShortNameRaw());
-        if (o != null) {
-            int count = o;
-            if (count > 1) {
-                for (Unit u : getUnits()) {
-                    Entity e = u.getEntity();
-                    if (e.getShortNameRaw().equals(entity.getShortNameRaw()) && (e.duplicateMarker > entity.duplicateMarker)) {
-                        e.duplicateMarker--;
-                        e.generateShortName();
-                        e.generateDisplayName();
-                    }
-                }
-                duplicateNameHash.put(entity.getShortNameRaw(), count - 1);
-            } else {
-                duplicateNameHash.remove(entity.getShortNameRaw());
-            }
-        }
+    private synchronized void checkDuplicateNamesDuringDelete(Entity entity) {
+        unitNameTracker.remove(entity, e -> {
+            // Regenerate entity names after a deletion
+            e.generateShortName();
+            e.generateDisplayName();
+        });
     }
 
     public String getUnitRatingText() {
@@ -6054,9 +6004,8 @@ public class Campaign implements Serializable, ITechManager {
         });
     }
 
-    public void completeMission(int id, int status) {
-        Mission mission = getMission(id);
-        if (null == mission) {
+    public void completeMission(@Nullable Mission mission, MissionStatus status) {
+        if (mission == null) {
             return;
         }
         mission.setStatus(status);
@@ -6066,8 +6015,8 @@ public class Campaign implements Serializable, ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems stupid
-            if ((contract.getStatus() == Mission.S_SUCCESS)
-                    && contract.getMonthsLeft(getLocalDate()) > 0) {
+            if ((contract.getStatus().isSuccess())
+                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
                 remainingMoney = contract.getMonthlyPayOut()
                         .multipliedBy(contract.getMonthsLeft(getLocalDate()));
             }
