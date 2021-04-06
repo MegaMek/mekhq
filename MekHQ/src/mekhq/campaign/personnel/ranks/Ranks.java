@@ -166,7 +166,7 @@ public class Ranks {
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true, type);
-                if (rankValidator.validate(rankSystem)) {
+                if (rankValidator.validate(rankSystem, true)) {
                     // This cannot be null, as the validator will ensure that is not the case.
                     getRankSystems().put(rankSystem.getRankSystemCode(), rankSystem);
                 }

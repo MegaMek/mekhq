@@ -4327,7 +4327,7 @@ public class Campaign implements Serializable, ITechManager {
         // Then, we need to validate the rank system. Null isn't valid to be set but may be the
         // result of a cancelled load, but validation will prevent that
         final RankValidator rankValidator = new RankValidator();
-        if (!rankValidator.validate(rankSystem)) {
+        if (!rankValidator.validate(rankSystem, false)) {
             return;
         }
 

@@ -1166,22 +1166,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (int level = 0; level <= rankLevels; level++) {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)
                                 + Utilities.getRomanNumeralsFromArabicNumber(level, true));
+                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.getRankNumeric())
+                                && (person.getRankLevel() == level));
                         cbMenuItem.setActionCommand(makeCommand(CMD_RANK,
                                 String.valueOf(rankDisplay.getRankNumeric()), String.valueOf(level)));
-                        if ((person.getRankNumeric() == rankDisplay.getRankNumeric())
-                                && (person.getRankLevel() == level)) {
-                            cbMenuItem.setSelected(true);
-                        }
                         cbMenuItem.addActionListener(this);
                         submenu.add(cbMenuItem);
                     }
                     JMenuHelpers.addMenuIfNonEmpty(menu, submenu);
                 } else {
                     cbMenuItem = new JCheckBoxMenuItem(rankDisplay.toString());
+                    cbMenuItem.setSelected(person.getRankNumeric() == rankDisplay.getRankNumeric());
                     cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.getRankNumeric())));
-                    if (person.getRankNumeric() == rankDisplay.getRankNumeric()) {
-                        cbMenuItem.setSelected(true);
-                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                 }
@@ -1190,19 +1186,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         menu = new JMenu(resourceMap.getString("changeRankSystem.text"));
+        final RankSystem campaignRankSystem = gui.getCampaign().getRankSystem();
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text"));
-        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, gui.getCampaign().getRankSystem().getRankSystemCode()));
+        cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
+        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, campaignRankSystem.getRankSystemCode()));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 
         for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
+            if (rankSystem.equals(campaignRankSystem)) {
+                continue;
+            }
             cbMenuItem = new JCheckBoxMenuItem(rankSystem.getRankSystemName());
+            cbMenuItem.setSelected(rankSystem.equals(person.getRankSystem()));
             cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getRankSystemCode()));
             cbMenuItem.addActionListener(this);
-            if (rankSystem.equals(person.getRankSystem())) {
-                cbMenuItem.setSelected(true);
-            }
             menu.add(cbMenuItem);
         }
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);

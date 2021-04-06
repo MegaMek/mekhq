@@ -707,7 +707,7 @@ public class CampaignXmlParser {
                     }
                     final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version);
                     // If the system is valid, set it. Otherwise, keep the default
-                    if (new RankValidator().validate(rankSystem)) {
+                    if (new RankValidator().validate(rankSystem, true)) {
                         retVal.setRankSystemDirect(rankSystem);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {

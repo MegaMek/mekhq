@@ -82,6 +82,7 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -2404,6 +2405,7 @@ public class Person implements Serializable {
 
     public void setRankSystem(final RankSystem rankSystem) {
         setRankSystemDirect(rankSystem);
+        new RankValidator().checkPersonRank(this);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 

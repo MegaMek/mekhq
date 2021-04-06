@@ -30,7 +30,7 @@ public class RankValidator {
 
     }
 
-    public boolean validate(final @Nullable RankSystem rankSystem) {
+    public boolean validate(final @Nullable RankSystem rankSystem, final boolean checkCode) {
         // Null is never a valid rank system, but this catches some default returns whose errors are
         // caught during the loading process. This MUST be the first check and CANNOT be removed.
         if (rankSystem == null) {
@@ -38,7 +38,7 @@ public class RankValidator {
         }
 
         // If the code is a duplicate, we've got a duplicate key error
-        if (Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
+        if (checkCode && Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
             if (rankSystem.getType().isUserData()) {
                 MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
                         + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).getRankSystemName()
@@ -66,7 +66,7 @@ public class RankValidator {
         return true;
     }
 
-    public void checkAssignedRankSystems(final Campaign campaign) throws NullPointerException {
+    public void checkAssignedRankSystems(final Campaign campaign) {
         // First, we need to ensure the campaign's rank system was refreshed. This can be done by
         // checking if the system is a campaign custom
         if (!campaign.getRankSystem().getType().isCampaign()) {

@@ -4305,7 +4305,7 @@ public class CampaignOptionsDialog extends JDialog {
             final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
                     FileDialogs.openIndividualRankSystem(frame).orElse(null));
             // Validate on load, to ensure we don't have any display issues
-            if (new RankValidator().validate(rankSystem)) {
+            if (new RankValidator().validate(rankSystem, true)) {
                 comboRankSystems.addItem(rankSystem);
             }
         }));
@@ -4444,10 +4444,19 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
 
-        // Finally we can update the rank system model and the rank system combo box
+        // Update the rank system model
         rankSystemModel.removeAllElements();
         rankSystemModel.addAll(Ranks.getRankSystems().values());
-        rankSystemModel.addAll(campaignRankSystems);
+
+        // Revalidate all of the Campaign Rank Systems before adding, as we need to ensure no duplicate keys
+        final RankValidator rankValidator = new RankValidator();
+        for (final RankSystem rankSystem : campaignRankSystems) {
+            if (rankValidator.validate(rankSystem, true)) {
+                rankSystemModel.addElement(rankSystem);
+            }
+        }
+
+        // Set the selected item
         comboRankSystems.setSelectedItem(campaign.getRankSystem());
     }
     //endregion Rank Systems Tab
@@ -4963,6 +4972,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
+        updateRankSystemRanks();
         campaign.setRankSystem(selectedRankSystem);
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
