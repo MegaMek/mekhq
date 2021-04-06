@@ -138,7 +138,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /* for the top button panel */
@@ -1102,6 +1102,7 @@ public class CampaignGUI extends JPanel {
             miPlaf.addActionListener(this::changeTheme);
         }
     }
+
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
@@ -1124,16 +1125,22 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
+            ((RepairTab) getTab(GuiTabType.REPAIR)).focusOnUnit(id);
             tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
     }
 
+    public void focusOnPerson(Person person) {
+        if (person != null) {
+            focusOnPerson(person.getId());
+        }
+    }
+
     public void focusOnPerson(UUID id) {
-        if (null == id) {
+        if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
             return;
         }
@@ -1236,8 +1243,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void hireBulkPersonnel() {
-        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign());
+        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hbpd.setVisible(true);
     }
 
@@ -1477,7 +1483,7 @@ public class CampaignGUI extends JPanel {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1486,7 +1492,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1495,7 +1501,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1504,7 +1510,7 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1544,11 +1550,9 @@ public class CampaignGUI extends JPanel {
         if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
-                JOptionPane
-                        .showMessageDialog(
-                                frame,
-                                "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
-                                "No Engineer", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             r.setTech(engineer);
@@ -1985,7 +1989,7 @@ public class CampaignGUI extends JPanel {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
                 if (p.getGenealogy().hasSpouse()
-                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());

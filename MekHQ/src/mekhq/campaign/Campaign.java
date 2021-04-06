@@ -503,7 +503,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -637,10 +637,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        final String METHOD_NAME = "purchaseShipSearchResult()";
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().error(this, "Cannot find entry for " + getShipSearchResult());
+            MekHQ.getLogger().error("Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -655,7 +654,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "Unable to load unit: " + ms.getEntryName(), ex);
+            MekHQ.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
             return;
         }
         Entity en = mechFileParser.getEntity();
@@ -3506,7 +3505,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        person.getGenealogy().clearGenealogy(this);
+        person.getGenealogy().clearGenealogy();
 
         Unit u = person.getUnit();
         if (null != u) {
@@ -3831,7 +3830,7 @@ public class Campaign implements Serializable, ITechManager {
         // Cleans non-existing spouses
         for (Person p : personnel.values()) {
             if (p.getGenealogy().hasSpouse()) {
-                if (!personnel.containsKey(p.getGenealogy().getSpouseId())) {
+                if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
                     p.getGenealogy().setSpouse(null);
                     if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                             && (p.getMaidenName() != null)) {
