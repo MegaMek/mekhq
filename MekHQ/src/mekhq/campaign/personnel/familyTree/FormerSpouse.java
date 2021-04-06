@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
@@ -33,7 +32,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class FormerSpouse implements Serializable, MekHqXmlSerializable {
+public class FormerSpouse implements Serializable {
     //region Variables
     private static final long serialVersionUID = 3700554959779939695L;
 
@@ -108,13 +107,12 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     //endregion Getters/Setters
 
     //region File I/O
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "formerSpouse");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", formerSpouse.getId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", date);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "reason", reason.name());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "formerSpouse");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouse");
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "id", formerSpouse.getId());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", date);
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "reason", reason.name());
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouse");
     }
 
     public static FormerSpouse generateInstanceFromXML(Node wn) {

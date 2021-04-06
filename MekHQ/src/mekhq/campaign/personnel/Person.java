@@ -1716,7 +1716,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
             if (!genealogy.isEmpty()) {
-                genealogy.writeToXml(pw1, indent + 1);
+                genealogy.writeToXML(pw1, indent + 1);
             }
             if (!isTryingToMarry()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
@@ -1963,9 +1963,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
                     retVal.getGenealogy().setSpouse(new PersonIdReference(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
-                    Genealogy.loadFormerSpouses(retVal.getGenealogy(), wn2.getChildNodes());
+                    retVal.getGenealogy().loadFormerSpouses(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.setGenealogy(Genealogy.generateInstanceFromXML(wn2.getChildNodes()));
+                    retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {

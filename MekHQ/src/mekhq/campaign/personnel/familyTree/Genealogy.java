@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -32,13 +31,19 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
  * It is also used to determine familial relationships between people
  */
-public class Genealogy implements Serializable, MekHqXmlSerializable {
+public class Genealogy implements Serializable {
     //region Variables
     private static final long serialVersionUID = -6350146649504329173L;
     private Person origin;
@@ -49,19 +54,11 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Constructors
     /**
-     * This creates an empty Genealogy object
-     * This case should only be used for reading from XML
-     */
-    private Genealogy() {
-        this(null);
-    }
-
-    /**
      * This is the standard constructor, and follow the below warning
-     * @param origin the origin person. This must ONLY be null when reading from XML
+     * @param origin the origin person
      */
-    public Genealogy(@Nullable Person origin) {
-        this.origin = origin; // null only when reading from XML
+    public Genealogy(final Person origin) {
+        setOrigin(origin);
         setSpouse(null);
         formerSpouses = new ArrayList<>();
         setFamily(new HashMap<>());
@@ -146,7 +143,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     /**
      * @param relationshipType the FamilialRelationshipType of the person to remove
-     * @param person the person to add
+     * @param person the person to remove
      */
     public void removeFamilyMember(@Nullable FamilialRelationshipType relationshipType, Person person) {
         if (relationshipType == null) {
@@ -200,14 +197,14 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return true if the person has at least one kid, false otherwise
      */
     public boolean hasChildren() {
-        return (getFamily().get(FamilialRelationshipType.CHILD) != null);
+        return getFamily().get(FamilialRelationshipType.CHILD) != null;
     }
 
     /**
      * @return true if the Person has any parents, otherwise false
      */
     public boolean hasParents() {
-        return (getFamily().get(FamilialRelationshipType.PARENT) != null);
+        return getFamily().get(FamilialRelationshipType.PARENT) != null;
     }
 
     /**
@@ -419,120 +416,110 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Read/Write to XML
     /**
-     * @param pw1 the PrintWriter to write to
+     * @param pw the PrintWriter to write to
      * @param indent the indent for the base line (i.e. the line containing genealogy)
      */
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "genealogy");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "origin", getOrigin().getId());
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "genealogy");
         if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "spouse", getSpouse().getId());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "spouse", getSpouse().getId());
         }
 
         if (!getFormerSpouses().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouses");
             for (FormerSpouse ex : getFormerSpouses()) {
-                ex.writeToXml(pw1, indent);
+                ex.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouses");
         }
 
         if (!familyIsEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "family");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "family");
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "relationship");
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", relationshipType.name());
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "relationship");
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", relationshipType.name());
                 for (Person person : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "personId", person.getId());
+                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "personId", person.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "relationship");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "relationship");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "family");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "family");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "genealogy");
     }
 
     /**
      * @param nl the NodeList containing the saved Genealogy
-     * @return the Genealogy generated from the provided NodeList
      */
-    public static Genealogy generateInstanceFromXML(NodeList nl) {
-        Genealogy retVal = new Genealogy();
-
-        try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn1 = nl.item(x);
-
-                if (wn1.getNodeName().equalsIgnoreCase("origin")) {
-                    retVal.setOrigin(new PersonIdReference(wn1.getTextContent().trim()));
-                } else if (wn1.getNodeName().equalsIgnoreCase("spouse")) {
-                    retVal.setSpouse(new PersonIdReference(wn1.getTextContent().trim()));
-                } else if (wn1.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    loadFormerSpouses(retVal, wn1.getChildNodes());
-                } else if (wn1.getNodeName().equalsIgnoreCase("family")) {
-                    loadFamily(retVal, wn1.getChildNodes());
+    public void fillFromXML(final NodeList nl) {
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn = nl.item(x);
+            try {
+                if (wn.getNodeName().equalsIgnoreCase("spouse")) {
+                    setSpouse(new PersonIdReference(wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("formerSpouses")) {
+                    if (wn.hasChildNodes()) {
+                        loadFormerSpouses(wn.getChildNodes());
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("family")) {
+                    if (wn.hasChildNodes()) {
+                        loadFamily(wn.getChildNodes());
+                    }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId());
             }
-        } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to generate Genealogy for "
-                    + ((retVal.getOrigin() == null) ? "unknown person." : retVal.getOrigin().toString()));
         }
-
-        return retVal;
     }
 
     /**
      * This loads the FormerSpouses from their saved nodes
-     * @param retVal the Genealogy to load the FormerSpouse nodes into
-     * @param nl2 the NodeList containing the saved former spouses
+     * @param nl the NodeList containing the saved former spouses
      * @note This must be public for migration reasons
      */
-    public static void loadFormerSpouses(Genealogy retVal, NodeList nl2) {
-        for (int y = 0; y < nl2.getLength(); y++) {
-            Node wn2 = nl2.item(y);
+    public void loadFormerSpouses(final NodeList nl) {
+        for (int y = 0; y < nl.getLength(); y++) {
+            final Node wn = nl.item(y);
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("formerSpouse")) {
+            if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
                 MekHQ.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
-                        + wn2.getNodeName());
+                        + wn.getNodeName());
                 continue;
             }
-            retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn2));
+            getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
         }
     }
 
     /**
      * This loads the familial relationships from their saved nodes
-     * @param retVal the Genealogy to load the family nodes into
-     * @param nl2 the NodeList containing the saved Genealogy familial relationships
+     * @param nl the NodeList containing the saved Genealogy familial relationships
      */
-    private static void loadFamily(Genealogy retVal, NodeList nl2) {
-        for (int y = 0; y < nl2.getLength(); y++) {
-            Node wn2 = nl2.item(y);
+    private void loadFamily(final NodeList nl) {
+        for (int y = 0; y < nl.getLength(); y++) {
+            final Node wn = nl.item(y);
 
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (wn2.getNodeName().equalsIgnoreCase("relationship")) {
-                NodeList nl3 = wn2.getChildNodes();
+            if (wn.getNodeName().equalsIgnoreCase("relationship")) {
+                final NodeList nl2 = wn.getChildNodes();
                 // The default value should never be used, but it is useful to have a default
                 FamilialRelationshipType type = FamilialRelationshipType.PARENT;
-                List<Person> people = new ArrayList<>();
-                for (int i = 0; i < nl3.getLength(); i++) {
-                    Node wn3 = nl3.item(i);
-                    if (wn3.getNodeName().equalsIgnoreCase("type")) {
-                        type = FamilialRelationshipType.valueOf(wn3.getTextContent());
-                    } else if (wn3.getNodeName().equalsIgnoreCase("personId")) {
-                        people.add(new PersonIdReference(wn3.getTextContent().trim()));
+                final List<Person> people = new ArrayList<>();
+                for (int i = 0; i < nl2.getLength(); i++) {
+                    Node wn2 = nl2.item(i);
+                    if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                        type = FamilialRelationshipType.valueOf(wn2.getTextContent().trim());
+                    } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                        people.add(new PersonIdReference(wn2.getTextContent().trim()));
                     }
                 }
-
-                retVal.getFamily().put(type, people);
+                getFamily().put(type, people);
             }
         }
     }
