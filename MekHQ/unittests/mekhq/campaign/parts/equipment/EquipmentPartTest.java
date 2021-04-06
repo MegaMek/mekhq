@@ -81,9 +81,9 @@ public class EquipmentPartTest {
         boolean isOmniPodded = false;
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), eq(size));
-        
+
         EquipmentPart equipmentPart = new EquipmentPart(tonnage, type, equipmentNum, size, isOmniPodded, mockCampaign);
-        
+
         assertEquals(tonnage, equipmentPart.getUnitTonnage());
         assertEquals(type, equipmentPart.getType());
         assertEquals(equipmentNum, equipmentPart.getEquipmentNum());
@@ -94,7 +94,7 @@ public class EquipmentPartTest {
 
         isOmniPodded = true;
         equipmentPart = new EquipmentPart(tonnage, type, equipmentNum, size, isOmniPodded, mockCampaign);
-        
+
         assertEquals(tonnage, equipmentPart.getUnitTonnage());
         assertEquals(type, equipmentPart.getType());
         assertEquals(equipmentNum, equipmentPart.getEquipmentNum());
@@ -103,7 +103,7 @@ public class EquipmentPartTest {
         assertEquals(equipTonnage, equipmentPart.getTonnage(), 0.001);
         assertEquals(mockCampaign, equipmentPart.getCampaign());
     }
-    
+
     @Test
     public void cloneTest() {
         Campaign mockCampaign = mock(Campaign.class);
@@ -115,9 +115,9 @@ public class EquipmentPartTest {
         boolean isOmniPodded = false;
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), eq(size));
-        
+
         EquipmentPart equipmentPart = new EquipmentPart(tonnage, type, equipmentNum, size, isOmniPodded, mockCampaign);
-        
+
         EquipmentPart clone = equipmentPart.clone();
 
         assertEquals(equipmentPart.getUnitTonnage(), clone.getUnitTonnage());
@@ -132,7 +132,7 @@ public class EquipmentPartTest {
         equipmentPart = new EquipmentPart(tonnage, type, equipmentNum, size, isOmniPodded, mockCampaign);
 
         clone = equipmentPart.clone();
-        
+
         assertEquals(equipmentPart.getUnitTonnage(), clone.getUnitTonnage());
         assertEquals(equipmentPart.getType(), clone.getType());
         assertEquals(equipmentPart.getEquipmentNum(), clone.getEquipmentNum());
@@ -153,7 +153,7 @@ public class EquipmentPartTest {
         boolean isOmniPodded = false;
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), eq(size));
-        
+
         EquipmentPart equipmentPart = new EquipmentPart(tonnage, type, equipmentNum, size, isOmniPodded, mockCampaign);
 
         MissingEquipmentPart missingPart = equipmentPart.getMissingPart();
@@ -207,7 +207,7 @@ public class EquipmentPartTest {
         assertFalse(equipmentPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RWING));
         assertFalse(equipmentPart.isPartForEquipmentNum(equipmentNum - 1, location));
     }
-    
+
     @Test
     public void isOmniPoddableTest() {
         Campaign mockCampaign = mock(Campaign.class);
@@ -418,7 +418,7 @@ public class EquipmentPartTest {
         int location = Mech.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
-        
+
         doReturn(location).when(entity).getLocationFromAbbr(eq(locationName));
 
         // Our location should match up
@@ -489,7 +489,7 @@ public class EquipmentPartTest {
 
         // Get the EquipmentPart XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -515,7 +515,7 @@ public class EquipmentPartTest {
         assertEquals(equipmentPart.getSize(), deserialized.getSize(), 0.001);
         assertEquals(equipmentPart.getTonnage(), deserialized.getTonnage(), 0.001);
     }
-    
+
     @Test
     public void removeTest() {
         Campaign mockCampaign = mock(Campaign.class);
@@ -567,7 +567,7 @@ public class EquipmentPartTest {
 
         verify(unit, times(1)).destroySystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum));
         verify(unit, times(1)).removePart(eq(equipmentPart));
-        
+
         ArgumentCaptor<Part> missingPartCaptor = ArgumentCaptor.forClass(Part.class);
         verify(unit, times(1)).addPart(missingPartCaptor.capture());
 
@@ -580,7 +580,7 @@ public class EquipmentPartTest {
         assertEquals(unit, missingEquipmentPart.getUnit());
         assertTrue(warehouse.getParts().contains(missingEquipmentPart));
     }
-    
+
     @Test
     public void salvageTest() {
         Campaign mockCampaign = mock(Campaign.class);
@@ -632,7 +632,7 @@ public class EquipmentPartTest {
 
         verify(unit, times(1)).destroySystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum));
         verify(unit, times(1)).removePart(eq(equipmentPart));
-        
+
         ArgumentCaptor<Part> missingPartCaptor = ArgumentCaptor.forClass(Part.class);
         verify(unit, times(1)).addPart(missingPartCaptor.capture());
 
@@ -645,7 +645,7 @@ public class EquipmentPartTest {
         assertEquals(unit, missingEquipmentPart.getUnit());
         assertTrue(warehouse.getParts().contains(missingEquipmentPart));
     }
-    
+
     @Test
     public void needsFixingTest() {
         Campaign mockCampaign = mock(Campaign.class);
@@ -655,7 +655,7 @@ public class EquipmentPartTest {
         doReturn(1.0).when(type).getTonnage(any(), anyDouble());
 
         EquipmentPart equipmentPart = new EquipmentPart(75, type, 6, size, false, mockCampaign);
-        
+
         assertFalse(equipmentPart.needsFixing());
 
         equipmentPart.setHits(1);
@@ -1501,7 +1501,7 @@ public class EquipmentPartTest {
         verify(weaponBay, times(1)).setRepairable(eq(true));
         verify(unit, times(1)).destroySystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(bayEqNum));
     }
-    
+
     @Test
     public void checkWeaponBayWeaponRemovedOthersOkayTest() {
         Campaign mockCampaign = mock(Campaign.class);

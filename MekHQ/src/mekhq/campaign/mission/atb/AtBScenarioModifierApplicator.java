@@ -120,7 +120,7 @@ public class AtBScenarioModifierApplicator {
             BotForce bf = scenario.getBotForce(botForceIndex);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
-                bf.getEntityList().remove(unitIndexToRemove);
+                bf.removeEntity(unitIndexToRemove);
             }
         }
     }

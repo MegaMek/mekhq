@@ -54,11 +54,11 @@ import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.MassRepairOption;
 import mekhq.service.MassRepairService;
 import mekhq.service.MassRepairService.MassRepairPartSet;
@@ -880,6 +880,20 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void btnStartMassRepairActionPerformed(ActionEvent evt) {
+        // Not enough Astechs to run the tech teams
+        if (campaignGUI.getCampaign().getAstechNeed() > 0) {
+            int savePrompt = JOptionPane.showConfirmDialog(null,
+                    resources.getString("NotEnoughAstechs.error"),
+                    resources.getString("NotEnoughAstechs.errorTitle"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.ERROR_MESSAGE);
+            if (savePrompt != JOptionPane.YES_OPTION) {
+                return;
+            } else {
+                campaignGUI.getCampaign().fillAstechPool();
+            }
+        }
+
         if (getMode().isUnits()) {
             int[] selectedRows = unitTable.getSelectedRows();
 

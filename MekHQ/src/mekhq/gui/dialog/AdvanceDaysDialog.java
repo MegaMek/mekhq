@@ -41,9 +41,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Dylan Myers <ralgith@gmail.com>

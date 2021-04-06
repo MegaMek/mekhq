@@ -68,12 +68,12 @@ import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
 
@@ -843,7 +843,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
         // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
-        List<Person> techs = getCampaign().getTechs(true, null, true, false);
+        List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         if ((selected > -1) && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);

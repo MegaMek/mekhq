@@ -33,7 +33,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import megamek.common.icons.Camouflage;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -147,11 +146,11 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
          if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
-             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
+             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
          }
 
          if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
-             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
+             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
          }
 
          if (tgtEnt.getDeployRound() > 0) {

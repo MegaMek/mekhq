@@ -157,8 +157,8 @@ public class MissionViewPanel extends ScrollablePanel {
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + mission.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + mission.getStatus() + "</b></html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -260,13 +260,13 @@ public class MissionViewPanel extends ScrollablePanel {
         txtCommand = new JLabel();
         lblBLC = new JLabel();
         txtBLC = new JLabel();
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + contract.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -597,8 +597,8 @@ public class MissionViewPanel extends ScrollablePanel {
 
         int y = 0;
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + contract.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;

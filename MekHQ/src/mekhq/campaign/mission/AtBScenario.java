@@ -695,6 +695,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         /* The entities in the attachedAllies list will be added to the player's forces
          * in MM and don't require a separate BotForce */
+        final Camouflage camouflage = getContract(campaign).getAllyCamouflage();
         for (int i = 0; i < numAttachedPlayer; i++) {
             Entity en = getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -705,8 +706,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 externalIDLookup.put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                    en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                    en.setCamoFileName(getContract(campaign).getAllyColour().name());
+                    en.setCamouflage(camouflage.clone());
                 }
             } else {
                 MekHQ.getLogger().error("Entity for player-controlled allies is null");
@@ -1473,7 +1473,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
-                c.getAllyCamoCategory(), c.getAllyCamoFileName(), c.getAllyColour());
+                c.getAllyCamouflage().clone(), c.getAllyColour());
     }
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
@@ -1482,7 +1482,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
-                c.getEnemyCamoCategory(), c.getEnemyCamoFileName(), c.getEnemyColour());
+                c.getEnemyCamouflage().clone(), c.getEnemyColour());
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {

@@ -962,7 +962,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        MekHQ.getLogger().debug(this, "Unit " + u.getName() + " updating advanced tech count.");
+        MekHQ.getLogger().debug("Unit " + u.getName() + " updating advanced tech count.");
 
         int unitType = u.getEntity().getUnitType();
         switch (unitType) {
@@ -978,16 +978,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.WARSHIP:
             case UnitType.JUMPSHIP:
                 int techLevel = u.getEntity().getTechLevel();
-                MekHQ.getLogger().debug(this, "Unit " + u.getName() + " TL = " + TechConstants.getLevelDisplayableName(techLevel));
+                MekHQ.getLogger().debug("Unit " + u.getName() + " TL = " + TechConstants.getLevelDisplayableName(techLevel));
                 if (techLevel > TechConstants.T_INTRO_BOXSET) {
                     if (TechConstants.isClan(techLevel)) {
                         setNumberClan(getNumberClan().add(value));
-                        if (!isConventionalInfantry(u)) {
+                        if (!u.isConventionalInfantry()) {
                             setCountClan(getCountClan() + 1);
                         }
                     } else {
                         setNumberIS2(getNumberIS2().add(value));
-                        if (!isConventionalInfantry(u)) {
+                        if (!u.isConventionalInfantry()) {
                             setCountIS2(getCountIS2() + 1);
                         }
                     }
@@ -995,7 +995,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 break;
             default:
                 // not counted for tech level purposes.
-                MekHQ.getLogger().debug(this, "Unit " + u.getName() + " not counted for tech level.");
+                MekHQ.getLogger().debug("Unit " + u.getName() + " not counted for tech level.");
                 break;
         }
     }

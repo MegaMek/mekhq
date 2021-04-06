@@ -36,11 +36,10 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Manages searches for DropShips or JumpShips for Against the Bot.
@@ -138,14 +137,14 @@ public class ShipSearchDialog extends JDialog {
             mainPanel.add(lblWarshipTarget, gbc);
         }
 
-        if (isInContract() && !isInSearch()) {
+        if (gui.getCampaign().hasActiveContract() && !isInSearch()) {
             JLabel lblInContract = new JLabel(resourceMap.getString("lblInContract.text"));
             gbc.gridx = 0;
             gbc.gridy = 6;
             mainPanel.add(lblInContract, gbc);
         }
 
-        if (isInContract() || isInSearch()) {
+        if (gui.getCampaign().hasActiveContract() || isInSearch()) {
             btnDropship.setEnabled(false);
             lblDropshipTarget.setEnabled(false);
             btnJumpship.setEnabled(false);
@@ -205,7 +204,7 @@ public class ShipSearchDialog extends JDialog {
                     gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
                     gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
             button.addActionListener(ev -> startSearch());
-            button.setEnabled(!isInContract());
+            button.setEnabled(!gui.getCampaign().hasActiveContract());
         }
         panButtons.add(button);
 
@@ -234,46 +233,39 @@ public class ShipSearchDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-	public TargetRoll getDSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getDSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
+                gui.getCampaign());
+    }
 
-	public TargetRoll getJSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getJSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
+                gui.getCampaign());
+    }
 
-	public TargetRoll getWSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getWSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
+                gui.getCampaign());
+    }
 
-	private int getUnitType() {
-		if (btnJumpship.isSelected()) {
-			return UnitType.JUMPSHIP;
-		} else if (btnWarship.isSelected()) {
-			return UnitType.WARSHIP;
-		} else {
-			return UnitType.DROPSHIP;
-		}
-	}
+    private int getUnitType() {
+        if (btnJumpship.isSelected()) {
+            return UnitType.JUMPSHIP;
+        } else if (btnWarship.isSelected()) {
+            return UnitType.WARSHIP;
+        } else {
+            return UnitType.DROPSHIP;
+        }
+    }
 
-	private boolean isInContract() {
-		return gui.getCampaign().getMissions().stream().anyMatch(m ->
-                m.isActive() && (m instanceof Contract)
-                        && ((Contract) m).getStartDate().isBefore(gui.getCampaign().getLocalDate())
-		);
-	}
+    private boolean isInSearch() {
+        return gui.getCampaign().getShipSearchStart() != null;
+    }
 
-	private boolean isInSearch() {
-		return gui.getCampaign().getShipSearchStart() != null;
-	}
-
-	private void startSearch() {
-		gui.getCampaign().startShipSearch(getUnitType());
-		setVisible(false);
-	}
+    private void startSearch() {
+        gui.getCampaign().startShipSearch(getUnitType());
+        setVisible(false);
+    }
 
     private void endSearch() {
         gui.getCampaign().setShipSearchStart(null);

@@ -180,7 +180,7 @@ public enum Marriage {
             case WEIGHTED:
             default:
                 MekHQ.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
-                                origin.getFullName(), spouse.getFullName()));
+                        origin.getFullName(), spouse.getFullName()));
                 break;
         }
 
@@ -188,8 +188,8 @@ public enum Marriage {
         origin.setMaidenName(surname);
         spouse.setMaidenName(spouseSurname);
 
-        origin.getGenealogy().setSpouse(spouse.getId());
-        spouse.getGenealogy().setSpouse(origin.getId());
+        origin.getGenealogy().setSpouse(spouse);
+        spouse.getGenealogy().setSpouse(origin);
 
         // Then we do the logging
         PersonalLogger.marriage(origin, spouse, campaign.getLocalDate());
