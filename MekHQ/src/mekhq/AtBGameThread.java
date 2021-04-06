@@ -115,8 +115,7 @@ public class AtBGameThread extends GameThread {
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
                 MekHQ.getLogger().info("Thread in lounge");
 
-                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
 
                 if (started) {
@@ -205,7 +204,7 @@ public class AtBGameThread extends GameThread {
                     }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
-                    if(!(scenario instanceof AtBDynamicScenario)) {
+                    if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
                         if (entity.getJumpMP() > 0) {
                             if (entity instanceof megamek.common.Infantry) {
@@ -360,8 +359,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-        }
-        finally {
+        } finally {
             client.die();
             client = null;
             swingGui = null;
@@ -392,8 +390,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-                botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+                botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();

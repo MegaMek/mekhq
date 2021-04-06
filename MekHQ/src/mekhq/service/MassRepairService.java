@@ -134,6 +134,10 @@ public class MassRepairService {
                     unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
             campaign.addReport(msg);
             return msg;
+        } else if (campaign.getAstechNeed() > 0) {
+            String message = resources.getString("MRMS.InsufficientAstechs.report");
+            campaign.addReport(message);
+            return message;
         }
 
         List<MassRepairOption> activeMROList = configuredOptions.getActiveMassRepairOptions();
@@ -168,7 +172,7 @@ public class MassRepairService {
 
         campaign.addReport(msg);
 
-        List<Person> techs = campaign.getTechs(false);
+        List<Person> techs = campaign.getTechs();
 
         if (!techs.isEmpty()) {
             List<IPartWork> parts = unit.getPartsNeedingService(true);
@@ -192,6 +196,9 @@ public class MassRepairService {
         MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(campaign);
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            return;
+        } else if (campaign.getAstechNeed() > 0) {
+            campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }
 
@@ -295,7 +302,7 @@ public class MassRepairService {
                 "Units with unfixable limbs:", campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
-            List<Person> techs = campaign.getTechs(false);
+            List<Person> techs = campaign.getTechs();
 
             if (!techs.isEmpty()) {
                 int count = 0;

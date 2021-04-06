@@ -183,7 +183,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private Map<String, Integer> duplicateNameHash = new HashMap<>();
+    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -226,8 +226,7 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Camouflage.COLOUR_CAMOUFLAGE;
-    private String camoFileName = PlayerColour.BLUE.name();
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
 
     //unit icon
@@ -1882,7 +1881,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
      */
     public List<Person> getTechs() {
-        return getTechs(false, null, true, false);
+        return getTechs(false);
     }
 
     public List<Person> getTechs(boolean noZeroMinute) {
@@ -1892,19 +1891,12 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Returns a list of active technicians.
      *
-     * @param noZeroMinute
-     *            If TRUE, then techs with no time remaining will be excluded from
-     *            the list.
-     * @param firstTechId
-     *            The ID of the tech that should appear first in the list (assuming
-     *            active and satisfies the noZeroMinute argument)
-     * @param sorted
-     *            If TRUE, then return the list sorted from worst to best
-     * @param eliteFirst
-     *            If TRUE and sorted also TRUE, then return the list sorted from
-     *            best to worst
-     * @return The list of active {@link Person}s who qualify as technicians
-     *         ({@link Person#isTech()}).
+     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
+     * @param firstTechId The ID of the tech that should appear first in the list (assuming
+     *                    active and satisfies the noZeroMinute argument)
+     * @param sorted If TRUE, then return the list sorted from worst to best
+     * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
+     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
     public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
@@ -1928,65 +1920,23 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        // Return the tech collection sorted worst to best
-        // Reverse the sort if we've been asked for best to worst
+        // Return the tech collection sorted worst to best Skill Level, or reversed if we want
+        // elites first
         if (sorted) {
-            // First order by the amount of time the person has remaining, based on the sorting order
-            // comparison changes because locations that use elite first will want the person with
-            // the most remaining time at the top of the list while locations that don't will want it
-            // at the bottom of the list
+            Comparator<Person> techSorter = Comparator.comparingInt(person ->
+                    person.getExperienceLevel(!person.isTechPrimary() && person.isTechSecondary()));
+
             if (eliteFirst) {
-                // We want the highest amount of remaining time at the top of the list, as that
-                // makes it easy to compare between the two
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+                techSorter = techSorter.reversed().thenComparing(Comparator
+                        .comparingInt(Person::getDailyAvailableTechTime).reversed());
             } else {
-                // Otherwise, we want the highest amount of time being at the bottom of the list
-                techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+                techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
             }
-            // Then sort by the skill level, which puts Elite personnel first or last dependant on
-            // the eliteFirst value
-            techs.sort((person1, person2) -> {
-                // default to 0, which means they're equal
-                int retVal = 0;
 
-                // Set up booleans to know if the tech is secondary only
-                // this is to get the skill from getExperienceLevel(boolean) properly
-                boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
-                boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
-
-                if (person1.getExperienceLevel(p1Secondary) > person2.getExperienceLevel(p2Secondary)) {
-                    // Person 1 is better than Person 2.
-                    retVal = 1;
-                } else if (person1.getExperienceLevel(p1Secondary) < person2.getExperienceLevel(p2Secondary)) {
-                    // Person 2 is better than Person 1
-                    retVal = -1;
-                }
-
-                // Return, swapping the value if we're looking to have Elites ordered first
-                return eliteFirst ? -retVal : retVal;
-            });
+            techs.sort(techSorter);
         }
 
         return techs;
-    }
-
-    /**
-     * Gets a list of all techs of a specific role type
-     * @param roleType The filter role type
-     * @return Collection of all techs that match the given tech role
-     */
-    public List<Person> getTechsByRole(int roleType) {
-        List<Person> techs = getTechs(false, null, false, false);
-        List<Person> retval = new ArrayList<>();
-
-        for (Person tech : techs) {
-            if((tech.getPrimaryRole() == roleType) ||
-               (tech.getSecondaryRole() == roleType)) {
-                retval.add(tech);
-            }
-        }
-
-        return retval;
     }
 
     public List<Person> getAdmins() {
@@ -4008,24 +3958,12 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void setCamoCategory(String name) {
-        camoCategory = name;
-    }
-
-    public String getCamoCategory() {
-        return camoCategory;
-    }
-
-    public void setCamoFileName(String name) {
-        camoFileName = name;
-    }
-
-    public String getCamoFileName() {
-        return camoFileName;
-    }
-
     public Camouflage getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+        return camouflage;
+    }
+
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = camouflage;
     }
 
     public PlayerColour getColour() {
@@ -4111,8 +4049,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", camoCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", camoFileName);
+        if (!getCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
+        }
+        if (!getCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
@@ -5289,11 +5231,23 @@ public class Campaign implements Serializable, ITechManager {
         return medicPool;
     }
 
+    public int getAstechNeed() {
+        return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6)
+                - getNumberAstechs();
+    }
+
     public void increaseAstechPool(int i) {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
         MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
+    }
+
+    public void fillAstechPool() {
+        final int need = getAstechNeed();
+        if (need > 0) {
+            increaseAstechPool(need);
+        }
     }
 
     public void decreaseAstechPool(int i) {
@@ -5408,9 +5362,20 @@ public class Campaign implements Serializable, ITechManager {
         return medics;
     }
 
+    public int getMedicsNeed() {
+        return (getDoctors().size() * 4) - getNumberMedics();
+    }
+
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void fillMedicPool() {
+        final int need = getMedicsNeed();
+        if (need > 0) {
+            increaseMedicPool(need);
+        }
     }
 
     public void decreaseMedicPool(int i) {
@@ -5535,42 +5500,21 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * borrowed from megamek.client
      */
-    private void checkDuplicateNamesDuringAdd(Entity entity) {
-        if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), 1);
-        } else {
-            int count = duplicateNameHash.get(entity.getShortName());
-            count++;
-            duplicateNameHash.put(entity.getShortName(), count);
-            entity.duplicateMarker = count;
-            entity.generateShortName();
-            entity.generateDisplayName();
-        }
+    private synchronized void checkDuplicateNamesDuringAdd(Entity entity) {
+        unitNameTracker.add(entity);
     }
 
     /**
-     * If we remove a unit, we may need to update the duplicate identifier. TODO: This function is super slow :(
+     * If we remove a unit, we may need to update the duplicate identifier.
      *
      * @param entity This is the entity whose name is checked for any duplicates
      */
-    private void checkDuplicateNamesDuringDelete(Entity entity) {
-        Integer o = duplicateNameHash.get(entity.getShortNameRaw());
-        if (o != null) {
-            int count = o;
-            if (count > 1) {
-                for (Unit u : getUnits()) {
-                    Entity e = u.getEntity();
-                    if (e.getShortNameRaw().equals(entity.getShortNameRaw()) && (e.duplicateMarker > entity.duplicateMarker)) {
-                        e.duplicateMarker--;
-                        e.generateShortName();
-                        e.generateDisplayName();
-                    }
-                }
-                duplicateNameHash.put(entity.getShortNameRaw(), count - 1);
-            } else {
-                duplicateNameHash.remove(entity.getShortNameRaw());
-            }
-        }
+    private synchronized void checkDuplicateNamesDuringDelete(Entity entity) {
+        unitNameTracker.remove(entity, e -> {
+            // Regenerate entity names after a deletion
+            e.generateShortName();
+            e.generateDisplayName();
+        });
     }
 
     public String getUnitRatingText() {

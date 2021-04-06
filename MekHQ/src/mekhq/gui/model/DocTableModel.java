@@ -42,7 +42,7 @@ public class DocTableModel extends DataTableModel {
 
         toReturn.append(String.format(" (%d XP)", doc.getXP()));
 
-        if (campaign.getMedicsPerDoctor() < 4) {
+        if (campaign.getMedicsNeed() > 0) {
             toReturn.append("</font><font size='2' color='red'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font size='2'><br/>");

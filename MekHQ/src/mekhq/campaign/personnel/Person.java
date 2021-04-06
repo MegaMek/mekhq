@@ -3177,6 +3177,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return false;
     }
 
+    /**
+     * @return the person's current daily available tech time. This does NOT account for any expended
+     * time.
+     */
+    public int getDailyAvailableTechTime() {
+        return (isTechPrimary() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME)
+                - getMaintenanceTimeUsing();
+    }
+
     public int getMaintenanceTimeUsing() {
         int time = 0;
         for (Unit u : getTechUnits()) {

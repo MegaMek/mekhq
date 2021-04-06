@@ -24,7 +24,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -45,7 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
@@ -129,15 +127,15 @@ public class UnitMarket implements Serializable {
             }
 
             if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-                Set<Faction> factions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
-                String faction = Utilities.getRandomItem(factions).getShortName();
-                if (campaign.getFaction().isClan() || !Factions.getInstance().getFaction(faction).isClan()) {
+                final Faction faction = Utilities.getRandomItem(campaign.getCurrentSystem()
+                        .getFactionSet(campaign.getLocalDate()));
+                if ((faction != null) && (campaign.getFaction().isClan() || !faction.isClan())) {
                     addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,
-                            faction, IUnitRating.DRAGOON_A, 6);
+                            faction.getShortName(), IUnitRating.DRAGOON_A, 6);
                     addOffers(campaign, Compute.d6() - 2, UnitMarketType.FACTORY, UnitType.TANK,
-                            faction, IUnitRating.DRAGOON_A, 6);
+                            faction.getShortName(), IUnitRating.DRAGOON_A, 6);
                     addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AERO,
-                            faction, IUnitRating.DRAGOON_A, 6);
+                            faction.getShortName(), IUnitRating.DRAGOON_A, 6);
                 }
             }
 

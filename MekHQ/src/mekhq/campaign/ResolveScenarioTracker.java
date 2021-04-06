@@ -135,8 +135,7 @@ public class ResolveScenarioTracker {
     }
 
     public String getUnitFilePath() {
-        return unitList.map(File::getAbsolutePath)
-                       .orElse("No file selected");
+        return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
     public void setClient(Client c) {
@@ -157,12 +156,8 @@ public class ResolveScenarioTracker {
     }
 
     private TestUnit generateNewTestUnit(Entity e) {
-        // Do some hoops here so that the new mech gets it's old individual paint job!
-        String cat = e.getCamoCategory();
-        String fn = e.getCamoFileName();
         TestUnit nu = new TestUnit(e, campaign, true);
-        nu.getEntity().setCamoCategory(cat);
-        nu.getEntity().setCamoFileName(fn);
+        nu.getEntity().setCamouflage(e.getCamouflage().clone());
         /* AtB uses id to track status of allied units */
         if (e.getExternalIdAsString().equals("-1")) {
             UUID id = UUID.randomUUID();
