@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -139,7 +140,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /* for the top button panel */
@@ -791,12 +792,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
-            if (need > 0) {
-                getCampaign().increaseAstechPool(need);
-            }
-        });
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
@@ -840,12 +836,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
-            if (need > 0) {
-                getCampaign().increaseMedicPool(need);
-            }
-        });
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
@@ -1112,6 +1103,7 @@ public class CampaignGUI extends JPanel {
             miPlaf.addActionListener(this::changeTheme);
         }
     }
+
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
@@ -1134,16 +1126,22 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
+            ((RepairTab) getTab(GuiTabType.REPAIR)).focusOnUnit(id);
             tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
     }
 
+    public void focusOnPerson(Person person) {
+        if (person != null) {
+            focusOnPerson(person.getId());
+        }
+    }
+
     public void focusOnPerson(UUID id) {
-        if (null == id) {
+        if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
             return;
         }
@@ -1245,8 +1243,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void hireBulkPersonnel() {
-        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign());
+        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hbpd.setVisible(true);
     }
 
@@ -1486,7 +1483,7 @@ public class CampaignGUI extends JPanel {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1495,7 +1492,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1504,7 +1501,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1513,7 +1510,7 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1553,20 +1550,17 @@ public class CampaignGUI extends JPanel {
         if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
-                JOptionPane
-                        .showMessageDialog(
-                                frame,
-                                "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
-                                "No Engineer", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getTechs().size() > 0) {
+        } else if (getCampaign().getActivePersonnel().stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
             String skillLvl;
-            int timePerDay;
 
             List<Person> techs = getCampaign().getTechs(false, null, true, true);
             int lastRightTech = 0;
@@ -1575,21 +1569,10 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                timePerDay = (tech.getSecondaryRole().isTechSecondary()
-                        ? Person.SECONDARY_ROLE_SUPPORT_TIME : Person.PRIMARY_ROLE_SUPPORT_TIME)
-                        - tech.getMaintenanceTimeUsing();
                 skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
-                name = tech.getFullName()
-                        + ", "
-                        + skillLvl
-                        + " "
-                        + tech.getPrimaryRoleDesc()
-                        + " ("
-                        + getCampaign().getTargetFor(r, tech).getValueAsString()
-                        + "+)"
-                        + ", "
-                        + tech.getMinutesLeft() + "/" + timePerDay
-                        + " minutes";
+                name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
+                        + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
+                        + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1610,11 +1593,10 @@ public class CampaignGUI extends JPanel {
 
             if (!selectedTech.isRightTechTypeFor(r)) {
                 if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
-                    "This tech is not appropriate for this unit. Would you like to continue?",
-                    "pending battle",
-                    JOptionPane.YES_NO_OPTION)) {
-                        return;
-                    }
+                        "This tech is not appropriate for this unit. Would you like to continue?",
+                        "Incorrect Tech Type", JOptionPane.YES_NO_OPTION)) {
+                    return;
+                }
             }
 
             r.setTech(selectedTech);
@@ -2007,7 +1989,7 @@ public class CampaignGUI extends JPanel {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
                 if (p.getGenealogy().hasSpouse()
-                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
@@ -2720,16 +2702,16 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setCampaignOptionsFromGameOptions() {
-        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
-        getCampaign().getCampaignOptions().setInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
-        getCampaign().getCampaignOptions().setToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
-        getCampaign().getCampaignOptions().setArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
-        getCampaign().getCampaignOptions().setAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
-        getCampaign().getCampaignOptions().setEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
-        getCampaign().getCampaignOptions().setImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
-        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
-        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
-        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
+        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
+        getCampaign().getCampaignOptions().setUseInitiativeBonus(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
+        getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
+        getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
+        getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
+        getCampaign().getCampaignOptions().setUseEdge(getCampaign().getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
+        getCampaign().getCampaignOptions().setUseImplants(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
+        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
+        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
+        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
         MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }

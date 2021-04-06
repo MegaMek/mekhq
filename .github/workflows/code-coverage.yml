@@ -84,12 +84,12 @@ jobs:
         echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
     #
-    # Use Java 1.8
+    # Use Java 11
     #
-    - name: Set up JDK 1.8
+    - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 11
 
     #
     # Make sure we can execute the Gradle wrapper        

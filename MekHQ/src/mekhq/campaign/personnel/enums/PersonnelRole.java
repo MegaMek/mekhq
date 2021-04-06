@@ -309,6 +309,7 @@ public enum PersonnelRole {
     }
     //endregion Boolean Comparisons
 
+    @Deprecated // This will go into a profession enum once that it ready
     public int getProfession() {
         switch (this) {
             case AEROSPACE_PILOT:
@@ -467,8 +468,6 @@ public enum PersonnelRole {
                     return LAM_PILOT;
                 case 27:
                     return VEHICLE_CREW;
-                default:
-                    break;
             }
         } catch (Exception ignored) {
 

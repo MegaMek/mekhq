@@ -1,6 +1,4 @@
 /*
- * Person.java
- *
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
@@ -28,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
@@ -43,6 +42,7 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.Ranks;
 import org.w3c.dom.Node;
@@ -312,7 +312,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        genealogy = new Genealogy(getId());
+        setGenealogy(new Genealogy(this));
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -828,7 +828,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status.isDead()) {
             setDateOfDeath(campaign.getLocalDate());
             // Don't forget to tell the spouse
-            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse(campaign).getStatus().isDeadOrMIA()) {
+            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
                 divorceType.divorce(this, campaign);
@@ -1105,6 +1105,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return genealogy;
     }
 
+    public void setGenealogy(Genealogy genealogy) {
+        this.genealogy = genealogy;
+    }
+
     //region Pregnancy
     public boolean isTryingToConceive() {
         return tryingToConceive;
@@ -1154,13 +1158,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (canProcreate(campaign)) {
             boolean conceived = false;
             if (getGenealogy().hasSpouse()) {
-                Person spouse = getGenealogy().getSpouse(campaign);
+                Person spouse = getGenealogy().getSpouse();
                 if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
                         && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
                 }
-            } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+            } else if (campaign.getCampaignOptions().useProcreationNoRelationship()) {
                 // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
                 conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
             }
@@ -1181,7 +1185,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
-                ? getGenealogy().getSpouseId().toString() : null);
+                ? getGenealogy().getSpouse().getId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
 
@@ -1189,7 +1193,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
             if (getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
+                PersonalLogger.spouseConceived(getGenealogy().getSpouse(),
                         getFullName(), getCampaign().getLocalDate(), sizeString);
             }
         }
@@ -1214,10 +1218,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
 
         // Determine father information
-        String fatherIdString = getExtraData().get(PREGNANCY_FATHER_DATA);
-        UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-        fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
-                ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
+        Person father = (getExtraData().get(PREGNANCY_FATHER_DATA) != null)
+                ? campaign.getPerson(UUID.fromString(getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
+        father = campaign.getCampaignOptions().determineFatherAtBirth()
+                ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
 
         // Determine Prisoner Status
         final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
@@ -1234,7 +1238,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Create the specific baby
             Person baby = campaign.newDependent(true);
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
+                    .generateBabySurname(this, father, baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
 
@@ -1242,12 +1246,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
 
             // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, getId());
-            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
-            if (fatherId != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
-                campaign.getPerson(fatherId).getGenealogy()
-                        .addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, this);
+            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+            if (father != null) {
+                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
+                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
             }
 
             // Create reports and log the birth
@@ -1255,9 +1258,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
-                if (fatherId != null) {
-                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
-                            campaign.getLocalDate());
+                if (father != null) {
+                    PersonalLogger.ourChildBorn(father, baby, getFullName(), campaign.getLocalDate());
                 }
             }
         }
@@ -1335,7 +1337,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            Marriage.WEIGHTED.marry(this, potentials.get(Compute.randomInt(n)), campaign);
+            Marriage.WEIGHTED.marry(campaign, this, potentials.get(Compute.randomInt(n)));
         }
     }
 
@@ -1476,7 +1478,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
             if (!genealogy.isEmpty()) {
-                genealogy.writeToXml(pw1, indent + 1);
+                genealogy.writeToXML(pw1, indent + 1);
             }
             if (!isTryingToMarry()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
@@ -1713,11 +1715,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
-                    retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
+                    retVal.getGenealogy().setSpouse(new PersonIdReference(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
-                    Genealogy.loadFormerSpouses(retVal.genealogy, wn2.getChildNodes());
+                    retVal.getGenealogy().loadFormerSpouses(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
+                    retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
@@ -1959,8 +1961,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
 
-            // Ensure the Genealogy Origin Id is set to the proper id
-            retVal.getGenealogy().setOrigin(retVal.getId());
+            // Ensure the Genealogy Origin is set to this
+            retVal.getGenealogy().setOrigin(retVal);
 
             // Prisoner and Bondsman updating
             if (retVal.rank < 0) {
@@ -1987,32 +1989,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return salary;
         }
 
-        //if salary is negative, then use the standard amounts
-        Money primaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getPrimaryRole());
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
-        if (hasSkill(SkillType.S_ANTI_MECH) && getPrimaryRole().isSoldierOrBattleArmour()) {
+        // If the salary is negative, then use the standard amounts
+        // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
+        // TODO : star paying to be part of the company, for example
+        Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(false)));
+        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
             primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        Money secondaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getSecondaryRole()).dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true)));
-        if (hasSkill(SkillType.S_ANTI_MECH) && getSecondaryRole().isSoldierOrBattleArmour()) {
+        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(true)));
+        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        Money totalBase = primaryBase.plus(secondaryBase);
-
-        if (getRank().isOfficer()) {
-            totalBase = totalBase.multipliedBy(campaign.getCampaignOptions().getSalaryCommissionMultiplier());
-        } else {
-            totalBase = totalBase.multipliedBy(campaign.getCampaignOptions().getSalaryEnlistedMultiplier());
-        }
-
-        totalBase = totalBase.multipliedBy(getRank().getPayMultiplier());
-
-        return totalBase;
         //TODO: distinguish DropShip, JumpShip, and WarShip crew
         //TODO: Add era mod to salary calc..
+        return primaryBase.plus(secondaryBase)
+                .multipliedBy(getRank().isOfficer()
+                        ? campaign.getCampaignOptions().getSalaryCommissionMultiplier()
+                        : campaign.getCampaignOptions().getSalaryEnlistedMultiplier())
+                .multipliedBy(getRank().getPayMultiplier());
     }
 
     /**
@@ -2228,7 +2226,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if they have the same id, otherwise false
      */
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (this == object) {
             return true;
         } else if (!(object instanceof Person)) {
@@ -2253,7 +2251,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
                         );
@@ -2269,11 +2267,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     return -1;
                 }
             case LAM_PILOT:
-                if (hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)
-                        && hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()
-                                    + getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel())
+                if (Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
+                        SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).allMatch(this::hasSkill)) {
+                    int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
+                            SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
                                     / 4.0
                     );
                     /*
@@ -2281,7 +2278,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         if ((getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore)
                                 == getSkill(SkillType.S_PILOT_MECH).getType().getExperienceLevel(rawScore))
                                 && (getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore)
@@ -2309,7 +2306,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : -1;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO)
                                     .getLevel()) / 2.0
@@ -2327,7 +2324,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET)
                                     .getLevel()) / 2.0
@@ -2347,7 +2344,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return hasSkill(SkillType.S_GUN_PROTO) ? getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() : -1;
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH)
                                     .getLevel()) / 2.0
@@ -2843,6 +2840,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return false;
     }
 
+    /**
+     * @return the person's current daily available tech time. This does NOT account for any expended
+     * time.
+     */
+    public int getDailyAvailableTechTime() {
+        return (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME)
+                - getMaintenanceTimeUsing();
+    }
+
     public int getMaintenanceTimeUsing() {
         int time = 0;
         for (Unit u : getTechUnits()) {
@@ -2852,15 +2858,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isMothballing() {
-        if (!isTech()) {
-            return false;
-        }
-        for (Unit u : techUnits) {
-            if (u.isMothballing()) {
-                return true;
-            }
-        }
-        return false;
+        return isTech() && techUnits.stream().anyMatch(Unit::isMothballing);
     }
 
     public @Nullable Unit getUnit() {
@@ -2923,8 +2921,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getPrimaryRole().isTech() || getPrimaryRole().isDoctor()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        }
-        if (getSecondaryRole().isTechSecondary() || getSecondaryRole().isDoctor()) {
+        } else if (getSecondaryRole().isTechSecondary() || getSecondaryRole().isDoctor()) {
             this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }

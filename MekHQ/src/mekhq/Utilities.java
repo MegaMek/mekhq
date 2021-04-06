@@ -63,6 +63,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
@@ -182,8 +183,8 @@ public class Utilities {
      * can return <i>null</i> if the collection contains <i>null</i> items.
      *
      */
-    public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if ((null == collection) || collection.isEmpty()) {
+    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
+        if ((collection == null) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
@@ -581,8 +582,8 @@ public class Utilities {
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
