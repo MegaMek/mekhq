@@ -1156,11 +1156,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // lets fill the pop up menu
         if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resourceMap.getString("changeRank.text"));
+            final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
             for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(
-                    person.getRankSystem(), person.getProfession())) {
+                    person.getRankSystem(), initialProfession)) {
                 final Rank rank = person.getRankSystem().getRank(rankDisplay.getRankNumeric());
-                final int profession = person.getRankSystem().getProfession(rank, person.getProfession());
-                final int rankLevels = rank.getRankLevels(profession);
+                final Profession profession = initialProfession.getProfession(person.getRankSystem(), rank);
+                final int rankLevels = rank.getRankLevels().get(profession);
 
                 if (rankLevels > 0) {
                     submenu = new JMenu(rankDisplay.toString());

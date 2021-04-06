@@ -18,6 +18,7 @@
  */
 package mekhq.gui.displayWrappers;
 
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
@@ -50,13 +51,13 @@ public class RankDisplay {
      * @param initialProfession the initial profession for the ranks
      * @return a list of all valid rank displays
      */
-    public static List<RankDisplay> getRankDisplaysForSystem(final RankSystem rankSystem, final int initialProfession) {
+    public static List<RankDisplay> getRankDisplaysForSystem(final RankSystem rankSystem, final Profession initialProfession) {
         final List<RankDisplay> rankDisplays = new ArrayList<>();
-        final int profession = rankSystem.getBaseProfession(initialProfession);
+        final Profession profession = initialProfession.getBaseProfession(rankSystem);
         for (int i = 0; i < rankSystem.getRanks().size(); i++) {
             final Rank rank = rankSystem.getRanks().get(i);
             if (!rank.isEmpty(profession)) {
-                rankDisplays.add(new RankDisplay(i, rank.getName(rankSystem.getProfessionFromBase(rank, profession))));
+                rankDisplays.add(new RankDisplay(i, rank.getName(profession.getProfessionFromBase(rankSystem, rank))));
             }
         }
         return rankDisplays;

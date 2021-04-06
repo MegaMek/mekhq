@@ -12,6 +12,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -324,10 +325,10 @@ public class HireBulkPersonnelDialog extends JDialog {
         // Determine correct profession to pass into the loop
         int primaryRoleId = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).id;
         if (0 == primaryRoleId) {
-            rankModel.addElement(new RankDisplay(0, campaign.getRankSystem().getRank(0).getName(0)));
+            rankModel.addElement(new RankDisplay(0, campaign.getRankSystem().getRank(0).getName(Profession.MECHWARRIOR)));
         } else {
             rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
-                    Person.getProfessionFromPrimaryRole(primaryRoleId)));
+                    Profession.getProfessionFromPersonnelRole(primaryRoleId)));
         }
 
         choiceRanks.setModel(rankModel);

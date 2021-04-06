@@ -24,6 +24,7 @@ import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
@@ -258,7 +259,7 @@ public class NewRecruitDialog extends JDialog {
     private void refreshRanksCombo() {
         DefaultComboBoxModel<RankDisplay> ranksModel = new DefaultComboBoxModel<>();
         ranksModel.addAll(RankDisplay.getRankDisplaysForSystem(person.getRankSystem(),
-                person.getProfession()));
+                Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())));
         choiceRanks.setModel(ranksModel);
         choiceRanks.setSelectedIndex(0);
     }

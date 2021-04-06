@@ -36,8 +36,8 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -141,7 +141,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
                 // TODO: This currently only exports MechWarrior Ranks. MercRoster software needs adjusted before this can be.
-                preparedStatement.setString(2, truncateString(rank.getName(RankSystem.RPROF_MW), 45));
+                preparedStatement.setString(2, truncateString(rank.getName(Profession.MECHWARRIOR), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;

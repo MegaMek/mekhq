@@ -78,6 +78,7 @@ import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -2461,9 +2462,8 @@ public class Person implements Serializable {
     }
 
     public String getRankName() {
-        String rankName;
-
-        rankName = getRank().getName(getRankSystem().getProfession(getRank(), getProfession()));
+        final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
+        String rankName = getRank().getName(profession.getProfession(getRankSystem(), getRank()));
 
         // Manei Domini Additions
         if (getRankSystem().isWoBMilitia()) {
@@ -3676,48 +3676,6 @@ public class Person implements Serializable {
     }
     //endregion injuries
 
-    public int getProfession() {
-        return getProfessionFromPrimaryRole(primaryRole);
-    }
-
-    public static int getProfessionFromPrimaryRole(int role) {
-        switch (role) {
-            case T_AERO_PILOT:
-            case T_CONV_PILOT:
-                return RankSystem.RPROF_ASF;
-            case T_GVEE_DRIVER:
-            case T_NVEE_DRIVER:
-            case T_VTOL_PILOT:
-            case T_VEE_GUNNER:
-            case T_VEHICLE_CREW:
-                return RankSystem.RPROF_VEE;
-            case T_BA:
-            case T_INFANTRY:
-                return RankSystem.RPROF_INF;
-            case T_SPACE_PILOT:
-            case T_SPACE_CREW:
-            case T_SPACE_GUNNER:
-            case T_NAVIGATOR:
-                return RankSystem.RPROF_NAVAL;
-            case T_MECH_TECH:
-            case T_MECHANIC:
-            case T_AERO_TECH:
-            case T_BA_TECH:
-            case T_ASTECH:
-            case T_ADMIN_COM:
-            case T_ADMIN_LOG:
-            case T_ADMIN_TRA:
-            case T_ADMIN_HR:
-                return RankSystem.RPROF_TECH;
-            case T_MECHWARRIOR:
-            case T_PROTO_PILOT:
-            case T_DOCTOR:
-            case T_MEDIC:
-            default:
-                return RankSystem.RPROF_MW;
-        }
-    }
-
     /* For use by Against the Bot retirement/defection rolls */
 
     public boolean isFounder() {
@@ -3782,10 +3740,11 @@ public class Person implements Serializable {
         shares += Math.max(-1, getExperienceLevel(false) - 2);
 
         if (getRank().isOfficer()) {
+            final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
             int rankOrder = getRankSystem().getOfficerCut();
             while ((rankOrder <= getRankNumeric()) && (rankOrder < Rank.RC_NUM)) {
                 Rank rank = getRankSystem().getRanks().get(rankOrder);
-                if (!rank.getName(getProfession()).equals("-")) {
+                if (!rank.isEmpty(profession)) {
                     shares++;
                 }
                 rankOrder++;

@@ -34,8 +34,7 @@ import java.util.UUID;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.Profession;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -414,11 +413,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     /**
-     * @param person
-     * @return	The amount in C-bills required to get a bonus to the retirement/defection roll
+     * @param person the person to get the bonus cost for
+     * @return The amount in C-bills required to get a bonus to the retirement/defection roll
      */
-    public static Money getBonusCost(Person person) {
-        final boolean isMechWarriorProfession = person.getProfession() == RankSystem.RPROF_MW;
+    public static Money getBonusCost(final Person person) {
+        final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
+                person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(false)) {
             case SkillType.EXP_ELITE:
                 return Money.of(isMechWarriorProfession ? 300000 : 150000);
@@ -492,7 +492,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     p.getSecondaryRole() == Person.T_AERO_PILOT)) {
                 stolenUnit = true;
             } else {
-                if (p.getProfession() == RankSystem.RPROF_INF) {
+                final Profession profession = Profession.getProfessionFromPersonnelRole(p.getPrimaryRole());
+                if (profession.isInfantry()) {
                     if (p.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
@@ -502,14 +503,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                         payoutAmount = payoutAmount.multipliedBy(2);
                     }
                 }
-                if (!shareSystem &&
-                        ((p.getProfession() == RankSystem.RPROF_MW) || (p.getProfession() == RankSystem.RPROF_ASF))
+                if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (p.getOriginalUnitWeight() > 0)) {
                     weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
                     if (roll <= 1) {
                         weightClass--;
-                    }
-                    if (roll >= 5) {
+                    } else if (roll >= 5) {
                         weightClass++;
                     }
                 }

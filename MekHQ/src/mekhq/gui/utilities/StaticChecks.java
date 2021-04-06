@@ -27,6 +27,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -561,8 +562,9 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(final boolean ignorePrisonerStatus, final Person... people) {
+        final Profession profession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
         return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                && (p.getProfession() == people[0].getProfession())
+                && (profession == Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
                 && people[0].getRankSystem().equals(p.getRankSystem()));
     }
     /**

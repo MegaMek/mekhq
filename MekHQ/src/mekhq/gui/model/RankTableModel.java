@@ -32,6 +32,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -93,12 +94,12 @@ public class RankTableModel extends DefaultTableModel {
                 rating = "E" + i;
             }
             array[i][RankTableModel.COL_NAME_RATE] = rating;
-            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(RankSystem.RPROF_MW);
-            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(RankSystem.RPROF_ASF);
-            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(RankSystem.RPROF_VEE);
-            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(RankSystem.RPROF_NAVAL);
-            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(RankSystem.RPROF_INF);
-            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(RankSystem.RPROF_TECH);
+            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(Profession.MECHWARRIOR);
+            array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(Profession.AEROSPACE);
+            array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(Profession.VEHICLE);
+            array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(Profession.NAVAL);
+            array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(Profession.INFANTRY);
+            array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(Profession.TECH);
             array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
             array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
         }
