@@ -33,7 +33,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import megamek.common.icons.Camouflage;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -146,16 +145,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
-         if ((null != tgtEnt.getCamoCategory())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoCategory())
-                 && !tgtEnt.getCamoCategory().isEmpty()) {
-             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
+         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
+             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
          }
 
-         if ((null != tgtEnt.getCamoFileName())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoFileName())
-                 && !tgtEnt.getCamoFileName().isEmpty()) {
-             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
+         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
+             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
          }
 
          if (tgtEnt.getDeployRound() > 0) {

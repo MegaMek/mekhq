@@ -971,9 +971,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //infantry take zero time to re-organize
         //also check for squad size and number changes
-        if (oldUnit.getEntity() instanceof Infantry && !(oldUnit.getEntity() instanceof BattleArmor)) {
-            if (((Infantry)oldUnit.getEntity()).getSquadN() != ((Infantry)newEntity).getSquadN()
-                    ||((Infantry)oldUnit.getEntity()).getSquadSize() != ((Infantry)newEntity).getSquadSize()) {
+        if (oldUnit.isConventionalInfantry()) {
+            if (((Infantry) oldUnit.getEntity()).getSquadN() != ((Infantry) newEntity).getSquadN()
+                    ||((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
                 updateRefitClass(CLASS_A);
             }
             time = 0;
@@ -1489,7 +1489,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 ((AmmoBin) p).loadBin();
             }
         }
-        
+
         if (null != newArmorSupplies) {
             getCampaign().getWarehouse().removePart(newArmorSupplies);
         }
@@ -1558,23 +1558,23 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+        String fileNameCampaign;
         try {
             if (newEntity instanceof Mech) {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
+                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
-                FileOutputStream out = new FileOutputStream(fileNameCampaign);
-                PrintStream p = new PrintStream(out);
-                p.println(((Mech) newEntity).getMtf());
-                p.close();
-                out.close();
+                try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
+                    PrintStream p = new PrintStream(out)) {
+                    p.println(((Mech) newEntity).getMtf());
+                }
             } else {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
+                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
@@ -1582,17 +1582,43 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-        }
-        getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
-        MechSummaryCache.getInstance().loadMechData();
-        //I need to change the new entity to the one from the mtf file now, so that equip
-        //numbers will match
-        MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
-        if (null == summary) {
-            throw(new EntityLoadingException());
+            fileNameCampaign = null;
         }
 
-        newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+        getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
+
+        try {
+            MechSummaryCache.getInstance().loadMechData();
+
+            // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
+
+            MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
+            if (null == summary) {
+                throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
+                        newEntity.getChassis(), newEntity.getModel()));
+            }
+
+            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            MekHQ.getLogger().info(String.format("Saved %s %s to %s",
+                    newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
+        } catch (EntityLoadingException e) {
+            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s",
+                    newEntity.getChassis(), newEntity.getModel()), e);
+
+            if (fileNameCampaign != null) {
+                MekHQ.getLogger().warning("Deleting invalid refit file " + fileNameCampaign);
+                try {
+                    new File(fileNameCampaign).delete();
+                } catch (SecurityException se) {
+                    MekHQ.getLogger().warning("Could not clean up bad refit file " + fileNameCampaign, se);
+                }
+            }
+
+            // Reload the mech cache if we had to delete the file
+            MechSummaryCache.getInstance().loadMechData();
+
+            throw e;
+        }
     }
 
     private int getTimeMultiplier() {
@@ -2242,8 +2268,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public void suggestNewName() {
-        if (newEntity instanceof Infantry && !(newEntity instanceof BattleArmor)) {
-            Infantry infantry = (Infantry)newEntity;
+        if (newEntity.isConventionalInfantry()) {
+            Infantry infantry = (Infantry) newEntity;
             String chassis;
             switch (infantry.getMovementMode()) {
             case INF_UMU:

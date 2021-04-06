@@ -21,8 +21,8 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MtfFile;
+import megamek.common.loaders.*;
+import megamek.common.util.BuildingBlock;
 import mekhq.TestUtilities;
 import org.junit.Assert;
 
@@ -50,6 +50,67 @@ public final class UnitTestUtilities {
             MtfFile parser = new MtfFile(in);
 
             return parser.getEntity();
+        } catch (EntityLoadingException e) {
+            Assert.fail(e.toString());
+        }
+
+        return null;
+    }
+
+    public static Entity parseBase64BlkFile(String base64) {
+        try {
+            InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
+            IMechLoader loader;
+            
+            BuildingBlock bb = new BuildingBlock(in);
+            if (bb.exists("UnitType")) {
+                String sType = bb.getDataAsString("UnitType")[0];
+                if (sType.equals("Tank") || sType.equals("Naval")
+                        || sType.equals("Surface") || sType.equals("Hydrofoil")) {
+                    loader = new BLKTankFile(bb);
+                } else if (sType.equals("Infantry")) {
+                    loader = new BLKInfantryFile(bb);
+                } else if (sType.equals("BattleArmor")) {
+                    loader = new BLKBattleArmorFile(bb);
+                } else if (sType.equals("ProtoMech")) {
+                    loader = new BLKProtoFile(bb);
+                } else if (sType.equals("Mech")) {
+                    loader = new BLKMechFile(bb);
+                } else if (sType.equals("VTOL")) {
+                    loader = new BLKVTOLFile(bb);
+                } else if (sType.equals("GunEmplacement")) {
+                    loader = new BLKGunEmplacementFile(bb);
+                } else if (sType.equals("SupportTank")) {
+                    loader = new BLKSupportTankFile(bb);
+                } else if (sType.equals("LargeSupportTank")) {
+                    loader = new BLKLargeSupportTankFile(bb);
+                } else if (sType.equals("SupportVTOL")) {
+                    loader = new BLKSupportVTOLFile(bb);
+                } else if (sType.equals("Aero")) {
+                    loader = new BLKAeroFile(bb);
+                } else if (sType.equals("FixedWingSupport")) {
+                    loader = new BLKFixedWingSupportFile(bb);
+                } else if (sType.equals("ConvFighter")) {
+                    loader = new BLKConvFighterFile(bb);
+                } else if (sType.equals("SmallCraft")) {
+                    loader = new BLKSmallCraftFile(bb);
+                } else if (sType.equals("Dropship")) {
+                    loader = new BLKDropshipFile(bb);
+                } else if (sType.equals("Jumpship")) {
+                    loader = new BLKJumpshipFile(bb);
+                } else if (sType.equals("Warship")) {
+                    loader = new BLKWarshipFile(bb);
+                } else if (sType.equals("SpaceStation")) {
+                    loader = new BLKSpaceStationFile(bb);
+                } else {
+                    throw new EntityLoadingException("Unknown UnitType: "
+                            + sType);
+                }
+            } else {
+                loader = new BLKMechFile(bb);
+            }
+
+            return loader.getEntity();
         } catch (EntityLoadingException e) {
             Assert.fail(e.toString());
         }
@@ -475,5 +536,38 @@ public final class UnitTestUtilities {
             + "Q0FUSU9OUzpOZWlsDQpzeXN0ZW1tb2RlOkNPTU1VTklDQVRJT05TOjIwMDANCnN5c3RlbW1hbnVm"
             + "YWN0dXJlcjpUQVJHRVRJTkc6RGFsYmFuDQpzeXN0ZW1tb2RlOlRBUkdFVElORzpIaVJlei1CDQo="
         );
+    }
+
+    public static Entity getHeavyTrackedApcStandard() {
+        return parseBase64BlkFile("I2J1aWxkaW5nIGJsb2NrIGRhdGEgZmlsZQo8QmxvY2tWZXJzaW9uPgoxCjwvQmxvY2tWZXJzaW9u"
+            + "PgojV3JpdGUgdGhlIHZlcnNpb24gbnVtYmVyIGp1c3QgaW4gY2FzZS4uLgo8VmVyc2lvbj4KTUFN"
+            + "MAo8L1ZlcnNpb24+CjxVbml0VHlwZT4KVGFuawo8L1VuaXRUeXBlPgo8TmFtZT4KSGVhdnkgVHJh"
+            + "Y2tlZCBBUEMKPC9OYW1lPgo8TW9kZWw+CihTdGFuZGFyZCkKPC9Nb2RlbD4KPFRvbm5hZ2U+CjIw"
+            + "CjwvVG9ubmFnZT4KPGNydWlzZU1QPgo1CjwvY3J1aXNlTVA+CjxBcm1vcj4KMjAKMTMKMTMKMTAK"
+            + "PC9Bcm1vcj4KPEZyb250IEVxdWlwbWVudD4KSVNNYWNoaW5lIEd1bgpJU01hY2hpbmUgR3VuCjwv"
+            + "RnJvbnQgRXF1aXBtZW50Pgo8dHJhbnNwb3J0ZXJzPgpUcm9vcFNwYWNlOjYKPC90cmFuc3BvcnRl"
+            + "cnM+CjxCb2R5IEVxdWlwbWVudD4KSVNNRyBBbW1vICgxMDApCjwvQm9keSBFcXVpcG1lbnQ+Cjx0"
+            + "eXBlPgpJUyBMZXZlbCAxCjwvdHlwZT4KPHllYXI+CjI0NzAKPC95ZWFyPgo8aW50ZXJuYWxfdHlw"
+            + "ZT4KMAo8L2ludGVybmFsX3R5cGU+Cjxhcm1vcl90eXBlPgowCjwvYXJtb3JfdHlwZT4KPGVuZ2lu"
+            + "ZV90eXBlPgoxCjwvZW5naW5lX3R5cGU+Cjxtb3Rpb25fdHlwZT4KVHJhY2tlZAo8L21vdGlvbl90"
+            + "eXBlPgo8c291cmNlPgpTdGFyIExlYWd1ZQo8L3NvdXJjZT4K");
+    }
+
+    public static Entity getHeavyTrackedApcMg() {
+        return parseBase64BlkFile("I2J1aWxkaW5nIGJsb2NrIGRhdGEgZmlsZQo8QmxvY2tWZXJzaW9uPgoxCjwvQmxvY2tWZXJzaW9u"
+            + "PgojV3JpdGUgdGhlIHZlcnNpb24gbnVtYmVyIGp1c3QgaW4gY2FzZS4uLgo8VmVyc2lvbj4KTUFN"
+            + "MAo8L1ZlcnNpb24+CjxVbml0VHlwZT4KVGFuawo8L1VuaXRUeXBlPgo8TmFtZT4KSGVhdnkgVHJh"
+            + "Y2tlZCBBUEMKPC9OYW1lPgo8TW9kZWw+CihNRykKPC9Nb2RlbD4KPFRvbm5hZ2U+CjIwCjwvVG9u"
+            + "bmFnZT4KPGNydWlzZU1QPgo1CjwvY3J1aXNlTVA+CjxBcm1vcj4KMjAKMTMKMTMKMTAKPC9Bcm1v"
+            + "cj4KPEZyb250IEVxdWlwbWVudD4KSVNNYWNoaW5lIEd1bgpJU01hY2hpbmUgR3VuCjwvRnJvbnQg"
+            + "RXF1aXBtZW50Pgo8UmlnaHQgRXF1aXBtZW50PgpJU01hY2hpbmUgR3VuCjwvUmlnaHQgRXF1aXBt"
+            + "ZW50Pgo8TGVmdCBFcXVpcG1lbnQ+CklTTWFjaGluZSBHdW4KPC9MZWZ0IEVxdWlwbWVudD4KPFJl"
+            + "YXIgRXF1aXBtZW50PgpJU01hY2hpbmUgR3VuCklTTWFjaGluZSBHdW4KPC9SZWFyIEVxdWlwbWVu"
+            + "dD4KPHRyYW5zcG9ydGVycz4KVHJvb3BTcGFjZTozCjwvdHJhbnNwb3J0ZXJzPgo8Qm9keSBFcXVp"
+            + "cG1lbnQ+CklTTUcgQW1tbyAoMjAwKQpJU01HIEFtbW8gKDEwMCkKPC9Cb2R5IEVxdWlwbWVudD4K"
+            + "PHR5cGU+CklTIExldmVsIDEKPC90eXBlPgo8eWVhcj4KMjQ3MAo8L3llYXI+CjxpbnRlcm5hbF90"
+            + "eXBlPgowCjwvaW50ZXJuYWxfdHlwZT4KPGFybW9yX3R5cGU+CjAKPC9hcm1vcl90eXBlPgo8ZW5n"
+            + "aW5lX3R5cGU+CjEKPC9lbmdpbmVfdHlwZT4KPG1vdGlvbl90eXBlPgpUcmFja2VkCjwvbW90aW9u"
+            + "X3R5cGU+Cjxzb3VyY2U+ClN0YXIgTGVhZ3VlCjwvc291cmNlPgo=");
     }
 }

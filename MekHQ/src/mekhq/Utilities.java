@@ -63,6 +63,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
@@ -181,8 +182,8 @@ public class Utilities {
      * can return <i>null</i> if the collection contains <i>null</i> items.
      *
      */
-    public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if ((null == collection) || collection.isEmpty()) {
+    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
+        if ((collection == null) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
@@ -580,8 +581,8 @@ public class Utilities {
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1154,10 +1155,14 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
+
+        Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
+
+        // Handle exact matches first
         List<Part> remaining = new ArrayList<>();
         for (Part part : unit.getParts()) {
             int eqnum = -1;
@@ -1169,40 +1174,73 @@ public class Utilities {
                 eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
                 etype = ((MissingEquipmentPart) part).getType();
             }
-            if (null != etype) {
+
+            if (etype != null) {
                 Mounted mounted = unit.getEntity().getEquipment(eqnum);
                 if (equipNums.contains(eqnum)
+                        && (mounted != null)
                         && etype.equals(mounted.getType())) {
                     equipNums.remove((Integer) eqnum);
-                } else if ((part instanceof AmmoBin)
-                        && (etype instanceof AmmoType)
-                        && (mounted.getType() instanceof AmmoType)) {
-                    // Handle AmmoBins which had their AmmoType changed
-                    // but did not get reloaded yet.
-                    AmmoBin ammoBin = (AmmoBin) part;
-                    AmmoType mountedType = (AmmoType) mounted.getType();
-                    if (mountedType.equalsAmmoTypeOnly(ammoBin.getType())
-                            && (mountedType.getRackSize() == ammoBin.getType().getRackSize())) {
-                        equipNums.remove((Integer) eqnum);
-                    } else {
-                        remaining.add(part);
-                    }
+                    partMap.put(eqnum, part);
                 } else {
                     remaining.add(part);
                 }
             }
         }
+
+        // Handle approximate matches (AmmoBins with munition or bomb type changes)
+        List<Part> notFound = new ArrayList<>();
+        for (Part part : remaining) {
+            int eqnum = -1;
+            EquipmentType etype = null;
+            if (part instanceof EquipmentPart) {
+                eqnum = ((EquipmentPart) part).getEquipmentNum();
+                etype = ((EquipmentPart) part).getType();
+            } else if (part instanceof MissingEquipmentPart) {
+                eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
+                etype = ((MissingEquipmentPart) part).getType();
+            } else {
+                continue;
+            }
+
+            // Invalid equipment or already found
+            if ((etype == null) || partMap.containsKey(eqnum)) {
+                notFound.add(part);
+                continue;
+            }
+
+            Mounted mounted = unit.getEntity().getEquipment(eqnum);
+            if ((part instanceof AmmoBin)
+                    && (etype instanceof AmmoType)
+                    && (mounted != null)
+                    && (mounted.getType() instanceof AmmoType)) {
+                // Handle AmmoBins which had their AmmoType changed but did not get reloaded yet.
+                AmmoBin ammoBin = (AmmoBin) part;
+                AmmoType mountedType = (AmmoType) mounted.getType();
+                if (mountedType.equalsAmmoTypeOnly(ammoBin.getType())
+                        && (mountedType.getRackSize() == ammoBin.getType().getRackSize())) {
+                    equipNums.remove((Integer) eqnum);
+                    partMap.put(eqnum, part);
+                    continue;
+                }
+            }
+
+            notFound.add(part);
+        }
+
+        remaining = new ArrayList<>(notFound);
+        notFound.clear();
+
         // For ammo types we want to match the same munition type if possible to avoid
         // imposing unnecessary ammo swaps.
         // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
-        List<Part> notFound = new ArrayList<>();
         for (Part part : remaining) {
             boolean found = false;
             int i = -1;
 
             if (part instanceof EquipmentPart) {
-                EquipmentPart epart = (EquipmentPart)part;
+                EquipmentPart epart = (EquipmentPart) part;
                 for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
@@ -1226,6 +1264,7 @@ public class Utilities {
                                 // Unload bin before munition change
                                 ammoBin.unload();
                                 ammoBin.changeMunition(ammoType);
+                                partMap.put(equipNum, part);
                                 found = true;
                                 break;
                             }
@@ -1233,6 +1272,7 @@ public class Utilities {
                     }
                     if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
                         found = true;
                         break;
                     }
@@ -1248,6 +1288,7 @@ public class Utilities {
                     }
                     if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
                         found = true;
                         break;
                     }
@@ -1285,16 +1326,29 @@ public class Utilities {
                 }
                 int equipNum;
                 if (p instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart)p;
+                    EquipmentPart ePart = (EquipmentPart) p;
                     equipNum = ePart.getEquipmentNum();
                 } else {
-                    MissingEquipmentPart mePart = (MissingEquipmentPart)p;
+                    MissingEquipmentPart mePart = (MissingEquipmentPart) p;
                     equipNum = mePart.getEquipmentNum();
                 }
                 boolean isMissing = remaining.contains(p);
                 String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
                 if (isMissing) {
                     eName = "<Incorrect>";
+
+                    // Break the incorrect equipment number linkage if there is already a valid part at the location.
+                    // This ensures only one part is mapped to each equipment number, avoiding crashes and other
+                    // problems when these parts get out of sync.
+                    if ((equipNum >= 0) && partMap.containsKey(equipNum)) {
+                        if (p instanceof EquipmentPart) {
+                            EquipmentPart ePart = (EquipmentPart) p;
+                            ePart.setEquipmentNum(-1);
+                        } else {
+                            MissingEquipmentPart mePart = (MissingEquipmentPart) p;
+                            mePart.setEquipmentNum(-1);
+                        }
+                    }
                 }
                 builder.append(String.format(" %d: %s %s %s %s\r\n", equipNum, p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
             }
@@ -1379,27 +1433,26 @@ public class Utilities {
      * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
+        TableModel model = table.getModel();
+        String[] columns = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            columns[i] = model.getColumnName(i);
+        }
 
+        String report;
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
+                    Object value = model.getValueAt(i, j);
                     // use regex to remove any HTML tags
-                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
+                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {

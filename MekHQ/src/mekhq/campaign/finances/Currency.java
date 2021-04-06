@@ -62,8 +62,8 @@ public class Currency {
                 Character.isUpperCase(code.charAt(2));
         assert numericCurrencyCode >= -1 && numericCurrencyCode <= 999;
         assert decimalPlaces >=0 && decimalPlaces <=30;
-        assert name != null && !name.trim().isEmpty();
-        assert symbol != null && !symbol.trim().isEmpty();
+        assert name != null && !name.isBlank();
+        assert symbol != null && !symbol.isBlank();
         assert startYear <= endYear;
 
         this.wrapped = CurrencyUnit.registerCurrency(code, numericCurrencyCode, decimalPlaces, true);

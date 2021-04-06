@@ -84,11 +84,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa

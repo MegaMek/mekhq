@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -118,7 +119,7 @@ public class AmmoBinTest {
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
 
-        assertEquals(Part.REPAIR_PART_TYPE.AMMO, ammoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMO, ammoBin.getMassRepairOptionType());
     }
 
     @Test
@@ -433,7 +434,7 @@ public class AmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -473,7 +474,7 @@ public class AmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -514,7 +515,7 @@ public class AmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -554,7 +555,7 @@ public class AmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -640,7 +641,7 @@ public class AmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();

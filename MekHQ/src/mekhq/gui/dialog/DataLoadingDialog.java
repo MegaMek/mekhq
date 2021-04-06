@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +39,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
@@ -55,10 +60,11 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.campaign.universe.Systems;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
@@ -128,12 +134,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         private boolean cancelled = false;
 
         @Override
-        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException {
+        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException,
+                DOMException, ParseException, SAXException, ParserConfigurationException {
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
 
-            Faction.generateFactions();
+            Factions.setInstance(Factions.loadDefault());
 
             CurrencyManager.getInstance().loadCurrencies();
 
@@ -142,15 +149,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //Load values needed for CampaignOptionsDialog
             RATManager.populateCollectionNames();
 
-            while (!Systems.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-            }
+            // Initialize the systems
+            Systems.setInstance(Systems.loadDefault());
 
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
+            Ranks.initializeRankSystems();
             //endregion Progress 0
 
             //region Progress 1

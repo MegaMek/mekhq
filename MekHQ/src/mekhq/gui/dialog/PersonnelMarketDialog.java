@@ -46,14 +46,14 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Jay Lawson <jaylawson39 at yahoo.com>

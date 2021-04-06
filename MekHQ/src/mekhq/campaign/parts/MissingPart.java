@@ -28,6 +28,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 
@@ -146,16 +147,19 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public void remove(boolean salvage) {
+        final Unit unit = getUnit();
+
         campaign.getWarehouse().removePart(this);
-        if(null != unit) {
+        if (unit != null) {
             unit.removePart(this);
         }
+
         setUnit(null);
 
         // Grab a reference to our parent part so that we don't accidentally NRE
         // when we remove the parent part reference.
         Part parentPart = getParentPart();
-        if (null != parentPart) {
+        if (parentPart != null) {
             parentPart.removeChildPart(this);
         }
     }

@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import static mekhq.campaign.parts.AmmoUtilities.*;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Document;
@@ -68,7 +69,7 @@ public class MissingInfantryAmmoBinTest {
 
         MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, 1, false, mockCampaign);
 
-        assertEquals(Part.REPAIR_PART_TYPE.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
     }
 
     @Test
@@ -121,7 +122,7 @@ public class MissingInfantryAmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -165,7 +166,7 @@ public class MissingInfantryAmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();

@@ -37,8 +37,8 @@ import javax.swing.JTextArea;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -26,6 +25,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,7 +43,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Armor extends Part implements IAcquisitionWork {
@@ -228,7 +227,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof Armor)
+        return getClass().equals(part.getClass())
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
     }
@@ -650,6 +649,7 @@ public class Armor extends Part implements IAcquisitionWork {
         return report;
     }
 
+    @Override
     public void doMaintenanceDamage(int d) {
         int current = unit.getEntity().getArmor(location, rear);
         if(d >= current) {
@@ -676,8 +676,8 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ARMOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ARMOR;
     }
 
     @Override

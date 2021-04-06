@@ -24,7 +24,6 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -52,7 +51,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
 	}
 
     @Override
-	public Part getNewPart() {
+	public JumpJet getNewPart() {
 		return new JumpJet(getUnitTonnage(), type, -1, omniPodded, campaign);
 	}
 

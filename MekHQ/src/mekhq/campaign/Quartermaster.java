@@ -157,18 +157,16 @@ public class Quartermaster {
         AmmoStorage ammoStorage = findSpareAmmo(ammoType);
 
         int shotsRemoved = removeAmmo(ammoStorage, shotsNeeded);
-        shotsNeeded -= shotsRemoved;
 
-        // See if we've still need some more ammo ...
-        if (shotsNeeded > 0) {
-            // ... then check if we can use compatible ammo ...
-            if (getCampaignOptions().useAmmoByType()) {
-                // ... and if so, remove some more from the campaign (if available).
-                shotsRemoved += removeCompatibleAmmo(ammoType, shotsNeeded);
-            }
+        // See if we still need some more ammo ...
+        int shotsRemaining = shotsNeeded - shotsRemoved;
+
+        // ... then check if we can use compatible ammo ...
+        if ((shotsRemaining > 0) && getCampaignOptions().useAmmoByType()) {
+            shotsRemoved += removeCompatibleAmmo(ammoType, shotsRemaining);
         }
 
-        // Inform the caller how many shots we actually removed for them.
+        // Inform the caller how many shots we actually removed for them ...
         return shotsRemoved;
     }
 
@@ -217,7 +215,7 @@ public class Quartermaster {
 
         List<AmmoStorage> compatibleAmmo = findCompatibleSpareAmmo(ammoType);
         for (AmmoStorage compatible : compatibleAmmo) {
-            if (shotsNeeded <= 0) {
+            if (shotsRemoved >= shotsNeeded) {
                 break;
             }
 
@@ -229,19 +227,24 @@ public class Quartermaster {
             }
 
             // Calculate the shots needed in the compatible ammo type ...
-            int compatibleShotsNeeded = convertShots(ammoType, shotsNeeded, compatible.getType());
+            int compatibleShotsNeeded = convertShotsNeeded(ammoType, shotsNeeded, compatible.getType());
 
-            // Try removing that ammo from the compatible ammo storage.
+            // Try removing at least one shot of ammo from the compatible ammo storage.
             int compatibleShotsRemoved = removeAmmo(compatible, compatibleShotsNeeded);
             if (compatibleShotsRemoved > 0) {
                 // If we did remove some ammo, adjust the number of shots we removed and needed
-                int shotsFound = convertShots(compatible.getType(), compatibleShotsRemoved, ammoType);
-                shotsRemoved += shotsFound;
-                shotsNeeded -= shotsFound;
+                shotsRemoved += convertShots(compatible.getType(), compatibleShotsRemoved, ammoType);
             }
         }
 
-        return shotsRemoved;
+        // Check if we removed more than we needed (e.g. we pull LRM20 ammo for an LRM5) ...
+        int unusedShots = shotsRemoved - shotsNeeded;
+        if (unusedShots > 0) {
+            // ... and if we did, return it to the camaign.
+            addAmmo(ammoType, unusedShots);
+        }
+
+        return Math.min(shotsNeeded, shotsRemoved);
     }
 
     /**
@@ -292,11 +295,46 @@ public class Quartermaster {
      * @param to The AmmoType which {@code shots} should be converted to.
      * @return The value of {@code shots} when converted to a specific AmmoType.
      */
-    private static int convertShots(AmmoType from, int shots, AmmoType to) {
-        int rounds = shots * Math.max(from.getRackSize(), 1);
+    public static int convertShots(AmmoType from, int shots, AmmoType to) {
+        if (shots <= 0) {
+            return 0;
+        }
 
-        // Use integer division to 'round down'
-        return rounds / Math.max(to.getRackSize(), 1);
+        int fromRackSize = Math.max(from.getRackSize(), 1);
+        int toRackSize = Math.max(to.getRackSize(), 1);
+        if (fromRackSize == toRackSize) {
+            // Exactly compatible rack sizes
+            return shots;
+        }
+
+        // Convert the shots (rounding down)
+        return (shots * fromRackSize) / toRackSize;
+    }
+
+    /**
+     * Calculates the shots needed when converting from a source ammo to a target ammo.
+     * NB: it is up to the caller to ensure the ammo types are compatible.
+     * @param target The target ammo type.
+     * @param shotsNeeded The number of shots needed in the target ammo type.
+     * @param source The source ammo type.
+     * @return The number of shots needed from the source ammo type.
+     */
+    public static int convertShotsNeeded(AmmoType target, int shotsNeeded, AmmoType source) {
+        if (shotsNeeded <= 0) {
+            return 0;
+        }
+
+        int targetRackSize = Math.max(target.getRackSize(), 1);
+        int sourceRackSize = Math.max(source.getRackSize(), 1);
+        if (targetRackSize == sourceRackSize) {
+            // Exactly compatible rack sizes
+            return shotsNeeded;
+        }
+
+        // Calculate the converted shots needed (rounding up)
+        int convertedShotsNeeded = (shotsNeeded * targetRackSize - 1) / sourceRackSize + 1;
+
+        return convertedShotsNeeded;
     }
 
     /**

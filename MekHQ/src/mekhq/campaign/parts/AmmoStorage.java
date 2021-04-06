@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -35,6 +36,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -114,11 +116,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(@Nullable Part part) {
-        if ((getType() != null) && (part instanceof AmmoStorage)) {
-            return getType().equals(((AmmoStorage) part).getType());
-        }
-
-        return false;
+        return getClass().equals(part.getClass())
+                && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
     /**
@@ -184,7 +183,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public MissingPart getMissingPart() {
+    public MissingEquipmentPart getMissingPart() {
         //nothing to do here
         return null;
     }
