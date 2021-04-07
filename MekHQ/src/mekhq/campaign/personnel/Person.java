@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,51 +19,94 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.Compute;
+import megamek.common.ConvFighter;
+import megamek.common.Crew;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
+import megamek.common.Mech;
+import megamek.common.Protomech;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.VTOL;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
+import mekhq.MekHqConstants;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.ExtraData;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.MedicalLogger;
+import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.Divorce;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.ModifierValue;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.work.IPartWork;
+import mekhq.io.idReferenceClasses.PersonIdReference;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.IntSupplier;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import megamek.client.generator.RandomNameGenerator;
-import megamek.common.*;
-import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
-import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
-import mekhq.campaign.*;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.io.CampaignXmlParser;
-import mekhq.campaign.log.*;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.Ranks;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -123,31 +166,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private boolean tryingToConceive;
     private LocalDate dueDate;
     private LocalDate expectedDueDate;
-
-    private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
-
-    // This creates a random range of approximately six weeks with which to modify the standard pregnancy duration
-    // To create randomized pregnancy duration
-    private static final IntSupplier PREGNANCY_MODIFY_DURATION = () -> {
-        double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
-            * Math.cos(2.0 * Math.PI * Math.random());
-        // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
-        return (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10);
-    };
-
-    private static final IntSupplier PREGNANCY_SIZE = () -> {
-        int children = 1;
-        // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
-        while (Compute.randomInt(50) == 0) {
-            ++ children;
-        }
-        return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
-    };
-
-    private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
-        "twins", "triplets", "quadruplets", "quintuplets",
-        "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
-    };
 
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
@@ -292,6 +310,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -933,7 +952,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     }
 
                     if (Compute.randomFloat() < babyBornChance) {
-                        birth(campaign);
+                        birth(campaign, campaign.getLocalDate());
                     }
                 }
                 MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
@@ -1352,7 +1371,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return tryingToConceive;
     }
 
-    public void setTryingToConceive(boolean tryingToConceive) {
+    public void setTryingToConceive(final boolean tryingToConceive) {
         this.tryingToConceive = tryingToConceive;
     }
 
@@ -1360,7 +1379,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(final LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -1368,13 +1387,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return expectedDueDate;
     }
 
-    public void setExpectedDueDate(LocalDate expectedDueDate) {
+    public void setExpectedDueDate(final LocalDate expectedDueDate) {
         this.expectedDueDate = expectedDueDate;
     }
 
-    public int getPregnancyWeek(LocalDate today) {
+    public int getPregnancyWeek(final LocalDate today) {
         return Math.toIntExact(ChronoUnit.WEEKS.between(getExpectedDueDate()
-                .minus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
+                .minus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
                 .plus(1, ChronoUnit.DAYS), today));
     }
 
@@ -1384,57 +1403,95 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      * This is used to determine if a person can procreate
-     * @param campaign the campaign the person was in
+     * @param today the current date
      * @return true if they can, otherwise false
      */
-    public boolean canProcreate(Campaign campaign) {
+    public boolean canProcreate(final LocalDate today) {
         return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(campaign.getLocalDate()) < 51);
+                && !isChild() && (getAge(today) < 51);
     }
 
-    public void procreate(Campaign campaign) {
-        if (canProcreate(campaign)) {
+    /**
+     * This is used to determine if a person has conceived, and if so add a pregnancy with a
+     * conception date of the current date.
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     */
+    public void procreate(final Campaign campaign, final LocalDate today) {
+        if (canProcreate(today)) {
             boolean conceived = false;
             if (getGenealogy().hasSpouse()) {
                 Person spouse = getGenealogy().getSpouse();
                 if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
                         && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
-                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
+                    conceived = Compute.randomFloat() < campaign.getCampaignOptions().getChanceProcreation();
                 }
             } else if (campaign.getCampaignOptions().useProcreationNoRelationship()) {
                 // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
-                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
+                conceived = Compute.randomFloat() < campaign.getCampaignOptions().getChanceProcreationNoRelationship();
             }
 
             if (conceived) {
-                addPregnancy(campaign);
+                addPregnancy(campaign, today);
             }
         }
     }
 
-    public void addPregnancy(Campaign campaign) {
-        LocalDate dueDate = campaign.getLocalDate();
-        dueDate = dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
-        setExpectedDueDate(dueDate);
-        dueDate = dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
-        setDueDate(dueDate);
+    /**
+     * This method is how a person becomes pregnant. They have their due date set and the size and
+     * parentage of the pregnancy determined.
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     */
+    public void addPregnancy(final Campaign campaign, final LocalDate today) {
+        setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
+        setDueDate(getExpectedDueDate().plus(determinePregnancyVariance(), ChronoUnit.DAYS));
 
-        int size = PREGNANCY_SIZE.getAsInt();
-        extraData.set(PREGNANCY_CHILDREN_DATA, size);
-        extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
+        final int size = determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences());
+        if (size <= 0) {
+            return;
+        }
+        getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
+        getExtraData().set(PREGNANCY_FATHER_DATA, getGenealogy().hasSpouse()
                 ? getGenealogy().getSpouse().getId().toString() : null);
 
-        String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-
-        campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
+        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
+        campaign.addReport(String.format(resources.getString("Person.BabyConceived.report"), getHyperlinkedName(), babyAmount).trim());
         if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
+            MedicalLogger.hasConceived(this, today, babyAmount);
             if (getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(getGenealogy().getSpouse(),
-                        getFullName(), getCampaign().getLocalDate(), sizeString);
+                PersonalLogger.spouseConceived(getGenealogy().getSpouse(), getFullName(), today, babyAmount);
             }
         }
+    }
+
+    /**
+     * This method determines the number of babies a person will give birth to.
+     * @param multiplePregnancyChance the chance to have each baby after the first
+     * @return the number of babies the person will give birth to, limited to decuplets
+     */
+    private int determineNumberOfBabies(final int multiplePregnancyChance) {
+        int children = 1;
+        while ((Compute.randomInt(multiplePregnancyChance) == 0) && (children < 10)) {
+            children++;
+        }
+        return children; // Limited to decuplets, for the sake of sanity
+    }
+
+    /**
+     * This method determines the variance in the duration for a pregnancy, with a Gaussian
+     * distribution of approximately six weeks.
+     *
+     * @return the pregnancy duration variance
+     */
+    private int determinePregnancyVariance() {
+        // This creates a random range of approximately six weeks with which to modify the standard
+        // pregnancy duration to create a randomized pregnancy duration
+        final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random()))
+                * Math.cos(2.0 * Math.PI * Math.random());
+        // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
+        return (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
     }
 
     /**
@@ -1450,8 +1507,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * This method is how a person gives birth to a number of babies and have them added to the campaign
      * @param campaign the campaign to add the baby in question to
+     * @param today today's date
      */
-    public void birth(Campaign campaign) {
+    public void birth(final Campaign campaign, final LocalDate today) {
         // Determine the number of children
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
 
@@ -1466,9 +1524,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ? getPrisonerStatus() : PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
-        if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
+        if (size > 1) {
             campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
-                    PREGNANCY_MULTIPLE_NAMES[size]));
+                    resources.getString("babyAmount.text").split(",")[size - 1]));
         }
 
         // Create Babies
@@ -1478,7 +1536,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, father, baby.getGender());
             baby.setSurname(surname);
-            baby.setBirthday(campaign.getLocalDate());
+            baby.setBirthday(today);
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
@@ -1491,13 +1549,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
             }
 
+            // Founder Tag Assignment
+            if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
+                    && !prisonerStatus.isPrisoner()) {
+                baby.setFounder(true);
+            } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
+                baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
+            }
+
             // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
+                MedicalLogger.deliveredBaby(this, baby, today);
                 if (father != null) {
-                    PersonalLogger.ourChildBorn(father, baby, getFullName(), campaign.getLocalDate());
+                    PersonalLogger.ourChildBorn(father, baby, getFullName(), today);
                 }
             }
         }

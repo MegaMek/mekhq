@@ -1,7 +1,7 @@
 /*
  * MekHqConstants.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,11 @@
 package mekhq;
 
 public final class MekHqConstants {
+    //region General Constants
+    public static final int MAXIMUM_D6_VALUE = 6;
+    public static final int PREGNANCY_STANDARD_DURATION = 280; //standard duration of a pregnancy in days (40 weeks)
+    //endregion General Constants
+
     //region MekHQ Options
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
@@ -77,6 +82,4 @@ public final class MekHqConstants {
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
-
-    public static final int MAXIMUM_D6_VALUE = 6;
 }

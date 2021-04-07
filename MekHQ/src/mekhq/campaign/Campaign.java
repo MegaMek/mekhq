@@ -3248,17 +3248,13 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Procreation
-            if (p.getGender().isFemale()) {
+            if (getCampaignOptions().useProcreation() && p.getGender().isFemale()) {
                 if (p.isPregnant()) {
-                    if (getCampaignOptions().useProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            p.birth(this);
-                        }
-                    } else {
-                        p.removePregnancy();
+                    if (getLocalDate().compareTo((p.getDueDate())) == 0) {
+                        p.birth(this, getLocalDate());
                     }
-                } else if (getCampaignOptions().useProcreation()) {
-                    p.procreate(this);
+                } else {
+                    p.procreate(this, getLocalDate());
                 }
             }
         }

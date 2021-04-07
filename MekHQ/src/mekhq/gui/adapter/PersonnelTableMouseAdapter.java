@@ -142,11 +142,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final ResourceBundle resourceMap;
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
-                                      PersonnelTableModel personnelModel) {
+                                         PersonnelTableModel personnelModel) {
         this.gui = gui;
         this.personnelTable = personnelTable;
         this.personnelModel = personnelModel;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl());
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable,
@@ -496,7 +496,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_PREGNANCY: {
                 if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy(gui.getCampaign());
+                    selectedPerson.addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate());
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
@@ -2686,7 +2686,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected) {
-                if (person.canProcreate(gui.getCampaign())) {
+                if (person.canProcreate(gui.getCampaign().getLocalDate())) {
                     menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);

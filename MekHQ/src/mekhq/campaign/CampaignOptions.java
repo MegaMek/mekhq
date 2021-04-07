@@ -250,10 +250,13 @@ public class CampaignOptions implements Serializable {
     private double chanceProcreation;
     private boolean useProcreationNoRelationship;
     private double chanceProcreationNoRelationship;
+    private int multiplePregnancyOccurrences;
+    private BabySurnameStyle babySurnameStyle;
+    private boolean assignNonPrisonerBabiesFounderTag;
+    private boolean assignChildrenOfFoundersFounderTag;
+    private boolean determineFatherAtBirth;
     private boolean displayTrueDueDate;
     private boolean logConception;
-    private BabySurnameStyle babySurnameStyle;
-    private boolean determineFatherAtBirth;
 
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
@@ -638,10 +641,13 @@ public class CampaignOptions implements Serializable {
         setChanceProcreation(0.0005);
         setUseProcreationNoRelationship(false);
         setChanceProcreationNoRelationship(0.00005);
+        setMultiplePregnancyOccurrences(50); // Hellin's Law is 81, but we make it more common so it shows up more
+        setBabySurnameStyle(BabySurnameStyle.MOTHERS);
+        setAssignNonPrisonerBabiesFounderTag(false);
+        setAssignChildrenOfFoundersFounderTag(false);
+        setDetermineFatherAtBirth(false);
         setDisplayTrueDueDate(false);
         setLogConception(false);
-        setBabySurnameStyle(BabySurnameStyle.MOTHERS);
-        setDetermineFatherAtBirth(false);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -1587,6 +1593,65 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
+     * @return the X occurrences for there to be a single multiple child occurrence (i.e. 1 in X)
+     */
+    public int getMultiplePregnancyOccurrences() {
+        return multiplePregnancyOccurrences;
+    }
+
+    /**
+     * @param multiplePregnancyOccurrences the number of occurrences for there to be a single
+     *                                     occurrence of a multiple child pregnancy (i.e. 1 in X)
+     */
+    public void setMultiplePregnancyOccurrences(final int multiplePregnancyOccurrences) {
+        this.multiplePregnancyOccurrences = multiplePregnancyOccurrences;
+    }
+
+    /**
+     * @return what style of surname to use for a baby
+     */
+    public BabySurnameStyle getBabySurnameStyle() {
+        return babySurnameStyle;
+    }
+
+    /**
+     * @param babySurnameStyle the style of surname to use for a baby
+     */
+    public void setBabySurnameStyle(final BabySurnameStyle babySurnameStyle) {
+        this.babySurnameStyle = babySurnameStyle;
+    }
+
+    public boolean isAssignNonPrisonerBabiesFounderTag() {
+        return assignNonPrisonerBabiesFounderTag;
+    }
+
+    public void setAssignNonPrisonerBabiesFounderTag(final boolean assignNonPrisonerBabiesFounderTag) {
+        this.assignNonPrisonerBabiesFounderTag = assignNonPrisonerBabiesFounderTag;
+    }
+
+    public boolean isAssignChildrenOfFoundersFounderTag() {
+        return assignChildrenOfFoundersFounderTag;
+    }
+
+    public void setAssignChildrenOfFoundersFounderTag(final boolean assignChildrenOfFoundersFounderTag) {
+        this.assignChildrenOfFoundersFounderTag = assignChildrenOfFoundersFounderTag;
+    }
+
+    /**
+     * @return whether or not to determine the father at birth instead of at conception
+     */
+    public boolean determineFatherAtBirth() {
+        return determineFatherAtBirth;
+    }
+
+    /**
+     * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
+     */
+    public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
+        this.determineFatherAtBirth = determineFatherAtBirth;
+    }
+
+    /**
      * @return whether to show the expected or actual due date for personnel
      */
     public boolean getDisplayTrueDueDate() {
@@ -1612,34 +1677,6 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogConception(final boolean logConception) {
         this.logConception = logConception;
-    }
-
-    /**
-     * @return what style of surname to use for a baby
-     */
-    public BabySurnameStyle getBabySurnameStyle() {
-        return babySurnameStyle;
-    }
-
-    /**
-     * @param babySurnameStyle the style of surname to use for a baby
-     */
-    public void setBabySurnameStyle(final BabySurnameStyle babySurnameStyle) {
-        this.babySurnameStyle = babySurnameStyle;
-    }
-
-    /**
-     * @return whether or not to determine the father at birth instead of at conception
-     */
-    public boolean determineFatherAtBirth() {
-        return determineFatherAtBirth;
-    }
-
-    /**
-     * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
-     */
-    public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
-        this.determineFatherAtBirth = determineFatherAtBirth;
     }
     //endregion Procreation
 
@@ -3234,10 +3271,13 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreation", getChanceProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreationNoRelationship", useProcreationNoRelationship());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logConception", logConception());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
         //endregion Procreation
 
         //region Death
@@ -3754,14 +3794,20 @@ public class CampaignOptions implements Serializable {
                 retVal.setUseProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("multiplePregnancyOccurrences")) {
+                retVal.setMultiplePregnancyOccurrences(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
+                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignNonPrisonerBabiesFounderTag")) {
+                retVal.setAssignNonPrisonerBabiesFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignChildrenOfFoundersFounderTag")) {
+                retVal.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
+                retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
                 retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.setLogConception(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
-                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
-                retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             //endregion Procreation
 
             //region Death

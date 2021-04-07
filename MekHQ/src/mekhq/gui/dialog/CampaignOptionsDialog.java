@@ -292,10 +292,13 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseProcreationNoRelationship;
     private JSpinner spnChanceProcreationNoRelationship;
+    private JSpinner spnMultiplePregnancyOccurrences;
+    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
+    private JCheckBox chkAssignChildrenOfFoundersFounderTag;
+    private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
-    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
-    private JCheckBox chkDetermineFatherAtBirth;
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -4629,6 +4632,8 @@ public class CampaignOptionsDialog extends JDialog {
         // Initialize Labels Used in ActionListeners
         JLabel lblChanceProcreation = new JLabel();
         JLabel lblChanceProcreationNoRelationship = new JLabel();
+        JLabel lblMultiplePregnancyOccurrences = new JLabel();
+        JLabel lblMultiplePregnancyOccurrencesEnd = new JLabel();
         JLabel lblBabySurnameStyle = new JLabel();
 
         // Create Panel Components
@@ -4642,11 +4647,16 @@ public class CampaignOptionsDialog extends JDialog {
             chkUseProcreationNoRelationship.setEnabled(selected);
             lblChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
             spnChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
-            chkDisplayTrueDueDate.setEnabled(selected);
-            chkLogConception.setEnabled(selected);
+            lblMultiplePregnancyOccurrences.setEnabled(selected);
+            spnMultiplePregnancyOccurrences.setEnabled(selected);
+            lblMultiplePregnancyOccurrencesEnd.setEnabled(selected);
             lblBabySurnameStyle.setEnabled(selected);
             comboBabySurnameStyle.setEnabled(selected);
+            chkAssignNonPrisonerBabiesFounderTag.setEnabled(selected);
+            chkAssignChildrenOfFoundersFounderTag.setEnabled(selected);
             chkDetermineFatherAtBirth.setEnabled(selected);
+            chkDisplayTrueDueDate.setEnabled(selected);
+            chkLogConception.setEnabled(selected);
         });
 
         lblChanceProcreation.setText(resources.getString("lblChanceProcreation.text"));
@@ -4674,19 +4684,24 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceProcreationNoRelationship.setToolTipText(resources.getString("lblChanceProcreationNoRelationship.toolTipText"));
         spnChanceProcreationNoRelationship.setName("spnChanceProcreationNoRelationship");
 
-        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
-        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
-        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+        lblMultiplePregnancyOccurrences.setText(resources.getString("lblMultiplePregnancyOccurrences.text"));
+        lblMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrences.setName("lblMultiplePregnancyOccurrences");
 
-        chkLogConception = new JCheckBox(resources.getString("chkLogConception.text"));
-        chkLogConception.setToolTipText(resources.getString("chkLogConception.toolTipText"));
-        chkLogConception.setName("chkLogConception");
+        spnMultiplePregnancyOccurrences = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        spnMultiplePregnancyOccurrences.setName("spnMultiplePregnancyOccurrences");
+
+        lblMultiplePregnancyOccurrencesEnd.setText(resources.getString("lblMultiplePregnancyOccurrencesEnd.text"));
+        lblMultiplePregnancyOccurrencesEnd.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrencesEnd.setName("lblMultiplePregnancyOccurrencesEnd");
 
         lblBabySurnameStyle.setText(resources.getString("lblBabySurnameStyle.text"));
         lblBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         lblBabySurnameStyle.setName("lblBabySurnameStyle");
 
         comboBabySurnameStyle = new JComboBox<>(BabySurnameStyle.values());
+        comboBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         comboBabySurnameStyle.setName("comboBabySurnameStyle");
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -4701,9 +4716,25 @@ public class CampaignOptionsDialog extends JDialog {
             }
         });
 
+        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox(resources.getString("chkAssignNonPrisonerBabiesFounderTag.text"));
+        chkAssignNonPrisonerBabiesFounderTag.setToolTipText(resources.getString("chkAssignNonPrisonerBabiesFounderTag.toolTipText"));
+        chkAssignNonPrisonerBabiesFounderTag.setName("chkAssignNonPrisonerBabiesFounderTag");
+
+        chkAssignChildrenOfFoundersFounderTag = new JCheckBox(resources.getString("chkAssignChildrenOfFoundersFounderTag.text"));
+        chkAssignChildrenOfFoundersFounderTag.setToolTipText(resources.getString("chkAssignChildrenOfFoundersFounderTag.toolTipText"));
+        chkAssignChildrenOfFoundersFounderTag.setName("chkAssignChildrenOfFoundersFounderTag");
+
         chkDetermineFatherAtBirth = new JCheckBox(resources.getString("chkDetermineFatherAtBirth.text"));
         chkDetermineFatherAtBirth.setToolTipText(resources.getString("chkDetermineFatherAtBirth.toolTipText"));
         chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
+
+        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
+        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
+        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+
+        chkLogConception = new JCheckBox(resources.getString("chkLogConception.text"));
+        chkLogConception.setToolTipText(resources.getString("chkLogConception.toolTipText"));
+        chkLogConception.setName("chkLogConception");
 
         // Programmatically Assign Accessibility Labels
         lblChanceProcreation.setLabelFor(spnChanceProcreation);
@@ -4734,12 +4765,18 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblChanceProcreationNoRelationship)
                                 .addComponent(spnChanceProcreationNoRelationship, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogConception)
         );
 
         layout.setHorizontalGroup(
@@ -4752,12 +4789,18 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblChanceProcreationNoRelationship)
                                 .addComponent(spnChanceProcreationNoRelationship))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogConception)
         );
 
         return panel;
@@ -5027,10 +5070,13 @@ public class CampaignOptionsDialog extends JDialog {
             chkUseProcreationNoRelationship.doClick();
         }
         spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
+        spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
+        chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
+        chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
+        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
         chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
         chkLogConception.setSelected(options.logConception());
-        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
-        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
 
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
@@ -5640,10 +5686,13 @@ public class CampaignOptionsDialog extends JDialog {
         options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
         options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
+        options.setMultiplePregnancyOccurrences((Integer) spnMultiplePregnancyOccurrences.getValue());
+        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
+        options.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());
+        options.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
+        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
-        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
-        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
 
         // Death
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());

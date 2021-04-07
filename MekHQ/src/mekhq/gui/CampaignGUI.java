@@ -1414,6 +1414,12 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        // Remove Pregnancies if they are disabled
+        if (!getCampaign().getCampaignOptions().useProcreation()) {
+            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
+                    .forEach(Person::removePregnancy);
+        }
+
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB(false);
