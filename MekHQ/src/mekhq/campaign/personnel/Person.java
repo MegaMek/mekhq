@@ -1446,7 +1446,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today) {
         setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        setDueDate(getExpectedDueDate().plus(determinePregnancyVariance(), ChronoUnit.DAYS));
+        setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
 
         final int size = determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences());
         if (size <= 0) {
@@ -1476,22 +1476,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
         while ((Compute.randomInt(multiplePregnancyChance) == 0) && (children < 10)) {
             children++;
         }
-        return children; // Limited to decuplets, for the sake of sanity
+        return children;
     }
 
     /**
-     * This method determines the variance in the duration for a pregnancy, with a Gaussian
-     * distribution of approximately six weeks.
+     * This method determines the duration for a pregnancy, with a variance determined through a
+     * Gaussian distribution with a maximum spread of approximately six weeks.
      *
-     * @return the pregnancy duration variance
+     * TODO : Swap me to instead use a distribution function that generates an overall length,
+     * TODO : Including pre-term and post-term births
+     *
+     * @return the pregnancy duration
      */
-    private int determinePregnancyVariance() {
+    private int determinePregnancyDuration() {
         // This creates a random range of approximately six weeks with which to modify the standard
         // pregnancy duration to create a randomized pregnancy duration
         final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random()))
                 * Math.cos(2.0 * Math.PI * Math.random());
-        // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
-        return (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
+        // To not get weird results, we limit the variance to +/- 4.0 (almost 6 weeks). A base
+        // length of 268 creates a solid enough duration for now.
+        return 268 + (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
     }
 
     /**

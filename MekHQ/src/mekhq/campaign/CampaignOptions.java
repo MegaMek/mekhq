@@ -641,7 +641,7 @@ public class CampaignOptions implements Serializable {
         setChanceProcreation(0.0005);
         setUseProcreationNoRelationship(false);
         setChanceProcreationNoRelationship(0.00005);
-        setMultiplePregnancyOccurrences(50); // Hellin's Law is 81, but we make it more common so it shows up more
+        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
