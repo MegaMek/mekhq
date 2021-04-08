@@ -155,7 +155,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
     /**
      * Adds the elements to the current model, sorted based on the declared sorting method. This
-     * is identical to {@link #addAll(int, Collection)}, as we ignore the latter parameter in
+     * is identical to {@link #addAll(int, Collection)}, as we ignore the first parameter in
      * that method.
      *
      * @param elements the elements to add
@@ -183,7 +183,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * This is used to clear and then set all elements based on a new input collection of elements,
      * retaining the selected item if possible, but otherwise reverting to a selected index of 0.
      *
-     * @param elements the elements to replace the current elements with
+     * @param elements the elements to replace the current elements with, which may be null to remove
+     *                 all elements, although this is not recommended.
      */
     @SuppressWarnings(value = "unchecked")
     public void setElements(final @Nullable Collection<E> elements) {
@@ -200,7 +201,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
         if ((selectedElement != null) && elements.contains(selectedElement)) {
             setSelectedItem(selectedElement);
-        } else {
+        } else if (elements.size() > 0) {
             setSelectedItem(getElementAt(0));
         }
     }
