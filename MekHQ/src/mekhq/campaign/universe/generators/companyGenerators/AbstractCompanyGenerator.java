@@ -72,6 +72,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Startup:
@@ -97,7 +98,6 @@ import java.util.stream.Collectors;
  *      Implement:
  *          centerPlanet
  *          selectStartingContract
- *          All of the Surprises
  *          Finish Finances
  *
  * FIXME :
@@ -261,8 +261,8 @@ public abstract class AbstractCompanyGenerator {
         if (getOptions().isAssignBestOfficers()) {
             personnelSorter = personnelSorter.thenComparingInt(t -> t.getPerson().getExperienceLevel(false))
                     .reversed()
-                    .thenComparingInt(t -> t.getPerson().getSkillLevel(SkillType.S_LEADER)
-                            + t.getPerson().getSkillLevel(SkillType.S_STRATEGY) + t.getPerson().getSkillLevel(SkillType.S_TACTICS))
+                    .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
+                            .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
                     .reversed();
         }
         trackers.sort(personnelSorter);
@@ -655,13 +655,8 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<AtBRandomMechParameters> createUnitGenerationParameters(
             final List<CompanyGenerationPersonTracker> trackers) {
-        final List<AtBRandomMechParameters> parameters = new ArrayList<>();
-        trackers.forEach(tracker -> {
-            if (tracker.getPersonType().isCombat()) {
-                parameters.add(createUnitGenerationParameter(tracker));
-            }
-        });
-        return parameters;
+        return trackers.stream().filter(tracker -> tracker.getPersonType().isCombat())
+                .map(this::createUnitGenerationParameter).collect(Collectors.toList());
     }
 
     /**

@@ -34,6 +34,7 @@ import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.JDisableablePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,10 +78,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JCheckBox chkAssignBestOfficers;
     private JCheckBox chkAutomaticallyAssignRanks;
     private JCheckBox chkAssignFounderFlag;
-    private JCheckBox chkRunStartingSimulation;
-    private JSpinner spnSimulationDuration;
-    private JCheckBox chkSimulateRandomMarriages;
-    private JCheckBox chkSimulateRandomProcreation;
 
     // Personnel Randomization
     private JCheckBox chkRandomizeOrigin;
@@ -91,6 +88,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JSpinner spnOriginSearchRadius;
     private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
+
+    // Starting Simulation
+    private JCheckBox chkRunStartingSimulation;
+    private JSpinner spnSimulationDuration;
+    private JCheckBox chkSimulateRandomMarriages;
+    private JCheckBox chkSimulateRandomProcreation;
 
     // Units
     private JCheckBox chkGenerateUnitsAsAttached;
@@ -385,38 +388,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     public void setChkAssignFounderFlag(final JCheckBox chkAssignFounderFlag) {
         this.chkAssignFounderFlag = chkAssignFounderFlag;
     }
-
-    public JCheckBox getChkRunStartingSimulation() {
-        return chkRunStartingSimulation;
-    }
-
-    public void setChkRunStartingSimulation(final JCheckBox chkRunStartingSimulation) {
-        this.chkRunStartingSimulation = chkRunStartingSimulation;
-    }
-
-    public JSpinner getSpnSimulationDuration() {
-        return spnSimulationDuration;
-    }
-
-    public void setSpnSimulationDuration(final JSpinner spnSimulationDuration) {
-        this.spnSimulationDuration = spnSimulationDuration;
-    }
-
-    public JCheckBox getChkSimulateRandomMarriages() {
-        return chkSimulateRandomMarriages;
-    }
-
-    public void setChkSimulateRandomMarriages(final JCheckBox chkSimulateRandomMarriages) {
-        this.chkSimulateRandomMarriages = chkSimulateRandomMarriages;
-    }
-
-    public JCheckBox getChkSimulateRandomProcreation() {
-        return chkSimulateRandomProcreation;
-    }
-
-    public void setChkSimulateRandomProcreation(final JCheckBox chkSimulateRandomProcreation) {
-        this.chkSimulateRandomProcreation = chkSimulateRandomProcreation;
-    }
     //endregion Personnel
 
     //region Personnel Randomization
@@ -509,6 +480,40 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.spnOriginDistanceScale = spnOriginDistanceScale;
     }
     //endregion Personnel Randomization
+
+    //region Starting Simulation
+    public JCheckBox getChkRunStartingSimulation() {
+        return chkRunStartingSimulation;
+    }
+
+    public void setChkRunStartingSimulation(final JCheckBox chkRunStartingSimulation) {
+        this.chkRunStartingSimulation = chkRunStartingSimulation;
+    }
+
+    public JSpinner getSpnSimulationDuration() {
+        return spnSimulationDuration;
+    }
+
+    public void setSpnSimulationDuration(final JSpinner spnSimulationDuration) {
+        this.spnSimulationDuration = spnSimulationDuration;
+    }
+
+    public JCheckBox getChkSimulateRandomMarriages() {
+        return chkSimulateRandomMarriages;
+    }
+
+    public void setChkSimulateRandomMarriages(final JCheckBox chkSimulateRandomMarriages) {
+        this.chkSimulateRandomMarriages = chkSimulateRandomMarriages;
+    }
+
+    public JCheckBox getChkSimulateRandomProcreation() {
+        return chkSimulateRandomProcreation;
+    }
+
+    public void setChkSimulateRandomProcreation(final JCheckBox chkSimulateRandomProcreation) {
+        this.chkSimulateRandomProcreation = chkSimulateRandomProcreation;
+    }
+    //endregion Starting Simulation
 
     //region Units
     public JCheckBox getChkGenerateUnitsAsAttached() {
@@ -814,33 +819,36 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
+        add(createStartingSimulationPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         add(createUnitsPanel(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridx++;
         add(createUnitPanel(), gbc);
 
-        gbc.gridx++;
+        gbc.gridx = 0;
+        gbc.gridy++;
         add(createSparesPanel(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridx++;
         add(createContractsPanel(), gbc);
 
-        gbc.gridx++;
-        add(createFinancesPanel(), gbc);
-
         gbc.gridx = 0;
         gbc.gridy++;
+        add(createFinancesPanel(), gbc);
+
+        gbc.gridx++;
         add(createSurprisesPanel(), gbc);
     }
 
     private JPanel createBaseInformationPanel() {
         // Initialize Labels Used in ActionListeners
-        JLabel lblStartingPlanet = new JLabel();
+        final JLabel lblStartingPlanet = new JLabel();
 
         // Create Panel Components
-        JLabel lblCompanyGenerationMethod = new JLabel(resources.getString("lblCompanyGenerationMethod.text"));
+        final JLabel lblCompanyGenerationMethod = new JLabel(resources.getString("lblCompanyGenerationMethod.text"));
         lblCompanyGenerationMethod.setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
         lblCompanyGenerationMethod.setName("lblCompanyGenerationMethod");
 
@@ -859,7 +867,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             }
         });
 
-        JLabel lblFaction = new JLabel(resources.getString("Faction.text"));
+        final JLabel lblFaction = new JLabel(resources.getString("Faction.text"));
         lblFaction.setToolTipText(resources.getString("lblFaction.toolTipText"));
         lblFaction.setName("lblFaction");
 
@@ -954,7 +962,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkGenerateMercenaryCompanyCommandLance().setToolTipText(resources.getString("chkGenerateMercenaryCompanyCommandLance.toolTipText"));
         getChkGenerateMercenaryCompanyCommandLance().setName("chkGenerateMercenaryCompanyCommandLance");
 
-        JLabel lblCompanyCount = new JLabel(resources.getString("lblCompanyCount.text"));
+        final JLabel lblCompanyCount = new JLabel(resources.getString("lblCompanyCount.text"));
         lblCompanyCount.setToolTipText(resources.getString("lblCompanyCount.toolTipText"));
         lblCompanyCount.setName("lblCompanyCount");
 
@@ -962,7 +970,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnCompanyCount().setToolTipText(resources.getString("lblCompanyCount.toolTipText"));
         getSpnCompanyCount().setName("spnCompanyCount");
 
-        JLabel lblIndividualLanceCount = new JLabel(resources.getString("lblIndividualLanceCount.text"));
+        final JLabel lblIndividualLanceCount = new JLabel(resources.getString("lblIndividualLanceCount.text"));
         lblIndividualLanceCount.setToolTipText(resources.getString("lblIndividualLanceCount.toolTipText"));
         lblIndividualLanceCount.setName("lblIndividualLanceCount");
 
@@ -970,7 +978,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnIndividualLanceCount().setToolTipText(resources.getString("lblIndividualLanceCount.toolTipText"));
         getSpnIndividualLanceCount().setName("spnIndividualLanceCount");
 
-        JLabel lblLancesPerCompany = new JLabel(resources.getString("lblLancesPerCompany.text"));
+        final JLabel lblLancesPerCompany = new JLabel(resources.getString("lblLancesPerCompany.text"));
         lblLancesPerCompany.setToolTipText(resources.getString("lblLancesPerCompany.toolTipText"));
         lblLancesPerCompany.setName("lblLancesPerCompany");
 
@@ -978,7 +986,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnLancesPerCompany().setToolTipText(resources.getString("lblLancesPerCompany.toolTipText"));
         getSpnLancesPerCompany().setName("spnLancesPerCompany");
 
-        JLabel lblLanceSize = new JLabel(resources.getString("lblLanceSize.text"));
+        final JLabel lblLanceSize = new JLabel(resources.getString("lblLanceSize.text"));
         lblLanceSize.setToolTipText(resources.getString("lblLanceSize.toolTipText"));
         lblLanceSize.setName("lblLanceSize");
 
@@ -986,7 +994,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnLanceSize().setToolTipText(resources.getString("lblLanceSize.toolTipText"));
         getSpnLanceSize().setName("spnLanceSize");
 
-        JLabel lblStarLeagueYear = new JLabel(resources.getString("lblStarLeagueYear.text"));
+        final JLabel lblStarLeagueYear = new JLabel(resources.getString("lblStarLeagueYear.text"));
         lblStarLeagueYear.setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
         lblStarLeagueYear.setName("lblStarLeagueYear");
 
@@ -1010,10 +1018,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkSpecifyStartingSystem().doClick();
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("baseInformationPanel.title")));
         panel.setName("baseInformationPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1080,20 +1088,18 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                                 .addComponent(lblStarLeagueYear)
                                 .addComponent(getSpnStarLeagueYear()))
         );
+
         return panel;
     }
 
     private JPanel createPersonnelPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblSimulationDuration = new JLabel();
-
         // Create Panel Components
         setLblTotalSupportPersonnel(new JLabel());
         updateLblTotalSupportPersonnel(0);
         getLblTotalSupportPersonnel().setToolTipText(resources.getString("lblTotalSupportPersonnel.toolTipText"));
         getLblTotalSupportPersonnel().setName("lblTotalSupportPersonnel");
 
-        JPanel supportPersonnelNumbersPanel = createSupportPersonnelNumbersPanel();
+        final JPanel supportPersonnelNumbersPanel = createSupportPersonnelNumbersPanel();
 
         setChkPoolAssistants(new JCheckBox(resources.getString("chkPoolAssistants.text")));
         getChkPoolAssistants().setToolTipText(resources.getString("chkPoolAssistants.toolTipText"));
@@ -1123,45 +1129,11 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkAssignFounderFlag().setToolTipText(resources.getString("chkAssignFounderFlag.toolTipText"));
         getChkAssignFounderFlag().setName("chkAssignFounderFlag");
 
-        setChkRunStartingSimulation(new JCheckBox(resources.getString("chkRunStartingSimulation.text")));
-        getChkRunStartingSimulation().setToolTipText(resources.getString("chkRunStartingSimulation.toolTipText"));
-        getChkRunStartingSimulation().setName("chkRunStartingSimulation");
-        getChkRunStartingSimulation().addActionListener(evt -> {
-            final boolean selected = getChkRunStartingSimulation().isSelected();
-            lblSimulationDuration.setEnabled(selected);
-            getSpnSimulationDuration().setEnabled(selected);
-            getChkSimulateRandomMarriages().setEnabled(selected);
-            getChkSimulateRandomProcreation().setEnabled(selected);
-        });
-
-        lblSimulationDuration.setText(resources.getString("lblSimulationDuration.text"));
-        lblSimulationDuration.setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
-        lblSimulationDuration.setName("lblSimulationDuration");
-
-        setSpnSimulationDuration(new JSpinner(new SpinnerNumberModel(0, 0, 25, 1)));
-        getSpnSimulationDuration().setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
-        getSpnSimulationDuration().setName("spnSimulationDuration");
-
-        setChkSimulateRandomMarriages(new JCheckBox(resources.getString("chkSimulateRandomMarriages.text")));
-        getChkSimulateRandomMarriages().setToolTipText(resources.getString("chkSimulateRandomMarriages.toolTipText"));
-        getChkSimulateRandomMarriages().setName("chkSimulateRandomMarriages");
-
-        setChkSimulateRandomProcreation(new JCheckBox(resources.getString("chkSimulateRandomProcreation.text")));
-        getChkSimulateRandomProcreation().setToolTipText(resources.getString("chkSimulateRandomProcreation.toolTipText"));
-        getChkSimulateRandomProcreation().setName("chkSimulateRandomProcreation");
-
-        // Programmatically Assign Accessibility Labels
-        lblSimulationDuration.setLabelFor(getSpnSimulationDuration());
-
-        // Disable Panel Portions by Default
-        getChkRunStartingSimulation().setSelected(true);
-        getChkRunStartingSimulation().doClick();
-
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelPanel.title")));
         panel.setName("personnelPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1178,12 +1150,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
                         .addComponent(getChkAssignFounderFlag())
-                        .addComponent(getChkRunStartingSimulation())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblSimulationDuration)
-                                .addComponent(getSpnSimulationDuration(), GroupLayout.Alignment.LEADING))
-                        .addComponent(getChkSimulateRandomMarriages())
-                        .addComponent(getChkSimulateRandomProcreation())
         );
 
         layout.setHorizontalGroup(
@@ -1197,14 +1163,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
                         .addComponent(getChkAssignFounderFlag())
-                        .addComponent(getChkRunStartingSimulation())
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblSimulationDuration)
-                                .addComponent(getSpnSimulationDuration()))
-                        .addComponent(getChkSimulateRandomMarriages())
-                        .addComponent(getChkSimulateRandomProcreation())
         );
-
 
         return panel;
     }
@@ -1307,7 +1266,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         setSpnSupportPersonnelNumbers(rtsArray);
 
         // Layout the UI
-        JPanel panel = new JPanel(new GridLayout(6, 3));
+        final JPanel panel = new JPanel(new GridLayout(6, 3));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("supportPersonnelNumbersPanel.title")));
         panel.setName("supportPersonnelNumbersPanel");
 
@@ -1334,9 +1293,9 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     private JPanel createPersonnelRandomizationPanel() {
         // Initialize Labels Used in ActionListeners
-        JLabel lblCentralPlanet = new JLabel();
-        JLabel lblOriginSearchRadius = new JLabel();
-        JLabel lblOriginDistanceScale = new JLabel();
+        final JLabel lblCentralPlanet = new JLabel();
+        final JLabel lblOriginSearchRadius = new JLabel();
+        final JLabel lblOriginDistanceScale = new JLabel();
 
         // Create Panel Components
         setChkRandomizeOrigin(new JCheckBox(resources.getString("chkRandomizeOrigin.text")));
@@ -1450,10 +1409,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkRandomizeOrigin().doClick();
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
         panel.setName("personnelRandomizationPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1496,6 +1455,79 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(getSpnOriginDistanceScale()))
         );
+
+        return panel;
+    }
+
+    private JPanel createStartingSimulationPanel() {
+        // Initialize Labels Used in ActionListeners
+        final JLabel lblSimulationDuration = new JLabel();
+
+        // Create Panel Components
+        setChkRunStartingSimulation(new JCheckBox(resources.getString("chkRunStartingSimulation.text")));
+        getChkRunStartingSimulation().setToolTipText(resources.getString("chkRunStartingSimulation.toolTipText"));
+        getChkRunStartingSimulation().setName("chkRunStartingSimulation");
+        getChkRunStartingSimulation().addActionListener(evt -> {
+            final boolean selected = getChkRunStartingSimulation().isSelected();
+            lblSimulationDuration.setEnabled(selected);
+            getSpnSimulationDuration().setEnabled(selected);
+            getChkSimulateRandomMarriages().setEnabled(selected);
+            getChkSimulateRandomProcreation().setEnabled(selected);
+        });
+
+        lblSimulationDuration.setText(resources.getString("lblSimulationDuration.text"));
+        lblSimulationDuration.setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
+        lblSimulationDuration.setName("lblSimulationDuration");
+
+        setSpnSimulationDuration(new JSpinner(new SpinnerNumberModel(0, 0, 25, 1)));
+        getSpnSimulationDuration().setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
+        getSpnSimulationDuration().setName("spnSimulationDuration");
+
+        setChkSimulateRandomMarriages(new JCheckBox(resources.getString("chkSimulateRandomMarriages.text")));
+        getChkSimulateRandomMarriages().setToolTipText(resources.getString("chkSimulateRandomMarriages.toolTipText"));
+        getChkSimulateRandomMarriages().setName("chkSimulateRandomMarriages");
+
+        setChkSimulateRandomProcreation(new JCheckBox(resources.getString("chkSimulateRandomProcreation.text")));
+        getChkSimulateRandomProcreation().setToolTipText(resources.getString("chkSimulateRandomProcreation.toolTipText"));
+        getChkSimulateRandomProcreation().setName("chkSimulateRandomProcreation");
+
+        // Programmatically Assign Accessibility Labels
+        lblSimulationDuration.setLabelFor(getSpnSimulationDuration());
+
+        // Disable Panel Portions by Default
+        getChkRunStartingSimulation().setSelected(true);
+        getChkRunStartingSimulation().doClick();
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("startingSimulationPanel.title")));
+        panel.setName("startingSimulationPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(getChkRunStartingSimulation())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblSimulationDuration)
+                                .addComponent(getSpnSimulationDuration(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkSimulateRandomMarriages())
+                        .addComponent(getChkSimulateRandomProcreation())
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(getChkRunStartingSimulation())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSimulationDuration)
+                                .addComponent(getSpnSimulationDuration()))
+                        .addComponent(getChkSimulateRandomMarriages())
+                        .addComponent(getChkSimulateRandomProcreation())
+        );
+
         return panel;
     }
 
@@ -1621,8 +1653,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     private JPanel createSparesPanel() {
         // Initialize Labels Used in ActionListeners
-        JLabel lblSparesPercentOfActiveUnits = new JLabel();
-        JLabel lblNumberReloadsPerWeapon = new JLabel();
+        final JLabel lblSparesPercentOfActiveUnits = new JLabel();
+        final JLabel lblNumberReloadsPerWeapon = new JLabel();
 
         // Create Panel Components
         setChkGenerateMothballedSpareUnits(new JCheckBox(resources.getString("chkGenerateMothballedSpareUnits.text")));
@@ -1642,7 +1674,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnSparesPercentOfActiveUnits().setToolTipText(resources.getString("chkGenerateMothballedSpareUnits.toolTipText"));
         getSpnSparesPercentOfActiveUnits().setName("spnGenerateMothballedSpareUnits");
 
-        JLabel lblPartGenerationMethod = new JLabel(resources.getString("lblPartGenerationMethod.text"));
+        final JLabel lblPartGenerationMethod = new JLabel(resources.getString("lblPartGenerationMethod.text"));
         lblPartGenerationMethod.setToolTipText(resources.getString("lblPartGenerationMethod.toolTipText"));
         lblPartGenerationMethod.setName("lblPartGenerationMethod");
 
@@ -1662,7 +1694,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             }
         });
 
-        JLabel lblStartingArmourWeight = new JLabel(resources.getString("lblStartingArmourWeight.text"));
+        final JLabel lblStartingArmourWeight = new JLabel(resources.getString("lblStartingArmourWeight.text"));
         lblStartingArmourWeight.setToolTipText(resources.getString("lblStartingArmourWeight.toolTipText"));
         lblStartingArmourWeight.setName("lblStartingArmourWeight");
 
@@ -1705,10 +1737,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkGenerateSpareAmmunition().doClick();
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("sparesPanel.title")));
         panel.setName("sparesPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1751,6 +1783,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                                 .addComponent(getSpnNumberReloadsPerWeapon()))
                         .addComponent(getChkGenerateFractionalMachineGunAmmunition())
         );
+
         return panel;
     }
 
@@ -1773,10 +1806,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkSelectStartingContract().doClick();
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("contractsPanel.title")));
         panel.setName("contractsPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1793,15 +1826,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkSelectStartingContract())
                         .addComponent(getChkStartCourseToContractPlanet())
         );
+
         return panel;
     }
 
     private JPanel createFinancesPanel() {
         // Initialize Labels Used in ActionListeners
-        JLabel lblRandomStartingCashDiceCount = new JLabel();
+        final JLabel lblRandomStartingCashDiceCount = new JLabel();
 
         // Create Panel Components
-        JLabel lblStartingCash = new JLabel(resources.getString("lblStartingCash.text"));
+        final JLabel lblStartingCash = new JLabel(resources.getString("lblStartingCash.text"));
         lblStartingCash.setToolTipText(resources.getString("lblStartingCash.toolTipText"));
         lblStartingCash.setName("lblStartingCash");
 
@@ -1828,7 +1862,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnRandomStartingCashDiceCount().setToolTipText(resources.getString("lblRandomStartingCashDiceCount.toolTipText"));
         getSpnRandomStartingCashDiceCount().setName("spnRandomStartingCashDiceCount");
 
-        JLabel lblMinimumStartingFloat = new JLabel(resources.getString("lblMinimumStartingFloat.text"));
+        final JLabel lblMinimumStartingFloat = new JLabel(resources.getString("lblMinimumStartingFloat.text"));
         lblMinimumStartingFloat.setToolTipText(resources.getString("lblMinimumStartingFloat.toolTipText"));
         lblMinimumStartingFloat.setName("lblMinimumStartingFloat");
 
@@ -1883,10 +1917,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkRandomizeStartingCash().doClick();
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financesPanel.title")));
         panel.setName("financesPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1933,12 +1967,13 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkPayForArmour())
                         .addComponent(getChkPayForAmmunition())
         );
+
         return panel;
     }
 
     private JPanel createSurprisesPanel() {
         // Initialize Components Used in ActionListeners
-        final JPanel mysteryBoxPanel = new JPanel();
+        final JPanel mysteryBoxPanel = new JDisableablePanel("mysteryBoxPanel");
 
         // Create Panel Components
         setChkGenerateSurprises(new JCheckBox(resources.getString("chkGenerateSurprises.text")));
@@ -1946,34 +1981,28 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkGenerateSurprises().setName("chkGenerateSurprises");
         getChkGenerateSurprises().addActionListener(evt -> {
             final boolean selected = getChkGenerateSurprises().isSelected();
-            mysteryBoxPanel.setEnabled(selected);
-            if (getChkGenerateMysteryBoxes().isSelected()) {
-                getChkGenerateMysteryBoxes().setEnabled(true);
-                if (selected) {
-                    getChkGenerateMysteryBoxes().setSelected(false);
-                    getChkGenerateMysteryBoxes().doClick();
-                } else {
-                    getChkGenerateMysteryBoxes().doClick();
-                    getChkGenerateMysteryBoxes().setSelected(true);
-                }
-            }
             getChkGenerateMysteryBoxes().setEnabled(selected);
+            mysteryBoxPanel.setEnabled(selected && getChkGenerateMysteryBoxes().isSelected());
         });
+
+        setChkGenerateMysteryBoxes(new JCheckBox(resources.getString("chkGenerateMysteryBoxes.text")));
+        getChkGenerateMysteryBoxes().setToolTipText(resources.getString("chkGenerateMysteryBoxes.toolTipText"));
+        getChkGenerateMysteryBoxes().setName("chkGenerateMysteryBoxes");
+        getChkGenerateMysteryBoxes().addActionListener(evt -> mysteryBoxPanel.setEnabled(
+                getChkGenerateMysteryBoxes().isSelected()));
 
         createMysteryBoxPanel(mysteryBoxPanel);
 
         // Disable Panel by Default
         getChkGenerateSurprises().setSelected(true);
         getChkGenerateSurprises().doClick();
-        getChkGenerateSurprises().setEnabled(false);
 
         // Layout the UI
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("surprisesPanel.title")));
         panel.setToolTipText(resources.getString("surprisesPanel.toolTipText"));
         panel.setName("surprisesPanel");
-        panel.setEnabled(false);
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -1982,14 +2011,23 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(getChkGenerateSurprises())
+                        .addComponent(getChkGenerateMysteryBoxes())
                         .addComponent(mysteryBoxPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(getChkGenerateSurprises())
+                        .addComponent(getChkGenerateMysteryBoxes())
                         .addComponent(mysteryBoxPanel)
         );
+
+        // TODO : Remove me and implement Surprises
+        panel.setEnabled(false);
+        getChkGenerateSurprises().setEnabled(false);
+        getChkGenerateMysteryBoxes().setEnabled(false);
+        mysteryBoxPanel.setEnabled(false);
+
         return panel;
     }
 
@@ -1997,21 +2035,9 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         // Create Panel
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("mysteryBoxPanel.title")));
         panel.setToolTipText(resources.getString("mysteryBoxPanel.toolTipText"));
-        panel.setName("mysteryBoxPanel");
         panel.setLayout(new GridLayout(0, 1));
 
         // Create Panel Components
-        setChkGenerateMysteryBoxes(new JCheckBox(resources.getString("chkGenerateMysteryBoxes.text")));
-        getChkGenerateMysteryBoxes().setToolTipText(resources.getString("chkGenerateMysteryBoxes.toolTipText"));
-        getChkGenerateMysteryBoxes().setName("chkGenerateMysteryBoxes");
-        getChkGenerateMysteryBoxes().addActionListener(evt -> {
-            final boolean selected = getChkGenerateMysteryBoxes().isSelected();
-            for (final JCheckBox checkBox : getChkGenerateMysteryBoxTypes()) {
-                checkBox.setEnabled(selected);
-            }
-        });
-        panel.add(getChkGenerateMysteryBoxes());
-
         final MysteryBoxType[] mysteryBoxTypes = MysteryBoxType.values();
         setChkGenerateMysteryBoxTypes(new JCheckBox[mysteryBoxTypes.length]);
         for (int i = 0; i < mysteryBoxTypes.length; i++) {
@@ -2020,10 +2046,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             getChkGenerateMysteryBoxTypes()[i].setName("chk" + mysteryBoxTypes[i].name());
             panel.add(getChkGenerateMysteryBoxTypes()[i]);
         }
-
-        // Disable Panel by Default
-        getChkGenerateMysteryBoxes().setSelected(true);
-        getChkGenerateMysteryBoxes().doClick();
     }
 
     private List<FactionChoice> getFactionChoices() {
@@ -2094,12 +2116,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkAssignBestOfficers().setSelected(options.isAssignBestOfficers());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
-        if (getChkRunStartingSimulation().isSelected() != options.isRunStartingSimulation()) {
-            getChkRunStartingSimulation().doClick();
-        }
-        getSpnSimulationDuration().setValue(options.getSimulationDuration());
-        getChkSimulateRandomMarriages().setSelected(options.isSimulateRandomMarriages());
-        getChkSimulateRandomProcreation().setSelected(options.isSimulateRandomProcreation());
 
         // Personnel Randomization
         if (getChkRandomizeOrigin().isSelected() != options.isRandomizeOrigin()) {
@@ -2115,6 +2131,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnOriginSearchRadius().setValue(options.getOriginSearchRadius());
         getChkExtraRandomOrigin().setSelected(options.isExtraRandomOrigin());
         getSpnOriginDistanceScale().setValue(options.getOriginDistanceScale());
+
+        // Starting Simulation
+        if (getChkRunStartingSimulation().isSelected() != options.isRunStartingSimulation()) {
+            getChkRunStartingSimulation().doClick();
+        }
+        getSpnSimulationDuration().setValue(options.getSimulationDuration());
+        getChkSimulateRandomMarriages().setSelected(options.isSimulateRandomMarriages());
+        getChkSimulateRandomProcreation().setSelected(options.isSimulateRandomProcreation());
 
         // Units
         getChkGenerateUnitsAsAttached().setSelected(options.isGenerateUnitsAsAttached());
@@ -2199,10 +2223,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setAssignBestOfficers(getChkAssignBestOfficers().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
-        options.setRunStartingSimulation(getChkRunStartingSimulation().isSelected());
-        options.setSimulationDuration((Integer) getSpnSimulationDuration().getValue());
-        options.setSimulateRandomMarriages(getChkSimulateRandomMarriages().isSelected());
-        options.setSimulateRandomProcreation(getChkSimulateRandomProcreation().isSelected());
 
         // Personnel Randomization
         options.setRandomizeOrigin(getChkRandomizeOrigin().isSelected());
@@ -2211,6 +2231,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setOriginSearchRadius((Integer) getSpnOriginSearchRadius().getValue());
         options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
         options.setOriginDistanceScale((Double) getSpnOriginDistanceScale().getValue());
+
+        // Starting Simulation
+        options.setRunStartingSimulation(getChkRunStartingSimulation().isSelected());
+        options.setSimulationDuration((Integer) getSpnSimulationDuration().getValue());
+        options.setSimulateRandomMarriages(getChkSimulateRandomMarriages().isSelected());
+        options.setSimulateRandomProcreation(getChkSimulateRandomProcreation().isSelected());
 
         // Units
         options.setGenerateUnitsAsAttached(getChkGenerateUnitsAsAttached().isSelected());

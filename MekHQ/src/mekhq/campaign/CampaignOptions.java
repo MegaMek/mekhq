@@ -4014,7 +4014,10 @@ public class CampaignOptions implements Serializable {
 
             //region Company Generation
             } else if (wn2.getNodeName().equals("companyGenerationOptions")) {
-                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2, version));
+                if (!wn2.hasChildNodes()) {
+                    continue;
+                }
+                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2.getChildNodes(), version));
             //endregion Company Generation
 
             //region Legacy
