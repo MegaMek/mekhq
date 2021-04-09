@@ -543,15 +543,17 @@ public class StratconRulesManager {
 
         // check every track attached to an active contract for unresolved scenarios
         // to which the player must deploy forces today
-        for (Contract contract : campaign.getActiveContracts()) {
-            if(contract instanceof AtBContract) {
-                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    for(StratconScenario scenario : track.getScenarios().values()) {
-                        if(scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
-                                campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
-                            // "scenario name, track name"
-                            sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
-                        }
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            if (contract.getStratconCampaignState() == null) {
+                continue;
+            }
+            
+            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                for (StratconScenario scenario : track.getScenarios().values()) {
+                    if (scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
+                            campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
+                        // "scenario name, track name"
+                        sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
                     }
                 }
             }
