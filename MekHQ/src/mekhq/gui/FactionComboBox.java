@@ -1,7 +1,8 @@
 /*
  * FactionComboBox.java
  *
- * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2014 - Carl Spain. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,35 +21,31 @@
  */
 package mekhq.gui;
 
-import java.awt.Component;
+import mekhq.campaign.universe.Factions;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComboBox;
-import javax.swing.JList;
-
-import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
-
 /**
- * Combo box for choosing a faction by full name that accounts for
- * the fact that full names are not always unique within the faction's
- * era.
+ * Combo box for choosing a faction by full name that accounts for the fact that full names are not
+ * always unique within the faction's era.
  *
  * @author Neoancient
  */
 public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
     public FactionComboBox() {
-        Comparator<Map.Entry<String, String>> comp = Entry.comparingByValue();
-        setModel(new SortedComboBoxModel<>(comp));
+        setModel(new SortedComboBoxModel<>(Entry.comparingByValue()));
         setRenderer(new DefaultListCellRenderer() {
             @Override
-            public  Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public  Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                           final int index, final boolean isSelected,
+                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value != null) {
                     setText((String) ((Map.Entry<?, ?>) value).getValue());

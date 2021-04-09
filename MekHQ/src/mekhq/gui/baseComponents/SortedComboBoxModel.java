@@ -38,28 +38,29 @@ import java.util.List;
  */
 public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     //region Variable Declarations
-	private static final long serialVersionUID = 3728158859609424148L;
-	private final Comparator<E> comparator;
-	//endregion Variable Declarations
+    private static final long serialVersionUID = 3728158859609424148L;
+    private final Comparator<E> comparator;
+    //endregion Variable Declarations
 
     //region Constructors
-	/**
-	 * Create an empty model that will use the natural sort order of any data added
-	 */
-	public SortedComboBoxModel() {
-	    // We can't use this because of the varargs below
-	    super();
-	    this.comparator = null;
-	}
+    /**
+     * Create an empty model that will use the natural sort order of any data added
+     */
+    public SortedComboBoxModel() {
+        // We can't use this because of the varargs below, so just call super and initialize the
+        // comparator as null
+        super();
+        this.comparator = null;
+    }
 
     /**
      * Create a model that will use the natural sort order of any data added, starting with the
      * provided data.
      * @param elements the elements to add to this model
      */
-	@SafeVarargs
+    @SafeVarargs
     public SortedComboBoxModel(final E... elements) {
-	    this(null, elements);
+        this(null, elements);
     }
 
     /**
@@ -67,38 +68,38 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * provided data.
      * @param elements the elements to add to this model
      */
-	public SortedComboBoxModel(final Collection<E> elements) {
-	    this(null, elements);
+    public SortedComboBoxModel(final Collection<E> elements) {
+        this(null, elements);
     }
 
-	/**
-	 * Create an empty model using the specified Comparator.
+    /**
+     * Create an empty model using the specified Comparator.
      * @param comparator the comparator to use in sorting any data added.
-	 */
-	public SortedComboBoxModel(final Comparator<E> comparator) {
-	    this(comparator, new ArrayList<>());
-	}
+     */
+    public SortedComboBoxModel(final Comparator<E> comparator) {
+        this(comparator, new ArrayList<>());
+    }
 
     /**
      * Create a model using the specified Comparator and fills it with the provided data.
      * @param comparator the comparator to use in sorting any data added.
      * @param elements the elements to add to this model.
      */
-	@SafeVarargs
+    @SafeVarargs
     public SortedComboBoxModel(final Comparator<E> comparator, final E... elements) {
-	    this(comparator, List.of(elements));
+        this(comparator, List.of(elements));
     }
 
-	/**
-	 * Create a model using the specified Comparator and fills it with the provided data, if any.
+    /**
+     * Create a model using the specified Comparator and fills it with the provided data, if any.
      * @param comparator the comparator to use in sorting any data added.
      * @param elements the elements to add to this model.
      */
-	public SortedComboBoxModel(final Comparator<E> comparator, final Collection<E> elements) {
-	    super();
-		this.comparator = comparator;
-		setElements(elements);
-	}
+    public SortedComboBoxModel(final Comparator<E> comparator, final Collection<E> elements) {
+        super();
+        this.comparator = comparator;
+        setElements(elements);
+    }
     //endregion Constructors
 
     //region Getters
@@ -118,9 +119,9 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * @param element the element to add
      */
     @Override
-	public void addElement(final E element) {
-		insertElementAt(element, 0);
-	}
+    public void addElement(final E element) {
+        insertElementAt(element, 0);
+    }
 
     /**
      * Adds a single element to the current model, sorted based on the declared sorting method.
@@ -130,31 +131,31 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      */
     @Override
     @SuppressWarnings(value = "unchecked")
-	public void insertElementAt(final E element, int index) {
+    public void insertElementAt(final E element, int index) {
         index = 0; // we want to ignore the provided index to ensure we keep the data sorted.
         final int size = getSize();
-		//  Determine where to insert element to keep model in sorted order
-		for (; index < size; index++) {
-			if (getComparator() != null) {
-				final E object = getElementAt(index);
+        //  Determine where to insert element to keep model in sorted order
+        for (; index < size; index++) {
+            if (getComparator() != null) {
+                final E object = getElementAt(index);
 
-				if (getComparator().compare(object, element) > 0) {
+                if (getComparator().compare(object, element) > 0) {
                     break;
                 }
-			} else {
-				final Comparable<E> comparable = (Comparable<E>) getElementAt(index);
-				if (comparable.compareTo(element) > 0) {
-				    break;
+            } else {
+                final Comparable<E> comparable = (Comparable<E>) getElementAt(index);
+                if (comparable.compareTo(element) > 0) {
+                    break;
                 }
-			}
-		}
+            }
+        }
 
-		super.insertElementAt(element, index);
-	}
+        super.insertElementAt(element, index);
+    }
 
     /**
      * Adds the elements to the current model, sorted based on the declared sorting method. This
-     * is identical to {@link #addAll(int, Collection)}, as we ignore the latter parameter in
+     * is identical to {@link #addAll(int, Collection)}, as we ignore the first parameter in
      * that method.
      *
      * @param elements the elements to add
@@ -182,7 +183,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * This is used to clear and then set all elements based on a new input collection of elements,
      * retaining the selected item if possible, but otherwise reverting to a selected index of 0.
      *
-     * @param elements the elements to replace the current elements with
+     * @param elements the elements to replace the current elements with, which may be null to remove
+     *                 all elements, although this is not recommended.
      */
     @SuppressWarnings(value = "unchecked")
     public void setElements(final @Nullable Collection<E> elements) {
@@ -199,7 +201,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
         if ((selectedElement != null) && elements.contains(selectedElement)) {
             setSelectedItem(selectedElement);
-        } else {
+        } else if (elements.size() > 0) {
             setSelectedItem(getElementAt(0));
         }
     }

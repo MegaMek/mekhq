@@ -13,6 +13,8 @@ VERSION HISTORY:
 + PR #2337: Shopping List No Longer Writes to XML While Empty
 + Issue #2459: Only calculate weight if EquipmentPart has a type
 + PR #2465: Change source and target compatibility to Java 11
++ PR #2151: Improving Mission and Scenario Status Processing
++ PR #2440: Base Components: Creation and Expanding Preferences
 + Issue #2458: MRMS Astech Requirement Checks
 + PR #2473: Better GM unit restore
 + PR #2475: Use the correct resource string for free C3i Nodes on TOE
@@ -26,6 +28,8 @@ VERSION HISTORY:
 + Issue #2489: Improving Award XML Load Null Proofing
 + PR #2356: Improving Genealogy Null Protections
 + PR #2417: Personnel Options Tab Rework
++ PR #2494: Base Components: Sorted Combo Box Model
++ PR #2331: Add MekLocation tests and fix location repair nits
 
 0.48.0 (Stable) - (2021-03-05 1530 UT
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
