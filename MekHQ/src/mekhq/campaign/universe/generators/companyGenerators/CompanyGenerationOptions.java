@@ -18,8 +18,10 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -46,6 +48,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public class CompanyGenerationOptions implements Serializable {
     //region Variable Declarations
@@ -752,18 +755,20 @@ public class CompanyGenerationOptions implements Serializable {
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
-            writeToXML(pw);
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            writeToXML(pw, 0, ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version"));
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
         }
     }
 
-    public void writeToXML(final PrintWriter pw) {
-        writeToXML(pw, 0);
-    }
-
-    public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "companyGenerationOptions");
+    public void writeToXML(final PrintWriter pw, int indent, final @Nullable String version) {
+        if (version == null) {
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "companyGenerationOptions");
+        } else {
+            pw.println(String.format("%s<companyGenerationOptions version=\"%s\">",
+                    MekHqXmlUtil.indentStr(indent++), version));
+        }
 
         // Base Information
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
@@ -870,18 +875,20 @@ public class CompanyGenerationOptions implements Serializable {
             return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
         }
         element.normalize();
+
+        final Version version = new Version(element.getAttribute("version"));
         final NodeList nl = element.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if ("companyGenerationOptions".equals(wn.getNodeName())) {
-                return parseFromXML(wn);
+                return parseFromXML(wn, version);
             }
         }
         MekHQ.getLogger().error("Failed to parse file, returning the default AtB options");
         return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
     }
 
-    public static CompanyGenerationOptions parseFromXML(final Node wn) {
+    public static CompanyGenerationOptions parseFromXML(final Node wn, final Version version) {
         final CompanyGenerationOptions options = new CompanyGenerationOptions();
         final NodeList nl = wn.getChildNodes();
         try {

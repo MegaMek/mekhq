@@ -3423,7 +3423,7 @@ public class CampaignOptions implements Serializable {
         //region Company Generation Options
         if ((getCompanyGenerationOptions() != null)
                 && MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
-            getCompanyGenerationOptions().writeToXML(pw1, indent);
+            getCompanyGenerationOptions().writeToXML(pw1, indent, null);
         }
         //endregion Company Generation Options
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
@@ -4014,7 +4014,7 @@ public class CampaignOptions implements Serializable {
 
             //region Company Generation
             } else if (wn2.getNodeName().equals("companyGenerationOptions")) {
-                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2));
+                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2, version));
             //endregion Company Generation
 
             //region Legacy
