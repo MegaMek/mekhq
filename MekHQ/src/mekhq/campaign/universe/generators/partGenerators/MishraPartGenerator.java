@@ -34,7 +34,7 @@ import java.util.List;
  * MASC is capped at 1 per type
  * Any other parts are capped at 6.
  */
-public class MishraPartGenerator extends TriplePartGenerator {
+public class MishraPartGenerator extends MultiplePartGenerator {
     //region Constructors
     public MishraPartGenerator() {
         super(PartGenerationMethod.MISHRA);

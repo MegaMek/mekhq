@@ -24,23 +24,29 @@ import mekhq.campaign.universe.enums.PartGenerationMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TriplePartGenerator extends AbstractPartGenerator {
-    //region Constructors
-    public TriplePartGenerator() {
-        this(PartGenerationMethod.TRIPLE);
-    }
+public class MultiplePartGenerator extends AbstractPartGenerator {
+    //region Variable Declarations
+    private final int multiple;
+    //endregion Variable Declarations
 
-    protected TriplePartGenerator(final PartGenerationMethod method) {
+    //region Constructors
+    public MultiplePartGenerator(final PartGenerationMethod method, final int multiple) {
         super(method);
+        this.multiple = multiple;
     }
     //endregion Constructors
+
+    //region Getters
+    public int getMultiple() {
+        return multiple;
+    }
+    //endregion Getters
 
     @Override
     public List<Part> generate(final List<Part> inputParts) {
         final List<Part> parts = new ArrayList<>();
-        inputParts.forEach(inputPart -> {
-            final Part part = clonePart(inputPart);
-            part.setQuantity(part.getQuantity() * 3);
+        inputParts.stream().map(this::clonePart).forEach(part -> {
+            part.setQuantity(part.getQuantity() * getMultiple());
             parts.add(part);
         });
         return parts;
