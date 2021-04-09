@@ -289,6 +289,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             // No battle
             return null;
         }
+        
+        // if we are using StratCon, don't *also* generate legacy scenarios
+        if (c.getCampaignOptions().getUseStratCon() &&
+                (getContract(c).getStratconCampaignState() != null)) {
+            return null;
+        }
 
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
