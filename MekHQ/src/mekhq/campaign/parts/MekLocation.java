@@ -605,7 +605,7 @@ public class MekLocation extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal((int)Math.round(getPercent() * unit.getEntity().getOInternal(loc)), loc);
+            unit.getEntity().setInternal((int) Math.round(getPercent() * unit.getEntity().getOInternal(loc)), loc);
             //TODO: we need to cycle through slots and remove crits on non-hittable ones
             //We shouldn't have to do this, these slots should not be hit in MM
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
