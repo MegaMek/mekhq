@@ -119,7 +119,7 @@ public class InfantryAmmoStorageTest {
 
         // Get the AmmoStorage XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();

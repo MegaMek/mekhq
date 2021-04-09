@@ -80,8 +80,7 @@ public class RandomPortraitGenerator {
                 searchCat_RoleGroup = "Medical";
             }
 
-            // TODO : Java 11 : Swap to isBlank
-            if (!searchCat_RoleGroup.trim().isEmpty()) {
+            if (!searchCat_RoleGroup.isBlank()) {
                 searchFile = new File(genderFile, searchCat_RoleGroup);
                 possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
             }

@@ -149,11 +149,11 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
          if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
-             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
+             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
          }
 
          if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
-             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
+             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
          }
 
          if (tgtEnt.getDeployRound() > 0) {

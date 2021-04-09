@@ -135,8 +135,7 @@ public class ResolveScenarioTracker {
     }
 
     public String getUnitFilePath() {
-        return unitList.map(File::getAbsolutePath)
-                       .orElse("No file selected");
+        return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
     public void setClient(Client c) {
@@ -157,12 +156,8 @@ public class ResolveScenarioTracker {
     }
 
     private TestUnit generateNewTestUnit(Entity e) {
-        // Do some hoops here so that the new mech gets it's old individual paint job!
-        String cat = e.getCamoCategory();
-        String fn = e.getCamoFileName();
         TestUnit nu = new TestUnit(e, campaign, true);
-        nu.getEntity().setCamoCategory(cat);
-        nu.getEntity().setCamoFileName(fn);
+        nu.getEntity().setCamouflage(e.getCamouflage().clone());
         /* AtB uses id to track status of allied units */
         if (e.getExternalIdAsString().equals("-1")) {
             UUID id = UUID.randomUUID();
@@ -652,8 +647,8 @@ public class ResolveScenarioTracker {
                             }
                         }
                         if (wounded) {
-                            int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                            int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
@@ -755,8 +750,8 @@ public class ResolveScenarioTracker {
                 }
             }
             if (wounded) {
-                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
@@ -794,8 +789,8 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                             if (wounded) {
-                                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -1031,8 +1026,8 @@ public class ResolveScenarioTracker {
                         }
                     }
                     if (wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }

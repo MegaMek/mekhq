@@ -517,7 +517,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_SPOUSE: {
-                Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
+                final Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
                 Marriage.valueOf(data[2]).marry(gui.getCampaign(), selectedPerson, spouse,
                         gui.getCampaign().getLocalDate());
                 break;
@@ -947,13 +947,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
-                        gui.getFrame(), true, gui.getCampaign().getLocalDate());
-                addPersonnelLogDialog.setVisible(true);
-                Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
-                if (personnelEntry.isPresent()) {
+                final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
+                        gui.getFrame(), null, gui.getCampaign().getLocalDate());
+                if (addPersonnelLogDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
-                        person.addLogEntry(personnelEntry.get().clone());
+                        person.addLogEntry(addPersonnelLogDialog.getEntry().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
@@ -2304,7 +2302,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+            if (gui.getCampaign().getCampaignOptions().useProcreation()
                     && person.getGender().isFemale()) {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
                 cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
@@ -2503,7 +2501,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(cbMenuItem);
             }
 
-            if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+            if (gui.getCampaign().getCampaignOptions().useProcreation()
                     && StaticChecks.areAllFemale(selected)
                     && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));

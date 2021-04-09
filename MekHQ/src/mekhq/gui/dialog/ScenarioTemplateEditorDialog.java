@@ -1253,8 +1253,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Force needs to be synced or have explicit deployment zones");
         }
 
-        if(txtForceName.getText().trim().isEmpty()) {
-            if(valBuilder.length() > 0) {
+        if (txtForceName.getText().isBlank()) {
+            if (valBuilder.length() > 0) {
                 valBuilder.append("\n");
             }
 
