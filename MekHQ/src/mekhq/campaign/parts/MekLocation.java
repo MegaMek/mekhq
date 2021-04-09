@@ -193,16 +193,11 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof MekLocation)
-                && isSamePartType((MekLocation) part);
-    }
+        if (!(part instanceof MekLocation)) {
+            return false;
+        }
 
-    /**
-     * Gets a value indicating whether or not {@code other} is the same
-     * type of {@code MekLocation}.
-     * @param other A different {@code MekLocation}.
-     */
-    public boolean isSamePartType(MekLocation other) {
+        MekLocation other = (MekLocation) part;
         return (getLoc() == other.getLoc())
                 && (getUnitTonnage() == other.getUnitTonnage())
                 && (isTsm() == other.isTsm())
@@ -669,10 +664,7 @@ public class MekLocation extends Part {
             return "You cannot salvage a limb with a busted hip/shoulder. You must scrap it instead.";
         }
         //cant salvage torsos until arms and legs are gone
-        String limbName = " arm ";
-        if (forQuad) {
-            limbName = " front leg ";
-        }
+        String limbName = forQuad ? " front leg " : " arm ";
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
             return "must salvage/scrap right" + limbName + "first";
         }
