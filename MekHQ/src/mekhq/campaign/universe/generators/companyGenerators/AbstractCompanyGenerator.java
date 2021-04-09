@@ -801,7 +801,8 @@ public abstract class AbstractCompanyGenerator {
      */
     public void generateEntities(final Campaign campaign,
                                  final List<CompanyGenerationPersonTracker> trackers) {
-        trackers.forEach(tracker -> generateEntity(campaign, tracker));
+        trackers.stream().filter(tracker -> tracker.getPersonType().isCombat())
+                .forEach(tracker -> generateEntity(campaign, tracker));
     }
 
     /**
@@ -832,8 +833,8 @@ public abstract class AbstractCompanyGenerator {
 
         try {
             return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
-        } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to generate entity", e);
+        } catch (Exception ignored) {
+            MekHQ.getLogger().error("Failed to generate entity");
         }
 
         return null;
@@ -1569,7 +1570,7 @@ public abstract class AbstractCompanyGenerator {
         assignTechsToUnits(trackers, units);
 
         // Generate the Forces and Assign Units to them
-        generateUnit(campaign, trackers);
+        generateUnit(campaign, sortPersonnelIntoLances(trackers));
 
         return units;
     }

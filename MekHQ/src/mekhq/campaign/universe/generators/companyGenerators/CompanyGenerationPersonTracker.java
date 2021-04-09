@@ -40,6 +40,8 @@ public class CompanyGenerationPersonTracker {
     public CompanyGenerationPersonTracker(final Person person, final CompanyGenerationPersonType personType) {
         setPerson(person);
         setPersonType(personType);
+        setParameters(null);
+        setEntity(null);
     }
     //endregion Constructors
 
@@ -60,11 +62,11 @@ public class CompanyGenerationPersonTracker {
         this.personType = personType;
     }
 
-    public AtBRandomMechParameters getParameters() {
+    public @Nullable AtBRandomMechParameters getParameters() {
         return parameters;
     }
 
-    public void setParameters(final AtBRandomMechParameters parameters) {
+    public void setParameters(final @Nullable AtBRandomMechParameters parameters) {
         this.parameters = parameters;
     }
 
