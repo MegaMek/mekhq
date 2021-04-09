@@ -23,14 +23,22 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
+import javax.swing.*;
 import java.util.Collection;
 
 public class RankValidator {
+    //region Constructors
     public RankValidator() {
 
     }
+    //endregion Constructors
 
     public boolean validate(final @Nullable RankSystem rankSystem, final boolean checkCode) {
+        return validate(null, rankSystem, checkCode);
+    }
+
+    public boolean validate(final @Nullable DefaultComboBoxModel<RankSystem> rankSystemsModel,
+                             final @Nullable RankSystem rankSystem, final boolean checkCode) {
         // Null is never a valid rank system, but this catches some default returns whose errors are
         // caught during the loading process. This MUST be the first check and CANNOT be removed.
         if (rankSystem == null) {
@@ -38,17 +46,31 @@ public class RankValidator {
         }
 
         // If the code is a duplicate, we've got a duplicate key error
-        if (checkCode && Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
-            if (rankSystem.getType().isUserData()) {
-                MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
-                        + " is duplicated by userData Rank System " + rankSystem.toString());
+        if (checkCode) {
+            boolean duplicateKey = false;
+            if (rankSystemsModel == null) {
+                duplicateKey = Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode());
             } else {
-                MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
-                        + " is duplicated by " + rankSystem.toString());
+                for (int i = 0; i < rankSystemsModel.getSize(); i++) {
+                    if (rankSystem.equals(rankSystemsModel.getElementAt(i))) {
+                        duplicateKey = true;
+                        break;
+                    }
+                }
             }
-            return false;
+
+            if (duplicateKey) {
+                if (rankSystem.getType().isUserData()) {
+                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                            + " is duplicated by userData Rank System " + rankSystem.toString());
+                } else {
+                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                            + " is duplicated by " + rankSystem.toString());
+                }
+                return false;
+            }
         }
 
         // Default System Validation has passed successfully

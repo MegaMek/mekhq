@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
-import mekhq.campaign.personnel.ranks.RankSystem;
 
 import java.util.ResourceBundle;
 

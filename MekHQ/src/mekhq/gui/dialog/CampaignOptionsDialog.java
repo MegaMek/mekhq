@@ -4847,54 +4847,61 @@ public class CampaignOptionsDialog extends JDialog {
         panel.add(createButton("btnExportCurrentRankSystem.text",
                 "btnExportCurrentRankSystem.toolTipText", "btnExportCurrentRankSystem",
                 evt -> {
-                    if (selectedRankSystem != null) {
-                        updateRankSystemRanks();
-                        selectedRankSystem.writeToFile(FileDialogs.saveIndividualRankSystem(frame).orElse(null));
-                    }
-                }));
+            if (selectedRankSystem != null) {
+                updateRankSystemRanks();
+                selectedRankSystem.writeToFile(FileDialogs.saveIndividualRankSystem(frame).orElse(null));
+            }
+        }));
 
         panel.add(createButton("btnExportUserDataRankSystems.text",
                 "btnExportUserDataRankSystems.toolTipText", "btnExportUserDataRankSystems",
                 evt -> {
-                    updateRankSystemRanks();
-                    final List<RankSystem> rankSystems = new ArrayList<>();
-                    for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
-                        final RankSystem rankSystem = comboRankSystems.getModel().getElementAt(i);
-                        if (rankSystem.getType().isUserData()) {
-                            rankSystems.add(rankSystem);
-                        }
-                    }
-                    Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
-                    refreshRankSystems();
-                }));
+            updateRankSystemRanks();
+            final List<RankSystem> rankSystems = new ArrayList<>();
+            for (int i = 0; i < rankSystemModel.getSize(); i++) {
+                final RankSystem rankSystem = rankSystemModel.getElementAt(i);
+                if (rankSystem.getType().isUserData()) {
+                    rankSystems.add(rankSystem);
+                }
+            }
+            Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
+            refreshRankSystems();
+        }));
 
         panel.add(createButton("btnExportRankSystems.text",
                 "btnExportRankSystems.toolTipText", "btnExportRankSystems",
                 evt -> {
-                    updateRankSystemRanks();
-                    final List<RankSystem> rankSystems = new ArrayList<>();
-                    for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
-                        rankSystems.add(comboRankSystems.getModel().getElementAt(i));
-                    }
-                    Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(frame).orElse(null), rankSystems);
-                }));
+            updateRankSystemRanks();
+            final List<RankSystem> rankSystems = new ArrayList<>();
+            for (int i = 0; i < rankSystemModel.getSize(); i++) {
+                rankSystems.add(rankSystemModel.getElementAt(i));
+            }
+            Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(frame).orElse(null), rankSystems);
+        }));
 
         panel.add(createButton("btnImportIndividualRankSystem.text",
                 "btnImportIndividualRankSystem.toolTipText", "btnImportIndividualRankSystem",
                 evt -> {
-                    final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
-                            FileDialogs.openIndividualRankSystem(frame).orElse(null));
-                    // Validate on load, to ensure we don't have any display issues
-                    if (new RankValidator().validate(rankSystem, true)) {
-                        comboRankSystems.addItem(rankSystem);
-                    }
-                }));
+            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
+                    FileDialogs.openIndividualRankSystem(frame).orElse(null));
+            // Validate on load, to ensure we don't have any display issues
+            if (new RankValidator().validate(rankSystemModel, rankSystem, true)) {
+                rankSystemModel.addElement(rankSystem);
+            }
+        }));
 
         panel.add(createButton("btnImportRankSystems.text",
                 "btnImportRankSystems.toolTipText", "btnImportRankSystems",
                 evt -> {
-
-                }));
+            final List<RankSystem> rankSystems = Ranks.loadRankSystemsFromFile(
+                    FileDialogs.openRankSystems(frame).orElse(null), RankSystemType.CAMPAIGN);
+            final RankValidator rankValidator = new RankValidator();
+            for (final RankSystem rankSystem : rankSystems) {
+                if (rankValidator.validate(rankSystemModel, rankSystem, true)) {
+                    rankSystemModel.addElement(rankSystem);
+                }
+            }
+        }));
 
         panel.add(createButton("btnRefreshRankSystemsFromFile.text",
                 "btnRefreshRankSystemsFromFile.toolTipText", "btnRefreshRankSystemsFromFile",
@@ -4937,7 +4944,7 @@ public class CampaignOptionsDialog extends JDialog {
         updateRankSystemRanks();
 
         // Then update the selected rank system, with null protection (although it shouldn't be null)
-        selectedRankSystem = (RankSystem) comboRankSystems.getSelectedItem();
+        selectedRankSystem = (RankSystem) rankSystemModel.getSelectedItem();
         if (selectedRankSystem == null) {
             return;
         }
@@ -4991,8 +4998,8 @@ public class CampaignOptionsDialog extends JDialog {
         // We need to get the current Rank Systems from the rank system combo box for to ensure
         // the data's uniqueness
         final List<RankSystem> rankSystems = new ArrayList<>();
-        for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
-            rankSystems.add(comboRankSystems.getModel().getElementAt(i));
+        for (int i = 0; i < rankSystemModel.getSize(); i++) {
+            rankSystems.add(rankSystemModel.getElementAt(i));
         }
 
         // Now we can show the dialog and check if it was confirmed
@@ -5000,7 +5007,7 @@ public class CampaignOptionsDialog extends JDialog {
                 rankSystems, ranksModel.getRanks());
         if (dialog.showDialog().isConfirmed()) {
             // If it was we add the new rank system to the model
-            comboRankSystems.addItem(dialog.getRankSystem());
+            rankSystemModel.addElement(dialog.getRankSystem());
             // And select that item if that's intended
             if (dialog.getChkSwapToRankSystem().isSelected()) {
                 comboRankSystems.setSelectedItem(dialog.getRankSystem());
@@ -5016,8 +5023,8 @@ public class CampaignOptionsDialog extends JDialog {
         // Then collect all of the campaign-type rank systems into a set, so we don't just throw
         // them away
         final Set<RankSystem> campaignRankSystems = new HashSet<>();
-        for (int i = 0; i < comboRankSystems.getItemCount(); i++) {
-            final RankSystem rankSystem = comboRankSystems.getModel().getElementAt(i);
+        for (int i = 0; i < rankSystemModel.getSize(); i++) {
+            final RankSystem rankSystem = rankSystemModel.getElementAt(i);
             if (rankSystem.getType().isCampaign()) {
                 campaignRankSystems.add(rankSystem);
             }
@@ -5030,6 +5037,8 @@ public class CampaignOptionsDialog extends JDialog {
         // Revalidate all of the Campaign Rank Systems before adding, as we need to ensure no duplicate keys
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystem rankSystem : campaignRankSystems) {
+            // Validating against the core ranks is fine here, as we know all of the rank systems
+            // we want to check against have been loaded there
             if (rankValidator.validate(rankSystem, true)) {
                 rankSystemModel.addElement(rankSystem);
             }

@@ -122,8 +122,18 @@ public class Ranks {
     public static void initializeRankSystems() {
         MekHQ.getLogger().info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
-        loadRankSystemsFromPath(RankSystemType.DEFAULT);
-        loadRankSystemsFromPath(RankSystemType.USER_DATA);
+        final RankValidator rankValidator = new RankValidator();
+        for (final RankSystemType type : RankSystemType.values()) {
+            if (type.isCampaign()) {
+                continue;
+            }
+            final List<RankSystem> rankSystems = loadRankSystemsFromFile(new File(type.getFilePath()), type);
+            for (final RankSystem rankSystem : rankSystems) {
+                if (rankValidator.validate(rankSystem, true)) {
+                    getRankSystems().put(rankSystem.getRankSystemCode(), rankSystem);
+                }
+            }
+        }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
             MekHQ.getLogger().fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
@@ -143,20 +153,25 @@ public class Ranks {
         rankValidator.checkPersonnelRanks(campaign.getPersonnel());
     }
 
-    private static void loadRankSystemsFromPath(final RankSystemType type) {
+    public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,
+                                                           final RankSystemType type) {
+        if (file == null) {
+            return new ArrayList<>();
+        }
+
         final Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(type.getFilePath())) {
+        try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
-            return;
+            return new ArrayList<>();
         }
 
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
         final NodeList nl = element.getChildNodes();
-        final RankValidator rankValidator = new RankValidator();
+        final List<RankSystem> rankSystems = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
 
@@ -166,12 +181,12 @@ public class Ranks {
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true, type);
-                if (rankValidator.validate(rankSystem, true)) {
-                    // This cannot be null, as the validator will ensure that is not the case.
-                    getRankSystems().put(rankSystem.getRankSystemCode(), rankSystem);
+                if (rankSystem != null) {
+                    rankSystems.add(rankSystem);
                 }
             }
         }
+        return rankSystems;
     }
     //endregion File IO
 }
