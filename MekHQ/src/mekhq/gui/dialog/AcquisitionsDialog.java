@@ -399,7 +399,7 @@ public class AcquisitionsDialog extends JDialog {
             Insets insetsOriginal = gbcMain.insets;
 
             // Set image
-            String[] imgData = PartWorkImageSelector.findPartImage(part);
+            String[] imgData = Part.findPartImage(part);
             String imgPath = imgData[0] + imgData[1] + ".png";
 
             Image imgTool = getToolkit().getImage(imgPath);

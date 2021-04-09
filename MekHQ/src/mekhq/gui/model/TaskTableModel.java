@@ -33,6 +33,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
@@ -41,7 +42,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
-import mekhq.gui.utilities.PartWorkImageSelector;
 
 /**
  * A table model for displaying work items
@@ -217,7 +217,7 @@ public class TaskTableModel extends DataTableModel {
 	            	break;
             }
 
-        	String[] imgData = PartWorkImageSelector.findPartImage(part);
+        	String[] imgData = Part.findPartImage(part);
         	String imgPath = imgData[0] + imgData[1] + imgMod + ".png";
 
             Image imgTool = getToolkit().getImage(imgPath); //$NON-NLS-1$
