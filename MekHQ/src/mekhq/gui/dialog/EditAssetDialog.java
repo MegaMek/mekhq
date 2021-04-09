@@ -1,20 +1,20 @@
 /*
  * EditAssetDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,9 +30,9 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  *
@@ -50,7 +50,7 @@ public class EditAssetDialog extends JDialog {
     private JMoneyTextField assetIncomeField;
     private JComboBox<String> choiceSchedule;
     boolean cancelled;
-    
+
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
         this.asset = a;
@@ -65,7 +65,7 @@ public class EditAssetDialog extends JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -86,7 +86,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -109,7 +109,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(assetValueField, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -132,7 +132,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(assetIncomeField, gridBagConstraints);
- 
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -140,7 +140,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
-        
+
         DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_MONTHLY));
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
@@ -200,12 +200,12 @@ public class EditAssetDialog extends JDialog {
         try {
             asset.setValue(assetValueField.getMoney());
         } catch(Exception ignored) {
-            
+
         }
         try {
             asset.setIncome(assetIncomeField.getMoney());
         } catch(Exception ignored) {
-            
+
         }
         if(choiceSchedule.getSelectedIndex() == 1) {
             asset.setSchedule(Finances.SCHEDULE_YEARLY);
@@ -219,7 +219,7 @@ public class EditAssetDialog extends JDialog {
         cancelled = true;
         this.setVisible(false);
     }
- 
+
     public boolean wasCancelled() {
         return cancelled;
     }

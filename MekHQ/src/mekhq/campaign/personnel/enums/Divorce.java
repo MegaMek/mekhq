@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
@@ -48,8 +48,8 @@ public enum Divorce {
 
     //region Divorce
     public void divorce(Person origin, Campaign campaign) {
-        Person spouse = origin.getGenealogy().getSpouse(campaign);
-        int reason = FormerSpouse.REASON_WIDOWED;
+        Person spouse = origin.getGenealogy().getSpouse();
+        FormerSpouseReason reason = FormerSpouseReason.WIDOWED;
 
         switch (this) {
             case ORIGIN_CHANGE_SURNAME:
@@ -76,7 +76,7 @@ public enum Divorce {
         }
 
         if (spouse.getStatus().isDeadOrMIA() == origin.getStatus().isDeadOrMIA()) {
-            reason = FormerSpouse.REASON_DIVORCE;
+            reason = FormerSpouseReason.DIVORCE;
 
             PersonalLogger.divorcedFrom(origin, spouse, campaign.getLocalDate());
             PersonalLogger.divorcedFrom(spouse, origin, campaign.getLocalDate());
@@ -104,8 +104,8 @@ public enum Divorce {
         }
 
         // Add to former spouse list
-        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin.getId(), campaign.getLocalDate(), reason));
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse.getId(), campaign.getLocalDate(), reason));
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, campaign.getLocalDate(), reason));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, campaign.getLocalDate(), reason));
 
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(origin));

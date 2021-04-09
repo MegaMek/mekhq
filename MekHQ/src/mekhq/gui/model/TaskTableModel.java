@@ -153,7 +153,7 @@ public class TaskTableModel extends DataTableModel {
 
 	                if (null == tech) {
 	                	//Find a valid tech that we can copy their skill from
-	                	List<Person> techs = gui.getCampaign().getTechs(false);
+	                	List<Person> techs = gui.getCampaign().getTechs();
 
 	        			for (int i = techs.size() - 1; i >= 0; i--) {
 	        				Person techTemp = techs.get(i);

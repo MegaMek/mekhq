@@ -39,6 +39,7 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.preferences.MMPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.EventBus;
@@ -84,8 +85,7 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
-import mekhq.preferences.MekHqPreferences;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -106,7 +106,7 @@ public class MekHQ implements GameListener {
     private static ObservableString selectedTheme;
 
     private static MMLogger logger = null;
-    private static MekHqPreferences preferences = null;
+    private static MMPreferences preferences = null;
     private static MekHQOptions mekHQOptions = new MekHQOptions();
 
     // Directory options
@@ -179,9 +179,9 @@ public class MekHQ implements GameListener {
         return logger;
     }
 
-    public static MekHqPreferences getPreferences() {
-        if (null == preferences) {
-            preferences = new MekHqPreferences();
+    public static MMPreferences getPreferences() {
+        if (preferences == null) {
+            preferences = new MMPreferences();
         }
 
         return preferences;
@@ -296,16 +296,24 @@ public class MekHQ implements GameListener {
     }
 
     public void exit() {
-        if (JOptionPane.showConfirmDialog(null,
-                "Do you really want to quit MekHQ?",
-                "Quit?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-            if (null != campaigngui) {
-                campaigngui.getFrame().dispose();
-            }
-            getPreferences().saveToFile(PREFERENCES_FILE);
-            System.exit(0);
+        int savePrompt = JOptionPane.showConfirmDialog(null,
+                "Do you want to save the game before quitting MekHQ?",
+                "Save First?",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
+            return;
+        } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
+            // When the user did not actually save the game, don't close MHQ
+            return;
         }
+
+        // Actually close MHQ
+        if (campaigngui != null) {
+            campaigngui.getFrame().dispose();
+        }
+        getPreferences().saveToFile(PREFERENCES_FILE);
+        System.exit(0);
     }
 
     public void showNewView() {
@@ -712,7 +720,7 @@ public class MekHQ implements GameListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getSource().equals(selectedTheme)) {
-                setLookAndFeel((String)evt.getNewValue());
+                setLookAndFeel((String) evt.getNewValue());
             }
         }
     }

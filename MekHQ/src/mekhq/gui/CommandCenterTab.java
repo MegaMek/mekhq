@@ -28,6 +28,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.*;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
 import mekhq.gui.model.ProcurementTableModel;
@@ -351,8 +352,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         procurementTable.setIntercellSpacing(new Dimension(0, 0));
         procurementTable.setShowGrid(false);
-        procurementTable.addMouseListener(new ProcurementTableMouseAdapter(getCampaignGui()));
-        procurementTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ProcurementTableMouseAdapter.connect(getCampaignGui(), procurementTable, procurementModel);
+        procurementTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
@@ -364,11 +365,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (procurementTable.getSelectedRow() < 0) {
-                    return;
+                for (final int row : procurementTable.getSelectedRows()) {
+                    if (row >= 0) {
+                        procurementModel.incrementItem(procurementTable.convertRowIndexToModel(row));
+                    }
                 }
-                procurementModel
-                        .incrementItem(procurementTable.convertRowIndexToModel(procurementTable.getSelectedRow()));
             }
         });
 
@@ -377,15 +378,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (procurementTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (procurementModel
-                        .getAcquisition(procurementTable.convertRowIndexToModel(procurementTable.getSelectedRow()))
-                        .map(a -> a.getQuantity())
-                        .orElse(0) > 0) {
-                    procurementModel.decrementItem(
-                            procurementTable.convertRowIndexToModel(procurementTable.getSelectedRow()));
+                for (final int rowIndex : procurementTable.getSelectedRows()) {
+                    if (rowIndex < 0) {
+                        continue;
+                    }
+                    final int row = procurementTable.convertRowIndexToModel(rowIndex);
+                    if (procurementModel.getAcquisition(row).map(IAcquisitionWork::getQuantity)
+                            .orElse(0) > 0) {
+                        procurementModel.decrementItem(row);
+                    }
                 }
             }
         });
@@ -508,7 +509,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * refresh the procurement list
      */
     private void refreshProcurementList() {
-        procurementModel.setData(getCampaign().getShoppingList().getAllShoppingItems());
+        procurementModel.setData(getCampaign().getShoppingList().getShoppingList());
     }
 
     /**

@@ -42,8 +42,8 @@ import mekhq.MekHqConstants;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class HistoricalDailyReportDialog extends JDialog {
     private static final long serialVersionUID = -4373796917722483042L;

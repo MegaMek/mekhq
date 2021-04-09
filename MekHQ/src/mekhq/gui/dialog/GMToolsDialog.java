@@ -1,7 +1,7 @@
 /*
  * GMToolsDialog.java
  *
- * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import javax.swing.*;
@@ -56,11 +57,11 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JTextFieldPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTextFieldPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class GMToolsDialog extends JDialog {
     //region Variable Declarations
@@ -83,11 +84,13 @@ public class GMToolsDialog extends JDialog {
     private JComboBox<Gender> genderPicker;
     private JComboBox<FactionChoice> nameGeneratorFactionPicker;
     private JCheckBox clannerPicker;
+    private JSpinner numNames;
     private JLabel currentName;
-    private JLabel nameGenerated;
+    private JTextArea nameGenerated;
 
+    private JSpinner numCallsigns;
     private JLabel currentCallsign;
-    private JLabel callsignGenerated;
+    private JTextArea callsignGenerated;
 
     private JComboBox<String> originClanPicker;
     private JComboBox<Integer> bloodnameEraPicker;
@@ -281,11 +284,11 @@ public class GMToolsDialog extends JDialog {
         }
         unitTypePicker = new JComboBox<>(unitTypeModel);
         unitTypePicker.setName("unitTypePicker");
-        unitTypePicker.addItemListener(ev ->
-                unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
-                        || unitTypePicker.getSelectedItem().equals("Tank")
-                        || unitTypePicker.getSelectedItem().equals("Aero"))
-        );
+        unitTypePicker.addItemListener(ev -> {
+            final String unitType = (String) Objects.requireNonNull(unitTypePicker.getSelectedItem());
+            unitWeightPicker.setEnabled(unitType.equals("Mek") || unitType.equals("Tank")
+                    || unitType.equals("Aero"));
+        });
         ratPanel.add(unitTypePicker, newGridBagConstraints(4, 1));
 
         JLabel unitWeightLabel = new JLabel(resources.getString("unitWeightLabel.text"));
@@ -382,25 +385,38 @@ public class GMToolsDialog extends JDialog {
             namePanel.add(currentName, newGridBagConstraints(gridx++, 3));
         }
 
-        JLabel nameGeneratedLabel = new JLabel(resources.getString("nameGeneratedLabel.text"));
+        JLabel nameGeneratedLabel = new JLabel(resources.getString((getPerson() == null)
+                ? "namesGeneratedLabel.text" : "nameGeneratedLabel.text"));
         nameGeneratedLabel.setName("nameGeneratedLabel");
         namePanel.add(nameGeneratedLabel, newGridBagConstraints(gridx++, 3));
 
-        nameGenerated = new JLabel("-");
+        nameGenerated = new JTextArea("-");
         nameGenerated.setName("nameGenerated");
         namePanel.add(nameGenerated, newGridBagConstraints(gridx++, 3));
 
-        if (getPerson() != null) {
+        JButton generateNameButton = new JButton(resources.getString((getPerson() == null)
+                ? "generateNamesButton.text" : "generateNameButton.text"));
+        generateNameButton.setName("generateNameButton");
+        generateNameButton.addActionListener(evt -> {
+            if (getPerson() == null) {
+                generateNames();
+            } else {
+                generateName();
+            }
+        });
+        namePanel.add(generateNameButton, newGridBagConstraints(gridxMax--, 4));
+
+        if (getPerson() == null) {
+            numNames = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+            numNames.setName("numNames");
+            ((JSpinner.DefaultEditor) numNames.getEditor()).getTextField().setEditable(true);
+            namePanel.add(numNames, newGridBagConstraints(gridxMax--, 4));
+        } else {
             JButton assignNameButton = new JButton(resources.getString("assignNameButton.text"));
             assignNameButton.setName("assignNameButton");
             assignNameButton.addActionListener(evt -> assignName());
             namePanel.add(assignNameButton, newGridBagConstraints(gridxMax--, 4));
         }
-
-        JButton generateNameButton = new JButton(resources.getString("generateNameButton.text"));
-        generateNameButton.setName("generateNameButton");
-        generateNameButton.addActionListener(evt -> generateName());
-        namePanel.add(generateNameButton, newGridBagConstraints(gridxMax--, 4));
 
         return namePanel;
     }
@@ -424,27 +440,40 @@ public class GMToolsDialog extends JDialog {
             callsignPanel.add(currentCallsign, newGridBagConstraints(gridx++, gridy));
         }
 
-        JLabel callsignGeneratedLabel = new JLabel(resources.getString("callsignGeneratedLabel.text"));
+        JLabel callsignGeneratedLabel = new JLabel(resources.getString((getPerson() == null)
+                ? "callsignsGeneratedLabel.text" : "callsignGeneratedLabel.text"));
         callsignGeneratedLabel.setName("callsignGeneratedLabel");
         callsignPanel.add(callsignGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
-        callsignGenerated = new JLabel("-");
+        callsignGenerated = new JTextArea("-");
         callsignGenerated.setName("callsignGenerated");
         callsignPanel.add(callsignGenerated, newGridBagConstraints(gridx++, gridy));
 
         gridy++;
 
-        if (getPerson() != null) {
+        JButton generateCallsignButton = new JButton(resources.getString((getPerson() == null)
+                ? "generateCallsignsButton.text" : "generateCallsignButton.text"));
+        generateCallsignButton.setName("generateCallsignButton");
+        generateCallsignButton.addActionListener(evt -> {
+            if (getPerson() == null) {
+                generateCallsigns();
+            } else {
+                generateCallsign();
+            }
+        });
+        callsignPanel.add(generateCallsignButton, newGridBagConstraints(gridx--, gridy));
+
+        if (getPerson() == null) {
+            numCallsigns = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+            numCallsigns.setName("numCallsigns");
+            ((JSpinner.DefaultEditor) numCallsigns.getEditor()).getTextField().setEditable(true);
+            callsignPanel.add(numCallsigns, newGridBagConstraints(gridx--, gridy));
+        } else {
             JButton assignCallsignButton = new JButton(resources.getString("assignCallsignButton.text"));
             assignCallsignButton.setName("assignCallsignButton");
             assignCallsignButton.addActionListener(evt -> assignCallsign());
             callsignPanel.add(assignCallsignButton, newGridBagConstraints(gridx--, gridy));
         }
-
-        JButton generateCallsignButton = new JButton(resources.getString("generateCallsignButton.text"));
-        generateCallsignButton.setName("generateCallsignButton");
-        generateCallsignButton.addActionListener(evt -> generateCallsign());
-        callsignPanel.add(generateCallsignButton, newGridBagConstraints(gridx--, gridy));
 
         return callsignPanel;
     }
@@ -616,7 +645,15 @@ public class GMToolsDialog extends JDialog {
 
         preferences.manage(new JComboBoxPreference(unitWeightPicker));
 
-        this.setName("dialog");
+        if (numNames != null) {
+            preferences.manage(new JIntNumberSpinnerPreference(numNames));
+        }
+
+        if (numCallsigns != null) {
+            preferences.manage(new JIntNumberSpinnerPreference(numCallsigns));
+        }
+
+        setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 
@@ -860,7 +897,22 @@ public class GMToolsDialog extends JDialog {
     }
 
     private void generateName() {
-        int ethnicCode = ethnicCodePicker.getSelectedIndex();
+        String[] name = generateIndividualName();
+        nameGenerated.setText((name[0] + " " + name[1]).trim());
+        setLastGeneratedName(name);
+    }
+
+    private void generateNames() {
+        StringJoiner sj = new StringJoiner("\n");
+        for (int i = 0; i < (Integer) numNames.getValue(); i++) {
+            final String[] name = generateIndividualName();
+            sj.add((name[0] + " " + name[1]).trim());
+        }
+        nameGenerated.setText(sj.toString());
+    }
+
+    private String[] generateIndividualName() {
+        final int ethnicCode = ethnicCodePicker.getSelectedIndex();
         String[] name;
 
         if (ethnicCode == 0) {
@@ -871,9 +923,7 @@ public class GMToolsDialog extends JDialog {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplitWithEthnicCode(
                     (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(), ethnicCode);
         }
-
-        nameGenerated.setText((name[0] + " " + name[1]).trim());
-        setLastGeneratedName(name);
+        return name;
     }
 
     private void assignName() {
@@ -892,6 +942,14 @@ public class GMToolsDialog extends JDialog {
         String callsign = RandomCallsignGenerator.getInstance().generate();
         callsignGenerated.setText(callsign);
         setLastGeneratedCallsign(callsign);
+    }
+
+    private void generateCallsigns() {
+        StringJoiner sj = new StringJoiner("\n");
+        for (int i = 0; i < (Integer) numCallsigns.getValue(); i++) {
+            sj.add(RandomCallsignGenerator.getInstance().generate());
+        }
+        callsignGenerated.setText(sj.toString());
     }
 
     private void assignCallsign() {

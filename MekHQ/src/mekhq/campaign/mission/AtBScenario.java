@@ -38,6 +38,7 @@ import java.util.Vector;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
+import mekhq.MekHqConstants;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,7 +49,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
@@ -695,6 +695,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         /* The entities in the attachedAllies list will be added to the player's forces
          * in MM and don't require a separate BotForce */
+        final Camouflage camouflage = getContract(campaign).getAllyCamouflage();
         for (int i = 0; i < numAttachedPlayer; i++) {
             Entity en = getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -705,8 +706,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 externalIDLookup.put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                    en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                    en.setCamoFileName(getContract(campaign).getAllyColour().name());
+                    en.setCamouflage(camouflage.clone());
                 }
             } else {
                 MekHQ.getLogger().error("Entity for player-controlled allies is null");
@@ -1309,11 +1309,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
 
         // aerotechs are rarer, so spawn them less often
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() >
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
 
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
@@ -1377,13 +1377,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
         boolean spawnConventionalInfantry = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
 
         // battle armor is more rare
         boolean spawnBattleArmor = !opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
@@ -1473,7 +1473,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
-                c.getAllyCamoCategory(), c.getAllyCamoFileName(), c.getAllyColour());
+                c.getAllyCamouflage().clone(), c.getAllyColour());
     }
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
@@ -1482,7 +1482,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
-                c.getEnemyCamoCategory(), c.getEnemyCamoFileName(), c.getEnemyColour());
+                c.getEnemyCamouflage().clone(), c.getEnemyColour());
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
