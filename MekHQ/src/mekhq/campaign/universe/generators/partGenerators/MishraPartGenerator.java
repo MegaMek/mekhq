@@ -37,12 +37,12 @@ import java.util.List;
 public class MishraPartGenerator extends MultiplePartGenerator {
     //region Constructors
     public MishraPartGenerator() {
-        super(PartGenerationMethod.MISHRA);
+        super(PartGenerationMethod.MISHRA, 3);
     }
     //endregion Constructors
 
     @Override
     public List<Part> generate(final List<Part> inputParts) {
-        return new ArrayList<>();
+        return super.generate(inputParts);
     }
 }
