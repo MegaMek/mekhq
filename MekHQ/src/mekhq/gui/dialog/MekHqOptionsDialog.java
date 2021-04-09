@@ -108,6 +108,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createDisplayTab() {
+        // Create Panel Components
         JLabel labelDisplayDateFormat = new JLabel(resources.getString("labelDisplayDateFormat.text"));
         JLabel labelDisplayDateFormatExample = new JLabel();
         optionDisplayDateFormat = new JTextField();
@@ -154,12 +155,12 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle = new JComboBox<>(PersonnelFilterStyle.values());
         optionPersonnelFilterStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof PersonnelFilterStyle)
-                            ? ((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText() : "");
+                if (value instanceof PersonnelFilterStyle) {
+                    list.setToolTipText(((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText());
                 }
                 return this;
             }
@@ -227,6 +228,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createAutosaveTab() {
+        // Create Panel Components
         optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
         optionNoSave.setMnemonic(KeyEvent.VK_N);
 
@@ -295,6 +297,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createNewDayTab() {
+        // Create Panel Components
         optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
 
         // Layout the UI
@@ -319,6 +322,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createCampaignXMLSaveTab() {
+        // Create Panel Components
         optionPreferGzippedOutput = new JCheckBox(resources.getString("optionPreferGzippedOutput.text"));
         optionPreferGzippedOutput.setToolTipText(resources.getString("optionPreferGzippedOutput.toolTipText"));
 
@@ -361,6 +365,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createMiscellaneousTab() {
+        // Create Panel Components
         JLabel labelStartGameDelay = new JLabel(resources.getString("labelStartGameDelay.text"));
         labelStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
 
@@ -373,12 +378,12 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDefaultCompanyGenerationMethod = new JComboBox<>(CompanyGenerationMethod.values());
         optionDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationMethod)
-                            ? ((CompanyGenerationMethod) list.getSelectedValue()).getToolTipText() : "");
+                if (value instanceof CompanyGenerationMethod) {
+                    list.setToolTipText(((CompanyGenerationMethod) list.getSelectedValue()).getToolTipText());
                 }
                 return this;
             }

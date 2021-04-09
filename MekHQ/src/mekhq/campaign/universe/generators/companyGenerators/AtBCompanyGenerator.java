@@ -61,7 +61,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
      * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
      */
     @Override
-    protected int determineBattleMechWeight(int roll) {
+    protected int determineBattleMechWeight(final int roll) {
         switch (roll) {
             case 2:
             case 3:
@@ -89,7 +89,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
     @Override
-    protected int determineBattleMechQuality(int roll) {
+    protected int determineBattleMechQuality(final int roll) {
         switch (roll) {
             case 2:
             case 3:

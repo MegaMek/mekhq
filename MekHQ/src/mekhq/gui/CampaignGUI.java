@@ -2223,8 +2223,7 @@ public class CampaignGUI extends JPanel {
     protected void loadOptionsFile() {
         Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
 
-        // TODO : Java 11: Swap to isEmpty
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 

@@ -310,8 +310,7 @@ public class PersonnelHiringDetailPanel extends JPanel {
             }
         }
 
-        // TODO : Java 11 : Swap to using isBlank
-        if (!"-".equals(getPerson().getCallsign()) && !getPerson().getCallsign().trim().isEmpty()) {
+        if (!"-".equals(getPerson().getCallsign()) && !getPerson().getCallsign().isBlank()) {
             getLblCallsign().setText(String.format(resources.getString("PersonnelHiringDetailPanel.lblCallsign.text"), getPerson().getCallsign()));
             getLblCallsign().setVisible(true);
         } else {

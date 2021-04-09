@@ -41,7 +41,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
-    protected void generateCommandingOfficerRank(Person commandingOfficer, int numMechWarriors) {
+    protected void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors) {
         if (numMechWarriors > 36) {
             commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors > 12) {
@@ -64,7 +64,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
      */
     @Override
-    protected int determineBattleMechWeight(int roll) {
+    protected int determineBattleMechWeight(final int roll) {
         switch (roll) {
             case 2:
             case 3:
@@ -92,7 +92,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
     @Override
-    protected int determineBattleMechQuality(int roll) {
+    protected int determineBattleMechQuality(final int roll) {
         switch (roll) {
             case 2:
             case 3:

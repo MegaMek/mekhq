@@ -389,8 +389,7 @@ public class Force implements Serializable {
         if (!getCamouflage().hasDefaultFilename()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageFilename", getCamouflage().getFilename());
         }
-        // TODO : Java 11 : swap to isBlank
-        if (!getDescription().trim().isEmpty()) {
+        if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);

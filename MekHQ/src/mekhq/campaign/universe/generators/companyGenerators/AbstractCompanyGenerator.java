@@ -811,7 +811,8 @@ public abstract class AbstractCompanyGenerator {
      * @param tracker the tracker to generate based on the parameters and to assign the result to
      */
     private void generateEntity(final Campaign campaign, final CompanyGenerationPersonTracker tracker) {
-        tracker.setEntity(generateEntity(campaign, tracker.getParameters(), tracker.getPerson().getOriginFaction()));
+        tracker.setEntity((tracker.getParameters() == null) ? null
+            : generateEntity(campaign, tracker.getParameters(), tracker.getPerson().getOriginFaction()));
     }
 
     /**
@@ -960,8 +961,7 @@ public abstract class AbstractCompanyGenerator {
             iconMap.get(LayeredForceIcon.TYPE.getLayerPath()).add("BattleMech.png");
 
             // Background
-            // TODO : Java 11 : isBlank
-            if (!background.trim().isEmpty()) {
+            if (!background.isBlank()) {
                 iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
                 iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
             }
@@ -1073,8 +1073,7 @@ public abstract class AbstractCompanyGenerator {
         iconMap.get(LayeredForceIcon.FORMATION.getLayerPath()).add(isLance ? "04 Lance.png" : "06 Company.png");
 
         // Background
-        // TODO : Java 11 : isBlank
-        if (!background.trim().isEmpty()) {
+        if (!background.isBlank()) {
             iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
             iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
         }
