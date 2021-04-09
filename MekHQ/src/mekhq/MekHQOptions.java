@@ -65,11 +65,19 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
 
+    public boolean getCompanyGeneratorStartup() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMPANY_GENERATOR_STARTUP, false);
+    }
+
+    public void setCompanyGeneratorStartup(final boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMPANY_GENERATOR_STARTUP, value);
+    }
+
     public boolean getShowCompanyGenerator() {
         return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, false);
     }
 
-    public void setShowCompanyGenerator(boolean value) {
+    public void setShowCompanyGenerator(final boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
@@ -219,7 +227,7 @@ public final class MekHQOptions {
         return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, false);
     }
 
-    public void setSaveCompanyGenerationOptions(boolean value) {
+    public void setSaveCompanyGenerationOptions(final boolean value) {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, value);
     }
     //endregion Campaign XML Save Options

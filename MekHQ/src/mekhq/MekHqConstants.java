@@ -28,6 +28,7 @@ public final class MekHqConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
+    public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
 
     // region Command Center

@@ -39,6 +39,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private JCheckBox optionHistoricalDailyLog;
+    private JCheckBox optionCompanyGeneratorStartup;
     private JCheckBox optionShowCompanyGenerator;
 
     //region Command Center Display
@@ -126,6 +127,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
 
+        optionCompanyGeneratorStartup = new JCheckBox(resources.getString("optionCompanyGeneratorStartup.text"));
+        optionCompanyGeneratorStartup.setToolTipText(resources.getString("optionCompanyGeneratorStartup.toolTipText"));
+        optionCompanyGeneratorStartup.setName("optionCompanyGeneratorStartup");
+
         optionShowCompanyGenerator = new JCheckBox(resources.getString("optionShowCompanyGenerator.text"));
         optionShowCompanyGenerator.setToolTipText(resources.getString("optionShowCompanyGenerator.toolTipText"));
         optionShowCompanyGenerator.setName("optionShowCompanyGenerator");
@@ -182,6 +187,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionLongDisplayDateFormat)
                                 .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
                         .addComponent(optionHistoricalDailyLog)
+                        .addComponent(optionCompanyGeneratorStartup)
                         .addComponent(optionShowCompanyGenerator)
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
@@ -205,6 +211,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionLongDisplayDateFormat)
                                 .addComponent(labelLongDisplayDateFormatExample))
                         .addComponent(optionHistoricalDailyLog)
+                        .addComponent(optionCompanyGeneratorStartup)
                         .addComponent(optionShowCompanyGenerator)
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
@@ -419,6 +426,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
+        MekHQ.getMekHQOptions().setCompanyGeneratorStartup(optionCompanyGeneratorStartup.isSelected());
         MekHQ.getMekHQOptions().setShowCompanyGenerator(optionShowCompanyGenerator.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
@@ -450,6 +458,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
+        optionCompanyGeneratorStartup.setSelected(MekHQ.getMekHQOptions().getCompanyGeneratorStartup());
         optionShowCompanyGenerator.setSelected(MekHQ.getMekHQOptions().getShowCompanyGenerator());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());

@@ -291,7 +291,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> openCompanyGenerationOptions(JFrame frame) {
+    public static Optional<File> openCompanyGenerationOptions(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Company Generation Options",
                 FileType.XML, MekHQ.getMekHQOptions().getCompanyGenerationDirectoryPath());
 
@@ -304,7 +304,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveCompanyGenerationOptions(JFrame frame) {
+    public static Optional<File> saveCompanyGenerationOptions(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Company Generation Options",
                 FileType.XML, MekHQ.getMekHQOptions().getCompanyGenerationDirectoryPath(),
                 "myoptions.xml");
