@@ -22,9 +22,12 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 
 import javax.swing.*;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RankValidator {
     //region Constructors
@@ -87,13 +90,69 @@ public class RankValidator {
             return false;
         }
 
-        // Index 0 needs to be checked individually, as all systems MUST either be filled or indicate
-        // an alternative system
+        // Index 0 needs to be checked individually for empty ranks, as that is a no-go.
+        // Additionally, we need to setup the default professions for later redirect testing
+        final Rank initialRank = rankSystem.getRank(0);
+        final Profession[] professions = Profession.values();
+        final Set<Profession> defaultProfessions = new HashSet<>(); // Professions with legal level 1 names
+        for (final Profession profession : professions) {
+            if (initialRank.isEmpty(profession)) {
+                MekHQ.getLogger().error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
+                return false;
+            } else if (!initialRank.indicatesAlternativeSystem(profession)) {
+                defaultProfessions.add(profession);
+            }
+        }
 
-        // The rest of the levels need to not be an infinite loop and valid
+        // We do require a single default profession
+        if (defaultProfessions.isEmpty()) {
+            MekHQ.getLogger().error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
+        }
+
+        // Now, we need to check each profession
+        for (final Profession profession : professions) {
+            // Default professions do not indicate an alternative and cannot be empty, so we can skip
+            // some processing for them
+            if (!defaultProfessions.contains(profession)) {
+                // Check the initial rank to ensure it doesn't include an infinite loop for this profession
+                if (!validateRankAlternatives(initialRank, profession, professions.length, 0)) {
+                    return false;
+                }
+
+                // Empty professions at this point can be skipped, as they are valid if their initial
+                // rank isn't an infinite loop
+                if (profession.isEmptyProfession(rankSystem)) {
+                    continue;
+                }
+            }
+
+            // Now we need to validate the rest of this system's ranks for this profession
+            for (final Rank rank : rankSystem.getRanks()) {
+                if (rank.indicatesAlternativeSystem(profession)
+                        && !validateRankAlternatives(rank, profession, professions.length, 0)) {
+                    return false;
+                }
+            }
+        }
 
         // Validation has passed successfully
         return true;
+    }
+
+    private boolean validateRankAlternatives(final Rank rank, final Profession profession,
+                                             final int maxRecursions, final int recursion) {
+        if (recursion > maxRecursions) {
+            MekHQ.getLogger().error("");
+            return false;
+        } else if (rank.isEmpty(profession)) {
+            MekHQ.getLogger().error("");
+            return false;
+        } else if (rank.indicatesAlternativeSystem(profession)) {
+            return validateRankAlternatives(rank, profession.getAlternateProfession(rank),
+                    maxRecursions, recursion + 1);
+        } else {
+            return true;
+        }
     }
 
     public void checkAssignedRankSystems(final Campaign campaign) {
@@ -106,7 +165,7 @@ public class RankValidator {
 
         // Then, we need to fix any old rank system assignments for personnel
         for (final Person person : campaign.getPersonnel()) {
-
+            
         }
     }
 

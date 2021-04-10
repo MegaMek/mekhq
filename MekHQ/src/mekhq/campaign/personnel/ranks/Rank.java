@@ -152,7 +152,8 @@ public class Rank implements Serializable {
 
     //region Boolean Comparison Methods
     public boolean isEmpty(final Profession profession) {
-        return !getRankNames().containsKey(profession) || getRankNames().get(profession).equals("-");
+        return !getRankNames().containsKey(profession) || getRankNames().get(profession).isBlank()
+                || getRankNames().get(profession).equals("-");
     }
 
     public boolean indicatesAlternativeSystem(final Profession profession) {
