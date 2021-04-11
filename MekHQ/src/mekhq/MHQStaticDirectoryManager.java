@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,6 +26,7 @@ import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
+import mekhq.io.AwardFileFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -91,7 +92,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseAwardIconDirectory = false;
             try {
                 awardIconDirectory = new DirectoryItems(new File("data/images/awards"),
-                        "", new ImageFileFactory());
+                        "", new AwardFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the award icon directory!", e);
             }
