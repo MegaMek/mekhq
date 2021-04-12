@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
@@ -157,8 +156,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Unit(Entity en, Campaign c) {
         this.entity = en;
         if (entity != null) {
-            entity.setCamoCategory(null);
-            entity.setCamoFileName(null);
+            entity.setCamouflage(new Camouflage());
         }
         this.site = SITE_BAY;
         this.campaign = c;
@@ -3285,42 +3283,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (entity == null) ? new Camouflage() : entity.getCamouflage();
     }
 
-    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
-        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
-    }
-
-    public String getCamoCategory() {
-        if (null == entity) {
-            return "";
+    public Camouflage getUtilizedCamouflage(final Campaign campaign) {
+        if (getCamouflage().hasDefaultCategory()) {
+            final Force force = campaign.getForce(getForceId());
+            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage())
+                    : campaign.getCamouflage();
+        } else {
+            return getCamouflage();
         }
-
-        String category = getCampaign().getCamoCategory();
-        if (isEntityCamo()) {
-            category = entity.getCamoCategory();
-        }
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        return category;
-    }
-
-    public String getCamoFileName() {
-        if (null == getCampaign() || null == entity) {
-            return "";
-        }
-
-        String fileName = getCampaign().getCamoFileName();
-        if (isEntityCamo()) {
-            fileName = entity.getCamoFileName();
-        }
-
-        if (null == fileName) {
-            fileName = "";
-        }
-
-        return fileName;
     }
 
     public Image getImage(Component component) {
@@ -3328,7 +3298,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getCamouflageOrElse(getCampaign().getCamouflage()),
+        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
                 component, getEntity()).loadPreviewImage();
     }
 
@@ -4695,10 +4665,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return null;
-    }
-
-    public boolean isEntityCamo() {
-        return !getCamouflage().hasDefaultCategory();
     }
 
     public int getAvailability(int era) {

@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -81,16 +82,19 @@ public class AwardsFactory {
     }
 
     /**
-     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates a copy of that
-     * award in order for it to be given to someone.
+     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates
+     * a copy of that award in order for it to be given to someone.
      * @param setName the name of the set
      * @param awardName the name of the award
-     * @return list with the awards belonging to that set
+     * @return the copied award, or null if one cannot be copied
      */
-    public Award generateNew(String setName, String awardName) {
-        Map<String, Award> awardSet = awardsMap.get(setName);
-        Award blueprintAward = awardSet.get(awardName);
-        return blueprintAward.createCopy();
+    public @Nullable Award generateNew(final String setName, final String awardName) {
+        final Map<String, Award> awardSet = awardsMap.get(setName);
+        if (awardSet == null) {
+            return null;
+        }
+        final Award award = awardSet.get(awardName);
+        return (award == null) ? null : award.createCopy();
     }
 
     /**
@@ -99,7 +103,7 @@ public class AwardsFactory {
      * @param defaultSetMigration whether or not to check if the default set needs to be migrated
      * @return an award
      */
-    public Award generateNewFromXML(Node node, final boolean defaultSetMigration) {
+    public @Nullable Award generateNewFromXML(final Node node, final boolean defaultSetMigration) {
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -119,21 +123,22 @@ public class AwardsFactory {
                 }
             }
         } catch (Exception ex) {
-            // Doh!
             MekHQ.getLogger().error(ex);
         }
 
         if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
             name = (name == null) ? "" : name;
-            String newName = PersonMigrator.awardDefaultSetMigrator(name);
+            final String newName = PersonMigrator.awardDefaultSetMigrator(name);
             if (newName != null) {
                 set = "standard";
                 name = newName;
             }
         }
 
-        Award award = generateNew(set, name);
-        award.setDates(dates);
+        final Award award = generateNew(set, name);
+        if (award != null) {
+            award.setDates(dates);
+        }
         return award;
     }
 

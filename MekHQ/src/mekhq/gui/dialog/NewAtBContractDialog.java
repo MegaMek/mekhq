@@ -39,8 +39,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.model.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -75,9 +75,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewAtBContractDialog.class);
-
-        this.setName("dialog");
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
+        setName("NewAtBContractDialog");
         preferences.manage(new JWindowPreference(this));
     }
 
@@ -87,7 +86,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         employerSet = RandomFactionGenerator.getInstance().getEmployerSet();
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
-        ((AtBContract)contract).initContractDetails(campaign);
+        ((AtBContract) contract).initContractDetails(campaign);
         IUnitRating rating = campaign.getUnitRating();
         dragoonRating = rating.getUnitRatingAsInteger();
         super.initComponents();
@@ -122,7 +121,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract)(this.contract);
 
         java.awt.GridBagConstraints gbc;
-        txtName = new javax.swing.JTextField();
+        txtName = new JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
         cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
@@ -130,13 +129,13 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
-        cbPlanets = new JComboBox<String>();
-        cbPlanets.setModel(new SortedComboBoxModel<String>());
+        cbPlanets = new JComboBox<>();
+        cbPlanets.setModel(new SortedComboBoxModel<>());
         chkShowAllPlanets = new JCheckBox();
-        cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+        cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,42 +31,35 @@ import java.util.ResourceBundle;
 
 public enum Marriage {
     //region Enum Declarations
-    NO_CHANGE(0, "Marriage.NO_CHANGE.text", "Marriage.NO_CHANGE.toolTipText", "Marriage.NO_CHANGE.dropDownText"),
-    YOURS(1, "Marriage.YOURS.text", "Marriage.YOURS.toolTipText", "Marriage.YOURS.dropDownText"),
-    SPOUSE(2, "Marriage.SPOUSE.text", "Marriage.SPOUSE.toolTipText", "Marriage.SPOUSE.dropDownText"),
+    NO_CHANGE("Marriage.NO_CHANGE.text", "Marriage.NO_CHANGE.toolTipText", "Marriage.NO_CHANGE.dropDownText"),
+    YOURS("Marriage.YOURS.text", "Marriage.YOURS.toolTipText", "Marriage.YOURS.dropDownText"),
+    SPOUSE("Marriage.SPOUSE.text", "Marriage.SPOUSE.toolTipText", "Marriage.SPOUSE.dropDownText"),
 
-    SPACE_YOURS(3, "Marriage.SPACE_YOURS.text", "Marriage.SPACE_YOURS.toolTipText", "Marriage.SPACE_YOURS.dropDownText"),
-    BOTH_SPACE_YOURS(4, "Marriage.BOTH_SPACE_YOURS.text", "Marriage.BOTH_SPACE_YOURS.toolTipText", "Marriage.BOTH_SPACE_YOURS.dropDownText"),
-    HYP_YOURS(5, "Marriage.HYP_YOURS.text", "Marriage.HYP_YOURS.toolTipText", "Marriage.HYP_YOURS.dropDownText"),
-    BOTH_HYP_YOURS(6, "Marriage.BOTH_HYP_YOURS.text", "Marriage.BOTH_HYP_YOURS.toolTipText", "Marriage.BOTH_HYP_YOURS.dropDownText"),
+    SPACE_YOURS("Marriage.SPACE_YOURS.text", "Marriage.SPACE_YOURS.toolTipText", "Marriage.SPACE_YOURS.dropDownText"),
+    BOTH_SPACE_YOURS( "Marriage.BOTH_SPACE_YOURS.text", "Marriage.BOTH_SPACE_YOURS.toolTipText", "Marriage.BOTH_SPACE_YOURS.dropDownText"),
+    HYP_YOURS("Marriage.HYP_YOURS.text", "Marriage.HYP_YOURS.toolTipText", "Marriage.HYP_YOURS.dropDownText"),
+    BOTH_HYP_YOURS("Marriage.BOTH_HYP_YOURS.text", "Marriage.BOTH_HYP_YOURS.toolTipText", "Marriage.BOTH_HYP_YOURS.dropDownText"),
 
-    SPACE_SPOUSE(7, "Marriage.SPACE_SPOUSE.text", "Marriage.SPACE_SPOUSE.toolTipText", "Marriage.SPACE_SPOUSE.dropDownText"),
-    BOTH_SPACE_SPOUSE(8, "Marriage.BOTH_SPACE_SPOUSE.text", "Marriage.BOTH_SPACE_SPOUSE.toolTipText", "Marriage.BOTH_SPACE_SPOUSE.dropDownText"),
-    HYP_SPOUSE(9, "Marriage.HYP_SPOUSE.text", "Marriage.HYP_SPOUSE.toolTipText", "Marriage.HYP_SPOUSE.dropDownText"),
-    BOTH_HYP_SPOUSE(10, "Marriage.BOTH_HYP_SPOUSE.text", "Marriage.BOTH_HYP_SPOUSE.toolTipText", "Marriage.BOTH_HYP_SPOUSE.dropDownText"),
+    SPACE_SPOUSE("Marriage.SPACE_SPOUSE.text", "Marriage.SPACE_SPOUSE.toolTipText", "Marriage.SPACE_SPOUSE.dropDownText"),
+    BOTH_SPACE_SPOUSE( "Marriage.BOTH_SPACE_SPOUSE.text", "Marriage.BOTH_SPACE_SPOUSE.toolTipText", "Marriage.BOTH_SPACE_SPOUSE.dropDownText"),
+    HYP_SPOUSE("Marriage.HYP_SPOUSE.text", "Marriage.HYP_SPOUSE.toolTipText", "Marriage.HYP_SPOUSE.dropDownText"),
+    BOTH_HYP_SPOUSE("Marriage.BOTH_HYP_SPOUSE.text", "Marriage.BOTH_HYP_SPOUSE.toolTipText", "Marriage.BOTH_HYP_SPOUSE.dropDownText"),
 
-    MALE(11, "Marriage.MALE.text", "Marriage.MALE.toolTipText", "Marriage.MALE.dropDownText"),
-    FEMALE(12, "Marriage.FEMALE.text", "Marriage.FEMALE.toolTipText", "Marriage.FEMALE.dropDownText"),
+    MALE("Marriage.MALE.text", "Marriage.MALE.toolTipText", "Marriage.MALE.dropDownText"),
+    FEMALE("Marriage.FEMALE.text", "Marriage.FEMALE.toolTipText", "Marriage.FEMALE.dropDownText"),
     WEIGHTED("Marriage.WEIGHTED.text", "Marriage.WEIGHTED.toolTipText", "Marriage.WEIGHTED.dropDownText");
     // NOTE: WEIGHTED MUST be the last option, or otherwise the WeightedMap creation method must change
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final int weightsNumber;
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    Marriage(String name, String toolTipText, String dropDownText) {
-        this(-1, name, toolTipText, dropDownText);
-    }
-
-    Marriage(int weightsNumber, String name, String toolTipText, String dropDownText) {
-        this.weightsNumber = weightsNumber;
+    Marriage(final String name, final String toolTipText, final String dropDownText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -74,10 +67,6 @@ public enum Marriage {
     //endregion Constructors
 
     //region Getters
-    public int getWeightsNumber() {
-        return weightsNumber;
-    }
-
     public String getToolTipText() {
         return toolTipText;
     }
@@ -87,9 +76,9 @@ public enum Marriage {
     }
     //endregion Getters
 
-    public void marry(Person origin, Person spouse, Campaign campaign) {
-        String surname = origin.getSurname();
-        String spouseSurname = spouse.getSurname();
+    public void marry(final Campaign campaign, final Person origin, final Person spouse) {
+        final String surname = origin.getSurname();
+        final String spouseSurname = spouse.getSurname();
         Marriage surnameStyle = this;
 
         if (surnameStyle == WEIGHTED) {
@@ -190,8 +179,8 @@ public enum Marriage {
                 break;
             case WEIGHTED:
             default:
-                MekHQ.getLogger().error(this, String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
-                                origin.getFullName(), spouse.getFullName()));
+                MekHQ.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                        origin.getFullName(), spouse.getFullName()));
                 break;
         }
 
@@ -199,8 +188,8 @@ public enum Marriage {
         origin.setMaidenName(surname);
         spouse.setMaidenName(spouseSurname);
 
-        origin.getGenealogy().setSpouse(spouse.getId());
-        spouse.getGenealogy().setSpouse(origin.getId());
+        origin.getGenealogy().setSpouse(spouse);
+        spouse.getGenealogy().setSpouse(origin);
 
         // Then we do the logging
         PersonalLogger.marriage(origin, spouse, campaign.getLocalDate());
@@ -224,15 +213,13 @@ public enum Marriage {
     }
 
 
-    private WeightedMap<Marriage> createWeightedSurnameMap(Campaign campaign) {
-        WeightedMap<Marriage> map = new WeightedMap<>();
-
-        int[] weights = campaign.getCampaignOptions().getRandomMarriageSurnameWeights();
-        Marriage[] styles = Marriage.values();
+    private WeightedMap<Marriage> createWeightedSurnameMap(final Campaign campaign) {
+        final WeightedMap<Marriage> map = new WeightedMap<>();
+        final int[] weights = campaign.getCampaignOptions().getMarriageSurnameWeights();
+        final Marriage[] styles = Marriage.values();
         for (int i = 0; i < (styles.length - 1); i++) {
             map.add(weights[i], styles[i]);
         }
-
         return map;
     }
 
