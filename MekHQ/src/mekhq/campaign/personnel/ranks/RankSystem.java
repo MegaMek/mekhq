@@ -58,6 +58,13 @@ public class RankSystem implements Serializable {
         this("UNK", "Unknown", type);
     }
 
+    public RankSystem(final RankSystem rankSystem) {
+        setRankSystemCode(rankSystem.getRankSystemCode());
+        setRankSystemName(rankSystem.toString());
+        setType(rankSystem.getType());
+        setRanks(new ArrayList<>(rankSystem.getRanks()));
+    }
+
     public RankSystem(final String rankSystemCode, final String rankSystemName, final RankSystemType type) {
         setRankSystemCode(rankSystemCode);
         setRankSystemName(rankSystemName);

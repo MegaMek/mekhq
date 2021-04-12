@@ -4749,12 +4749,15 @@ public class CampaignOptionsDialog extends JDialog {
         final JLabel lblRankSystem = new JLabel(resources.getString("lblRankSystem.text"));
         lblRankSystem.setName("lblRankSystem");
 
-        selectedRankSystem = campaign.getRankSystem();
+        selectedRankSystem = new RankSystem(campaign.getRankSystem());
 
         final Comparator<String> comparator = new NaturalOrderComparator();
         rankSystemModel = new SortedComboBoxModel<>(
-                (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()),
-                Ranks.getRankSystems().values());
+                (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()));
+        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
+            rankSystemModel.addElement(rankSystem.getType().isUserData()
+                    ? new RankSystem(rankSystem) : rankSystem);
+        }
         if (selectedRankSystem.getType().isCampaign()) {
             rankSystemModel.addElement(selectedRankSystem);
         }
@@ -5032,7 +5035,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Update the rank system model
         rankSystemModel.removeAllElements();
-        rankSystemModel.addAll(Ranks.getRankSystems().values());
+        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
+            rankSystemModel.addElement(new RankSystem(rankSystem));
+        }
 
         // Revalidate all of the Campaign Rank Systems before adding, as we need to ensure no duplicate keys
         final RankValidator rankValidator = new RankValidator();
