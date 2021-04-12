@@ -106,7 +106,7 @@ public class Rank implements Serializable {
     public void setPayMultiplier(final double payMultiplier) {
         this.payMultiplier = payMultiplier;
     }
-    //endregion Getters/Setter
+    //endregion Getters/Setters
 
     //region Initialization
     private void initializeRank(final String... names) {
@@ -161,7 +161,7 @@ public class Rank implements Serializable {
     }
     //endregion Boolean Comparison Methods
 
-    //region File IO
+    //region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final int index) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rank");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
@@ -209,5 +209,5 @@ public class Rank implements Serializable {
 
         return rank;
     }
-    //endregion File IO
+    //endregion File I/O
 }

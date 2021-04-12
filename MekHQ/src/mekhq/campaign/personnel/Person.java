@@ -1701,7 +1701,7 @@ public class Person implements Serializable {
         return extraData;
     }
 
-    //region File IO
+    //region File I/O
     public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
                 + "\" type=\"" + this.getClass().getName() + "\">");
@@ -1788,20 +1788,20 @@ public class Person implements Serializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "gender", getGender().name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "rankSystem", getRankSystem().getRankSystemCode());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rankSystem", getRankSystem().getRankSystemCode());
             }
             // Always save a person's rank
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rank", getRankNumeric());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rank", getRankNumeric());
             if (getRankLevel() != 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rankLevel", getRankLevel());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rankLevel", getRankLevel());
             }
             if (!getManeiDominiClass().isNone()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "maneiDominiClass", getManeiDominiClass().name());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maneiDominiClass", getManeiDominiClass().name());
             }
             if (!getManeiDominiRank().isNone()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "maneiDominiRank", getManeiDominiRank().name());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maneiDominiRank", getManeiDominiRank().name());
             }
             if (nTasks > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
@@ -2321,7 +2321,7 @@ public class Person implements Serializable {
 
         return retVal;
     }
-    //endregion File IO
+    //endregion File I/O
 
     public void setSalary(Money s) {
         salary = s;
@@ -2492,7 +2492,7 @@ public class Person implements Serializable {
                 : getPrisonerStatus().getTitleExtension() + rankName;
 
         // We have our name, return it
-        return rankName;
+        return rankName.trim();
     }
 
     public ManeiDominiClass getManeiDominiClass() {
@@ -2779,7 +2779,7 @@ public class Person implements Serializable {
         String rank = getRankName();
 
         if (!rank.isBlank()) {
-            rank = rank.trim() + " ";
+            rank = rank + " ";
         }
 
         return rank + getFullName();

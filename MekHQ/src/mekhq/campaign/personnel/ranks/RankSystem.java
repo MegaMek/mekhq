@@ -84,7 +84,7 @@ public class RankSystem implements Serializable {
         return type;
     }
 
-    public void setType(RankSystemType type) {
+    public void setType(final RankSystemType type) {
         this.type = type;
     }
 
@@ -132,7 +132,7 @@ public class RankSystem implements Serializable {
         return ranks.size() - 1;
     }
 
-    //region File IO
+    //region File I/O
     public void writeToFile(File file) {
         if (file == null) {
             return;
@@ -237,7 +237,7 @@ public class RankSystem implements Serializable {
             int rankSystemId = -1; // migration, 0.49.X
 
             for (int x = 0; x < nl.getLength(); x++) {
-                Node wn = nl.item(x);
+                final Node wn = nl.item(x);
 
                 if (Stream.of("system", "rankSystem", "systemId").anyMatch(s -> wn.getNodeName().equalsIgnoreCase(s))) { // Legacy, 0.49.0 removal
                     rankSystemId = Integer.parseInt(wn.getTextContent().trim());
@@ -270,7 +270,7 @@ public class RankSystem implements Serializable {
         }
         return rankSystem;
     }
-    //endregion File IO
+    //endregion File I/O
 
     @Override
     public String toString() {

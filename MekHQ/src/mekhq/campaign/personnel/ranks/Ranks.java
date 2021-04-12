@@ -53,7 +53,6 @@ import java.util.ResourceBundle;
  */
 public class Ranks {
     //region Variable Declarations
-    // Rank System Codes
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
 
     private static Map<String, RankSystem> rankSystems;
@@ -80,7 +79,7 @@ public class Ranks {
     }
     //endregion Getters/Setters
 
-    //region File IO
+    //region File I/O
     public static void exportRankSystemsToFile(final @Nullable File file, final RankSystem rankSystem) {
         if (file == null) {
             return;
@@ -163,8 +162,8 @@ public class Ranks {
 
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
             return new ArrayList<>();
         }
 
@@ -188,5 +187,5 @@ public class Ranks {
         }
         return rankSystems;
     }
-    //endregion File IO
+    //endregion File I/O
 }

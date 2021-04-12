@@ -503,6 +503,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                         payoutAmount = payoutAmount.multipliedBy(2);
                     }
                 }
+
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (p.getOriginalUnitWeight() > 0)) {
                     weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
