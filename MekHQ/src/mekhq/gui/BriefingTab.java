@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.Entity;
@@ -229,6 +230,11 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
         ScenarioTableMouseAdapter.connect(getCampaignGui(), scenarioTable, scenarioModel);
+        for (int i = 0; i < ScenarioTableModel.N_COL; i++) {
+            final TableColumn column = scenarioTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(scenarioModel.getColumnWidth(i));
+            column.setCellRenderer(scenarioModel.getRenderer());
+        }
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 
@@ -836,17 +842,20 @@ public final class BriefingTab extends CampaignGuiTab {
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        final boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).size() > 0;
-        final boolean canStartGame = scenario.getStatus().isCurrent() && unitsAssigned;
+        // The following has some confusing naming. canStartAnyGame is used for any check that
+        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
+        // the additional date check is required.
+        final boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
+        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
         boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartGame;
+                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
         btnStartGame.setEnabled(canStartAtBGame);
         btnJoinGame.setEnabled(canStartAtBGame);
         btnLoadGame.setEnabled(canStartAtBGame);
-        btnGetMul.setEnabled(canStartGame);
-        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canStartAnyGame);
+        btnClearAssignedUnits.setEnabled(canStartAnyGame);
         btnResolveScenario.setEnabled(canStartAtBGame);
-        btnPrintRS.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartAnyGame);
     }
 
     public void refreshLanceAssignments() {

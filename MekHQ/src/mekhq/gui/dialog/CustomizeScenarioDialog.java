@@ -20,18 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -48,9 +38,18 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * @author  Taharqa
@@ -168,6 +167,18 @@ public class CustomizeScenarioDialog extends JDialog {
             choiceStatus.setModel(new DefaultComboBoxModel<>(ScenarioStatus.values()));
             choiceStatus.setName("choiceStatus");
             choiceStatus.setSelectedItem(scenario.getStatus());
+            choiceStatus.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                              final int index, final boolean isSelected,
+                                                              final boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof ScenarioStatus) {
+                        list.setToolTipText(((ScenarioStatus) value).getToolTipText());
+                    }
+                    return this;
+                }
+            });
             gridBagConstraints.gridx = 1;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             panMain.add(choiceStatus, gridBagConstraints);

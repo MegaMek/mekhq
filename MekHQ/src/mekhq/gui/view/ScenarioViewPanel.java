@@ -137,8 +137,9 @@ public class ScenarioViewPanel extends ScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
+        lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + scenario.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

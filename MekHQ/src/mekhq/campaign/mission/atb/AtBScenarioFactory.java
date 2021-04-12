@@ -251,21 +251,24 @@ public class AtBScenarioFactory {
                         lList.add(l);
                     }
                 }
-                if (lList.size() == 0) {
+
+                if (lList.isEmpty()) {
                     for (Lance l : lances.values()) {
-                        if (l.getMissionId() == contract.getId() && l.isEligible(c)) {
+                        if ((l.getMissionId() == contract.getId()) && l.isEligible(c)) {
                             lList.add(l);
                         }
                     }
                 }
-                if (lList.size() == 0) {
+
+                if (lList.isEmpty()) {
                     for (Lance l : lances.values()) {
                         if (l.isEligible(c)) {
                             lList.add(l);
                         }
                     }
                 }
-                if (lList.size() > 0) {
+
+                if (!lList.isEmpty()) {
                     Lance lance = Utilities.getRandomItem(lList);
                     AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
                             AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
