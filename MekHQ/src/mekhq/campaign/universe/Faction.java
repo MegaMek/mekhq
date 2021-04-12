@@ -60,7 +60,6 @@ public class Faction {
     private int[] eraMods;
     private Color color;
     private String currencyCode = ""; // Currency of the faction, if any
-    private boolean playable;
     private Set<Tag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
@@ -78,7 +77,6 @@ public class Faction {
         color = Color.LIGHT_GRAY;
         startingPlanet = "Terra";
         eraMods = null;
-        setPlayable(false);
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
         end = 9999;
@@ -154,14 +152,6 @@ public class Faction {
         }
     }
 
-    public boolean isPlayable() {
-        return playable;
-    }
-
-    public void setPlayable(final boolean playable) {
-        this.playable = playable;
-    }
-
     public boolean is(Tag tag) {
         return tags.contains(tag);
     }
@@ -187,6 +177,10 @@ public class Faction {
     }
 
     //region Checks
+    public boolean isPlayable() {
+        return is(Tag.PLAYABLE);
+    }
+
     public boolean isMercenary() {
         return is(Tag.MERC);
     }
@@ -303,8 +297,6 @@ public class Faction {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                 retVal.currencyCode = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("playable")) {
-                retVal.setPlayable(true);
             } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
                 Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
                         .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
@@ -385,6 +377,8 @@ public class Faction {
         /** Faction is hidden from view */
         HIDDEN,
         /** Faction code is not intended to be for players */
-        SPECIAL
+        SPECIAL,
+        /** Faction is meant to be played */
+        PLAYABLE
     }
 }

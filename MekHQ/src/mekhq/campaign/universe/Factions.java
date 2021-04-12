@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +49,6 @@ public class Factions {
     private static Factions instance;
 
     private Map<String, Faction> factions = new HashMap<>();
-    private final List<Faction> choosableFactions = new ArrayList<>();
 
     private RATGenerator ratGenerator;
     //endregion Variable Declarations
@@ -84,7 +84,7 @@ public class Factions {
     }
 
     public List<Faction> getChoosableFactions() {
-        return choosableFactions;
+        return getFactions().stream().filter(Faction::isPlayable).collect(Collectors.toList());
     }
 
     public Collection<Faction> getFactions() {
@@ -211,10 +211,6 @@ public class Factions {
                     Faction faction = Faction.getFactionFromXML(wn);
                     if (!retVal.factions.containsKey(faction.getShortName())) {
                         retVal.factions.put(faction.getShortName(), faction);
-
-                        if (faction.isPlayable()) {
-                            retVal.getChoosableFactions().add(faction);
-                        }
                     } else {
                         MekHQ.getLogger().error(
                                 String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",

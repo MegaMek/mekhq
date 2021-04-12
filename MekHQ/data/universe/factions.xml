@@ -24,8 +24,7 @@ eraMods - A comma-separated 9-item list of optional modifiers to repair/replacem
 nameGenerator - The name of the faction name generator that should be used for this faction. If left out, then this defaults to "General."
 colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map for this faction. Defaults to light gray if missing.
 currencyCode - partially implemented (likely buggy) currency code value used by the faction.
-playable - if this is present the faction is playable
-tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
+tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos", "playable"
 start - the founding date of the faction
 end - the date the faction ceases to exist
 successor - unimplemented tag describing another faction code as the specified faction's successor
@@ -69,8 +68,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>255,255,255</colorRGB>
-		<playable/>
-        <tags>is,super</tags>
+        <tags>is,super,playable</tags>
         <start>2315</start>
         <end>2790</end>
     </faction>
@@ -99,8 +97,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>0,156,85</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>2367</start>
     </faction>
     <faction>
@@ -111,8 +108,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>DC</nameGenerator>
         <colorRGB>234,45,46</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>2319</start>
     </faction>
     <faction>
@@ -122,8 +118,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
         <colorRGB>248,212,44</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>2317</start>
     </faction>
     <faction>
@@ -133,8 +128,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>165,94,160</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>2271</start>
     </faction>
     <faction>
@@ -146,8 +140,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>LA</nameGenerator>
         <colorRGB>0,124,186</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>2340</start>
     </faction>
     <!-- Star League Era factions -->
@@ -424,8 +417,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Apollo</startingPlanet>
         <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
         <colorRGB>232,202,173</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2250</start>
         <end>2779</end>
     </faction>
@@ -456,8 +448,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Taurus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>179,62,38</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2335</start>
     </faction>
     <faction>
@@ -466,8 +457,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Canopus IV</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,1</eraMods>
         <colorRGB>57,158,145</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2530</start>
     </faction>
     <faction>
@@ -477,8 +467,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>210,190,153</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2413</start>
         <end>3083</end>
     </faction>
@@ -533,8 +522,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Erod's Escape</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,128,128</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2253</start> 
         <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
     </faction>
@@ -571,8 +559,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>255,99,71</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3085</end>
     </faction>
@@ -593,8 +580,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>147,112,219</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -604,8 +590,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,0,205</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -626,8 +611,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,255,255</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -637,8 +621,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>165,42,42</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3073</end>
     </faction>
@@ -651,8 +634,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
-		<playable/>
-        <tags>clan,major</tags>
+        <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3103</end>
     </faction>
@@ -664,8 +646,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>238,232,170</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3080</end>
     </faction>
@@ -678,8 +659,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>241,168,110</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -689,8 +669,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>248,248,255</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3074</end>
     </faction>
@@ -702,8 +681,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>172,208,115</colorRGB>
-		<playable/>
-        <tags>clan,major</tags>
+        <tags>clan,major,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -724,8 +702,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>245,255,250</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3143</end>
     </faction>
@@ -737,8 +714,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>152,164,129</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3060</end>
     </faction>
@@ -750,8 +726,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>135,206,235</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3083</end>
     </faction>
@@ -762,8 +737,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>218,165,32</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
     <faction>
@@ -773,8 +747,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>127,255,0</colorRGB>
-		<playable/>
-        <tags>clan,minor</tags>
+        <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3075</end>
     </faction>
@@ -807,8 +780,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>207,114,58</colorRGB>
-		<playable/>
-        <tags>clan,major</tags>
+        <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3142</end>
     </faction>
@@ -850,8 +822,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year='3059'>Tukayyid</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>255,250,240</colorRGB>
-		<playable/>
-        <tags>is,inactive,major</tags>
+        <tags>is,inactive,major,playable</tags>
         <start>2788</start>
     </faction>
     <faction>
@@ -961,8 +932,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <colorRGB>248,212,44</colorRGB>
-		<playable/>
-        <tags>is,super</tags>
+        <tags>is,super,playable</tags>
     </faction>
     <faction>
         <shortname>FVC</shortname>
@@ -983,8 +953,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>116,171,206</colorRGB>
-		<playable/>
-        <tags>is,minor</tags>
+        <tags>is,minor,playable</tags>
         <start>3034</start>
         <end>3103</end>
     </faction>
@@ -1024,8 +993,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Bremen (HL)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>219,112,147</colorRGB>
-		<playable/>
-        <tags>deep_periphery</tags>
+        <tags>deep_periphery,playable</tags>
         <start>2891</start>
     </faction>
     <faction>
@@ -1115,8 +1083,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alphard (MH)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>236,136,65</colorRGB>
-		<playable/>
-        <tags>periphery</tags>
+        <tags>periphery,playable</tags>
         <start>2920</start>
     </faction>
     <faction>
@@ -1151,8 +1118,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year='3067'>Galatea</changePlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>169,169,169</colorRGB>
-		<playable/>
-        <tags>merc</tags>
+        <tags>merc,playable</tags>
     </faction>
     <faction>
         <shortname>MV</shortname>
@@ -1200,8 +1166,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Asturias</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
-		<playable/>
-        <tags>deep_periphery</tags>
+        <tags>deep_periphery,playable</tags>
         <start>2392</start>
         <end>3080</end>
     </faction>
@@ -1278,8 +1243,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
-		<playable/>
-        <tags>clan,is,minor</tags>
+        <tags>clan,is,minor,playable</tags>
         <start>3103</start>
     </faction>
     <faction>
@@ -1289,8 +1253,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>25,120,110</colorRGB>
-		<playable/>
-        <tags>clan,periphery</tags>
+        <tags>clan,periphery,playable</tags>
         <start>3083</start>
     </faction>
     <faction>
@@ -1322,8 +1285,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>207,119,57</colorRGB>
-		<playable/>
-        <tags>is,major</tags>
+        <tags>is,major,playable</tags>
         <start>3081</start>
     </faction>
     <faction>
@@ -1419,8 +1381,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>188,223,186</colorRGB>
-		<playable/>
-        <tags>is,minor</tags>
+        <tags>is,minor,playable</tags>
         <start>3029</start>
         <end>3063</end>
     </faction>
@@ -1430,8 +1391,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>176,196,222</colorRGB>
-		<playable/>
-        <tags>is,super</tags>
+        <tags>is,super,playable</tags>
         <start>2570</start>
         <end>2781</end>
     </faction>
@@ -1545,8 +1505,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,1,1</eraMods>
         <colorRGB>205,192,176</colorRGB>
-		<playable/>
-        <tags>is,minor</tags>
+        <tags>is,minor,playable</tags>
         <start>3052</start>
     </faction>
     <faction>
@@ -1687,8 +1646,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Pirate</fullname>
         <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
         <colorRGB>128,40,0</colorRGB>
-		<playable/>
-        <tags>pirate</tags>
+        <tags>pirate,playable</tags>
     </faction>
     <faction>
         <shortname>UC</shortname>
@@ -1811,8 +1769,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year="3022">New Abilene</changePlanet>
         <changePlanet year="3026">Coromodir</changePlanet>
         <colorRGB>255,36,0</colorRGB>
-		<playable/>
-        <tags>periphery,minor</tags>
+        <tags>periphery,minor,playable</tags>
         <start>2910</start>
     </faction>
     <faction>
