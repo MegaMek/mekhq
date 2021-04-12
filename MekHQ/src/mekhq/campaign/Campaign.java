@@ -44,6 +44,7 @@ import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -867,15 +868,12 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Imports a {@link Mission} into a campaign.
-     * @param m Mission to import into the campaign.
+     * @param mission Mission to import into the campaign.
      */
-    public void importMission(Mission m) {
+    public void importMission(final Mission mission) {
         // add scenarios to the scenarioId hash
-        for (Scenario s : m.getScenarios()) {
-            importScenario(s);
-        }
-
-        addMissionWithoutId(m);
+        mission.getScenarios().forEach(this::importScenario);
+        addMissionWithoutId(mission);
     }
 
     private void addMissionWithoutId(Mission m) {
@@ -888,7 +886,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param id the mission's id
      * @return the mission in question
      */
-    public Mission getMission(int id) {
+    public @Nullable Mission getMission(int id) {
         return missions.get(id);
     }
 
@@ -3013,17 +3011,14 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
-            for (Scenario s : contract.getScenarios()) {
-                if (!s.isCurrent() || !(s instanceof AtBScenario)) {
-                    continue;
-                }
-                if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
-                    s.setStatus(Scenario.S_DEFEAT);
-                    s.clearAllForcesAndPersonnel(this);
+            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
+                if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
+                    scenario.setStatus(ScenarioStatus.DEFEAT);
+                    scenario.clearAllForcesAndPersonnel(this);
                     contract.addPlayerMinorBreach();
-                    addReport("Failure to deploy for " + s.getName()
+                    addReport("Failure to deploy for " + scenario.getName()
                             + " resulted in defeat and a minor contract breach.");
-                    s.generateStub(this);
+                    scenario.generateStub(this);
                 }
             }
         }
@@ -3038,9 +3033,8 @@ public class Campaign implements Serializable, ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (Scenario s : contract.getScenarios()) {
-                if ((s instanceof AtBScenario) && (s.getDate() != null)
-                        && s.getDate().equals(getLocalDate())) {
+            for (Scenario s : contract.getCurrentAtBScenarios()) {
+                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
@@ -3626,30 +3620,25 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void removeScenario(int id) {
-        Scenario scenario = getScenario(id);
+    public void removeScenario(final Scenario scenario) {
         scenario.clearAllForcesAndPersonnel(this);
-        Mission mission = getMission(scenario.getMissionId());
-        if (null != mission) {
-            mission.removeScenario(scenario.getId());
+        final Mission mission = getMission(scenario.getMissionId());
+        if (mission != null) {
+            mission.getScenarios().remove(scenario);
         }
-        scenarios.remove(id);
+        scenarios.remove(scenario.getId());
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(int id) {
-        Mission mission = getMission(id);
-
+    public void removeMission(final Mission mission) {
         // Loop through scenarios here! We need to remove them as well.
-        if (null != mission) {
-            for (Scenario scenario : mission.getScenarios()) {
-                scenario.clearAllForcesAndPersonnel(this);
-                scenarios.remove(scenario.getId());
-            }
-            mission.clearScenarios();
+        for (Scenario scenario : mission.getScenarios()) {
+            scenario.clearAllForcesAndPersonnel(this);
+            scenarios.remove(scenario.getId());
         }
+        mission.clearScenarios();
 
-        missions.remove(id);
+        missions.remove(mission.getId());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 

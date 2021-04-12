@@ -78,7 +78,6 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.ScenarioStatusComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -226,7 +225,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioSorter = new TableRowSorter<>(scenarioModel);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        scenarioSorter.setComparator(ScenarioTableModel.COL_STATUS, new ScenarioStatusComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
@@ -431,13 +429,17 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deleteMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
+        final Mission mission = getCampaign().getMission(selectedMission);
+        if (mission == null) {
+            MekHQ.getLogger().error("Cannot remove null mission with id " + selectedMission);
+            return;
+        }
         MekHQ.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
         }
-        getCampaign().removeMission(mission.getId());
+        getCampaign().removeMission(mission);
         List<Mission> missions = getCampaign().getSortedMissions();
         selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
@@ -832,19 +834,19 @@ public final class BriefingTab extends CampaignGuiTab {
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
-        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).size() > 0;
-        boolean canStartGame = scenario.isCurrent() && unitsAssigned;
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
-        }
-        btnStartGame.setEnabled(canStartGame);
-        btnJoinGame.setEnabled(canStartGame);
-        btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
+        SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
+
+        final boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).size() > 0;
+        final boolean canStartGame = scenario.getStatus().isCurrent() && unitsAssigned;
+        boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
+                ? (canStartGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartGame;
+        btnStartGame.setEnabled(canStartAtBGame);
+        btnJoinGame.setEnabled(canStartAtBGame);
+        btnLoadGame.setEnabled(canStartAtBGame);
+        btnGetMul.setEnabled(canStartGame);
+        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnResolveScenario.setEnabled(canStartAtBGame);
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

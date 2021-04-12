@@ -58,7 +58,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         if (row < 0) {
             return Optional.empty();
         }
-        
+
         JPopupMenu popup = new JPopupMenu();
 
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
@@ -100,7 +100,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         if (0 == JOptionPane.showConfirmDialog(null,
                 "Do you really want to delete the scenario?",
                 "Delete Scenario?", JOptionPane.YES_NO_OPTION)) {
-            gui.getCampaign().removeScenario(scenario.getId());
+            gui.getCampaign().removeScenario(scenario);
         }
     }
 }

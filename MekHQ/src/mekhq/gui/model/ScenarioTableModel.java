@@ -110,7 +110,7 @@ public class ScenarioTableModel extends DataTableModel {
         if (col == COL_NAME) {
             return scenario.getName();
         } else if (col == COL_STATUS) {
-            return scenario.getStatusName();
+            return scenario.getStatus();
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
                 return "-";

@@ -317,7 +317,7 @@ public class AtBDynamicScenario extends AtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
-        if(template != null && isCurrent()) {
+        if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
         }
 

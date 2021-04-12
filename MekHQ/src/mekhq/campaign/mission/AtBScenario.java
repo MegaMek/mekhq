@@ -1964,11 +1964,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getNumBots() {
-        if (isCurrent()) {
-            return botForces.size();
-        } else {
-            return botForceStubs.size();
-        }
+        return (getStatus().isCurrent() ? botForces : botForceStubs).size();
     }
 
     public List<String> getAlliesPlayerStub() {

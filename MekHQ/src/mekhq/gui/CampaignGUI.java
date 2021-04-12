@@ -82,7 +82,6 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -1216,12 +1215,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagOutstandingScenarios() {
-        for (AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
-            for (Scenario s : contract.getScenarios()) {
-                if (!s.isCurrent() || !(s instanceof AtBScenario)) {
-                    continue;
-                }
-                if (getCampaign().getLocalDate().equals(s.getDate())) {
+        for (final AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
+            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
+                if (getCampaign().getLocalDate().equals(scenario.getDate())) {
                     return 0 != JOptionPane.showConfirmDialog(null,
                             "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
                             "Pending battle", JOptionPane.YES_NO_OPTION);
