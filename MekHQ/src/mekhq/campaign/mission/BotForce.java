@@ -231,7 +231,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         if (!getCamouflage().hasDefaultFilename()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoFileName", getCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        
+        if (getColour() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        }
+        
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
