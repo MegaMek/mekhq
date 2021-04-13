@@ -1255,13 +1255,13 @@ public class StratconRulesManager {
 
 
         // run scenario generation routine for every track attached to an active contract
-        for (Contract contract : ev.getCampaign().getActiveContracts()) {
+        for (AtBContract contract : ev.getCampaign().getActiveAtBContracts()) {
             StratconCampaignState campaignState = ((AtBContract) contract).getStratconCampaignState();
 
-            if ((contract instanceof AtBContract) &&
-            		contract.isActiveOn(ev.getCampaign().getLocalDate()) &&
-            		(campaignState != null)) {
-                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+            if (campaignState != null) {
+                for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                    cleanupPhantomScenarios(track);
+                    
                     // loop through scenarios - if we haven't deployed in time, fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {
                         if (scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate())) {
@@ -1280,6 +1280,24 @@ public class StratconRulesManager {
                     processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                 }
             }
+        }
+    }
+    
+    /**
+     * Worker function that goes through a track and cleans up scenarios
+     * missing required data
+     */
+    private void cleanupPhantomScenarios(StratconTrackState track) {
+        List<StratconScenario> cleanupList = new ArrayList<>();
+        
+        for (StratconScenario scenario : track.getScenarios().values()) {
+            if (scenario.getDeploymentDate() == null) {
+                cleanupList.add(scenario);
+            }
+        }
+        
+        for (StratconScenario scenario : cleanupList) {
+            track.removeScenario(scenario);
         }
     }
 
