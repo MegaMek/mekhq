@@ -232,8 +232,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoFileName", getCamouflage().getFilename());
         }
         
+        // if we've got a legitimate color, great. Otherwise, write out something default
         if (getColour() != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        } else {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", PlayerColour.FIRE_BRICK.name());
         }
         
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
