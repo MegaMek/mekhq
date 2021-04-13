@@ -198,7 +198,12 @@ public class StratconRulesManager {
             }
         }
         
-        scenario.setIgnoreForceAutoAssignment(true);
+        // this is theoretically possible if forceIDs is passed in as null - not likely in practice
+        // but might as well, to future-proof.
+        if (scenario != null) {
+            scenario.setIgnoreForceAutoAssignment(true);
+        }
+        
         return scenario;
     }
 

@@ -17,6 +17,7 @@ package mekhq.gui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -26,7 +27,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -407,9 +410,17 @@ public class StratconPanel extends JPanel implements ActionListener {
                 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {                   
-                        g2D.setColor(Color.BLUE);
+                        g2D.setColor(Color.CYAN);
                         g2D.drawPolygon(forceMarker);
+                        
+                        Font currentFont = g2D.getFont();
+                        Font newFont = currentFont.deriveFont(Collections.singletonMap(
+                                TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
+                        g2D.setFont(newFont);
+                        
                         drawTextEffect(g2D, forceMarker, campaign.getForce(forceID).getName(), currentCoords);
+                        
+                        g2D.setFont(currentFont);
                     }
                 }
 
@@ -536,6 +547,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         return currentTrack.getScenario(boardState.getSelectedCoords());
     }
     
+    public StratconTrackState getCurrentTrack() {
+        return currentTrack;
+    }
+    
+    public StratconCoords getSelectedCoords() {
+        return boardState.getSelectedCoords();
+    }
+    
     /**
      * Worker function that outputs html representing the status of a selected hex,
      * containing info such as whether it's been revealed, assigned forces, scenarios, facilities, etc.
@@ -624,7 +643,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         switch (e.getActionCommand()) {
             case RCLICK_COMMAND_MANAGE_FORCES:
-                assignmentUI.display(campaign, campaignState, 0, selectedCoords);
+                assignmentUI.display(campaign, campaignState, selectedCoords);
                 assignmentUI.setVisible(true);
                 break;
             case RCLICK_COMMAND_MANAGE_SCENARIO:
