@@ -14,7 +14,11 @@
 
 package mekhq.gui.stratcon;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 
@@ -26,12 +30,24 @@ import mekhq.campaign.force.Force;
  * @author NickAragua
  */
 public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
+    private static final long serialVersionUID = 5015606735749150646L;
+
     /**
      * Constructor - sometimes, you have a list of force IDs.
      */
     public ScenarioWizardLanceModel(Campaign campaign, Collection<Integer> forceIDs) {
+        List<Force> sortedForces = new ArrayList<>(); 
+        
         for (int forceID : forceIDs) {
-            super.addElement(campaign.getForce(forceID));
+            sortedForces.add(campaign.getForce(forceID));    
+        }
+        
+        // let's sort these guys by alphabetical order
+        Collections.sort(sortedForces, 
+                (Comparator<Force>) (Force o1, Force o2) -> o1.getName().compareTo(o2.getName()) );
+        
+        for (Force force : sortedForces) {
+            super.addElement(force); 
         }
     }
 }
