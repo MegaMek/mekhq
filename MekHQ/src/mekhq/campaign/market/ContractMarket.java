@@ -172,13 +172,8 @@ public class ContractMarket implements Serializable {
 			int numContracts = Compute.d6() - 4 + unitRatingMod;
 
 			Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
-			boolean inMinorFaction = true;
-			for (final Faction faction : currentFactions) {
-				if (faction.isMajorOrSuperPower() || faction.isClan()) {
-					inMinorFaction = false;
-					break;
-				}
-			}
+			final boolean inMinorFaction = currentFactions.stream().noneMatch(faction ->
+                    faction.isISMajorOrSuperPower() || faction.isClan());
 			if (inMinorFaction) {
 				numContracts--;
 			}

@@ -392,15 +392,17 @@ public class AtBContract extends Contract implements Serializable {
                 break;
         }
 
-        Faction employer = Factions.getInstance().getFaction(employerCode);
+        final Faction employer = Factions.getInstance().getFaction(employerCode);
+        final Faction enemy = getEnemy();
         if (employer.isISMajorOrSuperPower() || employer.isClan()) {
             multiplier *= 1.2;
-        } else if (enemyCode.equals("IND") || enemyCode.equals("PIND")) {
+        } else if (enemy.isIndependent()) {
             multiplier *= 1.0;
         } else {
             multiplier *= 1.1;
         }
-        if (enemyCode.equals("REB") || enemyCode.equals("PIR")) {
+
+        if (enemy.isRebelOrPirate()) {
             multiplier *= 1.1;
         }
 
@@ -1310,6 +1312,10 @@ public class AtBContract extends Contract implements Serializable {
                     Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
         }
         return Factions.getInstance().getFaction(employerCode).getFullName(year);
+    }
+
+    public Faction getEnemy() {
+        return Factions.getInstance().getFaction(getEnemyCode());
     }
 
     public String getEnemyCode() {

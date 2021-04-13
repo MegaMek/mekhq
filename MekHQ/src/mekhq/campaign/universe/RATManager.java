@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import java.io.File;
@@ -38,6 +37,7 @@ import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.MekHqConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -60,16 +60,14 @@ import mekhq.campaign.event.OptionsChangedEvent;
  * a certain subset of all available RATs.
  *
  * @author Neoancient
- *
  */
 public class RATManager extends AbstractUnitGenerator implements IUnitGenerator {
-    private static final String RATINFO_DIR = "data/universe/ratdata";
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
-    private Map<String,LinkedHashMap<Integer,List<RAT>>> allRATs;
+    private Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
     private ArrayList<String> selectedCollections;
 
-    private static Map<String,List<Integer>> allCollections = null;
-    private static Map<String,String> fileNames = new HashMap<>();
+    private static Map<String, List<Integer>> allCollections = null;
+    private static Map<String, String> fileNames = new HashMap<>();
 
     private boolean canIgnoreEra = false;
 
@@ -80,7 +78,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     }
 
     @Subscribe
-    public void updateRATconfig(OptionsChangedEvent ev) {
+    public void updateRATConfig(OptionsChangedEvent ev) {
         canIgnoreEra = ev.getOptions().canIgnoreRatEra();
         setSelectedRATs(ev.getOptions().getRATs());
     }
@@ -131,7 +129,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            MekHQ.getLogger().error(this, "RAT collection " + name + " not found in " + RATINFO_DIR);
+            MekHQ.getLogger().error("RAT collection " + name + " not found in " + MekHqConstants.RATINFO_DIR);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -139,10 +137,10 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         }
-        File f = new File(RATINFO_DIR, fileNames.get(name));
+        File f = new File(MekHqConstants.RATINFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -151,7 +149,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "While loading RAT info from " + f.getName() + ": ", ex);
+            MekHQ.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
             return false;
         }
 
@@ -176,16 +174,16 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            MekHQ.getLogger().error(this, "Could not parse year " + year + " in " + name);
+                            MekHQ.getLogger().error("Could not parse year " + year + " in " + name);
                         }
                     } else {
-                        MekHQ.getLogger().error(this, "year attribute not found for era in RAT collection " + name);
+                        MekHQ.getLogger().error("year attribute not found for era in RAT collection " + name);
                     }
                 }
             }
-            return allRATs.get(name).size() > 0;
+            return !allRATs.get(name).isEmpty();
         } else {
-            MekHQ.getLogger().error(this, "source attribute not found for RAT data in " + f.getName());
+            MekHQ.getLogger().error("source attribute not found for RAT data in " + f.getName());
             return false;
         }
     }
@@ -225,11 +223,11 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         Document xmlDoc;
         DocumentBuilder db;
 
-        File dir = new File(RATINFO_DIR);
+        File dir = new File(MekHqConstants.RATINFO_DIR);
         FileInputStream fis;
 
         if (!dir.isDirectory()) {
-            MekHQ.getLogger().error(RATManager.class, "Ratinfo directory not found");
+            MekHQ.getLogger().error("Ratinfo directory not found");
             return;
         }
         for (File f : dir.listFiles()) {
@@ -239,9 +237,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     db = MekHqXmlUtil.newSafeDocumentBuilder();
                     xmlDoc = db.parse(fis);
                     fis.close();
-                } catch (Exception ex) {
-                    MekHQ.getLogger().error(RATManager.class, "While loading RAT info from " + f.getName() + ": ");
-                    MekHQ.getLogger().error(RATManager.class, ex);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error("While loading RAT info from " + f.getName() + ": ", e);
                     continue;
                 }
                 Element elem = xmlDoc.getDocumentElement();
@@ -261,10 +258,10 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                                 try {
                                     eras.add(Integer.parseInt(year));
                                 } catch (NumberFormatException ex) {
-                                    MekHQ.getLogger().error(RATManager.class, "Could not parse year " + year + " in " + f.getName());
+                                    MekHQ.getLogger().error("Could not parse year " + year + " in " + f.getName());
                                 }
                             } else {
-                                MekHQ.getLogger().error(RATManager.class, "year attribute not found for era in " + f.getName());
+                                MekHQ.getLogger().error("year attribute not found for era in " + f.getName());
                             }
                         }
                     }
@@ -272,7 +269,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     Collections.sort(eras);
                     allCollections.put(name, eras);
                 } else {
-                    MekHQ.getLogger().error(RATManager.class, "source attribute not found for RAT data in " + f.getName());
+                    MekHQ.getLogger().error("source attribute not found for RAT data in " + f.getName());
                 }
             }
         }
@@ -342,7 +339,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         if (faction.isPeriphery()) {
             factionTree.add("Periphery");
         }
-        factionTree.add(faction.isClan()? "Clan" : "General");
+        factionTree.add(faction.isClan() ? "Clan" : "General");
         return factionTree;
     }
 

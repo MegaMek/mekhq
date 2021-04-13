@@ -79,4 +79,7 @@ public final class MekHqConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 
     public static final int MAXIMUM_D6_VALUE = 6;
+
+    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String RATINFO_DIR = "data/universe/ratdata";
 }

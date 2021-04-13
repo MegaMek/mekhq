@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.MekHqConstants;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,9 +46,6 @@ import mekhq.MekHqXmlUtil;
  * @author Neoancient
  */
 public class FactionHints {
-
-    private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; // TODO : remove inline file
-
     private final Set<Faction> neutralFactions;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
@@ -408,7 +406,7 @@ public class FactionHints {
         MekHQ.getLogger().info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(FACTION_HINTS_FILE)) {
+        try (InputStream is = new FileInputStream(MekHqConstants.FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);

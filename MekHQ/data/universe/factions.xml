@@ -17,7 +17,7 @@ shortname - this is the abbreviation that is used to identify each faction in pl
 fullname  - the full display name for the faction.
 altNamesByYear - Identifies alternate names for a given year. Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
 altNames - A list of alternate names for a faction, 'also known as' type of names, not official designations
-alternativeFactionCodes - A list of alternativeFactionCodes used as a fallback during 
+alternativeFactionCodes - A list of alternativeFactionCodes used as a fallback during
 startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. The name of the planet must be the name as it is recognized in MekHQ. If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year. Format: <changePlanet year='XXXX'>Planet name</changePlanet>. Years given in this first revision are best guesses.
 eraMods - A comma-separated 9-item list of optional modifiers to repair/replacement rolls as per Strat Ops. If left out, then this defaults to 0 for all eras.
@@ -64,7 +64,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TH</shortname>
         <fullname>Terran Hegemony</fullname>
-		<alternativeFactionCodes>SL</alternativeFactionCodes>
+        <alternativeFactionCodes>SL</alternativeFactionCodes>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>255,255,255</colorRGB>
@@ -322,7 +322,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>UHC</shortname>
         <fullname>United Hindu Collective</fullname>
-		<alternativeFactionCodes>FS</alternativeFactionCodes>
+        <alternativeFactionCodes>FS</alternativeFactionCodes>
         <startingPlanet>Basantapur</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
@@ -486,7 +486,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>ARDC</shortname>
         <fullname>Arc-Royal Defense Cordon</fullname>
-		<alternativeFactionCodes>MERC,LA</alternativeFactionCodes>
+        <alternativeFactionCodes>MERC,LA</alternativeFactionCodes>
         <startingPlanet>Arc-Royal</startingPlanet>
         <eraMods>0,0,0,1,2,3,2,0,0</eraMods>
         <nameGenerator>LA</nameGenerator>
@@ -498,7 +498,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>AB</shortname>
         <fullname>Azami Brotherhood</fullname>
-		<alternativeFactionCodes>DC</alternativeFactionCodes>
+        <alternativeFactionCodes>DC</alternativeFactionCodes>
         <startingPlanet>Algedi</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>DC</nameGenerator>
@@ -518,12 +518,12 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CDP</shortname>
         <fullname>Calderon Protectorate</fullname>
-		<alternativeFactionCodes>TC</alternativeFactionCodes>
+        <alternativeFactionCodes>TC</alternativeFactionCodes>
         <startingPlanet>Erod's Escape</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,128,128</colorRGB>
         <tags>periphery,playable</tags>
-        <start>2253</start> 
+        <start>2253</start>
         <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
     </faction>
     <faction>
@@ -754,7 +754,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CSL</shortname>
         <fullname>Clan Stone Lion</fullname>
-		<alternativeFactionCodes>CHH</alternativeFactionCodes>
+        <alternativeFactionCodes>CHH</alternativeFactionCodes>
         <startingPlanet>Tokasha</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
@@ -787,7 +787,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CWE</shortname>
         <fullname>Wolf Empire</fullname>
-		<alternativeFactionCodes>CW</alternativeFactionCodes>
+        <alternativeFactionCodes>CW</alternativeFactionCodes>
         <startingPlanet>Gienah</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
@@ -828,7 +828,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DA</shortname>
         <fullname>Duchy of Andurien</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Andurien</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -839,7 +839,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DGM</shortname>
         <fullname>Duchy of Graham-Marik</fullname>
-		<alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
         <startingPlanet>Loyalty</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -851,7 +851,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DO</shortname>
         <fullname>Duchy of Oriente</fullname>
-		<alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
         <startingPlanet>Oriente</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -863,7 +863,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DoO</shortname>
         <fullname>Duchy of Orloff</fullname>
-		<alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
         <startingPlanet>Vanra</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -875,7 +875,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DS</shortname>
         <fullname>Duchy of Small</fullname>
-		<alternativeFactionCodes>CM</alternativeFactionCodes>
+        <alternativeFactionCodes>CM</alternativeFactionCodes>
         <startingPlanet>Small World</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -887,7 +887,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>DTA</shortname>
         <fullname>Duchy of Tamarind-Abbey</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Tamarind</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -918,7 +918,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
-		<alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
+        <alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>238,232,170</colorRGB>
@@ -928,7 +928,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FC</shortname>
         <fullname>Federated Commonwealth</fullname>
-		<alternativeFactionCodes>FS,LA</alternativeFactionCodes>
+        <alternativeFactionCodes>FS,LA</alternativeFactionCodes>
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <colorRGB>248,212,44</colorRGB>
@@ -937,7 +937,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FVC</shortname>
         <fullname>Filtvelt Coalition</fullname>
-		<alternativeFactionCodes>FS</alternativeFactionCodes>
+        <alternativeFactionCodes>FS</alternativeFactionCodes>
         <startingPlanet>Filtvelt</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
@@ -960,7 +960,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FWLR</shortname>
         <fullname>Free Worlds League Rebels</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>New Delos</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -970,7 +970,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FR</shortname>
         <fullname>Fronc Reaches</fullname>
-		<alternativeFactionCodes>NCR</alternativeFactionCodes>
+        <alternativeFactionCodes>NCR</alternativeFactionCodes>
         <startingPlanet>Fronc</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>128,169,127</colorRGB>
@@ -1068,7 +1068,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>MC</shortname>
         <fullname>Malagrotta Cooperative</fullname>
-		<alternativeFactionCodes>FS</alternativeFactionCodes>
+        <alternativeFactionCodes>FS</alternativeFactionCodes>
         <startingPlanet>Malagrotta</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
@@ -1089,7 +1089,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>MCM</shortname>
         <fullname>Marik Commonwealth</fullname>
-		<alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
         <startingPlanet>Marik</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1152,7 +1152,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>NCR</shortname>
         <fullname>New Colony Region</fullname>
-		<alternativeFactionCodes>MOC,TC</alternativeFactionCodes>
+        <alternativeFactionCodes>MOC,TC</alternativeFactionCodes>
         <startingPlanet>Fronc</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>32,178,170</colorRGB>
@@ -1191,7 +1191,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>OZP</shortname>
         <fullname>Ohrensen-Zion Province</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Ohrensen</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1203,7 +1203,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>OP</shortname>
         <fullname>Oriente Protectorate</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Oriente</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1215,7 +1215,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>PG</shortname>
         <fullname>Principality of Gibson</fullname>
-		<alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
         <startingPlanet>Gibson</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1226,7 +1226,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>PR</shortname>
         <fullname>Principality of Regulus</fullname>
-		<alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
         <startingPlanet>Regulus</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1238,7 +1238,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RD</shortname>
         <fullname>Rasalhague Dominion</fullname>
-		<alternativeFactionCodes>CGB</alternativeFactionCodes>
+        <alternativeFactionCodes>CGB</alternativeFactionCodes>
         <startingPlanet>Rasalhague</startingPlanet>
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
@@ -1249,7 +1249,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RA</shortname>
         <fullname>Raven Alliance</fullname>
-		<alternativeFactionCodes>CSR</alternativeFactionCodes>
+        <alternativeFactionCodes>CSR</alternativeFactionCodes>
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>25,120,110</colorRGB>
@@ -1259,7 +1259,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RF</shortname>
         <fullname>Regulan Fiefs</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Regulus</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1270,7 +1270,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RFS</shortname>
         <fullname>Regulan Free States</fullname>
-		<alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>RF,FWL</alternativeFactionCodes>
         <startingPlanet>Regulus</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1317,7 +1317,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RCM</shortname>
         <fullname>Rim Commonality</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Lesnovo</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>95,158,160</colorRGB>
@@ -1337,7 +1337,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>ST</shortname>
         <fullname>Saiph Triumvirate</fullname>
-		<alternativeFactionCodes>CM</alternativeFactionCodes>
+        <alternativeFactionCodes>CM</alternativeFactionCodes>
         <startingPlanet>Saiph</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1365,7 +1365,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>SHC</shortname>
         <fullname>Silver Hawk Coalition</fullname>
-		<alternativeFactionCodes>FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>FWL</alternativeFactionCodes>
         <startingPlanet>Amity</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1376,7 +1376,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>SIC</shortname>
         <fullname>St. Ives Compact</fullname>
-		<alternativeFactionCodes>CC</alternativeFactionCodes>
+        <alternativeFactionCodes>CC</alternativeFactionCodes>
         <startingPlanet>St. Ives</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1408,7 +1408,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>SC</shortname>
         <fullname>Stewart Commonality</fullname>
-		<alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>MSC,FWL</alternativeFactionCodes>
         <startingPlanet>Stewart</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1420,7 +1420,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>SKC</shortname>
         <fullname>Styk Commonality</fullname>
-		<alternativeFactionCodes>CM</alternativeFactionCodes>
+        <alternativeFactionCodes>CM</alternativeFactionCodes>
         <startingPlanet>Styk</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1461,7 +1461,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TP</shortname>
         <fullname>The Protectorate</fullname>
-		<alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>OP,FWL</alternativeFactionCodes>
         <startingPlanet>New Delos</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1472,7 +1472,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TFR</shortname>
         <fullname>Tikonov Free Republic</fullname>
-		<alternativeFactionCodes>CC</alternativeFactionCodes>
+        <alternativeFactionCodes>CC</alternativeFactionCodes>
         <startingPlanet>Tikonov</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1484,7 +1484,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TD</shortname>
         <fullname>Tortuga Dominions</fullname>
-		<alternativeFactionCodes>PIR</alternativeFactionCodes>
+        <alternativeFactionCodes>PIR</alternativeFactionCodes>
         <startingPlanet>Tortuga Prime</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>34,139,34</colorRGB>
@@ -1501,7 +1501,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>WOB</shortname>
         <fullname>Word of Blake</fullname>
-		<alternativeFactionCodes>CS</alternativeFactionCodes>
+        <alternativeFactionCodes>CS</alternativeFactionCodes>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,1,1</eraMods>
         <colorRGB>205,192,176</colorRGB>
@@ -1549,7 +1549,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <shortname>SA</shortname>
         <fullname>Senatorial Alliance</fullname>
         <altNames>Senate Alliance</altNames>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Augustine</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>255,102,153</colorRGB>
@@ -1560,7 +1560,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>AA</shortname>
         <fullname>Augustine Alliance</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Augustine</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>255,102,153</colorRGB>
@@ -1570,7 +1570,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TTU</shortname>
         <fullname>Tall Trees Union</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Tall Trees</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
@@ -1581,7 +1581,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>ShA</shortname>
         <fullname>Shiloh Alliance</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Shiloh</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1592,7 +1592,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CvW</shortname>
         <fullname>Covenant Worlds</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Bordon</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1613,7 +1613,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>MiC</shortname>
         <fullname>Milton Combine</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Milton</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
@@ -1623,7 +1623,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CP</shortname>
         <fullname>Clan Protectorate</fullname>
-		<alternativeFactionCodes>CNC,CDS,FWL</alternativeFactionCodes>
+        <alternativeFactionCodes>CNC,CDS,FWL</alternativeFactionCodes>
         <startingPlanet>Marik</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
@@ -1634,7 +1634,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RR</shortname>
         <fullname>Republic Remnant</fullname>
-		<alternativeFactionCodes>ROS</alternativeFactionCodes>
+        <alternativeFactionCodes>ROS</alternativeFactionCodes>
         <startingPlanet>Callison</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>128,40,0</colorRGB>
@@ -1651,7 +1651,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>UC</shortname>
         <fullname>Umayyad Caliphate</fullname>
-		<alternativeFactionCodes>NC</alternativeFactionCodes>
+        <alternativeFactionCodes>NC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
@@ -1667,7 +1667,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>RON</shortname>
         <fullname>Ronin</fullname>
-		<alternativeFactionCodes>DC</alternativeFactionCodes>
+        <alternativeFactionCodes>DC</alternativeFactionCodes>
         <startingPlanet>Predlitz</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>DC</nameGenerator>
