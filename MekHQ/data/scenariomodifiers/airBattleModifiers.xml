@@ -22,9 +22,6 @@
 		<modifier>
 			GoodEquipment.xml
 		</modifier>
-		<modifier>
-			BadEvent.xml
-		</modifier>
 		<!--modifier> 
 			Need ability to allow player to specifically deploy dropships
 			HotDrop.xml
@@ -70,9 +67,6 @@
 		</modifier>
 		<modifier>
 			PreBattleDamageAllies.xml
-		</modifier>
-		<modifier>
-			GoodEvent.xml
 		</modifier>
 		<modifier>
 			AlliedTraineesAir.xml

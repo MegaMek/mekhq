@@ -381,7 +381,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return 0;
+        return DYNAMIC;
     }
 
     @Override

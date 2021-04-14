@@ -22,6 +22,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,6 +30,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -325,13 +327,21 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     private void drawScenarios(Graphics2D g2D) {
         Polygon scenarioMarker = new Polygon();
+        Polygon scenarioMarker2 = new Polygon();
         int xRadius = HEX_X_RADIUS / 3;
         int yRadius = HEX_Y_RADIUS / 3;
+        int smallXRadius = xRadius / 2;
+        int smallYRadius = xRadius / 2;
 
         scenarioMarker.addPoint(-xRadius, -yRadius);
         scenarioMarker.addPoint(-xRadius, yRadius);
         scenarioMarker.addPoint(xRadius, yRadius);
         scenarioMarker.addPoint(xRadius, -yRadius);
+        
+        scenarioMarker2.addPoint(-smallXRadius, -smallYRadius);
+        scenarioMarker2.addPoint(-smallXRadius, smallYRadius);
+        scenarioMarker2.addPoint(smallXRadius, smallYRadius);
+        scenarioMarker2.addPoint(smallXRadius, -smallYRadius);
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
@@ -344,17 +354,22 @@ public class StratconPanel extends JPanel implements ActionListener {
                         ((scenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
+                    g2D.drawPolygon(scenarioMarker2);
                     if (currentTrack.getFacility(currentCoords) == null) {
                         drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
+                    } else if (currentTrack.getFacility(currentCoords).getOwner() == ForceAlignment.Allied) {
+                        drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
                     }
                 }
 
                 int[] downwardVector = getDownwardYVector();
                 scenarioMarker.translate(downwardVector[0], downwardVector[1]);
+                scenarioMarker2.translate(downwardVector[0], downwardVector[1]);
             }
 
             int[] translationVector = getRightAndUpVector(x % 2 == 0);
             scenarioMarker.translate(translationVector[0], translationVector[1]);
+            scenarioMarker2.translate(translationVector[0], translationVector[1]);
         }
     }
     
@@ -395,15 +410,12 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Worker function to render force icons to the given surface.
      */
     private void drawForces(Graphics2D g2D) {
-        Polygon forceMarker = new Polygon();
         int xRadius = HEX_X_RADIUS / 3;
         int yRadius = HEX_Y_RADIUS / 3;
 
-        forceMarker.addPoint(-xRadius, -yRadius);
-        forceMarker.addPoint(-xRadius, yRadius);
-        forceMarker.addPoint(xRadius, yRadius);
-        forceMarker.addPoint(xRadius, -yRadius);
-
+        Shape forceMarker = new Ellipse2D.Double(-xRadius, -yRadius, 
+                xRadius * 2.0, yRadius * 2.0);
+        
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
@@ -411,7 +423,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {                   
                         g2D.setColor(Color.CYAN);
-                        g2D.drawPolygon(forceMarker);
+                        g2D.draw(forceMarker);
                         
                         Font currentFont = g2D.getFont();
                         Font newFont = currentFont.deriveFont(Collections.singletonMap(
@@ -425,11 +437,16 @@ public class StratconPanel extends JPanel implements ActionListener {
                 }
 
                 int[] downwardVector = getDownwardYVector();
-                forceMarker.translate(downwardVector[0], downwardVector[1]);
+                AffineTransform ellipseTransform = new AffineTransform();
+                ellipseTransform.translate(downwardVector[0], downwardVector[1]);
+                forceMarker = ellipseTransform.createTransformedShape(forceMarker);
             }
 
             int[] translationVector = getRightAndUpVector(x % 2 == 0);
-            forceMarker.translate(translationVector[0], translationVector[1]);
+            
+            AffineTransform ellipseTransform = new AffineTransform();
+            ellipseTransform.translate(translationVector[0], translationVector[1]);
+            forceMarker = ellipseTransform.createTransformedShape(forceMarker);
         }
     }
     
@@ -437,7 +454,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Draws some text and line to it from a given polygon. 
      * Smart enough not to layer multiple strings on top of each other if they're all drawn in the same hex.
      */
-    private void drawTextEffect(Graphics2D g2D, Polygon marker, String text, StratconCoords coords) {
+    private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratconCoords coords) {
         int verticalOffsetIndex = numIconsInHex.containsKey(coords) ? numIconsInHex.get(coords) : 0;
         
         double startX = marker.getBounds().getMaxX();

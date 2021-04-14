@@ -1220,8 +1220,6 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagOutstandingScenarios() {
-        nagUnresolvedStratconContacts();
-
         for (AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
             for (Scenario s : contract.getScenarios()) {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
@@ -2542,6 +2540,14 @@ public class CampaignGUI extends JPanel {
             if (nagShortDeployments()) {
                 ev.cancel();
             }
+            
+            if (getCampaign().getCampaignOptions().getUseStratCon() &&
+                    nagUnresolvedStratconContacts()) {
+                {
+                    ev.cancel();
+                }            
+            }
+            
             if (nagOutstandingScenarios()) {
                 ev.cancel();
             }

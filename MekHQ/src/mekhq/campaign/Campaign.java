@@ -101,6 +101,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -3025,12 +3026,19 @@ public class Campaign implements Serializable, ITechManager {
                     continue;
                 }
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
-                    s.setStatus(Scenario.S_DEFEAT);
-                    s.clearAllForcesAndPersonnel(this);
-                    contract.addPlayerMinorBreach();
+                    if (getCampaignOptions().getUseStratCon() &&
+                            s instanceof AtBDynamicScenario) {
+                        StratconRulesManager.processIgnoredScenario(
+                                (AtBDynamicScenario) s, contract.getStratconCampaignState());
+                    } else {
+                        s.setStatus(Scenario.S_DEFEAT);
+                        s.clearAllForcesAndPersonnel(this);
+                        contract.addPlayerMinorBreach();
+                        s.generateStub(this);
+                    }
+                    
                     addReport("Failure to deploy for " + s.getName()
-                            + " resulted in defeat and a minor contract breach.");
-                    s.generateStub(this);
+                    + " resulted in defeat and a minor contract breach.");
                 }
             }
         }

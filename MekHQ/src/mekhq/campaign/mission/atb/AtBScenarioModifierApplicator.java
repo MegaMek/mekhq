@@ -95,6 +95,11 @@ public class AtBScenarioModifierApplicator {
      * Worker function that removes the number of units from the specified side.
      */
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient, int unitRemovalCount) {
+        // can't do this if we don't have bots
+        if (scenario.getNumBots() == 0) {
+            return;
+        }
+        
         int actualUnitsToRemove = unitRemovalCount;
 
         if (unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
@@ -112,7 +117,11 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+            
+            // only remove units from a bot force if it's on the affected team
+            // AND if it has any units to remove
+            if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
+                    && (bf.getEntityList().size() > 0)) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
                 bf.removeEntity(unitIndexToRemove);
             }

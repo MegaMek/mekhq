@@ -576,7 +576,7 @@ public class StratconRulesManager {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
-        //ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Allied Facility.xml");
+        //ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Hostile Facility.xml");
 
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
@@ -1188,6 +1188,20 @@ public class StratconRulesManager {
             track.unassignForce(forceID);
         }
     }
+    
+    /**
+     * Processes an ignored dynamic scenario - locates it on one of the tracks
+     * and calls the standared 'ignored scenario' routine.
+     */
+    public static void processIgnoredScenario(AtBDynamicScenario scenario, StratconCampaignState campaignState) {
+        for (StratconTrackState track : campaignState.getTracks()) {
+            if (track.getBackingScenariosMap().containsKey(scenario.getId())) {
+                processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()), campaignState);
+                return;
+            }
+        }
+    }
+    
 
     /**
      * Processes an ignored Stratcon scenario
@@ -1199,6 +1213,8 @@ public class StratconRulesManager {
                 if (scenario.isRequiredScenario()) {
                     campaignState.updateVictoryPoints(-1);
                 }
+                
+                track.removeScenario(scenario);
 
                 StratconFacility localFacility = track.getFacility(scenario.getCoords());
                 if (localFacility != null) {
@@ -1210,7 +1226,7 @@ public class StratconRulesManager {
                         if (localFacility.isStrategicObjective()) {
                             campaignState.decrementStrategicObjectiveCompletedCount();
                         }
-                    }
+                    }                  
                 } else {
                     // if it's an open-field
                     // move scenario towards nearest allied facility
@@ -1219,7 +1235,25 @@ public class StratconRulesManager {
                     if (closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords().translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
                         scenario.setCoords(newCoords);
-                        //scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysToAdd));
+                        
+                        int daysForward = Math.min(1, track.getDeploymentTime());
+                        
+                        scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysForward));
+                        scenario.setActionDate(scenario.getActionDate().plusDays(daysForward));
+                        scenario.setReturnDate(scenario.getReturnDate().plusDays(daysForward));
+                        
+                        // refresh the scenario's position on the track
+                        track.addScenario(scenario);
+                        
+                        // TODO: Write some functionality to "copy" a scenario's 
+                        // bot forces over
+                        /*StratconFacility facility = track.getFacility(newCoords);
+
+                        if (facility != null) {
+                            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(true);
+                            scenario = generateScenario(campaignState.getCa, contract, track, forceID, coords, template);
+                            setupFacilityScenario(scenario, facility);
+                        }*/
 
                         // TODO: if the allied facility is in the new coords, replace this scenario
                         // with a facility defense, with the opfor coming directly from all hostiles assigned to this scenario
@@ -1227,12 +1261,8 @@ public class StratconRulesManager {
                         scenario.setCurrentState(ScenarioState.UNRESOLVED);
                     } else {
                         // TODO: if there's no allied facilities here, add its forces to track reinforcement pool
-
                     }
                 }
-
-                // either way, it's gone
-                track.removeScenario(scenario);
             }
         }
     }

@@ -60,6 +60,8 @@ public class ScenarioTemplate implements Cloneable {
         st.name = this.name;
         st.shortBriefing = this.shortBriefing;
         st.detailedBriefing = this.detailedBriefing;
+        st.isHostileFacility = this.isHostileFacility;
+        st.isAlliedFacility = this.isAlliedFacility;
         for (ScenarioForceTemplate sft : scenarioForces.values()) {
             st.scenarioForces.put(sft.getForceName(), sft.clone());
         }

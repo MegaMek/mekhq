@@ -302,7 +302,7 @@ public class StratconTrackState {
         
         for (StratconCoords facilityCoords : facilities.keySet()) {
             if (facilities.get(facilityCoords).getOwner() == ForceAlignment.Allied) {
-                int distance = facilityCoords.direction(coords);
+                int distance = facilityCoords.distance(coords);
                 
                 if (distance < minDistance) {
                     minDistance = distance;

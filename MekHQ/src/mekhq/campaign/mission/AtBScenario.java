@@ -70,6 +70,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     //region Variable Declarations
     private static final long serialVersionUID = 1148105510264408943L;
 
+    public static final int DYNAMIC = -1;
     public static final int BASEATTACK = 0;
     public static final int EXTRACTION = 1;
     public static final int CHASE = 2;
