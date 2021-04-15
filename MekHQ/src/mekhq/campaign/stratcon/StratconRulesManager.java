@@ -52,6 +52,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 
@@ -104,8 +105,10 @@ public class StratconRulesManager {
         // once we've determined that scenarios occur, we loop through the ones that we generated
         // and use the random force to drive opfor generation (#required lances multiplies the BV budget of all
         for (int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
+            int targetNum = calculateScenarioOdds(track, contract, false);
+            
             // if we haven't already used all the player forces and are required to randomly generate a scenario
-            if ((availableForceIDs.size() > 0) && (Compute.randomInt(100) <= track.getScenarioOdds())) {
+            if ((availableForceIDs.size() > 0) && (Compute.randomInt(100) <= targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -222,7 +225,8 @@ public class StratconRulesManager {
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
-        boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= track.getScenarioOdds());
+        int targetNum = calculateScenarioOdds(track, contract, true);
+        boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
@@ -447,9 +451,6 @@ public class StratconRulesManager {
      *
      */
     public static void commitPrimaryForces(Campaign campaign, AtBContract contract, StratconScenario scenario, StratconTrackState trackState) {
-        // order of operations is important here, we need a valid scenario ID prior to adding the scenario to the track.
-        campaign.addScenario(scenario.getBackingScenario(), contract);
-        scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
         trackState.addScenario(scenario);
 
         // set up dates for the scenario if doesn't have them already
@@ -583,12 +584,14 @@ public class StratconRulesManager {
 
     /**
      * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track,
-     * using the given template. Also registers it with the track and campaign.
+     * using the given template. Also registers it with the campaign.
      */
     static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track,
             int forceID, StratconCoords coords, ScenarioTemplate template) {
         StratconScenario scenario = new StratconScenario();
-        scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
+        
+        AtBDynamicScenario backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign);        
+        scenario.setBackingScenario(backingScenario);
         scenario.setCoords(coords);
         
         // by default, certain conditions may make this bigger
@@ -609,8 +612,14 @@ public class StratconRulesManager {
         AtBDynamicScenarioFactory.setScenarioModifiers(scenario.getBackingScenario());
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
         setScenarioDates(track, campaign, scenario);
-
-        // register the scenario with the campaign and the track it's generated on
+        
+        // the backing scenario ID must be updated after registering the backing scenario 
+        // with the campaign, so that the stratcon - backing scenario association is maintained
+        // registering the scenario with the campaign should be done after setting
+        // dates, otherwise, the report messages for new scenarios look weird
+        campaign.addScenario(backingScenario, contract);
+        scenario.setBackingScenarioID(backingScenario.getId());
+        
         if (forceID > Force.FORCE_NONE) {
             scenario.addPrimaryForce(forceID);
         }
@@ -1070,6 +1079,53 @@ public class StratconRulesManager {
 
         // otherwise, the force requires support points / vps to deploy
         return ReinforcementEligibilityType.SupportPoint;
+    }
+    
+    /**
+     * Given a track and the current campaign state, and if the player is deploying
+     * a force or not, figure out the odds of a scenario occuring.
+     */
+    public static int calculateScenarioOdds(StratconTrackState track, 
+            AtBContract contract, boolean playerDeployingForce) {
+        // rules:
+        // rout morale: 0%
+        // very low morale: -10% when deploying forces to track, 0% attack
+        // low morale: -5%
+        // high morale: +5%
+        // invincible: special case, let's do +10% for now
+        int moraleModifier = 0;
+        
+        switch (contract.getMoraleLevel()) {
+            case AtBContract.MORALE_ROUT:
+                return 0;
+            case AtBContract.MORALE_VERYLOW:
+                if (playerDeployingForce) {
+                    moraleModifier = -10;
+                } else {
+                    return 0;
+                }
+                break;
+            case AtBContract.MORALE_LOW:
+                moraleModifier = -5;
+                break;
+            case AtBContract.MORALE_HIGH:
+                moraleModifier = 5;
+                break;
+            case AtBContract.MORALE_INVINCIBLE:
+                moraleModifier = 10;
+                break;
+        }
+        
+        // facilities: for each hostile data center, add +5%
+        // for each allied data center, subtract 5
+        int dataCenterModifier = 0;
+        for (StratconFacility facility : track.getFacilities().values()) {
+            if (facility.getFacilityType() == FacilityType.DataCenter) {
+                dataCenterModifier += facility.getOwner() == ForceAlignment.Allied ? -5 : 5;
+            }
+        }
+            
+        return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
 
     /**

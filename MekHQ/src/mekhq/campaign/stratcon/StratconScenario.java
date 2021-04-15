@@ -297,6 +297,8 @@ public class StratconScenario implements IStratconDisplayable {
     
     public void setBackingScenario(AtBDynamicScenario backingScenario) {
         this.backingScenario = backingScenario;
+        
+        setBackingScenarioID(backingScenario.getId());
     }
 
     public void setBackingScenarioID(int backingScenarioID) {
