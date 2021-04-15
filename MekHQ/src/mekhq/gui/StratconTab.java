@@ -31,6 +31,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -152,6 +153,7 @@ public class StratconTab extends CampaignGuiTab {
     
     @Override
     public void repaint() {
+        super.repaint();
         updateCampaignState();
     }
     
@@ -260,6 +262,11 @@ public class StratconTab extends CampaignGuiTab {
     @Subscribe
     public void handle(MissionCompletedEvent ev) {
         repopulateTrackList();
+        updateCampaignState();
+    }
+    
+    @Subscribe
+    public void handle(StratconDeploymentEvent ev) {
         updateCampaignState();
     }
     
