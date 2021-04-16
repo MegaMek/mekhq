@@ -3030,15 +3030,17 @@ public class Campaign implements Serializable, ITechManager {
                             s instanceof AtBDynamicScenario) {
                         StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) s, contract.getStratconCampaignState());
+                        s.convertToStub(this, Scenario.S_DEFEAT);
+                                                
+                        addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
+                        
                     } else {
-                        s.setStatus(Scenario.S_DEFEAT);
-                        s.clearAllForcesAndPersonnel(this);
+                        s.convertToStub(this, Scenario.S_DEFEAT);
                         contract.addPlayerMinorBreach();
-                        s.generateStub(this);
+                        
+                        addReport("Failure to deploy for " + s.getName()
+                        + " resulted in defeat and a minor contract breach.");
                     }
-                    
-                    addReport("Failure to deploy for " + s.getName()
-                    + " resulted in defeat and a minor contract breach.");
                 }
             }
         }

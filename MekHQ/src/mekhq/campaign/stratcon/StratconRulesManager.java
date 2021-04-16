@@ -1248,21 +1248,24 @@ public class StratconRulesManager {
     /**
      * Processes an ignored dynamic scenario - locates it on one of the tracks
      * and calls the standared 'ignored scenario' routine.
+     * @return Whether or not we also need to get rid of the backing scenario from the campaign
      */
-    public static void processIgnoredScenario(AtBDynamicScenario scenario, StratconCampaignState campaignState) {
+    public static boolean processIgnoredScenario(AtBDynamicScenario scenario, StratconCampaignState campaignState) {
         for (StratconTrackState track : campaignState.getTracks()) {
             if (track.getBackingScenariosMap().containsKey(scenario.getId())) {
-                processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()), campaignState);
-                return;
+                return processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()), campaignState);
             }
         }
+        
+        return true;
     }
     
 
     /**
      * Processes an ignored Stratcon scenario
+     * @return Whether or not we also need to get rid of the backing scenario from the campaign
      */
-    public static void processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
+    public static boolean processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
         for (StratconTrackState track : campaignState.getTracks()) {
             if (track.getScenarios().containsKey(scenario.getCoords())) {
                 // subtract VP if scenario is 'required'
@@ -1282,7 +1285,9 @@ public class StratconRulesManager {
                         if (localFacility.isStrategicObjective()) {
                             campaignState.decrementStrategicObjectiveCompletedCount();
                         }
-                    }                  
+                    }
+                    
+                    return true;
                 } else {
                     // if it's an open-field
                     // move scenario towards nearest allied facility
@@ -1315,12 +1320,18 @@ public class StratconRulesManager {
                         // with a facility defense, with the opfor coming directly from all hostiles assigned to this scenario
 
                         scenario.setCurrentState(ScenarioState.UNRESOLVED);
+                        return false;
                     } else {
                         // TODO: if there's no allied facilities here, add its forces to track reinforcement pool
+                        return true;
                     }
                 }
             }
         }
+        
+        // if we couldn't find the scenario on any tracks, then let's just 
+        // rid of any underlying AtB scenarios as well
+        return true;
     }
 
     public void startup() {
