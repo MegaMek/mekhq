@@ -27,10 +27,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
@@ -1957,6 +1959,28 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public AtBContract getContract(Campaign c) {
         return (AtBContract) c.getMission(getMissionId());
+    }
+    
+    /**
+     * Gets all the entities that are part of the given entity list and are 
+     * not in this scenario's transport linkages as a transported unit.
+     */
+    public List<Entity> filterUntransportedUnits(List<Entity> entities) {
+        List<Entity> retVal = new ArrayList<>();
+        
+        // assemble a set of transported units for easier lookup
+        Set<String> transportedUnits = new HashSet<>();
+        for (List<String> transported : getTransportLinkages().values()) {
+            transportedUnits.addAll(transported);
+        }
+        
+        for (Entity entity : entities) {
+            if (!transportedUnits.contains(entity.getExternalIdAsString())) {
+                retVal.add(entity);
+            }
+        }
+        
+        return retVal;
     }
 
     public int getLanceForceId() {

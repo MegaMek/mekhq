@@ -1930,7 +1930,7 @@ public class AtBDynamicScenarioFactory {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn());
+            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn(), scenario);
         }
     }
 
@@ -1938,15 +1938,20 @@ public class AtBDynamicScenarioFactory {
      * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
      * @param botForce The bot force to process
      * @param deployRound The specific deployment round, or a special constant.
+     * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
-    public static void setDeploymentTurns(BotForce botForce, int deployRound) {
+    public static void setDeploymentTurns(BotForce botForce, int deployRound,
+            AtBDynamicScenario scenario) {
+        // deployment turns don't matter for transported entities
+        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
+        
         if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
-            setDeploymentTurnsStaggeredByLance(botForce.getEntityList());
+            setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-            setDeploymentTurnsForReinforcements(botForce.getEntityList(), 0);
+            setDeploymentTurnsForReinforcements(untransportedEntities, 0);
         } else {
-            for (Entity entity : botForce.getEntityList()) {
+            for (Entity entity : untransportedEntities) {
                 entity.setDeployRound(deployRound);
             }
         }
@@ -2115,7 +2120,7 @@ public class AtBDynamicScenarioFactory {
             if (entity.getTransportId() != Entity.NONE) {
                 continue;
             }
-
+            
             int speed = calculateAtBSpeed(entity);
 
             // don't reduce minimum speed to 0, since dividing by zero further down is problematic
