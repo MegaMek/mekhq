@@ -78,6 +78,7 @@ public class StratconScenario implements IStratconDisplayable {
     private StratconCoords coords;
     private int numDefensivePoints;
     private boolean ignoreForceAutoAssignment;
+    private int leadershipPointsUsed;
     private Set<Integer> failedReinforcements = new HashSet<>();
     private Set<Integer> primaryForceIDs = new HashSet<>();
 
@@ -335,5 +336,17 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setIgnoreForceAutoAssignment(boolean ignoreForceAutoAssignment) {
         this.ignoreForceAutoAssignment = ignoreForceAutoAssignment;
+    }
+
+    public int getLeadershipPointsUsed() {
+        return leadershipPointsUsed;
+    }
+
+    public void setLeadershipPointsUsed(int leadershipPointsUsed) {
+        this.leadershipPointsUsed = leadershipPointsUsed;
+    }
+    
+    public void useLeadershipPoint() {
+        leadershipPointsUsed++;
     }
 }

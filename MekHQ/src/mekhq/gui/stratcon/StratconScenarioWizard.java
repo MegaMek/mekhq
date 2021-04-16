@@ -245,12 +245,32 @@ public class StratconScenarioWizard extends JDialog {
     }
     
     private void setLeadershipUI(GridBagConstraints gbc, List<Unit> eligibleUnits, int leadershipSkill) {
+        int maxSelectionSize = leadershipSkill - currentScenario.getLeadershipPointsUsed();
+        
         gbc.anchor = GridBagConstraints.WEST;
+        
+        if (maxSelectionSize <= 0) {
+            // either the full text or empty string
+            String leadershipUsedText = currentScenario.getLeadershipPointsUsed() > 0 ?
+                    String.format(resourceMap.getString("lblLeaderUnitsUsed.Text"), 
+                            currentScenario.getLeadershipPointsUsed()) : "";
+            String leadershipUnavailable = resourceMap.getString("lblLeadershipReinforcementsUnavailable.Text");
+            
+            JLabel lblLeadershipInstructions = new JLabel(
+                    String.format(resourceMap.getString("lblFCLeadershipAvailable.Text"),
+                            leadershipSkill, leadershipUsedText, leadershipUnavailable));
+            getContentPane().add(lblLeadershipInstructions, gbc);
+            gbc.gridy++;
+            return;
+        }
+        
+        
         JLabel lblLeadershipInstructions = new JLabel(resourceMap.getString("lblLeadershipInstructions.Text"));
         getContentPane().add(lblLeadershipInstructions, gbc);
         
         gbc.gridy++;
-        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, leadershipSkill);
+
+        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize);
     }
     
     /**
@@ -488,6 +508,7 @@ public class StratconScenarioWizard extends JDialog {
         for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
             currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
             unit.setScenarioId(currentScenario.getBackingScenarioID());
+            currentScenario.useLeadershipPoint();
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
         }
         
