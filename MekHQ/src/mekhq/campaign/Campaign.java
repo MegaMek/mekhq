@@ -3649,6 +3649,15 @@ public class Campaign implements Serializable, ITechManager {
         Mission mission = getMission(scenario.getMissionId());
         if (null != mission) {
             mission.removeScenario(scenario.getId());
+            
+            // if we GM-remove the scenario and it's attached to a StratCon scenario
+            // then pretend like we let the StratCon scenario expire
+            if ((mission instanceof AtBContract) &&
+                    (((AtBContract) mission).getStratconCampaignState() != null) &&
+                    (scenario instanceof AtBDynamicScenario)) {
+                StratconRulesManager.processIgnoredScenario(
+                        (AtBDynamicScenario) scenario, ((AtBContract) mission).getStratconCampaignState());
+            }
         }
         scenarios.remove(id);
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));

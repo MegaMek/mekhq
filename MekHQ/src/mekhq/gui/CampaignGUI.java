@@ -2524,30 +2524,37 @@ public class CampaignGUI extends JPanel {
             refreshFunds();
             showOverdueLoansDialog();
             ev.cancel();
+            return;
         }
         if (getCampaign().checkRetirementDefections()) {
             showRetirementDefectionDialog();
             ev.cancel();
+            return;
         }
         if (getCampaign().checkYearlyRetirements()) {
             showRetirementDefectionDialog();
             ev.cancel();
+            return;
         }
         if (nagShortMaintenance()) {
             ev.cancel();
+            return;
         }
         if (getCampaign().getCampaignOptions().getUseAtB()) {
             if (nagShortDeployments()) {
                 ev.cancel();
+                return;
             }
             
             if (getCampaign().getCampaignOptions().getUseStratCon() &&
                     nagUnresolvedStratconContacts()) {
-                ev.cancel();           
+                ev.cancel();
+                return;
             }
             
             if (nagOutstandingScenarios()) {
                 ev.cancel();
+                return;
             }
         }
     }
