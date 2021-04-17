@@ -1149,7 +1149,6 @@ public class StratconRulesManager {
             for (StratconCoords coords : trackState.getScenarios().keySet()) {
                 StratconScenario potentialScenario = trackState.getScenario(coords);
                 if (potentialScenario.getBackingScenarioID() == scenario.getId()) {
-
                     if (destroy) {
                         trackState.removeFacility(coords);
                     } else {
