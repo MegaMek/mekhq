@@ -543,7 +543,6 @@ public class StratconRulesManager {
                     break;
             }
         }
-
         return retVal;
     }
 
