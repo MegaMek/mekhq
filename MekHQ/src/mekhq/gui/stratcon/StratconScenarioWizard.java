@@ -318,9 +318,7 @@ public class StratconScenarioWizard extends JDialog {
         
         localGbc.gridy++;        
         DefaultListModel<Unit> availableModel = new DefaultListModel<>();
-        for (Unit u : units) {
-            availableModel.addElement(u);
-        }
+        availableModel.addAll(units);
         
         JLabel unitStatusLabel = new JLabel();
         
@@ -527,7 +525,7 @@ public class StratconScenarioWizard extends JDialog {
                 AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
             }
             
-            StratconRulesManager.commitPrimaryForces(campaign, currentCampaignState.getContract(), currentScenario, currentTrackState);
+            StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);
             setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
         // if we've just committed reinforcements then simply close it down

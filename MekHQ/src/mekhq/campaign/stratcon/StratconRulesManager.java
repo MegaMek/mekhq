@@ -31,6 +31,7 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -63,7 +64,6 @@ import mekhq.campaign.unit.Unit;
 public class StratconRulesManager {
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
-     * @author NickAragua
      */
     public enum ReinforcementEligibilityType {
         /**
@@ -176,7 +176,7 @@ public class StratconRulesManager {
                 scenario.setCurrentState(ScenarioState.UNRESOLVED);
                 track.addScenario(scenario);
             } else {
-                commitPrimaryForces(campaign, contract, scenario, track);
+                commitPrimaryForces(campaign, scenario, track);
             }
         }
     }
@@ -231,7 +231,7 @@ public class StratconRulesManager {
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
-            commitPrimaryForces(campaign, contract, scenario, track);
+            commitPrimaryForces(campaign, scenario, track);
         }
     }
 
@@ -450,7 +450,7 @@ public class StratconRulesManager {
      * adds it to the track
      *
      */
-    public static void commitPrimaryForces(Campaign campaign, AtBContract contract, StratconScenario scenario, StratconTrackState trackState) {
+    public static void commitPrimaryForces(Campaign campaign, StratconScenario scenario, StratconTrackState trackState) {
         trackState.addScenario(scenario);
 
         // set up dates for the scenario if doesn't have them already
@@ -708,9 +708,9 @@ public class StratconRulesManager {
         if (Compute.randomInt(100) <= alliedUnitOdds) {
             if((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) ||
                (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
             } else {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
             }
         }
     }
@@ -728,9 +728,9 @@ public class StratconRulesManager {
         // if we're on cadre duty, we're getting three trainees, period
         if (contract.getMissionType() == AtBContract.MT_CADREDUTY) {
             if (airBattle) {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_AIR));
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
             } else {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_GROUND));
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
             }
             return;
         }
@@ -739,19 +739,19 @@ public class StratconRulesManager {
         switch (contract.getCommandRights()) {
             case AtBContract.COM_INTEGRATED:
                 backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
-                        ? AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
-                        : AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+                        ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
+                        : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
                 break;
             case AtBContract.COM_HOUSE:
                 backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
-                        ? AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR
-                        : AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+                        ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
+                        : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case AtBContract.COM_LIAISON:
                 if (scenario.isRequiredScenario()) {
                     backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle 
-                            ? AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR
-                            : AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
+                            ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
+                            : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
                 }
                 break;
         }

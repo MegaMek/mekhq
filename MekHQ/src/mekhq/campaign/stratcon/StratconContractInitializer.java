@@ -339,7 +339,7 @@ public class StratconContractInitializer {
                     for (StratconScenario scenario : track.getScenarios().values()) {
                         Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
                         
-                        if ((campaignScenario != null) && campaignScenario instanceof AtBDynamicScenario) {
+                        if ((campaignScenario != null) && (campaignScenario instanceof AtBDynamicScenario)) {
                             scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
                         } else {
                             MekHQ.getLogger().warning(String.format("Unable to set backing scenario for stratcon scenario in track %s ID %d", 

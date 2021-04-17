@@ -2543,9 +2543,7 @@ public class CampaignGUI extends JPanel {
             
             if (getCampaign().getCampaignOptions().getUseStratCon() &&
                     nagUnresolvedStratconContacts()) {
-                {
-                    ev.cancel();
-                }            
+                ev.cancel();           
             }
             
             if (nagOutstandingScenarios()) {

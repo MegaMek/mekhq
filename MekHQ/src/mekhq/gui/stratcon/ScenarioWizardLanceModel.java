@@ -46,8 +46,6 @@ public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
         Collections.sort(sortedForces, 
                 (Comparator<Force>) (Force o1, Force o2) -> o1.getName().compareTo(o2.getName()) );
         
-        for (Force force : sortedForces) {
-            super.addElement(force); 
-        }
+        super.addAll(sortedForces);
     }
 }

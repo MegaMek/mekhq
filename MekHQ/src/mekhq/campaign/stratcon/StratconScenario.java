@@ -168,7 +168,7 @@ public class StratconScenario implements IStratconDisplayable {
             
         if (backingScenario.getTemplate() != null) {
             stateBuilder.append(backingScenario.getTemplate().shortBriefing)
-            .append(html ? "<br/>" : "");
+                .append(html ? "<br/>" : "");
         }
         
         if (this.isRequiredScenario()) {

@@ -38,8 +38,6 @@ public class StratconScenarioFactory {
     private static Map<MapLocation, List<ScenarioTemplate>> dynamicScenarioLocationMap = new HashMap<>();
     private static Map<Integer, List<ScenarioTemplate>> dynamicScenarioUnitTypeMap = new HashMap<>();
     private static Map<String, ScenarioTemplate> dynamicScenarioNameMap = new HashMap<>();
-    private static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    private static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
     
     static {
         reloadScenarios();
@@ -161,9 +159,9 @@ public class StratconScenarioFactory {
      */
     public static ScenarioTemplate getFacilityScenario(boolean allied) {
         if (allied) {
-            return getSpecificScenario(ALLIED_FACILITY_SCENARIO);
+            return getSpecificScenario(MekHqConstants.ALLIED_FACILITY_SCENARIO);
         } else {
-            return getSpecificScenario(HOSTILE_FACILITY_SCENARIO);
+            return getSpecificScenario(MekHqConstants.HOSTILE_FACILITY_SCENARIO);
         }
     }
     

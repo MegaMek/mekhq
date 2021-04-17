@@ -121,7 +121,7 @@ public class AtBScenarioModifierApplicator {
             // only remove units from a bot force if it's on the affected team
             // AND if it has any units to remove
             if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
-                    && (bf.getEntityList().size() > 0)) {
+                    && !bf.getEntityList().isEmpty()) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
                 bf.removeEntity(unitIndexToRemove);
             }

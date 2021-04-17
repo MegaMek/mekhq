@@ -48,27 +48,14 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 
-@XmlRootElement(name="AtBScenarioModifier")
-public class AtBScenarioModifier implements Cloneable {
-
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
-    
+/**
+ * Data structure representing a scenario modifier for dynamic AtB scenarios
+ * @author NickAragua
+ */
+@XmlRootElement(name = "AtBScenarioModifier")
+public class AtBScenarioModifier implements Cloneable {    
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
-     * @author NickAragua
-     *
      */
     public enum EventTiming {
         PreForceGeneration,
@@ -361,7 +348,7 @@ public class AtBScenarioModifier implements Cloneable {
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if (eventTiming == getEventTiming()) {
-            if ((getAdditionalBriefingText() != null) && (getAdditionalBriefingText().length() > 0)) {
+            if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
                         String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
             }

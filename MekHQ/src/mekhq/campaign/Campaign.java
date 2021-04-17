@@ -3027,7 +3027,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().getUseStratCon() &&
-                            s instanceof AtBDynamicScenario) {
+                            (s instanceof AtBDynamicScenario)) {
                         StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) s, contract.getStratconCampaignState());
                         s.convertToStub(this, Scenario.S_DEFEAT);
@@ -3039,7 +3039,7 @@ public class Campaign implements Serializable, ITechManager {
                         contract.addPlayerMinorBreach();
                         
                         addReport("Failure to deploy for " + s.getName()
-                        + " resulted in defeat and a minor contract breach.");
+                            + " resulted in defeat and a minor contract breach.");
                     }
                 }
             }
