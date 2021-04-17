@@ -1350,7 +1350,6 @@ public class StratconRulesManager {
         if (!ev.getCampaign().getCampaignOptions().getUseStratCon()) {
             return;
         }
-
         boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
 
         // run scenario generation routine for every track attached to an active contract
