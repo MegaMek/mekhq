@@ -237,6 +237,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         if (getColour() != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
         } else {
+            MekHQ.getLogger().error("Null colour specified for bot force; defaulting to FIRE BRICK");
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", PlayerColour.FIRE_BRICK.name());
         }
         
