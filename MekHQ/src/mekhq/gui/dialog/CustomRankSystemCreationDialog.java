@@ -276,7 +276,8 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
     protected void okAction() {
         super.okAction();
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
-                getTxtRankSystemName().getText(), (RankSystemType) getComboRankSystemType().getSelectedItem()));
+                getTxtRankSystemName().getText(), getTxtRankSystemDescription().getText(),
+                (RankSystemType) getComboRankSystemType().getSelectedItem()));
         getRankSystem().setRanks(getRanks());
     }
 
@@ -288,7 +289,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         } else if (getTxtRankSystemName().getText().isBlank()) {
             text = resources.getString("CustomRankSystemCreationDialog.BlankRankSystemName.text");
         } else if (getRankSystems().stream().anyMatch(rankSystem -> getTxtRankSystemCode().getText()
-                .equalsIgnoreCase(rankSystem.getRankSystemCode()))) {
+                .equalsIgnoreCase(rankSystem.getCode()))) {
             text = resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
         } else {
             text = resources.getString("ValidationSuccess.text");

@@ -86,7 +86,7 @@ public class Ranks {
         }
 
         final List<RankSystem> rankSystems = new ArrayList<>(getRankSystems().values());
-        if (!getRankSystems().containsKey(rankSystem.getRankSystemCode())) {
+        if (!getRankSystems().containsKey(rankSystem.getCode())) {
             rankSystems.add(rankSystem);
         }
         exportRankSystemsToFile(file, rankSystems);
@@ -129,7 +129,7 @@ public class Ranks {
             final List<RankSystem> rankSystems = loadRankSystemsFromFile(new File(type.getFilePath()), type);
             for (final RankSystem rankSystem : rankSystems) {
                 if (rankValidator.validate(rankSystem, true)) {
-                    getRankSystems().put(rankSystem.getRankSystemCode(), rankSystem);
+                    getRankSystems().put(rankSystem.getCode(), rankSystem);
                 }
             }
         }

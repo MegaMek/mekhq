@@ -47,8 +47,8 @@ public class RankSystem implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = -6037712487121208137L;
 
-    private String rankSystemCode; // Primary Key, must be unique
-    private String rankSystemName;
+    private String code; // Primary Key, must be unique
+    private String name;
     private String description;
     private transient RankSystemType type; // no need to serialize
     private List<Rank> ranks;
@@ -56,37 +56,39 @@ public class RankSystem implements Serializable {
 
     //region Constructors
     private RankSystem(final RankSystemType type) {
-        this("UNK", "Unknown", type);
+        this("UNK", "Unknown", "", type);
     }
 
     public RankSystem(final RankSystem rankSystem) {
-        setRankSystemCode(rankSystem.getRankSystemCode());
-        setRankSystemName(rankSystem.toString());
+        setCode(rankSystem.getCode());
+        setName(rankSystem.toString());
         setDescription(rankSystem.getDescription());
         setType(rankSystem.getType());
         setRanks(new ArrayList<>(rankSystem.getRanks()));
     }
 
-    public RankSystem(final String rankSystemCode, final String rankSystemName, final RankSystemType type) {
-        setRankSystemCode(rankSystemCode);
-        setRankSystemName(rankSystemName);
+    public RankSystem(final String code, final String name,
+                      final String description, final RankSystemType type) {
+        setCode(code);
+        setName(name);
+        setDescription(description);
         setType(type);
-        final RankSystem system = Ranks.getRankSystemFromCode(rankSystemCode);
+        final RankSystem system = Ranks.getRankSystemFromCode(code);
         setRanks((system == null) ? new ArrayList<>() : new ArrayList<>(system.getRanks()));
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public String getRankSystemCode() {
-        return rankSystemCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setRankSystemCode(final String rankSystemCode) {
-        this.rankSystemCode = rankSystemCode;
+    public void setCode(final String code) {
+        this.code = code;
     }
 
-    public void setRankSystemName(final String rankSystemName) {
-        this.rankSystemName = rankSystemName;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -110,21 +112,17 @@ public class RankSystem implements Serializable {
     }
 
     public void setRanks(final List<Rank> ranks) {
-        setRanksDirect(ranks);
-    }
-
-    public void setRanksDirect(final List<Rank> ranks) {
         this.ranks = ranks;
     }
     //endregion Getters/Setters
 
     //region Boolean Comparison Methods
     public boolean isWoBMilitia() {
-        return "WOBM".equals(getRankSystemCode());
+        return "WOBM".equals(getCode());
     }
 
     public boolean isComGuard() {
-        return "CG".equals(getRankSystemCode());
+        return "CG".equals(getCode());
     }
 
     public boolean isCGOrWoBM() {
@@ -175,12 +173,13 @@ public class RankSystem implements Serializable {
 
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemCode", getRankSystemCode());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "code", getCode());
 
         // Only write out any other information if we are exporting the system or we are using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "systemName", toString());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", toString());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
             for (int i = 0; i < getRanks().size(); i++) {
                 getRanks().get(i).writeToXML(pw, indent, i);
             }
@@ -248,7 +247,7 @@ public class RankSystem implements Serializable {
                                                                final RankSystemType type) {
         final RankSystem rankSystem = new RankSystem(type);
         // Dump the ranks ArrayList so we can re-use it.
-        rankSystem.setRanksDirect(new ArrayList<>());
+        rankSystem.setRanks(new ArrayList<>());
 
         try {
             int rankSystemId = -1; // migration, 0.49.X
@@ -261,25 +260,27 @@ public class RankSystem implements Serializable {
                     if (!initialLoad && (rankSystemId != 12)) {
                         return Ranks.getRankSystemFromCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
                     }
-                } else if (wn.getNodeName().equalsIgnoreCase("systemCode")) {
-                    final String systemCode = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("code")) {
+                    final String systemCode = MekHqXmlUtil.unEscape(wn.getTextContent().trim());
                     // If this isn't the initial load and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
                     if (!initialLoad && Ranks.getRankSystems().containsKey(systemCode)) {
                         return Ranks.getRankSystemFromCode(systemCode);
                     }
-                    rankSystem.setRankSystemCode(systemCode);
-                } else if (wn.getNodeName().equalsIgnoreCase("systemName")) {
-                    rankSystem.setRankSystemName(wn.getTextContent().trim());
+                    rankSystem.setCode(systemCode);
+                } else if (wn.getNodeName().equalsIgnoreCase("name")) {
+                    rankSystem.setName(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("description")) {
+                    rankSystem.setDescription(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
                     rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn));
                 }
             }
 
             if ((version != null) && (rankSystemId != -1) && version.isLowerThan("0.49.0")) {
-                rankSystem.setRankSystemCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
-                rankSystem.setRankSystemName(PersonMigrator.migrateRankSystemName(rankSystemId));
+                rankSystem.setCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
+                rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
@@ -291,7 +292,7 @@ public class RankSystem implements Serializable {
 
     @Override
     public String toString() {
-        return rankSystemName;
+        return name;
     }
 
     @Override
@@ -301,12 +302,12 @@ public class RankSystem implements Serializable {
         } else if (!(object instanceof RankSystem)) {
             return false;
         } else {
-            return getRankSystemCode().equals(((RankSystem) object).getRankSystemCode());
+            return getCode().equals(((RankSystem) object).getCode());
         }
     }
 
     @Override
     public int hashCode() {
-        return getRankSystemCode().hashCode();
+        return getCode().hashCode();
     }
 }

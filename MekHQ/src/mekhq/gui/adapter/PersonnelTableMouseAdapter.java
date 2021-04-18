@@ -1192,7 +1192,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text"));
         cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
-        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, campaignRankSystem.getRankSystemCode()));
+        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, campaignRankSystem.getCode()));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 
@@ -1205,7 +1205,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             cbMenuItem = new JCheckBoxMenuItem(rankSystem.toString());
             cbMenuItem.setSelected(rankSystem.equals(person.getRankSystem()));
-            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getRankSystemCode()));
+            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getCode()));
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
         }

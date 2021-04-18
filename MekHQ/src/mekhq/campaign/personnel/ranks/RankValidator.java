@@ -52,7 +52,7 @@ public class RankValidator {
         if (checkCode) {
             boolean duplicateKey = false;
             if (rankSystemsModel == null) {
-                duplicateKey = Ranks.getRankSystems().containsKey(rankSystem.getRankSystemCode());
+                duplicateKey = Ranks.getRankSystems().containsKey(rankSystem.getCode());
             } else {
                 for (int i = 0; i < rankSystemsModel.getSize(); i++) {
                     if (rankSystem.equals(rankSystemsModel.getElementAt(i))) {
@@ -64,12 +64,12 @@ public class RankValidator {
 
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
-                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode()).toString()
                             + " is duplicated by userData Rank System " + rankSystem.toString());
                 } else {
-                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getRankSystemCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getRankSystemCode()).toString()
+                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode()).toString()
                             + " is duplicated by " + rankSystem.toString());
                 }
                 return false;
@@ -160,12 +160,12 @@ public class RankValidator {
         // checking if the system is a campaign custom
         if (!campaign.getRankSystem().getType().isCampaign()) {
             // This ensures it properly changes, with fallback properly handled
-            campaign.setRankSystemDirect(Ranks.getRankSystemFromCode(campaign.getRankSystem().getRankSystemCode()));
+            campaign.setRankSystemDirect(Ranks.getRankSystemFromCode(campaign.getRankSystem().getCode()));
         }
 
         // Then, we need to fix any old rank system assignments for personnel
         for (final Person person : campaign.getPersonnel()) {
-            
+
         }
     }
 

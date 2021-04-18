@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 Each Rank System consists of the following fields:
-System Code: The unique String code for the system.
-System Name: The display name for the system.
+Code: The unique String code for the system.
+Name: The display name for the system.
+Description: The display description for the system.
 Rank:
-	Rank Names:
-	Officer:
-	Pay Multiplier: 
+	Rank Names: An array of names or alternatives for the rank based on the individual professions.
+	Officer: Whether the rank is considered to be an officer.
+	Pay Multiplier: The pay bonus paid to those of this rank.
 -->
 <rankSystems>
 	<rankSystem>
-		<systemCode>SSLDF</systemCode>
-		<systemName>Second Star League Defense Force</systemName>
+		<code>SSLDF</code>
+		<name>Second Star League Defense Force</name>
+		<description>This is the rank system used by the Second Star League Defence Force.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -269,8 +271,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>AFFS</systemCode>
-		<systemName>Armed Forces of the Federated Suns</systemName>
+		<code>AFFS</code>
+		<name>Armed Forces of the Federated Suns</name>
+		<description>This is the rank system used by the Armed Forces of the Federated Suns.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -528,8 +531,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>AFFC</systemCode>
-		<systemName>Armed Forces of the Federated Commonwealth</systemName>
+		<code>AFFC</code>
+		<name>Armed Forces of the Federated Commonwealth</name>
+		<description>This is the rank system used by the Armed Forces of the Federated Commonwealth, created during the merge of the Lyran Commonwealth Armed Forces and the Armed Forces of the Federated Suns.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -787,8 +791,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>LCAF</systemCode>
-		<systemName>Lyran Commonwealth Armed Forces</systemName>
+		<code>LCAF</code>
+		<name>Lyran Commonwealth Armed Forces</name>
+		<description>This is the rank system used by the Lyran Commonwealth Armed Forces.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -1046,8 +1051,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>LAAF</systemCode>
-		<systemName>Lyran Alliance Armed Forces</systemName>
+		<code>LAAF</code>
+		<name>Lyran Alliance Armed Forces</name>
+		<description>This is the rank system used by the Lyran Alliance Armed Forces.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -1305,8 +1311,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>FWLM</systemCode>
-		<systemName>Free Worlds League Military</systemName>
+		<code>FWLM</code>
+		<name>Free Worlds League Military</name>
+		<description>This is the rank system used by the Free Worlds League Military.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -1564,8 +1571,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>CCAF</systemCode>
-		<systemName>Capellan Confederation Armed Forces</systemName>
+		<code>CCAF</code>
+		<name>Capellan Confederation Armed Forces</name>
+		<description>This is the rank system used by the Capellan Confederation Armed Forces.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -1823,8 +1831,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>CCWH</systemCode>
-		<systemName>Capellan Confederation Warrior House</systemName>
+		<code>CCWH</code>
+		<name>Capellan Confederation Warrior House</name>
+		<description>This is the rank system used by the warrior houses within the Capellan Confederation.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -2082,8 +2091,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>DCMS</systemCode>
-		<systemName>Draconis Combine Mustered Soldiery</systemName>
+		<code>DCMS</code>
+		<name>Draconis Combine Mustered Soldiery</name>
+		<description>This is the rank system used by the Draconis Combine Mustered Soldiery.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -2341,8 +2351,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>CLAN</systemCode>
-		<systemName>Clan</systemName>
+		<code>CLAN</code>
+		<name>Clan</name>
+		<description>This is the rank system used by the Clans.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -2600,8 +2611,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>CG</systemCode>
-		<systemName>Com Guard</systemName>
+		<code>CG</code>
+		<name>Com Guard</name>
+		<description>This is the rank system used by the Com Guard.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -2859,8 +2871,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>WOBM</systemCode>
-		<systemName>Word of Blake Militia</systemName>
+		<code>WOBM</code>
+		<name>Word of Blake Militia</name>
+		<description>This is the rank system used by the Word of Blake Militia.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -3118,8 +3131,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>MAF</systemCode>
-		<systemName>Magistracy Armed Forces</systemName>
+		<code>MAF</code>
+		<name>Magistracy Armed Forces</name>
+		<description>This is the rank system used by the Magistracy of Canopus' Magistracy Armed Forces.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -3377,8 +3391,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>TDF</systemCode>
-		<systemName>Taurian Defense Force</systemName>
+		<code>TDF</code>
+		<name>Taurian Defense Force</name>
+		<description>This is the rank system used by the Taurian Defense Force.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -3636,8 +3651,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>MHAF</systemCode>
-		<systemName>Marian Hegemony Armed Forces</systemName>
+		<code>MHAF</code>
+		<name>Marian Hegemony Armed Forces</name>
+		<description>This is the rank system used by the Marian Hegemony Armed Forces.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -3895,8 +3911,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>AMC</systemCode>
-		<systemName>Alliance Military Corps</systemName>
+		<code>AMC</code>
+		<name>Alliance Military Corps</name>
+		<description>This is the rank system used by the Outworld Alliance's Alliance Military Corps.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -4154,8 +4171,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>KA</systemCode>
-		<systemName>KungsArmé</systemName>
+		<code>KA</code>
+		<name>KungsArmé</name>
+		<description>This is the rank system used by the Free Rasalhague Republic's KungsArmé.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -4413,8 +4431,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>ACM</systemCode>
-		<systemName>Aurigan Coalition Military</systemName>
+		<code>ACM</code>
+		<name>Aurigan Coalition Military</name>
+		<description>This is the rank system used by the Aurigan Coalition Military.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
@@ -4672,8 +4691,9 @@ Rank:
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<systemCode>SLDF</systemCode>
-		<systemName>Star League Defense Force</systemName>
+		<code>SLDF</code>
+		<name>Star League Defense Force</name>
+		<description>This is the rank system used by the Star League Defense Force.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH</rankNames>
 			<officer>false</officer>
