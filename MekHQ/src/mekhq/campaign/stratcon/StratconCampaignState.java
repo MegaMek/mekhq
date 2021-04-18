@@ -179,6 +179,14 @@ public class StratconCampaignState {
         completedStrategicObjectiveCount--;
     }
     
+    public void incrementStrategicObjectiveCompletedCount(int increment) {
+        completedStrategicObjectiveCount += increment;
+    }
+    
+    public void decrementStrategicObjectiveCompletedCount(int decrement) {
+        completedStrategicObjectiveCount -= decrement;
+    }
+    
     public void useSupportPoint() {
         supportPoints--;
     }

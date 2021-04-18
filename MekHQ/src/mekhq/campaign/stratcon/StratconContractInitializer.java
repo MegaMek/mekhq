@@ -105,6 +105,7 @@ public class StratconContractInitializer {
                         break;
                     case AlliedFacilityControl:
                         initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, null, true);
+                        campaignState.incrementStrategicObjectiveCompletedCount(numObjects);
                         break;
                     case HostileFacilityControl:
                     case FacilityDestruction:

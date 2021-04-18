@@ -204,7 +204,7 @@ public class StratconRulesManager {
             }
         }
 
-        // this is theoretically possible if forceIDs is empy - not likely in practice
+        // this is theoretically possible if forceIDs is empty - not likely in practice
         // but might as well, to future-proof.
         if (scenario != null) {
             scenario.setIgnoreForceAutoAssignment(true);
@@ -1195,14 +1195,6 @@ public class StratconRulesManager {
 
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
-                    if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
-                        if (facility.getOwner() == ForceAlignment.Allied) {
-                            facility.setOwner(ForceAlignment.Opposing);
-                        } else {
-                            facility.setOwner(ForceAlignment.Allied);
-                        }
-                    }
-
                     boolean victory = rst.getScenario().getStatus() == Scenario.S_VICTORY
                             || rst.getScenario().getStatus() == Scenario.S_MVICTORY;
 
@@ -1210,14 +1202,18 @@ public class StratconRulesManager {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
-                    if (scenario.isStrategicObjective()) {
-                        if (campaignState.strategicObjectivesBehaveAsVPs()) {
-                            campaignState.updateVictoryPoints(victory ? 1 : -1);
+                    // this must be done before updating ownership change to avoid
+                    // updating SO counts in the wrong direction.
+                    updateStrategicObjectiveCount(victory, scenario, facility, campaignState);
+
+                    if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
+                        if (facility.getOwner() == ForceAlignment.Allied) {
+                            facility.setOwner(ForceAlignment.Opposing);
                         } else {
-                            campaignState.incrementStrategicObjectiveCompletedCount();
+                            facility.setOwner(ForceAlignment.Allied);
                         }
                     }
-
+                    
                     processTrackForceReturnDates(track, rst.getCampaign().getLocalDate());
 
                     track.removeScenario(scenario);
@@ -1226,10 +1222,53 @@ public class StratconRulesManager {
             }
         }
     }
+    
+    /**
+     * Worker function that contains logic for updating strategic objective counts
+     * in a given campaign.
+     */
+    private static void updateStrategicObjectiveCount(boolean victory, 
+            StratconScenario scenario, StratconFacility facility, StratconCampaignState campaignState) {
+        // if neither the scenario nor facility are strategic objectives, 
+        // then we are done here.
+        if ((scenario == null) || !scenario.isStrategicObjective() && 
+                (facility == null) || !facility.isStrategicObjective()) {
+            return;
+        }
+        
+        // simple situation - if the strategic objective items simply increase VP count
+        // then we do that here
+        if (campaignState.strategicObjectivesBehaveAsVPs()) {
+            campaignState.updateVictoryPoints(victory ? 1 : -1);
+        } else {
+            // if a victory and the scenario is a strategic objective, SO++
+            // if a victory and facility is a strategic objective:
+            //      for allied facilities, do nothing
+            //      for hostile facilities, SO++
+            // if defeat and facility is a strategic objective:
+            //      for allied facilities, SO--
+            //      for hostile facilities, nothing
+            // the basic idea is that you're supposed to *hold* allied facilities
+            // and *seize* hostile facilities
+            
+            if (scenario.isStrategicObjective() && victory) {
+                campaignState.incrementStrategicObjectiveCompletedCount();
+                return;
+            }
+            
+            boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
+            
+            if (facility.isStrategicObjective() && alliedFacility && !victory) {
+                campaignState.decrementStrategicObjectiveCompletedCount();
+            } else if (facility.isStrategicObjective() && !alliedFacility && victory) {
+                campaignState.incrementStrategicObjectiveCompletedCount();
+            }
+        }
+    }
 
     /**
-     * Worker function that goes through a track and undeploys any forces where the return date is on or
-     * before the given date.
+     * Worker function that goes through a track and undeploys any forces where the 
+     * return date is on or before the given date.
      */
     public static void processTrackForceReturnDates(StratconTrackState track, LocalDate date) {
         List<Integer> forcesToUndeploy = new ArrayList<>();
