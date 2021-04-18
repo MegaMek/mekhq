@@ -52,9 +52,10 @@ public class RankTableModel extends DefaultTableModel {
     public final static int COL_NAME_TECH = 6;
     public final static int COL_NAME_MEDICAL = 7;
     public final static int COL_NAME_ADMIN = 8;
-    public final static int COL_OFFICER = 9;
-    public final static int COL_PAYMULT = 10;
-    public final static int COL_NUM = 11;
+    public final static int COL_NAME_CIVILIAN = 9;
+    public final static int COL_OFFICER = 10;
+    public final static int COL_PAYMULT = 11;
+    public final static int COL_NUM = 12;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
@@ -104,6 +105,7 @@ public class RankTableModel extends DefaultTableModel {
             array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(Profession.TECH);
             array[i][RankTableModel.COL_NAME_MEDICAL] = rank.getNameWithLevels(Profession.MEDICAL);
             array[i][RankTableModel.COL_NAME_ADMIN] = rank.getNameWithLevels(Profession.ADMIN);
+            array[i][RankTableModel.COL_NAME_CIVILIAN] = rank.getNameWithLevels(Profession.CIVILIAN);
             array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
             array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
         }
@@ -133,6 +135,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_NAME_TECH:
             case COL_NAME_MEDICAL:
             case COL_NAME_ADMIN:
+            case COL_NAME_CIVILIAN:
                 return String.class;
             case COL_OFFICER:
                 return Boolean.class;
@@ -166,6 +169,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_NAME_TECH:
             case COL_NAME_MEDICAL:
             case COL_NAME_ADMIN:
+            case COL_NAME_CIVILIAN:
                 return SwingConstants.LEFT;
             default:
                 return SwingConstants.CENTER;
@@ -192,6 +196,8 @@ public class RankTableModel extends DefaultTableModel {
                 return Profession.MEDICAL.getToolTipText();
             case COL_NAME_ADMIN:
                 return Profession.ADMIN.getToolTipText();
+            case COL_NAME_CIVILIAN:
+                return Profession.CIVILIAN.getToolTipText();
             case COL_OFFICER:
                 return resources.getString("RankTableModel.COL_OFFICER.toolTipText");
             case COL_PAYMULT:
@@ -213,7 +219,8 @@ public class RankTableModel extends DefaultTableModel {
                         (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
                         (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
                         (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH),
-                        (String) row.get(RankTableModel.COL_NAME_MEDICAL), (String) row.get(RankTableModel.COL_NAME_ADMIN)
+                        (String) row.get(RankTableModel.COL_NAME_MEDICAL), (String) row.get(RankTableModel.COL_NAME_ADMIN),
+                        (String) row.get(RankTableModel.COL_NAME_CIVILIAN)
                 };
                 final boolean officer = (boolean) row.get(RankTableModel.COL_OFFICER);
                 final double paymentMultiplier = (double) row.get(RankTableModel.COL_PAYMULT);
