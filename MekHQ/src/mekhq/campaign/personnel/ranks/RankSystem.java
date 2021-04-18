@@ -49,6 +49,7 @@ public class RankSystem implements Serializable {
 
     private String rankSystemCode; // Primary Key, must be unique
     private String rankSystemName;
+    private String description;
     private transient RankSystemType type; // no need to serialize
     private List<Rank> ranks;
     //endregion Variable Declarations
@@ -61,6 +62,7 @@ public class RankSystem implements Serializable {
     public RankSystem(final RankSystem rankSystem) {
         setRankSystemCode(rankSystem.getRankSystemCode());
         setRankSystemName(rankSystem.toString());
+        setDescription(rankSystem.getDescription());
         setType(rankSystem.getType());
         setRanks(new ArrayList<>(rankSystem.getRanks()));
     }
@@ -85,6 +87,14 @@ public class RankSystem implements Serializable {
 
     public void setRankSystemName(final String rankSystemName) {
         this.rankSystemName = rankSystemName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public RankSystemType getType() {

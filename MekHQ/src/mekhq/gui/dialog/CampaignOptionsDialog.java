@@ -18,50 +18,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
@@ -76,7 +36,6 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -90,18 +49,14 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.RankSystemType;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
@@ -110,11 +65,38 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
-import mekhq.gui.model.RankTableModel;
-import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -403,14 +385,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
-    private RankSystem selectedRankSystem;
-    private JComboBox<RankSystem> comboRankSystems;
-    private SortedComboBoxModel<RankSystem> rankSystemModel;
-    private JButton btnConvertRankSystemType;
-
-    // Ranks Table Panel
-    private JTable tableRanks;
-    private RankTableModel ranksModel;
+    private RankSystemsPane rankSystemsPane;
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
@@ -2556,7 +2531,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Skill Randomization Tab
 
         //region Rank Systems Tab
-        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab());
+        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab(frame, campaign));
         //endregion Rank Systems Tab
 
         //region Name and Portrait Generation Tab
@@ -4707,353 +4682,17 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Personnel Tab
 
     //region Rank Systems Tab
-    private JScrollPane createRankSystemsTab() {
-        final JPanel rankSystemsPanel = new JPanel(new GridBagLayout());
-        rankSystemsPanel.setName("rankSystemsPanel");
-
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-
-        final JTextArea txtInstructionsRanks = new JTextArea(resources.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resources.getString("txtInstructionsRanks.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
-        rankSystemsPanel.add(txtInstructionsRanks, gbc);
-
-        gbc.gridy++;
-        rankSystemsPanel.add(createRankSystemPanel(), gbc);
-
-        gbc.gridy++;
-        rankSystemsPanel.add(createRanksTablePane(), gbc);
-
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        rankSystemsPanel.add(createRankSystemFileButtonsPanel(), gbc);
-
-        final JScrollPane rankSystemsPane = new JScrollPane(rankSystemsPanel);
-        rankSystemsPane.setPreferredSize(new Dimension(500, 400));
-
+    private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
+        rankSystemsPane = new RankSystemsPane(frame, campaign);
         return rankSystemsPane;
-    }
-
-    private JPanel createRankSystemPanel() {
-        // Create Panel Components
-        final JLabel lblRankSystem = new JLabel(resources.getString("lblRankSystem.text"));
-        lblRankSystem.setName("lblRankSystem");
-
-        selectedRankSystem = new RankSystem(campaign.getRankSystem());
-
-        final Comparator<String> comparator = new NaturalOrderComparator();
-        rankSystemModel = new SortedComboBoxModel<>(
-                (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()));
-        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
-            rankSystemModel.addElement(rankSystem.getType().isUserData()
-                    ? new RankSystem(rankSystem) : rankSystem);
-        }
-        if (selectedRankSystem.getType().isCampaign()) {
-            rankSystemModel.addElement(selectedRankSystem);
-        }
-        comboRankSystems = new JComboBox<>(rankSystemModel);
-        comboRankSystems.setName("comboRankSystems");
-        comboRankSystems.setSelectedItem(selectedRankSystem);
-        comboRankSystems.addActionListener(evt -> comboRankSystemChanged());
-
-        btnConvertRankSystemType = createButton(selectedRankSystem.getType().isUserData()
-                        ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text",
-                "btnConvertRankSystemType.toolTipText", "btnConvertRankSystemType",
-                evt -> convertRankSystemType());
-        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
-
-        final JButton btnCreateCustomRankSystem = createButton("btnCreateCustomRankSystem.text",
-                "btnCreateCustomRankSystem.toolTipText", "btnCreateCustomRankSystem",
-                evt -> createCustomRankSystem());
-
-        // Programmatically Assign Accessibility Labels
-        lblRankSystem.setLabelFor(comboRankSystems);
-
-        // Layout the UI
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("rankSystemPanel.title")));
-        panel.setName("rankSystemPanel");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystem)
-                                .addComponent(comboRankSystems)
-                                .addComponent(btnConvertRankSystemType)
-                                .addComponent(btnCreateCustomRankSystem, GroupLayout.Alignment.LEADING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystem)
-                                .addComponent(comboRankSystems)
-                                .addComponent(btnConvertRankSystemType)
-                                .addComponent(btnCreateCustomRankSystem))
-        );
-
-        return panel;
-    }
-
-    private JScrollPane createRanksTablePane() {
-        // Create Model
-        ranksModel = new RankTableModel(selectedRankSystem);
-
-        // Create Table
-        tableRanks = new JTable(ranksModel);
-        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-        tableRanks.setRowSelectionAllowed(false);
-        tableRanks.setColumnSelectionAllowed(false);
-        tableRanks.setCellSelectionEnabled(true);
-        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-        tableRanks.setShowGrid(false);
-
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            final TableColumn column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-
-        // Create the Scroll Pane
-        final JScrollPane pane = new JScrollPane(tableRanks);
-        pane.setName("ranksTableScrollPane");
-
-        return pane;
-    }
-
-    private JPanel createRankSystemFileButtonsPanel() {
-        final JPanel panel = new JPanel(new GridLayout(0, 3));
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("rankSystemButtonsPanel.title")));
-        panel.setName("rankSystemFileButtonsPanel");
-
-        // Create the Buttons
-        panel.add(createButton("btnExportCurrentRankSystem.text",
-                "btnExportCurrentRankSystem.toolTipText", "btnExportCurrentRankSystem",
-                evt -> {
-            if (selectedRankSystem != null) {
-                updateRankSystemRanks();
-                selectedRankSystem.writeToFile(FileDialogs.saveIndividualRankSystem(frame).orElse(null));
-            }
-        }));
-
-        panel.add(createButton("btnExportUserDataRankSystems.text",
-                "btnExportUserDataRankSystems.toolTipText", "btnExportUserDataRankSystems",
-                evt -> {
-            updateRankSystemRanks();
-            final List<RankSystem> rankSystems = new ArrayList<>();
-            for (int i = 0; i < rankSystemModel.getSize(); i++) {
-                final RankSystem rankSystem = rankSystemModel.getElementAt(i);
-                if (rankSystem.getType().isUserData()) {
-                    rankSystems.add(rankSystem);
-                }
-            }
-            Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
-            refreshRankSystems();
-        }));
-
-        panel.add(createButton("btnExportRankSystems.text",
-                "btnExportRankSystems.toolTipText", "btnExportRankSystems",
-                evt -> {
-            updateRankSystemRanks();
-            final List<RankSystem> rankSystems = new ArrayList<>();
-            for (int i = 0; i < rankSystemModel.getSize(); i++) {
-                rankSystems.add(rankSystemModel.getElementAt(i));
-            }
-            Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(frame).orElse(null), rankSystems);
-        }));
-
-        panel.add(createButton("btnImportIndividualRankSystem.text",
-                "btnImportIndividualRankSystem.toolTipText", "btnImportIndividualRankSystem",
-                evt -> {
-            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
-                    FileDialogs.openIndividualRankSystem(frame).orElse(null));
-            // Validate on load, to ensure we don't have any display issues
-            if (new RankValidator().validate(rankSystemModel, rankSystem, true)) {
-                rankSystemModel.addElement(rankSystem);
-            }
-        }));
-
-        panel.add(createButton("btnImportRankSystems.text",
-                "btnImportRankSystems.toolTipText", "btnImportRankSystems",
-                evt -> {
-            final List<RankSystem> rankSystems = Ranks.loadRankSystemsFromFile(
-                    FileDialogs.openRankSystems(frame).orElse(null), RankSystemType.CAMPAIGN);
-            final RankValidator rankValidator = new RankValidator();
-            for (final RankSystem rankSystem : rankSystems) {
-                if (rankValidator.validate(rankSystemModel, rankSystem, true)) {
-                    rankSystemModel.addElement(rankSystem);
-                }
-            }
-        }));
-
-        panel.add(createButton("btnRefreshRankSystemsFromFile.text",
-                "btnRefreshRankSystemsFromFile.toolTipText", "btnRefreshRankSystemsFromFile",
-                evt -> refreshRankSystems()));
-
-        return panel;
     }
     //endregion Rank Systems Tab
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
-        setName("dialog");
+        setName("CampaignOptionsDialog");
         preferences.manage(new JWindowPreference(this));
     }
-
-    /**
-     * This creates a standard button for use in the dialog. It is a temporary copy over from
-     * AbstractButtonDialog until I, Windchild, can move this dialog over to using that properly
-     *
-     * TODO : Remove me once I've been migrated to AbstractMHQDialog
-     *
-     * @param text the text resource string
-     * @param toolTipText the toolTipText resource string
-     * @param name the name of the button
-     * @param actionListener the {@link ActionListener} to assign to the button
-     * @return the created button
-     */
-    protected JButton createButton(final String text, final String toolTipText, final String name,
-                                   final ActionListener actionListener) {
-        final JButton button = new JButton(resources.getString(text));
-        button.setToolTipText(resources.getString(toolTipText));
-        button.setName(name);
-        button.addActionListener(actionListener);
-        return button;
-    }
-
-    //region Action Listeners
-    //region Rank Systems Tab
-    private void comboRankSystemChanged() {
-        updateRankSystemRanks();
-
-        // Then update the selected rank system, with null protection (although it shouldn't be null)
-        selectedRankSystem = (RankSystem) rankSystemModel.getSelectedItem();
-        if (selectedRankSystem == null) {
-            return;
-        }
-
-        // Update the model with the new rank data
-        ranksModel.setRankSystem(selectedRankSystem);
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            final TableColumn column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-
-        // And the convert type button based on the new type
-        btnConvertRankSystemType.setText(resources.getString(selectedRankSystem.getType().isUserData()
-                ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
-        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
-    }
-
-    private void updateRankSystemRanks() {
-        // Update the now old rank system with the changes done to it in the model
-        if ((selectedRankSystem != null) && !selectedRankSystem.getType().isDefault()) {
-            selectedRankSystem.setRanks(ranksModel.getRanks());
-        }
-    }
-
-    private void convertRankSystemType() {
-        switch (selectedRankSystem.getType()) {
-            case DEFAULT:
-                MekHQ.getLogger().error("Error, tried to make a DEFAULT rank system into another type of rank system");
-                return;
-            case USER_DATA:
-                selectedRankSystem.setType(RankSystemType.CAMPAIGN);
-                break;
-            case CAMPAIGN:
-                selectedRankSystem.setType(RankSystemType.USER_DATA);
-                break;
-            default:
-                MekHQ.getLogger().error("Error, unknown rank system type.");
-                return;
-        }
-
-        btnConvertRankSystemType.setText(resources.getString(selectedRankSystem.getType().isUserData()
-                ? "btnConvertRankSystemToCampaign.text" : "btnConvertRankSystemToUserData.text"));
-        btnConvertRankSystemType.setEnabled(!selectedRankSystem.getType().isDefault());
-    }
-
-    private void createCustomRankSystem() {
-        // We need to get the current Rank Systems from the rank system combo box for to ensure
-        // the data's uniqueness
-        final List<RankSystem> rankSystems = new ArrayList<>();
-        for (int i = 0; i < rankSystemModel.getSize(); i++) {
-            rankSystems.add(rankSystemModel.getElementAt(i));
-        }
-
-        // Now we can show the dialog and check if it was confirmed
-        final CustomRankSystemCreationDialog dialog = new CustomRankSystemCreationDialog(frame,
-                rankSystems, ranksModel.getRanks());
-        if (dialog.showDialog().isConfirmed()) {
-            // If it was we add the new rank system to the model
-            rankSystemModel.addElement(dialog.getRankSystem());
-            // And select that item if that's intended
-            if (dialog.getChkSwapToRankSystem().isSelected()) {
-                comboRankSystems.setSelectedItem(dialog.getRankSystem());
-            }
-        }
-    }
-
-    private void refreshRankSystems() {
-        // Clear the selected rank system and reinitialize
-        selectedRankSystem = null;
-        Ranks.reinitializeRankSystems(campaign);
-
-        // Then collect all of the campaign-type rank systems into a set, so we don't just throw
-        // them away
-        final Set<RankSystem> campaignRankSystems = new HashSet<>();
-        for (int i = 0; i < rankSystemModel.getSize(); i++) {
-            final RankSystem rankSystem = rankSystemModel.getElementAt(i);
-            if (rankSystem.getType().isCampaign()) {
-                campaignRankSystems.add(rankSystem);
-            }
-        }
-
-        // Update the rank system model
-        rankSystemModel.removeAllElements();
-        for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
-            rankSystemModel.addElement(new RankSystem(rankSystem));
-        }
-
-        // Revalidate all of the Campaign Rank Systems before adding, as we need to ensure no duplicate keys
-        final RankValidator rankValidator = new RankValidator();
-        for (final RankSystem rankSystem : campaignRankSystems) {
-            // Validating against the core ranks is fine here, as we know all of the rank systems
-            // we want to check against have been loaded there
-            if (rankValidator.validate(rankSystem, true)) {
-                rankSystemModel.addElement(rankSystem);
-            }
-        }
-
-        // Set the selected item
-        comboRankSystems.setSelectedItem(campaign.getRankSystem());
-    }
-    //endregion Rank Systems Tab
-    //endregion Action Listeners
 
     public void applyPreset(GamePreset gamePreset) {
         // Handle CampaignOptions and RandomSkillPreferences
@@ -5592,8 +5231,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        updateRankSystemRanks();
-        campaign.setRankSystem(selectedRankSystem);
+        rankSystemsPane.applyToCampaign();
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 
@@ -6340,77 +5978,6 @@ public class CampaignOptionsDialog extends JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public static class SpinnerEditor extends DefaultCellEditor {
-        private static final long serialVersionUID = -2711422398394960413L;
-        JSpinner spinner;
-        JSpinner.NumberEditor editor;
-        JTextField textField;
-        boolean valueSet;
-
-        // Initializes the spinner.
-        public SpinnerEditor() {
-            super(new JTextField());
-            spinner = new JSpinner(new SpinnerNumberModel(1.0, 0, 10, 0.05));
-            editor = ((JSpinner.NumberEditor) spinner.getEditor());
-            textField = editor.getTextField();
-            textField.addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent fe) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (valueSet) {
-                            textField.setCaretPosition(1);
-                        }
-                    });
-                }
-
-                @Override
-                public void focusLost(FocusEvent fe) {
-                }
-            });
-            textField.addActionListener(ae -> stopCellEditing());
-        }
-
-        // Prepares the spinner component and returns it.
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            if (!valueSet) {
-                spinner.setValue(value);
-            }
-            SwingUtilities.invokeLater(() -> textField.requestFocus());
-            return spinner;
-        }
-
-        @Override
-        public boolean isCellEditable(EventObject eo) {
-            if (eo instanceof KeyEvent) {
-                KeyEvent ke = (KeyEvent) eo;
-                textField.setText(String.valueOf(ke.getKeyChar()));
-                valueSet = true;
-            } else {
-                valueSet = false;
-            }
-            return true;
-        }
-
-        // Returns the spinners current value.
-        @Override
-        public Object getCellEditorValue() {
-            return spinner.getValue();
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            try {
-                editor.commitEdit();
-                spinner.commitEdit();
-            } catch (java.text.ParseException e) {
-                JOptionPane.showMessageDialog(null, "Invalid value, discarding.");
-            }
-            return super.stopCellEditing();
         }
     }
 }

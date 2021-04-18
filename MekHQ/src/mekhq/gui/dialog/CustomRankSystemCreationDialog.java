@@ -18,22 +18,24 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.enums.DialogResult;
+import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Locale;
 
-public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
+public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final List<RankSystem> rankSystems;
     private RankSystem rankSystem;
@@ -42,17 +44,19 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
     private JTextField txtRankSystemCode;
     private JTextField txtRankSystemName;
     private JComboBox<RankSystemType> comboRankSystemType;
+    private JTextField txtRankSystemDescription;
     private JCheckBox chkSwapToRankSystem;
     //endregion Variable Declarations
 
     //region Constructors
-    protected CustomRankSystemCreationDialog(final JFrame frame, final List<RankSystem> rankSystems,
-                                             final List<Rank> ranks) {
+    public CustomRankSystemCreationDialog(final JFrame frame, final List<RankSystem> rankSystems,
+                                          final List<Rank> ranks) {
         super(frame, "CustomRankSystemCreationDialog", "CustomRankSystemCreationDialog.title");
         this.rankSystems = rankSystems;
         setRankSystem(null);
         this.ranks = ranks;
         initialize();
+        getOkButton().setEnabled(false);
     }
     //endregion Constructors
 
@@ -61,11 +65,11 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         return rankSystems;
     }
 
-    public RankSystem getRankSystem() {
+    public @Nullable RankSystem getRankSystem() {
         return rankSystem;
     }
 
-    public void setRankSystem(RankSystem rankSystem) {
+    public void setRankSystem(final @Nullable RankSystem rankSystem) {
         this.rankSystem = rankSystem;
     }
 
@@ -97,6 +101,14 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         this.comboRankSystemType = comboRankSystemType;
     }
 
+    public JTextField getTxtRankSystemDescription() {
+        return txtRankSystemDescription;
+    }
+
+    public void setTxtRankSystemDescription(final JTextField txtRankSystemDescription) {
+        this.txtRankSystemDescription = txtRankSystemDescription;
+    }
+
     public JCheckBox getChkSwapToRankSystem() {
         return chkSwapToRankSystem;
     }
@@ -117,6 +129,25 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         setTxtRankSystemCode(new JTextField());
         getTxtRankSystemCode().setToolTipText(resources.getString("lblRankSystemCode.toolTipText"));
         getTxtRankSystemCode().setName("txtRankSystemCode");
+        getTxtRankSystemCode().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+        });
 
         final JLabel lblRankSystemName = new JLabel(resources.getString("lblRankSystemName.text"));
         lblRankSystemName.setToolTipText(resources.getString("lblRankSystemName.toolTipText"));
@@ -125,6 +156,33 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         setTxtRankSystemName(new JTextField());
         getTxtRankSystemName().setToolTipText(resources.getString("lblRankSystemName.toolTipText"));
         getTxtRankSystemName().setName("txtRankSystemName");
+        getTxtRankSystemName().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent evt) {
+                setState(ValidationState.PENDING);
+                validateButtonActionPerformed(null);
+            }
+        });
+
+        final JLabel lblRankSystemDescription = new JLabel(resources.getString("lblRankSystemDescription.text"));
+        lblRankSystemDescription.setToolTipText(resources.getString("lblRankSystemDescription.toolTipText"));
+        lblRankSystemDescription.setName("lblRankSystemDescription");
+
+        setTxtRankSystemDescription(new JTextField());
+        getTxtRankSystemDescription().setToolTipText(resources.getString("lblRankSystemDescription.toolTipText"));
+        getTxtRankSystemDescription().setName("txtRankSystemDescription");
 
         final JLabel lblRankSystemType = new JLabel(resources.getString("lblRankSystemType.text"));
         lblRankSystemType.setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
@@ -135,6 +193,19 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         setComboRankSystemType(new JComboBox<>(rankSystemTypeModel));
         getComboRankSystemType().setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
         getComboRankSystemType().setName("comboRankSystemType");
+        getComboRankSystemType().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RankSystemType) {
+                    list.setToolTipText(((RankSystemType) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        getComboRankSystemType().addActionListener(evt -> setState(ValidationState.PENDING));
 
         setChkSwapToRankSystem(new JCheckBox(resources.getString("chkSwapToRankSystem.text")));
         getChkSwapToRankSystem().setToolTipText(resources.getString("chkSwapToRankSystem.toolTipText"));
@@ -143,6 +214,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
         // Programmatically Assign Accessibility Labels
         lblRankSystemCode.setLabelFor(getTxtRankSystemCode());
         lblRankSystemName.setLabelFor(getTxtRankSystemName());
+        lblRankSystemDescription.setLabelFor(getTxtRankSystemDescription());
         lblRankSystemType.setLabelFor(getComboRankSystemType());
 
         // Layout the UI
@@ -163,6 +235,9 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
                                 .addComponent(lblRankSystemName)
                                 .addComponent(getTxtRankSystemName(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRankSystemDescription)
+                                .addComponent(getTxtRankSystemDescription(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblRankSystemType)
                                 .addComponent(getComboRankSystemType(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkSwapToRankSystem())
@@ -176,6 +251,9 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRankSystemName)
                                 .addComponent(getTxtRankSystemName()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRankSystemDescription)
+                                .addComponent(getTxtRankSystemDescription()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRankSystemType)
                                 .addComponent(getComboRankSystemType()))
@@ -195,41 +273,41 @@ public class CustomRankSystemCreationDialog extends AbstractMHQButtonDialog {
 
     //region Button Actions
     @Override
-    protected void okButtonActionPerformed(final ActionEvent evt) {
-        final String validationText = validateSystem();
-        if (validationText.isBlank()) {
-            okAction();
-            setResult(DialogResult.CONFIRMED);
-            setVisible(false);
-        } else if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(getFrame(),
-                validationText, resources.getString("CustomRankSystemCreationDialog.ValidationFailed.title"),
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
-            cancelActionPerformed(evt);
-        }
-    }
-
-    @Override
     protected void okAction() {
         super.okAction();
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
                 getTxtRankSystemName().getText(), (RankSystemType) getComboRankSystemType().getSelectedItem()));
         getRankSystem().setRanks(getRanks());
     }
-    //endregion Button Actions
 
-    /**
-     * @return an empty string if the system is valid, or the text for the invalid rank system
-     */
-    private String validateSystem() {
+    @Override
+    protected ValidationState validateAction(final boolean display) {
+        final String text;
         if (getTxtRankSystemCode().getText().isBlank()) {
-            return resources.getString("CustomRankSystemCreationDialog.BlankRankSystemCode.text");
+            text = resources.getString("CustomRankSystemCreationDialog.BlankRankSystemCode.text");
         } else if (getTxtRankSystemName().getText().isBlank()) {
-            return resources.getString("CustomRankSystemCreationDialog.BlankRankSystemName.text");
-        } else if (getRankSystems().stream().noneMatch(rankSystem -> getTxtRankSystemCode().getText()
+            text = resources.getString("CustomRankSystemCreationDialog.BlankRankSystemName.text");
+        } else if (getRankSystems().stream().anyMatch(rankSystem -> getTxtRankSystemCode().getText()
                 .equalsIgnoreCase(rankSystem.getRankSystemCode()))) {
-            return resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
+            text = resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
         } else {
-            return "";
+            text = resources.getString("ValidationSuccess.text");
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(), text,
+                        resources.getString("ValidationSuccess.title"), JOptionPane.ERROR_MESSAGE);
+            }
+            getOkButton().setEnabled(true);
+            getOkButton().setToolTipText(text);
+            return ValidationState.SUCCESS;
         }
+
+        if (display) {
+            JOptionPane.showMessageDialog(getFrame(), text, resources.getString("ValidationFailure.title"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        getOkButton().setEnabled(false);
+        getOkButton().setToolTipText(text);
+        return ValidationState.FAILURE;
     }
+    //endregion Button Actions
 }

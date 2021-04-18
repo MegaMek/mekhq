@@ -133,7 +133,7 @@ public class Rank implements Serializable {
     }
 
     public String getNameWithLevels(final Profession profession) {
-        return getRankNames().get(profession) + ((getRankLevels().get(profession) > 0) ? ":" + getRankLevels().get(profession) : "");
+        return getRankNames().get(profession) + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
     }
 
     public String getRankNamesAsString(final String delimiter) {
@@ -141,7 +141,7 @@ public class Rank implements Serializable {
         for (final Profession profession : Profession.values()) {
             String name = getRankNames().get(profession);
             name = (name == null) ? "-" : name;
-            if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 0)) {
+            if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 1)) {
                 joiner.add(name + getRankLevels().get(profession).toString());
             } else {
                 joiner.add(name);
