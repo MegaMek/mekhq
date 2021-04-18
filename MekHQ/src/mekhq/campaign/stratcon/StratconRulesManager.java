@@ -1231,8 +1231,8 @@ public class StratconRulesManager {
             StratconScenario scenario, StratconFacility facility, StratconCampaignState campaignState) {
         // if neither the scenario nor facility are strategic objectives, 
         // then we are done here.
-        if ((scenario == null) || !scenario.isStrategicObjective() && 
-                (facility == null) || !facility.isStrategicObjective()) {
+        if (((scenario == null) || !scenario.isStrategicObjective()) && 
+                ((facility == null) || !facility.isStrategicObjective())) {
             return;
         }
         
