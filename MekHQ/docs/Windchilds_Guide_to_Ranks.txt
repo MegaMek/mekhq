@@ -12,7 +12,7 @@ If you want to run a campaign with entirely custom ranks, remove all rank system
 
 How to Write a Custom Rank System:
 The following clarifies some terms before I will start on how to write a custom rank system.
-{ "MW", "ASF", "VEE", "NAVAL", "INF", "TECH" } are the columns used for each rank name, in that order. These are henceforth referred to as professions. If there is a typo on the first tier it will default to using the MW profession, which may not be empty.
+{ "MW", "ASF", "VEE", "NAVAL", "INF", "TECH", "MEDICAL", "ADMIN" } are the columns used for each rank name, in that order. These are henceforth referred to as professions. If there is a typo on the first tier it will default to using the MW profession, which may not be empty.
 "--" followed by a profession code (capitalization required) means that the rank is designating an alternate profession to use for that rank tier (e.g. "--MW", "--INF") for that profession. This is referred to as "alternate profession".
 "-" means that the rank is empty for that tier for the specific profession. This is referred to as "empty".
 

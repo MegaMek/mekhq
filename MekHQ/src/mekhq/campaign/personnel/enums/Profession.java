@@ -32,7 +32,9 @@ public enum Profession {
     VEHICLE("Profession.VEHICLE.text", "Profession.VEHICLE.toolTipText"),
     NAVAL("Profession.NAVAL.text", "Profession.NAVAL.toolTipText"),
     INFANTRY("Profession.INFANTRY.text", "Profession.INFANTRY.toolTipText"),
-    TECH("Profession.TECH.text", "Profession.TECH.toolTipText");
+    TECH("Profession.TECH.text", "Profession.TECH.toolTipText"),
+    MEDICAL("Profession.MEDICAL.text", "Profession.MEDICAL.toolTipText"),
+    ADMIN("Profession.ADMIN.text", "Profession.ADMIN.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -78,6 +80,14 @@ public enum Profession {
 
     public boolean isTech() {
         return this == TECH;
+    }
+
+    public boolean isMedical() {
+        return this == MEDICAL;
+    }
+
+    public boolean isAdmin() {
+        return this == ADMIN;
     }
     //endregion Boolean Comparisons
 
@@ -194,6 +204,10 @@ public enum Profession {
                 return INFANTRY;
             case "TECH":
                 return TECH;
+            case "MEDIC":
+                return MEDICAL;
+            case "ADMIN":
+                return ADMIN;
             case "MW":
             default:
                 return MECHWARRIOR;
@@ -228,15 +242,17 @@ public enum Profession {
             case Person.T_AERO_TECH:
             case Person.T_BA_TECH:
             case Person.T_ASTECH:
+                return TECH;
+            case Person.T_DOCTOR:
+            case Person.T_MEDIC:
+                return MEDICAL;
             case Person.T_ADMIN_COM:
             case Person.T_ADMIN_LOG:
             case Person.T_ADMIN_TRA:
             case Person.T_ADMIN_HR:
-                return TECH;
+                return ADMIN;
             case Person.T_MECHWARRIOR:
             case Person.T_PROTO_PILOT:
-            case Person.T_DOCTOR:
-            case Person.T_MEDIC:
             default:
                 return MECHWARRIOR;
         }
