@@ -1251,10 +1251,14 @@ public class StratconRulesManager {
             // the basic idea is that you're supposed to *hold* allied facilities
             // and *seize* hostile facilities
             
-            if (scenario.isStrategicObjective() && victory) {
+            if ((scenario != null) && scenario.isStrategicObjective() && victory) {
                 campaignState.incrementStrategicObjectiveCompletedCount();
                 return;
             }
+            
+            if (facility == null) {
+                return;
+            }            
             
             boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
             
