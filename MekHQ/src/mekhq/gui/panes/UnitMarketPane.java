@@ -18,6 +18,8 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.panels.EntityImagePanel;
+import megamek.client.ui.panes.EntityViewPane;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;
@@ -37,7 +39,6 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.panels.EntityImagePanel;
 import mekhq.gui.sorter.WeightClassSorter;
 
 import javax.swing.*;
