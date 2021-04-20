@@ -463,6 +463,6 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     //endregion Action Listeners
 
     public void applyToCampaign() {
-
+        getCampaign().setRankSystem(getSelectedRankSystem());
     }
 }

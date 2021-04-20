@@ -402,7 +402,7 @@ public class Person implements Serializable {
         xp = 0;
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        setRankSystem(campaign.getRankSystem());
+        setRankSystemDirect(campaign.getRankSystem());
         setRank(0);
         setRankLevel(0);
         setManeiDominiClassDirect(ManeiDominiClass.NONE);
@@ -2405,9 +2405,9 @@ public class Person implements Serializable {
         return rankSystem;
     }
 
-    public void setRankSystem(final RankSystem rankSystem) {
+    public void setRankSystem(final RankValidator rankValidator, final RankSystem rankSystem) {
         setRankSystemDirect(rankSystem);
-        new RankValidator().checkPersonRank(this);
+        rankValidator.checkPersonRank(this);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 

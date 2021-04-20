@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
@@ -212,8 +213,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         switch (command) {
             case CMD_RANKSYSTEM: {
                 final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
+                final RankValidator rankValidator = new RankValidator();
                 for (final Person person : people) {
-                    person.setRankSystem(rankSystem);
+                    person.setRankSystem(rankValidator, rankSystem);
                 }
                 break;
             }

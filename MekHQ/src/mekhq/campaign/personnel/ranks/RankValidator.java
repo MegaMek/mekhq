@@ -164,28 +164,36 @@ public class RankValidator {
         }
 
         // Then, we need to fix any old rank system assignments for personnel
-        for (final Person person : campaign.getPersonnel()) {
-
-        }
+        campaign.getPersonnel().parallelStream().filter(person -> !person.getRankSystem().getType().isCampaign())
+                .forEach(person -> person.setRankSystem(this,
+                        Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }
 
     public void changeCampaignRankSystem(final RankSystem oldRankSystem,
                                          final RankSystem newRankSystem,
                                          final Collection<Person> personnel) {
         // We need to swap over the previous rank system to the current one
-        for (final Person person : personnel) {
-
-        }
+        personnel.parallelStream().filter(person -> person.getRankSystem().equals(oldRankSystem))
+                .forEach(person -> person.setRankSystem(this, newRankSystem));
 
         // Then, we need to check the ranks for the personnel
         checkPersonnelRanks(personnel);
     }
 
     public void checkPersonnelRanks(final Collection<Person> personnel) {
-
+        personnel.parallelStream().forEach(this::checkPersonRank);
     }
 
     public void checkPersonRank(final Person person) {
-
+        final RankSystem rankSystem = person.getRankSystem();
+        final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
+                .getBaseProfession(rankSystem);
+        if (person.getRank().isEmpty(profession)) {
+            for (int i = person.getRankNumeric() - 1; i == 0; i--) {
+                if (!rankSystem.getRanks().get(i).isEmpty(profession)) {
+                    person.setRank(i);
+                }
+            }
+        }
     }
 }
