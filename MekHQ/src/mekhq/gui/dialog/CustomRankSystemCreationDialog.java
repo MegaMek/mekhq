@@ -23,6 +23,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -32,8 +33,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
@@ -132,20 +135,17 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         getTxtRankSystemCode().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
 
             @Override
             public void removeUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
 
             @Override
             public void changedUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
         });
 
@@ -159,20 +159,17 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         getTxtRankSystemName().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
 
             @Override
             public void removeUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
 
             @Override
             public void changedUpdate(final DocumentEvent evt) {
-                setState(ValidationState.PENDING);
-                validateButtonActionPerformed(null);
+                revalidateAction(null);
             }
         });
 
