@@ -385,6 +385,11 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
+    public String getDesc() {
+        return getScenarioTypeDescription();
+    }
+    
+    @Override
     public String getScenarioTypeDescription() {
         return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
                 getTemplate().name : "Dynamic Scenario";
