@@ -32,6 +32,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.Dropship;
+import megamek.common.ProtomechBay;
 import megamek.common.SpaceStation;
 import megamek.common.Entity;
 import megamek.common.HeavyVehicleBay;
@@ -438,7 +439,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * and this method will immediately exit.
      */
     protected void initValues() {
-        MekHQ.getLogger().methodBegin(getClass(), "initValues()");
         setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -481,7 +481,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
         clearSkillRatingCounts();
-        MekHQ.getLogger().methodEnd(getClass(), "initValues()");
     }
 
     /**
@@ -493,9 +492,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
             for (Bay bay : e.getTransportBays()) {
                 if (bay instanceof MechBay) {
-                    setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
+                    setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof ProtomechBay) {
+                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof BattleArmorBay) {
-                    setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
+                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof InfantryBay) {
                     setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
                 } else if (bay instanceof LightVehicleBay) {
