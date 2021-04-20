@@ -151,7 +151,6 @@ public class RankTableModel extends DefaultTableModel {
             case COL_NAME_RATE:
                 return 100;
             case COL_OFFICER:
-            case COL_PAYMULT:
                 return 250;
             default:
                 return 500;

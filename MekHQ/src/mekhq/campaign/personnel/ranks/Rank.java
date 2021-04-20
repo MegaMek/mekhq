@@ -67,6 +67,17 @@ public class Rank implements Serializable {
         this(new String[0], false, 1.0);
     }
 
+    public Rank(final Rank rank) {
+        setRankNames(new HashMap<>());
+        setRankLevels(new HashMap<>());
+        for (final Profession profession : Profession.values()) {
+            getRankNames().put(profession, rank.getRankNames().getOrDefault(profession, "-"));
+            getRankLevels().put(profession, rank.getRankLevels().getOrDefault(profession, 1));
+        }
+        setOfficer(rank.isOfficer());
+        setPayMultiplier(rank.getPayMultiplier());
+    }
+
     public Rank(final String[] names, final boolean officer, final double payMultiplier) {
         initializeRank(names);
         setOfficer(officer);
@@ -142,7 +153,7 @@ public class Rank implements Serializable {
             String name = getRankNames().get(profession);
             name = (name == null) ? "-" : name;
             if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 1)) {
-                joiner.add(name + getRankLevels().get(profession).toString());
+                joiner.add(name + getRankLevels().get(profession));
             } else {
                 joiner.add(name);
             }

@@ -23,7 +23,6 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -36,7 +35,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
@@ -272,10 +270,17 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
     @Override
     protected void okAction() {
         super.okAction();
+
+        // First, we need to create the new rank system
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
                 getTxtRankSystemName().getText(), getTxtRankSystemDescription().getText(),
                 (RankSystemType) getComboRankSystemType().getSelectedItem()));
-        getRankSystem().setRanks(getRanks());
+
+        // Then, we need to clone out the rank setup
+        getRankSystem().setRanks(new ArrayList<>());
+        for (final Rank rank : getRanks()) {
+            getRankSystem().getRanks().add(new Rank(rank));
+        }
     }
 
     @Override
