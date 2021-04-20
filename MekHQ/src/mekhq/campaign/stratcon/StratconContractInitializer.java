@@ -104,12 +104,12 @@ public class StratconContractInitializer {
                                 objectiveParams.objectiveScenarios, objectiveParams.objectiveScenarioModifiers);
                         break;
                     case AlliedFacilityControl:
-                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, null, true);
+                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, true);
                         campaignState.incrementStrategicObjectiveCompletedCount(numObjects);
                         break;
                     case HostileFacilityControl:
                     case FacilityDestruction:
-                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, true);
+                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, true);
                         break;
                     case AnyScenarioVictory:
                         if (objectiveParams.objectiveScenarioModifiers != null) {
@@ -130,7 +130,7 @@ public class StratconContractInitializer {
         for (int x = 0; x < trackObjects.size(); x++) {
             int numObjects = trackObjects.get(x);
             
-            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, null, false);
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, false);
         }
         
         // non-objective hostile facilities
@@ -143,7 +143,7 @@ public class StratconContractInitializer {
         for (int x = 0; x < trackObjects.size(); x++) {
             int numObjects = trackObjects.get(x);
             
-            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, false);
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, false);
         }
         
         // now we're done
@@ -205,8 +205,8 @@ public class StratconContractInitializer {
      * Worker function that takes a trackstate and plops down the given number of facilities owned by the given faction
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic objective flag.
      */
-    private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities, ForceAlignment owner, 
-            List<String> facilitySubset, boolean strategicObjective) {
+    private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities, 
+            ForceAlignment owner, boolean strategicObjective) {
         
         int trackSize = trackState.getWidth() * trackState.getHeight();
         
@@ -216,10 +216,10 @@ public class StratconContractInitializer {
                 break;
             }
             
-            StratconFacility sf =
-                    facilitySubset == null ? 
-                    StratconFacilityFactory.getRandomFacility() :
-                    StratconFacilityFactory.getFacilityByName(facilitySubset.get(Compute.randomInt(facilitySubset.size())));
+            StratconFacility sf = owner == ForceAlignment.Allied ?
+                    StratconFacilityFactory.getRandomAlliedFacility() :
+                    StratconFacilityFactory.getRandomHostileFacility();
+                    
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
             
