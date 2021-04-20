@@ -73,3 +73,7 @@ Right click on the desired hex, and click the 'deploy force' item, then pick a f
 
 My units aren't showing up in the repair tab! Why?
 You've probably got them deployed to a StratCon track. Wait for them to come back, and don't deploy them to any additional scenarios.
+
+
+I want to design my own scenarios, how do I do that?
+Use the Scenario Template Editor to put together a scenario template. I recommend using the Briefing Room -> Add Scenario -> Generate From Template mechanism to test the template out. Now, go to your data\scenariomodifiers directory and create (if it doesn't exist already) a file called UserScenarioManifest.xml. It should be formatted exactly like ScenarioManifest. Make sure not to overlap with the ID numbers or file names in ScenarioManifest, as that "may cause unpredictable behavior". Now that you've got your scenario in the UserScenarioManifest file, it'll be added to the pool of scenarios StratCon draws from when generating battles.

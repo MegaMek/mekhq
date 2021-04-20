@@ -661,7 +661,7 @@ public class StratconRulesManager {
         // if a facility has been revealed, then it has a 100% chance to apply its effect
         // if a facility has not been revealed, then it has a x% chance to apply its effect
         //          where x is the current "aggro rating"
-        // if a facility is on the the scenario coordinates, then it applies the local effects
+        // if a facility is on the scenario coordinates, then it applies the local effects
         for (StratconCoords facilityCoords : track.getFacilities().keySet()) {
             boolean scenarioAtFacility = facilityCoords.equals(coords);
             StratconFacility facility = track.getFacilities().get(facilityCoords);
@@ -753,23 +753,23 @@ public class StratconRulesManager {
 
         // if we're under non-independent command rights, a supervisor may come along
         switch (contract.getCommandRights()) {
-        case AtBContract.COM_INTEGRATED:
-            backingScenario.addScenarioModifier(AtBScenarioModifier
-                    .getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
-                            : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
-            break;
-        case AtBContract.COM_HOUSE:
-            backingScenario.addScenarioModifier(
-                    AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
-                            : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
-            break;
-        case AtBContract.COM_LIAISON:
-            if (scenario.isRequiredScenario()) {
+            case AtBContract.COM_INTEGRATED:
+                backingScenario.addScenarioModifier(AtBScenarioModifier
+                        .getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
+                                : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+                break;
+            case AtBContract.COM_HOUSE:
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
-                                : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
-            }
-            break;
+                        AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
+                                : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+                break;
+            case AtBContract.COM_LIAISON:
+                if (scenario.isRequiredScenario()) {
+                    backingScenario.addScenarioModifier(
+                            AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
+                                    : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
+                }
+                break;
         }
     }
 
@@ -1095,24 +1095,24 @@ public class StratconRulesManager {
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-        case AtBContract.MORALE_ROUT:
-            return 0;
-        case AtBContract.MORALE_VERYLOW:
-            if (playerDeployingForce) {
-                moraleModifier = -10;
-            } else {
+            case AtBContract.MORALE_ROUT:
                 return 0;
-            }
-            break;
-        case AtBContract.MORALE_LOW:
-            moraleModifier = -5;
-            break;
-        case AtBContract.MORALE_HIGH:
-            moraleModifier = 5;
-            break;
-        case AtBContract.MORALE_INVINCIBLE:
-            moraleModifier = 10;
-            break;
+            case AtBContract.MORALE_VERYLOW:
+                if (playerDeployingForce) {
+                    moraleModifier = -10;
+                } else {
+                    return 0;
+                }
+                break;
+            case AtBContract.MORALE_LOW:
+                moraleModifier = -5;
+                break;
+            case AtBContract.MORALE_HIGH:
+                moraleModifier = 5;
+                break;
+            case AtBContract.MORALE_INVINCIBLE:
+                moraleModifier = 10;
+                break;
         }
 
         // facilities: for each hostile data center, add +5%
