@@ -462,10 +462,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setFighterBayCount(0);
         setSmallCraftBayCount(0);
         setProtoBayCount(0);
-        setBaBayCount(0);
-        setLightVeeBayCount(0);
-        setHeavyVeeBayCount(0);
         setSuperHeavyVeeBayCount(0);
+        setHeavyVeeBayCount(0);
+        setLightVeeBayCount(0);
+        setBaBayCount(0);
         setInfantryBayCount(0);
         setDockingCollarCount(0);
 
@@ -493,22 +493,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
             for (Bay bay : e.getTransportBays()) {
                 if (bay instanceof MechBay) {
                     setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof ProtomechBay) {
-                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof BattleArmorBay) {
-                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof InfantryBay) {
-                    setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
-                } else if (bay instanceof LightVehicleBay) {
-                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof HeavyVehicleBay) {
-                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof SuperHeavyVehicleBay) {
-                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof ASFBay) {
                     setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof SmallCraftBay) {
                     setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof ProtomechBay) {
+                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof SuperHeavyVehicleBay) {
+                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof HeavyVehicleBay) {
+                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof LightVehicleBay) {
+                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
+                }  else if (bay instanceof BattleArmorBay) {
+                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof InfantryBay) {
+                    setInfantryBayCount(getInfantryBayCount() + (int)
+                            Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
