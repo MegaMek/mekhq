@@ -878,7 +878,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             
-            if (gui.getCampaign().getCampaignOptions().checkMaintenance()) {
+            // if we're using maintenance and have selected something that requires maintenance
+            if (gui.getCampaign().getCampaignOptions().checkMaintenance() &&
+                    maintenanceTime > 0) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
                 
                 for (int x = 1; x <= 4; x++) {
