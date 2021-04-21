@@ -1,0 +1,8 @@
+<StratconFacility>
+	<displayableName>Tank Base</displayableName>
+        <facilityType>TankBase</facilityType>
+        <localModifiers>EnemyTankGarrison.xml</localModifiers>
+        <owner>Opposing</owner>
+        <sharedModifiers>EnemyTankReinforcements.xml</sharedModifiers>
+        <visible>false</visible>
+</StratconFacility>

@@ -1,0 +1,8 @@
+<StratconFacility>
+	<displayableName>Air Base</displayableName>
+        <facilityType>AirBase</facilityType>
+        <localModifiers>EnemyAirGarrison.xml</localModifiers>
+        <owner>Opposing</owner>
+        <sharedModifiers>EnemyAirSupport.xml</sharedModifiers>
+        <visible>false</visible>
+</StratconFacility>

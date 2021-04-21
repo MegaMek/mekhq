@@ -54,6 +54,10 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -163,6 +167,8 @@ public class AtBContract extends Contract implements Serializable {
     protected int battleTypeMod;
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
+    
+    private StratconCampaignState stratconCampaignState;
 
     protected AtBContract() {
         this(null);
@@ -1192,6 +1198,10 @@ public class AtBContract extends Contract implements Serializable {
                     MekHqXmlUtil.saveFormattedDate(specialEventScenarioDate));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioType", specialEventScenarioType);
         }
+        
+        if(stratconCampaignState != null) {
+            stratconCampaignState.Serialize(pw1);
+        }
     }
 
     @Override
@@ -1274,6 +1284,10 @@ public class AtBContract extends Contract implements Serializable {
                 specialEventScenarioDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                 specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                stratconCampaignState = StratconCampaignState.Deserialize(wn2);
+                stratconCampaignState.setContract(this);
+                this.setStratconCampaignState(stratconCampaignState);
             } else if (wn2.getNodeName().equalsIgnoreCase("parentContractId")) {
                 parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
             }
@@ -1496,7 +1510,23 @@ public class AtBContract extends Contract implements Serializable {
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
+    
+    public StratconCampaignState getStratconCampaignState() {
+        return stratconCampaignState;
+    }
+    
+    public void setStratconCampaignState(StratconCampaignState state) {
+        stratconCampaignState = state;
+    }
 
+    @Override
+    public void acceptContract(Campaign campaign) {
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.initializeCampaignState(this, campaign, 
+                    StratconContractDefinition.getContractDefinition(getMissionType()));
+        }
+    }
+    
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
 

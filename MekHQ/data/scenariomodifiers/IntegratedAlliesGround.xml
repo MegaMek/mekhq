@@ -1,98 +1,30 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Your force will be deployed as part of an integrated unit. Keep the allied units alive. Additionally, allied command will dictate retreat conditions.</additionalBriefingText>
+	<additionalBriefingText>Your force will be deployed as part of an integrated unit. Keep the allied units alive.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
-		<actualDeploymentZone>-1</actualDeploymentZone>
-		<allowAeroBombs>false</allowAeroBombs>
-		<allowedUnitType>0</allowedUnitType>
-		<arrivalTurn>0</arrivalTurn>
-		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
-		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
-		<destinationZone>4</destinationZone>
-		<fixedUnitCount>2</fixedUnitCount>
-		<forceAlignment>1</forceAlignment>
-		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Integrated Allies</forceName>
-		<generationMethod>3</generationMethod>
-		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>
-		<retreatThreshold>0</retreatThreshold>
-		<startingAltitude>0</startingAltitude>
-		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Player</syncedForceName>
-		<useArtillery>false</useArtillery>
+<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>0</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>false</contributesToMapSize>
+<contributesToUnitCount>true</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones/>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>2</fixedUnitCount>
+<forceAlignment>1</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Integrated Allies</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>1</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>0</retreatThreshold>
+<startingAltitude>0</startingAltitude>
+<syncDeploymentType>SameEdge</syncDeploymentType>
+<syncedForceName>Player</syncedForceName>
+<useArtillery>false</useArtillery>
 	</forceDefinition>
-
-	<objectives>
-        <objective>
-            <associatedForceNames>
-                <associatedForceName>Integrated Allies</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-		<failureEffect>
-                    <effectType>ContractScoreUpdate</effectType>
-                    <effectScaling>Inverted</effectScaling>
-                    <howMuch>-1</howMuch>
-                </failureEffect>
-            </failureEffects>
-		<additionalDetails>
-		<additionalDetail>Each integrated force unit irrevocably destroyed will reduce contract score by 1.</additionalDetail>
-            </additionalDetails>
-            <description>Preserve 100% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-	<objective>
-            <associatedForceNames>
-                <associatedForceName>Integrated Allies</associatedForceName>
-                <associatedForceName>Player</associatedForceName>
-                <associatedForceName>Allied Force</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails/>
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-        </objectives>
 </AtBScenarioModifier>

@@ -102,6 +102,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -129,6 +130,8 @@ import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
@@ -539,7 +542,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return atbConfig;
     }
-
+    
     //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
@@ -877,6 +880,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         addMissionWithoutId(m);
+        
+        StratconContractInitializer.restoreTransientStratconInformation(m, this);
     }
 
     private void addMissionWithoutId(Mission m) {
@@ -1638,10 +1643,13 @@ public class Campaign implements Serializable, ITechManager {
         return patients;
     }
 
+    /**
+     * List of all units that can show up in the repair bay.
+     */
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
-            if (u.isAvailable() && u.isServiceable()) {
+            if (u.isAvailable() && u.isServiceable() && !StratconRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }
         }
@@ -3019,12 +3027,21 @@ public class Campaign implements Serializable, ITechManager {
                     continue;
                 }
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
-                    s.setStatus(Scenario.S_DEFEAT);
-                    s.clearAllForcesAndPersonnel(this);
-                    contract.addPlayerMinorBreach();
-                    addReport("Failure to deploy for " + s.getName()
+                    if (getCampaignOptions().getUseStratCon() &&
+                            (s instanceof AtBDynamicScenario)) {
+                        StratconRulesManager.processIgnoredScenario(
+                                (AtBDynamicScenario) s, contract.getStratconCampaignState());
+                        s.convertToStub(this, Scenario.S_DEFEAT);
+                                                
+                        addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
+                        
+                    } else {
+                        s.convertToStub(this, Scenario.S_DEFEAT);
+                        contract.addPlayerMinorBreach();
+                        
+                        addReport("Failure to deploy for " + s.getName()
                             + " resulted in defeat and a minor contract breach.");
-                    s.generateStub(this);
+                    }
                 }
             }
         }
@@ -3633,6 +3650,15 @@ public class Campaign implements Serializable, ITechManager {
         Mission mission = getMission(scenario.getMissionId());
         if (null != mission) {
             mission.removeScenario(scenario.getId());
+            
+            // if we GM-remove the scenario and it's attached to a StratCon scenario
+            // then pretend like we let the StratCon scenario expire
+            if ((mission instanceof AtBContract) &&
+                    (((AtBContract) mission).getStratconCampaignState() != null) &&
+                    (scenario instanceof AtBDynamicScenario)) {
+                StratconRulesManager.processIgnoredScenario(
+                        (AtBDynamicScenario) scenario, ((AtBContract) mission).getStratconCampaignState());
+            }
         }
         scenarios.remove(id);
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));

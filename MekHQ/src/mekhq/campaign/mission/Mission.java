@@ -293,7 +293,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
             // Doh!
             MekHQ.getLogger().error(ex);
         }
-
+        
         return retVal;
     }
 }
