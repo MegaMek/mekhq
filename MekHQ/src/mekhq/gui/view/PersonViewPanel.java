@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;

@@ -27,6 +27,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.ScrollablePanel;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record

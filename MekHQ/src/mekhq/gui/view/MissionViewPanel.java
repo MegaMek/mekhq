@@ -33,6 +33,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**

@@ -39,6 +39,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**

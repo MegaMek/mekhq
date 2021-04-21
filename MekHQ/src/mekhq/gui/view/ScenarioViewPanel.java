@@ -41,6 +41,7 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**

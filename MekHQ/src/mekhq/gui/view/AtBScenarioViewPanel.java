@@ -71,6 +71,7 @@ import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
@@ -165,7 +166,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setScrollableTracksViewportWidth(false);
+        setTracksViewportWidth(false);
 
         int y = 0;
 

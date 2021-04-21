@@ -34,6 +34,7 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 

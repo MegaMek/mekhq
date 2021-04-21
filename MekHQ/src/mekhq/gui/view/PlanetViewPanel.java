@@ -40,10 +40,10 @@ import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.gui.baseComponents.ScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.campaign.universe.PlanetarySystem;
 
