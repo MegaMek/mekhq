@@ -650,6 +650,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
     	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
+    	
     	campaign.addMission(contract);
 
     	// Negotiator XP

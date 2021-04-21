@@ -357,6 +357,7 @@ public class CampaignOptions implements Serializable {
 
     //region Against the Bot Tab
     private boolean useAtB;
+    private boolean useStratCon;
     private int skillLevel;
 
     // Unit Administration
@@ -766,6 +767,7 @@ public class CampaignOptions implements Serializable {
 
         //region Against the Bot Tab
         useAtB = false;
+        useStratCon = false;
         skillLevel = 2;
 
         // Unit Administration
@@ -2617,6 +2619,14 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseStratCon() {
+        return useStratCon;
+    }
+
+    public void setUseStratCon(boolean useStratCon) {
+        this.useStratCon = useStratCon;
+    }
+
     public boolean getUseAero() {
         return useAero;
     }
@@ -3339,6 +3349,7 @@ public class CampaignOptions implements Serializable {
                 + StringUtils.join(phenotypeProbabilities, ',')
                 + "</phenotypeProbabilities>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStratCon", useStratCon);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
@@ -3445,7 +3456,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
-        MekHQ.getLogger().info("Loading Campaign Options from Version " + version.toString() + " XML...");
+        MekHQ.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3917,6 +3928,8 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useStratCon")) {
+                retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {

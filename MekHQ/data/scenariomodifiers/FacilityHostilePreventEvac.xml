@@ -2,6 +2,7 @@
 	<additionalBriefingText>Prevent at least 75% of the designated units from leaving the area.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Prevent Evac</modifierName>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -41,10 +42,20 @@
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>

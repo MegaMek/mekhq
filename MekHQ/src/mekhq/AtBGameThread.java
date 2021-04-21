@@ -39,6 +39,7 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
+import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
@@ -162,6 +163,13 @@ public class AtBGameThread extends GameThread {
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
+                
+                //minefields
+                client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
+                client.getLocalPlayer().setNbrMFCommand(scenario.getNumPlayerMinefields(Minefield.TYPE_COMMAND_DETONATED));
+                client.getLocalPlayer().setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
+                client.getLocalPlayer().setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
+                client.getLocalPlayer().setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
 
                 /* If the player is making a combat drop (either required by scenario
                  * or player chose to deploy a DropShip), do not use deployment

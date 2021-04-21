@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>Three trainees will deploy alongside your force. Keep them alive.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>Space</allowedMapLocation>
+		<allowedMapLocation>LowAtmosphere</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>

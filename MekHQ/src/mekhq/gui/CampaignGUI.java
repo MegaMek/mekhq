@@ -42,7 +42,6 @@ import megamek.common.*;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.gui.dialog.*;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -97,6 +96,7 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.RatingReport;
 import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -250,6 +250,9 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
+        if (getCampaign().getCampaignOptions().getUseStratCon()) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
         addStandardTab(GuiTabType.MAP);
         addStandardTab(GuiTabType.PERSONNEL);
         addStandardTab(GuiTabType.HANGAR);
@@ -1230,6 +1233,21 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * Displays a nag if the StratCon UI has unresolved hostile forces
+     */
+    public boolean nagUnresolvedStratconContacts() {
+        String nagText = StratconRulesManager.nagUnresolvedContacts(getCampaign());
+
+        if (!nagText.isEmpty()) {
+            return 0 != JOptionPane.showConfirmDialog(null,
+                    String.format("You have unresolved contacts on the StratCon interface:\n%s\nAdvance day anyway?", nagText),
+                    "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
+        }
+
         return false;
     }
 
@@ -2516,24 +2534,37 @@ public class CampaignGUI extends JPanel {
             refreshFunds();
             showOverdueLoansDialog();
             ev.cancel();
+            return;
         }
         if (getCampaign().checkRetirementDefections()) {
             showRetirementDefectionDialog();
             ev.cancel();
+            return;
         }
         if (getCampaign().checkYearlyRetirements()) {
             showRetirementDefectionDialog();
             ev.cancel();
+            return;
         }
         if (nagShortMaintenance()) {
             ev.cancel();
+            return;
         }
         if (getCampaign().getCampaignOptions().getUseAtB()) {
             if (nagShortDeployments()) {
                 ev.cancel();
+                return;
             }
+
+            if (getCampaign().getCampaignOptions().getUseStratCon() &&
+                    nagUnresolvedStratconContacts()) {
+                ev.cancel();
+                return;
+            }
+
             if (nagOutstandingScenarios()) {
                 ev.cancel();
+                return;
             }
         }
     }
@@ -2550,6 +2581,13 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
+            removeStandardTab(GuiTabType.STRATCON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
+
+        refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
