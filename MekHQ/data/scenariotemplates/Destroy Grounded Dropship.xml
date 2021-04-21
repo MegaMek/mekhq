@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Dropship Defense</name>
-    <shortBriefing>Defend grounded dropship.</shortBriefing>
-    <detailedBriefing>An allied dropship has come under attack while on the ground. Defend it until it lifts off or the hostile force is routed.</detailedBriefing>
+    <name>Destroy Grounded Dropship</name>
+    <shortBriefing>Destroy grounded hostile dropship.</shortBriefing>
+    <detailedBriefing>Destroy or cripple a grounded enemy dropship. You have 30 turns to do so before it lifts off.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>false</allowRotation>
@@ -27,7 +29,15 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
+                    <deploymentZone>1</deploymentZone>
+                    <deploymentZone>2</deploymentZone>
+                    <deploymentZone>3</deploymentZone>
+                    <deploymentZone>4</deploymentZone>
+                    <deploymentZone>5</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
+                    <deploymentZone>7</deploymentZone>
+                    <deploymentZone>8</deploymentZone>
+                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>4</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -38,6 +48,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -57,15 +68,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
+                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>4</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -75,7 +78,8 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -83,29 +87,30 @@
             </value>
         </entry>
         <entry>
-            <key>Grounded Dropship</key>
+            <key>Dropship</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>11</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
+                <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>true</contributesToUnitCount>
+                <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>4</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
-                <forceAlignment>1</forceAlignment>
+                <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Grounded Dropship</forceName>
+                <forceName>Dropship</forceName>
                 <generationMethod>3</generationMethod>
-                <generationOrder>4</generationOrder>
+                <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -116,14 +121,14 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Dropship</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -134,38 +139,41 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or cripple the following unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Destroy</objectiveCriterion>
-            <percentage>50</percentage>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimit>30</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
+            <timeLimitType>Fixed</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>
-            <associatedForceNames/>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Dropship</associatedForceName>
+            </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
-                    <effectType>ScenarioVictory</effectType>
+                    <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>2</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Preserve the following force(s) and unit(s):</description>
+            <description>Destroy, cripple or force to withdraw the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>30</timeLimit>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>Fixed</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>

@@ -1,0 +1,104 @@
+<scenarioManifest>
+	<scenarioFileNames>
+	<entry>
+		<key>0</key>
+		<value>Battle.xml</value>
+	</entry>
+	<entry>
+		<key>1</key>
+		<value>Capture.xml</value>
+	</entry>
+	<entry>
+		<key>2</key>
+		<value>Assassinate.xml</value>
+	</entry>
+	<entry>
+		<key>3</key>
+		<value>Convoy Attack.xml</value>
+	</entry>
+	<entry>
+		<key>4</key>
+		<value>Recon.xml</value>
+	</entry>
+	<entry>
+		<key>5</key>
+		<value>Engage.xml</value>
+	</entry>
+	<entry>
+		<key>6</key>
+		<value>Diversion.xml</value>
+	</entry>
+	<entry>
+		<key>7</key>
+		<value>Prevent Recon.xml</value>
+	</entry>
+	<entry>
+		<key>8</key>
+		<value>Breakthrough.xml</value>
+	</entry>
+	<entry>
+		<key>9</key>
+		<value>Pursuit.xml</value>
+	</entry>
+	<entry>
+		<key>10</key>
+		<value>Prevent Breakthrough.xml</value>
+	</entry>
+	<entry>
+		<key>11</key>
+		<value>Harass.xml</value>
+	</entry>
+	<entry>
+		<key>12</key>
+		<value>Convoy Escort.xml</value>
+	</entry>
+	<entry>
+		<key>13</key>
+		<value>Irregular Forces.xml</value>
+	</entry>
+	<entry>
+		<key>14</key>
+		<value>Defend Grounded Dropship.xml</value>
+	</entry>
+	<entry>
+		<key>15</key>
+		<value>Destroy Grounded Dropship.xml</value>
+	</entry>
+	<entry>
+		<key>16</key>
+		<value>Hostile Facility.xml</value>
+	</entry>
+	<entry>
+		<key>17</key>
+		<value>Allied Facility.xml</value>
+	</entry>
+	<entry>
+		<key>18</key>
+		<value>Low Atmo - Interception.xml</value>
+	</entry>
+	<entry>
+		<key>19</key>
+		<value>Low Atmo - Escort.xml</value>
+	</entry>
+	<entry>
+		<key>20</key>
+		<value>Low Atmo - Destroy Dropship.xml</value>
+	</entry>
+	<entry>
+		<key>21</key>
+		<value>Air Support.xml</value>
+	</entry>
+	<entry>
+		<key>22</key>
+		<value>Space - Interception.xml</value>
+	</entry>
+	<entry>
+		<key>23</key>
+		<value>Space - Blockade Run Escort.xml</value>
+	</entry>
+	<entry>
+		<key>24</key>
+		<value>Space - Blockade Run.xml</value>
+	</entry>
+	</scenarioFileNames>
+</scenarioManifest>

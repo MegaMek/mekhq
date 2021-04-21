@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <alliedFacilityCount>0</alliedFacilityCount>
+    <briefing>Destroy designated targets.</briefing>
+    <contractTypeName>Objective Raid</contractTypeName>
+    <hostileFacilityCount>-0.5</hostileFacilityCount>
+	<scenarioOdds>
+		<scenarioOdds>10</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+		<scenarioOdds>40</scenarioOdds>
+		<scenarioOdds>60</scenarioOdds>
+	</scenarioOdds>
+	<deploymentTimes>
+		<deploymentTimes>0</deploymentTimes>
+		<deploymentTimes>1</deploymentTimes>
+		<deploymentTimes>2</deploymentTimes>
+		<deploymentTimes>3</deploymentTimes>
+	</deploymentTimes>
+    <objectiveParameters>
+        <objectiveParameter>
+		<objectiveType>FacilityDestruction</objectiveType>
+		<objectiveCount>-0.5</objectiveCount>
+        </objectiveParameter>
+	<objectiveParameter>
+		<objectiveType>SpecificScenarioVictory</objectiveType>
+		<objectiveCount>-0.5</objectiveCount>
+            <objectiveScenarios>
+                <objectiveScenario>Assassinate.xml</objectiveScenario>
+                <objectiveScenario>Convoy Attack.xml</objectiveScenario>
+            </objectiveScenarios>
+        </objectiveParameter>
+    </objectiveParameters>
+</ScenarioTemplate>
