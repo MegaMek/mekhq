@@ -27,13 +27,13 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.ScrollablePanel;
+import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPathViewPanel extends ScrollablePanel {
+public class JumpPathViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private JumpPath path;

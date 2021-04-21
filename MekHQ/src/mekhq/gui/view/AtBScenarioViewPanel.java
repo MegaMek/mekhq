@@ -71,13 +71,13 @@ import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.gui.baseComponents.ScrollablePanel;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
  * @author Neoancient
  */
-public class AtBScenarioViewPanel extends ScrollablePanel {
+public class AtBScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
 
     private AtBScenario scenario;

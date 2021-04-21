@@ -39,14 +39,14 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.ScrollablePanel;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends ScrollablePanel {
+public class ForceViewPanel extends JScrollablePanel {
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Force force;

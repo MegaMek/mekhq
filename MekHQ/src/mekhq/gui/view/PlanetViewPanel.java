@@ -43,7 +43,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.gui.baseComponents.ScrollablePanel;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -51,7 +51,7 @@ import mekhq.campaign.universe.PlanetarySystem;
  * A custom panel that gets filled in with goodies from a Planet record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PlanetViewPanel extends ScrollablePanel {
+public class PlanetViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private PlanetarySystem system;
