@@ -220,13 +220,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANK: {
-                int rank = Integer.parseInt(data[1]);
-                int level = 0;
-                // Check to see if we added a rank level...
-                if (data.length > 2) {
-                    level = Integer.parseInt(data[2]);
-                }
-
+                final int rank = Integer.parseInt(data[1]);
+                final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
                 for (final Person person : people) {
                     person.changeRank(gui.getCampaign(), rank, level, true);
                 }
@@ -235,7 +230,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_MANEI_DOMINI_CLASS: {
                 try {
                     final ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
-                    for (Person person : people) {
+                    for (final Person person : people) {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
@@ -245,7 +240,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_MANEI_DOMINI_RANK: {
                 final ManeiDominiRank maneiDominiRank = ManeiDominiRank.valueOf(data[1]);
-                for (Person person : people) {
+                for (final Person person : people) {
                     person.setManeiDominiRank(maneiDominiRank);
                 }
                 break;

@@ -202,6 +202,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_PAYMULT:
                 return resources.getString("RankTableModel.COL_PAYMULT.toolTipText");
             default:
+                MekHQ.getLogger().error("Unknown column in RankTableModel of " + column);
                 return resources.getString("RankTableModel.defaultToolTip.toolTipText");
         }
     }
