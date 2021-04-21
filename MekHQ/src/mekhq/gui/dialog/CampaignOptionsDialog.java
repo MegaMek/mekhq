@@ -48,7 +48,6 @@ import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -66,8 +65,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.model.RankTableModel;
-import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -428,6 +427,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region Against the Bot Tab
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
+    private JCheckBox chkUseStratCon;
     private JComboBox<String> cbSkillLevel;
 
     //unit administration
@@ -3079,6 +3079,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBScenario, gridBagConstraints);
 
+        chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
+        chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        panAtB.add(chkUseStratCon, gridBagConstraints);
+
         // AtB options: "Unit Administration" frame controls
         chkUseShareSystem.setText(resourceMap.getString("chkUseShareSystem.text"));
         chkUseShareSystem.setToolTipText(resourceMap.getString("chkUseShareSystem.toolTipText"));
@@ -5177,6 +5184,7 @@ public class CampaignOptionsDialog extends JDialog {
         if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
         }
+        chkUseStratCon.setSelected(options.getUseStratCon());
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
 
         chkUseShareSystem.setSelected(options.getUseShareSystem());
@@ -5664,6 +5672,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseStratCon(chkUseStratCon.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseAtBUnitMarket(chkUseAtB.isSelected()); // TODO : add fully modular capabilities
         options.setUseShareSystem(chkUseShareSystem.isSelected());

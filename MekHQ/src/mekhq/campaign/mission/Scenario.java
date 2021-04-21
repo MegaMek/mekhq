@@ -286,6 +286,15 @@ public class Scenario implements Serializable {
         unitIds = new ArrayList<>();
     }
 
+    /**
+     * Converts this scenario to a stub
+     */
+    public void convertToStub(Campaign c, int status) {
+        setStatus(status);
+        clearAllForcesAndPersonnel(c);
+        generateStub(c);
+    }
+    
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
     }

@@ -1,0 +1,27 @@
+<facilityManifest>
+	<facilityFileNames>
+		<facilityFileName>AlliedMekBase.xml</facilityFileName>
+		<facilityFileName>AlliedTankBase.xml</facilityFileName>
+		<facilityFileName>AlliedAirBase.xml</facilityFileName>
+		<facilityFileName>AlliedArtilleryBase.xml</facilityFileName>
+		<facilityFileName>AlliedSupplyDepot.xml</facilityFileName>
+		<facilityFileName>AlliedDataCenter.xml</facilityFileName>
+		<facilityFileName>AlliedIndustrialFacility.xml</facilityFileName>
+		<facilityFileName>AlliedCommsCenter.xml</facilityFileName>
+		<facilityFileName>AlliedEarlyWarningSystem.xml</facilityFileName>
+		<facilityFileName>AlliedOrbitalDefense.xml</facilityFileName>
+		<facilityFileName>AlliedBaseOfOperations.xml</facilityFileName>
+
+		<facilityFileName>HostileMekBase.xml</facilityFileName>
+		<facilityFileName>HostileTankBase.xml</facilityFileName>
+		<facilityFileName>HostileAirBase.xml</facilityFileName>
+		<facilityFileName>HostileArtilleryBase.xml</facilityFileName>
+		<facilityFileName>HostileSupplyDepot.xml</facilityFileName>
+		<facilityFileName>HostileDataCenter.xml</facilityFileName>
+		<facilityFileName>HostileIndustrialFacility.xml</facilityFileName>
+		<facilityFileName>HostileCommsCenter.xml</facilityFileName>
+		<facilityFileName>HostileEarlyWarningSystem.xml</facilityFileName>
+		<facilityFileName>HostileOrbitalDefense.xml</facilityFileName>
+		<facilityFileName>HostileBaseOfOperations.xml</facilityFileName>
+	</facilityFileNames>
+</facilityManifest>

@@ -2,6 +2,7 @@
 	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must remain intact.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Capture</modifierName>
 	<objectives>
 		<objective>
 	            <associatedForceNames>
@@ -14,6 +15,11 @@
 	                    <effectScaling>Fixed</effectScaling>
 	                    <howMuch>2</howMuch>
 	                </successEffect>
+			<successEffect>
+	                    <effectType>FacilityCaptured</effectType>
+	                    <effectScaling>Fixed</effectScaling>
+	                    <howMuch>1</howMuch>
+	                </successEffect>
 	            </successEffects>
 	            <failureEffects>
 	                <failureEffect>
@@ -21,11 +27,16 @@
 	                    <effectScaling>Fixed</effectScaling>
 	                    <howMuch>1</howMuch>
 	                </failureEffect>
+			<failureEffect>
+				<effectType>FacilityRemains</effectType>
+				<effectScaling>Fixed</effectScaling>
+				<howMuch>1</howMuch>
+                	</failureEffect>
 	            </failureEffects>
 	            <additionalDetails>
 				<additionalDetail>Crippled turrets are considered intact for the purposes of this objective.</additionalDetail>
 			</additionalDetails>
-	            <description>Leave intact the following force(s) and unit(s):</description>
+	            <description>Leave intact the following force(s) and unit(s) to be able to take control of this facility:</description>
 	            <destinationEdge>NONE</destinationEdge>
 	            <objectiveCriterion>Preserve</objectiveCriterion>
 	            <percentage>75</percentage>
@@ -33,5 +44,44 @@
 	            <timeLimitAtMost>true</timeLimitAtMost>
 	            <timeLimitType>None</timeLimitType>
 		</objective>
+	<objective>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Base Turrets</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+		<successEffect>
+			<effectType>FacilityCaptured</effectType>
+			<effectScaling>Fixed</effectScaling>
+			<howMuch>1</howMuch>
+		</successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>FacilityRemains</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails/>
+            <description>Destroy, cripple or force the withdrawal of 75% of the following force(s) and unit(s) to take control of the facility:</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>75</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </objective>
         </objectives>
 </AtBScenarioModifier>

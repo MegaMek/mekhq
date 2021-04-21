@@ -345,6 +345,7 @@ public class CampaignOptions implements Serializable {
 
     //region Against the Bot Tab
     private boolean useAtB;
+    private boolean useStratCon;
     private int skillLevel;
 
     // AtB Module: Unit Market // TODO : Fully Implement Me
@@ -751,6 +752,7 @@ public class CampaignOptions implements Serializable {
 
         //region Against the Bot Tab
         useAtB = false;
+        useStratCon = false;
         skillLevel = 2;
 
         // AtB Module: Unit Market
@@ -2543,6 +2545,15 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseStratCon() {
+        return useStratCon;
+    }
+
+    public void setUseStratCon(boolean useStratCon) {
+        this.useStratCon = useStratCon;
+    }
+    
+    
     public boolean getUseAtBUnitMarket() {
         return useAtBUnitMarket;
     }
@@ -3285,6 +3296,7 @@ public class CampaignOptions implements Serializable {
                 + StringUtils.join(phenotypeProbabilities, ',')
                 + "</phenotypeProbabilities>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStratCon", useStratCon);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
@@ -3852,6 +3864,8 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useStratCon")) {
+                retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
                 retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {

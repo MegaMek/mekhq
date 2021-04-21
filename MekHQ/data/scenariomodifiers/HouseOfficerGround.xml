@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dicatate retreat conditions.</additionalBriefingText>
+	<additionalBriefingText>The house commanding officer will deploy alongside your units. Keep them alive.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
@@ -8,9 +8,9 @@
 		<allowedUnitType>0</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
-		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
 		<destinationZone>4</destinationZone>
@@ -27,72 +27,4 @@
 		<syncedForceName>Player</syncedForceName>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
-
-	<objectives>
-        <objective>
-            <associatedForceNames>
-                <associatedForceName>House Officer</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-		<failureEffect>
-                    <effectType>ContractScoreUpdate</effectType>
-                    <effectScaling>Inverted</effectScaling>
-                    <howMuch>-1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-		<additionalDetail>If the house unit is irrevocably destroyed, it will reduce contract score by 1.</additionalDetail>
-            </additionalDetails>
-            <description>Preserve 100% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-	<objective>
-            <associatedForceNames>
-                <associatedForceName>House Officer</associatedForceName>
-                <associatedForceName>Player</associatedForceName>
-                <associatedForceName>Allied Force</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails/>
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-        </objectives>
 </AtBScenarioModifier>

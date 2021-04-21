@@ -95,8 +95,8 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
-    private static final int[] validBotAABombs = { BombType.B_RL };
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, BombType.B_LG, BombType.B_TAG };
+    private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
     private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
@@ -129,7 +129,7 @@ public class AtBDynamicScenarioFactory {
         // apply any fixed modifiers
         for (String modifierName : template.scenarioModifiers) {
             if (AtBScenarioModifier.getScenarioModifiers().containsKey(modifierName)) {
-                scenario.getScenarioModifiers().add(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
+                scenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
             }
         }
 
@@ -153,11 +153,20 @@ public class AtBDynamicScenarioFactory {
 
         setTerrain(scenario);
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
-
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+            
+            // the default template should not allow the user to deploy ground units as 
+            // reinforcements to aerospace battles
+            // space battles are even more restrictive
+            if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
+                defaultReinforcements.setAllowedUnitType(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
+            } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
+                defaultReinforcements.setAllowedUnitType(UnitType.AERO);
+            }
+            
+            
             template.scenarioForces.put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
@@ -178,6 +187,8 @@ public class AtBDynamicScenarioFactory {
         for (int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
         }
+        
+        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
 
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
@@ -209,6 +220,8 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().useAbilities()) {
             upgradeBotCrews(scenario);
         }
+        
+        scenario.setFinalized(true);
     }
 
     /**
@@ -308,7 +321,7 @@ public class AtBDynamicScenarioFactory {
                 quality = scenario.getEffectiveOpforQuality();
                 break;
             default:
-                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
+                MekHQ.getLogger().warning(
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
@@ -396,14 +409,17 @@ public class AtBDynamicScenarioFactory {
             // no reason to go into an endless loop if we can't generate a lance
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
+                MekHQ.getLogger().warning(
                         String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
 
             if (forceTemplate.getAllowAeroBombs()) {
-                boolean isAeroMap = scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain;
+                MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
+                boolean isAeroMap = (mapLocation == MapLocation.LowAtmosphere) ||
+                        (mapLocation == MapLocation.Space);
+                        
                 populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
 
@@ -847,18 +863,23 @@ public class AtBDynamicScenarioFactory {
     public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
-        int numMods = Compute.randomInt(2);
+        int numModsRoll = Compute.d6(2);
+        int numMods = 0;
+        if (numModsRoll >= 11) {
+            numMods = 3;
+        } else if (numModsRoll >= 9) {
+            numMods = 2;
+        } else if (numModsRoll >= 7) {
+            numMods = 1;
+        }
 
         for (int x = 0; x < numMods; x++) {
-            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomScenarioModifier();
+            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
 
-            if ((scenarioMod.getAllowedMapLocations() == null) ||
-                    scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
-                scenario.getScenarioModifiers().add(scenarioMod);
+            scenario.addScenarioModifier(scenarioMod);
 
-                if (scenarioMod.getBlockFurtherEvents()) {
-                    break;
-                }
+            if (scenarioMod.getBlockFurtherEvents()) {
+                break;
             }
         }
     }
@@ -1280,8 +1301,7 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, ex);
+            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
             return null;
         }
 
@@ -1718,7 +1738,7 @@ public class AtBDynamicScenarioFactory {
         // if so, we log a warning, then generate what we can.
         // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
         if (unitTypeSize > weights.length()) {
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class,
+            MekHQ.getLogger().error(
                     String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
             unitTypeSize = weights.length();
         }
@@ -1910,7 +1930,7 @@ public class AtBDynamicScenarioFactory {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn());
+            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn(), scenario);
         }
     }
 
@@ -1918,15 +1938,20 @@ public class AtBDynamicScenarioFactory {
      * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
      * @param botForce The bot force to process
      * @param deployRound The specific deployment round, or a special constant.
+     * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
-    public static void setDeploymentTurns(BotForce botForce, int deployRound) {
+    public static void setDeploymentTurns(BotForce botForce, int deployRound,
+            AtBDynamicScenario scenario) {
+        // deployment turns don't matter for transported entities
+        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
+        
         if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
-            setDeploymentTurnsStaggeredByLance(botForce.getEntityList());
+            setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-            setDeploymentTurnsForReinforcements(botForce.getEntityList(), 0);
+            setDeploymentTurnsForReinforcements(untransportedEntities, 0);
         } else {
-            for (Entity entity : botForce.getEntityList()) {
+            for (Entity entity : untransportedEntities) {
                 entity.setDeployRound(deployRound);
             }
         }
@@ -2095,7 +2120,7 @@ public class AtBDynamicScenarioFactory {
             if (entity.getTransportId() != Entity.NONE) {
                 continue;
             }
-
+            
             int speed = calculateAtBSpeed(entity);
 
             // don't reduce minimum speed to 0, since dividing by zero further down is problematic
@@ -2122,7 +2147,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class, "Deployment Turn - Staggered by Lance not implemented");
+        MekHQ.getLogger().warning("Deployment Turn - Staggered by Lance not implemented");
     }
 
     /**
@@ -2260,7 +2285,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
-        OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4) + 1);
+        OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4));
         int distance = (Compute.randomInt(2) + 1) * 17;
 
         for (Entity entity : entityList) {
@@ -2301,7 +2326,7 @@ public class AtBDynamicScenarioFactory {
             if (entity.isBomber()) {
                 // if this entity has no guns (e.g. is a Boeing Jump Bomber)
                 if (entity.getIndividualWeaponList().size() == 0) {
-                    loadBombs(entity, validBombChoices);
+                    loadBombs(entity, validBombChoices, campaign.getGameYear());
                     continue;
                 }
 
@@ -2309,18 +2334,36 @@ public class AtBDynamicScenarioFactory {
                     break;
                 }
 
-                loadBombs(entity, validBombChoices);
+                loadBombs(entity, validBombChoices, campaign.getGameYear());
                 numBombers++;
             }
         }
     }
 
-    // todo: determine how many bombs can fit on this entity, and either pick
-    // a random amount or fill 'er up
-    private static void loadBombs(Entity entity, int[] validBombChoices) {
+    /**
+     * Worker function that takes an entity and an array of bomb types
+     * and loads it up with as many of a mostly period-appropriate random bomb type 
+     * as it's capable of holding
+     */
+    private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
         int[] bombChoices = new int[BombType.B_NUM];
-        int numBombs = (int) (entity.getWeight() / 5);
-        int bombIndex = validBombChoices[(Compute.randomInt(validBombChoices.length))];
+        
+        // remove bomb choices if they're not era-appropriate
+        List<Integer> actualValidBombChoices = new ArrayList<>();
+        for (int x = 0; x < validBombChoices.length; x++) {
+            String typeName = BombType.getBombInternalName(validBombChoices[x]);
+            
+            // hack: make rocket launcher pods available before 3055
+            if ((validBombChoices[x] == BombType.B_RL) ||
+                    BombType.get(typeName).isAvailableIn(year)) {
+                actualValidBombChoices.add(validBombChoices[x]);
+            }
+        }
+        
+        // pick out the index in the BombType array
+        int bombIndex = actualValidBombChoices.get(Compute.randomInt(actualValidBombChoices.size()));
+        // # of bombs is the unit's weight / (bomb cost * 5)
+        int numBombs = (int) (entity.getWeight() / (BombType.getBombCost(bombIndex) * 5));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);

@@ -79,4 +79,42 @@ public final class MekHqConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 
     public static final int MAXIMUM_D6_VALUE = 6;
+    
+    /**
+     * Paths to StratCon definition files
+     */
+    
+    public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
+    public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
+    public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
+    public static final String STRATCON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.xml";
+    public static final String STRATCON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.xml";
+    public static final String STRATCON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
+    public static final String STRATCON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
+    public static final String STRATCON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
+    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/ScenarioTemplates/";
+    public static final String STRATCON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
+    public static final String STRATCON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
+    public static final String STRATCON_FACILITY_PATH = "./data/stratconfacilities/";
+    public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
+    public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
+    public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
+    
+    public static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
+    public static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
+    
+    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
+    public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
+    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
+    public static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
+    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
+    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
+    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
+    
 }
