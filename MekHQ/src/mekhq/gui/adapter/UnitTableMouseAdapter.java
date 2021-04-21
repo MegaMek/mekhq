@@ -524,7 +524,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
             
             for (Unit u : units) {
-                u.setMaintenanceMultiplier(multiplier);
+                if (!u.isSelfCrewed()) {
+                    u.setMaintenanceMultiplier(multiplier);
+                }
             }
         }
     }
@@ -885,7 +887,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     // if we've got just one unit selected, 
                     // have the courtesy to show the multiplier if relevant
                     if (oneSelected && (unit.getMaintenanceMultiplier() == x) 
-                            && unit.requiresMaintenance()) {
+                            && !unit.isSelfCrewed()) {
                         maintenanceMultiplierItem.setSelected(true);
                     }
                     
