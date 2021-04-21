@@ -86,6 +86,7 @@ public class PersonViewPanel extends JScrollablePanel {
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+        super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;

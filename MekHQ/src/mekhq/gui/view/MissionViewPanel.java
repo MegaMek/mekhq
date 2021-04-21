@@ -96,6 +96,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
+        super();
         this.mission = m;
         this.scenarioTable = scenarioTable;
         this.gui = gui;

@@ -72,7 +72,8 @@ public class ForceViewPanel extends JScrollablePanel {
 	private javax.swing.JLabel lblTech2;
 
 	public ForceViewPanel(Force f, Campaign c) {
-		this.force = f;
+        super();
+        this.force = f;
 		this.campaign = c;
 		initComponents();
 	}

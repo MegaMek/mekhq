@@ -18,12 +18,9 @@
  */
 package mekhq.gui.baseComponents;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 
-import javax.swing.JPanel;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 /**
  * JScrollablePanel is an an extension of JPanel that implements scrollable, so that it can be
@@ -38,6 +35,36 @@ public class JScrollablePanel extends JPanel implements Scrollable {
     // by default, track the width, and re-size as needed.
     private boolean trackViewportWidth = true;
     //endregion Variable Declarations
+
+    //region Constructors
+    /**
+     * @see JPanel#JPanel(LayoutManager, boolean)
+     */
+    public JScrollablePanel(final LayoutManager layout, final boolean isDoubleBuffered) {
+        super(layout, isDoubleBuffered);
+    }
+
+    /**
+     * @see JPanel#JPanel(LayoutManager)
+     */
+    public JScrollablePanel(final LayoutManager layout) {
+        super(layout);
+    }
+
+    /**
+     * @see JPanel#JPanel(boolean)
+     */
+    public JScrollablePanel(final boolean isDoubleBuffered) {
+        super(isDoubleBuffered);
+    }
+
+    /**
+     * @see JPanel#JPanel()
+     */
+    public JScrollablePanel() {
+        super();
+    }
+    //endregion Constructors
 
     //region Setters
     public void setTracksViewportWidth(final boolean trackViewportWidth) {

@@ -64,6 +64,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel forceModel;
 
     public ScenarioViewPanel(Scenario s, Campaign c) {
+        super();
         this.scenario = s;
         this.campaign = c;
         if (s.isCurrent()) {

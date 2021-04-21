@@ -135,6 +135,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel playerForceModel;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
+        super();
         this.frame = frame;
         this.scenario = s;
         this.campaign = c;
@@ -157,7 +158,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         panStats = new JPanel();
         txtDesc = new JTextArea();

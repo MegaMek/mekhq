@@ -67,7 +67,8 @@ public class UnitViewPanel extends JScrollablePanel {
 	private javax.swing.JLabel txtQuirk;
 
 	public UnitViewPanel(Unit u, Campaign c) {
-		unit = u;
+        super();
+        unit = u;
 		entity = u.getEntity();
 		campaign = c;
 		initComponents();

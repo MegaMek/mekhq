@@ -68,6 +68,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     public PlanetViewPanel(PlanetarySystem s, Campaign c, int p) {
+        super();
         this.system = s;
         this.campaign = c;
         this.planetPos = p;

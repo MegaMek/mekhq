@@ -56,6 +56,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private javax.swing.JLabel txtCost;
 
     public JumpPathViewPanel(JumpPath p, Campaign c) {
+        super();
         this.path = p;
         this.campaign = c;
         initComponents();
