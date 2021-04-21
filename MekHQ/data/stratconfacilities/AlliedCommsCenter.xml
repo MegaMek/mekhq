@@ -1,0 +1,7 @@
+<StratconFacility>
+	<displayableName>Comms Center</displayableName>
+        <facilityType>CommandCenter</facilityType>
+        <owner>Allied</owner>
+	<sharedModifiers>GoodEvent.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>

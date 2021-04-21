@@ -1,0 +1,6 @@
+<StratconFacility>
+	<displayableName>Data Center</displayableName>
+        <facilityType>DataCenter</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>
