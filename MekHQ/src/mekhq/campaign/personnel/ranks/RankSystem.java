@@ -250,6 +250,7 @@ public class RankSystem implements Serializable {
         rankSystem.setRanks(new ArrayList<>());
 
         try {
+            final boolean preWindchild = (version != null) && version.isLowerThan("0.49.0");
             int rankSystemId = -1; // migration, 0.49.X
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -274,11 +275,11 @@ public class RankSystem implements Serializable {
                 } else if (wn.getNodeName().equalsIgnoreCase("description")) {
                     rankSystem.setDescription(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
-                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn));
+                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version));
                 }
             }
 
-            if ((version != null) && (rankSystemId != -1) && version.isLowerThan("0.49.0")) {
+            if (preWindchild && (version != null) && (rankSystemId != -1)) {
                 rankSystem.setCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
                 rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }

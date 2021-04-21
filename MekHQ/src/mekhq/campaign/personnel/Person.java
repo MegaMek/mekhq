@@ -2034,8 +2034,9 @@ public class Person implements Serializable {
                     final RankSystem rankSystem;
 
                     if (version.isLowerThan("0.49.0")) {
-                        rankSystem = Ranks.getRankSystemFromCode(PersonMigrator
-                                .migrateRankSystemCode(Integer.parseInt(wn2.getTextContent().trim())));
+                        final int rankSystemNumeric = Integer.parseInt(wn2.getTextContent().trim());
+                        rankSystem = (rankSystemNumeric >= 0) ? Ranks.getRankSystemFromCode(PersonMigrator
+                                .migrateRankSystemCode(rankSystemNumeric)) : retVal.getRankSystem();
                     } else {
                         rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
                     }
@@ -2790,11 +2791,11 @@ public class Person implements Serializable {
     }
 
     public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s</div>", getId().toString(), getRankName().trim());
+        return String.format("<div id=\"%s\">%s</div>", getId(), getRankName().trim());
     }
 
     public String getHyperlinkedFullTitle() {
-        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullTitle());
+        return String.format("<a href='PERSON:%s'>%s</a>", getId(), getFullTitle());
     }
 
     /**

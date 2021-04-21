@@ -24,6 +24,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import org.w3c.dom.Document;
@@ -169,6 +170,7 @@ public class Ranks {
 
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
+        final Version version = new Version(element.getAttribute("version"));
         final NodeList nl = element.getChildNodes();
         final List<RankSystem> rankSystems = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
@@ -179,7 +181,7 @@ public class Ranks {
             }
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
-                final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), null, true, type);
+                final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, true, type);
                 if (rankSystem != null) {
                     rankSystems.add(rankSystem);
                 }

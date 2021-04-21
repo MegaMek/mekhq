@@ -65,12 +65,12 @@ public class RankValidator {
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
                     MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode()).toString()
-                            + " is duplicated by userData Rank System " + rankSystem.toString());
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
+                            + " is duplicated by userData Rank System " + rankSystem);
                 } else {
                     MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode()).toString()
-                            + " is duplicated by " + rankSystem.toString());
+                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
+                            + " is duplicated by " + rankSystem);
                 }
                 return false;
             }
@@ -164,7 +164,7 @@ public class RankValidator {
         }
 
         // Then, we need to fix any old rank system assignments for personnel
-        campaign.getPersonnel().parallelStream().filter(person -> !person.getRankSystem().getType().isCampaign())
+        campaign.getPersonnel().stream().filter(person -> !person.getRankSystem().getType().isCampaign())
                 .forEach(person -> person.setRankSystem(this,
                         Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }
@@ -173,7 +173,7 @@ public class RankValidator {
                                          final RankSystem newRankSystem,
                                          final Collection<Person> personnel) {
         // We need to swap over the previous rank system to the current one
-        personnel.parallelStream().filter(person -> person.getRankSystem().equals(oldRankSystem))
+        personnel.stream().filter(person -> person.getRankSystem().equals(oldRankSystem))
                 .forEach(person -> person.setRankSystem(this, newRankSystem));
 
         // Then, we need to check the ranks for the personnel
@@ -181,7 +181,7 @@ public class RankValidator {
     }
 
     public void checkPersonnelRanks(final Collection<Person> personnel) {
-        personnel.parallelStream().forEach(this::checkPersonRank);
+        personnel.forEach(this::checkPersonRank);
     }
 
     public void checkPersonRank(final Person person) {
@@ -189,8 +189,8 @@ public class RankValidator {
         final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
                 .getBaseProfession(rankSystem);
         if (person.getRank().isEmpty(profession)) {
-            for (int i = person.getRankNumeric() - 1; i == 0; i--) {
-                if (!rankSystem.getRanks().get(i).isEmpty(profession)) {
+            for (int i = person.getRankNumeric() - 1; i >= 0; i--) {
+                if (rankSystem.getRanks().get(i).isEmpty(profession)) {
                     person.setRank(i);
                 }
             }

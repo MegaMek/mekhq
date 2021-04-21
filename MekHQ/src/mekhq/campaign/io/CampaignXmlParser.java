@@ -329,12 +329,11 @@ public class CampaignXmlParser {
             }
         }
 
-        // Fix any Person Id References
-        PersonIdReference.fixPersonIdReferences(retVal);
-
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
+        // Fix any Person Id References
+        PersonIdReference.fixPersonIdReferences(retVal);
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
@@ -710,7 +709,7 @@ public class CampaignXmlParser {
                     }
                     final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version);
                     // If the system is valid, set it. Otherwise, keep the default
-                    if (new RankValidator().validate(rankSystem, true)) {
+                    if (!rankSystem.getType().isCampaign() || new RankValidator().validate(rankSystem, true)) {
                         retVal.setRankSystemDirect(rankSystem);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {

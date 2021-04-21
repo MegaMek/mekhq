@@ -9,7 +9,7 @@ Rank:
 	Officer: Whether the rank is considered to be an officer.
 	Pay Multiplier: The pay bonus paid to those of this rank.
 -->
-<rankSystems>
+<rankSystems version="0.49.0">
 	<rankSystem>
 		<code>SSLDF</code>
 		<name>Second Star League Defense Force</name>

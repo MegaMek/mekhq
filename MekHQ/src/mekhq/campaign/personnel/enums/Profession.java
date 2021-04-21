@@ -120,12 +120,13 @@ public enum Profession {
         Profession profession = this;
 
         // This runs if the rank is empty or indicates an alternative system
-        for (boolean empty = rank.isEmpty(profession); empty || rank.indicatesAlternativeSystem(profession);
-             empty = rank.isEmpty(profession)) {
-            if (empty) {
+        while (true) {
+            if (rank.isEmpty(profession)) {
                 profession = profession.getAlternateProfession(rankSystem);
-            } else {
+            } else if (rank.indicatesAlternativeSystem(profession)) {
                 profession = profession.getAlternateProfession(rank);
+            } else {
+                break;
             }
         }
         return profession;

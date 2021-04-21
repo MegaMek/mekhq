@@ -22,6 +22,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.personnel.enums.Profession;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -197,7 +198,7 @@ public class Rank implements Serializable {
         pw.print(MekHqXmlUtil.indentStr(indent) + tag);
     }
 
-    public static @Nullable Rank generateInstanceFromXML(final Node wn) {
+    public static @Nullable Rank generateInstanceFromXML(final Node wn, final Version version) {
         final Rank rank = new Rank();
         try {
             final NodeList nl = wn.getChildNodes();
