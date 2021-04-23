@@ -670,13 +670,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setPrimaryRole(PersonnelRole primaryRole) {
         setPrimaryRoleDirect(primaryRole);
 
-        // you can't be primary tech and a secondary Astech
-        // you can't be a primary Astech and a secondary tech
-        if ((getPrimaryRole().isTech() && getSecondaryRole().isAstech())
-                || (getPrimaryRole().isTechSecondary() && getPrimaryRole().isAstech())
-                || (getPrimaryRole().isDoctor() && getSecondaryRole().isMedic())
-                || (getSecondaryRole().isDoctor() && getPrimaryRole().isMedic())
-                || (getSecondaryRole() == getPrimaryRole())) {
+        // Now, we need to make some secondary role assignments to None here for better UX in
+        // assigning roles, following these rules:
+        // 1) Cannot have the same primary and secondary roles
+        // 2) Must have a None secondary role if you are a Dependent
+        // 3) Cannot be a primary tech and a secondary Astech
+        // 4) Cannot be a primary Astech and a secondary tech
+        // 5) Cannot be primary medical staff and a secondary Medic
+        // 6) Cannot be a primary Medic and secondary medical staff
+        if ((primaryRole == getSecondaryRole())
+                || primaryRole.isDependent()
+                || (primaryRole.isTech() && getSecondaryRole().isAstech())
+                || (primaryRole.isAstech() && getSecondaryRole().isTechSecondary())
+                || (primaryRole.isMedicalStaff() && getSecondaryRole().isMedic())
+                || (primaryRole.isMedic() && getSecondaryRole().isMedicalStaff())) {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -747,30 +754,33 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
-            // 1) Can always be dependent
-            // 2) Cannot be none
-            // 3) Cannot be equal to your secondary role
+            // We only do a few here, as it is better on the UX-side to correct the issues when
+            // assigning the primary role
+            // 1) Can always be Dependent
+            // 2) Cannot be None
             if (role.isDependent()) {
                 return true;
-            } else if (role.isNone() || (role == getSecondaryRole())) {
+            } else if (role.isNone()) {
                 return false;
             }
         } else {
             // Secondary Role:
-            // 1) Can always be none
-            // 2) Cannot be dependent
-            // 3) Cannot be equal to the primary role
-            // 4) Cannot be a Tech role is the primary role is an Astech
-            // 5) Cannot be Astech if the primary role is a tech role
-            // 6) Cannot be a medical staff role if the primary role is a Medic
-            // 7) Cannot be Medic if the primary role is one of the medical staff roles
+            // 1) Can always be None
+            // 2) Cannot be Dependent
+            // 3) Can only be None if the primary role is a Dependent
+            // 4) Cannot be equal to the primary role
+            // 5) Cannot be a tech role if the primary role is an Astech
+            // 6) Cannot be Astech if the primary role is a tech role
+            // 7) Cannot be a medical staff role if the primary role is a Medic
+            // 8) Cannot be Medic if the primary role is one of the medical staff roles
             if (role.isNone()) {
                 return true;
             } else if (role.isDependent()
+                    || getPrimaryRole().isDependent()
                     || (getPrimaryRole() == role)
-                    || (getPrimaryRole().isAstech() && role.isTechSecondary())
+                    || (role.isTechSecondary() && getPrimaryRole().isAstech())
                     || (role.isAstech() && getPrimaryRole().isTech())
-                    || (getPrimaryRole().isMedic() && role.isMedicalStaff())
+                    || (role.isMedicalStaff() && getPrimaryRole().isMedic())
                     || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
                 return false;
             }
