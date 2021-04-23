@@ -282,7 +282,7 @@ public class AtBDynamicScenario extends AtBScenario {
         List<Integer> retval = new ArrayList<>();
 
         for (int forceID : getForceIDs()) {
-            if(getPlayerForceTemplates().containsKey(forceID)) {
+            if (getPlayerForceTemplates().containsKey(forceID)) {
                 retval.add(forceID);
             }
         }

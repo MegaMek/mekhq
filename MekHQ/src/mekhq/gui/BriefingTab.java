@@ -845,9 +845,9 @@ public final class BriefingTab extends CampaignGuiTab {
         // The following has some confusing naming. canStartAnyGame is used for any check that
         // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
         // the additional date check is required.
-        final boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
+        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
         final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
-        boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
+        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
                 ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
         btnStartGame.setEnabled(canStartAtBGame);
         btnJoinGame.setEnabled(canStartAtBGame);

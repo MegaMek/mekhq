@@ -165,20 +165,17 @@ public class AtBScenarioFactory {
             // Determine active scenarios, to ensure we don't generate a scenario for an already
             // assigned lance and to remove any currently active scenarios from the contract, so that
             // the generation rules are followed for all active scenarios not just new scenarios
-            final Iterator<AtBScenario> iterator = contract.getCurrentAtBScenarios().iterator();
-            while (iterator.hasNext()) {
-                final AtBScenario scenario = iterator.next();
-
+            for (final AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 // Add any currently assigned lances to the assignedLances
                 assignedLances.add(scenario.getLanceForceId());
 
                 // Remove any active scenarios from the contract, and add them to the current scenarios list instead
-                iterator.remove();
+                contract.getScenarios().remove(scenario);
                 sList.add(scenario);
                 dontGenerateForces.add(scenario.getId());
 
-                // If we have a current base attack (attacker) scenario, no other scenarios should be generated
-                // for that contract
+                // If we have a current base attack (attacker) scenario, no other scenarios should
+                // be generated for that contract
                 if ((scenario.getScenarioType() == AtBScenario.BASEATTACK)) {
                     hasBaseAttack = true;
                     if (scenario.isAttacker()) {
