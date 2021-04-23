@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
@@ -25,45 +25,45 @@ import mekhq.campaign.universe.Faction;
  * Represents a class which selects {@link Faction} objects.
  */
 public abstract class AbstractFactionSelector {
-
+    //region Variable Declarations
     /**
      * A value indicating whether or not the clans are a valid
      * faction to choose from.
      */
     private boolean allowClan = false;
+    //endregion Variable Declarations
 
+    //region Getters/Setters
     /**
-     * Gets a value indicating whether or not the clans are a valid
-     * faction to choose from.
-     * @return A value indicating whether or not the clans are a valid
-     *         faction to choose from.
+     * Gets a value indicating whether or not the clans are a valid faction to choose from.
+     * @return A value indicating whether or not the clans are a valid faction to choose from.
      */
     public boolean isAllowClan() {
         return allowClan;
     }
 
     /**
-     * Sets a value indicating whether or not the clans are a valid
-     * faction to choose from.
-     * @param allowClan {@code true} if clans should be considered
-     *                  during faction selection, otherwise {@code false}.
+     * Sets a value indicating whether or not the clans are a valid faction to choose from.
+     * @param allowClan {@code true} if clans should be considered during faction selection,
+     *                              otherwise {@code false}.
      */
     public void setAllowClan(boolean allowClan) {
         this.allowClan = allowClan;
         clearCache();
     }
+    //endregion Getters/Setters
 
     /**
      * Selects a {@link Faction} for a {@link Campaign}.
-     * @param campaign The {@link Campaign} within which this {@link Faction}
-     *                 exists.
+     * @param campaign The {@link Campaign} within which this {@link Faction} exists.
      * @return A {@link Faction} selected for {@code campaign}.
      */
-    public abstract Faction selectFaction(Campaign campaign);
+    public abstract Faction selectFaction(final Campaign campaign);
 
     /**
      * Clears any cache associated with faction selection.
      */
     public void clearCache() {
+
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,47 +10,66 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 
 /**
  * Selects a {@link Faction} object.
  */
 public class DefaultFactionSelector extends AbstractFactionSelector {
-    private String factionCode;
+    //region Variable Declarations
+    private Faction faction;
+    //endregion Variable Declarations
 
+    //region Constructors
     /**
      * Creates a new DefaultFactionSelector class which uses
      * {@link Campaign#getFaction()} to select the faction.
      */
     public DefaultFactionSelector() {
+
     }
 
     /**
-     * Creates a new DefaultFactionSelector using the specified
-     * faction.
+     * Creates a new DefaultFactionSelector using the specified faction.
      * @param factionCode The short name of the {@link Faction}.
      */
-    public DefaultFactionSelector(String factionCode) {
-        this.factionCode = factionCode;
+    @Deprecated
+    public DefaultFactionSelector(final String factionCode) {
+        setFaction((factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
     }
 
+    /**
+     * Creates a new DefaultFactionSelector using the specified faction
+     * @param faction The {@link Faction}.
+     */
+    public DefaultFactionSelector(final Faction faction) {
+        setFaction(faction);
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public @Nullable Faction getFaction() {
+        return faction;
+    }
+
+    public void setFaction(final @Nullable Faction faction) {
+        this.faction = faction;
+    }
+    //endregion Getters/Setters
+
     @Override
-    public Faction selectFaction(Campaign campaign) {
-        if (factionCode != null) {
-            return Factions.getInstance().getFaction(factionCode);
-        } else {
-            return campaign.getFaction();
-        }
+    public Faction selectFaction(final Campaign campaign) {
+        return (getFaction() != null) ? getFaction() : campaign.getFaction();
     }
 }

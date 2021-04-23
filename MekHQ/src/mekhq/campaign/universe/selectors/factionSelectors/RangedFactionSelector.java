@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,14 +18,6 @@
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ThreadLocalRandom;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -35,18 +27,30 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * An implementation of {@link AbstractFactionSelector} which chooses
  * a faction from a defined range of planets.
  */
 public class RangedFactionSelector extends AbstractFactionSelector {
+    //region Variable Declarations
     /**
-     * The range around {@link Campaign#getCurrentSystem()} to search
-     * for factions.
+     * The range around {@link Campaign#getCurrentSystem()} to search for factions.
      */
     private final int range;
+
+    /**
+     * A scale to apply to planetary distances.
+     */
+    private double distanceScale;
 
     /**
      * The current date of the {@link Campaign} when the values were
@@ -69,21 +73,24 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * in the map, then select the key equal to or greater than the value.
      */
     private TreeMap<Double, Faction> cachedFactions;
+    //endregion Variable Declarations
 
-    /**
-     * A scale to apply to planetary distances.
-     */
-    private double distanceScale = 0.6;
-
+    //region Constructors
     /**
      * Creates a new {@code RangedFactionSelector} with the given range.
      * @param range The range around the current location ({@link Campaign#getCurrentSystem()})
      *              from which to select factions.
      */
-    public RangedFactionSelector(int range) {
+    public RangedFactionSelector(final int range, final double distanceScale) {
         this.range = range;
+        setDistanceScaleDirect(distanceScale);
     }
+    //endregion Constructors
 
+    //region Getters/Setters
+    public int getRange() {
+        return range;
+    }
 
     /**
      * Gets a scale to apply to planetary distances.
@@ -95,26 +102,29 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
     /**
      * Sets the scale to apply to planetary distances.
-     * @param distanceScale A scaling factor--ideally between 0.1 and 2.0--
-     *                      to apply to planetary distances during weighting.
-     *                      Values above 1.0 prefer the current location,
-     *                      while values closer to 0.1 spread out the faction
-     *                      selection.
+     * @param distanceScale A scaling factor, ideally between 0.1 and 2.0, to apply to planetary
+     *                      distances during weighting. Values above 1.0 prefer the current location,
+     *                      while values closer to 0.1 spread out the faction selection.
      */
-    public void setDistanceScale(double distanceScale) {
-        this.distanceScale = distanceScale;
+    public void setDistanceScale(final double distanceScale) {
+        setDistanceScaleDirect(distanceScale);
         clearCache();
     }
 
+    private void setDistanceScaleDirect(final double distanceScale) {
+        this.distanceScale = distanceScale;
+    }
+    //endregion Getters/Setters
+
     @Override
-    public Faction selectFaction(Campaign campaign) {
+    public Faction selectFaction(final Campaign campaign) {
         if ((cachedFactions == null)
                 || !cachedSystem.equals(campaign.getCurrentSystem())
                 || campaign.getLocalDate().isAfter(cachedDate)) {
             createLookupMap(campaign);
         }
 
-        double random = ThreadLocalRandom.current().nextDouble(cachedFactions.lastKey());
+        final double random = ThreadLocalRandom.current().nextDouble(cachedFactions.lastKey());
         return cachedFactions.ceilingEntry(random).getValue();
     }
 
@@ -131,14 +141,14 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     /**
      * Creates the cached {@link Faction} lookup map.
      */
-    private void createLookupMap(Campaign campaign) {
+    private void createLookupMap(final Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
         LocalDate now = campaign.getLocalDate();
         boolean isClan = campaign.getFaction().isClan();
 
         Map<Faction, Double> weights = new HashMap<>();
-        Systems.getInstance().visitNearbySystems(currentSystem, range, planetarySystem -> {
+        Systems.getInstance().visitNearbySystems(currentSystem, getRange(), planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
             if ((pop == null) || (pop <= 0)) {
@@ -150,7 +160,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // Weight the faction by the planet's population divided by its
             // distance from our current system. The scaling factor is used
             // to affect the 'spread'.
-            double delta = Math.log10(pop) / (1 + distance * distanceScale);
+            double delta = Math.log10(pop) / (1 + distance * getDistanceScale());
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
                         || faction.is(Tag.MERC)) {
@@ -253,7 +263,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      *                probabilities.
      * @return A weight to apply to the given {@link Faction}.
      */
-    private double getFactionWeight(Faction faction) {
+    private double getFactionWeight(final Faction faction) {
         if (faction.isComStar() || faction.getShortName().equals("WOB")) {
             return 0.05;
         } else if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {

@@ -1591,13 +1591,10 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
      */
     public AbstractFactionSelector getFactionSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultFactionSelector();
-        }
+        return getCampaignOptions().randomizeOrigin()
+                ? new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius(),
+                        getCampaignOptions().getOriginDistanceScale())
+                : new DefaultFactionSelector();
     }
 
     /**
