@@ -356,7 +356,7 @@ public class Person implements Serializable {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
-    public Person(String givenName, String surname, Campaign campaign, String factionCode) {
+    public Person(String givenName, String surname, @Nullable Campaign campaign, String factionCode) {
         this(givenName, surname, "", campaign, factionCode);
     }
 
@@ -366,10 +366,10 @@ public class Person implements Serializable {
      * @param givenName     the person's given name
      * @param surname       the person's surname
      * @param honorific     the person's honorific
-     * @param campaign      the campaign this person is a part of
+     * @param campaign      the campaign this person is a part of, or null (unit testing only)
      * @param factionCode   the faction this person was borne into
      */
-    public Person(String givenName, String surname, String honorific, Campaign campaign,
+    public Person(String givenName, String surname, String honorific, @Nullable Campaign campaign,
                   String factionCode) {
         // First, we assign campaign
         this.campaign = campaign;
@@ -402,7 +402,7 @@ public class Person implements Serializable {
         xp = 0;
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        setRankSystemDirect(campaign.getRankSystem());
+        setRankSystemDirect((campaign == null) ? null : campaign.getRankSystem());
         setRank(0);
         setRankLevel(0);
         setManeiDominiClassDirect(ManeiDominiClass.NONE);
