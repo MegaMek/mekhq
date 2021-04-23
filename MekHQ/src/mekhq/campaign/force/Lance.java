@@ -289,6 +289,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             // No battle
             return null;
         }
+        
+        // if we are using StratCon, don't *also* generate legacy scenarios
+        if (c.getCampaignOptions().getUseStratCon() &&
+                (getContract(c).getStratconCampaignState() != null)) {
+            return null;
+        }
 
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
@@ -298,6 +304,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         // debugging code that will allow you to force the generation of a particular scenario.
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
+
         /*if (true) {
             AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
             scenario.setMissionId(this.getMissionId());

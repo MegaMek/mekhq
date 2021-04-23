@@ -53,6 +53,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -1399,6 +1400,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
             }
         }
+        
+        StratconRulesManager.processScenarioCompletion(tracker);
 
         this.setVisible(false);
     }

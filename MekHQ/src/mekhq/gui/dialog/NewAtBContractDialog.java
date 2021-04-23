@@ -35,6 +35,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
@@ -527,11 +529,16 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setSharesPct((Integer)spnShares.getValue());
 
         contract.calculatePartsAvailabilityLevel(campaign);
+        
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.initializeCampaignState(contract, campaign, 
+                    StratconContractDefinition.getContractDefinition(contract.getMissionType()));
+        }
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
         campaign.addMission(contract);
-        this.setVisible(false);
+        setVisible(false);
     }
 
     @Override
@@ -547,20 +554,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "Setting employer code to " + getCurrentEmployerCode());
+            MekHQ.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
             long time = System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to set employer code: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updateEnemies();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update enemies: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updatePlanets();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update planets: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

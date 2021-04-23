@@ -1,0 +1,9 @@
+<StratconFacility>
+	<displayableName>Base of Operations</displayableName>
+        <facilityType>BaseOfOperations</facilityType>
+        <owner>Opposing</owner>
+	<localModifiers>Veterans.xml</localModifiers>
+	<localModifiers>GoodEquipment.xml</localModifiers>
+	<localModifiers>EnemyTurrets.xml</localModifiers>
+        <visible>false</visible>
+</StratconFacility>
