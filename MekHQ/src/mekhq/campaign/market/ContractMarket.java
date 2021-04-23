@@ -158,27 +158,27 @@ public class ContractMarket implements Serializable {
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
         if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
                 || newCampaign) {
-			Contract[] list = contracts.toArray(new Contract[0]);
-			for (Contract c : list) {
-				removeContract(c);
-			}
+            Contract[] list = contracts.toArray(new Contract[0]);
+            for (Contract c : list) {
+                removeContract(c);
+            }
 
-			int unitRatingMod = campaign.getUnitRatingMod();
+            int unitRatingMod = campaign.getUnitRatingMod();
 
-			for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
-			}
+            }
 
-			int numContracts = Compute.d6() - 4 + unitRatingMod;
+            int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-			Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
-			final boolean inMinorFaction = currentFactions.stream().noneMatch(faction ->
+            Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
+            final boolean inMinorFaction = currentFactions.stream().noneMatch(faction ->
                     faction.isISMajorOrSuperPower() || faction.isClan());
-			if (inMinorFaction) {
-				numContracts--;
-			}
+            if (inMinorFaction) {
+                numContracts--;
+            }
 
-			boolean inBackwater = true;
+            boolean inBackwater = true;
             if (currentFactions.size() > 1) {
                 // More than one faction, if any is *not* periphery, we're not in backwater either
                 for (Faction f : currentFactions) {
