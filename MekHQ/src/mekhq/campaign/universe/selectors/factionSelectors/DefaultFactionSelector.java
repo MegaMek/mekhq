@@ -45,7 +45,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
      * @param factionCode The short name of the {@link Faction}.
      */
     @Deprecated
-    public DefaultFactionSelector(final String factionCode) {
+    public DefaultFactionSelector(final @Nullable String factionCode) {
         setFaction((factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
     }
 
@@ -53,7 +53,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
      * Creates a new DefaultFactionSelector using the specified faction
      * @param faction The {@link Faction}.
      */
-    public DefaultFactionSelector(final Faction faction) {
+    public DefaultFactionSelector(final @Nullable Faction faction) {
         setFaction(faction);
     }
     //endregion Constructors

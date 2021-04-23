@@ -20,7 +20,6 @@ package mekhq.campaign.universe.selectors.factionSelectors;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -155,12 +154,12 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                 return;
             }
 
-            double distance = planetarySystem.getDistanceTo(currentSystem);
+            final double distance = planetarySystem.getDistanceTo(currentSystem);
 
             // Weight the faction by the planet's population divided by its
             // distance from our current system. The scaling factor is used
             // to affect the 'spread'.
-            double delta = Math.log10(pop) / (1 + distance * getDistanceScale());
+            final double delta = Math.log10(pop) / (1.0 + distance * getDistanceScale());
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
                         || faction.is(Tag.MERC)) {
@@ -182,8 +181,8 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         });
 
-        Faction mercenaries = Factions.getInstance().getFaction("MERC");
-        TreeMap<Double, Faction> factions = new TreeMap<>();
+        final Faction mercenaries = Factions.getInstance().getFaction("MERC");
+        final TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
             // If we have no valid factions use the campaign's faction ...
             if (!isClan) {
@@ -198,7 +197,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             return;
         }
 
-        Set<Faction> enemies = getEnemies(campaign);
+        final Set<Faction> enemies = getEnemies(campaign);
 
         //
         // Convert the tallied per-faction weights into a TreeMap
@@ -211,8 +210,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
             // Only take factions which are not actively fighting us
             if (!enemies.contains(faction)) {
-                double factionWeight = getFactionWeight(faction);
-                total += entry.getValue() * factionWeight;
+                total += entry.getValue() * getFactionWeight(faction);
                 factions.put(total, faction);
             }
         }
@@ -245,22 +243,19 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * @param campaign The current campaign.
      * @return A set of current enemies for the {@link Campaign}.
      */
-    private Set<Faction> getEnemies(Campaign campaign) {
-        Set<Faction> enemies = new HashSet<>();
-        for (Contract contract : campaign.getActiveContracts()) {
-            if (contract instanceof AtBContract) {
-                enemies.add(Factions.getInstance().getFaction(((AtBContract)contract).getEnemyCode()));
-            }
+    private Set<Faction> getEnemies(final Campaign campaign) {
+        final Set<Faction> enemies = new HashSet<>();
+        for (final AtBContract contract : campaign.getActiveAtBContracts()) {
+            enemies.add(Factions.getInstance().getFaction(contract.getEnemyCode()));
         }
         return enemies;
     }
 
     /**
-     * Gets a weight to apply to a {@link Faction}. This is based on the
-     * tags assigned to the faction.
+     * Gets a weight to apply to a {@link Faction}. This is based on the tags assigned to the
+     * faction.
      *
-     * @param faction The {@link Faction} to get a weight when calculating
-     *                probabilities.
+     * @param faction The {@link Faction} to get a weight when calculating probabilities.
      * @return A weight to apply to the given {@link Faction}.
      */
     private double getFactionWeight(final Faction faction) {

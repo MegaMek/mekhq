@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
 
@@ -28,27 +28,25 @@ import mekhq.campaign.universe.Planet;
  * from a {@link Campaign} and optionally a {@link Faction}.
  */
 public abstract class AbstractPlanetSelector {
-
     /**
-     * Select a {@Planet} for a {@link Campaign}.
+     * Select a {@link Planet} for a {@link Campaign}.
      * @param campaign The {@link Campaign} to use when selecting a planet.
      * @return A {@link Planet} or {@code null}.
      */
-    @Nullable
-    public abstract Planet selectPlanet(Campaign campaign);
+    public abstract @Nullable Planet selectPlanet(final Campaign campaign);
 
     /**
-     * Select a {@Planet} for a {@link Campaign} and optional {@link} Faction.
+     * Select a {@link Planet} for a {@link Campaign} and optional {@link} Faction.
      * @param campaign The {@link Campaign} to use when selecting a planet.
      * @param faction An optional {@link Faction} to use when selecting a planet.
      * @return A {@link Planet} or {@code null}.
      */
-    @Nullable
-    public abstract Planet selectPlanet(Campaign campaign, @Nullable Faction faction);
+    public abstract @Nullable Planet selectPlanet(final Campaign campaign, final @Nullable Faction faction);
 
     /**
      * Clears any cache associated with planet selection.
      */
     public void clearCache() {
+
     }
 }

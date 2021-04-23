@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
 
@@ -22,45 +22,47 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 /**
  * Selects planets using the default MekHQ logic.
  */
 public class DefaultPlanetSelector extends AbstractPlanetSelector {
+    //region Variable Declarations
+    private final Planet selectedPlanet;
+    //endregion Variable Declarations
 
-    private Planet selectedPlanet;
-
+    //region Constructors
     /**
-     * Creates a new DefaultPlanetSelector that uses
-     * {@link Campaign#getCurrentSystem()} to produce
+     * Creates a new DefaultPlanetSelector that uses {@link Campaign#getCurrentSystem()} to produce
      * the planet.
      */
     public DefaultPlanetSelector() {
+        this(null);
     }
 
     /**
-     * Creates a new DefaultPlanetSelector that always
-     * selects a specific planet.
-     * @param planet The {@link Planet} to use.
+     * Creates a new DefaultPlanetSelector that always selects a specific planet.
+     * @param selectedPlanet The {@link Planet} to use.
      */
-    public DefaultPlanetSelector(Planet planet) {
-        selectedPlanet = planet;
+    public DefaultPlanetSelector(final @Nullable Planet selectedPlanet) {
+        this.selectedPlanet = selectedPlanet;
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public Planet getSelectedPlanet() {
+        return selectedPlanet;
+    }
+    //endregion Getters/Setters
+
+    @Override
+    public @Nullable Planet selectPlanet(final Campaign campaign) {
+        return (getSelectedPlanet() == null) ? campaign.getCurrentSystem().getPrimaryPlanet()
+                : getSelectedPlanet();
     }
 
     @Override
-    @Nullable
-    public Planet selectPlanet(Campaign campaign) {
-        if (selectedPlanet != null) {
-            return selectedPlanet;
-        }
-
-        return campaign.getCurrentSystem().getPrimaryPlanet();
-    }
-
-    @Override
-    @Nullable
-    public Planet selectPlanet(Campaign campaign, @Nullable Faction faction) {
+    public @Nullable Planet selectPlanet(final Campaign campaign, final @Nullable Faction faction) {
         return selectPlanet(campaign);
     }
 }
