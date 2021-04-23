@@ -44,11 +44,6 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     private final int range;
 
     /**
-     * A scale to apply to planetary distances.
-     */
-    private double distanceScale = 0.6;
-
-    /**
      * A value indicating if extra randomness should be used when selecting planets. Currently,
      * this is implemented by including planets within systems, rather than just the primary planet
      * for a system.
@@ -56,13 +51,17 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     private final boolean extraRandom;
 
     /**
+     * A scale to apply to planetary distances.
+     */
+    private double distanceScale = 0.6;
+
+    /**
      * The current date of the {@link Campaign} when the values were cached.
      */
     private LocalDate cachedDate;
 
     /**
-     * The current {@link PlanetarySystem} of the {@link Campaign} when
-     * the values were cached.
+     * The current {@link PlanetarySystem} of the {@link Campaign} when the values were cached.
      */
     private PlanetarySystem cachedSystem;
 
@@ -84,14 +83,27 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
      * @param range The range to use when selecting planets.
      * @param isExtraRandom A value indicating whether or not to use planets within a system,
      *                      effectively producing a more random origin planet.
+     * @param distanceScale the scale to use for planetary distances
      */
-    public RangedPlanetSelector(final int range, final boolean isExtraRandom) {
+    public RangedPlanetSelector(final int range, final boolean isExtraRandom,
+                                final double distanceScale) {
         this.range = range;
         this.extraRandom = isExtraRandom;
+        setDistanceScale(distanceScale);
     }
     //endregion Constructors
 
     //endregion Getters/Setters
+    /**
+     * Gets a value indicating if extra randomness should be used when selecting planets. Currently,
+     * this is implemented by including planets within systems, rather than just the primary planet
+     * for a system.
+     * @return A value indicating if extra randomness should be used during planet selection.
+     */
+    public boolean isExtraRandom() {
+        return extraRandom;
+    }
+
     /**
      * Gets a scale to apply to planetary distances.
      * @return The scaling factor to apply to planetary distances.
@@ -109,16 +121,6 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     public void setDistanceScale(final double distanceScale) {
         this.distanceScale = distanceScale;
         clearCache();
-    }
-
-    /**
-     * Gets a value indicating if extra randomness should be used when selecting planets. Currently,
-     * this is implemented by including planets within systems, rather than just the primary planet
-     * for a system.
-     * @return A value indicating if extra randomness should be used during planet selection.
-     */
-    public boolean isExtraRandom() {
-        return extraRandom;
     }
     //endregion Getters/Setters
 

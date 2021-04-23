@@ -18,47 +18,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
@@ -86,16 +49,16 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -103,12 +66,42 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.model.RankTableModel;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.TableCellListener;
+import mekhq.gui.panels.RandomOriginOptionsPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -146,8 +139,8 @@ public class CampaignOptionsDialog extends JDialog {
     //region General Tab
     private JPanel panGeneral;
     private JTextField txtName;
-    private JComboBox<String> comboFaction;
-    private SortedComboBoxModel<String> factionModel;
+    private SortedComboBoxModel<FactionDisplay> factionModel;
+    private JComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
@@ -259,11 +252,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
-    private JCheckBox chkRandomizeOrigin;
-    private JCheckBox chkRandomizeDependentsOrigin;
-    private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkExtraRandomOrigin;
-    private JSpinner spnOriginDistanceScale;
+    private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
     // Family
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
@@ -646,17 +635,9 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblFaction, gridBagConstraints);
 
-        factionModel = new SortedComboBoxModel<>();
-        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
-            Faction f = Factions.getInstance().getFaction(sName);
-            if (f.validIn(date.getYear())) {
-                factionModel.addElement(f.getFullName(date.getYear()));
-            }
-        }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
-        comboFaction = new JComboBox<>();
+        createFactionModel();
+        comboFaction = new JComboBox<>(factionModel);
         comboFaction.setName("comboFaction");
-        comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new Dimension(400, 30));
         comboFaction.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints.gridx = gridx--;
@@ -3040,7 +3021,7 @@ public class CampaignOptionsDialog extends JDialog {
             enableAtBComponents(panSubAtBRat,
                     chkUseAtB.isSelected() && btnStaticRATs.isSelected());
         });
-        
+
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -3083,7 +3064,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBScenario, gridBagConstraints);
-        
+
         chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
         chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -3693,6 +3674,23 @@ public class CampaignOptionsDialog extends JDialog {
         pack();
     }
 
+    //region General Tab
+    private void createFactionModel() {
+        factionModel = new SortedComboBoxModel<>(Comparator.comparing(FactionDisplay::toString));
+        final Faction campaignFaction = campaign.getFaction();
+        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
+            Faction f = Factions.getInstance().getFaction(sName);
+            if (f.validIn(date.getYear())) {
+                final FactionDisplay factionDisplay = new FactionDisplay(f, date);
+                factionModel.addElement(factionDisplay);
+                if (f.equals(campaignFaction)) {
+                    factionModel.setSelectedItem(factionDisplay);
+                }
+            }
+        }
+    }
+    //endregion General Tab
+
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
         JPanel personnelPanel = new JPanel(new GridBagLayout());
@@ -4113,7 +4111,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        JPanel randomOriginPanel = createRandomOriginPanel();
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(campaign, comboFaction);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4128,103 +4126,13 @@ public class CampaignOptionsDialog extends JDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
-        );
-
-        return panel;
-    }
-
-    private JPanel createRandomOriginPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblOriginSearchRadius = new JLabel();
-        JLabel lblOriginDistanceScale = new JLabel();
-
-        // Create Panel Components
-        chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
-        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
-        chkRandomizeOrigin.setName("chkRandomizeOrigin");
-        chkRandomizeOrigin.addActionListener(evt -> {
-            final boolean selected = chkRandomizeOrigin.isSelected();
-            chkRandomizeDependentsOrigin.setEnabled(selected);
-            lblOriginSearchRadius.setEnabled(selected);
-            spnOriginSearchRadius.setEnabled(selected);
-            chkExtraRandomOrigin.setEnabled(selected);
-            lblOriginDistanceScale.setEnabled(selected);
-            spnOriginDistanceScale.setEnabled(selected);
-        });
-
-        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
-        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
-        chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
-
-        lblOriginSearchRadius.setText(resources.getString("lblOriginSearchRadius.text"));
-        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        lblOriginSearchRadius.setName("lblOriginSearchRadius");
-
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
-        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        spnOriginSearchRadius.setName("spnOriginSearchRadius");
-
-        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
-        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
-        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
-
-        lblOriginDistanceScale.setText(resources.getString("lblOriginDistanceScale.text"));
-        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        lblOriginDistanceScale.setName("lblOriginDistanceScale");
-
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
-        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        spnOriginDistanceScale.setName("spnOriginDistanceScale");
-
-        // Programmatically Assign Accessibility Labels
-        lblOriginSearchRadius.setLabelFor(spnOriginSearchRadius);
-        lblOriginDistanceScale.setLabelFor(spnOriginDistanceScale);
-
-        // Disable Panel by Default
-        chkRandomizeOrigin.setSelected(true);
-        chkRandomizeOrigin.doClick();
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomOriginPanel.title")));
-        panel.setName("randomOriginPanel");
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale))
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         return panel;
@@ -4986,13 +4894,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
-        if (chkRandomizeOrigin.isSelected() != options.randomizeOrigin()) {
-            chkRandomizeOrigin.doClick();
-        }
-        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
-        spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
-        chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
-        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
+        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
 
         // Family
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
@@ -5605,11 +5507,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Personnel Randomization
         options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-        options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-        options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-        options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
-        options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
-        options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
+        options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
 
         // Family
         options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
@@ -5803,14 +5701,7 @@ public class CampaignOptionsDialog extends JDialog {
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
-            factionModel = new SortedComboBoxModel<>();
-            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
-                Faction f = Factions.getInstance().getFaction(sname);
-                if (f.validIn(date.getYear())) {
-                    factionModel.addElement(f.getFullName(date.getYear()));
-                }
-            }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
+            createFactionModel();
             comboFaction.setModel(factionModel);
         }
     }

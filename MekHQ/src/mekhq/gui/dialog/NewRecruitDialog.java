@@ -129,7 +129,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().randomizeOrigin();
+        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons"); // NOI18N

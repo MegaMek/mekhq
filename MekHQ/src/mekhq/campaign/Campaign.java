@@ -1222,7 +1222,7 @@ public class Campaign implements Serializable, ITechManager {
     public Person newDependent(int type, boolean baby) {
         Person person;
 
-        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+        if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
             person = newPerson(type);
         } else {
             person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
@@ -1253,7 +1253,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Gender.RANDOMIZE);
+        return newPerson(type, secondary, getFactionSelector(getCampaignOptions().getRandomOriginOptions()),
+                getPlanetSelector(getCampaignOptions().getRandomOriginOptions()), Gender.RANDOMIZE);
     }
 
     /**
@@ -1267,7 +1268,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, String factionCode, Gender gender) {
-        return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+        return newPerson(type, secondary, new DefaultFactionSelector(factionCode),
+                getPlanetSelector(getCampaignOptions().getRandomOriginOptions()), gender);
     }
 
     /**
@@ -1588,29 +1590,25 @@ public class Campaign implements Serializable, ITechManager {
     //region Personnel Selectors and Generators
     /**
      * Gets the {@link AbstractFactionSelector} to use with this campaign.
+     * @param options the random origin options to use
      * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
      */
-    public AbstractFactionSelector getFactionSelector() {
-        return getCampaignOptions().randomizeOrigin()
-                ? new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius(),
-                        getCampaignOptions().getOriginDistanceScale())
+    public AbstractFactionSelector getFactionSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin()
+                ? new RangedFactionSelector(options.getOriginSearchRadius(), options.getOriginDistanceScale())
                 : new DefaultFactionSelector();
     }
 
     /**
      * Gets the {@link AbstractPlanetSelector} to use with this campaign.
+     * @param options the random origin options to use
      * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
      */
-    public AbstractPlanetSelector getPlanetSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedPlanetSelector selector =
-                    new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                            getCampaignOptions().extraRandomOrigin());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultPlanetSelector();
-        }
+    public AbstractPlanetSelector getPlanetSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin()
+                ? new RangedPlanetSelector(options.getOriginSearchRadius(),
+                        options.isExtraRandomOrigin(), options.getOriginDistanceScale())
+                : new DefaultPlanetSelector();
     }
 
     /**
@@ -5612,8 +5610,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param p The {@link Person} who should receive a randomized origin.
      */
     public void assignRandomOriginFor(Person p) {
-        AbstractFactionSelector factionSelector = getFactionSelector();
-        AbstractPlanetSelector planetSelector = getPlanetSelector();
+        AbstractFactionSelector factionSelector = getFactionSelector(getCampaignOptions().getRandomOriginOptions());
+        AbstractPlanetSelector planetSelector = getPlanetSelector(getCampaignOptions().getRandomOriginOptions());
 
         Faction faction = factionSelector.selectFaction(this);
         Planet planet = planetSelector.selectPlanet(this, faction);
