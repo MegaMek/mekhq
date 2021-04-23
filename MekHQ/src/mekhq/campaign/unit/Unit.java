@@ -3888,7 +3888,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
-                engineer.setPrimaryRole(PersonnelRole.MECHANIC);
+                engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
                 engineer.setRankNumeric(getCommander().getRankNumeric());
                 //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
@@ -3953,7 +3953,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRole(PersonnelRole.VESSEL_CREW);
+                    engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
                         engineer.setRankNumeric(bestRank);
                     }
@@ -4892,11 +4892,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Removes all of the parts from a unit.
-     * 
+     *
      * NOTE: this puts the unit in an inconsistent state, and
      *       the unit should not be used until its parts have
      *       been re-assigned.
-     * 
+     *
      */
     public void removeParts() {
         for (Part part : parts) {

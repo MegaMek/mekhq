@@ -232,28 +232,28 @@ public class AtBEventProcessor {
                         en.getMovementMode() == EntityMovementMode.WIGE) {
                     if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.VTOL) {
                     if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(PersonnelRole.VTOL_PILOT);
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(PersonnelRole.VTOL_PILOT);
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
                         en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
                         en.getMovementMode() == EntityMovementMode.SUBMARINE) {
                     if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     } else if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     }
                 }
             }

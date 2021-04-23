@@ -668,15 +668,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPrimaryRole(PersonnelRole primaryRole) {
+        setPrimaryRoleDirect(primaryRole);
+
         // you can't be primary tech and a secondary Astech
         // you can't be a primary Astech and a secondary tech
         if ((getPrimaryRole().isTech() && getSecondaryRole().isAstech())
                 || (getPrimaryRole().isTechSecondary() && getPrimaryRole().isAstech())
                 || (getPrimaryRole().isDoctor() && getSecondaryRole().isMedic())
-                || (getSecondaryRole().isDoctor() && getPrimaryRole().isMedic())) {
+                || (getSecondaryRole().isDoctor() && getPrimaryRole().isMedic())
+                || (getSecondaryRole() == getPrimaryRole())) {
             setSecondaryRoleDirect(PersonnelRole.NONE);
-        } else {
-            setPrimaryRoleDirect(primaryRole);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -690,17 +691,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setSecondaryRole(PersonnelRole secondaryRole) {
-        // you can't be primary tech and a secondary Astech
-        // you can't be a primary Astech and a secondary tech
-        if ((getPrimaryRole().isTech() && getSecondaryRole().isAstech())
-                || (getPrimaryRole().isTechSecondary() && getPrimaryRole().isAstech())
-                || (getPrimaryRole().isDoctor() && getSecondaryRole().isMedic())
-                || (getSecondaryRole().isDoctor() && getPrimaryRole().isMedic())) {
-            setSecondaryRoleDirect(PersonnelRole.NONE);
-        } else {
-            setSecondaryRoleDirect(secondaryRole);
-        }
-
+        setSecondaryRoleDirect(secondaryRole);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -731,6 +722,115 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean hasSupportRole(boolean excludeUnmarketable) {
         return getPrimaryRole().isSupport(excludeUnmarketable) || getSecondaryRole().isSupport(excludeUnmarketable);
+    }
+
+    public String getRoleDesc() {
+        String role = getPrimaryRoleDesc();
+        if (!getSecondaryRole().isNone()) {
+            role += "/" + getSecondaryRoleDesc();
+        }
+        return role;
+    }
+
+    public String getPrimaryRoleDesc() {
+        String bgPrefix = "";
+        if (isClanner()) {
+            bgPrefix = getPhenotype().getShortName() + " ";
+        }
+        return bgPrefix + getPrimaryRole().getName(isClanner());
+    }
+
+    public String getSecondaryRoleDesc() {
+        return getSecondaryRole().getName(isClanner());
+    }
+
+    public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
+        if (primary) {
+            // Primary Role:
+            // 1) Can always be dependent
+            // 2) Cannot be equal to your secondary role
+            if (role.isDependent()) {
+                return true;
+            } else if (role == getSecondaryRole()) {
+                return false;
+            }
+        } else {
+            // Secondary Role:
+            // 1) Cannot be dependent
+            // 2) Cannot be equal to the primary role, unless the role is none
+            // 3) Cannot be a Tech role is the primary role is an Astech
+            // 4) Cannot be Astech if the primary role is a tech role
+            // 5) Cannot be a medical staff role if the primary role is a Medic
+            // 6) Cannot be Medic if the primary role is one of the medical staff roles
+            if (role.isDependent()
+                    || ((getPrimaryRole() == role) && !role.isNone())
+                    || (getPrimaryRole().isAstech() && role.isTechSecondary())
+                    || (role.isAstech() && getPrimaryRole().isTech())
+                    || (getPrimaryRole().isMedic() && role.isMedicalStaff())
+                    || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
+                return false;
+            }
+        }
+
+        switch (role) {
+            case MECHWARRIOR:
+                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
+            case LAM_PILOT:
+                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)
+                        && hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER:
+                return hasSkill(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER:
+                return hasSkill(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT:
+                return hasSkill(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER:
+                return hasSkill(SkillType.S_GUN_VEE);
+            case VEHICLE_CREW:
+                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case AEROSPACE_PILOT:
+                return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT:
+                return hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
+            case PROTOMECH_PILOT:
+                return hasSkill(SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR:
+                return hasSkill(SkillType.S_GUN_BA);
+            case SOLDIER:
+                return hasSkill(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT:
+                return hasSkill(SkillType.S_PILOT_SPACE);
+            case VESSEL_CREW:
+                return hasSkill(SkillType.S_TECH_VESSEL);
+            case VESSEL_GUNNER:
+                return hasSkill(SkillType.S_GUN_SPACE);
+            case VESSEL_NAVIGATOR:
+                return hasSkill(SkillType.S_NAV);
+            case MECH_TECH:
+                return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case MECHANIC:
+                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case AERO_TECH:
+                return hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case BA_TECH:
+                return hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case ASTECH:
+                return hasSkill(SkillType.S_ASTECH);
+            case DOCTOR:
+                return hasSkill(SkillType.S_DOCTOR) && getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+            case MEDIC:
+                return hasSkill(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND:
+            case ADMINISTRATOR_LOGISTICS:
+            case ADMINISTRATOR_TRANSPORT:
+            case ADMINISTRATOR_HR:
+                return hasSkill(SkillType.S_ADMIN);
+            case DEPENDENT:
+            case NONE:
+                return true;
+            default:
+                return false;
+        }
     }
     //endregion Personnel Roles
 
@@ -879,88 +979,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setDaysToWaitForHealing(int d) {
         this.daysToWaitForHealing = d;
-    }
-
-    public String getRoleDesc() {
-        String role = getPrimaryRoleDesc();
-        if (!getSecondaryRole().isNone()) {
-            role += "/" + getSecondaryRoleDesc();
-        }
-        return role;
-    }
-
-    public String getPrimaryRoleDesc() {
-        String bgPrefix = "";
-        if (isClanner()) {
-            bgPrefix = getPhenotype().getShortName() + " ";
-        }
-        return bgPrefix + getPrimaryRole().getName(isClanner());
-    }
-
-    public String getSecondaryRoleDesc() {
-        return getSecondaryRole().getName(isClanner());
-    }
-
-    public boolean canPerformRole(PersonnelRole role) {
-        switch (role) {
-            case MECHWARRIOR:
-                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
-            case LAM_PILOT:
-                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)
-                        && hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT:
-                return hasSkill(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER:
-                return hasSkill(SkillType.S_GUN_VEE);
-            case VEHICLE_CREW:
-                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case AEROSPACE_PILOT:
-                return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
-            case PROTOMECH_PILOT:
-                return hasSkill(SkillType.S_GUN_PROTO);
-            case BATTLE_ARMOUR:
-                return hasSkill(SkillType.S_GUN_BA);
-            case SOLDIER:
-                return hasSkill(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT:
-                return hasSkill(SkillType.S_PILOT_SPACE);
-            case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL);
-            case VESSEL_GUNNER:
-                return hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAV);
-            case MECH_TECH:
-                return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case AERO_TECH:
-                return hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case ASTECH:
-                return hasSkill(SkillType.S_ASTECH);
-            case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR) && getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-            case MEDIC:
-                return hasSkill(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                return hasSkill(SkillType.S_ADMIN);
-            case DEPENDENT:
-            case NONE:
-                return true;
-            default:
-                return false;
-        }
     }
 
     public void setGender(Gender gender) {

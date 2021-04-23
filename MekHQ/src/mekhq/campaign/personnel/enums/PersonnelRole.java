@@ -70,19 +70,19 @@ public enum PersonnelRole {
     //endregion Variable Declarations
 
     //region Constructors
-    PersonnelRole(String name, int mnemonic) {
+    PersonnelRole(final String name, final int mnemonic) {
         this(name, null, mnemonic);
     }
 
-    PersonnelRole(String name, int mnemonic, boolean marketable) {
+    PersonnelRole(final String name, final int mnemonic, final boolean marketable) {
         this(name, null, mnemonic, marketable);
     }
 
-    PersonnelRole(String name, String clanName, int mnemonic) {
+    PersonnelRole(final String name, final String clanName, final int mnemonic) {
         this(name, clanName, mnemonic, true);
     }
 
-    PersonnelRole(String name, String clanName, int mnemonic, boolean marketable) {
+    PersonnelRole(final String name, final String clanName, final int mnemonic, final boolean marketable) {
         this.name = resources.getString(name);
         this.clanName = (clanName != null) ? resources.getString(clanName) : this.name;
         this.mnemonic = mnemonic;
@@ -91,7 +91,7 @@ public enum PersonnelRole {
     //endregion Constructors
 
     //region Getters
-    public String getName(boolean isClan) {
+    public String getName(final boolean isClan) {
         return isClan ? clanName : name;
     }
 
@@ -279,12 +279,8 @@ public enum PersonnelRole {
         return isSupport(false);
     }
 
-    public boolean isSupport(boolean excludeUnmarketable) {
-        if (excludeUnmarketable && !isMarketable()) {
-            return false;
-        } else {
-            return !isCombat();
-        }
+    public boolean isSupport(final boolean excludeUnmarketable) {
+        return (!excludeUnmarketable || isMarketable()) && !isCombat();
     }
 
     public boolean isTech() {
@@ -350,9 +346,12 @@ public enum PersonnelRole {
     }
 
     //region Static Methods
+    /**
+     * @return a list of roles that can be included in the personnel market
+     */
     public static List<PersonnelRole> getMarketableRoles() {
-        List<PersonnelRole> marketableRoles = new ArrayList<>();
-        for (PersonnelRole role : values()) {
+        final List<PersonnelRole> marketableRoles = new ArrayList<>();
+        for (final PersonnelRole role : values()) {
             if (role.isMarketable()) {
                 marketableRoles.add(role);
             }
@@ -360,9 +359,12 @@ public enum PersonnelRole {
         return marketableRoles;
     }
 
+    /**
+     * @return a list of roles that are considered to be vessel (as in spacecraft) crewmembers
+     */
     public static List<PersonnelRole> getVesselRoles() {
-        List<PersonnelRole> vesselRoles = new ArrayList<>();
-        for (PersonnelRole role : values()) {
+        final List<PersonnelRole> vesselRoles = new ArrayList<>();
+        for (final PersonnelRole role : values()) {
             if (role.isVesselCrewmember()) {
                 vesselRoles.add(role);
             }
@@ -370,9 +372,12 @@ public enum PersonnelRole {
         return vesselRoles;
     }
 
+    /**
+     * @return a list of roles that are considered to be techs
+     */
     public static List<PersonnelRole> getTechRoles() {
-        List<PersonnelRole> techRoles = new ArrayList<>();
-        for (PersonnelRole role : values()) {
+        final List<PersonnelRole> techRoles = new ArrayList<>();
+        for (final PersonnelRole role : values()) {
             if (role.isTech()) {
                 techRoles.add(role);
             }
@@ -380,9 +385,12 @@ public enum PersonnelRole {
         return techRoles;
     }
 
+    /**
+     * @return a list of all roles that are considered to be administrators
+     */
     public static List<PersonnelRole> getAdministratorRoles() {
-        List<PersonnelRole> administratorRoles = new ArrayList<>();
-        for (PersonnelRole role : values()) {
+        final List<PersonnelRole> administratorRoles = new ArrayList<>();
+        for (final PersonnelRole role : values()) {
             if (role.isAdministrator()) {
                 administratorRoles.add(role);
             }
@@ -390,9 +398,12 @@ public enum PersonnelRole {
         return administratorRoles;
     }
 
+    /**
+     * @return the number of roles that are not tagged as marketable
+     */
     public static int getUnmarketableCount() {
         int unmarketable = 0;
-        for (PersonnelRole role : values()) {
+        for (final PersonnelRole role : values()) {
             if (!role.isMarketable()) {
                 unmarketable++;
             }
@@ -402,7 +413,7 @@ public enum PersonnelRole {
     //endregion Static Methods
 
     //region File I/O
-    public static PersonnelRole parseFromString(String text) {
+    public static PersonnelRole parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -479,6 +490,10 @@ public enum PersonnelRole {
     }
     //endregion File I/O
 
+    /**
+     * This method is not recommend to be used in MekHQ, but is provided for non-specified utilization
+     * @return the base name of this role, without applying any overrides
+     */
     @Override
     public String toString() {
         return name;

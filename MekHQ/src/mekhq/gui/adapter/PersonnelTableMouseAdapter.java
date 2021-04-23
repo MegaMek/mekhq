@@ -1312,12 +1312,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         final PersonnelRole[] roles = PersonnelRole.values();
         menu = new JMenu(resourceMap.getString("changePrimaryRole.text"));
         for (final PersonnelRole role : roles) {
-            if (person.canPerformRole(role) && (person.getSecondaryRole() != role)) {
+            if (person.canPerformRole(role, true)) {
                 cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
-                if (person.getPrimaryRole() == role) {
-                    cbMenuItem.setSelected(true);
-                }
+                cbMenuItem.setSelected(person.getPrimaryRole() == role);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }
@@ -1326,18 +1324,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         menu = new JMenu(resourceMap.getString("changeSecondaryRole.text"));
         for (final PersonnelRole role : roles) {
-            if (!role.isDependent()
-                    && (role.isNone() || (person.canPerformRole(role) && (person.getPrimaryRole() != role)))) {
-                // You can't be an astech if you are a tech, or a medic if you are a doctor
-                if ((person.getPrimaryRole().isTech() && role.isAstech())
-                        || (person.getPrimaryRole().isDoctor() && role.isMedic())) {
-                    continue;
-                }
+            if (person.canPerformRole(role, false)) {
                 cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
-                if (person.getSecondaryRole() == role) {
-                    cbMenuItem.setSelected(true);
-                }
+                cbMenuItem.setSelected(person.getSecondaryRole() == role);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }
