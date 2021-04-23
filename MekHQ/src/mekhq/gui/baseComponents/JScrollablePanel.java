@@ -74,7 +74,7 @@ public class JScrollablePanel extends JPanel implements Scrollable {
 
     @Override
     public Dimension getPreferredScrollableViewportSize() {
-        //tell the JScrollPane that we want to be our 'preferredSize' - but later, we'll say that
+        // tell the JScrollPane that we want to be our 'preferredSize' - but later, we'll say that
         // vertically, it should scroll.
         return super.getPreferredSize();
     }

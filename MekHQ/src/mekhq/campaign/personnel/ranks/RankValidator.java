@@ -47,7 +47,7 @@ public class RankValidator {
      * @return whether the rank system is valid
      */
     public boolean validate(final @Nullable DefaultComboBoxModel<RankSystem> rankSystemsModel,
-                             final @Nullable RankSystem rankSystem, final boolean checkCode) {
+                            final @Nullable RankSystem rankSystem, final boolean checkCode) {
         // Null is never a valid rank system, but this catches some default returns whose errors are
         // caught during the loading process. This MUST be the first check and CANNOT be removed.
         if (rankSystem == null) {
