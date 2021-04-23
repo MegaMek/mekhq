@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe;
+package mekhq.campaign.universe.selectors.planetSelectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 /**
  * Does not select a {@link Planet}.

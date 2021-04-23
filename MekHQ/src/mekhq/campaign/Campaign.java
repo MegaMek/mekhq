@@ -138,10 +138,10 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
-import mekhq.campaign.universe.AbstractFactionSelector;
-import mekhq.campaign.universe.AbstractPlanetSelector;
-import mekhq.campaign.universe.DefaultFactionSelector;
-import mekhq.campaign.universe.DefaultPlanetSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -153,8 +153,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.RangedFactionSelector;
-import mekhq.campaign.universe.RangedPlanetSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -541,7 +541,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return atbConfig;
     }
-    
+
     //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
@@ -879,7 +879,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         addMissionWithoutId(m);
-        
+
         StratconContractInitializer.restoreTransientStratconInformation(m, this);
     }
 
@@ -3031,13 +3031,13 @@ public class Campaign implements Serializable, ITechManager {
                         StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) s, contract.getStratconCampaignState());
                         s.convertToStub(this, Scenario.S_DEFEAT);
-                                                
+
                         addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
-                        
+
                     } else {
                         s.convertToStub(this, Scenario.S_DEFEAT);
                         contract.addPlayerMinorBreach();
-                        
+
                         addReport("Failure to deploy for " + s.getName()
                             + " resulted in defeat and a minor contract breach.");
                     }
@@ -3649,7 +3649,7 @@ public class Campaign implements Serializable, ITechManager {
         Mission mission = getMission(scenario.getMissionId());
         if (null != mission) {
             mission.removeScenario(scenario.getId());
-            
+
             // if we GM-remove the scenario and it's attached to a StratCon scenario
             // then pretend like we let the StratCon scenario expire
             if ((mission instanceof AtBContract) &&

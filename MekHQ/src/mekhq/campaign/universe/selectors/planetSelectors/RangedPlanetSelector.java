@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe;
+package mekhq.campaign.universe.selectors.planetSelectors;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -26,7 +26,12 @@ import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 /**
  * An implementation of {@link AbstractPlanetSelector} which chooses

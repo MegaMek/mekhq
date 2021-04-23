@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe;
+package mekhq.campaign.universe.selectors.factionSelectors;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Represents a class which selects {@link Faction} objects.
