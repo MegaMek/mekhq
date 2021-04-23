@@ -130,21 +130,24 @@ public class RankSystem implements Serializable {
     }
     //endregion Boolean Comparison Methods
 
-    public Rank getRank(int r) {
-        if (r >= ranks.size()) {
+    public Rank getRank(int index) {
+        if (index >= getRanks().size()) {
             //assign the highest rank
-            r = ranks.size() - 1;
+            index = getRanks().size() - 1;
         }
-        return ranks.get(r);
+        return getRanks().get(index);
     }
 
+    /**
+     * @return the index of the first officer
+     */
     public int getOfficerCut() {
-        for (int i = 0; i < ranks.size(); i++) {
-            if (ranks.get(i).isOfficer()) {
+        for (int i = 0; i < getRanks().size(); i++) {
+            if (getRanks().get(i).isOfficer()) {
                 return i;
             }
         }
-        return ranks.size() - 1;
+        return getRanks().size() - 1;
     }
 
     //region File I/O
