@@ -748,22 +748,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (primary) {
             // Primary Role:
             // 1) Can always be dependent
-            // 2) Cannot be equal to your secondary role
+            // 2) Cannot be none
+            // 3) Cannot be equal to your secondary role
             if (role.isDependent()) {
                 return true;
-            } else if (role == getSecondaryRole()) {
+            } else if (role.isNone() || (role == getSecondaryRole())) {
                 return false;
             }
         } else {
             // Secondary Role:
-            // 1) Cannot be dependent
-            // 2) Cannot be equal to the primary role, unless the role is none
-            // 3) Cannot be a Tech role is the primary role is an Astech
-            // 4) Cannot be Astech if the primary role is a tech role
-            // 5) Cannot be a medical staff role if the primary role is a Medic
-            // 6) Cannot be Medic if the primary role is one of the medical staff roles
-            if (role.isDependent()
-                    || ((getPrimaryRole() == role) && !role.isNone())
+            // 1) Can always be none
+            // 2) Cannot be dependent
+            // 3) Cannot be equal to the primary role
+            // 4) Cannot be a Tech role is the primary role is an Astech
+            // 5) Cannot be Astech if the primary role is a tech role
+            // 6) Cannot be a medical staff role if the primary role is a Medic
+            // 7) Cannot be Medic if the primary role is one of the medical staff roles
+            if (role.isNone()) {
+                return true;
+            } else if (role.isDependent()
+                    || (getPrimaryRole() == role)
                     || (getPrimaryRole().isAstech() && role.isTechSecondary())
                     || (role.isAstech() && getPrimaryRole().isTech())
                     || (getPrimaryRole().isMedic() && role.isMedicalStaff())
