@@ -1160,7 +1160,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final Profession profession = initialProfession.getProfession(person.getRankSystem(), rank);
                 final int rankLevels = rank.getRankLevels().get(profession);
 
-                if (rankLevels > 0) {
+                if (rankLevels > 1) {
                     submenu = new JMenu(rankDisplay.toString());
                     for (int level = 0; level <= rankLevels; level++) {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)

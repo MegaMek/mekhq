@@ -230,19 +230,19 @@ public class RankSystem implements Serializable {
      * @return the unvalidated parsed rank system, or null if there is an issue in parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-                                                               final @Nullable Version version) {
+                                                               final Version version) {
         return generateInstanceFromXML(nl, version, false, RankSystemType.CAMPAIGN);
     }
 
     /**
      * @param nl the node list to parse the rank system from
-     * @param version the version to parse the rank system at, or null to not check the version
+     * @param version the version to parse the rank system at
      * @param initialLoad whether this is the initial load or a later load
      * @param type the type of rank system being loaded
      * @return the unvalidated parsed rank system, or null if there is an issue in parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-                                                               final @Nullable Version version,
+                                                               final Version version,
                                                                final boolean initialLoad,
                                                                final RankSystemType type) {
         final RankSystem rankSystem = new RankSystem(type);
@@ -250,8 +250,9 @@ public class RankSystem implements Serializable {
         rankSystem.setRanks(new ArrayList<>());
 
         try {
-            final boolean preWindchild = (version != null) && version.isLowerThan("0.49.0");
-            int rankSystemId = -1; // migration, 0.49.X
+            final boolean preWindchild = version.isLowerThan("0.49.0");
+            int rankSystemId = -1; // migration, from pre-0.49.0
+            boolean e0 = true; // migration, from pre-0.49.0
 
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
@@ -259,7 +260,8 @@ public class RankSystem implements Serializable {
                 if (Stream.of("system", "rankSystem", "systemId").anyMatch(s -> wn.getNodeName().equalsIgnoreCase(s))) { // Legacy, 0.49.0 removal
                     rankSystemId = Integer.parseInt(wn.getTextContent().trim());
                     if (!initialLoad && (rankSystemId != 12)) {
-                        return Ranks.getRankSystemFromCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
+                        final String code = PersonMigrator.migrateRankSystemCode(rankSystemId);
+                        return Ranks.getRankSystemFromCode(code);
                     }
                 } else if (wn.getNodeName().equalsIgnoreCase("code")) {
                     final String systemCode = MekHqXmlUtil.unEscape(wn.getTextContent().trim());
@@ -275,11 +277,12 @@ public class RankSystem implements Serializable {
                 } else if (wn.getNodeName().equalsIgnoreCase("description")) {
                     rankSystem.setDescription(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
-                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version));
+                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version, e0));
+                    e0 = false;
                 }
             }
 
-            if (preWindchild && (version != null) && (rankSystemId != -1)) {
+            if (preWindchild && (rankSystemId >= 0)) {
                 rankSystem.setCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
                 rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }

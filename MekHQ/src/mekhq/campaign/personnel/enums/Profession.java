@@ -120,7 +120,7 @@ public enum Profession {
         Profession profession = this;
 
         // This runs if the rank is empty or indicates an alternative system
-        while (true) {
+        for (int i = 0; i < values().length; i++) {
             if (rank.isEmpty(profession)) {
                 profession = profession.getAlternateProfession(rankSystem);
             } else if (rank.indicatesAlternativeSystem(profession)) {
@@ -199,24 +199,24 @@ public enum Profession {
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final String name) {
-        switch (name.replaceAll("--", "")) {
-            case "ASF":
+        switch (name) {
+            case "--ASF":
                 return AEROSPACE;
-            case "VEE":
+            case "--VEE":
                 return VEHICLE;
-            case "NAVAL":
+            case "--NAVAL":
                 return NAVAL;
-            case "INF":
+            case "--INF":
                 return INFANTRY;
-            case "TECH":
+            case "--TECH":
                 return TECH;
-            case "MEDIC":
+            case "--MEDIC":
                 return MEDICAL;
-            case "ADMIN":
+            case "--ADMIN":
                 return ADMIN;
-            case "CIV":
+            case "--CIV":
                 return CIVILIAN;
-            case "MW":
+            case "--MW":
             default:
                 return MECHWARRIOR;
         }

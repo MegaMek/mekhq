@@ -21,6 +21,7 @@ package mekhq.gui.panes;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -54,6 +55,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     // Rank System Panel
     private SortedComboBoxModel<RankSystem> rankSystemModel;
     private MMComboBox<RankSystem> comboRankSystems;
+    private DefaultComboBoxModel<RankSystemType> rankSystemTypeModel;
     private MMComboBox<RankSystemType> comboRankSystemType;
 
     // Ranks Table Panel
@@ -74,15 +76,23 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         return campaign;
     }
 
-    public RankSystem getSelectedRankSystem() {
+    public @Nullable RankSystem getSelectedRankSystem() {
         return selectedRankSystem;
     }
 
-    public void setSelectedRankSystem(final RankSystem selectedRankSystem) {
+    public void setSelectedRankSystem(final @Nullable RankSystem selectedRankSystem) {
         this.selectedRankSystem = selectedRankSystem;
     }
 
     //region Rank System Panel
+    public SortedComboBoxModel<RankSystem> getRankSystemModel() {
+        return rankSystemModel;
+    }
+
+    public void setRankSystemModel(final SortedComboBoxModel<RankSystem> rankSystemModel) {
+        this.rankSystemModel = rankSystemModel;
+    }
+
     public MMComboBox<RankSystem> getComboRankSystems() {
         return comboRankSystems;
     }
@@ -91,12 +101,12 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         this.comboRankSystems = comboRankSystems;
     }
 
-    public SortedComboBoxModel<RankSystem> getRankSystemModel() {
-        return rankSystemModel;
+    public DefaultComboBoxModel<RankSystemType> getRankSystemTypeModel() {
+        return rankSystemTypeModel;
     }
 
-    public void setRankSystemModel(final SortedComboBoxModel<RankSystem> rankSystemModel) {
-        this.rankSystemModel = rankSystemModel;
+    public void setRankSystemTypeModel(final DefaultComboBoxModel<RankSystemType> rankSystemTypeModel) {
+        this.rankSystemTypeModel = rankSystemTypeModel;
     }
 
     public MMComboBox<RankSystemType> getComboRankSystemType() {
@@ -129,11 +139,13 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
 
     //region Initialization
     /**
-     * No Preferences are required here, so we don't call setPreferences
+     * No Preferences are required here, so we don't call setPreferences.
+     * SelectedRankSystem will be non-null for the initialization based on how the logic is set up,
+     * so we don't need to check to ensure that is the case
      */
     @Override
     protected void initialize() {
-        // First, we have to initialize the selected rank system
+        // First, we have to initialize the selected rank system.
         setSelectedRankSystem(getCampaign().getRankSystem().getType().isCampaign()
                 ? new RankSystem(getCampaign().getRankSystem()) : getCampaign().getRankSystem());
 
@@ -214,7 +226,11 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         });
         getComboRankSystems().addActionListener(evt -> comboRankSystemChanged());
 
-        setComboRankSystemType(new MMComboBox<>("comboRankSystemType", RankSystemType.values()));
+        setRankSystemTypeModel(new DefaultComboBoxModel<>(RankSystemType.values()));
+        if (!getSelectedRankSystem().getType().isDefault()) {
+            getRankSystemTypeModel().removeElement(RankSystemType.DEFAULT);
+        }
+        setComboRankSystemType(new MMComboBox<>("comboRankSystemType", getRankSystemTypeModel()));
         getComboRankSystemType().setToolTipText(resources.getString("comboRankSystemType.toolTipText"));
         getComboRankSystemType().setSelectedItem(getSelectedRankSystem().getType());
         getComboRankSystemType().setEnabled(!getSelectedRankSystem().getType().isDefault());
@@ -375,10 +391,15 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     private void comboRankSystemChanged() {
         updateRankSystem();
 
+        if ((getSelectedRankSystem() != null) && !getSelectedRankSystem().getType().isDefault()) {
+            getRankSystemTypeModel().addElement(RankSystemType.DEFAULT);
+        }
+
         // Then update the selected rank system, with null protection (although it shouldn't be null)
         setSelectedRankSystem(getRankSystemModel().getSelectedItem());
         if (getSelectedRankSystem() == null) {
             MekHQ.getLogger().error("The selected rank system is null. Not changing the ranks, just returning.");
+            getComboRankSystemType().setEnabled(false);
             return;
         }
 
@@ -393,8 +414,14 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             }
         }
 
+        if (getSelectedRankSystem().getType().isDefault()) {
+            getComboRankSystemType().setEnabled(false);
+        } else {
+            getRankSystemTypeModel().removeElement(RankSystemType.DEFAULT);
+            getComboRankSystemType().setEnabled(true);
+        }
+
         getComboRankSystemType().setSelectedItem(getSelectedRankSystem().getType());
-        getComboRankSystemType().setEnabled(!getSelectedRankSystem().getType().isDefault());
     }
 
     private void updateRankSystem() {

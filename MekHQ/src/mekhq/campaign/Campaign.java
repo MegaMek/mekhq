@@ -542,7 +542,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return atbConfig;
     }
-    
+
     //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
@@ -880,7 +880,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         addMissionWithoutId(m);
-        
+
         StratconContractInitializer.restoreTransientStratconInformation(m, this);
     }
 
@@ -3032,13 +3032,13 @@ public class Campaign implements Serializable, ITechManager {
                         StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) s, contract.getStratconCampaignState());
                         s.convertToStub(this, Scenario.S_DEFEAT);
-                                                
+
                         addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
-                        
+
                     } else {
                         s.convertToStub(this, Scenario.S_DEFEAT);
                         contract.addPlayerMinorBreach();
-                        
+
                         addReport("Failure to deploy for " + s.getName()
                             + " resulted in defeat and a minor contract breach.");
                     }
@@ -3650,7 +3650,7 @@ public class Campaign implements Serializable, ITechManager {
         Mission mission = getMission(scenario.getMissionId());
         if (null != mission) {
             mission.removeScenario(scenario.getId());
-            
+
             // if we GM-remove the scenario and it's attached to a StratCon scenario
             // then pretend like we let the StratCon scenario expire
             if ((mission instanceof AtBContract) &&
@@ -4344,13 +4344,13 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
-        // If they equal, there hasn't been a change and thus don't need to process further
-        if (getRankSystem().equals(rankSystem)) {
+        // If they are the same object, there hasn't been a change and thus don't need to process further
+        if (getRankSystem() == rankSystem) {
             return;
         }
 
         // Then, we need to validate the rank system. Null isn't valid to be set but may be the
-        // result of a cancelled load, but validation will prevent that
+        // result of a cancelled load. However, validation will prevent that
         final RankValidator rankValidator = new RankValidator();
         if (!rankValidator.validate(rankSystem, false)) {
             return;
@@ -4363,7 +4363,8 @@ public class Campaign implements Serializable, ITechManager {
         setRankSystemDirect(rankSystem);
 
         // Finally, we fix all personnel ranks and ensure they are properly set
-        rankValidator.changeCampaignRankSystem(oldRankSystem, rankSystem, getPersonnel());
+        getPersonnel().stream().filter(person -> person.getRankSystem().equals(oldRankSystem))
+                .forEach(person -> person.setRankSystem(rankValidator, rankSystem));
     }
 
     public void setRankSystemDirect(final RankSystem rankSystem) {

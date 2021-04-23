@@ -150,7 +150,7 @@ public class Ranks {
         // Then, we need to check and fix any issues that may arise from the file load
         final RankValidator rankValidator = new RankValidator();
         rankValidator.checkAssignedRankSystems(campaign);
-        rankValidator.checkPersonnelRanks(campaign.getPersonnel());
+        campaign.getPersonnel().forEach(rankValidator::checkPersonRank);
     }
 
     public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,

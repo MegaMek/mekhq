@@ -40,6 +40,12 @@ public class RankValidator {
         return validate(null, rankSystem, checkCode);
     }
 
+    /**
+     * @param rankSystemsModel the combo box model to use in checking the rank system code, or null
+     * @param rankSystem the rank system to check, which may be null to indicate an invalid system
+     * @param checkCode the code to check
+     * @return whether the rank system is valid
+     */
     public boolean validate(final @Nullable DefaultComboBoxModel<RankSystem> rankSystemsModel,
                              final @Nullable RankSystem rankSystem, final boolean checkCode) {
         // Null is never a valid rank system, but this catches some default returns whose errors are
@@ -139,13 +145,21 @@ public class RankValidator {
         return true;
     }
 
+    /**
+     * Validates that the rank alternatives aren't an infinite loop or empty
+     * @param rank the rank to check for issues
+     * @param profession the current profession
+     * @param maxRecursions the maximum level of recursion
+     * @param recursion the current recursion level
+     * @return if the alternatives are valid
+     */
     private boolean validateRankAlternatives(final Rank rank, final Profession profession,
                                              final int maxRecursions, final int recursion) {
         if (recursion > maxRecursions) {
-            MekHQ.getLogger().error("");
+            MekHQ.getLogger().error("Hit max recursions, rank system contains an infinite loop");
             return false;
         } else if (rank.isEmpty(profession)) {
-            MekHQ.getLogger().error("");
+            MekHQ.getLogger().error("Cannot have an empty value as an alternative");
             return false;
         } else if (rank.indicatesAlternativeSystem(profession)) {
             return validateRankAlternatives(rank, profession.getAlternateProfession(rank),
@@ -155,6 +169,12 @@ public class RankValidator {
         }
     }
 
+    /**
+     * Check assigned rank systems for the campaign, updating if needed, and then do the same for
+     * all personnel
+     *
+     * @param campaign the campaign to check the rank systems for
+     */
     public void checkAssignedRankSystems(final Campaign campaign) {
         // First, we need to ensure the campaign's rank system was refreshed. This can be done by
         // checking if the system is a campaign custom
@@ -169,29 +189,21 @@ public class RankValidator {
                         Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }
 
-    public void changeCampaignRankSystem(final RankSystem oldRankSystem,
-                                         final RankSystem newRankSystem,
-                                         final Collection<Person> personnel) {
-        // We need to swap over the previous rank system to the current one
-        personnel.stream().filter(person -> person.getRankSystem().equals(oldRankSystem))
-                .forEach(person -> person.setRankSystem(this, newRankSystem));
-
-        // Then, we need to check the ranks for the personnel
-        checkPersonnelRanks(personnel);
-    }
-
-    public void checkPersonnelRanks(final Collection<Person> personnel) {
-        personnel.forEach(this::checkPersonRank);
-    }
-
+    /**
+     * Checks the rank of a person to ensure it is valid, and decreases the rank down to the highest
+     * one that is valid for the rank system.
+     *
+     * @param person the person whose rank needs to be checked
+     */
     public void checkPersonRank(final Person person) {
         final RankSystem rankSystem = person.getRankSystem();
-        final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
+        final Profession baseProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
                 .getBaseProfession(rankSystem);
-        if (person.getRank().isEmpty(profession)) {
+        if (person.getRank().isEmpty(baseProfession)) {
             for (int i = person.getRankNumeric() - 1; i >= 0; i--) {
-                if (rankSystem.getRanks().get(i).isEmpty(profession)) {
+                if (!rankSystem.getRank(i).isEmpty(baseProfession)) {
                     person.setRank(i);
+                    break;
                 }
             }
         }
