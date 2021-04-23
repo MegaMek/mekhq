@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <name>Special Mission: Allied Traitors</name>
+    <shortBriefing></shortBriefing>
+    <detailedBriefing>One of your officer MechWarriors has been isolated and must conduct operations on their own.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
+    <mapParameters>
+        <allowedTerrainTypes>
+            <allowedTerrainType>1</allowedTerrainType>
+        </allowedTerrainTypes>
+        <allowRotation>false</allowRotation>
+        <baseHeight>0</baseHeight>
+        <baseWidth>0</baseWidth>
+        <heightScalingIncrement>5</heightScalingIncrement>
+        <mapLocation>AllGroundTerrain</mapLocation>
+        <useStandardAtBSizing>true</useStandardAtBSizing>
+        <widthScalingIncrement>5</widthScalingIncrement>
+    </mapParameters>
+    <scenarioModifiers>AlliedTreachery.xml (Post)</scenarioModifiers>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>0</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>4</destinationZone>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Primary Opfor</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>0</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>4</destinationZone>
+                <fixedUnitCount>2</fixedUnitCount>
+                <forceAlignment>1</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Primary Opfor</forceName>
+                <generationMethod>3</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
+    <scenarioObjectives/>
+</ScenarioTemplate>

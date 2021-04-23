@@ -3,6 +3,8 @@
     <name>Recon</name>
     <shortBriefing>Identify enemy units.</shortBriefing>
     <detailedBriefing>Conduct detailed scans on all enemy units present on the battlefield.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>false</allowRotation>
@@ -19,7 +21,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-3</allowedUnitType>
+                <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>

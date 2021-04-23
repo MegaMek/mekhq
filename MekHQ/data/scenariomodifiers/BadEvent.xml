@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Hostiles are coordinating additional forces in the area.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<numExtraEvents>1</numExtraEvents>
+</AtBScenarioModifier>

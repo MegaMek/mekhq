@@ -2,6 +2,7 @@
 	<additionalBriefingText>Preserve 50% of the designated turrets.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Defend</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>
@@ -14,10 +15,20 @@
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>2</howMuch>
                 </successEffect>
+		<successEffect>
+                    <effectType>FacilityRemains</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>
@@ -26,7 +37,7 @@
             <description>Preserve 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
+            <percentage>50</percentage>
             <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

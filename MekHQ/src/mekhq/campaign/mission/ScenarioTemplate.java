@@ -32,13 +32,16 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
  *
  */
 @XmlRootElement(name="ScenarioTemplate")
-public class ScenarioTemplate {
+public class ScenarioTemplate implements Cloneable {
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
     
     public String name;
     public String shortBriefing;
     public String detailedBriefing;
+    
+    public boolean isHostileFacility;
+    public boolean isAlliedFacility;
     
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     public List<String> scenarioModifiers = new ArrayList<>(); 
@@ -51,6 +54,32 @@ public class ScenarioTemplate {
     @XmlElement(name="scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
     
+    @Override
+    public ScenarioTemplate clone() {
+        ScenarioTemplate st = new ScenarioTemplate();
+        st.name = this.name;
+        st.shortBriefing = this.shortBriefing;
+        st.detailedBriefing = this.detailedBriefing;
+        st.isHostileFacility = this.isHostileFacility;
+        st.isAlliedFacility = this.isAlliedFacility;
+        for (ScenarioForceTemplate sft : scenarioForces.values()) {
+            st.scenarioForces.put(sft.getForceName(), sft.clone());
+        }
+        
+        for (String mod : scenarioModifiers) {
+            st.scenarioModifiers.add(mod);
+        }
+        
+        for (ScenarioObjective obj : scenarioObjectives) {
+            st.scenarioObjectives.add(new ScenarioObjective(obj));
+        }
+        
+        st.mapParameters = (ScenarioMapParameters) mapParameters.clone();
+        
+        
+        return st;
+    }
+    
     /**
      * Returns the "primary" player force. This is always the force with the name "Player".
      * @return Primary player force.
@@ -61,6 +90,18 @@ public class ScenarioTemplate {
     
     public List<ScenarioForceTemplate> getAllScenarioForces() {
         return scenarioForces.values().stream().collect(Collectors.toList());
+    }
+    
+    public boolean isHostileFacility() {
+        return isHostileFacility;
+    }
+    
+    public boolean isAlliedFacility() {
+        return isAlliedFacility;
+    }
+    
+    public boolean isFacilityScenario() {
+        return isHostileFacility || isAlliedFacility;
     }
     
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
@@ -97,8 +138,8 @@ public class ScenarioTemplate {
     public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
         List<ScenarioForceTemplate> retVal = new ArrayList<>();
         
-        for(ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
-            if((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+        for (ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
+            if ((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
                     ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
                      (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()))) {
@@ -122,7 +163,7 @@ public class ScenarioTemplate {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -140,7 +181,7 @@ public class ScenarioTemplate {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -151,8 +192,8 @@ public class ScenarioTemplate {
      */
     public static ScenarioTemplate Deserialize(String filePath) {
         File inputFile = new File(filePath);
-        if(!inputFile.exists()) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", String.format("Cannot deserialize file %s, does not exist", filePath));
+        if (!inputFile.exists()) {
+            MekHQ.getLogger().error(String.format("Cannot deserialize file %s, does not exist", filePath));
             return null;
         }
         
@@ -176,7 +217,7 @@ public class ScenarioTemplate {
                 resultingTemplate = templateElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
@@ -196,7 +237,7 @@ public class ScenarioTemplate {
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Template", e);
         }
         
         return resultingTemplate;

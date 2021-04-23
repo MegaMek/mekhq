@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>The allied forces have turned on us.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<eventRecipient>Allied</eventRecipient>
+	<switchSides>True</switchSides>
+</AtBScenarioModifier>
