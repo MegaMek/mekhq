@@ -323,16 +323,32 @@ public class ScenarioObjective {
         case ForceWithdraw:
         case Capture:
         case Preserve:
-            return String.format("%s %s%s", getObjectiveCriterion().toString(), amountString, timeLimitString);
+            return String.format("%s %s%s(%s)", getObjectiveCriterion().toString(), amountString, timeLimitString,
+                    this.getSuccessEffects().get(0).effectType);
         case ReachMapEdge:
-            return String.format("Reach %s edge with %s%s", edgeString, amountString, timeLimitString);
+            return String.format("Reach %s edge with %s%s(%s)", edgeString, amountString, timeLimitString);
         case PreventReachMapEdge:
-            return String.format("Prevent %s from reaching %s%s", amountString, edgeString, timeLimitString);
+            return String.format("Prevent %s from reaching %s%s(%s)", amountString, edgeString, timeLimitString);
         case Custom:
-            return String.format("%s%s%s", getDescription(), amountString, timeLimitString);
+            return String.format("%s%s%s\n(%s)", getDescription(), amountString, timeLimitString);
         default:
                 return "?";
         }
+    }
+    
+    private String buildEffects(boolean success) {
+        StringBuilder result = new StringBuilder();
+        List<ObjectiveEffect> effectCollection = success ? getSuccessEffects() : getFailureEffects();
+        
+        for (ObjectiveEffect effect : effectCollection) {
+            result.append(effect.effectType.toString()).append(" : ");
+            
+            switch (effect.effectScaling) {
+            //case Fixed
+            }
+        }
+        
+        return result.toString();
     }
     
     public int getAmount() {
