@@ -3028,12 +3028,15 @@ public class Campaign implements Serializable, ITechManager {
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().getUseStratCon() &&
                             (s instanceof AtBDynamicScenario)) {
-                        StratconRulesManager.processIgnoredScenario(
+                        var stub = StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) s, contract.getStratconCampaignState());
-                        s.convertToStub(this, Scenario.S_DEFEAT);
-                                                
-                        addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
                         
+                        if (stub) {
+                            s.convertToStub(this, Scenario.S_DEFEAT);
+                            addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
+                        } else {
+                            s.clearAllForcesAndPersonnel(this);
+                        }
                     } else {
                         s.convertToStub(this, Scenario.S_DEFEAT);
                         contract.addPlayerMinorBreach();

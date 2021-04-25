@@ -1344,7 +1344,7 @@ public class StratconRulesManager {
                                 .translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
                         scenario.setCoords(newCoords);
 
-                        int daysForward = Math.min(1, track.getDeploymentTime());
+                        int daysForward = Math.max(1, track.getDeploymentTime());
 
                         scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysForward));
                         scenario.setActionDate(scenario.getActionDate().plusDays(daysForward));
@@ -1402,7 +1402,8 @@ public class StratconRulesManager {
                     // loop through scenarios - if we haven't deployed in time, 
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {
-                        if (scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate())) {
+                        if (scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate()) &&
+                                scenario.getPrimaryForceIDs().isEmpty()) {
                             processIgnoredScenario(scenario, campaignState);
                         }
                     }
