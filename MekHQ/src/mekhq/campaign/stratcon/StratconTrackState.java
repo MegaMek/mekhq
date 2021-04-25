@@ -151,6 +151,14 @@ public class StratconTrackState {
     public void removeScenario(StratconScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
+        
+        // any assigned forces get cleared out here as well.
+        for (int forceID : scenario.getAssignedForces()) {
+            unassignForce(forceID);
+            
+            // scenario book-keeping
+            scenario.getPrimaryForceIDs().clear();
+        }
     }
     
     public StratconScenario getScenario(StratconCoords coords) {
@@ -193,9 +201,7 @@ public class StratconTrackState {
      * Handles the assignment of a force to the given coordinates on this track on the given date.
      */
     public void assignForce(int forceID, StratconCoords coords, LocalDate date, boolean sticky) {
-        assignedForceCoords.put(forceID, coords);
-        assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
-        
+        assignedForceCoords.put(forceID, coords);        
         assignedCoordForces.putIfAbsent(coords, new HashSet<>());
         assignedCoordForces.get(coords).add(forceID);
         
@@ -203,7 +209,19 @@ public class StratconTrackState {
             addStickyForce(forceID);
         }
         
-        getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
+        LocalDate returnDate;
+        
+        // if we're assigning the force to a scenario, then
+        // the return date should be the scenario's return date;
+        // otherwise, just deploy it for the minimum amount for the track
+        if (getScenarios().containsKey(coords)) {
+            returnDate = getScenarios().get(coords).getReturnDate();
+        } else {
+            returnDate = date.plusDays(deploymentTime);
+        }
+        
+        getAssignedForceReturnDates().put(forceID, returnDate);
+        getAssignedForceReturnDatesForStorage().put(forceID, returnDate.toString());
     }
     
     /**
