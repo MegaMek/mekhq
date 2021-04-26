@@ -296,7 +296,7 @@ public class RandomFactionGenerator {
             mercWeight += key;
         }
         
-        enemyMap.add((int) (mercWeight / 10), Factions.getInstance().getFaction("MERC"));
+        enemyMap.add((int) Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction("MERC"));
     }
     
     /**
