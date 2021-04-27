@@ -28,13 +28,9 @@ import java.time.temporal.ChronoUnit;
 
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.BattleArmor;
-import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -408,6 +404,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         cachedJumpPath = null;
     }
 
+    @Override
+    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
+        return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
+                && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
+    }
+
     /**
      * Gets the currently calculated jump path for this contract,
      * only recalculating if it's not valid any longer or hasn't been calculated yet.
@@ -449,21 +451,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 .minus(getTotalEstimatedOverheadExpenses(c))
                 .minus(getTotalEstimatedMaintenanceExpenses(c))
                 .minus(getTotalEstimatedPayrollExpenses(c));
-    }
-
-    public static String generateRandomContractName() {
-        RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange('0', 'Z')
-                .filteredBy(UpperCaseAndDigits.UPPERANDDIGITS).build();
-        return generator.generate(15);
-    }
-
-    public enum UpperCaseAndDigits implements CharacterPredicate {
-        UPPERANDDIGITS {
-            @Override
-            public boolean test(int codePoint) {
-                return (Character.isDigit(codePoint) || Character.isUpperCase(codePoint));
-            }
-        }
     }
 
     private int getTravelDays(Campaign c) {
@@ -569,6 +556,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     /**
+     * Calculations to be performed once the contract has been accepted.
+     */
+    public void acceptContract(Campaign campaign) {
+        
+    }
+    
+    /**
      * Only do this at the time the contract is set up, otherwise amounts may change after
      * the ink is signed, which is a no-no.
      * @param c current campaign
@@ -603,9 +597,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                                 .multipliedBy(straightSupport)
                                 .dividedBy(100);
         } else {
-            Money maintCosts = c.getHangar().getUnitCosts(
-                u -> !(u.getEntity() instanceof Infantry) || (u.getEntity() instanceof BattleArmor),
-                Unit::getWeeklyMaintenanceCost);
+            Money maintCosts = c.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
+                    Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
                                 .multipliedBy(getLength())

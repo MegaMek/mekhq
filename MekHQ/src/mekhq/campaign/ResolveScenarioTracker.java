@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
 
 /**
@@ -134,8 +135,7 @@ public class ResolveScenarioTracker {
     }
 
     public String getUnitFilePath() {
-        return unitList.map(File::getAbsolutePath)
-                       .orElse("No file selected");
+        return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
     public void setClient(Client c) {
@@ -156,12 +156,8 @@ public class ResolveScenarioTracker {
     }
 
     private TestUnit generateNewTestUnit(Entity e) {
-        // Do some hoops here so that the new mech gets it's old individual paint job!
-        String cat = e.getCamoCategory();
-        String fn = e.getCamoFileName();
         TestUnit nu = new TestUnit(e, campaign, true);
-        nu.getEntity().setCamoCategory(cat);
-        nu.getEntity().setCamoFileName(fn);
+        nu.getEntity().setCamouflage(e.getCamouflage().clone());
         /* AtB uses id to track status of allied units */
         if (e.getExternalIdAsString().equals("-1")) {
             UUID id = UUID.randomUUID();
@@ -651,8 +647,8 @@ public class ResolveScenarioTracker {
                             }
                         }
                         if (wounded) {
-                            int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                            int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
@@ -754,8 +750,8 @@ public class ResolveScenarioTracker {
                 }
             }
             if (wounded) {
-                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
@@ -793,8 +789,8 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                             if (wounded) {
-                                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -909,11 +905,11 @@ public class ResolveScenarioTracker {
             if (en instanceof Tank) {
                 //Prefer gunner over driver, as in Unit::getCommander
                 for (Person p : crew) {
-                    if (p.getPrimaryRole() == Person.T_VEE_GUNNER) {
+                    if (p.getPrimaryRole().isVehicleGunner()) {
                         commander = p;
-                    } else if (p.getPrimaryRole() == Person.T_GVEE_DRIVER
-                            || p.getPrimaryRole() == Person.T_VTOL_PILOT
-                            || p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                    } else if (p.getPrimaryRole().isGroundVehicleDriver()
+                            || p.getPrimaryRole().isNavalVehicleDriver()
+                            || p.getPrimaryRole().isVTOLPilot()) {
                         driver = p;
                     }
                 }
@@ -926,7 +922,8 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
-            if (commander == null && crew.size() > 0) {
+
+            if ((commander == null) && (crew.size() > 0)) {
                 commander = crew.get(0);
             }
 
@@ -1030,8 +1027,8 @@ public class ResolveScenarioTracker {
                         }
                     }
                     if (wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1508,7 +1505,7 @@ public class ResolveScenarioTracker {
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
-                    unit.adjustLargeCraftAmmo();
+                    new AdjustLargeCraftAmmoAction().execute(campaign, unit);
                 }
                 unit.runDiagnostic(true);
                 unit.resetPilotAndEntity();

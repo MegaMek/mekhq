@@ -90,6 +90,10 @@ public class RandomFactionGenerator {
         return rfg;
     }
 
+    public static void setInstance(RandomFactionGenerator instance) {
+        rfg = instance;
+    }
+
     public void startup(Campaign c) {
         borderTracker.setDate(c.getLocalDate());
         final PlanetarySystem location = c.getLocation().getCurrentSystem();
@@ -97,7 +101,7 @@ public class RandomFactionGenerator {
         borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
         MekHQ.registerHandler(borderTracker);
         MekHQ.registerHandler(this);
-        for (Faction f : Faction.getFactions()) {
+        for (Faction f : Factions.getInstance().getFactions()) {
             if (factionHints.isDeepPeriphery(f)) {
                 borderTracker.setBorderSize(f, BORDER_RANGE_DEEP_PERIPHERY);
             }
@@ -223,18 +227,22 @@ public class RandomFactionGenerator {
      * @return          The shortName of the faction to use as the opfor.
      */
     public String getEnemy(String employer, boolean useRebels) {
-        final String METHOD_NAME = "getEnemy(String,boolean)"; //$NON-NLS-1$
-
-        Faction employerFaction = Faction.getFaction(employer);
+        Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Could not find enemy for " + employer); //$NON-NLS-1$
+            MekHQ.getLogger().error("Could not find enemy for " + employer); //$NON-NLS-1$
             return "PIR";
         } else {
             return getEnemy(employerFaction, useRebels);
         }
     }
 
+    /**
+     * Pick an enemy faction, possibly rebels, given an employer.
+     */
+    public String getEnemy(Faction employer, boolean useRebels) {
+        return getEnemy(employer, useRebels, false);
+    }
+    
     /**
      * Selects an enemy faction for the given employer, weighted by length of shared border and
      * diplomatic relations. Factions at war or designated as rivals are twice as likely (cumulative)
@@ -243,11 +251,11 @@ public class RandomFactionGenerator {
      *
      * @param employer  The faction offering the contract
      * @param useRebels Whether to include rebels as a possible opponent
+     * @param useMercs  Whether to include MERC as a possible opponent. Note, don't do this when
+     * first generating contract, as contract generation relies on the opfor having planets
      * @return          The faction to use as the opfor.
      */
-    public String getEnemy(Faction employer, boolean useRebels) {
-        final String METHOD_NAME = "getEnemy(Faction,boolean)"; //$NON-NLS-1$
-        
+    public String getEnemy(Faction employer, boolean useRebels, boolean useMercs) {
         String employerName = employer != null ? employer.getShortName() : "no employer supplied or faction does not exist";
 
         /* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
@@ -262,19 +270,35 @@ public class RandomFactionGenerator {
         if (null != employer) {
             employerName = employer.getShortName();
             WeightedMap<Faction> enemyMap = buildEnemyMap(employer);
+            
+            if (useMercs) {
+                appendMercsToEnemyMap(enemyMap);
+            }
+            
             enemy = enemyMap.randomItem();
         }
         if (null != enemy) {
             return enemy.getShortName();
         }
         
-        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                "Could not find enemy for " + employerName); //$NON-NLS-1$
+        MekHQ.getLogger().error("Could not find enemy for " + employerName); //$NON-NLS-1$
         
         // Fallback; there are always pirates.
         return "PIR";
     }
 
+    /**
+     * Appends MERC faction to the given enemy map, with approximately a 10% probability
+     */
+    protected void appendMercsToEnemyMap(WeightedMap<Faction> enemyMap) {
+        int mercWeight = 0;
+        for (int key : enemyMap.keySet()) {
+            mercWeight += key;
+        }
+        
+        enemyMap.add((int) Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction("MERC"));
+    }
+    
     /**
      * Builds a map of potential enemies keyed to cumulative weight
      *
@@ -343,13 +367,12 @@ public class RandomFactionGenerator {
      * @return             A list of faction that share a border
      */
     public List<String> getEnemyList(String employerName) {
-        Faction employer = Faction.getFaction(employerName);
+        Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
-            MekHQ.getLogger().warning(getClass(), "getEnemyList(String)", //$NON-NLS-1$
-                    "Unknown faction key: " + employerName); //$NON-NLS-1$
+            MekHQ.getLogger().warning("Unknown faction key: " + employerName); //$NON-NLS-1$
             return Collections.emptyList();
         }
-        return getEnemyList(Faction.getFaction(employerName));
+        return getEnemyList(Factions.getInstance().getFaction(employerName));
     }
 
     /**
@@ -446,17 +469,14 @@ public class RandomFactionGenerator {
      * @return          The planetId of the chosen planet, or null if there are no target candidates
      */
     @Nullable public String getMissionTarget(String attacker, String defender) {
-        final String METHOD_NAME = "getMissionTarget(String, String)"; // $NON-NLS-1$
-        Faction f1 = Faction.getFaction(attacker);
-        Faction f2 = Faction.getFaction(defender);
+        Faction f1 = Factions.getInstance().getFaction(attacker);
+        Faction f2 = Factions.getInstance().getFaction(defender);
         if (null == f1) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Non-existent faction key: " + attacker); // $NON-NLS-1$
+            MekHQ.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
         if (null == f2) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Non-existent faction key: " + attacker); // $NON-NLS-1$
+            MekHQ.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
@@ -475,16 +495,13 @@ public class RandomFactionGenerator {
      * @return              A list of potential mission targets
      */
     public List<PlanetarySystem> getMissionTargetList(String attackerKey, String defenderKey) {
-        final String METHOD_NAME = "getMissionTargetList(String, String)"; //$NON-NLS-1$
-        Faction attacker = Faction.getFaction(attackerKey);
-        Faction defender = Faction.getFaction(defenderKey);
+        Faction attacker = Factions.getInstance().getFaction(attackerKey);
+        Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Non-existent faction key: " + attackerKey); //$NON-NLS-1$
+            MekHQ.getLogger().error("Non-existent faction key: " + attackerKey); //$NON-NLS-1$
         }
         if (null == defender) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Non-existent faction key: " + defenderKey); //$NON-NLS-1$
+            MekHQ.getLogger().error("Non-existent faction key: " + defenderKey); //$NON-NLS-1$
         }
         if ((null != attacker) && (null != defender)) {
             return getMissionTargetList(attacker, defender);

@@ -1,28 +1,28 @@
 /*
  * MissingSpacecraftEngine.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -36,12 +36,11 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingSpacecraftEngine extends MissingPart {
     private static final long serialVersionUID = -6961398614705924172L;
-    double engineTonnage;  
+    double engineTonnage;
     boolean clan;
 
     public MissingSpacecraftEngine() {
@@ -55,7 +54,7 @@ public class MissingSpacecraftEngine extends MissingPart {
         this.name = "Spacecraft Engine";
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         //Per errata, small craft now use fighter engine times but still have the
         //large craft engine part
@@ -79,12 +78,12 @@ public class MissingSpacecraftEngine extends MissingPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof SpacecraftEngine
                 && getName().equals(part.getName())
-                && getTonnage() == ((SpacecraftEngine)part).getTonnage();
+                && getTonnage() == part.getTonnage();
     }
 
     @Override
     public int getTechLevel() {
-        if(clan) {
+        if (clan) {
             return TechConstants.T_CLAN_TW;
         } else {
             return TechConstants.T_IS_TW_NON_BOX;
@@ -112,18 +111,14 @@ public class MissingSpacecraftEngine extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
                 engineTonnage = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                if(wn2.getTextContent().equalsIgnoreCase("true")) {
-                    clan = true;
-                } else {
-                    clan = false;
-                }
-            } 
+                clan = Boolean.parseBoolean(wn2.getTextContent().trim());
+            }
         }
     }
 
@@ -134,9 +129,9 @@ public class MissingSpacecraftEngine extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(3);
+        if (null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(3);
             }
         }
     }
@@ -163,7 +158,7 @@ public class MissingSpacecraftEngine extends MissingPart {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ENGINE;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ENGINE;
     }
 }

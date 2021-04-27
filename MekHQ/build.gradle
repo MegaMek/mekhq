@@ -28,6 +28,7 @@ sourceSets {
 
 configurations {
     jarbundler
+    all*.exclude group: 'xml-apis', module: 'xml-apis'
 }
 
 dependencies {
@@ -48,7 +49,6 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.4'
     implementation 'javax.vecmath:vecmath:1.5.2'
     implementation 'com.atlassian.commonmark:commonmark:0.13.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
 
     jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
@@ -175,6 +175,8 @@ task stageFiles(type: Copy) {
     include "${data}/images/universe/"
     include "${data}/scenariomodifiers/"
     include "${data}/scenariotemplates/"
+    include "${data}/stratconcontractdefinitions/"
+    include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
     include 'license.txt'

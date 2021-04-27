@@ -85,7 +85,22 @@ public class ObjectiveEffect {
         /*
          *  roll an AtB-style "bonus"
          */
-        AtBBonus
+        AtBBonus,
+        
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility remains in play.
+         */
+        FacilityRemains,
+        
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility is removed from play.
+         */
+        FacilityRemoved,
+        
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility changes ownership.
+         */
+        FacilityCaptured
     }        
     
     /**

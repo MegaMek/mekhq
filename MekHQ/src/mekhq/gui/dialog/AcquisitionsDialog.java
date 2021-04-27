@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,8 +37,8 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
@@ -499,15 +499,15 @@ public class AcquisitionsDialog extends JDialog {
                 });
                 actionButtons.add(btnOrderOne, gbcActions);
                 gbcActions.gridy++;
-
-                btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
-                btnOrderAll.setToolTipText("Order all missing");
-                btnOrderAll.setName("btnOrderAll");
-                btnOrderAll.setVisible(partCountInfo.getMissingCount() > 1);
-                btnOrderAll.addActionListener(ev -> orderAllMissing());
-                actionButtons.add(btnOrderAll, gbcActions);
-                gbcActions.gridy++;
             }
+
+            btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
+            btnOrderAll.setToolTipText("Order all missing");
+            btnOrderAll.setName("btnOrderAll");
+            btnOrderAll.setVisible(partCountInfo.isCanBeAcquired() && (partCountInfo.getMissingCount() > 1));
+            btnOrderAll.addActionListener(ev -> orderAllMissing());
+            actionButtons.add(btnOrderAll, gbcActions);
+            gbcActions.gridy++;
 
             btnDepod = new JButton("Remove One From Pod");
             btnDepod.setToolTipText("Remove replacement from pod");
@@ -535,11 +535,16 @@ public class AcquisitionsDialog extends JDialog {
                     IAcquisitionWork actualWork = targetWork;
 
                     // ammo bins have some internal logic for generating acquisition work?
-                    if (targetWork instanceof AmmoBin) {
-                        actualWork = ((AmmoBin) targetWork).getAcquisitionWork();
+                    if (actualWork instanceof AmmoBin) {
+                        actualWork = ((AmmoBin) actualWork).getAcquisitionWork();
                     }
 
-                    campaignGUI.getCampaign().addReport(actualWork.find(0));
+                    // GM find the actual number required
+                    for (int count = 0; count < partCountInfo.getRequiredCount(); count++) {
+                        campaignGUI.getCampaign().addReport(String.format("GM Acquiring %s. %s",
+                                actualWork.getAcquisitionName(), actualWork.find(0)));
+                    }
+
                     Unit unit = actualWork.getUnit();
                     if (unit != null) {
                         MekHQ.triggerEvent(new UnitChangedEvent(unit));

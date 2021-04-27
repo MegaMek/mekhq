@@ -32,10 +32,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
 
-import megamek.common.icons.Camouflage;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -55,16 +52,6 @@ import megamek.common.Tank;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
-    private static XPath XPATH_INSTANCE;
-
-    public static XPath getXPathInstance() {
-        if (XPATH_INSTANCE == null) {
-            XPathFactory xpf = XPathFactory.newInstance();
-            XPATH_INSTANCE = xpf.newXPath();
-        }
-
-        return XPATH_INSTANCE;
-    }
 
     /**
      * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
@@ -158,16 +145,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
-         if ((null != tgtEnt.getCamoCategory())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoCategory())
-                 && !tgtEnt.getCamoCategory().isEmpty()) {
-             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
+         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
+             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
          }
 
-         if ((null != tgtEnt.getCamoFileName())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoFileName())
-                 && !tgtEnt.getCamoFileName().isEmpty()) {
-             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
+         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
+             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
          }
 
          if (tgtEnt.getDeployRound() > 0) {

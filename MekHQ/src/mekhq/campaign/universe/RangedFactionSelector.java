@@ -129,6 +129,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
         LocalDate now = campaign.getLocalDate();
+        boolean isClan = campaign.getFaction().isClan();
 
         Map<Faction, Double> weights = new HashMap<>();
         Systems.getInstance().visitNearbySystems(currentSystem, range, planetarySystem -> {
@@ -145,12 +146,17 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // to affect the 'spread'.
             double delta = Math.log10(pop) / (1 + distance * distanceScale);
             for (Faction faction : planetarySystem.getFactionSet(now)) {
-                if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.INACTIVE)
-                    || faction.is(Tag.MERC)) {
+                if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
+                        || faction.is(Tag.MERC)) {
                     continue;
                 }
 
-                if (faction.is(Tag.CLAN) && !isAllowClan()) {
+                if (faction.is(Tag.INACTIVE) && !faction.isComStar()) {
+                    // Skip INACTIVE factions [excepting ComStar]
+                    continue;
+                }
+
+                if (faction.isClan() && !(isClan || isAllowClan())) {
                     continue;
                 }
 
@@ -160,12 +166,14 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         });
 
-        Faction mercenaries = Faction.getFaction("MERC");
+        Faction mercenaries = Factions.getInstance().getFaction("MERC");
         TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
-            // If we have no valid factions, we can always
-            // have mercs and the campaign's faction.
-            factions.put(1.0, mercenaries);
+            // If we have no valid factions use the campaign's faction ...
+            if (!isClan) {
+                // ... and if we're not a clan faction, we can have mercs too.
+                factions.put(1.0, mercenaries);
+            }
             factions.put(2.0, campaign.getFaction());
 
             cachedDate = now;
@@ -194,14 +202,21 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         }
 
         if (factions.isEmpty()) {
-            // If we have no valid factions, we can always
-            // have mercs and the campaign's faction.
-            factions.put(1.0, mercenaries);
+            // If we have no valid factions use the campaign's faction ...
+            if (!isClan) {
+                // ... and if we're not a clan faction, we can have mercs too.
+                factions.put(1.0, mercenaries);
+            }
             factions.put(2.0, campaign.getFaction());
         } else {
-            // There is a good chance they're a merc!
-            // The 1.0 prevents no weight calculations
-            factions.put((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
+            if (!isClan) {
+                // There is a good chance they're a merc if we're not a clan faction!
+                // The 1.0 prevents no weight calculations
+                factions.put((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
+            } else {
+                // There is a lopsided chance they're from the campaign faction if it is a clan faction.
+                factions.put((total == 0.0) ? 1.0 : total + (15 * total), campaign.getFaction());
+            }
         }
 
         cachedDate = now;
@@ -218,7 +233,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         Set<Faction> enemies = new HashSet<>();
         for (Contract contract : campaign.getActiveContracts()) {
             if (contract instanceof AtBContract) {
-                enemies.add(Faction.getFaction(((AtBContract)contract).getEnemyCode()));
+                enemies.add(Factions.getInstance().getFaction(((AtBContract)contract).getEnemyCode()));
             }
         }
         return enemies;

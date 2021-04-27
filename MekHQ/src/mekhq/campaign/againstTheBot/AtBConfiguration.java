@@ -37,6 +37,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,6 +55,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
 /**
  * @author Neoancient
@@ -291,7 +293,7 @@ public class AtBConfiguration implements Serializable {
 
     public static String getParentFactionType(String factionCode) {
         String org = AtBConfiguration.ORG_IS;
-        Faction faction = Faction.getFaction(factionCode);
+        Faction faction = Factions.getInstance().getFaction(factionCode);
 
         if (faction.isComStar()) {
             org = AtBConfiguration.ORG_CS;
@@ -352,12 +354,12 @@ public class AtBConfiguration implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Base");
         }
         TargetRoll target = new TargetRoll(shipSearchTargetBase(unitType), "Base");
-        Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         for (Person p : campaign.getAdmins()) {
-            if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
-                    p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
-                    p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
+            if (p.getPrimaryRole().isAdministratorLogistics()
+                    || p.getSecondaryRole().isAdministratorLogistics()
+                    && (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp)) {
                 adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
             }
         }

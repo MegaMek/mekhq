@@ -46,9 +46,10 @@ import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final long serialVersionUID = 6025304629282204159L;
@@ -480,7 +481,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         if ((null != event) && (null != event.faction)) {
             factionSet = new HashSet<>();
             for (String f : event.faction) {
-                factionSet.add(Faction.getFaction(f));
+                factionSet.add(Factions.getInstance().getFaction(f));
             }
         }
         factionsButton.setText(Faction.getFactionNames(factionSet, date.getYear()));

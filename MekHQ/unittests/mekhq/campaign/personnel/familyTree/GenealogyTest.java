@@ -23,11 +23,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +40,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class GenealogyTest {
@@ -58,7 +60,16 @@ public class GenealogyTest {
     private Person xi;
     private Person omicron;
     private Person pi;
+    private Person rho;
+    private Person sigma;
+    private Person tau;
 
+    @Test
+    public void testOrigin() {
+        assertEquals(alpha, alpha.getGenealogy().getOrigin());
+    }
+
+    //region Boolean Checks
     @Test
     public void testHasAnyFamily() {
         assertTrue(alpha.getGenealogy().hasAnyFamily());
@@ -69,7 +80,7 @@ public class GenealogyTest {
     @Test
     public void testHasSpouse() {
         assertTrue(xi.getGenealogy().hasSpouse());
-        assertFalse(alpha.getGenealogy().hasSpouse());
+        assertFalse(sigma.getGenealogy().hasSpouse());
     }
 
     @Test
@@ -133,17 +144,19 @@ public class GenealogyTest {
         assertFalse(nu.getGenealogy().checkMutualAncestors(eta, mockCampaign));
         assertFalse(nu.getGenealogy().checkMutualAncestors(zeta, mockCampaign));
     }
+    //endregion Boolean Checks
 
+    //region Basic Family Getters
     @Test
     public void testGetGrandparents() {
         // Testing Gamma's grandparents, which are Beta and Eta
-        List<UUID> answer = new ArrayList<>();
-        answer.add(beta.getId());
-        answer.add(eta.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(beta);
+        answer.add(eta);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> grandparents = gamma.getGenealogy().getGrandparents(mockCampaign);
-        grandparents.sort(UUID::compareTo);
+        List<Person> grandparents = gamma.getGenealogy().getGrandparents();
+        grandparents.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, grandparents);
     }
@@ -151,13 +164,13 @@ public class GenealogyTest {
     @Test
     public void testGetParents() {
         // Testing Alpha's parents, which are Beta and Eta
-        List<UUID> answer = new ArrayList<>();
-        answer.add(beta.getId());
-        answer.add(eta.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(beta);
+        answer.add(eta);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> parents = alpha.getGenealogy().getParents();
-        parents.sort(UUID::compareTo);
+        List<Person> parents = alpha.getGenealogy().getParents();
+        parents.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, parents);
     }
@@ -165,12 +178,12 @@ public class GenealogyTest {
     @Test
     public void testGetFathers() {
         // Testing Alpha's father, which is Beta
-        List<UUID> answer = new ArrayList<>();
-        answer.add(beta.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(beta);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> fathers = alpha.getGenealogy().getFathers(mockCampaign);
-        fathers.sort(UUID::compareTo);
+        List<Person> fathers = alpha.getGenealogy().getFathers();
+        fathers.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, fathers);
     }
@@ -178,12 +191,12 @@ public class GenealogyTest {
     @Test
     public void testGetMothers() {
         // Testing Alpha's mother, which is Eta
-        List<UUID> answer = new ArrayList<>();
-        answer.add(eta.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(eta);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> mothers = alpha.getGenealogy().getMothers(mockCampaign);
-        mothers.sort(UUID::compareTo);
+        List<Person> mothers = alpha.getGenealogy().getMothers();
+        mothers.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, mothers);
     }
@@ -191,12 +204,12 @@ public class GenealogyTest {
     @Test
     public void testGetSiblings() {
         // Testing Omicron's siblings, which is just Nu
-        List<UUID> answer = new ArrayList<>();
-        answer.add(nu.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(nu);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> siblings = omicron.getGenealogy().getSiblings(mockCampaign);
-        siblings.sort(UUID::compareTo);
+        List<Person> siblings = omicron.getGenealogy().getSiblings();
+        siblings.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, siblings);
     }
@@ -204,13 +217,13 @@ public class GenealogyTest {
     @Test
     public void testGetSiblingsAndSpouses() {
         // Testing Omicron's siblings and their spouses, which is just Nu and Nu's spouse Xi
-        List<UUID> answer = new ArrayList<>();
-        answer.add(nu.getId());
-        answer.add(xi.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(nu);
+        answer.add(xi);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> siblings = omicron.getGenealogy().getSiblingsAndSpouses(mockCampaign);
-        siblings.sort(UUID::compareTo);
+        List<Person> siblings = omicron.getGenealogy().getSiblingsAndSpouses();
+        siblings.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, siblings);
     }
@@ -218,13 +231,13 @@ public class GenealogyTest {
     @Test
     public void testGetChildren() {
         // Testing Alpha's children, which are Gamma and Iota
-        List<UUID> answer = new ArrayList<>();
-        answer.add(gamma.getId());
-        answer.add(iota.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(gamma);
+        answer.add(iota);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> children = alpha.getGenealogy().getChildren();
-        children.sort(UUID::compareTo);
+        List<Person> children = alpha.getGenealogy().getChildren();
+        children.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, children);
     }
@@ -232,13 +245,13 @@ public class GenealogyTest {
     @Test
     public void testGetGrandchildren() {
         // Testing Beta's grandchildren, which are Gamma and Iota
-        List<UUID> answer = new ArrayList<>();
-        answer.add(gamma.getId());
-        answer.add(iota.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(gamma);
+        answer.add(iota);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> grandchildren = beta.getGenealogy().getGrandchildren(mockCampaign);
-        grandchildren.sort(UUID::compareTo);
+        List<Person> grandchildren = beta.getGenealogy().getGrandchildren();
+        grandchildren.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, grandchildren);
     }
@@ -246,13 +259,13 @@ public class GenealogyTest {
     @Test
     public void testGetAuntsAndUncles() {
         // Testing Delta's Aunts and Uncles, which are Iota and Pi
-        List<UUID> answer = new ArrayList<>();
-        answer.add(iota.getId());
-        answer.add(pi.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(iota);
+        answer.add(pi);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> auntsAndUncles = delta.getGenealogy().getsAuntsAndUncles(mockCampaign);
-        auntsAndUncles.sort(UUID::compareTo);
+        List<Person> auntsAndUncles = delta.getGenealogy().getsAuntsAndUncles();
+        auntsAndUncles.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, auntsAndUncles);
     }
@@ -260,38 +273,42 @@ public class GenealogyTest {
     @Test
     public void testGetCousins() {
         // Testing Kappa's cousins, which are Gamma and Iota
-        List<UUID> answer = new ArrayList<>();
-        answer.add(gamma.getId());
-        answer.add(iota.getId());
-        answer.sort(UUID::compareTo);
+        List<Person> answer = new ArrayList<>();
+        answer.add(gamma);
+        answer.add(iota);
+        answer.sort(Comparator.comparing(Person::getId));
 
-        List<UUID> cousins = kappa.getGenealogy().getCousins(mockCampaign);
-        cousins.sort(UUID::compareTo);
+        List<Person> cousins = kappa.getGenealogy().getCousins();
+        cousins.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, cousins);
     }
+    //endregion Basic Family Getters
 
     @Before
     public void createFamilyTree() {
         mockCampaign = mock(Campaign.class);
 
         // Create a bunch of people
-        alpha = spy(new Person("Alpha", "Alpha", mockCampaign, "MERC"));
-        beta = spy(new Person("Beta", "Beta", mockCampaign, "MERC"));
-        gamma = spy(new Person("Gamma", "Gamma", mockCampaign, "MERC"));
-        delta = spy(new Person("Delta", "Delta", mockCampaign, "MERC"));
-        epsilon = spy(new Person("Epsilon", "Epsilon", mockCampaign, "MERC"));
-        zeta = spy(new Person("Zeta", "Zeta", mockCampaign, "MERC"));
-        eta = spy(new Person("Eta", "Eta", mockCampaign, "MERC"));
-        theta = spy(new Person("Theta", "Theta", mockCampaign, "MERC"));
-        iota = spy(new Person("Iota", "Iota", mockCampaign, "MERC"));
-        kappa = spy(new Person("Kappa", "Kappa", mockCampaign, "MERC"));
-        lambda = spy(new Person("Lambda", "Lambda", mockCampaign, "MERC"));
-        mu = spy(new Person("Mu", "Mu", mockCampaign, "MERC"));
-        nu = spy(new Person("Nu", "Nu", mockCampaign, "MERC"));
-        xi = spy(new Person("Xi", "Xi", mockCampaign, "MERC"));
-        omicron = spy(new Person("Omicron", "Omicron", mockCampaign, "MERC"));
-        pi = spy(new Person("Pi", "Pi", mockCampaign, "MERC"));
+        alpha = new Person("Alpha", "Alpha", mockCampaign, "MERC");
+        beta = new Person("Beta", "Beta", mockCampaign, "MERC");
+        gamma = new Person("Gamma", "Gamma", mockCampaign, "MERC");
+        delta = new Person("Delta", "Delta", mockCampaign, "MERC");
+        epsilon = new Person("Epsilon", "Epsilon", mockCampaign, "MERC");
+        zeta = new Person("Zeta", "Zeta", mockCampaign, "MERC");
+        eta = new Person("Eta", "Eta", mockCampaign, "MERC");
+        theta = new Person("Theta", "Theta", mockCampaign, "MERC");
+        iota = new Person("Iota", "Iota", mockCampaign, "MERC");
+        kappa = new Person("Kappa", "Kappa", mockCampaign, "MERC");
+        lambda = new Person("Lambda", "Lambda", mockCampaign, "MERC");
+        mu = new Person("Mu", "Mu", mockCampaign, "MERC");
+        nu = new Person("Nu", "Nu", mockCampaign, "MERC");
+        xi = new Person("Xi", "Xi", mockCampaign, "MERC");
+        omicron = new Person("Omicron", "Omicron", mockCampaign, "MERC");
+        pi = new Person("Pi", "Pi", mockCampaign, "MERC");
+        rho = new Person("Rho", "Rho", mockCampaign, "MERC");
+        sigma = new Person("Sigma", "Sigma", mockCampaign, "MERC");
+        tau = new Person("Tau", "Tau", mockCampaign, "MERC");
 
         // Setup the getPerson methods
         given(mockCampaign.getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
@@ -310,10 +327,17 @@ public class GenealogyTest {
         given(mockCampaign.getPerson(argThat(matchPersonUUID(xi.getId())))).willReturn(xi);
         given(mockCampaign.getPerson(argThat(matchPersonUUID(omicron.getId())))).willReturn(omicron);
         given(mockCampaign.getPerson(argThat(matchPersonUUID(pi.getId())))).willReturn(pi);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(rho.getId())))).willReturn(rho);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(sigma.getId())))).willReturn(sigma);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(tau.getId())))).willReturn(tau);
 
         // Setup Gender (where needed)
+        alpha.setGender(Gender.FEMALE);
         beta.setGender(Gender.MALE);
         eta.setGender(Gender.FEMALE);
+        rho.setGender(Gender.MALE);
+        sigma.setGender(Gender.FEMALE);
+        tau.setGender(Gender.MALE);
 
         // Create Family Tree:
         // Beta, Eta and Epsilon are the topmost nodes
@@ -322,47 +346,61 @@ public class GenealogyTest {
         // Delta is the child of Gamma
         // Mu is the child of Delta
         // Nu and Omicron are the children of Mu
-        // Xi is married to Nu, Pi is married to Iota
+        // Xi is married to Nu, Pi is married to Iota, Alpha is married to Rho
+        // Alpha was married to Sigma and Tau
         // Lambda is not related to anyone
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, beta.getId());
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta.getId());
-        beta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha.getId());
-        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha.getId());
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, beta);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        beta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
 
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta.getId());
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon.getId());
-        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta.getId());
-        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta.getId());
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
 
-        theta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon.getId());
-        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, theta.getId());
+        theta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, theta);
 
-        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha.getId());
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, gamma.getId());
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, gamma);
 
-        iota.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha.getId());
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, iota.getId());
+        iota.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, iota);
 
-        kappa.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, zeta.getId());
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, kappa.getId());
+        kappa.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, zeta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, kappa);
 
-        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, gamma.getId());
-        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, delta.getId());
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, gamma);
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, delta);
 
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, delta.getId());
-        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mu.getId());
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, delta);
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mu);
 
-        nu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu.getId());
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, nu.getId());
+        nu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, nu);
 
-        omicron.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu.getId());
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, omicron.getId());
+        omicron.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, omicron);
 
-        xi.getGenealogy().setSpouse(nu.getId());
-        nu.getGenealogy().setSpouse(xi.getId());
+        alpha.getGenealogy().setSpouse(rho);
+        rho.getGenealogy().setSpouse(alpha);
 
-        pi.getGenealogy().setSpouse(iota.getId());
-        iota.getGenealogy().setSpouse(pi.getId());
+        xi.getGenealogy().setSpouse(nu);
+        nu.getGenealogy().setSpouse(xi);
+
+        pi.getGenealogy().setSpouse(iota);
+        iota.getGenealogy().setSpouse(pi);
+
+        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(sigma,
+                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+        sigma.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
+                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+
+        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(tau,
+                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+        tau.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
+                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
     }
 
     private ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {

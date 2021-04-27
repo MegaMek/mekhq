@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,7 +27,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -475,9 +475,9 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean areAllInfantry(Person... people) {
+    public static boolean areAllInfantrySoldiers(Person... people) {
         for (Person person : people) {
-            if (Person.T_INFANTRY != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isSoldier()) {
                 return false;
             }
         }
@@ -486,16 +486,16 @@ public class StaticChecks {
 
     public static boolean areAllBattleArmor(Person... people) {
         for (Person person : people) {
-            if (Person.T_BA != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isBattleArmour()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVeeGunners(Person... people) {
+    public static boolean areAllVehicleGunners(Person... people) {
         for (Person person : people) {
-            if (Person.T_VEE_GUNNER != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isVehicleGunner()) {
                 return false;
             }
         }
@@ -504,7 +504,7 @@ public class StaticChecks {
 
     public static boolean areAllVesselGunners(Person... people) {
         for (Person person : people) {
-            if (Person.T_SPACE_GUNNER != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isVesselGunner()) {
                 return false;
             }
         }
@@ -513,8 +513,7 @@ public class StaticChecks {
 
     public static boolean areAllVesselCrew(Person... people) {
         for (Person person : people) {
-            if ((Person.T_SPACE_CREW != person.getPrimaryRole())
-                    && (Person.T_VEHICLE_CREW != person.getPrimaryRole())) {
+            if (!person.getPrimaryRole().isVehicleCrew() && !person.getPrimaryRole().isVesselCrew()) {
                 return false;
             }
         }
@@ -523,7 +522,7 @@ public class StaticChecks {
 
     public static boolean areAllVesselPilots(Person... people) {
         for (Person person : people) {
-            if (Person.T_SPACE_PILOT != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isVesselPilot()) {
                 return false;
             }
         }
@@ -532,7 +531,7 @@ public class StaticChecks {
 
     public static boolean areAllVesselNavigators(Person... people) {
         for (Person person : people) {
-            if (Person.T_NAVIGATOR != person.getPrimaryRole()) {
+            if (!person.getPrimaryRole().isVesselNavigator()) {
                 return false;
             }
         }
@@ -562,10 +561,10 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
-        int profession = people[0].getProfession();
+        int profession = people[0].getPrimaryRole().getProfession();
         for (Person person : people) {
             if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                    || (person.getProfession() != profession)) {
+                    || (person.getPrimaryRole().getProfession() != profession)) {
                 return false;
             }
         }

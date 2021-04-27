@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -21,15 +21,19 @@
  */
 package mekhq.campaign.unit;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -37,6 +41,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -87,7 +92,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int site;
     private boolean salvaged;
     private UUID id;
-    private int oldId;
     private String fluffName;
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -153,8 +157,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Unit(Entity en, Campaign c) {
         this.entity = en;
         if (entity != null) {
-            entity.setCamoCategory(null);
-            entity.setCamoFileName(null);
+            entity.setCamouflage(new Camouflage());
         }
         this.site = SITE_BAY;
         this.campaign = c;
@@ -261,7 +264,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //one gets some of the same things set
         if (null != this.entity) {
             en.setId(this.entity.getId());
-            en.duplicateMarker = this.entity.duplicateMarker;
+            en.setDuplicateMarker(this.entity.getDuplicateMarker());
+            en.generateShortName();
+            en.generateDisplayName();
         }
         this.entity = en;
     }
@@ -1870,11 +1875,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-            retVal.oldId = Integer.parseInt(idNode.getTextContent());
-        } else {
-            retVal.id = UUID.fromString(idNode.getTextContent());
-        }
+
+        retVal.id = UUID.fromString(idNode.getTextContent());
 
         //Temp storage for used bay capacities
         boolean needsBayInitialization = true;
@@ -2284,13 +2286,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof BattleArmorSuit) {
-                if (((BattleArmorSuit) part).getTrooper() < locations.length) {
+                if ((entity instanceof BattleArmor)
+                        && ((BattleArmorSuit) part).getTrooper() < locations.length) {
                     locations[((BattleArmorSuit) part).getTrooper()] = part;
                 } else {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof MissingBattleArmorSuit) {
-                if (((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
+                if ((entity instanceof BattleArmor)
+                        && ((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
                     locations[((MissingBattleArmorSuit) part).getTrooper()] = part;
                 } else {
                     partsToRemove.add(part);
@@ -2324,19 +2328,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if (part instanceof MissingJumpJet) {
                 jumpJets.put(((MissingJumpJet)part).getEquipmentNum(), part);
             }  else if (part instanceof BattleArmorEquipmentPart) {
-                Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart)part).getEquipmentNum());
-                if (null == parts) {
-                    parts = new Part[((BattleArmor)entity).getSquadSize()];
+                if (!(entity instanceof BattleArmor)) {
+                    partsToRemove.add(part);
+                } else {
+                    Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart) part).getEquipmentNum());
+                    if (null == parts) {
+                        parts = new Part[((BattleArmor) entity).getSquadSize()];
+                    }
+                    parts[((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    baEquipParts.put(((BattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
-                parts[((BattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
-                baEquipParts.put(((BattleArmorEquipmentPart)part).getEquipmentNum(), parts);
             } else if (part instanceof MissingBattleArmorEquipmentPart) {
-                Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart)part).getEquipmentNum());
-                if (null == parts) {
-                    parts = new Part[((BattleArmor)entity).getSquadSize()];
+                if (!(entity instanceof BattleArmor)) {
+                    partsToRemove.add(part);
+                } else {
+                    Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart) part).getEquipmentNum());
+                    if (null == parts) {
+                        parts = new Part[((BattleArmor) entity).getSquadSize()];
+                    }
+                    parts[((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    baEquipParts.put(((MissingBattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
-                parts[((MissingBattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
-                baEquipParts.put(((MissingBattleArmorEquipmentPart)part).getEquipmentNum(), parts);
             } else if (part instanceof EquipmentPart) {
                 equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
             } else if (part instanceof MissingEquipmentPart) {
@@ -3134,7 +3146,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 jj--;
             }
         }
-        if (entity.isConventionalInfantry()) {
+
+        if (isConventionalInfantry()) {
             if ((null == motiveType) && (entity.getMovementMode() != EntityMovementMode.INF_LEG)) {
                 int number = entity.getOInternal(Infantry.LOC_INFANTRY);
                 if (((Infantry) entity).isMechanized()) {
@@ -3226,81 +3239,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-    /**
-     * Checks for additional ammo bins and adds the appropriate part.
-     *
-     * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type
-     * of one or more tons of ammo can require the addition of an ammo bin and can change the ammo bin
-     * capacity.
-     */
-    public void adjustLargeCraftAmmo() {
-        Map<Integer,Part> ammoParts = new HashMap<>();
-        List<Part> toAdd = new ArrayList<>();
-        for (Part p : parts) {
-            if (p instanceof LargeCraftAmmoBin) {
-                ammoParts.put(((LargeCraftAmmoBin) p).getEquipmentNum(), p);
-            }
-        }
-        for (Mounted m : entity.getAmmo()) {
-            assert(m.getType() instanceof AmmoType);
-
-            int eqNum = entity.getEquipmentNum(m);
-            Part part = ammoParts.get(eqNum);
-            if (null == part) {
-                part = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqNum,
-                        m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), getCampaign());
-                ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
-                toAdd.add(part);
-            } else {
-                part.updateConditionFromEntity(false);
-                // Reset the name
-                ((LargeCraftAmmoBin) part).changeMunition((AmmoType) m.getType());
-            }
-        }
-        for (Part p : toAdd) {
-            addPart(p);
-            getCampaign().getQuartermaster().addPart(p, 0);
-        }
-    }
-
-    /**
-     * Adds a new zero-capacity ammo bin to the bay as part of an ammo swap. If the bay has a zeroed-out
-     * bin, sets the ammo type on that one and returns it instead of creating a new one.
-     *
-     * @param etype The type of ammo being changed to
-     * @param bay   The weapon bay where the ammo is located
-     * @return      The new ammo bin part
-     */
-    public LargeCraftAmmoBin addBayAmmoBin(AmmoType etype, Mounted bay) {
-        for (Part p : getParts()) {
-            if (p instanceof LargeCraftAmmoBin) {
-                final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
-                if ((bin.getCapacity() == 0) && (bin.getBay() == bay)) {
-                    bin.changeMunition(etype);
-                    bin.updateConditionFromPart();
-                    return bin;
-                }
-            }
-        }
-        try {
-            Mounted m = entity.addEquipment(etype, bay.getLocation(), bay.isRearMounted(), 0);
-            int anum = entity.getEquipmentNum(m);
-            bay.addAmmoToBay(anum);
-            LargeCraftAmmoBin bin = new LargeCraftAmmoBin((int) entity.getWeight(), etype, anum,
-                    0, 0, getCampaign());
-            addPart(bin);
-            getCampaign().getQuartermaster().addPart(bin, 0);
-            return bin;
-        } catch (LocationFullException ex) {
-            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName());
-            MekHQ.getLogger().error(Unit.class, ex);
-            return null;
-        }
-
-    }
-
     public List<Part> getParts() {
         return parts;
+    }
+
+    /**
+     * Find a part on a unit.
+     * @param predicate A predicate to apply to each part on the unit.
+     * @return The first part which matched the predicate, otherwise null.
+     */
+    public @Nullable Part findPart(Predicate<Part> predicate) {
+        for (Part part : parts) {
+            if (predicate.test(part)) {
+                return part;
+            }
+        }
+
+        return null;
     }
 
     public void setParts(ArrayList<Part> newParts) {
@@ -3325,42 +3280,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
-    public AbstractIcon getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+    public Camouflage getCamouflage() {
+        return (entity == null) ? new Camouflage() : entity.getCamouflage();
     }
 
-    public String getCamoCategory() {
-        if (null == entity) {
-            return "";
+    public Camouflage getUtilizedCamouflage(final Campaign campaign) {
+        if (getCamouflage().hasDefaultCategory()) {
+            final Force force = campaign.getForce(getForceId());
+            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage())
+                    : campaign.getCamouflage();
+        } else {
+            return getCamouflage();
         }
-
-        String category = getCampaign().getCamoCategory();
-        if (isEntityCamo()) {
-            category = entity.getCamoCategory();
-        }
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        return category;
     }
 
-    public String getCamoFileName() {
-        if (null == getCampaign() || null == entity) {
-            return "";
+    public Image getImage(Component component) {
+        if (MHQStaticDirectoryManager.getMechTileset() == null) {
+            return null;
         }
-
-        String fileName = getCampaign().getCamoFileName();
-        if (isEntityCamo()) {
-            fileName = entity.getCamoFileName();
-        }
-
-        if (null == fileName) {
-            fileName = "";
-        }
-
-        return fileName;
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
+                component, getEntity()).loadPreviewImage();
     }
 
     /**
@@ -3948,7 +3888,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
-                engineer.setPrimaryRole(Person.T_MECHANIC);
+                engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
                 engineer.setRankNumeric(getCommander().getRankNumeric());
                 //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
@@ -4013,7 +3953,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRole(Person.T_SPACE_CREW);
+                    engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
                         engineer.setRankNumeric(bestRank);
                     }
@@ -4719,10 +4659,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return engineer;
     }
 
-    public int getOldId() {
-        return oldId;
-    }
-
     public Part getPartForEquipmentNum(int index, int loc) {
         for (Part p : parts) {
             if (p.isPartForEquipmentNum(index, loc)) {
@@ -4730,15 +4666,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return null;
-    }
-
-    public boolean isEntityCamo() {
-        return (entity != null) && ((entity.getCamoCategory() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
-                && !entity.getCamoCategory().isEmpty())
-                && ((entity.getCamoFileName() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
-                && !entity.getCamoFileName().isEmpty());
     }
 
     public int getAvailability(int era) {
@@ -4933,8 +4860,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
-                || getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)
+                || isConventionalInfantry();
     }
 
     public boolean isUnderRepair() {
@@ -4963,8 +4890,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return en.getDamageLevel(false);
     }
 
-    public void resetParts() {
-        parts = new ArrayList<>();
+    /**
+     * Removes all of the parts from a unit.
+     *
+     * NOTE: this puts the unit in an inconsistent state, and
+     *       the unit should not be used until its parts have
+     *       been re-assigned.
+     *
+     */
+    public void removeParts() {
+        for (Part part : parts) {
+            part.setUnit(null);
+
+            if (campaign != null) {
+                campaign.getWarehouse().removePart(part);
+            }
+        }
+
+        parts.clear();
     }
 
     /**
@@ -4986,7 +4929,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * This requires the suit to not be destroyed and to have not missing equipment parts
      */
     public boolean isBattleArmorSuitOperable(int trooper) {
-        if (null == getEntity() || !(getEntity() instanceof BattleArmor)) {
+        if (!(getEntity() instanceof BattleArmor)) {
             return false;
         }
         if (getEntity().getInternal(trooper) < 0) {
@@ -5001,6 +4944,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return true;
     }
 
+    /**
+     * @return true if the unit is conventional infantry, otherwise false
+     */
+    public boolean isConventionalInfantry() {
+        return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
     public boolean isIntroducedBy(int year) {
         return null != entity && entity.getYear() <= year;
     }
@@ -5011,6 +4961,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return false;
     }
 
+    @Override
     public String toString() {
         String entName = "None";
         if (getEntity() != null) {

@@ -54,7 +54,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
 import megamek.common.util.ImageUtil;
@@ -565,38 +564,6 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Get an image for a unit. Camo will be applied to this image if relevant.
-     * @param u a <code>Unit</code>
-     * @return a <code>BufferedImage</code?
-     */
-    private BufferedImage getEntityImage(Unit u) {
-        Image img;
-        img = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        if (img == null) {
-            return null;
-        }
-        int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
-        EntityImage entityImage = new EntityImage(img, tint, getCamo(), this, u.getEntity());
-        img = entityImage.loadPreviewImage();
-        return Utilities.toBufferedImage(img);
-    }
-
-    /**
-     * Get the camo image for the campaign if it exists
-     * @return An <code>Image</code> of the camo
-     */
-    private Image getCamo() {
-        Image camo = null;
-        try {
-            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
-                    .getItem(campaign.getCamoCategory(), campaign.getCamoFileName());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-        return camo;
-    }
-
-    /**
      * Draw and image with the given rotation
      * @param g - the <code>Graphics2D</code> device to draw on
      * @param image - a <code>BufferedImage</code> to be drawn
@@ -701,13 +668,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         dropship = getBestDropship();
         imgDropshipFleet = imgDefaultDropshipFleet;
         if (null != dropship) {
-            imgDropshipFleet = getEntityImage(dropship);
+            imgDropshipFleet = Utilities.toBufferedImage(dropship.getImage(this));
         }
 
         jumpship = getBestJumpship();
         imgJumpshipFleet = imgDefaultJumpshipFleet;
         if (null != jumpship) {
-            imgJumpshipFleet = getEntityImage(jumpship);
+            imgJumpshipFleet = Utilities.toBufferedImage(jumpship.getImage(this));
         }
     }
 

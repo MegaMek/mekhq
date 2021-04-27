@@ -28,8 +28,8 @@ import javax.swing.border.EmptyBorder;
 
 import mekhq.MekHQ;
 import mekhq.campaign.report.Report;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Jay Lawson

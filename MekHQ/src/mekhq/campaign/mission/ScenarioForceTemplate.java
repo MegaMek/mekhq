@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.Board;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
@@ -76,15 +77,42 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // this is used to indicate that a "fixed" size unit should deploy as a lance
     public static final int FIXED_UNIT_SIZE_LANCE = -1;
 
+    public static final String PRIMARY_FORCE_TEMPLATE_ID = "Player";
     public static final String REINFORCEMENT_TEMPLATE_ID = "Reinforcements";
 
+    /**
+     * Which side a particular force will fight for
+     */
     public enum ForceAlignment {
+        /**
+         * On this player's side, controlled by the player
+         */
         Player,
+        
+        /**
+         * Allied, bot-controlled
+         */
         Allied,
+        
+        /**
+         * Opposing, bot-controlled
+         */
         Opposing,
+        
+        /**
+         * Hostile to both allied and opposing, bot-controlled
+         */
         Third,
+        
+        /**
+         * Dynamically either allied, opposing or third, depending on who owns the current planet
+         */
         PlanetOwner;
 
+        /**
+         * Get a force alignment value given an int
+         */
+        @Nullable
         public static ForceAlignment getForceAlignment(int ordinal) {
             for (ForceAlignment fe : values()) {
                 if (fe.ordinal() == ordinal) {
@@ -95,19 +123,63 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         }
     }
 
+    /**
+     * What kind of mechanism to use to generate the force
+     */
     public enum ForceGenerationMethod {
+        /**
+         * Assigned by player from TO&E
+         */
         PlayerSupplied,
+        
+        /**
+         * Scale using BV, based on the BV value of already generated units flagged as contributing towards BV
+         */
         BVScaled,
+        
+        /*
+         * Scale on the unit count, based on number of already generated units flagged as contributing towards unit count
+         */
         UnitCountScaled,
+        
+        /**
+         * What it says on the tin
+         */
         FixedUnitCount,
+        
+        /**
+         * Either assigned by player from TO&E or a minimum fixed number of units; TODO: currently unimplemented
+         */
         PlayerOrFixedUnitCount
     }
 
+    /**
+     * How to determine deployment edge of this force based on deployment edge of a designated force
+     */
     public enum SynchronizedDeploymentType {
+        /**
+         * Don't
+         */
         None,
+        
+        /**
+         * Same edge as the designated force
+         */
         SameEdge,
+        
+        /**
+         * Same or adjacent edge as the designated force (e.g. E = E, NE, SE)
+         */
         SameArc,
+        
+        /**
+         * Opposite edge from the designated force (ANY = ANY, CTR = EDGE, EDGE = CTR)
+         */
         OppositeEdge,
+        
+        /**
+         * Oppositee or adjacent edge as the designated force (e.g. W = E, NE, SE)
+         */
         OppositeArc
     }
 
@@ -279,6 +351,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     private List<String> objectiveLinkedForces;
 
+    @Override
+    public ScenarioForceTemplate clone() {
+        return new ScenarioForceTemplate(this);
+    }
+    
     /**
      * Blank constructor for deserialization purposes.
      */
@@ -287,6 +364,9 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         objectiveLinkedForces = new ArrayList<>();
     }
 
+    /**
+     * Constructor given a set of individual parameters, useful for populating from individual UI elements
+     */
     public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier, List<Integer> deploymentZones,
             int destinationZone, int retreatThreshold, int allowedUnitType) {
         this.forceAlignment = forceAlignment;
@@ -297,6 +377,47 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.allowedUnitType = allowedUnitType;
         this.deploymentZones = deploymentZones == null ? new ArrayList<>() : new ArrayList<>(deploymentZones);
         this.objectiveLinkedForces = new ArrayList<>();
+    }
+    
+    /**
+     * Copy constructor
+     */
+    public ScenarioForceTemplate(ScenarioForceTemplate forceDefinition) {
+        forceAlignment = forceDefinition.forceAlignment;
+        generationMethod = forceDefinition.generationMethod;
+        forceMultiplier = forceDefinition.forceMultiplier;
+        deploymentZones = new ArrayList<>();
+        
+        for (int zone : forceDefinition.deploymentZones) {
+            deploymentZones.add(zone);
+        }
+        
+        destinationZone = forceDefinition.destinationZone;
+        retreatThreshold = forceDefinition.retreatThreshold;
+        allowedUnitType = forceDefinition.allowedUnitType;
+        canReinforceLinked = forceDefinition.canReinforceLinked;
+        contributesToBV = forceDefinition.contributesToBV;
+        contributesToUnitCount = forceDefinition.contributesToUnitCount;
+        forceName = forceDefinition.forceName;
+        syncedForceName = forceDefinition.syncedForceName;
+        syncDeploymentType = forceDefinition.syncDeploymentType;
+        syncRetreatThreshold = forceDefinition.syncRetreatThreshold;
+        arrivalTurn = forceDefinition.arrivalTurn;
+        maxWeightClass = forceDefinition.maxWeightClass;
+        minWeightClass = forceDefinition.minWeightClass;
+        contributesToMapSize = forceDefinition.contributesToMapSize;
+        actualDeploymentZone =  forceDefinition.actualDeploymentZone;
+        fixedUnitCount = forceDefinition.fixedUnitCount;
+        generationOrder = forceDefinition.generationOrder;
+        allowAeroBombs = forceDefinition.allowAeroBombs;
+        startingAltitude = forceDefinition.startingAltitude;
+        useArtillery = forceDefinition.useArtillery;
+        deployOffBoard = forceDefinition.deployOffBoard;
+        objectiveLinkedForces = new ArrayList<String>();
+        
+        for (String force : forceDefinition.objectiveLinkedForces) {
+            objectiveLinkedForces.add(force);
+        }
     }
 
     public int getForceAlignment() {
@@ -602,5 +723,10 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         rft.setSyncDeploymentType(SynchronizedDeploymentType.None);
 
         return rft;
+    }
+    
+    @Override
+    public String toString() {
+        return getForceName();
     }
 }
