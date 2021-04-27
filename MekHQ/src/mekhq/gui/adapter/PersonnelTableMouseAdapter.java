@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 
@@ -494,21 +495,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                for (Person person : people) {
-                    if (person.canProcreate(gui.getCampaign())) {
-                        person.addPregnancy(gui.getCampaign());
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    }
-                }
+                Stream.of(people).filter(p -> p.canProcreate(gui.getCampaign())).forEach(p -> {
+                    p.addPregnancy(gui.getCampaign());
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                for (Person person : people) {
-                    if (person.isPregnant()) {
-                        person.removePregnancy();
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    }
-                }
+                Stream.of(people).filter(Person::isPregnant).forEach(p -> {
+                    p.removePregnancy();
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
@@ -2666,14 +2663,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.anyCanBePregnant(gui.getCampaign(), selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
+                menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                 menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
 
             if (StaticChecks.anyPregnant(selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
+                menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
                 menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
