@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,17 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ReportEvent;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.DailyReportLogPanel;
+import mekhq.gui.baseComponents.AbstractMHQDialog;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,130 +37,249 @@ import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
-import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.event.ReportEvent;
-import mekhq.gui.CampaignGUI;
-import mekhq.gui.DailyReportLogPanel;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-
-/**
- * @author Dylan Myers <ralgith@gmail.com>
- */
-public class AdvanceDaysDialog extends JDialog implements ActionListener {
-    private static final long serialVersionUID = 1L;
+public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListener {
+    //region Variable Declarations
+    private final CampaignGUI gui;
+    private AtomicBoolean running;
+    private LocalDate tomorrow;
+    private LocalDate nextMonday;
+    private LocalDate nextMonth;
+    private LocalDate nextYear;
+    private LocalDate nextDecade;
 
     private JSpinner spnDays;
-    private JButton btnStart;
-    private JButton btnNextWeek;
-    private JButton btnNextMonth;
-    private JButton btnNextYear;
-    private DailyReportLogPanel logPanel;
-    private CampaignGUI gui;
+    private JButton btnStartAdvancement;
+    private JButton btnNewDay;
+    private JButton btnNewWeek;
+    private JButton btnNewMonth;
+    private JButton btnNewYear;
+    private JButton btnNewDecade;
+    private DailyReportLogPanel dailyLogPanel;
+    //endregion Variable Declarations
 
-    public AdvanceDaysDialog(Frame owner, CampaignGUI gui) {
-        super(owner, true);
+    //region Constructors
+    public AdvanceDaysDialog(final JFrame frame, final CampaignGUI gui) {
+        super(frame, "AdvanceDaysDialog", "AdvanceDaysDialog.title");
         this.gui = gui;
-        setName("formADD"); // NOI18N
-        getContentPane().setLayout(new GridBagLayout());
-        initComponents();
-        this.setPreferredSize(new Dimension(500,500));
-        setLocationRelativeTo(owner);
-        setUserPreferences();
+        initialize();
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public CampaignGUI getGUI() {
+        return gui;
     }
 
-    public void initComponents() {
-        setLayout(new BorderLayout());
+    public AtomicBoolean getRunning() {
+        return running;
+    }
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
+    public void setRunning(final AtomicBoolean running) {
+        this.running = running;
+    }
 
-        this.setTitle(resourceMap.getString("dlgTitle.text"));
-        JPanel pnlNumDays = new JPanel();
+    public JSpinner getSpnDays() {
+        return spnDays;
+    }
 
-        // Maxing out at 10 years for dev testing reasons
-        spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 3650, 1));
-        ((JSpinner.DefaultEditor) spnDays.getEditor()).getTextField().setEditable(true);
-        pnlNumDays.add(spnDays);
+    public void setSpnDays(final JSpinner spnDays) {
+        this.spnDays = spnDays;
+    }
 
-        JLabel lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
-        pnlNumDays.add(lblDays);
+    public JButton getBtnStartAdvancement() {
+        return btnStartAdvancement;
+    }
 
-        btnStart = new JButton(resourceMap.getString("dlgStartAdvancement.text"));
-        btnStart.addActionListener(this);
-        pnlNumDays.add(btnStart);
+    public void setBtnStartAdvancement(JButton btnStartAdvancement) {
+        this.btnStartAdvancement = btnStartAdvancement;
+    }
 
-        btnNextWeek = new JButton(resourceMap.getString("dlgAdvanceNextWeek.text"));
-        btnNextWeek.addActionListener(this);
-        pnlNumDays.add(btnNextWeek);
+    public JButton getBtnNewDay() {
+        return btnNewDay;
+    }
 
-        btnNextMonth = new JButton(resourceMap.getString("dlgAdvanceNextMonth.text"));
-        btnNextMonth.addActionListener(this);
-        pnlNumDays.add(btnNextMonth);
+    public void setBtnNewDay(final JButton btnNewDay) {
+        this.btnNewDay = btnNewDay;
+    }
 
-        btnNextYear = new JButton(resourceMap.getString("dlgAdvanceNextYear.text"));
-        btnNextYear.addActionListener(this);
-        pnlNumDays.add(btnNextYear);
+    public JButton getBtnNewWeek() {
+        return btnNewWeek;
+    }
 
-        getContentPane().add(pnlNumDays, BorderLayout.NORTH);
+    public void setBtnNewWeek(final JButton btnNewWeek) {
+        this.btnNewWeek = btnNewWeek;
+    }
 
-        logPanel = new DailyReportLogPanel(gui);
-        getContentPane().add(logPanel, BorderLayout.CENTER);
+    public JButton getBtnNewMonth() {
+        return btnNewMonth;
+    }
 
+    public void setBtnNewMonth(final JButton btnNewMonth) {
+        this.btnNewMonth = btnNewMonth;
+    }
+
+    public JButton getBtnNewYear() {
+        return btnNewYear;
+    }
+
+    public void setBtnNewYear(final JButton btnNewYear) {
+        this.btnNewYear = btnNewYear;
+    }
+
+    public JButton getBtnNewDecade() {
+        return btnNewDecade;
+    }
+
+    public void setBtnNewDecade(final JButton btnNewDecade) {
+        this.btnNewDecade = btnNewDecade;
+    }
+
+    public DailyReportLogPanel getDailyLogPanel() {
+        return dailyLogPanel;
+    }
+
+    public void setDailyLogPanel(final DailyReportLogPanel dailyLogPanel) {
+        this.dailyLogPanel = dailyLogPanel;
+    }
+    //endregion Getters/Setters
+
+    //region Initialization
+    @Override
+    protected Container createCenterPane() {
+        // Create Panel Components
+        // Maxing out at 100 years for dev testing reasons, which is cancellable by pressing escape
+        setSpnDays(new JSpinner(new SpinnerNumberModel(7, 1, 36525, 1)));
+        getSpnDays().setName("spnDays");
+
+        final JLabel lblDays = new JLabel(resources.getString("lblDays.text"));
+        lblDays.setName("lblDays");
+        lblDays.setLabelFor(getSpnDays());
+
+        setBtnStartAdvancement(new MMButton("btnStartAdvancement", resources.getString("btnStartAdvancement.text"),
+                String.format(resources.getString("btnStartAdvancement.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setBtnNewDay(new MMButton("btnNewDay", resources.getString("btnNewDay.text"),
+                String.format(resources.getString("advanceToDay.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setBtnNewWeek(new MMButton("btnNewWeek", resources.getString("btnNewWeek.text"),
+                String.format(resources.getString("advanceToDay.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setBtnNewMonth(new MMButton("btnNewMonth", resources.getString("btnNewMonth.text"),
+                String.format(resources.getString("advanceToDay.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setBtnNewYear(new MMButton("btnNewYear", resources.getString("btnNewYear.text"),
+                String.format(resources.getString("advanceToDay.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setBtnNewDecade(new MMButton("btnNewDecade", resources.getString("btnNewDecade.text"),
+                String.format(resources.getString("advanceToDay.toolTipText"),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
+                this::validateButtonActionPerformed));
+
+        setDailyLogPanel(new DailyReportLogPanel(getGUI()));
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setName("advanceDaysPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnDays())
+                                .addComponent(lblDays)
+                                .addComponent(getBtnStartAdvancement(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnst)
+                                .addComponent(lblChanceProcreationNoRelationship)
+                                .addComponent(spnChanceProcreationNoRelationship, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkDisplayTrueDueDate)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblChanceProcreation)
+                                .addComponent(spnChanceProcreation))
+                        .addComponent(chkUseProcreationNoRelationship)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblChanceProcreationNoRelationship)
+                                .addComponent(spnChanceProcreationNoRelationship))
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogConception)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblBabySurnameStyle)
+                                .addComponent(comboBabySurnameStyle))
+                        .addComponent(chkDetermineFatherAtBirth)
+        );
+
+        return panel;
+    }
+
+    @Override
+    protected void finalizeInitialization() {
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                // We need to unregister here as unregistering in the actionPerformed
-                // method will lead to incorrect behaviour if the user tries to advance
-                // days again without exiting this dialog
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                // We need to unregister here as unregistering in the actionPerformed method will
+                // lead to incorrect behaviour if the user tries to advance days again without
+                // exiting this dialog
                 MekHQ.unregisterHandler(this);
             }
         });
+        super.finalizeInitialization();
     }
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AdvanceDaysDialog.class);
-
-        spnDays.setName("numberDays");
-        preferences.manage(new JIntNumberSpinnerPreference(spnDays));
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextWeek)
-                || event.getSource().equals(btnNextMonth) || event.getSource().equals(btnNextYear)) {
+    protected void setCustomPreferences(final PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JIntNumberSpinnerPreference(getSpnDays()));
+    }
+    //endregion Initialization
+
+    //region Button Actions
+    @Override
+    protected void cancelActionPerformed(final ActionEvent evt) {
+
+    }
+    //endregion Button Actions
+
+    //region ActionListener
+    @Override
+    public void actionPerformed(final ActionEvent evt) {
+        if (evt.getSource().equals(btnStart) || evt.getSource().equals(btnNextWeek)
+                || evt.getSource().equals(btnNextMonth) || evt.getSource().equals(btnNextYear)) {
             int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
 
             LocalDate today = gui.getCampaign().getLocalDate();
-            if (btnNextWeek.equals(event.getSource())) {
+            if (btnNextWeek.equals(evt.getSource())) {
                 // The number of days till the next monday is eight days (a week and a day) minus
                 // the current day of the week. The additional one is added to ensure we get the next
                 // Monday instead of the Sunday
                 days = 8 - today.getDayOfWeek().getValue();
-            } else if (btnNextMonth.equals(event.getSource())) {
+            } else if (btnNextMonth.equals(evt.getSource())) {
                 // The number of days till the next month is the length of the month plus one minus
                 // the current day, with the one added because otherwise we get the last day of the same
                 // month
                 days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
-            } else if (btnNextYear.equals(event.getSource())) {
+            } else if (btnNextYear.equals(evt.getSource())) {
                 // The number of days till the next year is the length of the year plus one minus
                 // the current day, with the one added because otherwise we get the last day of the same
                 // year
@@ -158,10 +288,12 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             List<String> reports = new ArrayList<>();
             for (; days > 0; days--) {
-                if (!gui.getCampaign().newDay()) {
+                if (!getRunning().get()) {
+                    break;
+                } else if (!getGUI().getCampaign().newDay()) {
                     break;
                 }
-                String report = gui.getCampaign().getCurrentReportHTML();
+                final String report = gui.getCampaign().getCurrentReportHTML();
                 if (firstDay) {
                     logPanel.refreshLog(report);
                     firstDay = false;
@@ -185,9 +317,10 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
             gui.refreshAllTabs();
         }
     }
+    //endregion ActionListener
 
     @Subscribe(priority = 1)
-    public void reportOverride(ReportEvent ev) {
-        ev.cancel();
+    public void reportOverride(ReportEvent evt) {
+        evt.cancel();
     }
 }
