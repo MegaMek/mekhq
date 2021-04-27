@@ -295,10 +295,6 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
             text = resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
         } else {
             text = resources.getString("ValidationSuccess.text");
-            if (display) {
-                JOptionPane.showMessageDialog(getFrame(), text,
-                        resources.getString("ValidationSuccess.title"), JOptionPane.ERROR_MESSAGE);
-            }
             getOkButton().setEnabled(true);
             getOkButton().setToolTipText(text);
             return ValidationState.SUCCESS;
