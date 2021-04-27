@@ -51,6 +51,7 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -741,31 +742,31 @@ public class GMToolsDialog extends JDialog {
      * given unit type.
      */
     private boolean doesPersonPrimarilyDriveUnitType(int unitType) {
-        int primaryRole = getPerson().getPrimaryRole();
+        PersonnelRole primaryRole = getPerson().getPrimaryRole();
         switch (unitType) {
             case UnitType.AERO:
-                return primaryRole == Person.T_AERO_PILOT;
+                return primaryRole.isAerospacePilot();
             case UnitType.BATTLE_ARMOR:
-                return primaryRole == Person.T_BA;
+                return primaryRole.isBattleArmour();
             case UnitType.CONV_FIGHTER:
-                return (primaryRole == Person.T_CONV_PILOT) || (primaryRole == Person.T_AERO_PILOT);
+                return primaryRole.isConventionalAircraftPilot() || primaryRole.isAerospacePilot();
             case UnitType.DROPSHIP:
             case UnitType.JUMPSHIP:
             case UnitType.SMALL_CRAFT:
             case UnitType.WARSHIP:
-                return primaryRole == Person.T_SPACE_PILOT;
+                return primaryRole.isVesselPilot();
             case UnitType.INFANTRY:
-                return primaryRole == Person.T_INFANTRY;
+                return primaryRole.isSoldier();
             case UnitType.MEK:
-                return primaryRole == Person.T_MECHWARRIOR;
+                return primaryRole.isMechWarrior();
             case UnitType.NAVAL:
-                return primaryRole == Person.T_NVEE_DRIVER;
+                return primaryRole.isNavalVehicleDriver();
             case UnitType.PROTOMEK:
-                return primaryRole == Person.T_PROTO_PILOT;
+                return primaryRole.isProtoMechPilot();
             case UnitType.TANK:
-                return primaryRole == Person.T_GVEE_DRIVER;
+                return primaryRole.isGroundVehicleDriver();
             case UnitType.VTOL:
-                return primaryRole == Person.T_VTOL_PILOT;
+                return primaryRole.isVTOLPilot();
             default:
                 return false;
         }
@@ -890,7 +891,7 @@ public class GMToolsDialog extends JDialog {
                 setLastRolledUnit(null);
             } catch (Exception ex) {
                 MekHQ.getLogger().error("Failed to load entity "
-                        + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile().toString(), ex);
+                        + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile(), ex);
                 unitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
             }
         }

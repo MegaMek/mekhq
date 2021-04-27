@@ -708,13 +708,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 if ((unit != null) && unit.isSelfCrewed()) {
-                    if (tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                    if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;
                     }
                     // check whether the engineer is assigned to the correct
                     // unit
                     return unit.equals(tech.getUnit());
-                } else if ((tech.getPrimaryRole() == Person.T_SPACE_CREW) && (unit != null) && !unit.isSelfCrewed()) {
+                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
                     return false;

@@ -22,12 +22,14 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.service.MassRepairOption;
@@ -41,7 +43,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -330,7 +331,7 @@ public class CampaignOptions implements Serializable {
 
     //region Name and Portrait Generation
     private boolean useOriginFactionForNames;
-    private boolean[] usePortraitForType;
+    private boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
@@ -415,6 +416,9 @@ public class CampaignOptions implements Serializable {
 
     //region Constructors
     public CampaignOptions() {
+        // Initialize any reused variables
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+
         //region Unlisted Variables
         repairSystem = REPAIR_SYSTEM_STRATOPS;
 
@@ -582,35 +586,36 @@ public class CampaignOptions implements Serializable {
         setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
         setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
         setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
-        setRoleBaseSalaries(new Money[Person.T_NUM]);
-        setRoleBaseSalary(Person.T_NONE, 0);
-        setRoleBaseSalary(Person.T_MECHWARRIOR, 1500);
-        setRoleBaseSalary(Person.T_AERO_PILOT, 1500);
-        setRoleBaseSalary(Person.T_VEE_GUNNER, 900);
-        setRoleBaseSalary(Person.T_GVEE_DRIVER, 900);
-        setRoleBaseSalary(Person.T_NVEE_DRIVER, 900);
-        setRoleBaseSalary(Person.T_VTOL_PILOT, 900);
-        setRoleBaseSalary(Person.T_CONV_PILOT, 900);
-        setRoleBaseSalary(Person.T_INFANTRY, 750);
-        setRoleBaseSalary(Person.T_BA, 960);
-        setRoleBaseSalary(Person.T_SPACE_PILOT, 1000);
-        setRoleBaseSalary(Person.T_SPACE_GUNNER, 1000);
-        setRoleBaseSalary(Person.T_SPACE_CREW, 1000);
-        setRoleBaseSalary(Person.T_NAVIGATOR, 1000);
-        setRoleBaseSalary(Person.T_DOCTOR, 1500);
-        setRoleBaseSalary(Person.T_ADMIN_COM, 500);
-        setRoleBaseSalary(Person.T_ADMIN_HR, 500);
-        setRoleBaseSalary(Person.T_ADMIN_LOG, 500);
-        setRoleBaseSalary(Person.T_ADMIN_TRA, 500);
-        setRoleBaseSalary(Person.T_MECH_TECH, 800);
-        setRoleBaseSalary(Person.T_AERO_TECH, 800);
-        setRoleBaseSalary(Person.T_BA_TECH, 800);
-        setRoleBaseSalary(Person.T_MECHANIC, 800);
-        setRoleBaseSalary(Person.T_ASTECH, 400);
-        setRoleBaseSalary(Person.T_MEDIC, 400);
-        setRoleBaseSalary(Person.T_PROTO_PILOT, 960);
-        setRoleBaseSalary(Person.T_LAM_PILOT, 1500);
-        setRoleBaseSalary(Person.T_VEHICLE_CREW, 900);
+        setRoleBaseSalaries(new Money[personnelRoles.length]);
+        setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
+        setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
+        setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
+        setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
+        setRoleBaseSalary(PersonnelRole.VTOL_PILOT, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_GUNNER, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW, 900);
+        setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
+        setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
+        setRoleBaseSalary(PersonnelRole.PROTOMECH_PILOT, 960);
+        setRoleBaseSalary(PersonnelRole.BATTLE_ARMOUR, 960);
+        setRoleBaseSalary(PersonnelRole.SOLDIER, 750);
+        setRoleBaseSalary(PersonnelRole.VESSEL_PILOT, 1000);
+        setRoleBaseSalary(PersonnelRole.VESSEL_GUNNER, 1000);
+        setRoleBaseSalary(PersonnelRole.VESSEL_CREW, 1000);
+        setRoleBaseSalary(PersonnelRole.VESSEL_NAVIGATOR, 1000);
+        setRoleBaseSalary(PersonnelRole.MECH_TECH, 800);
+        setRoleBaseSalary(PersonnelRole.MECHANIC, 800);
+        setRoleBaseSalary(PersonnelRole.AERO_TECH, 800);
+        setRoleBaseSalary(PersonnelRole.BA_TECH, 800);
+        setRoleBaseSalary(PersonnelRole.ASTECH, 400);
+        setRoleBaseSalary(PersonnelRole.DOCTOR, 1500);
+        setRoleBaseSalary(PersonnelRole.MEDIC, 400);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_COMMAND, 500);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
+        setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
+        setRoleBaseSalary(PersonnelRole.NONE, 0);
 
         // Marriage
         setUseManualMarriages(true);
@@ -734,11 +739,9 @@ public class CampaignOptions implements Serializable {
 
         //region Name and Portrait Generation Tab
         useOriginFactionForNames = true;
-        usePortraitForType = new boolean[Person.T_NUM];
-        for (int i = 0; i < Person.T_NUM; i++) {
-            usePortraitForType[i] = false;
-        }
-        usePortraitForType[Person.T_MECHWARRIOR] = true;
+        usePortraitForRole = new boolean[personnelRoles.length];
+        Arrays.fill(usePortraitForRole, false);
+        usePortraitForRole[PersonnelRole.MECHWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         //endregion Name and Portrait Generation Tab
 
@@ -1343,25 +1346,16 @@ public class CampaignOptions implements Serializable {
         return roleBaseSalaries;
     }
 
-    public double getRoleBaseSalary(final int role) {
-        return ((role < 0) || (role >= getRoleBaseSalaries().length)) ? 0.0
-                : getRoleBaseSalaries()[role].getAmount().doubleValue();
-    }
-
-    public Money getRoleBaseSalaryMoney(final int role) {
-        return ((role < 0) || (role >= getRoleBaseSalaries().length)) ? Money.zero() : getRoleBaseSalaries()[role];
-    }
-
     public void setRoleBaseSalaries(final Money... roleBaseSalaries) {
         this.roleBaseSalaries = roleBaseSalaries;
     }
 
-    public void setRoleBaseSalary(final int role, final double base) {
-        if ((role < 0) || (role >= getRoleBaseSalaries().length)) {
-            return;
-        }
+    public void setRoleBaseSalary(final PersonnelRole role, final double base) {
+        setRoleBaseSalary(role, Money.of(base));
+    }
 
-        getRoleBaseSalaries()[role] = Money.of(base);
+    public void setRoleBaseSalary(final PersonnelRole role, final Money base) {
+        getRoleBaseSalaries()[role.ordinal()] = base;
     }
     //endregion Salary
 
@@ -2199,25 +2193,23 @@ public class CampaignOptions implements Serializable {
     }
 
     public int getPhenotypeProbability(Phenotype phenotype) {
-        return phenotypeProbabilities[phenotype.getIndex()];
+        return getPhenotypeProbabilities()[phenotype.getIndex()];
     }
 
     public void setPhenotypeProbability(int index, int percentage) {
         phenotypeProbabilities[index] = percentage;
     }
 
-    public boolean usePortraitForType(int type) {
-        if (type < 0 || type >= usePortraitForType.length) {
-            return false;
-        }
-        return usePortraitForType[type];
+    public boolean[] usePortraitForRoles() {
+        return usePortraitForRole;
     }
 
-    public void setUsePortraitForType(int type, boolean b) {
-        if (type < 0 || type >= usePortraitForType.length) {
-            return;
-        }
-        usePortraitForType[type] = b;
+    public boolean usePortraitForRole(final PersonnelRole role) {
+        return usePortraitForRoles()[role.ordinal()];
+    }
+
+    public void setUsePortraitForRole(int index, boolean b) {
+        usePortraitForRole[index] = b;
     }
 
     public boolean getAssignPortraitOnRoleChange() {
@@ -3431,9 +3423,9 @@ public class CampaignOptions implements Serializable {
 
         // cannot use StringUtils.join for a boolean array, so we are using this instead
         StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < usePortraitForType.length; i++) {
-            csv.append(usePortraitForType[i]);
-            if (i < usePortraitForType.length - 1) {
+        for (int i = 0; i < usePortraitForRoles().length; i++) {
+            csv.append(usePortraitForRoles()[i]);
+            if (i < usePortraitForRoles().length - 1) {
                 csv.append(",");
             }
         }
@@ -3455,7 +3447,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
-        MekHQ.getLogger().info("Loading Campaign Options from Version " + version.toString() + " XML...");
+        MekHQ.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3625,9 +3617,14 @@ public class CampaignOptions implements Serializable {
                 retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    if (i < retVal.usePortraitForType.length) {
-                        retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
+                if (version.isLowerThan("0.49.0")) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.setUsePortraitForRole(PersonnelRole.parseFromString(String.valueOf(i)).ordinal(),
+                                Boolean.parseBoolean(values[i].trim()));
+                    }
+                } else {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
@@ -3758,9 +3755,14 @@ public class CampaignOptions implements Serializable {
                     retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                // CAW: we need at least the correct number of salaries as are expected in this version,
-                //      otherwise we'll not be able to set a salary for a role.
-                retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, Person.T_NUM));
+                if (version.isLowerThan("0.49.0")) {
+                    Money[] roleBaseSalaries = Utilities.readMoneyArray(wn2);
+                    for (int i = 0; i < roleBaseSalaries.length; i++) {
+                        retVal.setRoleBaseSalary(PersonnelRole.parseFromString(String.valueOf(i)), roleBaseSalaries[i]);
+                    }
+                } else {
+                    retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
+                }
             //endregion Salary
 
             //region Marriage
