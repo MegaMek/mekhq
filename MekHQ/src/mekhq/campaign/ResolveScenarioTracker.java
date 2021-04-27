@@ -906,11 +906,11 @@ public class ResolveScenarioTracker {
             if (en instanceof Tank) {
                 //Prefer gunner over driver, as in Unit::getCommander
                 for (Person p : crew) {
-                    if (p.getPrimaryRole() == Person.T_VEE_GUNNER) {
+                    if (p.getPrimaryRole().isVehicleGunner()) {
                         commander = p;
-                    } else if (p.getPrimaryRole() == Person.T_GVEE_DRIVER
-                            || p.getPrimaryRole() == Person.T_VTOL_PILOT
-                            || p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                    } else if (p.getPrimaryRole().isGroundVehicleDriver()
+                            || p.getPrimaryRole().isNavalVehicleDriver()
+                            || p.getPrimaryRole().isVTOLPilot()) {
                         driver = p;
                     }
                 }
@@ -923,7 +923,8 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
-            if (commander == null && crew.size() > 0) {
+
+            if ((commander == null) && (crew.size() > 0)) {
                 commander = crew.get(0);
             }
 

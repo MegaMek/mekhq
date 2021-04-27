@@ -314,21 +314,21 @@ public class SkillType implements Serializable {
     }
 
     public static String getExperienceLevelName(int level) {
-        switch(level) {
-        case EXP_ULTRA_GREEN:
-            return ULTRA_GREEN_NM;
-        case EXP_GREEN:
-            return GREEN_NM;
-        case EXP_REGULAR:
-            return REGULAR_NM;
-        case EXP_VETERAN:
-            return VETERAN_NM;
-        case EXP_ELITE:
-            return ELITE_NM;
-        case -1:
-            return "Unknown";
-        default:
-            return "Impossible";
+        switch (level) {
+            case EXP_ULTRA_GREEN:
+                return ULTRA_GREEN_NM;
+            case EXP_GREEN:
+                return GREEN_NM;
+            case EXP_REGULAR:
+                return REGULAR_NM;
+            case EXP_VETERAN:
+                return VETERAN_NM;
+            case EXP_ELITE:
+                return ELITE_NM;
+            case -1:
+                return "Unknown";
+            default:
+                return "Impossible";
         }
     }
 

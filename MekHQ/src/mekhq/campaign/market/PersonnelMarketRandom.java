@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,7 @@ import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
@@ -45,12 +46,10 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
         List<Person> personnel = new ArrayList<>();
         int q = generateRandomQuantity();
 
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (int i = 0; i < q; i++) {
-            int roll = Compute.randomInt(Person.T_NUM - 1);
-            while (roll == Person.T_NONE) {
-                roll = Compute.randomInt(Person.T_NUM - 1);
-            }
-            Person p = c.newPerson(roll);
+            int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getUnmarketableCount());
+            Person p = c.newPerson(personnelRoles[roll]);
             personnel.add(p);
         }
         return personnel;

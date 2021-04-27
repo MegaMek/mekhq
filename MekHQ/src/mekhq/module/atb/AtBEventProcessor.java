@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -80,18 +81,18 @@ public class AtBEventProcessor {
 
     private void doPaidRecruitment(Campaign campaign) {
         int mod;
-        switch (campaign.getPersonnelMarket().getPaidRecruitType()) {
-            case Person.T_MECHWARRIOR:
+        switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
+            case MECHWARRIOR:
                 mod = -2;
                 break;
-            case Person.T_INFANTRY:
+            case SOLDIER:
                 mod = 2;
                 break;
-            case Person.T_MECH_TECH:
-            case Person.T_AERO_TECH:
-            case Person.T_MECHANIC:
-            case Person.T_BA_TECH:
-            case Person.T_DOCTOR:
+            case MECH_TECH:
+            case MECHANIC:
+            case AERO_TECH:
+            case BA_TECH:
+            case DOCTOR:
                 mod = 1;
                 break;
             default:
@@ -104,7 +105,7 @@ public class AtBEventProcessor {
             mod -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+        Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
         int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         mod += adminHRExp - 2;
@@ -126,7 +127,7 @@ public class AtBEventProcessor {
         }
 
         for (int i = 0; i < q; i++) {
-            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitType());
+            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
             campaign.getPersonnelMarket().addPerson(p);
             addRecruitUnit(p);
         }
@@ -148,34 +149,28 @@ public class AtBEventProcessor {
 
         int unitType;
         switch (p.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
+            case MECHWARRIOR:
                 unitType = UnitType.MEK;
                 break;
-            case Person.T_GVEE_DRIVER:
-            case Person.T_VEE_GUNNER:
-            case Person.T_VTOL_PILOT:
-                return;
-            case Person.T_AERO_PILOT:
+            case AEROSPACE_PILOT:
                 if (!campaign.getCampaignOptions().getAeroRecruitsHaveUnits()) {
                     return;
                 }
                 unitType = UnitType.AERO;
                 break;
-            case Person.T_INFANTRY:
+            case PROTOMECH_PILOT:
+                unitType = UnitType.PROTOMEK;
+                break;
+            case BATTLE_ARMOUR:
+                unitType = UnitType.BATTLE_ARMOR;
+                break;
+            case SOLDIER:
                 unitType = UnitType.INFANTRY;
-
                 // infantry will have a 1/3 chance of being field guns
-                if(Compute.d6() <= 2) {
+                if (Compute.d6() <= 2) {
                     params.getMissionRoles().add(MissionRole.FIELD_GUN);
                     params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
                 }
-
-                break;
-            case Person.T_BA:
-                unitType = UnitType.BATTLE_ARMOR;
-                break;
-            case Person.T_PROTO_PILOT:
-                unitType = UnitType.PROTOMEK;
                 break;
             default:
                 return;
@@ -235,33 +230,30 @@ public class AtBEventProcessor {
                         en.getMovementMode() == EntityMovementMode.WHEELED ||
                         en.getMovementMode() == EntityMovementMode.HOVER ||
                         en.getMovementMode() == EntityMovementMode.WIGE) {
-                    if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
+                    if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(Person.T_GVEE_DRIVER);
-                    }
-                    if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(Person.T_GVEE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.VTOL) {
-                    if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
+                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(Person.T_VTOL_PILOT);
-                    }
-                    if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
+                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(Person.T_VTOL_PILOT);
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
                         en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
                         en.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                    if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
+                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(Person.T_NVEE_DRIVER);
-                    }
-                    if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                    } else if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(Person.T_NVEE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     }
                 }
             }

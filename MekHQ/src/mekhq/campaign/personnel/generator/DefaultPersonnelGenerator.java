@@ -23,6 +23,7 @@ import java.util.Objects;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
@@ -77,11 +78,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
     }
 
     @Override
-    public Person generate(Campaign campaign, int primaryRole, int secondaryRole, Gender gender) {
+    public Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole, Gender gender) {
         Person person = createPerson(campaign);
 
-        person.setPrimaryRole(primaryRole);
-        person.setSecondaryRole(secondaryRole);
+        person.setPrimaryRoleDirect(primaryRole);
+        person.setSecondaryRoleDirect(secondaryRole);
 
         int expLvl = generateExperienceLevel(campaign, person);
 

@@ -208,7 +208,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
+                    preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                     NodeList wList = wn.getChildNodes();
                     // Okay, lets iterate through the children, eh?
