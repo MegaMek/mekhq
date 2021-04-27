@@ -909,7 +909,8 @@ public class Campaign implements Serializable, ITechManager {
      */
     public List<Mission> getSortedMissions() {
         return getMissions().stream()
-                .sorted(Comparator.comparing(Mission::getStatus))
+                .sorted(Comparator.comparing(Mission::getStatus).thenComparing(m ->
+                        (m instanceof Contract) ? ((Contract) m).getStartDate() : LocalDate.now()))
                 .collect(Collectors.toList());
     }
 
