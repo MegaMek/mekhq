@@ -1,8 +1,8 @@
 /*
  * CampaignGUI.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import megamek.common.options.OptionsConstants;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.*;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -749,15 +750,14 @@ public class CampaignGUI extends JPanel {
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
+        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
-        for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
-            int miHireMnemonic = Person.getRoleMnemonic(i);
-            if (miHireMnemonic != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(miHireMnemonic);
+        for (PersonnelRole role : PersonnelRole.values()) {
+            JMenuItem miHire = new JMenuItem(role.getName(getCampaign().getFaction().isClan()));
+            if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+                miHire.setMnemonic(role.getMnemonic());
             }
-            miHire.setActionCommand(Integer.toString(i));
+            miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
         }
@@ -1251,10 +1251,9 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    private void hirePerson(java.awt.event.ActionEvent evt) {
-        int type = Integer.parseInt(evt.getActionCommand());
-        NewRecruitDialog npd = new NewRecruitDialog(this, true,
-                getCampaign().newPerson(type));
+    private void hirePerson(final ActionEvent evt) {
+        final NewRecruitDialog npd = new NewRecruitDialog(this, true,
+                getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
         npd.setVisible(true);
     }
 
@@ -1362,7 +1361,7 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuLoadXmlActionPerformed(ActionEvent evt) {
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
@@ -2294,7 +2293,7 @@ public class CampaignGUI extends JPanel {
             if (xn.equalsIgnoreCase("campaignOptions")) {
                 options = CampaignOptions.generateCampaignOptionsFromXml(wn, version);
             } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
+                rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version);
             } else if (xn.equalsIgnoreCase("skillTypes")) {
                 NodeList wList = wn.getChildNodes();
 
@@ -2634,7 +2633,7 @@ public class CampaignGUI extends JPanel {
     public void handlePersonUpdate(PersonEvent ev) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
         // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
             refreshPartsAvailability();
         }
     }

@@ -1234,7 +1234,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(false)) {
+            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(true)) {
                 //Add the Edge Available field for support personnel only
                 lblEdgeAvail1.setName("lblEdgeAvail1");
                 lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));
