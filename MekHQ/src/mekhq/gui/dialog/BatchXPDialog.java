@@ -31,6 +31,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.model.PersonnelTableModel;
@@ -200,15 +201,15 @@ public final class BatchXPDialog extends JDialog {
         choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null));
-        for (int i = 1; i < Person.T_NUM; ++ i) {
-            personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        for (PersonnelRole personnelRole : personnelRoles) {
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole.ordinal()));
         }
-        personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(0, campaign.getFaction().isClan()), 0));
-        // Add "none" for generic AsTechs
         choiceType.setModel(personTypeModel);
         choiceType.setSelectedIndex(0);
         choiceType.addActionListener(e -> {
-            personnelFilter.setPrimaryRole(((PersonTypeItem) choiceType.getSelectedItem()).getId());
+            PersonTypeItem personTypeItem = (PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem());
+            personnelFilter.setPrimaryRole((personTypeItem.getId() == null) ? null : personnelRoles[personTypeItem.getId()]);
             updatePersonnelTable();
         });
         panel.add(choiceType);
@@ -389,7 +390,7 @@ public final class BatchXPDialog extends JDialog {
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if (campaign.getCampaignOptions().getUseAtB()) {
-                    if ((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
+                    if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
@@ -422,7 +423,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
-        private Integer primaryRole = null;
+        private PersonnelRole primaryRole = null;
         private Integer expLevel = null;
         private Integer rank = null;
         private boolean onlyOfficers = false;
@@ -461,8 +462,8 @@ public final class BatchXPDialog extends JDialog {
             return true;
         }
 
-        public void setPrimaryRole(Integer role) {
-            primaryRole = role;
+        public void setPrimaryRole(PersonnelRole primaryRole) {
+            this.primaryRole = primaryRole;
         }
 
         public void setExpLevel(Integer level) {

@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
@@ -226,44 +225,45 @@ public enum Profession {
      * @param role the personnel role to get the profession for
      * @return the profession for the role
      */
-    public static Profession getProfessionFromPersonnelRole(final int role) {
+    public static Profession getProfessionFromPersonnelRole(final PersonnelRole role) {
         switch (role) {
-            case Person.T_AERO_PILOT:
-            case Person.T_CONV_PILOT:
+            case AEROSPACE_PILOT:
+            case CONVENTIONAL_AIRCRAFT_PILOT:
                 return AEROSPACE;
-            case Person.T_GVEE_DRIVER:
-            case Person.T_NVEE_DRIVER:
-            case Person.T_VTOL_PILOT:
-            case Person.T_VEE_GUNNER:
-            case Person.T_VEHICLE_CREW:
+            case GROUND_VEHICLE_DRIVER:
+            case NAVAL_VEHICLE_DRIVER:
+            case VTOL_PILOT:
+            case VEHICLE_GUNNER:
+            case VEHICLE_CREW:
                 return VEHICLE;
-            case Person.T_BA:
-            case Person.T_INFANTRY:
+            case BATTLE_ARMOUR:
+            case SOLDIER:
                 return INFANTRY;
-            case Person.T_SPACE_PILOT:
-            case Person.T_SPACE_CREW:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_NAVIGATOR:
+            case VESSEL_PILOT:
+            case VESSEL_CREW:
+            case VESSEL_GUNNER:
+            case VESSEL_NAVIGATOR:
                 return NAVAL;
-            case Person.T_MECH_TECH:
-            case Person.T_MECHANIC:
-            case Person.T_AERO_TECH:
-            case Person.T_BA_TECH:
-            case Person.T_ASTECH:
+            case MECH_TECH:
+            case MECHANIC:
+            case AERO_TECH:
+            case BA_TECH:
+            case ASTECH:
                 return TECH;
-            case Person.T_DOCTOR:
-            case Person.T_MEDIC:
+            case DOCTOR:
+            case MEDIC:
                 return MEDICAL;
-            case Person.T_ADMIN_COM:
-            case Person.T_ADMIN_LOG:
-            case Person.T_ADMIN_TRA:
-            case Person.T_ADMIN_HR:
+            case ADMINISTRATOR_COMMAND:
+            case ADMINISTRATOR_LOGISTICS:
+            case ADMINISTRATOR_HR:
+            case ADMINISTRATOR_TRANSPORT:
                 return ADMIN;
-            case Person.T_NONE:
+            case DEPENDENT:
+            case NONE:
                 return CIVILIAN;
-            case Person.T_MECHWARRIOR:
-            case Person.T_LAM_PILOT:
-            case Person.T_PROTO_PILOT:
+            case MECHWARRIOR:
+            case LAM_PILOT:
+            case PROTOMECH_PILOT:
             default:
                 return MECHWARRIOR;
         }

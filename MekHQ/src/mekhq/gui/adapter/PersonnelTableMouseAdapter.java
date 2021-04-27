@@ -30,7 +30,6 @@ import javax.swing.*;
 
 import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
 import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
-import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
@@ -268,11 +267,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_PRIMARY_ROLE: {
-                int role = Integer.parseInt(data[1]);
-                for (Person person : people) {
+                PersonnelRole role = PersonnelRole.valueOf(data[1]);
+                for (final Person person : people) {
                     person.setPrimaryRole(role);
                     gui.getCampaign().personUpdated(person);
-                    if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
+                    if (gui.getCampaign().getCampaignOptions().usePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
                             && person.getPortrait().hasDefaultFilename()) {
                         gui.getCampaign().assignRandomPortraitFor(person);
@@ -281,9 +280,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SECONDARY_ROLE: {
-                int secRole = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setSecondaryRole(secRole);
+                PersonnelRole role = PersonnelRole.valueOf(data[1]);
+                for (final Person person : people) {
+                    person.setSecondaryRole(role);
                     gui.getCampaign().personUpdated(person);
                 }
                 break;
@@ -554,10 +553,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type));
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
                         && gui.getCampaign().getCampaignOptions().useAbilities()) {
-                    if (selectedPerson.getPrimaryRole() > Person.T_NONE
-                            && selectedPerson.getPrimaryRole() <= Person.T_CONV_PILOT
-                            && selectedPerson.getExperienceLevel(false) > oldExpLevel
-                            && oldExpLevel >= SkillType.EXP_REGULAR) {
+                    if (selectedPerson.getPrimaryRole().isCombat()
+                            && (selectedPerson.getExperienceLevel(false) > oldExpLevel)
+                            && (oldExpLevel >= SkillType.EXP_REGULAR)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
                         String spa = spaGenerator.rollSPA(selectedPerson);
                         if (null == spa) {
@@ -567,7 +565,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName()));
                             }
                         } else {
-                            gui.getCampaign().addReport(String.format(resourceMap.getString("gained.format"), //$NON-NLS-1$
+                            gui.getCampaign().addReport(String.format(resourceMap.getString("gained.format"),
                                     selectedPerson.getHyperlinkedName(), SpecialAbility.getDisplayName(spa)));
                         }
                     }
@@ -1289,65 +1287,44 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT));
         }
 
+        final PersonnelRole[] roles = PersonnelRole.values();
         menu = new JMenu(resourceMap.getString("changePrimaryRole.text"));
-        for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            if (person.canPerformRole(i) && (person.getSecondaryRole() != i)) {
-                cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(
-                        i, gui.getCampaign().getFaction().isClan()));
-                cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, String.valueOf(i)));
-                if (person.getPrimaryRole() == i) {
-                    cbMenuItem.setSelected(true);
-                }
+        for (final PersonnelRole role : roles) {
+            if (person.canPerformRole(role, true)) {
+                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
+                cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
+                cbMenuItem.setSelected(person.getPrimaryRole() == role);
                 cbMenuItem.addActionListener(this);
-                cbMenuItem.setEnabled(true);
                 menu.add(cbMenuItem);
             }
         }
-        if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-            MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-        }
-        popup.add(menu);
-        menu = new JMenu(resourceMap.getString("changeSecondaryRole.text")); //$NON-NLS-1$
-        for (int i = 0; i < Person.T_NUM; i++) {
-            if ((i == Person.T_NONE) || (person.canPerformRole(i) && (person.getPrimaryRole() != i))) {
-                // you cant be an astech if you are a tech, or a medic
-                // if you are a doctor
-                if (person.isTechPrimary() && (i == Person.T_ASTECH)) {
-                    continue;
-                }
-                if ((person.getPrimaryRole() == Person.T_DOCTOR) && (i == Person.T_MEDIC)) {
-                    continue;
-                }
-                cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(
-                        i, gui.getCampaign().getFaction().isClan()));
-                cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, String.valueOf(i)));
-                if (person.getSecondaryRole() == i) {
-                    cbMenuItem.setSelected(true);
-                }
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+
+        menu = new JMenu(resourceMap.getString("changeSecondaryRole.text"));
+        for (final PersonnelRole role : roles) {
+            if (person.canPerformRole(role, false)) {
+                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
+                cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
+                cbMenuItem.setSelected(person.getSecondaryRole() == role);
                 cbMenuItem.addActionListener(this);
-                cbMenuItem.setEnabled(true);
                 menu.add(cbMenuItem);
             }
         }
-        if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-            MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-        }
-        popup.add(menu);
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+
         // Bloodnames
-        if (StaticChecks.areAllClanEligible(selected)) {
+        if (StaticChecks.areAllClanEligible(selected) && StaticChecks.areAllActive(selected)) {
             menuItem = new JMenuItem(resourceMap.getString("giveRandomBloodname.text"));
             menuItem.setActionCommand(CMD_BLOODNAME);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(StaticChecks.areAllActive(selected));
             popup.add(menuItem);
         }
 
         // change salary
-        if (gui.getCampaign().getCampaignOptions().payForSalaries()) {
-            menuItem = new JMenuItem(resourceMap.getString("setSalary.text")); //$NON-NLS-1$
+        if (gui.getCampaign().getCampaignOptions().payForSalaries() && StaticChecks.areAllActive(selected)) {
+            menuItem = new JMenuItem(resourceMap.getString("setSalary.text"));
             menuItem.setActionCommand(CMD_EDIT_SALARY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(StaticChecks.areAllActive(selected));
             popup.add(menuItem);
         }
 
@@ -1603,7 +1580,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         soldierEntityWeightMenu = new JMenu(weightClassName);
                     }
 
-                    if (StaticChecks.areAllInfantry(selected)) {
+                    if (StaticChecks.areAllInfantrySoldiers(selected)) {
                         if (!unit.isConventionalInfantry()) {
                             continue;
                         }
@@ -1626,7 +1603,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             cbMenuItem.addActionListener(this);
                             soldierEntityWeightMenu.add(cbMenuItem);
                         }
-                    } else if (StaticChecks.areAllVeeGunners(selected)) {
+                    } else if (StaticChecks.areAllVehicleGunners(selected)) {
                         if (!(unit.getEntity() instanceof Tank)) {
                             continue;
                         }
@@ -2108,7 +2085,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_HEADHIT));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
-                if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2117,7 +2094,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerTAC.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_TAC));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
-                if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2126,7 +2103,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_KO));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
-                if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2135,7 +2112,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_EXPLOSION));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
-                if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2144,19 +2121,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_MASC_FAILURE));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
-                //Aero pilots and gunners
+                // Aerospace pilots and gunners
+                final boolean isNotAeroOrConventional = !(person.getPrimaryRole().isAerospacePilot()
+                        || person.getPrimaryRole().isConventionalAircraftPilot()
+                        || person.getPrimaryRole().isLAMPilot());
+                final boolean isNotVessel = !person.getPrimaryRole().isVesselCrewmember();
+                final boolean isNotAeroConvOrVessel = isNotAeroOrConventional || isNotVessel;
+
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroAltLoss.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_ALT_LOSS));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_ALT_LOSS));
-                if (person.getPrimaryRole() != Person.T_SPACE_PILOT
-                        && person.getPrimaryRole() != Person.T_SPACE_GUNNER
-                        && person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                if (isNotAeroConvOrVessel) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2165,9 +2146,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroExplosion.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_EXPLOSION));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_EXPLOSION));
-                if ((person.getPrimaryRole() != Person.T_SPACE_PILOT)
-                        && (person.getPrimaryRole() != Person.T_SPACE_GUNNER)
-                        && (person.getPrimaryRole() != Person.T_AERO_PILOT)) {
+                if (isNotAeroConvOrVessel) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2176,7 +2155,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroKO.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_KO));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_KO));
-                if (person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                if (isNotAeroOrConventional) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2185,9 +2164,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_LUCKY_CRIT));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_LUCKY_CRIT));
-                if ((person.getPrimaryRole() != Person.T_SPACE_PILOT)
-                        && (person.getPrimaryRole() != Person.T_SPACE_GUNNER)
-                        && (person.getPrimaryRole() != Person.T_AERO_PILOT)) {
+                if (isNotAeroConvOrVessel) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2196,8 +2173,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_NUKE_CRIT));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_NUKE_CRIT));
-                if ((person.getPrimaryRole() != Person.T_SPACE_PILOT)
-                        && (person.getPrimaryRole() != Person.T_SPACE_GUNNER)) {
+                if (isNotVessel) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2206,8 +2182,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
-                if ((person.getPrimaryRole() != Person.T_SPACE_PILOT)
-                        && (person.getPrimaryRole() != Person.T_SPACE_GUNNER)) {
+                if (isNotVessel) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2219,7 +2194,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHealCheck.text"));
                     cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
-                    if (person.getPrimaryRole() != Person.T_DOCTOR) {
+                    if (!person.getPrimaryRole().isDoctor()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }
                     cbMenuItem.addActionListener(this);
@@ -2229,7 +2204,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerBreakPart.text"));
                     cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART));
-                    if (!person.isTechPrimary()) {
+                    if (!person.getPrimaryRole().isTech()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }
                     cbMenuItem.addActionListener(this);
@@ -2238,7 +2213,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerFailedRefit.text"));
                     cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
-                    if (!person.isTechPrimary()) {
+                    if (!person.getPrimaryRole().isTech()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }
                     cbMenuItem.addActionListener(this);
@@ -2248,7 +2223,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text"));
                     cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
-                    if (!person.isAdminPrimary()) {
+                    if (!person.getPrimaryRole().isAdministrator()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }
                     cbMenuItem.addActionListener(this);
