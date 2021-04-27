@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -45,45 +46,33 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
     @Override
     public List<Person> generatePersonnelForDay(Campaign c) {
         if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
+            final List<PersonnelRole> techRoles = PersonnelRole.getTechRoles();
+            final List<PersonnelRole> vesselRoles = PersonnelRole.getVesselRoles();
+
             Person p;
             int roll = Compute.d6(2);
             if (roll == 2) { // Medical
-                p = c.newPerson(Person.T_DOCTOR);
+                p = c.newPerson(PersonnelRole.DOCTOR);
             } else if (roll == 3) { // ASF or Proto Pilot
                 if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
                         && Compute.d6(2) < 6) {
-                    p = c.newPerson(Person.T_PROTO_PILOT);
+                    p = c.newPerson(PersonnelRole.PROTOMECH_PILOT);
                 } else {
-                    p = c.newPerson(Person.T_AERO_PILOT);
+                    p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
                 }
             } else if (roll == 4 || roll == 10) { // MW
-                p = c.newPerson(Person.T_MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MECHWARRIOR);
             } else if (roll == 5 || roll == 9) { // Vehicle Crews
-                if (Compute.d6() < 3) {
-                    p = c.newPerson(Person.T_GVEE_DRIVER);
-                } else {
-                    p = c.newPerson(Person.T_VEE_GUNNER);
-                }
+                p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER : PersonnelRole.VEHICLE_GUNNER);
             } else if (roll == 6 || roll == 8) { // Infantry
-                if (c.getFaction().isClan() && Compute.d6(2) > 3) {
-                    p = c.newPerson(Person.T_BA);
-                } else {
-                    p = c.newPerson(Person.T_INFANTRY);
-                }
+                p = c.newPerson((c.getFaction().isClan() && Compute.d6(2) > 3)
+                        ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
             } else if (roll == 11) { // Tech
-                int tr = Compute.randomInt(Person.T_ASTECH);
-                while (tr < Person.T_MECH_TECH) {
-                    tr = Compute.randomInt(Person.T_ASTECH);
-                }
-                p = c.newPerson(tr);
+                p = c.newPerson(techRoles.get(Compute.randomInt(techRoles.size())));
             } else if (roll == 12) { // Vessel Crew
-                int tr = Compute.randomInt(Person.T_SPACE_GUNNER);
-                while (tr < Person.T_SPACE_PILOT) {
-                    tr = Compute.randomInt(Person.T_SPACE_GUNNER);
-                }
-                p = c.newPerson(tr);
+                p = c.newPerson(vesselRoles.get(Compute.randomInt(vesselRoles.size())));
             } else {
-                p = c.newPerson(Person.T_NONE);
+                p = c.newPerson(PersonnelRole.NONE);
             }
             daysSinceRolled = 0;
             return Collections.singletonList(p);
@@ -95,10 +84,7 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
 
     @Override
     public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
-            return current;
-        }
-        return null;
+        return (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) ? current : null;
     }
 
     @Override

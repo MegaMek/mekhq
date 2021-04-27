@@ -680,7 +680,7 @@ public class AtBContract extends Contract implements Serializable {
                 number = Compute.d6();
                 c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
                 for (int i = 0; i < number; i++) {
-                    Person p = c.newDependent(Person.T_ASTECH, false);
+                    Person p = c.newDependent(false);
                     c.recruitPerson(p);
                 }
             }
