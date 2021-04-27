@@ -39,12 +39,12 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Taharqa
@@ -650,6 +650,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
     	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
+    	
     	campaign.addMission(contract);
 
     	// Negotiator XP

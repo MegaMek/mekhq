@@ -29,10 +29,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -66,6 +68,7 @@ public class Force implements Serializable {
     private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
+    private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
     private Force parentForce;
@@ -79,9 +82,10 @@ public class Force implements Serializable {
     //an ID so that forces can be tracked in Campaign hash
     private int id;
 
-    public Force(String n) {
-        this.name = n;
-        this.desc = "";
+    public Force(String name) {
+        setName(name);
+        setCamouflage(new Camouflage());
+        setDescription("");
         this.combatForce = true;
         this.parentForce = null;
         this.subForces = new Vector<>();
@@ -106,6 +110,18 @@ public class Force implements Serializable {
 
     public void setName(String n) {
         this.name = n;
+    }
+
+    public Camouflage getCamouflage() {
+        return camouflage;
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
+    }
+
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = camouflage;
     }
 
     public String getDescription() {
@@ -368,7 +384,16 @@ public class Force implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        if (!getCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageCategory", getCamouflage().getCategory());
+        }
+        if (!getCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageFilename", getCamouflage().getFilename());
+        }
+        // TODO : Java 11 : swap to isBlank
+        if (!getDescription().trim().isEmpty()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", iconCategory);
 
@@ -388,6 +413,7 @@ public class Force implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
+        
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
 
         if (units.size() > 0) {
@@ -419,12 +445,16 @@ public class Force implements Serializable {
             NodeList nl = wn.getChildNodes();
             retVal.id = Integer.parseInt(idString);
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.setName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) {
+                    retVal.getCamouflage().setCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageFilename")) {
+                    retVal.getCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
+                    retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
@@ -451,7 +481,7 @@ public class Force implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error(Force.class, "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -464,7 +494,7 @@ public class Force implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Force.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;
@@ -572,7 +602,12 @@ public class Force implements Serializable {
             sub.fixIdReferences(uHash);
         }
     }
-
+    
+    /**
+     * Calculates the force's total BV, including sub forces.
+     * @param c The working campaign.
+     * @return Total BV
+     */
     public int getTotalBV(Campaign c) {
         int bvTotal = 0;
 
@@ -590,5 +625,30 @@ public class Force implements Serializable {
         }
 
         return bvTotal;
+    }
+    
+    /**
+     * Calculates the unit type most represented in this force
+     * and all subforces.
+     * @param c Working campaign
+     * @return Majority unit type.
+     */
+    public int getPrimaryUnitType(Campaign c) {
+        Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
+        int biggestBucketID = -1;
+        int biggestBucketCount = 0;
+        
+        for (UUID id : getUnits()) {
+            int unitType = c.getUnit(id).getEntity().getUnitType();
+
+            unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
+            
+            if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
+                biggestBucketCount = unitTypeBuckets.get(unitType);
+                biggestBucketID = unitType;
+            }
+        }
+        
+        return biggestBucketID;
     }
 }

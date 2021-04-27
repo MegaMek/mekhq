@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -183,9 +183,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     if (iconMap.containsKey(layer)) {
                         for (String value : iconMap.get(layer)) {
                             // Load up the image piece
-                            BufferedImage img = (BufferedImage) getForceIcons().getItem(layer, value);
-                            width = Math.max(img.getWidth(), width);
-                            height = Math.max(img.getHeight(), height);
+                            BufferedImage image = (BufferedImage) getForceIcons().getItem(layer, value);
+                            if (image != null) {
+                                width = Math.max(image.getWidth(), width);
+                                height = Math.max(image.getHeight(), height);
+                            }
                         }
                     }
                 }
@@ -195,9 +197,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     String layer = layeredForceIcon.getLayerPath();
                     if (iconMap.containsKey(layer)) {
                         for (String value : iconMap.get(layer)) {
-                            BufferedImage img = (BufferedImage) getForceIcons().getItem(layer, value);
-                            // Draw the current buffered image onto the base, aligning bottom and right side
-                            g2d.drawImage(img, width - img.getWidth() + 1, height - img.getHeight() + 1, null);
+                            BufferedImage image = (BufferedImage) getForceIcons().getItem(layer, value);
+                            if (image != null) {
+                                // Draw the current buffered image onto the base, aligning bottom and right side
+                                g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
+                            }
                         }
                     }
                 }

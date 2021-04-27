@@ -285,32 +285,32 @@ public class StaticChecks {
     }
 
     public static boolean areAllInfantry(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_INFANTRY);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isSoldier());
     }
 
     public static boolean areAllBattleArmor(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_BA);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isBattleArmour());
     }
 
     public static boolean areAllVeeGunners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_VEE_GUNNER);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVehicleGunner());
     }
 
     public static boolean areAllVesselGunners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_SPACE_GUNNER);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselGunner());
     }
 
     public static boolean areAllVesselCrew(Person... people) {
-        return Stream.of(people).allMatch(p -> (p.getPrimaryRole() == Person.T_SPACE_CREW)
-                || (p.getPrimaryRole() == Person.T_VEHICLE_CREW));
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselCrew()
+                || p.getPrimaryRole().isVehicleCrew());
     }
 
     public static boolean areAllVesselPilots(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_SPACE_PILOT);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselPilot());
     }
 
     public static boolean areAllVesselNavigators(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole() == Person.T_NAVIGATOR);
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselNavigator());
     }
 
     public static boolean areAllActive(Person... people) {
@@ -326,10 +326,12 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(boolean ignorePrisonerStatus, Person... people) {
+        int profession = people[0].getPrimaryRole().getProfession();
         return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                && (p.getProfession() == people[0].getProfession())
+                && (p.getPrimaryRole().getProfession() == profession)
                 && (p.getRankSystem() == people[0].getRankSystem()));
     }
+
     /**
      * Checks if there is at least one award in the selected group of people
      * @param people the selected group of people

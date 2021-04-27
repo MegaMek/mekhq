@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ import megamek.common.options.OptionsConstants;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * This class handles randomly generating SPAs for bot-controlled entities
@@ -168,11 +169,11 @@ public class CrewSkillUpgrader {
                         break;
                     default:
                         if ((entity.getCrew() == null) ||
-                                (entity.getCrew().getOptions() == null) || 
+                                (entity.getCrew().getOptions() == null) ||
                                 (entity.getCrew().getOptions(spa.getName()) == null)) {
                             return 0;
                         }
-                        
+
                         entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
                         return spa.getCost();
                 }
@@ -232,7 +233,7 @@ public class CrewSkillUpgrader {
         List<Mounted> eligibleWeapons = new ArrayList<>();
 
         for (Mounted weapon : weapons) {
-            if (SpecialAbility.isWeaponEligibleForSPA(weapon.getType(), Person.T_NONE, clusterOnly)) {
+            if (SpecialAbility.isWeaponEligibleForSPA(weapon.getType(), PersonnelRole.NONE, clusterOnly)) {
                 eligibleWeapons.add(weapon);
             }
         }
@@ -256,7 +257,7 @@ public class CrewSkillUpgrader {
         if (entity.getIndividualWeaponList().size() <= 0) {
             return Crew.SPECIAL_NONE;
         }
-        
+
         int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
         WeaponType weaponType = (WeaponType) entity.getIndividualWeaponList().get(weaponIndex).getType();
 

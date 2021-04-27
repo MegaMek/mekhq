@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -33,11 +33,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
@@ -45,7 +45,6 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
@@ -91,7 +90,7 @@ public class ContractMarketDialog extends JDialog {
         campaign = c;
         contractMarket = c.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (c.getFactionCode().equals("MERC")) { //$NON-NLS-1$
+        if (c.getFactionCode().equals("MERC")) {
             countSuccessfulContracts();
         }
         initComponents();
@@ -104,16 +103,14 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (Mission m : campaign.getMissions()) {
-            if (m.isActive() || !(m instanceof AtBContract)
-                    || ((AtBContract) m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
-            AtBContract contract = (AtBContract) m;
             int num;
             num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),
-                    num + ((contract.getStatus() == Mission.S_SUCCESS) ? 1 : -1));
+                    num + (contract.getStatus().isSuccess() ? 1 : -1));
         }
         for (String key : successfulContracts.keySet()) {
             if (successfulContracts.get(key) >= 6) {
@@ -447,6 +444,9 @@ public class ContractMarketDialog extends JDialog {
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(selectedContract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                     "Advance monies for " + selectedContract.getName(), campaign.getLocalDate());
+            
+            selectedContract.acceptContract(campaign);
+            
             campaign.addMission(selectedContract);
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts

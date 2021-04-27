@@ -35,15 +35,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.model.SortedComboBoxModel;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
@@ -75,9 +77,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewAtBContractDialog.class);
-
-        this.setName("dialog");
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
+        setName("NewAtBContractDialog");
         preferences.manage(new JWindowPreference(this));
     }
 
@@ -87,7 +88,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         employerSet = RandomFactionGenerator.getInstance().getEmployerSet();
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
-        ((AtBContract)contract).initContractDetails(campaign);
+        ((AtBContract) contract).initContractDetails(campaign);
         IUnitRating rating = campaign.getUnitRating();
         dragoonRating = rating.getUnitRatingAsInteger();
         super.initComponents();
@@ -122,7 +123,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract)(this.contract);
 
         java.awt.GridBagConstraints gbc;
-        txtName = new javax.swing.JTextField();
+        txtName = new JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
         cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
@@ -130,13 +131,13 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
-        cbPlanets = new JComboBox<String>();
-        cbPlanets.setModel(new SortedComboBoxModel<String>());
+        cbPlanets = new JComboBox<>();
+        cbPlanets.setModel(new SortedComboBoxModel<>());
         chkShowAllPlanets = new JCheckBox();
-        cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+        cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
@@ -528,11 +529,16 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setSharesPct((Integer)spnShares.getValue());
 
         contract.calculatePartsAvailabilityLevel(campaign);
+        
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.initializeCampaignState(contract, campaign, 
+                    StratconContractDefinition.getContractDefinition(contract.getMissionType()));
+        }
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
         campaign.addMission(contract);
-        this.setVisible(false);
+        setVisible(false);
     }
 
     @Override
@@ -548,20 +554,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "Setting employer code to " + getCurrentEmployerCode());
+            MekHQ.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
             long time = System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to set employer code: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updateEnemies();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update enemies: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updatePlanets();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update planets: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

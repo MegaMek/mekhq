@@ -39,7 +39,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -91,17 +90,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         forceId = fid;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
-                break;
-            }
-            if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
-                    missionId = m.getId();
-                } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
-                }
-            }
+        for (AtBContract contract : c.getActiveAtBContracts()) {
+            missionId = ((contract.getParentContract() == null)
+                    ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }
@@ -298,6 +289,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             // No battle
             return null;
         }
+        
+        // if we are using StratCon, don't *also* generate legacy scenarios
+        if (c.getCampaignOptions().getUseStratCon() &&
+                (getContract(c).getStratconCampaignState() != null)) {
+            return null;
+        }
 
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
@@ -307,6 +304,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         // debugging code that will allow you to force the generation of a particular scenario.
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
+
         /*if (true) {
             AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
             scenario.setMissionId(this.getMissionId());

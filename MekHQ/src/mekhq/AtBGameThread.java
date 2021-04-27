@@ -39,6 +39,7 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
+import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
@@ -115,8 +116,7 @@ public class AtBGameThread extends GameThread {
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
                 MekHQ.getLogger().info("Thread in lounge");
 
-                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
 
                 if (started) {
@@ -163,6 +163,13 @@ public class AtBGameThread extends GameThread {
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
+                
+                //minefields
+                client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
+                client.getLocalPlayer().setNbrMFCommand(scenario.getNumPlayerMinefields(Minefield.TYPE_COMMAND_DETONATED));
+                client.getLocalPlayer().setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
+                client.getLocalPlayer().setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
+                client.getLocalPlayer().setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
 
                 /* If the player is making a combat drop (either required by scenario
                  * or player chose to deploy a DropShip), do not use deployment
@@ -205,7 +212,7 @@ public class AtBGameThread extends GameThread {
                     }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
-                    if(!(scenario instanceof AtBDynamicScenario)) {
+                    if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
                         if (entity.getJumpMP() > 0) {
                             if (entity instanceof megamek.common.Infantry) {
@@ -360,8 +367,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-        }
-        finally {
+        } finally {
             client.die();
             client = null;
             swingGui = null;
@@ -392,8 +398,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-                botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+                botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();

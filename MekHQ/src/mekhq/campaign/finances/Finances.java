@@ -156,7 +156,8 @@ public class Finances implements Serializable {
      */
     public void newFiscalYear(Campaign campaign) {
         if (campaign.getCampaignOptions().getNewFinancialYearFinancesToCSVExport()) {
-            String exportFileName = campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
+            final String exportFileName = campaign.getName() + " Finances for "
+                    + campaign.getCampaignOptions().getFinancialYearDuration().getExportFilenameDateString(campaign.getLocalDate())
                     + "." + FileType.CSV.getRecommendedExtension();
             exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(),
                             exportFileName).getPath(), FileType.CSV.getRecommendedExtension());

@@ -31,9 +31,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class NewRecruitDialog extends javax.swing.JDialog {
     /**
@@ -202,7 +202,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         person = hqView.getCampaign().newPerson(person.getPrimaryRole());
         refreshRanksCombo();
         hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
-                person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
+                person.getPrimaryRole().getProfession(), (String) choiceRanks.getSelectedItem()), false);
     }
 
     private void randomName() {
@@ -255,7 +255,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void changeRank() {
         hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
-                person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
+                person.getPrimaryRole().getProfession(), (String) choiceRanks.getSelectedItem()), false);
         refreshView();
     }
 
@@ -263,7 +263,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<>();
 
         // Determine correct profession to pass into the loop
-        int profession = person.getProfession();
+        int profession = person.getPrimaryRole().getProfession();
         while (hqView.getCampaign().getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
             profession = hqView.getCampaign().getRanks().getAlternateProfession(profession);
         }

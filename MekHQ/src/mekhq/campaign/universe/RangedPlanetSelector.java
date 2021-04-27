@@ -184,17 +184,17 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         for (PlanetarySystem system : systems) {
             double distance = system.getDistanceTo(currentSystem);
             if (faction.is(Tag.MERC) || system.getFactionSet(now).contains(faction)) {
-                if (!isExtraRandom) {
+                if (!isExtraRandom()) {
                     Planet planet = system.getPrimaryPlanet();
                     Long pop = planet.getPopulation(now);
-                    if (pop != null && pop > 0) {
+                    if ((pop != null) && (pop > 0)) {
                         total += 100.0 * Math.log10(pop) / (1 + distance * distanceScale);
                         planets.put(total, planet);
                     }
                 } else {
                     for (Planet planet : system.getPlanets()) {
                         Long pop = planet.getPopulation(now);
-                        if (pop != null && pop > 0) {
+                        if ((pop != null) && (pop > 0)) {
                             total += 100.0 * Math.log10(pop) / (1 + distance * distanceScale);
                             planets.put(total, planet);
                         }

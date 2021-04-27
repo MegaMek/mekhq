@@ -18,8 +18,9 @@
  */
 package mekhq.campaign.unit.actions;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import java.util.UUID;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
@@ -32,14 +33,69 @@ import mekhq.campaign.unit.Unit;
 import org.junit.Test;
 
 import megamek.common.Entity;
+import megamek.common.Game;
+import megamek.common.Player;
 
 public class RestoreUnitActionTest {
     @Test
-    public void restoreUnitDoesNotSkipPartsAfterRepairingMissingParts() {
+    public void restoreUnitSwitchesOutEntityAndParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Game mockGame = mock(Game.class);
+        when(mockCampaign.getGame()).thenReturn(mockGame);
+        Player mockPlayer = new Player(1, "Player");
+        when(mockCampaign.getPlayer()).thenReturn(mockPlayer);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        
+        int entityId = 42;
+        String shortName = "Test Mech TST-01X";
+        Entity mockEntity = mock(Entity.class);
+        when(mockEntity.getId()).thenReturn(entityId);
+        when(mockEntity.getShortNameRaw()).thenReturn(shortName);
+        
+        UUID id = UUID.randomUUID();
+        Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(id);
+        when(unit.getEntity()).thenReturn(mockEntity);
+
+        Entity mockNewEntity = mock(Entity.class);
+        doAnswer(inv -> {
+            int newId = (int) inv.getArgument(0);
+            when(mockNewEntity.getId()).thenReturn(newId);
+            return null;
+        }).when(mockNewEntity).setId(anyInt());
+        RestoreUnitAction.IEntityCopyFactory mockEntityCopyFactory = mock(RestoreUnitAction.IEntityCopyFactory.class);
+        doReturn(mockNewEntity).when(mockEntityCopyFactory).copy(eq(mockEntity));
+
+        RestoreUnitAction action = new RestoreUnitAction(mockEntityCopyFactory);
+
+        action.execute(mockCampaign, unit);
+
+        verify(mockNewEntity, times(1)).setId(eq(entityId));
+        verify(mockNewEntity, times(1)).setOwner(eq(mockPlayer));
+        verify(mockNewEntity, times(1)).setGame(eq(mockGame));
+        verify(mockNewEntity, times(1)).setExternalIdAsString(eq(id.toString()));
+        
+        verify(mockGame, times(1)).removeEntity(eq(entityId), anyInt());
+        verify(mockGame, times(1)).addEntity(eq(entityId), eq(mockNewEntity));
+
+        verify(unit, times(1)).setEntity(eq(mockNewEntity));
+        verify(unit, times(1)).removeParts();
+        verify(unit, times(1)).initializeBaySpace();
+        verify(unit, times(1)).initializeParts(eq(true));
+        verify(unit, times(1)).runDiagnostic(eq(false));
+        verify(unit, times(1)).setSalvage(eq(false));
+        verify(unit, times(1)).resetPilotAndEntity();
+    }
+
+    @Test
+    public void restoreUnitUsingOldStrategy() {
+        RestoreUnitAction.IEntityCopyFactory mockEntityCopyFactory = mock(RestoreUnitAction.IEntityCopyFactory.class);
         Campaign mockCampaign = mock(Campaign.class);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Entity mockEntity = mock(Entity.class);
+        when(mockEntity.getShortNameRaw()).thenReturn("Test Mech TST-01X");
         Unit unit = new Unit(mockEntity, mockCampaign);
 
         Part part0 = mock(Part.class);
@@ -70,7 +126,7 @@ public class RestoreUnitActionTest {
         unit.addPart(missing1);
         unit.addPart(part1);
 
-        RestoreUnitAction action = new RestoreUnitAction();
+        RestoreUnitAction action = new RestoreUnitAction(mockEntityCopyFactory);
 
         action.execute(mockCampaign, unit);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,7 +20,6 @@ package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -30,11 +29,9 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
-import megamek.common.icons.Camouflage;
-import megamek.common.util.StringUtil;
 import mekhq.MHQStaticDirectoryManager;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.utilities.JMenuHelpers;
-import org.apache.commons.lang3.tuple.Pair;
 
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.EntityWeightClass;
@@ -171,8 +168,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String ASF_CARRIERS = "Aerospace Fighter Transports";
     private static final String SC_CARRIERS = "Small Craft Transports";
     private static final String VARIABLE_TRANSPORT = "%s Transports";
-
-    private static final int MAX_POPUP_ITEMS = 20;
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -347,8 +342,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
                 }
             }
-        } else if (command.contains(TOEMouseAdapter.CHANGE_ICON)) {
-            if (null != singleForce) {
+        } else if (command.contains(CHANGE_ICON)) {
+            if (singleForce != null) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
                         singleForce.getIconCategory(), singleForce.getIconFileName(),
                         singleForce.getIconMap(), MHQStaticDirectoryManager.getForceIcons(), true);
@@ -360,25 +355,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
-        } else if (command.contains(TOEMouseAdapter.CHANGE_CAMO)) {
+        } else if (command.contains(CHANGE_CAMO)) {
             if (singleForce != null) {
-                CamoChooserDialog ccd = getCamoChooserDialogForForce(singleForce);
-                ccd.setLocationRelativeTo(gui.getFrame());
-                ccd.setVisible(true);
+                CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+                        singleForce.getCamouflageOrElse(gui.getCampaign().getCamouflage()), true);
 
                 if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
                     return;
                 }
-                for (UUID id : singleForce.getAllUnits(false)) {
-                    Unit unit = gui.getCampaign().getUnit(id);
-                    if (unit != null) {
-                        unit.getEntity().setCamouflage(ccd.getSelectedItem());
-                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                    }
-                }
+                singleForce.setCamouflage(ccd.getSelectedItem());
                 MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
-        } else if (command.contains(TOEMouseAdapter.CHANGE_NAME)) {
+        } else if (command.contains(CHANGE_NAME)) {
             if (null != singleForce) {
                 String name = (String) JOptionPane.showInputDialog(null,
                         "Enter the force name", "Force Name",
@@ -634,7 +622,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         boolean unitsSelected = !units.isEmpty();
         // if both are selected then we prefer units
         // and will deselect forces
-        if (forcesSelected & unitsSelected) {
+        if (forcesSelected && unitsSelected) {
             forcesSelected = false;
             TreePath[] paths = new TreePath[uPath.size()];
             int i = 0;
@@ -676,8 +664,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JMenu mechanics = new JMenu("Mechanics");
                     JMenu baTechs = new JMenu("BA Techs");
 
-                    int role;
-                    int previousRole = Person.T_MECH_TECH;
+                    PersonnelRole role;
+                    PersonnelRole previousRole = PersonnelRole.MECH_TECH;
 
                     JMenu eliteMenu = new JMenu(SkillType.ELITE_NM);
                     JMenu veteranMenu = new JMenu(SkillType.VETERAN_NM);
@@ -689,29 +677,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     // Get the list of techs, then sort them based on their tech role
                     List<Person> techList = gui.getCampaign().getTechs();
                     techList.sort((o1, o2) -> {
-                        int r1 = o1.isTechPrimary() ? o1.getPrimaryRole() : o1.getSecondaryRole();
-                        int r2 = o2.isTechPrimary() ? o2.getPrimaryRole() : o2.getSecondaryRole();
-                        return r1 - r2;
+                        PersonnelRole r1 = o1.getPrimaryRole().isTech() ? o1.getPrimaryRole() : o1.getSecondaryRole();
+                        PersonnelRole r2 = o2.getPrimaryRole().isTech() ? o2.getPrimaryRole() : o2.getSecondaryRole();
+                        return r1.compareTo(r2);
                     });
                     for (Person tech : techList) {
                         if ((tech.getMaintenanceTimeUsing() == 0) && !tech.isEngineer()) {
-                            role = tech.isTechPrimary() ? tech.getPrimaryRole() : tech.getSecondaryRole();
-                            String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.isTechPrimary()));
+                            role = tech.getPrimaryRole().isTech() ? tech.getPrimaryRole() : tech.getSecondaryRole();
+                            String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.getPrimaryRole().isTech()));
 
                             // We need to add all the non-empty menus to the current menu, then
                             // the current menu must be added to the main menu if the role changes
                             // This enables us to use significantly less code to do the same thing
-                            if (role > previousRole) {
+                            if (role.ordinal() > previousRole.ordinal()) {
                                 previousRole = role;
 
                                 // Adding menus if they aren't empty and adding scrollbars if they
                                 // contain more than MAX_POPUP_ITEMS items
-                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu, MAX_POPUP_ITEMS);
-                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu, MAX_POPUP_ITEMS);
-                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu, MAX_POPUP_ITEMS);
-                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu, MAX_POPUP_ITEMS);
-                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu, MAX_POPUP_ITEMS);
-                                JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
 
                                 eliteMenu = new JMenu(SkillType.ELITE_NM);
                                 veteranMenu = new JMenu(SkillType.VETERAN_NM);
@@ -719,20 +707,22 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 greenMenu = new JMenu(SkillType.GREEN_NM);
                                 ultraGreenMenu = new JMenu(SkillType.ULTRA_GREEN_NM);
                                 switch (role) {
-                                    case Person.T_MECHANIC:
+                                    case MECHANIC:
                                         currentMenu = mechanics;
                                         break;
-                                    case Person.T_AERO_TECH:
+                                    case AERO_TECH:
                                         currentMenu = aeroTechs;
                                         break;
-                                    case Person.T_BA_TECH:
+                                    case BA_TECH:
                                         currentMenu = baTechs;
+                                        break;
+                                    default:
                                         break;
                                 }
                             }
 
                             menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
+                            menuItem.setActionCommand(COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                             menuItem.addActionListener(this);
                             switch (skillLvl) {
                                 case SkillType.ELITE_NM:
@@ -750,18 +740,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 case SkillType.ULTRA_GREEN_NM:
                                     ultraGreenMenu.add(menuItem);
                                     break;
+                                default:
+                                    break;
                             }
                         }
                     }
 
                     // We need to add the last role to the menu after we assign the last tech
-                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 } else {
                     menuItem = new JMenuItem("Remove Tech from Force");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + "|" + forceIds);
@@ -776,8 +768,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 final List<Integer> svTypes = Arrays.asList(UnitType.TANK,
                         UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER);
 
-                for (int i = 0; i < UnitType.SIZE; i++)
-                {
+                for (int i = 0; i < UnitType.SIZE; i++) {
                     String unittype = UnitType.getTypeName(i);
                     String displayname = UnitType.getTypeDisplayableName(i);
                     unitTypeMenus.put(unittype, new JMenu(displayname));
@@ -853,8 +844,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 });
 
-                for (int i = 0; i < UnitType.SIZE; i++)
-                {
+                for (int i = 0; i < UnitType.SIZE; i++) {
                     String unittype = UnitType.getTypeName(i);
                     JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(i));
                     if (tmp.isEnabled()) {
@@ -890,19 +880,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
+
                 if (unsorted.getComponentCount() > 0 || unsorted.getItemCount() > 0) {
                     menu.add(unsorted);
                     menu.setEnabled(true);
                 }
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
                 menuItem = new JMenuItem("Change Force Icon...");
-                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_ICON + forceIds);
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
-                menuItem = new JMenuItem("Change Force Camo...");
-                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_CAMO + forceIds);
+                menuItem = new JMenuItem("Force Camouflage...");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CAMO + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
@@ -921,10 +912,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
                 menu.setEnabled(false);
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getMissions()) {
-                    if (!m.isActive()) {
-                        continue;
-                    }
+                for (Mission m : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(m.getName());
                     for (Scenario s : m.getScenarios()) {
                         if (s.isCurrent()) {
@@ -940,9 +928,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menu.setEnabled(true);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(menu, missionMenu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, missionMenu);
                 }
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
             if (StaticChecks.areAllForcesDeployed(forces)) {
                 menuItem = new JMenuItem("Undeploy Force");
@@ -1277,10 +1265,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 //Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getMissions()) {
-                    if (!m.isActive()) {
-                        continue;
-                    }
+                for (Mission m : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(m.getName());
                     for (Scenario s : m.getScenarios()) {
                         if (s.isCurrent()) {
@@ -1310,7 +1295,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     MenuScroller.createScrollBarsOnMenus(menu);
                     popup.add(menu);
                 }
-
 
                 //First, only display the Assign to Ship command if your command has at least 1 valid transport
                 //and if your selection does not include a transport
@@ -1479,44 +1463,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
         }
-        
+
         return Optional.of(popup);
-    }
-
-    /**
-     * Creates a Camouflage chooser dialog for a force, starting with
-     * the most used camouflage in the force; otherwise the campaign
-     * camouflage.
-     * @param force The force to create a camouflage choice dialog for.
-     * @return A CamoChooserDialog for the given force.
-     */
-    private CamoChooserDialog getCamoChooserDialogForForce(Force force) {
-        String category = gui.getCampaign().getCamoCategory();
-        String fileName = gui.getCampaign().getCamoFileName();
-
-        // Gather the most used camo category/file name for the force
-        Optional<Pair<String, String>> used = force.getAllUnits(false).stream()
-            .map(id -> gui.getCampaign().getUnit(id))
-            .filter(Objects::nonNull)
-            .map(Unit::getEntity)
-            .collect(
-                Collectors.collectingAndThen(
-                    Collectors.groupingBy(
-                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()),
-                        Collectors.counting()),
-                    m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
-                )
-            );
-        if (used.isPresent()) {
-            // IF there is a camo category and its not blank...
-            if (!StringUtil.isNullOrEmpty(used.get().getKey())) {
-                // ...use it as the category/fileName
-                category = used.get().getKey();
-                fileName = used.get().getValue();
-            }
-        }
-
-        return new CamoChooserDialog(gui.getFrame(), new Camouflage(category, fileName));
     }
 
     /**

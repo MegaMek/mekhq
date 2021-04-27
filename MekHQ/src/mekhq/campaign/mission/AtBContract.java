@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 import megamek.client.ui.swing.util.PlayerColour;
@@ -34,6 +35,7 @@ import megamek.common.icons.Camouflage;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
+import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -45,6 +47,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.WeightedMap;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -52,6 +55,9 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -129,11 +135,9 @@ public class AtBContract extends Contract implements Serializable {
     protected int enemyQuality;
     protected String allyBotName;
     protected String enemyBotName;
-    protected String allyCamoCategory;
-    protected String allyCamoFileName;
+    protected Camouflage allyCamouflage;
     protected PlayerColour allyColour;
-    protected String enemyCamoCategory;
-    protected String enemyCamoFileName;
+    protected Camouflage enemyCamouflage;
     protected PlayerColour enemyColour;
 
     protected int extensionLength;
@@ -163,6 +167,8 @@ public class AtBContract extends Contract implements Serializable {
     protected int battleTypeMod;
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
+    
+    private StratconCampaignState stratconCampaignState;
 
     protected AtBContract() {
         this(null);
@@ -183,11 +189,9 @@ public class AtBContract extends Contract implements Serializable {
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
-        allyCamoCategory = Camouflage.COLOUR_CAMOUFLAGE;
-        allyCamoFileName = PlayerColour.RED.name();
+        setAllyCamouflage(new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name()));
         setAllyColour(PlayerColour.RED);
-        enemyCamoCategory = Camouflage.COLOUR_CAMOUFLAGE;
-        enemyCamoFileName = PlayerColour.GREEN.name();
+        setEnemyCamouflage(new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.GREEN.name()));
         setEnemyColour(PlayerColour.GREEN);
 
         extensionLength = 0;
@@ -443,6 +447,7 @@ public class AtBContract extends Contract implements Serializable {
             if (today.isAfter(routEnd)) {
                 moraleLevel = MORALE_NORMAL;
                 routEnd = null;
+                updateEnemy(today); // mix it up a little
             } else {
                 moraleLevel = MORALE_ROUT;
             }
@@ -550,6 +555,19 @@ public class AtBContract extends Contract implements Serializable {
         moraleMod = 0;
     }
 
+    /**
+     * Changes the enemy to a randomly selected faction that's an enemy of 
+     * the current employer
+     */
+    private void updateEnemy(LocalDate today) {
+        String enemyCode = RandomFactionGenerator.getInstance().getEnemy(
+                Factions.getInstance().getFaction(employerCode), false, true);
+        setEnemyCode(enemyCode);
+        
+        Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
+        setEnemyBotName(enemyFaction.getFullName(today.getYear()));
+    }
+    
     public int getRepairLocation(int dragoonRating) {
         int retval = Unit.SITE_BAY;
         if ((missionType == MT_GUERRILLAWARFARE) ||
@@ -653,8 +671,6 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void doBonusRoll(Campaign c) {
-        final String METHOD_NAME = "doBonusRoll(Campaign)"; //$NON-NLS-1$
-
         int number;
         String rat = null;
         int roll = Compute.d6();
@@ -664,7 +680,7 @@ public class AtBContract extends Contract implements Serializable {
                 number = Compute.d6();
                 c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
                 for (int i = 0; i < number; i++) {
-                    Person p = c.newDependent(Person.T_ASTECH, false);
+                    Person p = c.newDependent(false);
                     c.recruitPerson(p);
                 }
             }
@@ -698,7 +714,7 @@ public class AtBContract extends Contract implements Serializable {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    MekHQ.getLogger().error(this, "Unable to load entity: " + msl.get(0).getSourceFile()
+                    MekHQ.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
                             + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
                 }
             }
@@ -1119,23 +1135,19 @@ public class AtBContract extends Contract implements Serializable {
                 +"<enemyBotName>"
                 +enemyBotName
                 +"</enemyBotName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<allyCamoCategory>"
-                +allyCamoCategory
-                +"</allyCamoCategory>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<allyCamoFileName>"
-                +allyCamoFileName
-                +"</allyCamoFileName>");
+        if (!getAllyCamouflage().hasDefaultCategory()) {
+           MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allyCamoCategory", getAllyCamouflage().getCategory());
+        }
+        if (!getAllyCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allyCamoFileName", getAllyCamouflage().getFilename());
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allyColour", getAllyColour().name());
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<enemyCamoCategory>"
-                +enemyCamoCategory
-                +"</enemyCamoCategory>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<enemyCamoFileName>"
-                +enemyCamoFileName
-                +"</enemyCamoFileName>");
+        if (!getEnemyCamouflage().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "enemyCamoCategory", getEnemyCamouflage().getCategory());
+        }
+        if (!getEnemyCamouflage().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "enemyCamoFileName", getEnemyCamouflage().getFilename());
+        }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "enemyColour", getEnemyColour().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<requiredLances>"
@@ -1198,6 +1210,10 @@ public class AtBContract extends Contract implements Serializable {
                     MekHqXmlUtil.saveFormattedDate(specialEventScenarioDate));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioType", specialEventScenarioType);
         }
+        
+        if(stratconCampaignState != null) {
+            stratconCampaignState.Serialize(pw1);
+        }
     }
 
     @Override
@@ -1227,28 +1243,28 @@ public class AtBContract extends Contract implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyBotName")) {
                 enemyBotName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("allyCamoCategory")) {
-                allyCamoCategory = wn2.getTextContent();
+                getAllyCamouflage().setCategory(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allyCamoFileName")) {
-                allyCamoFileName = wn2.getTextContent();
+                getAllyCamouflage().setFilename(wn2.getTextContent().trim());
             } else if (wn2.getTextContent().equalsIgnoreCase("allyColour")) {
                 setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) { // Legacy - 0.47.15 removal
                 setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamoCategory())) {
-                    setAllyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                    setAllyCamoFileName(getAllyColour().name());
+                if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamouflage().getCategory())) {
+                    getAllyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    getAllyCamouflage().setFilename(getAllyColour().name());
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
-                enemyCamoCategory = wn2.getTextContent();
+                getEnemyCamouflage().setCategory(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
-                enemyCamoFileName = wn2.getTextContent();
+                getEnemyCamouflage().setFilename(wn2.getTextContent().trim());
             } else if (wn2.getTextContent().equalsIgnoreCase("enemyColour")) {
                 setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) { // Legacy - 0.47.15 removal
                 setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamoCategory())) {
-                    setEnemyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                    setEnemyCamoFileName(getEnemyColour().name());
+                if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamouflage().getCategory())) {
+                    getEnemyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    getEnemyCamouflage().setFilename(getEnemyColour().name());
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances")) {
                 requiredLances = Integer.parseInt(wn2.getTextContent());
@@ -1280,6 +1296,10 @@ public class AtBContract extends Contract implements Serializable {
                 specialEventScenarioDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                 specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                stratconCampaignState = StratconCampaignState.Deserialize(wn2);
+                stratconCampaignState.setContract(this);
+                this.setStratconCampaignState(stratconCampaignState);
             } else if (wn2.getNodeName().equalsIgnoreCase("parentContractId")) {
                 parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
             }
@@ -1399,20 +1419,12 @@ public class AtBContract extends Contract implements Serializable {
         enemyBotName = name;
     }
 
-    public String getAllyCamoCategory() {
-        return allyCamoCategory;
+    public Camouflage getAllyCamouflage() {
+        return allyCamouflage;
     }
 
-    public void setAllyCamoCategory(String category) {
-        allyCamoCategory = category;
-    }
-
-    public String getAllyCamoFileName() {
-        return allyCamoFileName;
-    }
-
-    public void setAllyCamoFileName(String fileName) {
-        allyCamoFileName = fileName;
+    public void setAllyCamouflage(Camouflage allyCamouflage) {
+        this.allyCamouflage = Objects.requireNonNull(allyCamouflage);
     }
 
     public PlayerColour getAllyColour() {
@@ -1420,23 +1432,15 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void setAllyColour(PlayerColour allyColour) {
-        this.allyColour = allyColour;
+        this.allyColour = Objects.requireNonNull(allyColour);
     }
 
-    public String getEnemyCamoCategory() {
-        return enemyCamoCategory;
+    public Camouflage getEnemyCamouflage() {
+        return enemyCamouflage;
     }
 
-    public void setEnemyCamoCategory(String category) {
-        enemyCamoCategory = category;
-    }
-
-    public String getEnemyCamoFileName() {
-        return enemyCamoFileName;
-    }
-
-    public void setEnemyCamoFileName(String fileName) {
-        enemyCamoFileName = fileName;
+    public void setEnemyCamouflage(Camouflage enemyCamouflage) {
+        this.enemyCamouflage = enemyCamouflage;
     }
 
     public PlayerColour getEnemyColour() {
@@ -1444,7 +1448,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void setEnemyColour(PlayerColour enemyColour) {
-        this.enemyColour = enemyColour;
+        this.enemyColour = Objects.requireNonNull(enemyColour);
     }
 
     public int getRequiredLances() {
@@ -1518,7 +1522,23 @@ public class AtBContract extends Contract implements Serializable {
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
+    
+    public StratconCampaignState getStratconCampaignState() {
+        return stratconCampaignState;
+    }
+    
+    public void setStratconCampaignState(StratconCampaignState state) {
+        stratconCampaignState = state;
+    }
 
+    @Override
+    public void acceptContract(Campaign campaign) {
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.initializeCampaignState(this, campaign, 
+                    StratconContractDefinition.getContractDefinition(getMissionType()));
+        }
+    }
+    
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
 
@@ -1599,7 +1619,7 @@ public class AtBContract extends Contract implements Serializable {
         retVal.setType(c.getType());
         retVal.setSystemId(c.getSystemId());
         retVal.setDesc(c.getDescription());
-        retVal.setStatus(Mission.S_ACTIVE);
+        retVal.setStatus(MissionStatus.ACTIVE);
         retVal.setLength(length);
         retVal.setStartDate(campaign.getLocalDate());
         /*Set ending date; the other calculated values will be replaced
