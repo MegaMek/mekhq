@@ -35,6 +35,7 @@ VERSION HISTORY:
 + Issue #2487: When a garrison-type contract comes back from a "rout" break, you may find yourself facing different opposition
 + Issue #2460: Improving Default AtBContract Name and Briefing Tab Sort
 + PR #2352: Personnel Role Enum
++ PR #2545: Allow aerospace fighters with only 10 heat sinks to repair damaged heat sinks
 
 0.48.0 (Stable) - (2021-03-05 1530 UT
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
