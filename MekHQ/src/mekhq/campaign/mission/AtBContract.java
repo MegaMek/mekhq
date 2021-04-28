@@ -167,7 +167,7 @@ public class AtBContract extends Contract implements Serializable {
     protected int battleTypeMod;
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
-    
+
     private StratconCampaignState stratconCampaignState;
 
     protected AtBContract() {
@@ -556,18 +556,18 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     /**
-     * Changes the enemy to a randomly selected faction that's an enemy of 
+     * Changes the enemy to a randomly selected faction that's an enemy of
      * the current employer
      */
     private void updateEnemy(LocalDate today) {
         String enemyCode = RandomFactionGenerator.getInstance().getEnemy(
                 Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
-        
+
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
     }
-    
+
     public int getRepairLocation(int dragoonRating) {
         int retval = Unit.SITE_BAY;
         if ((missionType == MT_GUERRILLAWARFARE) ||
@@ -1210,7 +1210,7 @@ public class AtBContract extends Contract implements Serializable {
                     MekHqXmlUtil.saveFormattedDate(specialEventScenarioDate));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioType", specialEventScenarioType);
         }
-        
+
         if(stratconCampaignState != null) {
             stratconCampaignState.Serialize(pw1);
         }
@@ -1344,6 +1344,10 @@ public class AtBContract extends Contract implements Serializable {
                     Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
         }
         return Factions.getInstance().getFaction(employerCode).getFullName(year);
+    }
+
+    public Faction getEnemy() {
+        return Factions.getInstance().getFaction(getEnemyCode());
     }
 
     public String getEnemyCode() {
@@ -1522,11 +1526,11 @@ public class AtBContract extends Contract implements Serializable {
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
-    
+
     public StratconCampaignState getStratconCampaignState() {
         return stratconCampaignState;
     }
-    
+
     public void setStratconCampaignState(StratconCampaignState state) {
         stratconCampaignState = state;
     }
@@ -1534,11 +1538,11 @@ public class AtBContract extends Contract implements Serializable {
     @Override
     public void acceptContract(Campaign campaign) {
         if (campaign.getCampaignOptions().getUseStratCon()) {
-            StratconContractInitializer.initializeCampaignState(this, campaign, 
+            StratconContractInitializer.initializeCampaignState(this, campaign,
                     StratconContractDefinition.getContractDefinition(getMissionType()));
         }
     }
-    
+
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
 

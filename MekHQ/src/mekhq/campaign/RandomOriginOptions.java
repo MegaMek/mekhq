@@ -198,8 +198,8 @@ public class RandomOriginOptions implements Serializable {
                         options.setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "centralPlanet":
-                        String centralPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                        String centralPlanetPlanetId = wn.getTextContent().trim();
+                        final String centralPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                        final String centralPlanetPlanetId = wn.getTextContent().trim();
                         options.setCentralPlanet(Systems.getInstance().getSystemById(centralPlanetSystemId).getPlanetById(centralPlanetPlanetId));
                         break;
                     case "originSearchRadius":

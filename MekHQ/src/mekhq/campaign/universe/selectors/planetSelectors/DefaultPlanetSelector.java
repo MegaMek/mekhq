@@ -20,6 +20,7 @@ package mekhq.campaign.universe.selectors.planetSelectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
@@ -33,7 +34,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     //region Constructors
     /**
-     * Creates a new DefaultPlanetSelector that uses {@link Campaign#getCurrentSystem()} to produce
+     * Creates a new DefaultPlanetSelector that uses {@link CurrentLocation#getPlanet()} to produce
      * the planet.
      */
     public DefaultPlanetSelector() {
@@ -57,7 +58,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     @Override
     public @Nullable Planet selectPlanet(final Campaign campaign) {
-        return (getSelectedPlanet() == null) ? campaign.getCurrentSystem().getPrimaryPlanet()
+        return (getSelectedPlanet() == null) ? campaign.getLocation().getPlanet()
                 : getSelectedPlanet();
     }
 

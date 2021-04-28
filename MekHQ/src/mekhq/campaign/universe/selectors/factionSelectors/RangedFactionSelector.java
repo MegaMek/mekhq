@@ -141,12 +141,12 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * Creates the cached {@link Faction} lookup map.
      */
     private void createLookupMap(final Campaign campaign) {
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
-        LocalDate now = campaign.getLocalDate();
-        boolean isClan = campaign.getFaction().isClan();
+        final LocalDate now = campaign.getLocalDate();
+        final boolean isClan = campaign.getFaction().isClan();
 
-        Map<Faction, Double> weights = new HashMap<>();
+        final Map<Faction, Double> weights = new HashMap<>();
         Systems.getInstance().visitNearbySystems(currentSystem, getRange(), planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
@@ -246,7 +246,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private Set<Faction> getEnemies(final Campaign campaign) {
         final Set<Faction> enemies = new HashSet<>();
         for (final AtBContract contract : campaign.getActiveAtBContracts()) {
-            enemies.add(Factions.getInstance().getFaction(contract.getEnemyCode()));
+            enemies.add(contract.getEnemy());
         }
         return enemies;
     }

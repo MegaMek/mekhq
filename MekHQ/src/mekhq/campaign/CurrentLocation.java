@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
 
+import mekhq.campaign.universe.Planet;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -91,6 +92,14 @@ public class CurrentLocation implements Serializable {
 
     public PlanetarySystem getCurrentSystem() {
         return currentSystem;
+    }
+
+    /**
+     * @return the current planet location. This is currently the primary planet of the system, but
+     * in the future this will not be the case.
+     */
+    public Planet getPlanet() {
+        return getCurrentSystem().getPrimaryPlanet();
     }
 
     public double getTransitTime() {
