@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public enum Profession {
@@ -198,7 +199,7 @@ public enum Profession {
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final String name) {
-        switch (name) {
+        switch (name.toUpperCase(Locale.ENGLISH)) {
             case "--ASF":
                 return AEROSPACE;
             case "--VEE":
@@ -209,11 +210,11 @@ public enum Profession {
                 return INFANTRY;
             case "--TECH":
                 return TECH;
-            case "--MEDIC":
+            case "--MEDICAL":
                 return MEDICAL;
             case "--ADMIN":
                 return ADMIN;
-            case "--CIV":
+            case "--CIVILIAN":
                 return CIVILIAN;
             case "--MW":
             default:

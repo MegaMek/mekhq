@@ -25,7 +25,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 

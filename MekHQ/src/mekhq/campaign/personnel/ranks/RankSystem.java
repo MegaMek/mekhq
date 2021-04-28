@@ -125,6 +125,10 @@ public class RankSystem implements Serializable {
         return "CG".equals(getCode());
     }
 
+    /**
+     * @return if the Rank System is either Com Guard or Word of Blake Militia, which is used to
+     * determine if a person can have a ROM Designation
+     */
     public boolean isCGOrWoBM() {
         return isComGuard() || isWoBMilitia();
     }
