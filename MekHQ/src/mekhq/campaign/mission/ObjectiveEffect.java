@@ -53,23 +53,23 @@ public class ObjectiveEffect {
         /*
          *  contributes a "victory point" towards the scenario's victory/defeat state
          */
-        ScenarioVictory("Gain Scenario VP", true),
+        ScenarioVictory("+%d Scenario VP", true),
         /*
          *  contributes a "negative victory point" towards the scenario's victory/defeat state
          */
-        ScenarioDefeat("Lose Scenario VP", true),
+        ScenarioDefeat("-%d Scenario VP", true),
         /*
          *  changes the contract score
          */
-        ContractScoreUpdate("Contract Score Change", true),
+        ContractScoreUpdate("%d Contract Score", true),
         /* changes the number of support points (not implemented yet)
          * 
          */
-        SupportPointUpdate("Support Point Change", true),
+        SupportPointUpdate("%d Support Points", true),
         /*
          *  changes the contract morale up or down
          */
-        ContractMoraleUpdate("Contract Morale Change", true),
+        ContractMoraleUpdate("%d Contract Morale", true),
         /*
          *  insta-win the contract (player still has to manually complete it)
          */
@@ -81,11 +81,11 @@ public class ObjectiveEffect {
         /*
          *  update the BV budget multiplier for template scenarios (not implemented yet)
          */
-        BVBudgetUpdate("BV budget increase", true),
+        BVBudgetUpdate("%d%% BV budget increase", true),
         /*
          *  roll an AtB-style "bonus"
          */
-        AtBBonus("AtB bonus roll(s)", true),
+        AtBBonus("%d AtB bonus roll(s)", true),
         
         /*
          * In StratCon, relevant if scenario is about a facility, said facility remains in play.

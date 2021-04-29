@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -40,6 +39,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.OffBoardDirection;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 
 /**
  * Contains metadata used to describe a scenario objective
@@ -323,14 +323,17 @@ public class ScenarioObjective {
         case ForceWithdraw:
         case Capture:
         case Preserve:
-            return String.format("%s %s%s(%s)", getObjectiveCriterion().toString(), amountString, timeLimitString,
-                    this.getSuccessEffects().get(0).effectType);
+            return String.format("<html>%s %s%s<span color='black'>%s%s</span></html>", getObjectiveCriterion().toString(), amountString, 
+                    timeLimitString, buildEffects(true), buildEffects(false));
         case ReachMapEdge:
-            return String.format("Reach %s edge with %s%s(%s)", edgeString, amountString, timeLimitString);
+            return String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString, amountString, 
+                    timeLimitString, buildEffects(true), buildEffects(false));
         case PreventReachMapEdge:
-            return String.format("Prevent %s from reaching %s%s(%s)", amountString, edgeString, timeLimitString);
+            return String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>", amountString, edgeString, 
+                    timeLimitString, buildEffects(true), buildEffects(false));
         case Custom:
-            return String.format("%s%s%s\n(%s)", getDescription(), amountString, timeLimitString);
+            return String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(), amountString, 
+                    timeLimitString, buildEffects(true), buildEffects(false));
         default:
                 return "?";
         }
@@ -340,11 +343,40 @@ public class ScenarioObjective {
         StringBuilder result = new StringBuilder();
         List<ObjectiveEffect> effectCollection = success ? getSuccessEffects() : getFailureEffects();
         
+        if (!effectCollection.isEmpty()) {
+            result.append("<br/>");
+        }
+        
         for (ObjectiveEffect effect : effectCollection) {
-            result.append(effect.effectType.toString()).append(" : ");
+            boolean scaledEffect = effect.effectScaling == EffectScalingType.Linear ||
+                    effect.effectScaling == EffectScalingType.Inverted;
+
+            String effectTypeText = "";
             
-            switch (effect.effectScaling) {
-            //case Fixed
+            if (effect.effectType.isMagnitudeRelevant()) {
+                effectTypeText = String.format(effect.effectType.toString(), effect.howMuch);
+            } else {
+                effectTypeText = effect.effectType.toString();
+            }
+            
+            result.append(effectTypeText);
+            
+            if (scaledEffect) {
+                result.append(" per unit");
+                
+                if (effect.effectScaling == EffectScalingType.Linear) {
+                    result.append(" qualifying for this objective");
+                } else if (effect.effectScaling == EffectScalingType.Inverted) {
+                    result.append(" not qualifying for this objective");
+                }
+            } else {
+                result.append(" if this objective is ");
+
+                if (success) {
+                    result.append("completed");
+                } else {
+                    result.append("failed");
+                }
             }
         }
         
@@ -470,7 +502,7 @@ public class ScenarioObjective {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(objectiveElement, pw);
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error("Error Serializing Scenario Objective", e);
         }
     }
     
@@ -488,7 +520,7 @@ public class ScenarioObjective {
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Objective", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Objective", e);
         }
         
         return resultingObjective;
