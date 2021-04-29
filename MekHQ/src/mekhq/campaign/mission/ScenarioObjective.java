@@ -378,7 +378,11 @@ public class ScenarioObjective {
                     result.append("failed");
                 }
             }
+            
+            result.append("<br/>");
         }
+        
+        result.replace(result.lastIndexOf("<br/>"), result.length(), "");
         
         return result.toString();
     }
