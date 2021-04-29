@@ -117,9 +117,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
     public StratconPanel(CampaignGUI gui, JLabel infoArea) {
-        if (gui != null) {
-            campaign = gui.getCampaign();
-        }
+        campaign = gui.getCampaign();
         
         scenarioWizard = new StratconScenarioWizard(campaign);
         this.infoArea = infoArea;
