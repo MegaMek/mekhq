@@ -21,6 +21,7 @@
  */
 package mekhq.gui;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 
@@ -77,16 +78,20 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
         }
     }
 
-    public String getSelectedItemKey() {
+    public @Nullable String getSelectedItemKey() {
         if (getSelectedItem() == null) {
             return null;
         }
         return (String) ((Map.Entry<?, ?>) getSelectedItem()).getKey();
     }
 
-    public void setSelectedItemByKey(String key) {
+    public void setSelectedItemByKey(final @Nullable String key) {
+        if (key == null) {
+            return;
+        }
+
         for (int i = 0; i < getModel().getSize(); i++) {
-            if (key.equals(getModel().getElementAt(i).getKey())) {
+            if (getModel().getElementAt(i).getKey().equals(key)) {
                 setSelectedIndex(i);
                 return;
             }
