@@ -348,8 +348,8 @@ public class ScenarioObjective {
         }
         
         for (ObjectiveEffect effect : effectCollection) {
-            boolean scaledEffect = effect.effectScaling == EffectScalingType.Linear ||
-                    effect.effectScaling == EffectScalingType.Inverted;
+            boolean scaledEffect = (effect.effectScaling == EffectScalingType.Linear) ||
+                    (effect.effectScaling == EffectScalingType.Inverted);
 
             String effectTypeText = "";
             
