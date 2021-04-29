@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,22 +10,22 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -53,10 +53,10 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         if (mft == Entity.ETYPE_MECH || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
             mftMod = 1;
         }
-        for (int i = Person.T_NONE + 1; i < Person.T_NUM; i++) {
+        for (PersonnelRole role : PersonnelRole.getMarketableRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-            switch(c.getUnitRatingMod()) {
+            switch (c.getUnitRatingMod()) {
                 case IUnitRating.DRAGOON_A:
                 case IUnitRating.DRAGOON_ASTAR:
                     roll += 3;
@@ -92,7 +92,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
                 q = 6;
             }
             for (int j = 0; j < q; j++) {
-                retVal.add(c.newPerson(i));
+                retVal.add(c.newPerson(role));
             }
         }
         return retVal;

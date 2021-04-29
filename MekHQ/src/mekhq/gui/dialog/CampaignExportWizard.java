@@ -278,7 +278,7 @@ public class CampaignExportWizard extends JDialog {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
         List<Person> people = sourceCampaign.getActivePersonnel();
-        people.sort(Comparator.comparingInt(Person::getPrimaryRole));
+        people.sort(Comparator.comparing(Person::getPrimaryRole));
         for (Person person : people) {
             personListModel.addElement(person);
         }

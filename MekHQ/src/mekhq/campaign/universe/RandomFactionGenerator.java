@@ -237,6 +237,13 @@ public class RandomFactionGenerator {
     }
 
     /**
+     * Pick an enemy faction, possibly rebels, given an employer.
+     */
+    public String getEnemy(Faction employer, boolean useRebels) {
+        return getEnemy(employer, useRebels, false);
+    }
+    
+    /**
      * Selects an enemy faction for the given employer, weighted by length of shared border and
      * diplomatic relations. Factions at war or designated as rivals are twice as likely (cumulative)
      * to be chosen as opponents. Allied factions are ignored except for Clans, which halves
@@ -244,9 +251,11 @@ public class RandomFactionGenerator {
      *
      * @param employer  The faction offering the contract
      * @param useRebels Whether to include rebels as a possible opponent
+     * @param useMercs  Whether to include MERC as a possible opponent. Note, don't do this when
+     * first generating contract, as contract generation relies on the opfor having planets
      * @return          The faction to use as the opfor.
      */
-    public String getEnemy(Faction employer, boolean useRebels) {
+    public String getEnemy(Faction employer, boolean useRebels, boolean useMercs) {
         String employerName = employer != null ? employer.getShortName() : "no employer supplied or faction does not exist";
 
         /* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
@@ -261,6 +270,11 @@ public class RandomFactionGenerator {
         if (null != employer) {
             employerName = employer.getShortName();
             WeightedMap<Faction> enemyMap = buildEnemyMap(employer);
+            
+            if (useMercs) {
+                appendMercsToEnemyMap(enemyMap);
+            }
+            
             enemy = enemyMap.randomItem();
         }
         if (null != enemy) {
@@ -273,6 +287,18 @@ public class RandomFactionGenerator {
         return "PIR";
     }
 
+    /**
+     * Appends MERC faction to the given enemy map, with approximately a 10% probability
+     */
+    protected void appendMercsToEnemyMap(WeightedMap<Faction> enemyMap) {
+        int mercWeight = 0;
+        for (int key : enemyMap.keySet()) {
+            mercWeight += key;
+        }
+        
+        enemyMap.add((int) Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction("MERC"));
+    }
+    
     /**
      * Builds a map of potential enemies keyed to cumulative weight
      *

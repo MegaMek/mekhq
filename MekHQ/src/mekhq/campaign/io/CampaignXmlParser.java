@@ -266,7 +266,7 @@ public class CampaignXmlParser {
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
+                    retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } /* We don't need this since info is processed above in the first iteration...
                 else if (xn.equalsIgnoreCase("info")) {
                     processInfoNode(retVal, wn, version);
