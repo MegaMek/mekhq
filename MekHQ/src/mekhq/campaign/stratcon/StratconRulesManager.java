@@ -419,6 +419,8 @@ public class StratconRulesManager {
                     campaign.addReport(reportStatus.toString());
                     return true;
                 }
+            case ChainedScenario:
+                return true;
             case None: 
             default:
                 return false;
