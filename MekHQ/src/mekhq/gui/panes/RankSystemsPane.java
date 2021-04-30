@@ -333,23 +333,12 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         }));
 
         panel.add(new MMButton("btnExportUserDataRankSystems", resources.getString("btnExportUserDataRankSystems.text"),
-                resources.getString("btnExportUserDataRankSystems.toolTipText"), evt -> {
-            updateRankSystem();
-            final java.util.List<RankSystem> rankSystems = new ArrayList<>();
-            for (int i = 0; i < getRankSystemModel().getSize(); i++) {
-                final RankSystem rankSystem = getRankSystemModel().getElementAt(i);
-                if (rankSystem.getType().isUserData()) {
-                    rankSystems.add(rankSystem);
-                }
-            }
-            Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
-            refreshRankSystems();
-        }));
+                resources.getString("btnExportUserDataRankSystems.toolTipText"), evt -> exportUserDataRankSystems(true)));
 
         panel.add(new MMButton("btnExportRankSystems", resources.getString("btnExportRankSystems.text"),
                 resources.getString("btnExportRankSystems.toolTipText"), evt -> {
             updateRankSystem();
-            final java.util.List<RankSystem> rankSystems = new ArrayList<>();
+            final List<RankSystem> rankSystems = new ArrayList<>();
             for (int i = 0; i < getRankSystemModel().getSize(); i++) {
                 rankSystems.add(getRankSystemModel().getElementAt(i));
             }
@@ -386,8 +375,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
     //endregion Initialization
 
-    //region Action Listeners
-    //region Rank Systems Tab
+    //region Button Actions
     private void comboRankSystemChanged() {
         updateRankSystem();
 
@@ -453,6 +441,21 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         }
     }
 
+    private void exportUserDataRankSystems(final boolean refresh) {
+        updateRankSystem();
+        final List<RankSystem> rankSystems = new ArrayList<>();
+        for (int i = 0; i < getRankSystemModel().getSize(); i++) {
+            final RankSystem rankSystem = getRankSystemModel().getElementAt(i);
+            if (rankSystem.getType().isUserData()) {
+                rankSystems.add(rankSystem);
+            }
+        }
+        Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
+        if (refresh) {
+            refreshRankSystems();
+        }
+    }
+
     private void refreshRankSystems() {
         // Clear the selected rank system and reinitialize
         setSelectedRankSystem(null);
@@ -487,10 +490,11 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Set the selected item
         getComboRankSystems().setSelectedItem(getCampaign().getRankSystem());
     }
-    //endregion Rank Systems Tab
-    //endregion Action Listeners
+    //endregion Button Actions
 
     public void applyToCampaign() {
+        exportUserDataRankSystems(false);
+        Ranks.reinitializeRankSystems(getCampaign());
         getCampaign().setRankSystem(getSelectedRankSystem());
     }
 }
