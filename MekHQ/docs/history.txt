@@ -38,10 +38,10 @@ VERSION HISTORY:
 + PR #2545: Allow aerospace fighters with only 10 heat sinks to repair damaged heat sinks
 + Issue #2553: Fixing FactionComboBox NPE with null input code
 + Issue #2553: Fixing preferences issue in the Personnel Market
-+ Issues #1483, #2196, #2201, #2202, #2205, #2449: Rank System Rework
++ Issues #1483, #2196, #2201, #2202, #2205, #2449: Rank System and Profession Rework
++ Issue #271: ScenarioStatus Enum: Expanded Scenario Status Options
 
-
-0.48.0 (Stable) - (2021-03-05 1530 UT
+0.48.0 (Stable) - (2021-03-05 1530 UTC)
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
 + Issue #2431: Fix exception exporting personnel to CSV
 + PR #2437: Hangar Report: Fixing Wrong Node Addition for Medium Wheeled
