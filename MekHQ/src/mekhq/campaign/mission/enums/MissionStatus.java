@@ -25,23 +25,31 @@ import java.util.ResourceBundle;
 
 public enum MissionStatus {
     //region Enum Declarations
-    ACTIVE("MissionStatus.ACTIVE.text"),
-    SUCCESS("MissionStatus.SUCCESS.text"),
-    FAILED("MissionStatus.FAILED.text"),
-    BREACH("MissionStatus.BREACH.text");
+    ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
+    SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
+    FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
+    BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-            new EncodeControl());
+    private final String toolTipText;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    MissionStatus(String name) {
+    MissionStatus(final String name, final String toolTipText) {
         this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
 
     //region Boolean Comparison Methods
     public boolean isActive() {
@@ -70,12 +78,12 @@ public enum MissionStatus {
     }
     //endregion Boolean Comparison Methods
 
-    //region File IO
+    //region File I/O
     /**
      * @param text containing the MissionStatus
      * @return the saved MissionStatus
      */
-    public static MissionStatus parseFromString(String text) {
+    public static MissionStatus parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -84,25 +92,26 @@ public enum MissionStatus {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return ACTIVE;
                 case 1:
                     return SUCCESS;
                 case 2:
                     return FAILED;
                 case 3:
                     return BREACH;
-                case 0:
                 default:
-                    return ACTIVE;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus");
+        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
 
         return ACTIVE;
     }
-    //endregion File IO
+    //endregion File I/O
 
     @Override
     public String toString() {

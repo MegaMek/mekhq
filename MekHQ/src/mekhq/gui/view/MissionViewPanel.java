@@ -161,6 +161,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + mission.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(mission.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -269,6 +270,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -601,6 +603,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;

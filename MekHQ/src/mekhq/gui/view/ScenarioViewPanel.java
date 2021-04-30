@@ -67,11 +67,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         super();
         this.scenario = s;
         this.campaign = c;
-        if (s.isCurrent()) {
-            this.forces = new ForceStub(s.getForces(campaign), campaign);
-        } else {
-            this.forces = s.getForceStub();
-        }
+        this.forces = s.getStatus().isCurrent() ? new ForceStub(s.getForces(c), c) : s.getForceStub();
         forceModel = new StubTreeModel(forces);
         initComponents();
     }
@@ -143,8 +139,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + scenario.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + scenario.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
