@@ -39,88 +39,90 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends ScrollablePanel {
-	private static final long serialVersionUID = 7004741688464105277L;
+public class ForceViewPanel extends JScrollablePanel {
+    private static final long serialVersionUID = 7004741688464105277L;
 
-	private Force force;
-	private Campaign campaign;
+    private Force force;
+    private Campaign campaign;
 
-	private javax.swing.JLabel lblIcon;
-	private javax.swing.JPanel pnlStats;
-	private javax.swing.JPanel pnlSubUnits;
-	private javax.swing.JTextPane txtDesc;
+    private javax.swing.JLabel lblIcon;
+    private javax.swing.JPanel pnlStats;
+    private javax.swing.JPanel pnlSubUnits;
+    private javax.swing.JTextPane txtDesc;
 
-	private javax.swing.JLabel lblType;
-	private javax.swing.JLabel lblAssign1;
-	private javax.swing.JLabel lblAssign2;
-	private javax.swing.JLabel lblCommander1;
-	private javax.swing.JLabel lblCommander2;
-	private javax.swing.JLabel lblBV1;
-	private javax.swing.JLabel lblBV2;
-	private javax.swing.JLabel lblTonnage1;
-	private javax.swing.JLabel lblTonnage2;
-	private javax.swing.JLabel lblCost1;
-	private javax.swing.JLabel lblCost2;
-	private javax.swing.JLabel lblTech1;
-	private javax.swing.JLabel lblTech2;
+    private javax.swing.JLabel lblType;
+    private javax.swing.JLabel lblAssign1;
+    private javax.swing.JLabel lblAssign2;
+    private javax.swing.JLabel lblCommander1;
+    private javax.swing.JLabel lblCommander2;
+    private javax.swing.JLabel lblBV1;
+    private javax.swing.JLabel lblBV2;
+    private javax.swing.JLabel lblTonnage1;
+    private javax.swing.JLabel lblTonnage2;
+    private javax.swing.JLabel lblCost1;
+    private javax.swing.JLabel lblCost2;
+    private javax.swing.JLabel lblTech1;
+    private javax.swing.JLabel lblTech2;
 
-	public ForceViewPanel(Force f, Campaign c) {
-		this.force = f;
-		this.campaign = c;
-		initComponents();
-	}
+    public ForceViewPanel(Force f, Campaign c) {
+        super();
+        this.force = f;
+        this.campaign = c;
+        initComponents();
+    }
 
-	private void initComponents() {
-		java.awt.GridBagConstraints gridBagConstraints;
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-		lblIcon = new javax.swing.JLabel();
-		pnlStats = new javax.swing.JPanel();
-		pnlSubUnits = new javax.swing.JPanel();
-		txtDesc = new javax.swing.JTextPane();
+        lblIcon = new javax.swing.JLabel();
+        pnlStats = new javax.swing.JPanel();
+        pnlSubUnits = new javax.swing.JPanel();
+        txtDesc = new javax.swing.JTextPane();
 
-		setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.GridBagLayout());
 
 
-		lblIcon.setName("lblPortrait"); // NOI18N
-		setIcon(force, lblIcon, 150);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
-		add(lblIcon, gridBagConstraints);
+        lblIcon.setName("lblPortrait"); // NOI18N
+        setIcon(force, lblIcon, 150);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
+        add(lblIcon, gridBagConstraints);
 
-		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
-		fillStats();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 1;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(pnlStats, gridBagConstraints);
+        pnlStats.setName("pnlStats");
+        pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
+        fillStats();
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(pnlStats, gridBagConstraints);
 
-		pnlSubUnits.setName("pnlSubUnits");
-		fillSubUnits();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(pnlSubUnits, gridBagConstraints);
+        pnlSubUnits.setName("pnlSubUnits");
+        fillSubUnits();
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(pnlSubUnits, gridBagConstraints);
 
         if (null != force.getDescription() && !force.getDescription().isEmpty()) {
             txtDesc.setName("txtDesc");
@@ -140,324 +142,324 @@ public class ForceViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
         }
-	}
+    }
 
-	private void setIcon(Force force, JLabel lbl, int scale) {
-	    ImageIcon icon = null;
-	    try {
+    private void setIcon(Force force, JLabel lbl, int scale) {
+        ImageIcon icon = null;
+        try {
             icon = new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
                     force.getIconFileName(), force.getIconMap())
                     .getScaledInstance(scale, -1, Image.SCALE_SMOOTH));
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
         }
-	    lbl.setIcon(icon);
-	}
+        lbl.setIcon(icon);
+    }
 
 
-	private void fillStats() {
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl());
+    private void fillStats() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl());
 
-    	lblType = new javax.swing.JLabel();
-    	lblAssign1 = new javax.swing.JLabel();
-		lblAssign2 = new javax.swing.JLabel();
-    	lblCommander1 = new javax.swing.JLabel();
-		lblCommander2 = new javax.swing.JLabel();
-		lblBV1 = new javax.swing.JLabel();
-		lblBV2 = new javax.swing.JLabel();
-		lblCost1 = new javax.swing.JLabel();
-		lblCost2 = new javax.swing.JLabel();
-		lblTonnage1 = new javax.swing.JLabel();
-		lblTonnage2 = new javax.swing.JLabel();
-		lblTech1 = new javax.swing.JLabel();
-		lblTech2 = new javax.swing.JLabel();
-		java.awt.GridBagConstraints gridBagConstraints;
-		pnlStats.setLayout(new java.awt.GridBagLayout());
+        lblType = new javax.swing.JLabel();
+        lblAssign1 = new javax.swing.JLabel();
+        lblAssign2 = new javax.swing.JLabel();
+        lblCommander1 = new javax.swing.JLabel();
+        lblCommander2 = new javax.swing.JLabel();
+        lblBV1 = new javax.swing.JLabel();
+        lblBV2 = new javax.swing.JLabel();
+        lblCost1 = new javax.swing.JLabel();
+        lblCost2 = new javax.swing.JLabel();
+        lblTonnage1 = new javax.swing.JLabel();
+        lblTonnage2 = new javax.swing.JLabel();
+        lblTech1 = new javax.swing.JLabel();
+        lblTech2 = new javax.swing.JLabel();
+        java.awt.GridBagConstraints gridBagConstraints;
+        pnlStats.setLayout(new java.awt.GridBagLayout());
 
-	 	long bv = 0;
-    	Money cost = Money.zero();
-    	double ton = 0;
-    	String commander = "";
-    	String LanceTech = "";
-    	String assigned = "";
-    	String type = null;
-    	ArrayList<Person> people = new ArrayList<>();
-    	for (UUID uid : force.getAllUnits(false)) {
-    		Unit u = campaign.getUnit(uid);
-    		if (null != u) {
-    			Person p = u.getCommander();
-    			bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
-    			cost = cost.plus(u.getEntity().getCost(true));
-    			ton += u.getEntity().getWeight();
-    			String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
-    			if (null == type) {
-    				type = utype;
-    			} else if (!utype.equals(type)) {
-    				type = resourceMap.getString("mixed");
-    			}
-    			if (null != p) {
-    				people.add(p);
-    			}
-    		}
-    	}
- 		//sort person vector by rank
- 		people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-    	if (people.size() > 0) {
-    		commander = people.get(0).getFullTitle();
-    	}
+        long bv = 0;
+        Money cost = Money.zero();
+        double ton = 0;
+        String commander = "";
+        String LanceTech = "";
+        String assigned = "";
+        String type = null;
+        ArrayList<Person> people = new ArrayList<>();
+        for (UUID uid : force.getAllUnits(false)) {
+            Unit u = campaign.getUnit(uid);
+            if (null != u) {
+                Person p = u.getCommander();
+                bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
+                cost = cost.plus(u.getEntity().getCost(true));
+                ton += u.getEntity().getWeight();
+                String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+                if (null == type) {
+                    type = utype;
+                } else if (!utype.equals(type)) {
+                    type = resourceMap.getString("mixed");
+                }
+                if (null != p) {
+                    people.add(p);
+                }
+            }
+        }
+        //sort person vector by rank
+        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
+        if (people.size() > 0) {
+            commander = people.get(0).getFullTitle();
+        }
 
-    	if (null != force.getTechID()) {
-    		Person p = campaign.getPerson(force.getTechID());
-    		LanceTech = p.getFullName();
-    	}
+        if (null != force.getTechID()) {
+            Person p = campaign.getPerson(force.getTechID());
+            LanceTech = p.getFullName();
+        }
 
-    	if (null != force.getParentForce()) {
-    		assigned = force.getParentForce().getName();
-    	}
+        if (null != force.getParentForce()) {
+            assigned = force.getParentForce().getName();
+        }
 
-    	int nexty = 0;
+        int nexty = 0;
 
-    	if (null != type) {
-    		lblType.setName("lblCommander2");
-			lblType.setText("<html><i>" + (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit")+ "</i></html>");
-			gridBagConstraints = new GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.fill = GridBagConstraints.NONE;
-			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblType, gridBagConstraints);
-			nexty++;
-    	}
+        if (null != type) {
+            lblType.setName("lblCommander2");
+            lblType.setText("<html><i>" + (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit")+ "</i></html>");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblType, gridBagConstraints);
+            nexty++;
+        }
 
-    	if (!commander.equals("")) {
-	    	lblCommander1.setName("lblCommander1"); // NOI18N
-	    	lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblCommander1, gridBagConstraints);
+        if (!commander.equals("")) {
+            lblCommander1.setName("lblCommander1"); // NOI18N
+            lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblCommander1, gridBagConstraints);
 
-			lblCommander2.setName("lblCommander2"); // NOI18N
-			lblCommander2.setText(commander);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblCommander2, gridBagConstraints);
-			nexty++;
-    	}
-		if (null != force.getTechID()) {
-    		if (!LanceTech.equals("")) {
-    			lblTech1.setName("lblTech1"); // NOI18N
-    			lblTech1.setText(resourceMap.getString("lblTech1.text"));
-    			gridBagConstraints = new java.awt.GridBagConstraints();
-    			gridBagConstraints.gridx = 0;
-    			gridBagConstraints.gridy = nexty;
-    			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-    			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    			pnlStats.add(lblTech1, gridBagConstraints);
+            lblCommander2.setName("lblCommander2"); // NOI18N
+            lblCommander2.setText(commander);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblCommander2, gridBagConstraints);
+            nexty++;
+        }
+        if (null != force.getTechID()) {
+            if (!LanceTech.equals("")) {
+                lblTech1.setName("lblTech1"); // NOI18N
+                lblTech1.setText(resourceMap.getString("lblTech1.text"));
+                gridBagConstraints = new java.awt.GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = nexty;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblTech1, gridBagConstraints);
 
-    			lblTech2.setName("lblTech2"); // NOI18N
-    			lblTech2.setText(LanceTech);
-    			gridBagConstraints = new java.awt.GridBagConstraints();
-    			gridBagConstraints.gridx = 1;
-    			gridBagConstraints.gridy = nexty;
-    			gridBagConstraints.weightx = 0.5;
-    			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-    			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-    			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    			pnlStats.add(lblTech2, gridBagConstraints);
-    			nexty++;
-    			}
-    	}
+                lblTech2.setName("lblTech2"); // NOI18N
+                lblTech2.setText(LanceTech);
+                gridBagConstraints = new java.awt.GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = nexty;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblTech2, gridBagConstraints);
+                nexty++;
+                }
+        }
 
-    	if (!assigned.equals("")) {
-	    	lblAssign1.setName("lblAssign1"); // NOI18N
-	    	lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblAssign1, gridBagConstraints);
+        if (!assigned.equals("")) {
+            lblAssign1.setName("lblAssign1"); // NOI18N
+            lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblAssign1, gridBagConstraints);
 
-			lblAssign2.setName("lblAssign2"); // NOI18N
-			lblAssign2.setText(assigned);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblAssign2, gridBagConstraints);
-			nexty++;
-    	}
+            lblAssign2.setName("lblAssign2"); // NOI18N
+            lblAssign2.setText(assigned);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblAssign2, gridBagConstraints);
+            nexty++;
+        }
 
-    	lblBV1.setName("lblBV1"); // NOI18N
-    	lblBV1.setText(resourceMap.getString("lblBV1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblBV1, gridBagConstraints);
+        lblBV1.setName("lblBV1"); // NOI18N
+        lblBV1.setText(resourceMap.getString("lblBV1.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblBV1, gridBagConstraints);
 
-		lblBV2.setName("lblBV2"); // NOI18N
-		lblBV2.setText(DecimalFormat.getInstance().format(bv));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblBV2, gridBagConstraints);
-		nexty++;
+        lblBV2.setName("lblBV2"); // NOI18N
+        lblBV2.setText(DecimalFormat.getInstance().format(bv));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblBV2, gridBagConstraints);
+        nexty++;
 
-		lblTonnage1.setName("lblTonnage1"); // NOI18N
-		lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblTonnage1, gridBagConstraints);
+        lblTonnage1.setName("lblTonnage1"); // NOI18N
+        lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblTonnage1, gridBagConstraints);
 
-		lblTonnage2.setName("lblTonnage2"); // NOI18N
-		lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblTonnage2, gridBagConstraints);
-		nexty++;
+        lblTonnage2.setName("lblTonnage2"); // NOI18N
+        lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblTonnage2, gridBagConstraints);
+        nexty++;
 
-		// if AtB is enabled, set tooltip to show lance weight breakdowns
-		if (campaign.getCampaignOptions().getUseAtB()) {
-			// see Lance.java for lance weight breakdowns
-			lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
-			lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
-		}
+        // if AtB is enabled, set tooltip to show lance weight breakdowns
+        if (campaign.getCampaignOptions().getUseAtB()) {
+            // see Lance.java for lance weight breakdowns
+            lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
+            lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
+        }
 
-		lblCost1.setName("lblCost1"); // NOI18N
-		lblCost1.setText(resourceMap.getString("lblCost1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblCost1, gridBagConstraints);
+        lblCost1.setName("lblCost1"); // NOI18N
+        lblCost1.setText(resourceMap.getString("lblCost1.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblCost1, gridBagConstraints);
 
-		lblCost2.setName("lblCost2"); // NOI18N
-		lblCost2.setText(cost.toAmountAndSymbolString());
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = nexty;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblCost2, gridBagConstraints);
-		nexty++;
+        lblCost2.setName("lblCost2"); // NOI18N
+        lblCost2.setText(cost.toAmountAndSymbolString());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblCost2, gridBagConstraints);
+        nexty++;
 
-		//BV
-		//Tonnage?
-		//Cost?
-		//Number of units?
-		//Assigned to
-	}
+        //BV
+        //Tonnage?
+        //Cost?
+        //Number of units?
+        //Assigned to
+    }
 
-	private void fillSubUnits() {
+    private void fillSubUnits() {
 
-		java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
-		pnlSubUnits.setLayout(new java.awt.GridBagLayout());
+        pnlSubUnits.setLayout(new java.awt.GridBagLayout());
 
-		JLabel lblForce;
+        JLabel lblForce;
 
-		int nexty = 0;
-		for (Force subForce : force.getSubForces()) {
-			lblForce = new JLabel();
-			lblForce.setText(getSummaryFor(subForce));
-			setIcon(subForce, lblForce, 72);
-			nexty++;
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.weighty = 1.0;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlSubUnits.add(lblForce, gridBagConstraints);
-		}
-		JLabel lblPerson;
-		JLabel lblUnit;
-		ArrayList<Unit> units = new ArrayList<>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<>();
- 		for (UUID uid : force.getUnits()) {
-			Unit u = campaign.getUnit(uid);
-			if (null == u) {
-				continue;
-			}
-			if (null == u.getCommander()) {
-				unmannedUnits.add(u);
-			} else {
-				units.add(u);
-			}
- 		}
- 		//sort person vector by rank
- 		units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric()));
+        int nexty = 0;
+        for (Force subForce : force.getSubForces()) {
+            lblForce = new JLabel();
+            lblForce.setText(getSummaryFor(subForce));
+            setIcon(subForce, lblForce, 72);
+            nexty++;
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlSubUnits.add(lblForce, gridBagConstraints);
+        }
+        JLabel lblPerson;
+        JLabel lblUnit;
+        ArrayList<Unit> units = new ArrayList<>();
+        ArrayList<Unit> unmannedUnits = new ArrayList<>();
+        for (UUID uid : force.getUnits()) {
+            Unit u = campaign.getUnit(uid);
+            if (null == u) {
+                continue;
+            }
+            if (null == u.getCommander()) {
+                unmannedUnits.add(u);
+            } else {
+                units.add(u);
+            }
+        }
+        //sort person vector by rank
+        units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric()));
         units.addAll(unmannedUnits);
- 		for (Unit unit : units) {
- 			Person p = unit.getCommander();
- 			lblPerson = new JLabel();
-			lblUnit = new JLabel();
-			if (null != p) {
-				lblPerson.setText(getSummaryFor(p, unit));
-				lblPerson.setIcon(p.getPortrait().getImageIcon());
-			}
-			nexty++;
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.gridwidth = 1;
-			gridBagConstraints.weighty = 1.0;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlSubUnits.add(lblPerson, gridBagConstraints);
+        for (Unit unit : units) {
+            Person p = unit.getCommander();
+            lblPerson = new JLabel();
+            lblUnit = new JLabel();
+            if (null != p) {
+                lblPerson.setText(getSummaryFor(p, unit));
+                lblPerson.setIcon(p.getPortrait().getImageIcon());
+            }
+            nexty++;
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlSubUnits.add(lblPerson, gridBagConstraints);
             lblUnit.setText(getSummaryFor(unit));
             lblUnit.setIcon(new ImageIcon(unit.getImage(lblUnit)));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = nexty;
-			gridBagConstraints.gridwidth = 1;
-			gridBagConstraints.weighty = 1.0;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlSubUnits.add(lblUnit, gridBagConstraints);
-		}
-	}
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlSubUnits.add(lblUnit, gridBagConstraints);
+        }
+    }
 
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
         if (null != unit && null != unit.getEntity()
-        		&& null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-        	toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+                && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
+            toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
         }
         toReturn += "</font></html>";
         return toReturn;
@@ -480,18 +482,18 @@ public class ForceViewPanel extends ScrollablePanel {
             }
             toReturn += "</i>";
         } else if (entity.hasC3i()) {
-    		toReturn += "<br><i>";
+            toReturn += "<br><i>";
             if (entity.calculateFreeC3Nodes() >= 5) {
-            	toReturn += Messages.getString("ChatLounge.C3iNone");
+                toReturn += Messages.getString("ChatLounge.C3iNone");
             } else {
-            	toReturn += Messages
+                toReturn += Messages
                         .getString("ChatLounge.C3iNetwork")
                         + entity.getC3NetId();
                 if (entity.calculateFreeC3Nodes() > 0) {
-                	toReturn += Messages.getString("ChatLounge.C3Nodes", entity.calculateFreeC3Nodes());
+                    toReturn += Messages.getString("ChatLounge.C3Nodes", entity.calculateFreeC3Nodes());
                 }
             }
-    		toReturn += "</i>";
+            toReturn += "</i>";
         }
         if (unit.hasTransportShipAssignment()) {
             toReturn += "<br><i>" + "Transported by: ";
@@ -526,36 +528,36 @@ public class ForceViewPanel extends ScrollablePanel {
     }
 
     public String getSummaryFor(Force f) {
-    	//we are not going to use the campaign methods here because we can be more efficient
-    	//by only traversing once
-    	int bv = 0;
-    	Money cost = Money.zero();
-    	double ton = 0;
-    	int number = 0;
-    	String commander = "No personnel found";
-    	ArrayList<Person> people = new ArrayList<>();
-    	for (UUID uid : f.getAllUnits(false)) {
-    		Unit u = campaign.getUnit(uid);
-    		if (null != u) {
-    			Person p = u.getCommander();
-    			number++;
+        //we are not going to use the campaign methods here because we can be more efficient
+        //by only traversing once
+        int bv = 0;
+        Money cost = Money.zero();
+        double ton = 0;
+        int number = 0;
+        String commander = "No personnel found";
+        ArrayList<Person> people = new ArrayList<>();
+        for (UUID uid : f.getAllUnits(false)) {
+            Unit u = campaign.getUnit(uid);
+            if (null != u) {
+                Person p = u.getCommander();
+                number++;
                 if (p != null) {
                     bv += u.getEntity().calculateBattleValue(true, false);
                 } else {
                     bv += u.getEntity().calculateBattleValue(true, true);
                 }
-    			cost = cost.plus(u.getEntity().getCost(true));
-    			ton += u.getEntity().getWeight();
-    			if (p != null) {
-    				people.add(p);
-    			}
-    		}
-    	}
- 		//sort person vector by rank
- 		people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-    	if (people.size() > 0) {
-    		commander = people.get(0).getFullTitle();
-    	}
+                cost = cost.plus(u.getEntity().getCost(true));
+                ton += u.getEntity().getWeight();
+                if (p != null) {
+                    people.add(p);
+                }
+            }
+        }
+        //sort person vector by rank
+        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
+        if (people.size() > 0) {
+            commander = people.get(0).getFullTitle();
+        }
         String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
         toReturn += "<b>Number of Units:</b> " + number + "<br/>";
         toReturn += bv + " BV, ";

@@ -37,8 +37,8 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -142,11 +142,11 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".ranks");
             int i = 0;
-            for (Rank rank : campaign.getRanks().getAllRanks()) {
+            for (Rank rank : campaign.getRankSystem().getRanks()) {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
                 // TODO: This currently only exports MechWarrior Ranks. MercRoster software needs adjusted before this can be.
-                preparedStatement.setString(2, truncateString(rank.getName(Ranks.RPROF_MW), 45));
+                preparedStatement.setString(2, truncateString(rank.getName(Profession.MECHWARRIOR), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;
@@ -674,7 +674,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private int getLengthOfTask() {
-        return 2 + campaign.getRanks().getAllRanks().size() + SkillType.skillList.length
+        return 2 + campaign.getRankSystem().getRanks().size() + SkillType.skillList.length
                 + PersonnelRole.values().length * 2 + UnitType.SIZE + campaign.getPersonnel().size() *
                 + campaign.getHangar().getUnits().size() + campaign.getAllForces().size() * 2;
     }

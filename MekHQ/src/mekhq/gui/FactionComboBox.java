@@ -40,8 +40,6 @@ import java.util.Map.Entry;
  * @author Neoancient
  */
 public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
-    private static final long serialVersionUID = 1352706316707722054L;
-
     public FactionComboBox() {
         setModel(new SortedComboBoxModel<>(Entry.comparingByValue()));
         setRenderer(new DefaultListCellRenderer() {
