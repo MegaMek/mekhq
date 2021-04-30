@@ -120,9 +120,9 @@ public class StratconScenarioWizard extends JDialog {
                 List<Unit> eligibleLeadershipUnits = 
                         StratconRulesManager.getEligibleLeadershipUnits(campaign, 
                         currentScenario.getPrimaryForceIDs());
-                
-                Collections.sort(eligibleLeadershipUnits, 
-                        (Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()) );
+
+                eligibleLeadershipUnits.sort
+                        ((Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()));
                 
                 int leadershipSkill = 
                         currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
@@ -231,8 +231,8 @@ public class StratconScenarioWizard extends JDialog {
         gbc.gridy++;
         
         List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleDefensiveUnits(campaign);
-        Collections.sort(eligibleInfantryUnits, 
-                (Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()) );
+        eligibleInfantryUnits.sort 
+                ((Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()));
         
         availableInfantryUnits =
                 addIndividualUnitSelector(eligibleInfantryUnits, gbc, currentScenario.getNumDefensivePoints());
