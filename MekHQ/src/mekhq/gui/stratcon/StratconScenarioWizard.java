@@ -104,6 +104,7 @@ public class StratconScenarioWizard extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
         setInstructions(gbc);
         
         switch (currentScenario.getCurrentState()) {        
