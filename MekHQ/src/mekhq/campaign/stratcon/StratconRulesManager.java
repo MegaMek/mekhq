@@ -963,9 +963,16 @@ public class StratconRulesManager {
         }
 
         int primaryUnitType = getPrimaryUnitType(campaign, forceIDs);
+        int generalUnitType = StratconScenarioFactory.convertSpecificUnitTypeToGeneral(primaryUnitType);
 
         for (Unit u : campaign.getUnits()) {
-            if ((primaryUnitType != u.getEntity().getUnitType()) && !u.isDeployed() && !u.isMothballed()
+            // the general idea is that we want a different unit type than the primary
+            // but also something that can be deployed to the scenario - 
+            // e.g. no infantry on air scenarios etc.
+            boolean validUnitType = (primaryUnitType != u.getEntity().getUnitType()) &&
+                    forceCompositionMatchesDeclaredUnitType(u.getEntity().getUnitType(), generalUnitType, true);
+            
+            if (validUnitType && !u.isDeployed() && !u.isMothballed()
                     && u.isFunctional() && (u.getEntity().calculateBattleValue() < lowestBV)
                     && !isUnitDeployedToStratCon(u)) {
                 retVal.add(u);

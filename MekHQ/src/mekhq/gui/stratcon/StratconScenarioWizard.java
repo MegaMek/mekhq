@@ -19,6 +19,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +104,7 @@ public class StratconScenarioWizard extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
         setInstructions(gbc);
         
         switch (currentScenario.getCurrentState()) {        
@@ -117,6 +120,10 @@ public class StratconScenarioWizard extends JDialog {
                 List<Unit> eligibleLeadershipUnits = 
                         StratconRulesManager.getEligibleLeadershipUnits(campaign, 
                         currentScenario.getPrimaryForceIDs());
+
+                eligibleLeadershipUnits.sort
+                        ((Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()));
+                
                 int leadershipSkill = 
                         currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
                 
@@ -222,11 +229,13 @@ public class StratconScenarioWizard extends JDialog {
         getContentPane().add(lblDefensivePostureInstructions, gbc);
         
         gbc.gridy++;
+        
+        List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleDefensiveUnits(campaign);
+        eligibleInfantryUnits.sort 
+                ((Comparator<Unit>) (Unit o1, Unit o2) -> o1.getName().compareTo(o2.getName()));
+        
         availableInfantryUnits =
-                addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), 
-                        gbc, currentScenario.getNumDefensivePoints());
-        
-        
+                addIndividualUnitSelector(eligibleInfantryUnits, gbc, currentScenario.getNumDefensivePoints());
         
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
