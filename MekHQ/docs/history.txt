@@ -36,6 +36,10 @@ VERSION HISTORY:
 + Issue #2460: Improving Default AtBContract Name and Briefing Tab Sort
 + PR #2352: Personnel Role Enum
 + PR #2545: Allow aerospace fighters with only 10 heat sinks to repair damaged heat sinks
++ Issue #2553: Fixing FactionComboBox NPE with null input code
++ Issue #2553: Fixing preferences issue in the Personnel Market
++ Issues #1483, #2196, #2201, #2202, #2205, #2449: Rank System Rework
+
 
 0.48.0 (Stable) - (2021-03-05 1530 UT
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ

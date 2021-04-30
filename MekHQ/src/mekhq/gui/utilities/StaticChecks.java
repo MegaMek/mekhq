@@ -21,12 +21,13 @@ package mekhq.gui.utilities;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -556,25 +557,16 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(Person... people) {
-        return areAllEligible(people, false);
+        return areAllEligible(false, people);
     }
 
-    public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
-        int profession = people[0].getPrimaryRole().getProfession();
-        for (Person person : people) {
-            if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                    || (person.getPrimaryRole().getProfession() != profession)) {
-                return false;
-            }
-        }
-        int system = people[0].getRankSystem();
-        for (Person person : people) {
-            if (person.getRankSystem() != system) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllEligible(final boolean ignorePrisonerStatus, final Person... people) {
+        final Profession profession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
+        return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
+                && (profession == Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
+                && people[0].getRankSystem().equals(p.getRankSystem()));
     }
+
     /**
      * Checks if there is at least one award in the selected group of people
      * @param people the selected group of people
@@ -697,21 +689,12 @@ public class StaticChecks {
         return false;
     }
 
-    public static boolean areAllWoB(Person[] people) {
-        for (Person p : people) {
-            if (p.getRankSystem() != Ranks.RS_WOB)
-                return false;
-        }
-        return true;
+    public static boolean areAllWoBMilitia(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getRankSystem().isWoBMilitia());
     }
 
-    public static boolean areAllWoBOrComstar(Person[] people) {
-        for (Person p : people) {
-            if (p.getRankSystem() != Ranks.RS_WOB
-                    && p.getRankSystem() != Ranks.RS_COM)
-                return false;
-        }
-        return true;
+    public static boolean areAllWoBMilitiaOrComGuard(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getRankSystem().isCGOrWoBM());
     }
 
     public static boolean areAllSameSite(Unit[] units) {

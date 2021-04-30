@@ -178,8 +178,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(txtName, gbc);
 
         if (campaign.getFactionCode().equals("MERC")) {
-            lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
-            lblEmployer.setName("lblEmployer"); // NOI18N
+            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            lblEmployer.setName("lblEmployer");
             gbc.gridx = 0;
             gbc.gridy = y;
             gbc.gridwidth = 1;
@@ -187,7 +187,6 @@ public class NewAtBContractDialog extends NewContractDialog {
             gbc.insets = new java.awt.Insets(5, 5, 5, 5);
             descPanel.add(lblEmployer, gbc);
 
-//        	cbEmployer.setSelectedIndex(0);
             gbc.gridx = 1;
             gbc.gridy = y++;
             gbc.gridwidth = 2;
@@ -197,8 +196,8 @@ public class NewAtBContractDialog extends NewContractDialog {
             descPanel.add(cbEmployer, gbc);
         }
 
-        lblEnemy.setText(resourceMap.getString("lblEnemy.text")); // NOI18N
-        lblEnemy.setName("lblEnemy"); // NOI18N
+        lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
+        lblEnemy.setName("lblEnemy");
 
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -431,7 +430,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
         cbEnemy.addFactionEntries(RandomFactionGenerator.getInstance().
                 getEnemyList(getCurrentEmployerCode()), campaign.getGameYear());
-        cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
+        cbEnemy.setSelectedItemByKey(((AtBContract) contract).getEnemyCode());
     }
 
     private void showAllFactions(boolean show) {
@@ -442,12 +441,12 @@ public class NewAtBContractDialog extends NewContractDialog {
             cbEnemy.removeAllItems();
             cbEmployer.addFactionEntries(currentFactions, campaign.getGameYear());
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
-            cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
-            cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
+            cbEmployer.setSelectedItemByKey(((AtBContract) contract).getEmployerCode());
+            cbEnemy.setSelectedItemByKey(((AtBContract) contract).getEnemyCode());
         } else {
             cbEmployer.removeAllItems();
             cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
-            cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
+            cbEmployer.setSelectedItemByKey(((AtBContract) contract).getEmployerCode());
             updateEnemies();
         }
         addAllListeners();
@@ -529,9 +528,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setSharesPct((Integer)spnShares.getValue());
 
         contract.calculatePartsAvailabilityLevel(campaign);
-        
+
         if (campaign.getCampaignOptions().getUseStratCon()) {
-            StratconContractInitializer.initializeCampaignState(contract, campaign, 
+            StratconContractInitializer.initializeCampaignState(contract, campaign,
                     StratconContractDefinition.getContractDefinition(contract.getMissionType()));
         }
 

@@ -3901,7 +3901,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
                 engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
-                engineer.setRankNumeric(getCommander().getRankNumeric());
+                engineer.setRank(getCommander().getRankNumeric());
                 //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
             } else {
@@ -3967,7 +3967,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setId(getCommander().getId());
                     engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
-                        engineer.setRankNumeric(bestRank);
+                        engineer.setRank(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
