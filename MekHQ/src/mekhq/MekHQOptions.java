@@ -208,12 +208,38 @@ public final class MekHQOptions {
     //endregion Campaign XML Save Options
 
     //region File Paths
-    public String getAwardsDirectoryPath() {
-        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.AWARDS_DIRECTORY_PATH, "data/universe/awards/");
+    /**
+     * @return the path of the folder to load when loading or saving rank systems
+     */
+    public String getRankSystemsPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, "userdata/data/universe/");
     }
 
-    public void setAwardsDirectoryPath(String value) {
-        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
+    /**
+     * This sets the path where one saves or loads their rank systems from, as this is not required
+     * for any data but improves UX.
+     *
+     * @param value the path where the person saved their last individual rank system.
+     */
+    public void setRankSystemsPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, value);
+    }
+
+    /**
+     * @return the path of the folder to load when loading or saving an individual rank system
+     */
+    public String getIndividualRankSystemPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, "userdata/data/universe/");
+    }
+
+    /**
+     * This sets the path where one saves or loads their individual rank system, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last individual rank system.
+     */
+    public void setIndividualRankSystemPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
     //endregion File Paths
 

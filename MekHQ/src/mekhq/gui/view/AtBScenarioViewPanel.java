@@ -71,12 +71,13 @@ import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
  * @author Neoancient
  */
-public class AtBScenarioViewPanel extends ScrollablePanel {
+public class AtBScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
 
     private AtBScenario scenario;
@@ -134,6 +135,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private StubTreeModel playerForceModel;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
+        super();
         this.frame = frame;
         this.scenario = s;
         this.campaign = c;
@@ -156,7 +158,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         panStats = new JPanel();
         txtDesc = new JTextArea();
@@ -165,7 +167,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setScrollableTracksViewportWidth(false);
+        setTracksViewportWidth(false);
 
         int y = 0;
 

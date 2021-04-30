@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,166 +19,212 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
-
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-
+import mekhq.Version;
+import mekhq.campaign.personnel.enums.Profession;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * A specific rank with information about officer status and payment multipliers
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
+public class Rank implements Serializable {
+    //region Variable Declarations
+    private static final long serialVersionUID = 1677999967776587426L;
 
-public class Rank implements MekHqXmlSerializable {
+    // Rank Size Codes
+    // Enlisted
+    public static final int RE_MIN	= 0; // Rank "None"
+    public static final int RE_MAX	= 20;
+    public static final int RE_NUM	= 21;
+    // Warrant Officers
+    public static final int RWO_MIN	= 21;
+    public static final int RWO_MAX	= 30;
+    public static final int RWO_NUM	= 31; // Number that comes after RWO_MAX
+    // Officers
+    public static final int RO_MIN	= 31;
+    public static final int RO_MAX	= 50;
+    public static final int RO_NUM	= 51; // Number that comes after RO_MAX
+    // Total
+    public static final int RC_NUM	= 51; // Same as RO_MAX+1
 
-    private List<String> rankNames;
+    private Map<Profession, String> rankNames;
+    private Map<Profession, Integer> rankLevels;
     private boolean officer;
     private double payMultiplier;
-    private List<Integer> rankLevels;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Rank() {
-        this(new ArrayList<>(), false, 1.0);
+        this(new String[0], false, 1.0);
     }
 
-    public Rank(String[] names) {
-        this(names, false, 1.0);
-    }
-
-    public Rank(List<String> names) {
-        this(names, false, 1.0);
-    }
-
-    public Rank(String[] name, boolean b, double mult) {
-        this(Arrays.asList(name), b, mult);
-    }
-
-    public Rank(List<String> names, boolean b, double mult) {
-    	rankNames = names;
-        officer = b;
-        payMultiplier = mult;
-        rankLevels = new ArrayList<>();
-        for (int i = 0; i < rankNames.size(); i++) {
-        	rankLevels.add(0);
-        	if (rankNames.get(i).matches(".+:\\d+\\s*$")) {
-        		String[] temp = rankNames.get(i).split(":");
-        		rankNames.set(i, temp[0].trim());
-        		rankLevels.set(i, Integer.parseInt(temp[1].trim()));
-        	}
+    public Rank(final Rank rank) {
+        setRankNames(new HashMap<>());
+        setRankLevels(new HashMap<>());
+        for (final Profession profession : Profession.values()) {
+            getRankNames().put(profession, rank.getRankNames().getOrDefault(profession, "-"));
+            getRankLevels().put(profession, rank.getRankLevels().getOrDefault(profession, 1));
         }
+        setOfficer(rank.isOfficer());
+        setPayMultiplier(rank.getPayMultiplier());
     }
 
-    public String getName(int profession) {
-    	if (profession >= rankNames.size()) {
-    		return "Profession Out of Bounds";
-    	}
-    	return rankNames.get(profession);
+    public Rank(final String[] names, final boolean officer, final double payMultiplier) {
+        initializeRank(names);
+        setOfficer(officer);
+        setPayMultiplier(payMultiplier);
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public Map<Profession, String> getRankNames() {
+        return rankNames;
     }
 
-    public String getNameWithLevels(int profession) {
-    	if (profession >= rankNames.size()) {
-    		return "Profession Out of Bounds";
-    	}
-    	return rankNames.get(profession) + (rankLevels.get(profession) > 0 ? ":" + rankLevels.get(profession) : "");
+    public void setRankNames(final Map<Profession, String> rankNames) {
+        this.rankNames = rankNames;
+    }
+
+    public Map<Profession, Integer> getRankLevels() {
+        return rankLevels;
+    }
+
+    public void setRankLevels(final Map<Profession, Integer> rankLevels) {
+        this.rankLevels = rankLevels;
     }
 
     public boolean isOfficer() {
         return officer;
     }
 
-    public void setOfficer(boolean b) {
-        officer = b;
+    public void setOfficer(final boolean officer) {
+        this.officer = officer;
     }
 
     public double getPayMultiplier() {
         return payMultiplier;
     }
 
-    public void setPayMultiplier(double d) {
-        payMultiplier = d;
+    public void setPayMultiplier(final double payMultiplier) {
+        this.payMultiplier = payMultiplier;
+    }
+    //endregion Getters/Setters
+
+    //region Initialization
+    private void initializeRank(final String... names) {
+        setRankNames(new HashMap<>());
+        setRankLevels(new HashMap<>());
+        for (final Profession profession : Profession.values()) {
+            String name = (names.length > profession.ordinal()) ? names[profession.ordinal()] : "-";
+            final int level;
+            if (name.matches(".+:\\d+\\s*$")) {
+                final String[] split = name.split(":");
+                name = split[0];
+                level = Integer.parseInt(split[1].trim());
+            } else {
+                level = 1;
+            }
+            getRankNames().put(profession, name);
+            getRankLevels().put(profession, level);
+        }
+    }
+    //endregion Initialization
+
+    public String getName(final Profession profession) {
+        return getRankNames().get(profession);
     }
 
-    public int getRankLevels(int profession) {
-    	return rankLevels.get(profession);
+    public String getNameWithLevels(final Profession profession) {
+        return getRankNames().get(profession) + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
     }
 
-    public String getRankNamesAsString() {
-    	StringJoiner joiner = new StringJoiner(",");
-    	for (String name : rankNames) {
-    		if (rankLevels.size() > 0 && rankLevels.get(rankNames.indexOf(name)) > 0) {
-    			joiner.add(name + rankLevels.get(rankNames.indexOf(name)).toString());
-    		} else {
+    public String getRankNamesAsString(final String delimiter) {
+        StringJoiner joiner = new StringJoiner(delimiter);
+        for (final Profession profession : Profession.values()) {
+            String name = getRankNames().get(profession);
+            name = (name == null) ? "-" : name;
+            if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 1)) {
+                joiner.add(name + getRankLevels().get(profession));
+            } else {
                 joiner.add(name);
             }
-    	}
-    	return joiner.toString();
+        }
+        return joiner.toString();
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<rank>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<rankNames>"
-                +MekHqXmlUtil.escape(getRankNamesAsString())
-                +"</rankNames>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<officer>"
-                +officer
-                +"</officer>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<payMultiplier>"
-                +payMultiplier
-                +"</payMultiplier>");
-        pw1.print(MekHqXmlUtil.indentStr(indent) + "</rank>");
+    //region Boolean Comparison Methods
+    public boolean isEmpty(final Profession profession) {
+        return !getRankNames().containsKey(profession) || getRankNames().get(profession).isBlank()
+                || getRankNames().get(profession).equals("-");
     }
 
-    public static Rank generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+    public boolean indicatesAlternativeSystem(final Profession profession) {
+        return getRankNames().containsKey(profession) && getRankNames().get(profession).startsWith("--");
+    }
+    //endregion Boolean Comparison Methods
 
-        Rank retVal = null;
+    //region File I/O
+    public void writeToXML(final PrintWriter pw, int indent, final int index) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rank");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());
+        writeCloseTag(pw, --indent, index);
+    }
 
+    private void writeCloseTag(final PrintWriter pw, final int indent, final int rankIndex) {
+        final String tag;
+        if (rankIndex == 0) {
+            tag = "</rank> <!-- E0 \"None\" -->\n";
+        } else if (rankIndex < RE_NUM) {
+            tag = "</rank> <!-- E" + rankIndex + " -->\n";
+        } else if (rankIndex < RWO_NUM) {
+            tag = "</rank> <!-- WO" + (rankIndex - RE_MAX) + " -->\n";
+        } else if (rankIndex < RO_NUM) {
+            tag = "</rank> <!-- O" + (rankIndex - RWO_MAX) + " -->\n";
+        } else {
+            tag = "</rank>\n";
+        }
+        pw.print(MekHqXmlUtil.indentStr(indent) + tag);
+    }
+
+    public static @Nullable Rank generateInstanceFromXML(final Node wn, final Version version,
+                                                         final boolean e0) {
+        final Rank rank = new Rank();
         try {
-            retVal = new Rank();
+            final NodeList nl = wn.getChildNodes();
 
-            // Okay, now load Skill-specific fields!
-            NodeList nl = wn.getChildNodes();
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn2 = nl.item(x);
 
-            for (int x=0; x<nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                if (wn2.getNodeName().equalsIgnoreCase("rankName")) {
-                	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
-                    retVal.rankNames = Arrays.asList(rNames);
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
-                    retVal.rankNames = Arrays.asList(wn2.getTextContent().split(",", -1));
-                    for (int i = 0; i < retVal.rankNames.size(); i++) {
-                    	retVal.rankLevels.add(0);
-                    	if (retVal.rankNames.get(i).matches(".+:\\d+\\s*$")) {
-                    		String[] temp = retVal.rankNames.get(i).split(":");
-                    		retVal.rankNames.set(i, temp[0].trim());
-                    		retVal.rankLevels.set(i, Integer.parseInt(temp[1].trim()));
-                    	}
+                if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
+                    String names = wn2.getTextContent();
+                    if (version.isLowerThan("0.49.0")) {
+                        names += e0 ? ",--TECH,--TECH,--ADMIN" : ",-,-,-";
                     }
+                    rank.initializeRank(names.split(",", -1));
                 } else if (wn2.getNodeName().equalsIgnoreCase("officer")) {
-                    retVal.officer = Boolean.parseBoolean(wn2.getTextContent());
+                    rank.setOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payMultiplier")) {
-                    retVal.payMultiplier = Double.parseDouble(wn2.getTextContent());
+                    rank.setPayMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 }
             }
-        } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Rank.class, METHOD_NAME, ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            return null;
         }
 
-        return retVal;
+        return rank;
     }
-
+    //endregion File I/O
 }
