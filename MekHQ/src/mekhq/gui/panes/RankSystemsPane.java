@@ -375,7 +375,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
     //endregion Initialization
 
-    //region Action Listeners
+    //region Button Actions
     private void comboRankSystemChanged() {
         updateRankSystem();
 
@@ -490,7 +490,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Set the selected item
         getComboRankSystems().setSelectedItem(getCampaign().getRankSystem());
     }
-    //endregion Action Listeners
+    //endregion Button Actions
 
     public void applyToCampaign() {
         exportUserDataRankSystems(false);
