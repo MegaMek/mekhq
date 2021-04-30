@@ -15,12 +15,13 @@
 
 package mekhq.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Objects;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,27 +68,17 @@ public class StratconTab extends CampaignGuiTab {
         infoPanelText = new JLabel();
         campaignStatusText = new JLabel();
         
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 4;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.ipadx = 5;
+        setLayout(new GridLayout());
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
-        this.add(scrollPane, gbc);
+        this.add(scrollPane);
         
         // TODO: lance role assignment UI here?
         
         initializeInfoPanel();
-        gbc.gridx = 4;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.NORTH;
-        this.add(infoPanel, gbc);
+        this.add(infoPanel);
         
         MekHQ.registerHandler(this);
     }
@@ -96,28 +87,18 @@ public class StratconTab extends CampaignGuiTab {
      * Worker function that sets up the layout of the right-side info panel.
      */
     private void initializeInfoPanel() {
-        infoPanel = new JPanel();        
-        infoPanel.setLayout(new GridBagLayout()); 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
+        infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         
-        infoPanel.add(new JLabel("Current Campaign Status:"), gbc);
-        
-        gbc.gridy++;
-        
-        infoPanel.add(campaignStatusText, gbc);        
-        gbc.gridy++;
-        
-        gbc.gridwidth = 1;
-        gbc.gridheight = 2;
+        infoPanel.add(new JLabel("Current Campaign Status:"));
+        infoPanel.add(campaignStatusText);        
+
         JLabel lblCurrentTrack = new JLabel("Current Track:");
-        infoPanel.add(lblCurrentTrack, gbc);
-        gbc.gridx = 1;
-                
+        infoPanel.add(lblCurrentTrack);
+
         cboCurrentTrack = new JComboBox<>();
+        cboCurrentTrack.setAlignmentX(LEFT_ALIGNMENT);
+        cboCurrentTrack.setMaximumSize(new Dimension(320, 20));
         repopulateTrackList();
         cboCurrentTrack.addItemListener(new ItemListener() {
             @Override
@@ -126,18 +107,14 @@ public class StratconTab extends CampaignGuiTab {
             }
         });
 
-        infoPanel.add(cboCurrentTrack, gbc);
+        infoPanel.add(cboCurrentTrack);
         
         // have a default selected
         if (cboCurrentTrack.getItemCount() > 0) {
         	trackSelectionHandler();
         }
         
-        gbc.gridy += 2;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        infoPanel.add(infoPanelText, gbc);
+        infoPanel.add(infoPanelText);
     }
     
     /**
