@@ -25,8 +25,9 @@ import java.io.Serializable;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
 
+import mekhq.Version;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,7 +56,7 @@ public class RandomSkillPreferences implements Serializable {
 
     public RandomSkillPreferences() {
         overallRecruitBonus = 0;
-        recruitBonuses = new int[Person.T_NUM];
+        recruitBonuses = new int[PersonnelRole.values().length];
         randomizeSkill = true;
         useClanBonuses = true;
         antiMekProb = 10;
@@ -77,14 +78,16 @@ public class RandomSkillPreferences implements Serializable {
         overallRecruitBonus = b;
     }
 
-    public int getRecruitBonus(int type) {
-        return (type < recruitBonuses.length) ? recruitBonuses[type] : 0;
+    public int[] getRecruitBonuses() {
+        return recruitBonuses;
     }
 
-    public void setRecruitBonus(int type, int bonus) {
-        if (type < recruitBonuses.length) {
-            recruitBonuses[type] = bonus;
-        }
+    public int getRecruitBonus(PersonnelRole role) {
+        return getRecruitBonuses()[role.ordinal()];
+    }
+
+    public void setRecruitBonus(int index, int bonus) {
+        recruitBonuses[index] = bonus;
     }
 
     public int getSpecialAbilBonus(int type) {
@@ -197,7 +200,7 @@ public class RandomSkillPreferences implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "randomSkillPreferences");
     }
 
-    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
+    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
         MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
@@ -235,8 +238,14 @@ public class RandomSkillPreferences implements Serializable {
                 retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+                if (version.isLowerThan("0.49.0")) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = Integer.parseInt(values[i]);
+                    }
+                } else {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+                    }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                 String[] values = wn2.getTextContent().split(",");

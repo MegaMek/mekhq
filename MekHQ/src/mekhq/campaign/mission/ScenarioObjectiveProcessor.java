@@ -32,12 +32,21 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.stratcon.StratconRulesManager;
 
+/**
+ * Handles processing for objectives for a scenario that has them
+ * @author NickAragua
+ */
 public class ScenarioObjectiveProcessor {
 
     private Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits;
     private Map<ScenarioObjective, Set<String>> potentialObjectiveUnits;
 
+    /**
+     * Blank constructor
+     */
     public ScenarioObjectiveProcessor() {
         qualifyingObjectiveUnits = new HashMap<>();
         potentialObjectiveUnits = new HashMap<>();
@@ -259,11 +268,13 @@ public class ScenarioObjectiveProcessor {
      * @param objectiveOverrides Map containing user overrides of objective completion state
      * @param objectiveUnitCounts Map containing objectives and the number of units that qualified for each.
      */
-    public int determineScenarioStatus(Scenario scenario, Map<ScenarioObjective, Boolean> objectiveOverrides, Map<ScenarioObjective, Integer> objectiveUnitCounts) {
+    public ScenarioStatus determineScenarioStatus(Scenario scenario,
+                                                  Map<ScenarioObjective, Boolean> objectiveOverrides,
+                                                  Map<ScenarioObjective, Integer> objectiveUnitCounts) {
         int victoryScore = 0;
 
         if (!scenario.hasObjectives()) {
-            return Scenario.S_DRAW;
+            return ScenarioStatus.DRAW;
         }
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
@@ -288,11 +299,11 @@ public class ScenarioObjectiveProcessor {
         }
 
         if (victoryScore > 0) {
-            return Scenario.S_VICTORY;
+            return ScenarioStatus.VICTORY;
         } else if (victoryScore < 0) {
-            return Scenario.S_DEFEAT;
+            return ScenarioStatus.DEFEAT;
         } else {
-            return Scenario.S_DRAW;
+            return ScenarioStatus.DRAW;
         }
     }
 
@@ -367,6 +378,19 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case SupportPointUpdate:
+                if (tracker.getMission() instanceof AtBContract) {
+                    AtBContract contract = (AtBContract) tracker.getMission();
+
+                    if (contract.getStratconCampaignState() != null) {
+                        int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
+                        int numSupportPoints = effect.howMuch * effectMultiplier;
+                        if (dryRun) {
+                            return String.format("%d support points will be added", numSupportPoints);
+                        } else {
+                            contract.getStratconCampaignState().addSupportPoints(numSupportPoints);
+                        }
+                    }
+                }
                 break;
             case ContractMoraleUpdate:
                 break;
@@ -400,6 +424,32 @@ public class ScenarioObjectiveProcessor {
                         for (int x = 0; x < numBonuses; x++) {
                             contract.doBonusRoll(tracker.getCampaign());
                         }
+                    }
+                }
+            case FacilityRemains:
+                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
+                    if (dryRun) {
+                        return "This facility will not be captured.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, false);
+                    }
+                }
+                break;
+            case FacilityRemoved:
+                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
+                    if (dryRun) {
+                        return "This facility will be destroyed.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), true, false);
+                    }
+                }
+                break;
+            case FacilityCaptured:
+                if (tracker.getMission() instanceof AtBContract) {
+                    if (dryRun) {
+                        return "Allied forces will control this facility.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, true);
                     }
                 }
         }

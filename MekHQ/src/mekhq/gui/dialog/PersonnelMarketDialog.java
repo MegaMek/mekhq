@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
@@ -67,27 +68,26 @@ public class PersonnelMarketDialog extends JDialog {
     private Campaign campaign;
     private CampaignGUI hqView;
     private PersonnelMarket personnelMarket;
-    Person selectedPerson = null;
+    private Person selectedPerson = null;
     private Money unitCost = Money.zero();
 
     private JComboBox<PersonnelFilter> comboPersonType;
     private JLabel lblPersonChoice;
     private JRadioButton radioNormalRoll;
-    private javax.swing.JRadioButton radioPaidRecruitment;
-    private javax.swing.JComboBox<String> comboRecruitType;
-    private javax.swing.JPanel panelOKBtns;
-    private javax.swing.JPanel panelMain;
-    private javax.swing.JPanel panelFilterBtns;
-    private javax.swing.JTable tablePersonnel;
-    private javax.swing.JLabel lblUnitCost;
-    private javax.swing.JScrollPane scrollTablePersonnel;
-    private javax.swing.JScrollPane scrollPersonnelView;
+    private JRadioButton radioPaidRecruitment;
+    private JComboBox<PersonnelRole> comboRecruitRole;
+    private JPanel panelOKBtns;
+    private JPanel panelMain;
+    private JPanel panelFilterBtns;
+    private JTable tablePersonnel;
+    private JLabel lblUnitCost;
+    private JScrollPane scrollTablePersonnel;
+    private JScrollPane scrollPersonnelView;
     private TableRowSorter<PersonnelTableModel> sorter;
     private ArrayList<RowSorter.SortKey> sortKeys;
-    private javax.swing.JSplitPane splitMain;
+    private JSplitPane splitMain;
 
-    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
-            new EncodeControl());
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog", new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
@@ -116,14 +116,12 @@ public class PersonnelMarketDialog extends JDialog {
         comboPersonType = new javax.swing.JComboBox<>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
-        comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         lblPersonChoice = new javax.swing.JLabel();
-        //choicePersonView = new javax.swing.JComboBox();
-        //lblPersonView = new javax.swing.JLabel();
+        comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Personnel Market");
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
@@ -161,14 +159,14 @@ public class PersonnelMarketDialog extends JDialog {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
             radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
 
             ButtonGroup group = new ButtonGroup();
@@ -180,26 +178,33 @@ public class PersonnelMarketDialog extends JDialog {
                 radioNormalRoll.setSelected(true);
             }
 
-            for (int i = 1; i < Person.T_NUM; i++) {
-                comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
-            }
+            final boolean isClan = campaign.getFaction().isClan();
+            comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    return super.getListCellRendererComponent(list,
+                            (value instanceof PersonnelRole) ? ((PersonnelRole) value).getName(isClan) : value,
+                            index, isSelected, cellHasFocus);
+                }
+            });
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panelFilterBtns.add(comboRecruitType, gridBagConstraints);
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            panelFilterBtns.add(comboRecruitRole, gridBagConstraints);
 
             if (personnelMarket.getPaidRecruitment()) {
                 radioPaidRecruitment.setSelected(true);
-                comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
+                comboRecruitRole.setSelectedItem(personnelMarket.getPaidRecruitRole());
             } else {
                 radioNormalRoll.setSelected(true);
             }
         }
 
-        scrollTablePersonnel.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTablePersonnel.setName("srcTablePersonnel"); // NOI18N
-        scrollTablePersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
+        scrollTablePersonnel.setMinimumSize(new Dimension(500, 400));
+        scrollTablePersonnel.setName("srcTablePersonnel");
+        scrollTablePersonnel.setPreferredSize(new Dimension(500, 400));
 
         tablePersonnel.setModel(personnelModel);
         tablePersonnel.setName("tablePersonnel"); // NOI18N
@@ -299,8 +304,8 @@ public class PersonnelMarketDialog extends JDialog {
         radioPaidRecruitment.setName("paidRecruitment");
         preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
 
-        comboRecruitType.setName("recruitType");
-        preferences.manage(new JComboBoxPreference(comboRecruitType));
+        comboRecruitRole.setName("recruitRole");
+        preferences.manage(new JComboBoxPreference(comboRecruitRole));
 
         tablePersonnel.setName("unitsTable");
         preferences.manage(new JTablePreference(tablePersonnel));
@@ -377,7 +382,7 @@ public class PersonnelMarketDialog extends JDialog {
             unit.addDriver(selectedPerson);
         } else if (selectedPerson.canGun(en)) {
             unit.addGunner(selectedPerson);
-        } else if (selectedPerson.getPrimaryRole() == Person.T_NAVIGATOR) {
+        } else if (selectedPerson.getPrimaryRole().isVesselNavigator()) {
             unit.setNavigator(selectedPerson);
         } else {
             unit.addVesselCrew(selectedPerson);
@@ -387,11 +392,11 @@ public class PersonnelMarketDialog extends JDialog {
         hireAction.execute(campaign, unit);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCloseActionPerformed(ActionEvent evt) {
         selectedPerson = null;
         personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
         if (radioPaidRecruitment.isSelected()) {
-            personnelMarket.setPaidRecruitType(comboRecruitType.getSelectedIndex() + 1);
+            personnelMarket.setPaidRecruitRole((PersonnelRole) comboRecruitRole.getSelectedItem());
         }
         setVisible(false);
     }

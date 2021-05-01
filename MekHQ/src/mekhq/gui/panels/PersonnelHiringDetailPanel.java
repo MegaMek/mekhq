@@ -276,7 +276,7 @@ public class PersonnelHiringDetailPanel extends JPanel {
             getLblPortrait().setToolTipText(getPerson().getPortrait().toString());
         }
 
-        getLblPrimaryRole().setText(Person.getRoleDesc(getPerson().getPrimaryRole(), getPerson().isClanner()));
+        getLblPrimaryRole().setText(getPerson().getPrimaryRole().getName(getPerson().isClanner()));
 
         getLblGender().setText(String.format(resources.getString("PersonnelHiringDetailPanel.lblGender.text"),
                 GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(getPerson().getGender())));

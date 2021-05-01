@@ -1,6 +1,18 @@
 <AtBScenarioModifier>
+	<additionalBriefingText>The forces at this facility must be engaged for the specified duration.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
+	<linkedModifiers>
+		<entry>
+            		<key>FacilityHostileDestroy.xml</key>
+            		<value>If destroyed, this facility will be considered to have been sufficiently distracted.</value>
+		</entry>
+		<entry>
+            		<key>FacilityHostileCapture.xml</key>
+            		<value>If captured, this facility will be considered to have been sufficiently distracted.</value>
+		</entry>
+	</linkedModifiers>
+	<modifierName>Engage</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>

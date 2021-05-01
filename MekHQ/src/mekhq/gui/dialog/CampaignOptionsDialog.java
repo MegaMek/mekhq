@@ -18,47 +18,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
@@ -86,17 +49,17 @@ import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -106,10 +69,38 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
-import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -398,17 +389,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
-    private JPanel panRank;
-    private JComboBox<Ranks> comboRanks;
-    @SuppressWarnings("unused")
-    private JButton btnAddRank; // FIXME: Unused
-    @SuppressWarnings("unused")
-    private JButton btnDeleteRank; // FIXME: Unused
-    private JTable tableRanks;
-    private RankTableModel ranksModel;
-    private JScrollPane scrRanks;
-    // FIXME: Place in resource files
-    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
+    private RankSystemsPane rankSystemsPane;
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
@@ -438,6 +419,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region Against the Bot Tab
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
+    private JCheckBox chkUseStratCon;
     private JComboBox<String> cbSkillLevel;
 
     //unit administration
@@ -556,7 +538,6 @@ public class CampaignOptionsDialog extends JDialog {
         panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
-        panRank = new JPanel();
         panXP = new JPanel();
         panSkill = new JPanel();
         panTech = new JPanel();
@@ -596,7 +577,6 @@ public class CampaignOptionsDialog extends JDialog {
         choiceTechLevel = new JComboBox<>();
         btnLoad = new JButton();
         btnCancel = new JButton();
-        scrRanks = new JScrollPane();
 
         usePlanetaryAcquisitions = new JCheckBox();
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
@@ -615,6 +595,8 @@ public class CampaignOptionsDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
         int gridx = 0;
+
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
         //endregion Variable Declaration and Initialisation
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
@@ -2334,26 +2316,29 @@ public class CampaignOptionsDialog extends JDialog {
         spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
         ((JSpinner.DefaultEditor) spnOverallRecruitBonus.getEditor()).getTextField().setEditable(false);
         spnOverallRecruitBonus.setToolTipText(resourceMap.getString("spnOverallRecruitBonus.toolTipText"));
-        spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
-        int nRow = (int) Math.ceil(Person.T_NUM / 4.0);
+        spnTypeRecruitBonus = new JSpinner[personnelRoles.length];
+        int nRow = (int) Math.ceil(personnelRoles.length / 4.0);
         JPanel panTypeRecruitBonus = new JPanel(new GridLayout(nRow, 4));
         JSpinner spin;
         JPanel panRecruit;
-        for (int i = 0; i < Person.T_NUM; i++) {
+        for (PersonnelRole role : personnelRoles) {
             panRecruit = new JPanel(new GridBagLayout());
+
             spin = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             ((JSpinner.DefaultEditor) spin.getEditor()).getTextField().setEditable(false);
-            spnTypeRecruitBonus[i] = spin;
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            spnTypeRecruitBonus[role.ordinal()] = spin;
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(2, 5, 0, 0);
             panRecruit.add(spin, gridBagConstraints);
+
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            panRecruit.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
+            panRecruit.add(new JLabel(role.toString()), gridBagConstraints);
+
             panTypeRecruitBonus.add(panRecruit);
         }
 
@@ -2361,7 +2346,7 @@ public class CampaignOptionsDialog extends JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("panTypeRecruitBonus.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
@@ -2559,97 +2544,9 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill);
         //endregion Skill Randomization Tab
 
-        //region Rank System Tab
-        panRank.setName("panRank");
-        panRank.setLayout(new java.awt.GridBagLayout());
-
-        JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
-        lblRank.setName("lblRank");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRank.add(lblRank, gridBagConstraints);
-
-        DefaultComboBoxModel<Ranks> rankModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Ranks.RS_NUM; i++) {
-            final Ranks ranks = Ranks.getRanksFromSystem(i);
-            if (ranks != null) {
-                rankModel.addElement(ranks);
-            }
-        }
-        comboRanks = new JComboBox<>(rankModel);
-        comboRanks.setName("comboRanks");
-        comboRanks.addActionListener(evt -> fillRankInfo());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(comboRanks, gridBagConstraints);
-
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
-        tableRanks = new JTable(ranksModel);
-        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableRanks.setRowSelectionAllowed(false);
-        tableRanks.setColumnSelectionAllowed(false);
-        tableRanks.setCellSelectionEnabled(true);
-        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-        tableRanks.setShowGrid(false);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-        tableRanks.getSelectionModel().addListSelectionListener(this::tableRanksValueChanged);
-        scrRanks.setViewportView(tableRanks);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        panRank.add(scrRanks, gridBagConstraints);
-
-        //scrRanks.setMinimumSize(new Dimension(500, 500));
-        //scrRanks.setPreferredSize(new Dimension(500, 500));
-        //scrRanks.setMaximumSize(new Dimension(500, 500));
-
-        JTextArea txtInstructionsRanks = new JTextArea();
-        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
-        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        //txtInstructionsRanks.setMinimumSize(new Dimension(400, 400));
-        panRank.add(txtInstructionsRanks, gridBagConstraints);
-
-        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank);
-        //endregion Rank System Tab
+        //region Rank Systems Tab
+        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab(frame, campaign));
+        //endregion Rank Systems Tab
 
         //region Name and Portrait Generation Tab
         panNameGen.setName("panNameGen");
@@ -2721,8 +2618,8 @@ public class CampaignOptionsDialog extends JDialog {
         // The math below is used to determine how to split the personnel role options for portraits,
         // which it does into 4 columns with rows equal to the number of roles plus two, with the
         // additional two being the all role and no role options.
-        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
-        chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 4.0), 4));
+        chkUsePortrait = new JCheckBox[personnelRoles.length];
         allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
         noPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.no.text"));
         allPortraitsBox.addActionListener(evt -> {
@@ -2753,10 +2650,10 @@ public class CampaignOptionsDialog extends JDialog {
         panUsePortrait.add(noPortraitsBox);
 
         JCheckBox box;
-        for (int i = 0; i < Person.T_NUM; i++) {
-            box = new JCheckBox(Person.getRoleDesc(i, false));
+        for (PersonnelRole role : personnelRoles) {
+            box = new JCheckBox(role.toString());
             panUsePortrait.add(box);
-            chkUsePortrait[i] = box;
+            chkUsePortrait[role.ordinal()] = box;
         }
 
         panRandomPortrait.add(panUsePortrait, BorderLayout.CENTER);
@@ -3087,6 +2984,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBScenario, gridBagConstraints);
+
+        chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
+        chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        panAtB.add(chkUseStratCon, gridBagConstraints);
 
         // AtB options: "Unit Administration" frame controls
         chkUseShareSystem.setText(resourceMap.getString("chkUseShareSystem.text"));
@@ -4408,26 +4312,32 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createBaseSalaryPanel() {
-        final JPanel panel = new JPanel(new GridLayout((int) Math.ceil((double) (Person.T_NUM - 1) / 3.0), 6));
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        final JPanel panel = new JPanel(new GridLayout((int) Math.ceil((double) (personnelRoles.length - 1) / 3.0), 6));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("baseSalaryPanel.title")));
         panel.setPreferredSize(new Dimension(200, 200));
 
-        spnBaseSalary = new JSpinner[Person.T_NUM];
-        for (int i = 1; i < Person.T_NUM; i++) {
-            final String roleName = Person.getRoleDesc(i, false);
-            final String toolTipText = String.format(resources.getString("lblBaseSalary.toolTipText"), roleName);
+        spnBaseSalary = new JSpinner[personnelRoles.length];
+        for (final PersonnelRole personnelRole : personnelRoles) {
+            // Create Reused Values
+            final String toolTipText = String.format(resources.getString("lblBaseSalary.toolTipText"), personnelRole.toString());
 
-            final JLabel label = new JLabel(roleName);
+            // Create Panel Components
+            final JLabel label = new JLabel(personnelRole.toString());
             label.setToolTipText(toolTipText);
-            label.setName("lbl" + roleName);
+            label.setName("lbl" + personnelRole.toString());
             panel.add(label);
 
-            spnBaseSalary[i] = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
-            spnBaseSalary[i].setToolTipText(toolTipText);
-            spnBaseSalary[i].setName("spn" + roleName);
-            panel.add(spnBaseSalary[i]);
+            final JSpinner salarySpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
+            salarySpinner.setToolTipText(toolTipText);
+            salarySpinner.setName("spn" + personnelRole.toString());
+            panel.add(salarySpinner);
 
-            label.setLabelFor(spnBaseSalary[i]);
+            // Programmatically Assign Accessibility Labels
+            label.setLabelFor(salarySpinner);
+
+            // Component Tracking Assignment
+            spnBaseSalary[personnelRole.ordinal()] = salarySpinner;
         }
 
         return panel;
@@ -4809,26 +4719,17 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Personnel Tab
 
+    //region Rank Systems Tab
+    private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
+        rankSystemsPane = new RankSystemsPane(frame, campaign);
+        return rankSystemsPane;
+    }
+    //endregion Rank Systems Tab
+
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
-        setName("dialog");
+        setName("CampaignOptionsDialog");
         preferences.manage(new JWindowPreference(this));
-    }
-
-    private void fillRankInfo() {
-        final Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
-        if (ranks != null) {
-            ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-            TableColumn column;
-            for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-                column = tableRanks.getColumnModel().getColumn(i);
-                column.setPreferredWidth(ranksModel.getColumnWidth(i));
-                column.setCellRenderer(ranksModel.getRenderer());
-                if (i == RankTableModel.COL_PAYMULT) {
-                    column.setCellEditor(new SpinnerEditor());
-                }
-            }
-        }
     }
 
     public void applyPreset(final @Nullable GamePreset gamePreset) {
@@ -5017,7 +4918,7 @@ public class CampaignOptionsDialog extends JDialog {
             spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
         }
         for (int i = 1; i < spnBaseSalary.length; i++) {
-            spnBaseSalary[i].setValue(options.getRoleBaseSalary(i));
+            spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
 
         // Marriage
@@ -5125,14 +5026,14 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region Skill Randomization Tab
         chkExtraRandom.setSelected(randomSkillPreferences.randomizeSkill());
-        int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
+        final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
         }
         spnProbAntiMek.setValue(rSkillPrefs.getAntiMekProb());
         spnOverallRecruitBonus.setValue(rSkillPrefs.getOverallRecruitBonus());
-        for (int i = 0; i < Person.T_NUM; i++) {
-            spnTypeRecruitBonus[i].setValue(rSkillPrefs.getRecruitBonus(i));
+        for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
+            spnTypeRecruitBonus[i].setValue(rSkillPrefs.getRecruitBonuses()[i]);
         }
         spnArtyProb.setValue(rSkillPrefs.getArtilleryProb());
         spnArtyBonus.setValue(rSkillPrefs.getArtilleryBonus());
@@ -5160,10 +5061,10 @@ public class CampaignOptionsDialog extends JDialog {
 
         boolean allSelected = true;
         boolean noneSelected = true;
-        for (int i = 0; i < Person.T_NUM; i++) {
-            boolean usePortrait = options.usePortraitForType(i);
-            chkUsePortrait[i].setSelected(usePortrait);
-            if (usePortrait) {
+        final boolean[] usePortraitForRole = options.usePortraitForRoles();
+        for (int i = 0; i < chkUsePortrait.length; i++) {
+            chkUsePortrait[i].setSelected(usePortraitForRole[i]);
+            if (usePortraitForRole[i]) {
                 noneSelected = false;
             } else {
                 allSelected = false;
@@ -5195,6 +5096,7 @@ public class CampaignOptionsDialog extends JDialog {
         if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
         }
+        chkUseStratCon.setSelected(options.getUseStratCon());
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
 
         chkUseShareSystem.setSelected(options.getUseShareSystem());
@@ -5295,45 +5197,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Initialization
 
-    @SuppressWarnings(value = "unused") // FIXME:
-    private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        int row = tableRanks.getSelectedRow();
-        //btnDeleteRank.setEnabled(row != -1);
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void addRank() {
-        Object[] rank = {"Unknown", false, 1.0};
-        int row = tableRanks.getSelectedRow();
-        if (row == -1) {
-            if (ranksModel.getRowCount() > 0) {
-                rank[1] = ranksModel.getValueAt(ranksModel.getRowCount() - 1, 1);
-            }
-            ranksModel.addRow(rank);
-            tableRanks.setRowSelectionInterval(tableRanks.getRowCount() - 1, tableRanks.getRowCount() - 1);
-        } else {
-            rank[1] = ranksModel.getValueAt(row, 1);
-            ranksModel.insertRow(row + 1, rank);
-            tableRanks.setRowSelectionInterval(row + 1, row + 1);
-        }
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void removeRank() {
-        int row = tableRanks.getSelectedRow();
-        if (row > -1) {
-            ranksModel.removeRow(row);
-        }
-        if (tableRanks.getRowCount() == 0) {
-            return;
-        }
-        if (tableRanks.getRowCount() > row) {
-            tableRanks.setRowSelectionInterval(row, row);
-        } else {
-            tableRanks.setRowSelectionInterval(row - 1, row - 1);
-        }
-    }
-
     private void btnSaveActionPerformed() {
         if (txtName.getText().length() == 0) {
             return;
@@ -5406,10 +5269,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRanks((Ranks) Objects.requireNonNull(comboRanks.getSelectedItem()));
-        if (campaign.getRanks().isCustom()) {
-            campaign.getRanks().setRanksFromModel(ranksModel);
-        }
+        rankSystemsPane.applyToCampaign();
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 
@@ -5417,7 +5277,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.setIconFileName(iconFileName);
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
-            options.setUsePortraitForType(i, chkUsePortrait[i].isSelected());
+            options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
         }
 
         updateSkillTypes();
@@ -5538,7 +5398,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue((String) choiceTechLevel.getSelectedItem());
 
         rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
-        for (int i = 0; i < Person.T_NUM; i++) {
+        for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
             rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getValue());
         }
         rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
@@ -5627,12 +5487,8 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
             options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
         }
-        for (int i = 1; i < Person.T_NUM; i++) {
-            try {
-                options.setRoleBaseSalary(i, (double) spnBaseSalary[i].getValue());
-            } catch (Exception ignored) {
-
-            }
+        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
+            options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
         }
 
         // Marriage
@@ -5681,6 +5537,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseStratCon(chkUseStratCon.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseAtBUnitMarket(chkUseAtB.isSelected()); // TODO : add fully modular capabilities
         options.setUseShareSystem(chkUseShareSystem.isSelected());
@@ -6162,77 +6019,6 @@ public class CampaignOptionsDialog extends JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public static class SpinnerEditor extends DefaultCellEditor {
-        private static final long serialVersionUID = -2711422398394960413L;
-        JSpinner spinner;
-        JSpinner.NumberEditor editor;
-        JTextField textField;
-        boolean valueSet;
-
-        // Initializes the spinner.
-        public SpinnerEditor() {
-            super(new JTextField());
-            spinner = new JSpinner(new SpinnerNumberModel(1.0, 0, 10, 0.05));
-            editor = ((JSpinner.NumberEditor) spinner.getEditor());
-            textField = editor.getTextField();
-            textField.addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent fe) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (valueSet) {
-                            textField.setCaretPosition(1);
-                        }
-                    });
-                }
-
-                @Override
-                public void focusLost(FocusEvent fe) {
-                }
-            });
-            textField.addActionListener(ae -> stopCellEditing());
-        }
-
-        // Prepares the spinner component and returns it.
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            if (!valueSet) {
-                spinner.setValue(value);
-            }
-            SwingUtilities.invokeLater(() -> textField.requestFocus());
-            return spinner;
-        }
-
-        @Override
-        public boolean isCellEditable(EventObject eo) {
-            if (eo instanceof KeyEvent) {
-                KeyEvent ke = (KeyEvent) eo;
-                textField.setText(String.valueOf(ke.getKeyChar()));
-                valueSet = true;
-            } else {
-                valueSet = false;
-            }
-            return true;
-        }
-
-        // Returns the spinners current value.
-        @Override
-        public Object getCellEditorValue() {
-            return spinner.getValue();
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            try {
-                editor.commitEdit();
-                spinner.commitEdit();
-            } catch (java.text.ParseException e) {
-                JOptionPane.showMessageDialog(null, "Invalid value, discarding.");
-            }
-            return super.stopCellEditing();
         }
     }
 }

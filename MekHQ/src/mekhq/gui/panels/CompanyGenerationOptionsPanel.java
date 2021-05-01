@@ -24,6 +24,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -316,8 +317,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnSupportPersonnelNumbers;
     }
 
-    public Map<Integer, Integer> getSupportPersonnelNumbers() {
-        final Map<Integer, Integer> supportPersonnelNumbers = new HashMap<>();
+    public Map<PersonnelRole, Integer> getSupportPersonnelNumbers() {
+        final Map<PersonnelRole, Integer> supportPersonnelNumbers = new HashMap<>();
         Stream.of(getSpnSupportPersonnelNumbers()).filter(rts -> rts.getValue() > 0)
                 .forEach(rts -> supportPersonnelNumbers.put(rts.getRole(), rts.getValue()));
         return supportPersonnelNumbers;
@@ -327,7 +328,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.spnSupportPersonnelNumbers = spnSupportPersonnelNumbers;
     }
 
-    public void setSupportPersonnelNumbers(final Map<Integer, Integer> supportPersonnelNumbers) {
+    public void setSupportPersonnelNumbers(final Map<PersonnelRole, Integer> supportPersonnelNumbers) {
         for (final RoleToSpinner rts : getSpnSupportPersonnelNumbers()) {
             rts.getSpinner().setValue(supportPersonnelNumbers.getOrDefault(rts.getRole(), 0));
         }
@@ -1173,92 +1174,92 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         final RoleToSpinner[] rtsArray = new RoleToSpinner[9];
         final JLabel[] rtsLabelArray = new JLabel[9];
 
-        String roleName = Person.getRoleDesc(Person.T_MECH_TECH, false);
+        String roleName = PersonnelRole.MECH_TECH.getName(false);
         String toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[0] = new JLabel(roleName);
         rtsLabelArray[0].setToolTipText(toolTipText);
         rtsLabelArray[0].setName("lbl" + roleName);
-        rtsArray[0] = new RoleToSpinner(Person.T_MECH_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[0] = new RoleToSpinner(PersonnelRole.MECH_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[0].getSpinner().setToolTipText(toolTipText);
         rtsArray[0].getSpinner().setName("spn" + roleName);
         rtsLabelArray[0].setLabelFor(rtsArray[0].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_MECHANIC, false);
+        roleName = PersonnelRole.MECHANIC.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[1] = new JLabel(roleName);
         rtsLabelArray[1].setToolTipText(toolTipText);
         rtsLabelArray[1].setName("lbl" + roleName);
-        rtsArray[1] = new RoleToSpinner(Person.T_MECHANIC, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[1] = new RoleToSpinner(PersonnelRole.MECHANIC, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[1].getSpinner().setToolTipText(toolTipText);
         rtsArray[1].getSpinner().setName("spn" + roleName);
         rtsLabelArray[1].setLabelFor(rtsArray[1].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_AERO_TECH, false);
+        roleName = PersonnelRole.AERO_TECH.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[2] = new JLabel(roleName);
         rtsLabelArray[2].setToolTipText(toolTipText);
         rtsLabelArray[2].setName("lbl" + roleName);
-        rtsArray[2] = new RoleToSpinner(Person.T_AERO_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[2] = new RoleToSpinner(PersonnelRole.AERO_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[2].getSpinner().setToolTipText(toolTipText);
         rtsArray[2].getSpinner().setName("spn" + roleName);
         rtsLabelArray[2].setLabelFor(rtsArray[2].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_BA_TECH, false);
+        roleName = PersonnelRole.BA_TECH.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[3] = new JLabel(roleName);
         rtsLabelArray[3].setToolTipText(toolTipText);
         rtsLabelArray[3].setName("lbl" + roleName);
-        rtsArray[3] = new RoleToSpinner(Person.T_BA_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[3] = new RoleToSpinner(PersonnelRole.BA_TECH, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[3].getSpinner().setToolTipText(toolTipText);
         rtsArray[3].getSpinner().setName("spn" + roleName);
         rtsLabelArray[3].setLabelFor(rtsArray[3].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_DOCTOR, false);
+        roleName = PersonnelRole.DOCTOR.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[4] = new JLabel(roleName);
         rtsLabelArray[4].setToolTipText(toolTipText);
         rtsLabelArray[4].setName("lbl" + roleName);
-        rtsArray[4] = new RoleToSpinner(Person.T_DOCTOR, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[4] = new RoleToSpinner(PersonnelRole.DOCTOR, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[4].getSpinner().setToolTipText(toolTipText);
         rtsArray[4].getSpinner().setName("spn" + roleName);
         rtsLabelArray[4].setLabelFor(rtsArray[4].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_ADMIN_COM, false);
+        roleName = PersonnelRole.ADMINISTRATOR_COMMAND.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[5] = new JLabel(roleName);
         rtsLabelArray[5].setToolTipText(toolTipText);
         rtsLabelArray[5].setName("lbl" + roleName);
-        rtsArray[5] = new RoleToSpinner(Person.T_ADMIN_COM, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[5] = new RoleToSpinner(PersonnelRole.ADMINISTRATOR_COMMAND, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[5].getSpinner().setToolTipText(toolTipText);
         rtsArray[5].getSpinner().setName("spn" + roleName);
         rtsLabelArray[5].setLabelFor(rtsArray[5].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_ADMIN_LOG, false);
+        roleName = PersonnelRole.ADMINISTRATOR_LOGISTICS.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[6] = new JLabel(roleName);
         rtsLabelArray[6].setToolTipText(toolTipText);
         rtsLabelArray[6].setName("lbl" + roleName);
-        rtsArray[6] = new RoleToSpinner(Person.T_ADMIN_LOG, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[6] = new RoleToSpinner(PersonnelRole.ADMINISTRATOR_LOGISTICS, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[6].getSpinner().setToolTipText(toolTipText);
         rtsArray[6].getSpinner().setName("spn" + roleName);
         rtsLabelArray[6].setLabelFor(rtsArray[6].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_ADMIN_TRA, false);
+        roleName = PersonnelRole.ADMINISTRATOR_TRANSPORT.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[7] = new JLabel(roleName);
         rtsLabelArray[7].setToolTipText(toolTipText);
         rtsLabelArray[7].setName("lbl" + roleName);
-        rtsArray[7] = new RoleToSpinner(Person.T_ADMIN_TRA, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[7] = new RoleToSpinner(PersonnelRole.ADMINISTRATOR_TRANSPORT, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[7].getSpinner().setToolTipText(toolTipText);
         rtsArray[7].getSpinner().setName("spn" + roleName);
         rtsLabelArray[7].setLabelFor(rtsArray[7].getSpinner());
 
-        roleName = Person.getRoleDesc(Person.T_ADMIN_HR, false);
+        roleName = PersonnelRole.ADMINISTRATOR_HR.getName(false);
         toolTipText = String.format(resources.getString("supportPersonnelNumber.toolTipText"), roleName);
         rtsLabelArray[8] = new JLabel(roleName);
         rtsLabelArray[8].setToolTipText(toolTipText);
         rtsLabelArray[8].setName("lbl" + roleName);
-        rtsArray[8] = new RoleToSpinner(Person.T_ADMIN_HR, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        rtsArray[8] = new RoleToSpinner(PersonnelRole.ADMINISTRATOR_HR, new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
         rtsArray[8].getSpinner().setToolTipText(toolTipText);
         rtsArray[8].getSpinner().setName("spn" + roleName);
         rtsLabelArray[8].setLabelFor(rtsArray[8].getSpinner());
@@ -2388,19 +2389,19 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     private static class RoleToSpinner {
         //region Variable Declarations
-        private final int role;
+        private final PersonnelRole role;
         private final JSpinner spinner;
         //endregion Variable Declarations
 
         //region Constructors
-        public RoleToSpinner(final int role, final JSpinner spinner) {
+        public RoleToSpinner(final PersonnelRole role, final JSpinner spinner) {
             this.role = role;
             this.spinner = spinner;
         }
         //endregion Constructors
 
         //region Getters/Setters
-        public int getRole() {
+        public PersonnelRole getRole() {
             return role;
         }
 

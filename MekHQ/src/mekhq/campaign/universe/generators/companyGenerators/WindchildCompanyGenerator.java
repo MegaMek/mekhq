@@ -22,7 +22,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
@@ -43,13 +43,13 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     @Override
     protected void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors) {
         if (numMechWarriors > 36) {
-            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
+            commandingOfficer.setRank(Rank.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors > 12) {
-            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
+            commandingOfficer.setRank(Rank.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
         } else if (numMechWarriors > 4) {
-            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 4);
+            commandingOfficer.setRank(Rank.RWO_MAX + 4);
         } else {
-            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 3);
+            commandingOfficer.setRank(Rank.RWO_MAX + 3);
         }
     }
     //endregion Personnel

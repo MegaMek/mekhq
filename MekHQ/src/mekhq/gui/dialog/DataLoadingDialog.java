@@ -177,6 +177,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             //region Progress 3
             setProgress(3);
+            
             Campaign campaign;
             boolean newCampaign = false;
             if (fileCampaign == null) {

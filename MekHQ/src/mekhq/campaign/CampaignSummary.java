@@ -93,9 +93,9 @@ public class CampaignSummary {
             if (p.getHits() > 0) {
                 totalInjuries++;
             }
-            if (p.hasPrimaryCombatRole()) {
+            if (p.getPrimaryRole().isCombat()) {
                 totalCombatPersonnel++;
-            } else if (p.hasPrimarySupportRole(false)) {
+            } else {
                 totalSupportPersonnel++;
             }
         }

@@ -1,0 +1,37 @@
+<!-- This is all possible scenario modifiers related to command rights/etc-->
+<scenarioModifierManifest>
+	<modifiers>
+		<modifier>
+			IntegratedAlliesGround.xml
+		</modifier>
+		<modifier>
+			HouseOfficerGround.xml
+		</modifier>
+		<modifier>
+			LiaisonGround.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesGround.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesGround.xml
+		</modifier>
+
+		<!-- and the air versions -->
+		<modifier>
+			IntegratedAlliesAir.xml
+		</modifier>
+		<modifier>
+			HouseOfficerAir.xml
+		</modifier>
+		<modifier>
+			LiaisonAir.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesAir.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesAir.xml
+		</modifier>
+	</modifiers>
+</scenarioModifierManifest>

@@ -493,7 +493,7 @@ public class CustomizeAtBContractDialog extends JDialog {
                     return;
                 }
                 allyCamouflage = ccd.getSelectedItem();
-                btnEnemyCamo.setIcon(allyCamouflage.getImageIcon());
+                btnAllyCamo.setIcon(allyCamouflage.getImageIcon());
             } else {
                 ccd = new CamoChooserDialog(frame, enemyCamouflage);
                 if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {

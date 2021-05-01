@@ -28,8 +28,6 @@ import java.time.temporal.ChronoUnit;
 
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -455,21 +453,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 .minus(getTotalEstimatedPayrollExpenses(c));
     }
 
-    public static String generateRandomContractName() {
-        RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange('0', 'Z')
-                .filteredBy(UpperCaseAndDigits.UPPERANDDIGITS).build();
-        return generator.generate(15);
-    }
-
-    public enum UpperCaseAndDigits implements CharacterPredicate {
-        UPPERANDDIGITS {
-            @Override
-            public boolean test(int codePoint) {
-                return (Character.isDigit(codePoint) || Character.isUpperCase(codePoint));
-            }
-        }
-    }
-
     private int getTravelDays(Campaign c) {
         if (null != this.getSystem()) {
             JumpPath jumpPath = getJumpPath(c);
@@ -572,6 +555,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return monthsLeft;
     }
 
+    /**
+     * Calculations to be performed once the contract has been accepted.
+     */
+    public void acceptContract(Campaign campaign) {
+        
+    }
+    
     /**
      * Only do this at the time the contract is set up, otherwise amounts may change after
      * the ink is signed, which is a no-no.

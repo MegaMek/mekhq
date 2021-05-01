@@ -1,6 +1,14 @@
 <AtBScenarioModifier>
+	<additionalBriefingText>Extract assets from designated locations at this facility.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Extract</modifierName>
+<linkedModifiers>
+		<entry>
+            		<key>FacilityHostileCapture.xml</key>
+            		<value>If captured, our forces can extract what they need at will.</value>
+		</entry>
+	</linkedModifiers>
 	<objectives>
         <objective>
             <associatedForceNames>

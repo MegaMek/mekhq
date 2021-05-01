@@ -23,15 +23,15 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
-import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,7 +67,7 @@ public class CompanyGenerationOptions implements Serializable {
     private int starLeagueYear;
 
     // Personnel
-    private Map<Integer, Integer> supportPersonnel;
+    private Map<PersonnelRole, Integer> supportPersonnel;
     private boolean poolAssistants;
     private boolean generateCaptains;
     private boolean assignCompanyCommanderFlag;
@@ -159,20 +159,20 @@ public class CompanyGenerationOptions implements Serializable {
         setStarLeagueYear(2765);
 
         // Personnel
-        Map<Integer, Integer> supportPersonnel = new HashMap<>();
+        final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
         if (getMethod().isWindchild()) {
-            supportPersonnel.put(Person.T_MECH_TECH, 5);
-            supportPersonnel.put(Person.T_MECHANIC, 1);
-            supportPersonnel.put(Person.T_AERO_TECH, 1);
-            supportPersonnel.put(Person.T_DOCTOR, 1);
-            supportPersonnel.put(Person.T_ADMIN_COM, 1);
-            supportPersonnel.put(Person.T_ADMIN_LOG, 1);
-            supportPersonnel.put(Person.T_ADMIN_TRA, 1);
-            supportPersonnel.put(Person.T_ADMIN_HR, 1);
+            supportPersonnel.put(PersonnelRole.MECH_TECH, 5);
+            supportPersonnel.put(PersonnelRole.MECHANIC, 1);
+            supportPersonnel.put(PersonnelRole.AERO_TECH, 1);
+            supportPersonnel.put(PersonnelRole.DOCTOR, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 1);
         } else { // Defaults to AtB
-            supportPersonnel.put(Person.T_MECH_TECH, 10);
-            supportPersonnel.put(Person.T_DOCTOR, 1);
-            supportPersonnel.put(Person.T_ADMIN_LOG, 1);
+            supportPersonnel.put(PersonnelRole.MECH_TECH, 10);
+            supportPersonnel.put(PersonnelRole.DOCTOR, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);
         }
         setSupportPersonnel(supportPersonnel);
         setPoolAssistants(true);
@@ -328,11 +328,11 @@ public class CompanyGenerationOptions implements Serializable {
     //endregion Base Information
 
     //region Personnel
-    public Map<Integer, Integer> getSupportPersonnel() {
+    public Map<PersonnelRole, Integer> getSupportPersonnel() {
         return supportPersonnel;
     }
 
-    public void setSupportPersonnel(final Map<Integer, Integer> supportPersonnel) {
+    public void setSupportPersonnel(final Map<PersonnelRole, Integer> supportPersonnel) {
         this.supportPersonnel = supportPersonnel;
     }
 
@@ -791,9 +791,9 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportPersonnel");
-        for (final Map.Entry<Integer, Integer> entry : getSupportPersonnel().entrySet()) {
+        for (final Map.Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportRole");
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", entry.getKey());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", entry.getKey().name());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "number", entry.getValue());
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "supportRole");
         }
@@ -953,20 +953,20 @@ public class CompanyGenerationOptions implements Serializable {
                             final Node wn3 = nl2.item(y);
                             if ("supportRole".equals(wn3.getNodeName())) {
                                 final NodeList nl3 = wn3.getChildNodes();
-                                int role = -1;
+                                PersonnelRole role = PersonnelRole.NONE;
                                 int number = -1;
                                 for (int z = 0; z < nl3.getLength(); z++) {
                                     final Node wn4 = nl3.item(z);
                                     switch (wn4.getNodeName()) {
                                         case "role":
-                                            role = Integer.parseInt(wn4.getTextContent().trim());
+                                            role = PersonnelRole.valueOf(wn4.getTextContent().trim());
                                             break;
                                         case "number":
                                             number = Integer.parseInt(wn4.getTextContent().trim());
                                             break;
                                     }
                                 }
-                                if ((role != -1) && (number != -1)) {
+                                if (!role.isNone() && (number != -1)) {
                                     options.getSupportPersonnel().put(role, number);
                                 }
                             }

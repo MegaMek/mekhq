@@ -28,6 +28,7 @@ sourceSets {
 
 configurations {
     jarbundler
+    all*.exclude group: 'xml-apis', module: 'xml-apis'
 }
 
 dependencies {
@@ -174,6 +175,8 @@ task stageFiles(type: Copy) {
     include "${data}/images/universe/"
     include "${data}/scenariomodifiers/"
     include "${data}/scenariotemplates/"
+    include "${data}/stratconcontractdefinitions/"
+    include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
     include 'license.txt'

@@ -43,8 +43,9 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
@@ -252,7 +253,7 @@ public abstract class AbstractCompanyGenerator {
 
         for (int i = 0; i < numMechWarriors; i++) {
             trackers.add(new CompanyGenerationPersonTracker(
-                    campaign.newPerson(Person.T_MECHWARRIOR, getPersonnelGenerator())));
+                    campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator())));
         }
 
         // Default Sort is Tactical Genius First
@@ -370,7 +371,7 @@ public abstract class AbstractCompanyGenerator {
 
             if (getOptions().isAutomaticallyAssignRanks()) {
                 // Assign Rank of O4 - Captain
-                officer.setRankNumeric(Ranks.RWO_MAX + 4);
+                officer.setRank(Rank.RWO_MAX + 4);
             }
         } else {
             // Assign Random Officer Skill Increase
@@ -378,7 +379,7 @@ public abstract class AbstractCompanyGenerator {
 
             if (getOptions().isAutomaticallyAssignRanks()) {
                 // Assign Rank of O3 - Lieutenant
-                officer.setRankNumeric(Ranks.RWO_MAX + 3);
+                officer.setRank(Rank.RWO_MAX + 3);
             }
         }
     }
@@ -438,7 +439,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateStandardMechWarrior(final Person person) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            person.setRankNumeric((getOptions().getFaction().isComStarOrWoB()
+            person.setRank((getOptions().getFaction().isComStarOrWoB()
                     || getOptions().getFaction().isClan()) ? 4 : 12);
         }
     }
@@ -452,7 +453,7 @@ public abstract class AbstractCompanyGenerator {
     private List<CompanyGenerationPersonTracker> generateSupportPersonnel(final Campaign campaign) {
         final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
 
-        for (final Map.Entry<Integer, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
+        for (final Map.Entry<PersonnelRole, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
                 trackers.add(new CompanyGenerationPersonTracker(
                         generateSupportPerson(campaign, entry.getKey()), CompanyGenerationPersonType.SUPPORT));
@@ -466,21 +467,21 @@ public abstract class AbstractCompanyGenerator {
      * @param role the created person's primary role
      * @return the newly created support person with the provided role
      */
-    private Person generateSupportPerson(final Campaign campaign, final int role) {
+    private Person generateSupportPerson(final Campaign campaign, final PersonnelRole role) {
         final Person person = campaign.newPerson(role, getPersonnelGenerator());
         // All support personnel get assigned Corporal or equivalent as their rank
         if (getOptions().isAutomaticallyAssignRanks()) {
-            switch (campaign.getRanks().getRankSystem()) {
-                case Ranks.RS_CCWH:
-                case Ranks.RS_CL:
+            switch (campaign.getRankSystem().getCode()) {
+                case "CCWH":
+                case "CLAN":
                     break;
-                case Ranks.RS_COM:
-                case Ranks.RS_WOB:
-                case Ranks.RS_MOC:
-                    person.setRankNumeric(4);
+                case "CG":
+                case "WOBM":
+                case "MAF":
+                    person.setRank(4);
                     break;
                 default:
-                    person.setRankNumeric(8);
+                    person.setRank(8);
                     break;
             }
         }
@@ -498,14 +499,14 @@ public abstract class AbstractCompanyGenerator {
         }
 
         final int assistantRank;
-        switch (campaign.getRanks().getRankSystem()) {
-            case Ranks.RS_CCWH:
-            case Ranks.RS_CL:
+        switch (campaign.getRankSystem().getCode()) {
+            case "CCWH":
+            case "CLAN":
                 assistantRank = 0;
                 break;
-            case Ranks.RS_COM:
-            case Ranks.RS_WOB:
-            case Ranks.RS_MOC:
+            case "CG":
+            case "WOBM":
+            case "MAF":
                 assistantRank = 4;
                 break;
             default:
@@ -514,17 +515,17 @@ public abstract class AbstractCompanyGenerator {
         }
 
         for (int i = 0; i < campaign.getAstechNeed(); i++) {
-            final Person astech = campaign.newPerson(Person.T_ASTECH, getPersonnelGenerator());
+            final Person astech = campaign.newPerson(PersonnelRole.ASTECH, getPersonnelGenerator());
             if (getOptions().isAutomaticallyAssignRanks()) {
-                astech.setRankNumeric(assistantRank);
+                astech.setRank(assistantRank);
             }
             trackers.add(new CompanyGenerationPersonTracker(astech, CompanyGenerationPersonType.ASSISTANT));
         }
 
         for (int i = 0; i < campaign.getMedicsNeed(); i++) {
-            final Person medic = campaign.newPerson(Person.T_MEDIC, getPersonnelGenerator());
+            final Person medic = campaign.newPerson(PersonnelRole.MEDIC, getPersonnelGenerator());
             if (getOptions().isAutomaticallyAssignRanks()) {
-                medic.setRankNumeric(assistantRank);
+                medic.setRank(assistantRank);
             }
             trackers.add(new CompanyGenerationPersonTracker(medic, CompanyGenerationPersonType.ASSISTANT));
         }
@@ -902,9 +903,9 @@ public abstract class AbstractCompanyGenerator {
 
         final List<CompanyGenerationPersonTracker> mechTechs = trackers.parallelStream()
                 .filter(tracker -> tracker.getPersonType().isSupport())
-                .filter(tracker -> tracker.getPerson().getPrimaryRole() == Person.T_MECH_TECH)
+                .filter(tracker -> tracker.getPerson().getPrimaryRole().isMechTech())
                 .collect(Collectors.toList());
-        if (mechTechs.size() == 0) {
+        if (mechTechs.isEmpty()) {
             return;
         }
 
