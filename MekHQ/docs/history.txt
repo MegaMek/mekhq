@@ -40,6 +40,7 @@ VERSION HISTORY:
 + Issue #2553: Fixing preferences issue in the Personnel Market
 + Issues #1483, #2196, #2201, #2202, #2205, #2449: Rank System and Profession Rework
 + Issue #271: ScenarioStatus Enum: Expanded Scenario Status Options
++ PR #2479: Fixing Escorpión Imperio starting planet
 
 0.48.0 (Stable) - (2021-03-05 1530 UTC)
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
