@@ -60,6 +60,7 @@ mainClassName = 'mekhq.MekHQ'
 
 ext {
     jvmOptions = ['-Xmx1024m']
+	userdata='userdata'
     data = 'data'
     conf = 'mmconf'
     log = 'logs'
@@ -179,6 +180,7 @@ task stageFiles(type: Copy) {
     include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
+	include "${userdata}/"
     include 'license.txt'
     include 'SubmitBug.html'
 
