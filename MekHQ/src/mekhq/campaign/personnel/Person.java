@@ -208,7 +208,6 @@ public class Person implements Serializable {
     private int hits;
     private PrisonerStatus prisonerStatus;
 
-    private boolean dependent;
     private boolean commander;
 
     // Supports edge usage by a ship's engineer composite crewman
@@ -350,7 +349,6 @@ public class Person implements Serializable {
         primaryDesignator = ROMDesignation.NONE;
         secondaryDesignator = ROMDesignation.NONE;
         commander = false;
-        dependent = false;
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
@@ -459,22 +457,6 @@ public class Person implements Serializable {
         commander = tf;
     }
 
-    @Deprecated
-    public boolean isDependent() {
-        return dependent || getPrimaryRole().isDependent();
-    }
-
-    public void setDependent(boolean tf) {
-        dependent = tf;
-        if (dependent) {
-            setRecruitment(null);
-            setLastRankChangeDate(null);
-        } else {
-            setRecruitment(getCampaign().getLocalDate());
-            setLastRankChangeDate(getCampaign().getLocalDate());
-        }
-    }
-
     public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
@@ -515,7 +497,7 @@ public class Person implements Serializable {
                 }
                 break;
             case FREE:
-                if (!isDependent()) {
+                if (!getPrimaryRole().isDependent()) {
                     if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                         setRecruitment(getCampaign().getLocalDate());
                     }
@@ -523,6 +505,7 @@ public class Person implements Serializable {
                         setLastRankChangeDate(getCampaign().getLocalDate());
                     }
                 }
+
                 if (log) {
                     if (freed) {
                         ServiceLogger.freed(this, getCampaign().getLocalDate(),
@@ -712,10 +695,13 @@ public class Person implements Serializable {
         return primaryRole;
     }
 
-    public void setPrimaryRole(PersonnelRole primaryRole) {
-        setPrimaryRoleDirect(primaryRole);
+    public void setPrimaryRole(final PersonnelRole primaryRole) {
+        // don't need to do any processing for no changes
+        if (primaryRole == getPrimaryRole()) {
+            return;
+        }
 
-        // Now, we need to make some secondary role assignments to None here for better UX in
+        // We need to make some secondary role assignments to None here for better UX in
         // assigning roles, following these rules:
         // 1) Cannot have the same primary and secondary roles
         // 2) Must have a None secondary role if you are a Dependent
@@ -731,6 +717,19 @@ public class Person implements Serializable {
                 || (primaryRole.isMedic() && getSecondaryRole().isMedicalStaff())) {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
+
+        if (primaryRole.isDependent()) {
+            setRecruitment(null);
+            setLastRankChangeDate(null);
+        } else if (getPrimaryRole().isDependent()) {
+            setRecruitment(getCampaign().getLocalDate());
+            setLastRankChangeDate(getCampaign().getLocalDate());
+        }
+
+        // Finally, we can set the primary role
+        setPrimaryRoleDirect(primaryRole);
+
+        // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -742,7 +741,11 @@ public class Person implements Serializable {
         return secondaryRole;
     }
 
-    public void setSecondaryRole(PersonnelRole secondaryRole) {
+    public void setSecondaryRole(final PersonnelRole secondaryRole) {
+        if (secondaryRole == getSecondaryRole()) {
+            return;
+        }
+
         setSecondaryRoleDirect(secondaryRole);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -1320,7 +1323,7 @@ public class Person implements Serializable {
             baby.setBirthday(campaign.getLocalDate());
 
             // Recruit the baby
-            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
+            campaign.recruitPerson(baby, prisonerStatus, true, true);
 
             // Create genealogy information
             baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, this);
@@ -1526,9 +1529,6 @@ public class Person implements Serializable {
             }
             if (commander) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
-            }
-            if (dependent) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependent", true);
             }
             // Always save the person's origin faction
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", originFaction.getShortName());
@@ -1757,8 +1757,10 @@ public class Person implements Serializable {
                     retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
-                    retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
+                    if (retVal.getPrimaryRole().isAstech() || retVal.getPrimaryRole().isNone()) {
+                        retVal.setPrimaryRole(PersonnelRole.DEPENDENT);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                     retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
@@ -2071,7 +2073,7 @@ public class Person implements Serializable {
     }
 
     public Money getSalary() {
-        if (!getPrisonerStatus().isFree() || isDependent()) {
+        if (!getPrisonerStatus().isFree()) {
             return Money.zero();
         }
 
@@ -2182,7 +2184,7 @@ public class Person implements Serializable {
         setRankLevel(rankLevel);
 
         if (campaign.getCampaignOptions().getUseTimeInRank()) {
-            if (getPrisonerStatus().isFree() && !isDependent()) {
+            if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
                 setLastRankChangeDate(campaign.getLocalDate());
             } else {
                 setLastRankChangeDate(null);

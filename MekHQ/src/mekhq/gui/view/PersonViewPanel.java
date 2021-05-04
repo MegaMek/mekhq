@@ -658,11 +658,10 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free non-dependent, or if the
-        // person has tracked total earnings
+        // We show the following if track total earnings is on for a free person, or if the
+        // person has previously tracked total earnings
         if (campaign.getCampaignOptions().trackTotalEarnings()
-                && ((person.getPrisonerStatus().isFree() && !person.isDependent())
-                || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
+                && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();

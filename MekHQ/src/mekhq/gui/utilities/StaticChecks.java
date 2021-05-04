@@ -604,22 +604,6 @@ public class StaticChecks {
 
     /**
      * @param people an array of people
-     * @return true if they are either all dependents or all not dependents, otherwise false
-     */
-    public static boolean areEitherAllDependentsOrNot(Person[] people) {
-        if (people.length > 0) {
-            boolean isDependent = people[0].isDependent();
-            for (Person person : people) {
-                if (isDependent != person.isDependent()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param people an array of people
      * @return true if all of the people are female, otherwise false
      */
     public static boolean areAllFemale(Person[] people) {

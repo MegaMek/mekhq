@@ -292,7 +292,7 @@ public enum PersonnelFilter {
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT:
-                return active && person.isDependent();
+                return active && person.getPrimaryRole().isDependent();
             case FOUNDER:
                 return person.isFounder();
             case PRISONER:

@@ -180,7 +180,7 @@ public class PersonnelReport extends Report {
                 countDead++;
             }
 
-            if (p.isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
+            if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
                 dependents++;
             }
         }
