@@ -37,6 +37,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -718,6 +719,7 @@ public class Person implements Serializable {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
+        // Now, we can perform the time in service and last rank change tracking change for dependents
         if (primaryRole.isDependent()) {
             setRecruitment(null);
             setLastRankChangeDate(null);
@@ -1776,7 +1778,12 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
-                    retVal.setPrimaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
+                    final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
+                    if (version.isLowerThan("0.49.1") && primaryRole.isNone()) {
+                        retVal.setPrimaryRole(PersonnelRole.DEPENDENT);
+                    } else {
+                        retVal.setPrimaryRoleDirect(primaryRole);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
                     retVal.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
@@ -3384,7 +3391,7 @@ public class Person implements Serializable {
         originalUnitId = unit.getId();
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
-        } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
             originalUnitTech = TECH_IS2;
         } else {
             originalUnitTech = TECH_IS1;
