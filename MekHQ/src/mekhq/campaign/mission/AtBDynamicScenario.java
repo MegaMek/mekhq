@@ -259,12 +259,12 @@ public class AtBDynamicScenario extends AtBScenario {
     /**
      * This is used to indicate that player forces have been assigned to this scenario
      * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
-     * generate opposing forces and their bots, apply any present scenario modifiers, 
+     * generate opposing forces and their bots, apply any present scenario modifiers,
      * set up deployment turns, calculate which units belong to which objectives, and many other things.
-     * 
-     * Further "post-force-generation" modifiers can be applied to this scenario, but calling 
+     *
+     * Further "post-force-generation" modifiers can be applied to this scenario, but calling
      * finalizeScenario() on it again will lead to "unsupported" behavior.
-     * 
+     *
      * Can be called as a short hand way of telling "is this scenario ready to play".
      */
     public boolean isFinalized() {
@@ -282,7 +282,7 @@ public class AtBDynamicScenario extends AtBScenario {
         List<Integer> retval = new ArrayList<>();
 
         for (int forceID : getForceIDs()) {
-            if(getPlayerForceTemplates().containsKey(forceID)) {
+            if (getPlayerForceTemplates().containsKey(forceID)) {
                 retval.add(forceID);
             }
         }
@@ -388,7 +388,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public String getDesc() {
         return getScenarioTypeDescription();
     }
-    
+
     @Override
     public String getScenarioTypeDescription() {
         return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
@@ -404,7 +404,7 @@ public class AtBDynamicScenario extends AtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
-        if (template != null && isCurrent()) {
+        if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
         }
 

@@ -119,6 +119,7 @@ public class PersonnelMarketDialog extends JDialog {
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         lblPersonChoice = new javax.swing.JLabel();
+        comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Personnel Market");
@@ -178,7 +179,6 @@ public class PersonnelMarketDialog extends JDialog {
             }
 
             final boolean isClan = campaign.getFaction().isClan();
-            comboRecruitRole = new JComboBox<>(PersonnelRole.values());
             comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index,

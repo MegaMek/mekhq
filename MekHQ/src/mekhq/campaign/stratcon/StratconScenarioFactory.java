@@ -170,7 +170,7 @@ public class StratconScenarioFactory {
      * @param unitType The unit type to convert.
      * @return Generic unit type.
      */
-    private static int convertSpecificUnitTypeToGeneral(int unitType) {
+    public static int convertSpecificUnitTypeToGeneral(int unitType) {
         switch (unitType) {
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:

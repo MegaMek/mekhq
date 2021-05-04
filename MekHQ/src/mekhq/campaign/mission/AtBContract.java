@@ -462,11 +462,9 @@ public class AtBContract extends Contract implements Serializable {
                 continue;
             }
 
-            if ((s.getStatus() == Scenario.S_VICTORY) ||
-                    (s.getStatus() == Scenario.S_MVICTORY)) {
+            if (s.getStatus().isOverallVictory()) {
                 victories++;
-            } else if ((s.getStatus() == Scenario.S_DEFEAT) ||
-                    (s.getStatus() == Scenario.S_MDEFEAT)) {
+            } else if (s.getStatus().isOverallDefeat()) {
                 defeats++;
             }
         }
@@ -618,47 +616,51 @@ public class AtBContract extends Contract implements Serializable {
         int score = employerMinorBreaches - playerMinorBreaches;
         int battles = 0;
         boolean earlySuccess = false;
-        for (Scenario s : getScenarios()) {
-
-            /* Special Missions get no points for victory and and only -1
+        for (Scenario s : getCompletedScenarios()) {
+            /*
+             * Special Missions get no points for victory and and only -1
              * for defeat.
              */
-            if (s instanceof AtBScenario && ((AtBScenario)s).isSpecialMission()) {
-                if (s.getStatus() == Scenario.S_DEFEAT ||
-                        s.getStatus() == Scenario.S_MDEFEAT) {
+            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialMission()) {
+                if (s.getStatus().isOverallDefeat()) {
                     score--;
                 }
             } else {
                 switch (s.getStatus()) {
-                    case Scenario.S_VICTORY:
-                    case Scenario.S_MVICTORY:
+                    case DECISIVE_VICTORY:
+                    case VICTORY:
+                    case MARGINAL_VICTORY:
+                    case PYRRHIC_VICTORY:
                         score++;
                         battles++;
                         break;
-                    case Scenario.S_DEFEAT:
+                    case DECISIVE_DEFEAT:
+                    case DEFEAT:
                         score -= 2;
                         battles++;
                         break;
-                    case Scenario.S_MDEFEAT:
+                    case MARGINAL_DEFEAT:
                         //special mission defeat
                         score--;
                         break;
+                    default:
+                        break;
                 }
             }
-            if (s instanceof AtBScenario
-                    && ((AtBScenario)s).getScenarioType() == AtBScenario.BASEATTACK
-                    && ((AtBScenario)s).isAttacker()
-                    && (s.getStatus() == Scenario.S_VICTORY ||
-                    s.getStatus() == Scenario.S_MVICTORY)) {
+
+            if ((s instanceof AtBScenario)
+                    && (((AtBScenario) s).getScenarioType() == AtBScenario.BASEATTACK)
+                    && ((AtBScenario) s).isAttacker() && s.getStatus().isOverallVictory()) {
                 earlySuccess = true;
-            }
-            if (missionType > MT_RIOTDUTY && moraleLevel == MORALE_ROUT) {
+            } else if ((missionType > MT_RIOTDUTY) && (moraleLevel == MORALE_ROUT)) {
                 earlySuccess = true;
             }
         }
+
         if (battles == 0) {
             score++;
         }
+
         if (earlySuccess) {
             score += 4;
         }

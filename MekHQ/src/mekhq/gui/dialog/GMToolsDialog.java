@@ -33,6 +33,7 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -44,7 +45,6 @@ import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -825,7 +825,7 @@ public class GMToolsDialog extends JDialog {
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        List<Integer> individualDice = Utilities.individualDice((Integer) numDice.getValue(),
+        List<Integer> individualDice = Compute.individualDice((Integer) numDice.getValue(),
                 (Integer) sizeDice.getValue());
         totalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
                 individualDice.get(0)));

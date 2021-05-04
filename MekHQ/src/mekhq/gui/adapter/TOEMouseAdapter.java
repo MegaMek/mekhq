@@ -912,21 +912,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
                 menu.setEnabled(false);
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getActiveMissions()) {
-                    missionMenu = new JMenu(m.getName());
-                    for (Scenario s : m.getScenarios()) {
-                        if (s.isCurrent()) {
-                            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                                    && (s instanceof AtBScenario)
-                                    && !((AtBScenario) s).canDeployForces(forces, gui.getCampaign())) {
-                                continue;
-                            }
-                            menuItem = new JMenuItem(s.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + s.getId() + "|" + forceIds);
-                            menuItem.addActionListener(this);
-                            missionMenu.add(menuItem);
-                            menu.setEnabled(true);
+                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                    missionMenu = new JMenu(mission.getName());
+                    for (final Scenario scenario : mission.getCurrentScenarios()) {
+                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                                && (scenario instanceof AtBScenario)
+                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign())) {
+                            continue;
                         }
+                        menuItem = new JMenuItem(scenario.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + "|" + forceIds);
+                        menuItem.addActionListener(this);
+                        missionMenu.add(menuItem);
                     }
                     JMenuHelpers.addMenuIfNonEmpty(menu, missionMenu);
                 }
@@ -1265,25 +1262,19 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 //Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getActiveMissions()) {
-                    missionMenu = new JMenu(m.getName());
-                    for (Scenario s : m.getScenarios()) {
-                        if (s.isCurrent()) {
-                            if (gui.getCampaign().getCampaignOptions()
-                                    .getUseAtB()
-                                    && s instanceof AtBScenario
-                                    && !((AtBScenario) s)
-                                    .canDeployUnits(units,
-                                            gui.getCampaign())) {
-                                continue;
-                            }
-                            menuItem = new JMenuItem(s.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
-                                    + s.getId() + "|" + unitIds);
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(true);
-                            missionMenu.add(menuItem);
+                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                    missionMenu = new JMenu(mission.getName());
+                    for (final Scenario scenario : mission.getCurrentScenarios()) {
+                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                                && (scenario instanceof AtBScenario)
+                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign())) {
+                            continue;
                         }
+                        menuItem = new JMenuItem(scenario.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
+                                + scenario.getId() + "|" + unitIds);
+                        menuItem.addActionListener(this);
+                        missionMenu.add(menuItem);
                     }
                     if (missionMenu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(missionMenu, 30);

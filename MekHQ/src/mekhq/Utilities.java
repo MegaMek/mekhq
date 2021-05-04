@@ -149,27 +149,6 @@ public class Utilities {
     }
 
     /**
-     * @param num   the number of dice to roll
-     * @param faces the number of faces on those dice
-     * @return an Integer list of every dice roll, with index 0 containing the summed result
-     */
-    public static List<Integer> individualDice(int num, int faces) {
-        List<Integer> individualRolls = new ArrayList<>();
-        int result = 0, roll;
-        individualRolls.add(result);
-
-        for (int i = 0; i < num; i++) {
-            roll = Compute.randomInt(faces) + 1;
-            individualRolls.add(roll);
-            result += roll;
-        }
-
-        individualRolls.set(0, result);
-
-        return individualRolls;
-    }
-
-    /**
      * Get a random element out of a collection, with equal probability.
      * <p>
      * This is the same as calling the following code, only plays nicely with
@@ -181,7 +160,6 @@ public class Utilities {
      *
      * @return <i>null</i> if the collection itself is null or empty;
      * can return <i>null</i> if the collection contains <i>null</i> items.
-     *
      */
     public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
         if ((collection == null) || collection.isEmpty()) {

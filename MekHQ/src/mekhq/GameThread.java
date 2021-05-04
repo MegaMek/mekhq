@@ -13,10 +13,12 @@ package mekhq;
 
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
+import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
@@ -26,6 +28,7 @@ import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
 class GameThread extends Thread implements CloseClientListener {
@@ -113,19 +116,17 @@ class GameThread extends Thread implements CloseClientListener {
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
+                var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
-                    // Get the Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
-                    // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    // Add Mek to game
-                    client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Force force = campaign.getForceFor(unit);
+                    entity.setForceString(force.getFullMMName());
+                    entities.add(entity);
                 }
-
+                client.sendAddEntity(entities);
                 client.sendPlayerInfo();
             }
 

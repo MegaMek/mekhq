@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -72,7 +73,7 @@ import mekhq.gui.utilities.WrapLayout;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends ScrollablePanel {
+public class PersonViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -85,6 +86,7 @@ public class PersonViewPanel extends ScrollablePanel {
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+        super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;

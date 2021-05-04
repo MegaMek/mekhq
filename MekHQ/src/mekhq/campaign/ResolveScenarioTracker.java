@@ -45,6 +45,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -1353,7 +1354,7 @@ public class ResolveScenarioTracker {
         return units;
     }
 
-    public void resolveScenario(int resolution, String report) {
+    public void resolveScenario(ScenarioStatus resolution, String report) {
         //lets start by generating a stub file for our records
         scenario.generateStub(campaign);
 
