@@ -54,6 +54,8 @@ public final class MekHqConstants {
 
     //region New Day
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
+    public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
+    public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     //endregion New Day
 
@@ -87,11 +89,11 @@ public final class MekHqConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 
     public static final int MAXIMUM_D6_VALUE = 6;
-    
+
     /**
      * Paths to StratCon definition files
      */
-    
+
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
     public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
     public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
@@ -107,10 +109,10 @@ public final class MekHqConstants {
     public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
     public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
     public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
-    
+
     public static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
-    
+
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
     public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
@@ -124,5 +126,5 @@ public final class MekHqConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
-    
+
 }
