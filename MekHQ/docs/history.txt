@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 0.49.1-SNAPSHOT
 + Data: Fixing Aerospace Tech Portrait Folder Names
++ PR #2571: Fixing MechWarrior Salary Display
 
 0.49.0 (2021-05-01 2130 UTC)
 + Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
