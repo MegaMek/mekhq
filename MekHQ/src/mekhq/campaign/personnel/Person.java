@@ -1760,8 +1760,10 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
-                    if (retVal.getPrimaryRole().isAstech() || retVal.getPrimaryRole().isNone()) {
-                        retVal.setPrimaryRole(PersonnelRole.DEPENDENT);
+                    // Legacy setup was as Astechs, but people (including me) often forgot to remove
+                    // the flag so... just ignoring if they aren't astechs
+                    if (retVal.getPrimaryRole().isAstech()) {
+                        retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                     retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
@@ -1780,7 +1782,7 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
                     final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
                     if (version.isLowerThan("0.49.1") && primaryRole.isNone()) {
-                        retVal.setPrimaryRole(PersonnelRole.DEPENDENT);
+                        retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
                     } else {
                         retVal.setPrimaryRoleDirect(primaryRole);
                     }
