@@ -51,6 +51,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private final Campaign campaign;
     private RankSystem selectedRankSystem;
+    private boolean changed;
 
     // Rank System Panel
     private SortedComboBoxModel<RankSystem> rankSystemModel;
@@ -67,6 +68,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     public RankSystemsPane(final JFrame frame, final Campaign campaign) {
         super(frame, "RankSystemsPane");
         this.campaign = campaign;
+        setChanged(false);
         initialize();
     }
     //endregion Constructors
@@ -82,6 +84,14 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
 
     public void setSelectedRankSystem(final @Nullable RankSystem selectedRankSystem) {
         this.selectedRankSystem = selectedRankSystem;
+    }
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    public void setChanged(final boolean changed) {
+        this.changed = changed;
     }
 
     //region Rank System Panel
@@ -293,7 +303,6 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         setRanksTable(new JTable(getRanksTableModel()));
         getRanksTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         getRanksTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
         getRanksTable().setRowSelectionAllowed(false);
         getRanksTable().setColumnSelectionAllowed(false);
         getRanksTable().setCellSelectionEnabled(true);
@@ -413,6 +422,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
 
     private void updateRankSystem() {
+        setChanged(true);
         // Update the now old rank system with the changes done to it in the model
         if ((getSelectedRankSystem() != null) && !getSelectedRankSystem().getType().isDefault()) {
             getSelectedRankSystem().setType(getComboRankSystemType().getSelectedItem());
@@ -432,6 +442,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         final CustomRankSystemCreationDialog dialog = new CustomRankSystemCreationDialog(getFrame(),
                 rankSystems, getRanksTableModel().getRanks());
         if (dialog.showDialog().isConfirmed() && (dialog.getRankSystem() != null)) {
+            // We've made changes
+            setChanged(true);
             // If it was we add the new rank system to the model
             getRankSystemModel().addElement(dialog.getRankSystem());
             // And select that item if that's intended
@@ -457,6 +469,9 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
 
     private void refreshRankSystems() {
+        // If this occurs, something has changed
+        setChanged(true);
+
         // Clear the selected rank system and reinitialize
         setSelectedRankSystem(null);
         Ranks.reinitializeRankSystems(getCampaign());
@@ -493,8 +508,10 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     //endregion Button Actions
 
     public void applyToCampaign() {
-        exportUserDataRankSystems(false);
-        Ranks.reinitializeRankSystems(getCampaign());
-        getCampaign().setRankSystem(getSelectedRankSystem());
+        if (isChanged()) {
+            exportUserDataRankSystems(false);
+            Ranks.reinitializeRankSystems(getCampaign());
+            getCampaign().setRankSystem(getSelectedRankSystem());
+        }
     }
 }
