@@ -910,7 +910,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (StaticChecks.areAllForcesUndeployed(forces) && StaticChecks.areAllCombatForces(forces)) {
                 menu = new JMenu("Deploy Force");
-                menu.setEnabled(false);
+
                 JMenu missionMenu;
                 for (final Mission mission : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(mission.getName());
