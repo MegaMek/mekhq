@@ -3397,8 +3397,20 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    /** @return <code>true</code> if the new day arrived */
+    /**
+     * @return <code>true</code> if the new day arrived
+     */
     public boolean newDay() {
+        // Refill Automated Pools, if the options are selected
+        if (MekHQ.getMekHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
+            fillAstechPool();
+        }
+
+        if (MekHQ.getMekHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
+            fillMedicPool();
+        }
+
+        // Ensure we don't have anything that would prevent the new day
         if (MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
@@ -5256,6 +5268,10 @@ public class Campaign implements Serializable, ITechManager {
         return medicPool;
     }
 
+    public boolean requiresAdditionalAstechs() {
+        return getAstechNeed() > 0;
+    }
+
     public int getAstechNeed() {
         return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6)
                 - getNumberAstechs();
@@ -5385,6 +5401,10 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return medics;
+    }
+
+    public boolean requiresAdditionalMedics() {
+        return getMedicsNeed() > 0;
     }
 
     public int getMedicsNeed() {
