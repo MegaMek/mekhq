@@ -19,7 +19,6 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.MegaMek;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -2345,14 +2344,12 @@ public class Person implements Serializable {
                     if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
                                 SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
-                                / 4.0
-                        );
+                                / 4.0);
 
                         final int mechGunneryExperienceLevel = SkillType.lookupHash.get(SkillType.S_GUN_MECH).getExperienceLevel(rawScore);
                         if ((mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_MECH).getExperienceLevel(rawScore)
                                 && (mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_GUN_AERO).getExperienceLevel(rawScore))
-                                && (mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_AERO).getExperienceLevel(rawScore)))
-                        ) {
+                                && (mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_AERO).getExperienceLevel(rawScore)))) {
                             return getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore);
                         }
                     }
