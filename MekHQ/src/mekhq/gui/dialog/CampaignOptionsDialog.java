@@ -4908,7 +4908,11 @@ public class CampaignOptionsDialog extends JDialog {
             spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeight(i) / 10.0);
         }
         if (chkUseRandomSameSexMarriages.isSelected() != options.useRandomSameSexMarriages()) {
-            chkUseRandomSameSexMarriages.doClick();
+            if (chkUseRandomSameSexMarriages.isEnabled()) {
+                chkUseRandomSameSexMarriages.doClick();
+            } else {
+                chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
+            }
         }
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
@@ -4918,7 +4922,11 @@ public class CampaignOptionsDialog extends JDialog {
         }
         spnChanceProcreation.setValue(options.getChanceProcreation() * 100.0);
         if (chkUseProcreationNoRelationship.isSelected() != options.useProcreationNoRelationship()) {
-            chkUseProcreationNoRelationship.doClick();
+            if (chkUseProcreationNoRelationship.isEnabled()) {
+                chkUseProcreationNoRelationship.doClick();
+            } else {
+                chkUseProcreationNoRelationship.setSelected(options.useProcreationNoRelationship());
+            }
         }
         spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
         chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
