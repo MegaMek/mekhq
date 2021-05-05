@@ -24,7 +24,13 @@ MekHQ/.idea/
 
 MekHQ/out/
 MekHQ/mmconf/mekhq.preferences
-MekHQ/userdata/
+MekHQ/userdata/**
+!/MekHQ/userdata/README.md
+!/MekHQ/userdata/data
+/MekHQ/userdata/data/**
+!/MekHQ/userdata/data/universe/
+/MekHQ/userdata/data/universe/**
+!/MekHQ/userdata/data/universe/ranks.xml
 *.sav.gz
 /MekHQ/campaigns
 !/MekHQ/campaigns/Fist and Falcon

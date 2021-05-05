@@ -32,6 +32,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
 /**
@@ -267,11 +268,13 @@ public class ScenarioObjectiveProcessor {
      * @param objectiveOverrides Map containing user overrides of objective completion state
      * @param objectiveUnitCounts Map containing objectives and the number of units that qualified for each.
      */
-    public int determineScenarioStatus(Scenario scenario, Map<ScenarioObjective, Boolean> objectiveOverrides, Map<ScenarioObjective, Integer> objectiveUnitCounts) {
+    public ScenarioStatus determineScenarioStatus(Scenario scenario,
+                                                  Map<ScenarioObjective, Boolean> objectiveOverrides,
+                                                  Map<ScenarioObjective, Integer> objectiveUnitCounts) {
         int victoryScore = 0;
 
         if (!scenario.hasObjectives()) {
-            return Scenario.S_DRAW;
+            return ScenarioStatus.DRAW;
         }
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
@@ -296,11 +299,11 @@ public class ScenarioObjectiveProcessor {
         }
 
         if (victoryScore > 0) {
-            return Scenario.S_VICTORY;
+            return ScenarioStatus.VICTORY;
         } else if (victoryScore < 0) {
-            return Scenario.S_DEFEAT;
+            return ScenarioStatus.DEFEAT;
         } else {
-            return Scenario.S_DRAW;
+            return ScenarioStatus.DRAW;
         }
     }
 
@@ -377,7 +380,7 @@ public class ScenarioObjectiveProcessor {
             case SupportPointUpdate:
                 if (tracker.getMission() instanceof AtBContract) {
                     AtBContract contract = (AtBContract) tracker.getMission();
-                    
+
                     if (contract.getStratconCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;

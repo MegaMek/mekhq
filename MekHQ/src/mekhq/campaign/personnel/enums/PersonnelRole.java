@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.ranks.Ranks;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -304,46 +303,6 @@ public enum PersonnelRole {
         return isDependent() || isNone();
     }
     //endregion Boolean Comparisons
-
-    @Deprecated // This will go into a profession enum once that it ready
-    public int getProfession() {
-        switch (this) {
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return Ranks.RPROF_ASF;
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-                return Ranks.RPROF_VEE;
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-                return Ranks.RPROF_INF;
-            case VESSEL_PILOT:
-            case VESSEL_CREW:
-            case VESSEL_GUNNER:
-            case VESSEL_NAVIGATOR:
-                return Ranks.RPROF_NAVAL;
-            case MECH_TECH:
-            case MECHANIC:
-            case AERO_TECH:
-            case BA_TECH:
-            case ASTECH:
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_HR:
-            case ADMINISTRATOR_TRANSPORT:
-                return Ranks.RPROF_TECH;
-            case MECHWARRIOR:
-            case LAM_PILOT:
-            case PROTOMECH_PILOT:
-            case DOCTOR:
-            case MEDIC:
-            default:
-                return Ranks.RPROF_MW;
-        }
-    }
 
     //region Static Methods
     /**

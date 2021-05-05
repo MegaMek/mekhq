@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMButton;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.UnitMarketPane;
@@ -96,22 +97,22 @@ public class UnitMarketDialog extends AbstractMHQButtonDialog {
     @Override
     protected JPanel createButtonPanel() {
         final JPanel panel = new JPanel(new GridLayout(1, getCampaign().isGM() ? 4 : 2));
-        setPurchaseButton(createButton("Purchase.text", "Purchase.toolTipText",
-                "purchaseButton", evt -> okAction()));
+        setPurchaseButton(new MMButton("btnPurchase", resources.getString("Purchase.text"),
+                resources.getString("Purchase.toolTipText"), evt -> okAction()));
         panel.add(getPurchaseButton());
 
         if (getCampaign().isGM()) {
-            setAddGMButton(createButton("AddGM.text", "AddGM.toolTipText",
-                    "addGMButton", evt -> getUnitMarketPane().addSelectedOffers()));
+            setAddGMButton(new MMButton("btnAddGM", resources.getString("AddGM.text"),
+                    resources.getString("AddGM.toolTipText"), evt -> getUnitMarketPane().addSelectedOffers()));
             panel.add(getAddGMButton());
 
-            setRemoveButton(createButton("Remove.text", "Remove.toolTipText",
-                    "removeButton", evt -> getUnitMarketPane().removeSelectedOffers()));
+            setRemoveButton(new MMButton("btnRemove", resources.getString("Remove.text"),
+                    resources.getString("Remove.toolTipText"), evt -> getUnitMarketPane().removeSelectedOffers()));
             panel.add(getRemoveButton());
         }
 
-        panel.add(createButton("Cancel.text", "Cancel.toolTipText", "cancelButton",
-                this::cancelActionPerformed));
+        panel.add(new MMButton("btnCancel", resources.getString("Cancel.text"),
+                resources.getString("Cancel.toolTipText"), this::cancelActionPerformed));
         return panel;
     }
     //endregion Initialization

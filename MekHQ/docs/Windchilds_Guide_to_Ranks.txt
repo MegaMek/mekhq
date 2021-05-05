@@ -1,0 +1,80 @@
+Windchild's Guide to Ranks in MekHQ
+Written 25-Mar-2021
+MekHQ version 0.49.0
+
+How Rank.xml Loading Works:
+Ranks located within the default rank file (/data/universe/ranks.xml as a default path) are loaded first, followed by any player created customs from the userdata file (/userdata/data/universe/ranks.xml). During this load any duplicated system codes are logged as duplicates before the system is discarded. All non-default rank systems are then run against further validations to ensure they are valid. If the validator detects an infinite loop scenario or any other invalid setup, it will write errors into the log file and not add the system to the list of systems.
+
+The campaign file may contain a custom rank system that is not one of the rank systems loaded above. In this case the system will be written to and loaded from the campaign save file including all rank levels instead of merely writing and reading the system code.
+
+If you want to run a campaign with entirely custom ranks, remove all rank systems EXCEPT the SSLDF-coded rank system. That system is used as a default value within the code base and removing it may cause unexpected issues. However, you may change the system name and all ranks within it, the specific code is all that is required.
+
+
+
+Professions:
+Professions are used to determine the type of ranks a person has. They consist of a number of Personnel Roles that are a a part of the profession, and the profession code, which is used during alternate profession specification (explained below). The groupings of Personnel Roles cannot be customized. The professions are as followed:
+MechWarrior:
+	Personnel Roles: MechWarrior, LAM Pilot, ProtoMech Pilot
+	Profession Code: "MW"
+	This is the default profession, and thus it may not be an empty profession (see below for more information about this term).
+Aerospace:
+	Personnel Roles: Aerospace Pilot, Conventional Aircraft Pilot
+	Profession Code: "ASF"
+Vehicle:
+	Personnel Roles: Ground Driver, Naval Driver, VTOL Pilot, Vehicle Gunner, Vehicle Crewmember
+	Profession Code: "VEE"
+Naval:
+	Personnel Roles: Vessel Pilot, Vessel Crewmember, Vessel Gunner, Hyperspace Navigator
+	Profession Code: "NAVAL"
+Infantry:
+	Personnel Roles: Battle Armour Pilot, Elemental, Soldier
+	Profession Code: "INF"
+Tech:
+	Personnel Roles: Mech Tech, Mechanic, Aero Tech, Battle Armour Tech, Astech
+	Profession Code: "TECH"
+Medical:
+	Personnel Roles: Doctor, Medic
+	Profession Code: "MEDICAL"
+Admin:
+	Personnel Roles: Admin/Command, Admin/Logistical, Admin/Transport, Admin/HR
+	Profession Code: "ADMIN"
+Civilian:
+	Personnel Roles: Dependent, None
+	Profession Code: "CIVILIAN"
+
+
+
+How to Write a Custom Rank System:
+The following clarifies some terms before I will start on how to write a custom rank system.
+{ "MW", "ASF", "VEE", "NAVAL", "INF", "TECH", "MEDICAL", "ADMIN", "CIVILIAN" } are the profession codes, the columns used for each rank name, in their written and display order.
+"--" followed by a profession code (capitalization required) means that the rank is designating an alternate profession to use for that rank tier (e.g. "--MW", "--INF") for that profession. This is referred to as "alternate profession".
+"-" or an empty string (containing nothing, spaces, and/or tabs) means that the rank is empty for that tier for the specific profession. This is referred to as "empty".
+
+First, you need to specify a unique system code and a system name for the rank system. These are used to track the rank system internally and in displays.
+
+Second, each rank system requires a rank entry for every one of the E0-E20, WO1-WO10, and O1-O20 ranks. To discount an entry from internal processing, fill all professions with empty. The first tier (E0) must have a valid initial value (non-empty and not designating an alternate profession) in one or more of the professions. All others on that tier must be declared as designating an alternate profession. If a profession is completely empty (all name values are empty) outside of having an alternate profession in the first tier, is is considered to be an empty profession. It will then used the value in the first tier to determine the alternate profession to use, repeating until the final profession is determined. Following these rules, fill in each rank starting with the name, then whether the rank is to be considered to be an officer rank or not, and finally add a pay multiplier (1 for no changes).
+
+Third, you will need to add the now complete system to the userdata rank file. Ensure the whole system is wrapped with rankSystem tags, then add it to the bottom of the file. You can then, through Campaign Options Dialog, reload the rank systems from file, or it will be automatically loaded when loading a campaign file.
+
+
+
+What NOT to do when working with Ranks:
+1) Remove the SSLDF-coded rank system (although you may customize the ranks within it)
+2) Add to the default rank system file without first testing the system in the userdata file.
+3) Add cyclical alternate professions within a rank system (e.g. a rank with the "NAVAL" profession containing "--ASF" while the "ASF" profession contains "--NAVAL")
+
+
+
+How Ranks Are Handled Internally:
+Ranks.java: This is a static class that is used to load and store rank systems. This is not to be instatiated nor used for any other purpose. 
+RankSystem.java: This class contains the information for a single rank system, namely the system's code, the system's name, the system's type (transient value dependant on system load style and file location), and a list of all ranks within that system (which currently must include a rank for all possible rank tiers).
+Rank.java: This class contains the information regarding a single rank level, namely the rank names, the pay multiplier, and whether that level is to be considered officers. The numeric for this rank is currently the index on the rank system's list.
+RankSystemType: This enum contains the information one needs to parse through the different rank systems when working with them in Campaign Options Dialog.
+RankValidator.java: This is a static class that is used to validate the rank system and each rank tier within. It is called on any load and upon setting the Campaign rank system to prevent null systems and duplication of primary keys. Non-default rank systems are further checked for infinite loop setups and other illegal rank setups. It is also used to validate and fix any rank changes for personnel when the campaign rank system changes.
+RankDisplay.java: This is a display wrapper class that is used to track an individual rank for visual display (as one cannot merely override toString given the different returns on the name based on a number of factors, largely relating to the profession), and ensures that all ranks on the display are filtered properly for the profession provided.
+ranks.xml: This contains all default rank systems used in MekHQ, with a required minimum content of the SSLDF-coded rank system.
+User Data ranks.xml: This contains all custom user ranks, which are loaded and treated internally as equivalent to the default rank systems outside of Campaign Options Dialog.
+Campaign.java: This contains the base campaign rank system, which may be a completely custom rank system that is not tracked in either of the rank files.
+Person.java: Person contains the person's rank system (with a default of the campaign rank system), their rank (saved as a numeric), their rank level (if applicable), their Manei Domini classification (requires WOBM for their rank system), and ROM Designation (requiring CG or WOBM).
+
+

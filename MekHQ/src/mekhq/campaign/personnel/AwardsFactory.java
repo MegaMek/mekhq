@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHqConstants;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -146,7 +147,7 @@ public class AwardsFactory {
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
     private void loadAwards() {
-        File dir = new File(MekHQ.getMekHQOptions().getAwardsDirectoryPath());
+        File dir = new File(MekHqConstants.AWARDS_DIRECTORY_PATH);
         File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {
