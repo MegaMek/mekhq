@@ -314,9 +314,10 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
-
+                    
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                     if (scenario != null) {
                         AtBDynamicScenarioFactory.loadTransports(scenario, botClient);
                     }
