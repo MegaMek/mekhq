@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>AlliedAirBase.xml</capturedDefinition>
 	<displayableName>Air Base</displayableName>
         <facilityType>AirBase</facilityType>
         <localModifiers>EnemyAirGarrison.xml</localModifiers>
