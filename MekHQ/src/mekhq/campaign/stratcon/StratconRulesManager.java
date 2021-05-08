@@ -1227,7 +1227,6 @@ public class StratconRulesManager {
      * modifier/type/alignment switches etc.
      */
     private static void switchFacilityOwner(StratconFacility facility) {
-        facility.setCapturedDefinition("AlliedArtilleryBase.xml");
         if (facility.getCapturedDefinition() != null && !facility.getCapturedDefinition().isBlank()) {
             StratconFacility newOwnerData = 
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
