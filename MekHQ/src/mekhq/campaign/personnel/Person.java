@@ -2336,28 +2336,28 @@ public class Person implements Serializable {
             case LAM_PILOT:
                 if (Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
                         SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).allMatch(this::hasSkill)) {
-                    int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
-                            SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
-                                    / 4.0
-                    );
                     /*
                      * Attempt to use higher precision averaging, but if it doesn't provide a clear result
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
                     if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
-                        if ((getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore)
-                                == getSkill(SkillType.S_PILOT_MECH).getType().getExperienceLevel(rawScore))
-                                && (getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore)
-                                == getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore))
-                                && (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore)
-                                == getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore))
-                        ) {
+                        int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
+                                SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
+                                / 4.0);
+
+                        final int mechGunneryExperienceLevel = SkillType.lookupHash.get(SkillType.S_GUN_MECH).getExperienceLevel(rawScore);
+                        if ((mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_MECH).getExperienceLevel(rawScore)
+                                && (mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_GUN_AERO).getExperienceLevel(rawScore))
+                                && (mechGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_AERO).getExperienceLevel(rawScore)))) {
                             return getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return rawScore;
+                    return (int) Math.floor(
+                            (getSkill(SkillType.S_GUN_MECH).getExperienceLevel() + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()
+                            + getSkill(SkillType.S_GUN_AERO).getExperienceLevel() + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel())
+                            / 4.0);
                 } else {
                     return -1;
                 }
