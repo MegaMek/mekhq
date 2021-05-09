@@ -18,6 +18,7 @@
  */
 package mekhq.gui.utilities;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 
 import megamek.common.Entity;
 import megamek.common.UnitType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
@@ -592,7 +594,7 @@ public class StaticChecks {
         return false;
     }
 
-    public static boolean areAllPrisoners(Person[] people) {
+    public static boolean areAllPrisoners(Person... people) {
         for (Person person : people) {
             if (!person.getPrisonerStatus().isPrisoner()) {
                 return false;
@@ -606,7 +608,7 @@ public class StaticChecks {
      * @param people an array of people
      * @return true if they are either all dependents or all not dependents, otherwise false
      */
-    public static boolean areEitherAllDependentsOrNot(Person[] people) {
+    public static boolean areEitherAllDependentsOrNot(Person... people) {
         if (people.length > 0) {
             boolean isDependent = people[0].isDependent();
             for (Person person : people) {
@@ -622,7 +624,7 @@ public class StaticChecks {
      * @param people an array of people
      * @return true if all of the people are female, otherwise false
      */
-    public static boolean areAllFemale(Person[] people) {
+    public static boolean areAllFemale(Person... people) {
         for (Person person : people) {
             if (person.getGender().isMale()) {
                return false;
@@ -632,10 +634,27 @@ public class StaticChecks {
     }
 
     /**
+     * @param today the current date
+     * @param people an array of people
+     * @return true if any of the people can procreate, otherwise false
+     */
+    public static boolean anyCanBePregnant(final LocalDate today, final Person... people) {
+        return Stream.of(people).anyMatch(p -> p.canProcreate(today));
+    }
+
+    /**
+     * @param people an array of people
+     * @return true if any of the people are pregnant, otherwise false
+     */
+    public static boolean anyPregnant(Person... people) {
+        return Stream.of(people).anyMatch(Person::isPregnant);
+    }
+
+    /**
      * @param people an array of people
      * @return true if they are either all trying to conceive or all not, otherwise false
      */
-    public static boolean areEitherAllTryingToConceiveOrNot(Person[] people) {
+    public static boolean areEitherAllTryingToConceiveOrNot(Person... people) {
         if (people.length > 0) {
             boolean tryingToConceive = people[0].isTryingToConceive();
             for (Person person : people) {
@@ -651,7 +670,7 @@ public class StaticChecks {
      * @param people an array of people
      * @return true if they are either all trying to marry or all not, otherwise false
      */
-    public static boolean areEitherAllTryingToMarryOrNot(Person[] people) {
+    public static boolean areEitherAllTryingToMarryOrNot(Person... people) {
         if (people.length > 0) {
             boolean tryingToMarry = people[0].isTryingToMarry();
             for (Person person : people) {
@@ -667,7 +686,7 @@ public class StaticChecks {
      * @param people an array of people
      * @return true if they are either all founders or all not, otherwise false
      */
-    public static boolean areEitherAllFoundersOrNot(Person[] people) {
+    public static boolean areEitherAllFoundersOrNot(Person... people) {
         if (people.length > 0) {
             boolean founder = people[0].isFounder();
             for (Person person : people) {
@@ -679,7 +698,7 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean areAnyWillingToDefect(Person[] people) {
+    public static boolean areAnyWillingToDefect(Person... people) {
         for (Person person : people) {
             if (person.getPrisonerStatus().isWillingToDefect()) {
                 return true;
@@ -697,7 +716,7 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getRankSystem().isCGOrWoBM());
     }
 
-    public static boolean areAllSameSite(Unit[] units) {
+    public static boolean areAllSameSite(Unit... units) {
         int site = units[0].getSite();
         for (Unit unit : units) {
             if (unit.getSite() != site) {
@@ -707,7 +726,7 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean allHaveSameUnit(Person[] people) {
+    public static boolean allHaveSameUnit(Person... people) {
         if ((people == null) || (people.length == 0)) {
             return false;
         }

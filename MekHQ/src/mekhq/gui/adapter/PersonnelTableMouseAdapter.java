@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 
@@ -120,21 +121,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE"; //$NON-NLS-1$
-    private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
-    private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
+    private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
+    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_IMPROVE = "IMPROVE";
+    private static final String CMD_ADD_SPOUSE = "SPOUSE";
+    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
+    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
+    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_ADD_TECH = "ADD_TECH";
 
-    private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
-    private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
-    private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
+    private static final String CMD_IMPRISON = "IMPRISON";
+    private static final String CMD_FREE = "FREE";
+    private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_RANSOM = "RANSOM";
 
-    private static final String SEPARATOR = "@"; //$NON-NLS-1$
+    private static final String SEPARATOR = "@";
+
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -493,17 +495,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate());
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people).filter(p -> p.canProcreate(gui.getCampaign().getLocalDate())).forEach(p -> {
+                    p.addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate());
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                if (selectedPerson.isPregnant()) {
-                    selectedPerson.removePregnancy();
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people).filter(Person::isPregnant).forEach(p -> {
+                    p.removePregnancy();
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
@@ -2617,6 +2619,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
                 menu.add(menuItem);
             }
+
             if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text"));
                 menuItem.setActionCommand(CMD_CLEAR_INJURIES);
@@ -2638,20 +2641,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (oneSelected) {
-                if (person.canProcreate(gui.getCampaign().getLocalDate())) {
-                    menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
+            if (gui.getCampaign().getCampaignOptions().useProcreation()) {
+                if (StaticChecks.anyCanBePregnant(gui.getCampaign().getLocalDate(), selected)) {
+                    menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                } else if (person.isPregnant()) {
-                    menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
+                }
+
+                if (StaticChecks.anyPregnant(selected)) {
+                    menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
             }
-            popup.add(menu);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         //endregion GM Menu
 
