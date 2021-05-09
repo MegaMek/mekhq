@@ -20,7 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
-import megamek.common.util.WeightedMap;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -82,7 +82,7 @@ public enum Marriage {
         Marriage surnameStyle = this;
 
         if (surnameStyle == WEIGHTED) {
-            WeightedMap<Marriage> map = createWeightedSurnameMap(campaign);
+            WeightedIntMap<Marriage> map = createWeightedSurnameMap(campaign);
             surnameStyle = map.randomItem();
         }
 
@@ -213,8 +213,8 @@ public enum Marriage {
     }
 
 
-    private WeightedMap<Marriage> createWeightedSurnameMap(final Campaign campaign) {
-        final WeightedMap<Marriage> map = new WeightedMap<>();
+    private WeightedIntMap<Marriage> createWeightedSurnameMap(final Campaign campaign) {
+        final WeightedIntMap<Marriage> map = new WeightedIntMap<>();
         final int[] weights = campaign.getCampaignOptions().getMarriageSurnameWeights();
         final Marriage[] styles = Marriage.values();
         for (int i = 0; i < (styles.length - 1); i++) {

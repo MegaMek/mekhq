@@ -18,55 +18,36 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.*;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SortOrder;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.model.RankTableModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 public final class BatchXPDialog extends JDialog {
     private static final long serialVersionUID = -7897406116865495209L;
@@ -253,13 +234,9 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
         personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
 
-        Object[][] ranks = campaign.getRanks().getRanksForModel();
-        for (int i = 0; i < ranks.length; i++) {
-            StringBuilder rankName = new StringBuilder(((String) ranks[i][0]).trim());
-            for (int j = 1; j <= RankTableModel.COL_NAME_TECH; j++) {
-                rankName.append(", ").append(((String) ranks[i][j]).trim());
-            }
-            personRankModel.addElement(new PersonTypeItem(rankName.toString(), i));
+        final List<Rank> ranks = campaign.getRankSystem().getRanks();
+        for (int i = 0; i < ranks.size(); i++) {
+            personRankModel.addElement(new PersonTypeItem(ranks.get(i).getRankNamesAsString(", "), i));
         }
         choiceRank.setModel(personRankModel);
         choiceRank.setSelectedIndex(0);

@@ -73,6 +73,18 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         JComboBox<MissionStatus> choiceOutcome = new JComboBox<>(outcomeModel);
         choiceOutcome.setName("choiceOutcome");
         choiceOutcome.setSelectedItem(getStatus());
+        choiceOutcome.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof MissionStatus) {
+                    list.setToolTipText(((MissionStatus) value).getToolTipText());
+                }
+                return this;
+            }
+        });
         gridBagConstraints.gridx = gridx--;
         getContentPane().add(choiceOutcome, gridBagConstraints);
 

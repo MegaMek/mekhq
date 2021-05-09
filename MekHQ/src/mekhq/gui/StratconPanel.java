@@ -118,6 +118,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     public StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
+        
         scenarioWizard = new StratconScenarioWizard(campaign);
         this.infoArea = infoArea;
         

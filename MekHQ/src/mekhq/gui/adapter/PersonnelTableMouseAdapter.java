@@ -35,6 +35,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -48,12 +49,15 @@ import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
+import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
@@ -131,7 +135,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RANSOM = "RANSOM";
 
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String HYPHEN = "-"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -208,40 +211,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         switch (command) {
             case CMD_RANKSYSTEM: {
-                int system = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setRankSystem(system);
+                final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
+                final RankValidator rankValidator = new RankValidator();
+                for (final Person person : people) {
+                    person.setRankSystem(rankValidator, rankSystem);
                 }
                 break;
             }
             case CMD_RANK: {
-                int rank = Integer.parseInt(data[1]);
-                int level = 0;
-                // Check to see if we added a rank level...
-                if (data.length > 2) {
-                    level = Integer.parseInt(data[2]);
-                }
-
-                for (Person person : people) {
-                    gui.getCampaign().changeRank(person, rank, level, true);
-                }
-                break;
-            }
-            case CMD_MANEI_DOMINI_RANK: {
-                ManeiDominiRank maneiDominiRank = ManeiDominiRank.parseFromString(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiRank(maneiDominiRank);
+                final int rank = Integer.parseInt(data[1]);
+                final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
+                for (final Person person : people) {
+                    person.changeRank(gui.getCampaign(), rank, level, true);
                 }
                 break;
             }
             case CMD_MANEI_DOMINI_CLASS: {
                 try {
-                    ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
-                    for (Person person : people) {
+                    final ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
+                    for (final Person person : people) {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
                     MekHQ.getLogger().error("Failed to assign Manei Domini Class", e);
+                }
+                break;
+            }
+            case CMD_MANEI_DOMINI_RANK: {
+                final ManeiDominiRank maneiDominiRank = ManeiDominiRank.valueOf(data[1]);
+                for (final Person person : people) {
+                    person.setManeiDominiRank(maneiDominiRank);
                 }
                 break;
             }
@@ -1148,100 +1147,66 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu submenu;
         JCheckBoxMenuItem cbMenuItem;
         Person[] selected = getSelectedPeople();
+
         // lets fill the pop up menu
-        if (StaticChecks.areAllEligible(selected, true)) {
+        if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resourceMap.getString("changeRank.text"));
-            Ranks ranks = person.getRanks();
-            for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
-                Rank rank = ranks.getAllRanks().get(rankOrder);
-                int profession = person.getPrimaryRole().getProfession();
+            final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+            for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(
+                    person.getRankSystem(), initialProfession)) {
+                final Rank rank = person.getRankSystem().getRank(rankDisplay.getRankNumeric());
+                final Profession profession = initialProfession.getProfession(person.getRankSystem(), rank);
+                final int rankLevels = rank.getRankLevels().get(profession);
 
-                // Empty professions need swapped before the continuation
-                while (ranks.isEmptyProfession(profession) && (profession != Ranks.RPROF_MW)) {
-                    profession = ranks.getAlternateProfession(profession);
-                }
-
-                if (rank.getName(profession).equals(HYPHEN)) {
-                    continue;
-                }
-
-                // re-route through any profession redirections,
-                // starting with the empty profession check
-                while (rank.getName(profession).startsWith("--") && (profession != Ranks.RPROF_MW)) {
-                    if (rank.getName(profession).equals("--")) {
-                        profession = ranks.getAlternateProfession(profession);
-                    } else if (rank.getName(profession).startsWith("--")) {
-                        profession = ranks.getAlternateProfession(rank.getName(profession));
-                    }
-                }
-
-                if (rank.getRankLevels(profession) > 0) {
-                    submenu = new JMenu(rank.getName(profession));
-                    for (int level = 0; level <= rank.getRankLevels(profession); level++) {
+                if (rankLevels > 1) {
+                    submenu = new JMenu(rankDisplay.toString());
+                    for (int level = 0; level <= rankLevels; level++) {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)
                                 + Utilities.getRomanNumeralsFromArabicNumber(level, true));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder), String.valueOf(level)));
-                        if ((person.getRankNumeric() == rankOrder) && (person.getRankLevel() == level)) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.getRankNumeric())
+                                && (person.getRankLevel() == level));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK,
+                                String.valueOf(rankDisplay.getRankNumeric()), String.valueOf(level)));
                         cbMenuItem.addActionListener(this);
-                        cbMenuItem.setEnabled(true);
                         submenu.add(cbMenuItem);
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(menu, submenu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, submenu);
                 } else {
-                    cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder)));
-                    if (person.getRankNumeric() == rankOrder) {
-                        cbMenuItem.setSelected(true);
-                    }
+                    cbMenuItem = new JCheckBoxMenuItem(rankDisplay.toString());
+                    cbMenuItem.setSelected(person.getRankNumeric() == rankDisplay.getRankNumeric());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.getRankNumeric())));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
                     menu.add(cbMenuItem);
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
+
         menu = new JMenu(resourceMap.getString("changeRankSystem.text"));
+        final RankSystem campaignRankSystem = gui.getCampaign().getRankSystem();
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text"));
-        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, "-1"));
+        cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
+        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, campaignRankSystem.getCode()));
         cbMenuItem.addActionListener(this);
-        cbMenuItem.setEnabled(true);
         menu.add(cbMenuItem);
-        for (int system = 0; system < Ranks.RS_NUM; system++) {
-            if (system == Ranks.RS_CUSTOM) {
+
+        final List<RankSystem> rankSystems = new ArrayList<>(Ranks.getRankSystems().values());
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        rankSystems.sort((r1, r2) -> naturalOrderComparator.compare(r1.toString(), r2.toString()));
+        for (final RankSystem rankSystem : rankSystems) {
+            if (rankSystem.equals(campaignRankSystem)) {
                 continue;
             }
-            final Ranks ranks = Ranks.getRanksFromSystem(system);
-            if (ranks == null) {
-                continue;
-            }
-            cbMenuItem = new JCheckBoxMenuItem(ranks.getRankSystemName());
-            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, String.valueOf(system)));
+            cbMenuItem = new JCheckBoxMenuItem(rankSystem.toString());
+            cbMenuItem.setSelected(rankSystem.equals(person.getRankSystem()));
+            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getCode()));
             cbMenuItem.addActionListener(this);
-            cbMenuItem.setEnabled(true);
-            if (system == person.getRanks().getRankSystem()) {
-                cbMenuItem.setSelected(true);
-            }
             menu.add(cbMenuItem);
         }
-        JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
-        if (StaticChecks.areAllWoB(selected)) {
-            // MD Ranks
-            menu = new JMenu(resourceMap.getString("changeMDRank.text"));
-            for (ManeiDominiRank maneiDominiRank : ManeiDominiRank.values()) {
-                cbMenuItem = new JCheckBoxMenuItem(maneiDominiRank.toString());
-                cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, maneiDominiRank.name()));
-                cbMenuItem.addActionListener(this);
-                if (person.getManeiDominiRank() == maneiDominiRank) {
-                    cbMenuItem.setSelected(true);
-                }
-                menu.add(cbMenuItem);
-            }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
-
+        if (StaticChecks.areAllWoBMilitia(selected)) {
             // MD Classes
             menu = new JMenu(resourceMap.getString("changeMDClass.text"));
             for (ManeiDominiClass maneiDominiClass : ManeiDominiClass.values()) {
@@ -1253,10 +1218,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 menu.add(cbMenuItem);
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+
+            // MD Ranks
+            menu = new JMenu(resourceMap.getString("changeMDRank.text"));
+            for (ManeiDominiRank maneiDominiRank : ManeiDominiRank.values()) {
+                cbMenuItem = new JCheckBoxMenuItem(maneiDominiRank.toString());
+                cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, maneiDominiRank.name()));
+                cbMenuItem.addActionListener(this);
+                if (person.getManeiDominiRank() == maneiDominiRank) {
+                    cbMenuItem.setSelected(true);
+                }
+                menu.add(cbMenuItem);
+            }
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
-        if (StaticChecks.areAllWoBOrComstar(selected)) {
+        if (StaticChecks.areAllWoBMilitiaOrComGuard(selected)) {
             menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text"));
             for (ROMDesignation romDesignation : ROMDesignation.values()) {
                 cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());

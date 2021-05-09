@@ -25,7 +25,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -47,6 +50,7 @@ import mekhq.campaign.universe.Systems;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Mission implements Serializable, MekHqXmlSerializable {
+    //region Variable Declarations
     private static final long serialVersionUID = -5692134027829715149L;
 
     private String name;
@@ -54,22 +58,25 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     private MissionStatus status;
     private String desc;
     private String type;
-    private ArrayList<Scenario> scenarios;
+    private List<Scenario> scenarios;
     private int id = -1;
     private String legacyPlanetName;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Mission() {
         this(null);
     }
 
-    public Mission(String n) {
-        this.name = n;
+    public Mission(final @Nullable String name) {
+        this.name = name;
         this.systemId = "Unknown System";
         this.desc = "";
         this.type = "";
         this.status = MissionStatus.ACTIVE;
         scenarios = new ArrayList<>();
     }
+    //endregion Constructors
 
     public String getName() {
         return name;
@@ -141,20 +148,45 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         return getStatus().isActive();
     }
 
-    public ArrayList<Scenario> getScenarios() {
+    //region Scenarios
+    public List<Scenario> getScenarios() {
         return scenarios;
+    }
+
+    public List<Scenario> getCurrentScenarios() {
+        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent()).collect(Collectors.toList());
+    }
+
+    public List<AtBScenario> getCurrentAtBScenarios() {
+        return getScenarios().stream()
+                .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
+                .map(scenario -> (AtBScenario) scenario)
+                .collect(Collectors.toList());
+    }
+
+    public List<Scenario> getCompletedScenarios() {
+        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent()).collect(Collectors.toList());
     }
 
     /**
      * Don't use this method directly as it will not add an id to the added
      * scenario. Use Campaign#AddScenario instead
      *
-     * @param s
+     * @param scenario the scenario to add this this mission
      */
-    public void addScenario(Scenario s) {
-        s.setMissionId(getId());
-        scenarios.add(s);
+    public void addScenario(final Scenario scenario) {
+        scenario.setMissionId(getId());
+        getScenarios().add(scenario);
     }
+
+    public void clearScenarios() {
+        scenarios.clear();
+    }
+
+    public boolean hasPendingScenarios() {
+        return getScenarios().stream().anyMatch(scenario -> scenario.getStatus().isCurrent());
+    }
+    //endregion Scenarios
 
     public int getId() {
         return id;
@@ -164,34 +196,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.id = i;
     }
 
-    public void removeScenario(int id) {
-        int idx = 0;
-        boolean found = false;
-        for (Scenario s : getScenarios()) {
-            if (s.getId() == id) {
-                found = true;
-                break;
-            }
-            idx++;
-        }
-        if (found) {
-            scenarios.remove(idx);
-        }
-    }
-
-    public void clearScenarios() {
-        scenarios.clear();
-    }
-
-    public boolean hasPendingScenarios() {
-        for (Scenario s : scenarios) {
-            if (s.isCurrent()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -288,12 +293,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             MekHQ.getLogger().error(ex);
         }
-        
+
         return retVal;
     }
+    //endregion File I/O
 }

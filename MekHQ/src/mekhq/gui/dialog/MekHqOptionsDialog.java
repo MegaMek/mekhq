@@ -61,6 +61,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Autosave
 
     //region New Day
+    private JCheckBox optionNewDayAstechPoolFill;
+    private JCheckBox optionNewDayMedicPoolFill;
     private JCheckBox optionNewDayMRMS;
     //endregion New Day
 
@@ -289,31 +291,44 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createNewDayTab() {
-        //region Create Graphical Components
-        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
-        //endregion Create Graphical Components
+        // Create Panel Components
+        optionNewDayAstechPoolFill = new JCheckBox(resources.getString("optionNewDayAstechPoolFill.text"));
+        optionNewDayAstechPoolFill.setToolTipText(resources.getString("optionNewDayAstechPoolFill.toolTipText"));
+        optionNewDayAstechPoolFill.setName("optionNewDayAstechPoolFill");
 
-        //region Layout
+        optionNewDayMedicPoolFill = new JCheckBox(resources.getString("optionNewDayMedicPoolFill.text"));
+        optionNewDayMedicPoolFill.setToolTipText(resources.getString("optionNewDayMedicPoolFill.toolTipText"));
+        optionNewDayMedicPoolFill.setName("optionNewDayMedicPoolFill");
+
+        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
+        optionNewDayMRMS.setToolTipText(resources.getString("optionNewDayMRMS.toolTipText"));
+        optionNewDayMRMS.setName("optionNewDayMRMS");
+
         // Layout the UI
-        JPanel body = new JPanel();
-        GroupLayout layout = new GroupLayout(body);
-        body.setLayout(layout);
+        final JPanel panel = new JPanel();
+        panel.setName("newDayPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(optionNewDayAstechPoolFill)
+                        .addComponent(optionNewDayMedicPoolFill)
                         .addComponent(optionNewDayMRMS)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(optionNewDayAstechPoolFill)
+                        .addComponent(optionNewDayMedicPoolFill)
                         .addComponent(optionNewDayMRMS)
         );
         //endregion Layout
 
-        return body;
+        return panel;
     }
 
     private JPanel createCampaignXMLSaveTab() {
@@ -416,6 +431,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
+        MekHQ.getMekHQOptions().setNewDayAstechPoolFill(optionNewDayAstechPoolFill.isSelected());
+        MekHQ.getMekHQOptions().setNewDayMedicPoolFill(optionNewDayMedicPoolFill.isSelected());
         MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
 
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
@@ -444,6 +461,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
 
+        optionNewDayAstechPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayAstechPoolFill());
+        optionNewDayMedicPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayMedicPoolFill());
         optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
