@@ -44,7 +44,7 @@ import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
-import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.dialog.*;

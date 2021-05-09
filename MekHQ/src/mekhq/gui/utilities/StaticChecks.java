@@ -23,7 +23,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.unit.Unit;
 
 import java.time.LocalDate;

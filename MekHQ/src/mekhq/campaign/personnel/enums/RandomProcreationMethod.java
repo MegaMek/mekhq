@@ -20,9 +20,9 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
-import mekhq.campaign.personnel.randomProcreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.randomProcreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
 
 import java.util.ResourceBundle;
 

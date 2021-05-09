@@ -16,44 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.randomProcreation;
+package mekhq.campaign.personnel.procreation;
 
-import megamek.common.Compute;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
-public class PercentageRandomProcreation extends AbstractProcreation {
-    //region Variable Declarations
-    private final double percentage;
-    private final double relationshiplessPercentage;
-    //endregion Variable Declarations
+import java.time.LocalDate;
 
+public class DisabledRandomProcreation extends AbstractProcreation {
     //region Constructors
-    public PercentageRandomProcreation(final CampaignOptions options) {
-        super(RandomProcreationMethod.PERCENTAGE, options.isUseRelationshiplessRandomProcreation());
-        this.percentage = options.getPercentageRandomProcreationRelationshipChance();
-        this.relationshiplessPercentage = options.getPercentageRandomProcreationRelationshiplessChance();
+    public DisabledRandomProcreation() {
+        super(RandomProcreationMethod.NONE, false);
     }
     //endregion Constructors
 
-    //region Getters
-    public double getPercentage() {
-        return percentage;
+    @Override
+    protected boolean randomlyProcreates(final LocalDate today, final Person person) {
+        return false;
     }
-
-    public double getRelationshiplessPercentage() {
-        return relationshiplessPercentage;
-    }
-    //endregion Getters
 
     @Override
     protected boolean relationshipProcreation(final Person person) {
-        return Compute.randomFloat() < getPercentage();
+        return false;
     }
 
     @Override
     protected boolean relationshiplessProcreation(final Person person) {
-        return Compute.randomFloat() < getRelationshiplessPercentage();
+        return false;
     }
 }

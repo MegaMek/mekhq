@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.randomProcreation;
+package mekhq.campaign.personnel.procreation;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
