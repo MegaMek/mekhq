@@ -40,7 +40,7 @@ import java.util.UUID;
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private final boolean useRelationshiplessProcreation;
+    private boolean useRelationshiplessProcreation;
 
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
@@ -52,7 +52,7 @@ public abstract class AbstractProcreation {
     protected AbstractProcreation(final RandomProcreationMethod method,
                                   final boolean useRelationshiplessProcreation) {
         this.method = method;
-        this.useRelationshiplessProcreation = useRelationshiplessProcreation;
+        setUseRelationshiplessProcreation(useRelationshiplessProcreation);
     }
     //endregion Constructors
 
@@ -63,6 +63,10 @@ public abstract class AbstractProcreation {
 
     public boolean isUseRelationshiplessProcreation() {
         return useRelationshiplessProcreation;
+    }
+
+    public void setUseRelationshiplessProcreation(boolean useRelationshiplessProcreation) {
+        this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
     //endregion Getters
 

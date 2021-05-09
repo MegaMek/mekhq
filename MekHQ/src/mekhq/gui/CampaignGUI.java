@@ -45,6 +45,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.dialog.*;
@@ -1443,9 +1444,6 @@ public class CampaignGUI extends JPanel {
         boolean staticRATs = oldOptions.useStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-        final boolean useRelationshiplessProcreation = oldOptions.isUseRelationshiplessRandomProcreation();
-        final double percentageRandomProcreationRelationshipChance = oldOptions.getPercentageRandomProcreationRelationshipChance();
-        final double percentageRandomProcreationRelationshiplessChance = oldOptions.getPercentageRandomProcreationRelationshiplessChance();
 
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
@@ -1483,19 +1481,20 @@ public class CampaignGUI extends JPanel {
         }
 
         // Procreation Updates
-        if ((randomProcreationMethod != newOptions.getRandomProcreationMethod())
-                || (useRelationshiplessProcreation != newOptions.isUseRelationshiplessRandomProcreation())) {
+        if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
             getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
-        } else if (randomProcreationMethod.isPercentage()) {
-            if ((percentageRandomProcreationRelationshipChance != newOptions.getPercentageRandomProcreationRelationshipChance())
-                    || (percentageRandomProcreationRelationshiplessChance != newOptions.getPercentageRandomProcreationRelationshiplessChance())) {
-                getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getProcreation().setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
+            if (getCampaign().getProcreation().getMethod().isPercentage()) {
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshipChance());
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
             }
         }
 
         // Clear Procreation Data if Disabled
-        if (!newOptions.isUseManualProcreation()
-                && newOptions.getRandomProcreationMethod().isNone()) {
+        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
             getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
                     .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
         }

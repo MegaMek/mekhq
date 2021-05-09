@@ -25,15 +25,15 @@ import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
 public class PercentageRandomProcreation extends AbstractProcreation {
     //region Variable Declarations
-    private final double percentage;
-    private final double relationshiplessPercentage;
+    private double percentage;
+    private double relationshiplessPercentage;
     //endregion Variable Declarations
 
     //region Constructors
     public PercentageRandomProcreation(final CampaignOptions options) {
         super(RandomProcreationMethod.PERCENTAGE, options.isUseRelationshiplessRandomProcreation());
-        this.percentage = options.getPercentageRandomProcreationRelationshipChance();
-        this.relationshiplessPercentage = options.getPercentageRandomProcreationRelationshiplessChance();
+        setPercentage(options.getPercentageRandomProcreationRelationshipChance());
+        setRelationshiplessPercentage(options.getPercentageRandomProcreationRelationshiplessChance());
     }
     //endregion Constructors
 
@@ -42,8 +42,16 @@ public class PercentageRandomProcreation extends AbstractProcreation {
         return percentage;
     }
 
+    public void setPercentage(final double percentage) {
+        this.percentage = percentage;
+    }
+
     public double getRelationshiplessPercentage() {
         return relationshiplessPercentage;
+    }
+
+    public void setRelationshiplessPercentage(final double relationshiplessPercentage) {
+        this.relationshiplessPercentage = relationshiplessPercentage;
     }
     //endregion Getters
 
