@@ -423,14 +423,11 @@ public class StratconScenarioWizard extends JDialog {
             costBuilder.append(resourceMap.getString("supportPoint.text"));
             if (currentCampaignState.getSupportPoints() <= 0) {
                 costBuilder.append(", ");
-                if (currentCampaignState.getVictoryPoints() <= 1) {
-                    costBuilder.append("<span color='red'>");
-                }
-                
-                costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 
                 if (currentCampaignState.getVictoryPoints() <= 1) {
-                    costBuilder.append("</span>");
+                    costBuilder.append(resourceMap.getString("reinforcementRoll.Text"));
+                } else {
+                    costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 }
             }
             break;
