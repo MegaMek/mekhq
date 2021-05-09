@@ -29,6 +29,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -73,11 +74,15 @@ public class Accountant {
                 salaries = salaries.plus(p.getSalary());
             }
         }
-        // add in astechs from the astech pool
-        // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
-        // 800 * 0.5 * 0.6 = 240
-        salaries = salaries.plus(240.0 * getCampaign().getAstechPool());
-        salaries = salaries.plus(320.0 * getCampaign().getMedicPool());
+
+        // And pay our pool
+        salaries = salaries.plus(getCampaign().getCampaignOptions()
+                .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
+                * getCampaign().getAstechPool());
+        salaries = salaries.plus(getCampaign().getCampaignOptions()
+                .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
+                * getCampaign().getMedicPool());
+
         return salaries;
     }
 

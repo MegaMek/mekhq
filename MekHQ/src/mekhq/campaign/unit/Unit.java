@@ -3063,6 +3063,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToAdd.add(gravDeckPart);
                 }
             }
+            
             //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
                 int hsinks = ((Aero)entity).getOHeatSinks()
@@ -3074,14 +3075,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
                     sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
                 }
-                while (hsinks > 0) {
-                    AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
-                            sinkType, podhsinks > 0, getCampaign());
-                    addPart(aHeatSink);
-                    partsToAdd.add(aHeatSink);
-                    hsinks--;
-                    if (podhsinks > 0) {
-                        podhsinks--;
+                
+                // add busted heat sinks even if they're "engine free" so they can be repaired
+                if (hsinks == 0) {
+                    for (int x = 0; x < ((Aero) entity).getHeatSinkHits(); x++) {
+                        MissingAeroHeatSink aHeatSink = new MissingAeroHeatSink((int)entity.getWeight(),
+                                sinkType, false, getCampaign());
+                        addPart(aHeatSink);
+                        partsToAdd.add(aHeatSink);
+                    }
+                } else {
+                    while (hsinks > 0) {
+                        AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                                sinkType, podhsinks > 0, getCampaign());
+                        addPart(aHeatSink);
+                        partsToAdd.add(aHeatSink);
+                        hsinks--;
+                        if (podhsinks > 0) {
+                            podhsinks--;
+                        }
                     }
                 }
             }
@@ -3889,7 +3901,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
                 engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
-                engineer.setRankNumeric(getCommander().getRankNumeric());
+                engineer.setRank(getCommander().getRankNumeric());
                 //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
             } else {
@@ -3955,7 +3967,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setId(getCommander().getId());
                     engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
-                        engineer.setRankNumeric(bestRank);
+                        engineer.setRank(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
@@ -5002,12 +5014,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
-                MekHQ.getLogger().error(this, getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
+                MekHQ.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
             // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.getLogger().error(this, getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
+                MekHQ.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 

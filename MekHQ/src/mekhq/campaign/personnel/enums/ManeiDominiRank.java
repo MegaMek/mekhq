@@ -36,26 +36,27 @@ public enum ManeiDominiRank {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String rankName;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final String name;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    ManeiDominiRank(String rankName) {
-        this.rankName = resources.getString(rankName);
+    ManeiDominiRank(final String name) {
+        this.name = resources.getString(name);
     }
     //endregion Constructors
 
-    @Override
-    public String toString() {
-        return rankName;
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
     }
+    //endregion Boolean Comparison Methods
 
-    public static ManeiDominiRank parseFromString(String information) {
+    //region File I/O
+    public static ManeiDominiRank parseFromString(final String text) {
         // Parse based on the enum name
         try {
-            return valueOf(information);
+            return valueOf(text);
         } catch (Exception ignored) {
 
         }
@@ -63,7 +64,7 @@ public enum ManeiDominiRank {
         // Parse from Ordinal Int - Legacy save method
         ManeiDominiRank[] values = values();
         try {
-            int mdRank = Integer.parseInt(information) + 1;
+            int mdRank = Integer.parseInt(text) + 1;
             if (values.length > mdRank) {
                 return values[mdRank];
             }
@@ -71,9 +72,15 @@ public enum ManeiDominiRank {
 
         }
 
-        MekHQ.getLogger().error(ManeiDominiRank.class, "parseFromString",
-                "Unable to parse " + information + "into a ManeiDominiRank. Returning NONE.");
+        MekHQ.getLogger().error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
 
-        return ManeiDominiRank.NONE;
+        return NONE;
     }
+    //endregion File I/O
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

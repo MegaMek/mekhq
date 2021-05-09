@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright (c) 2010-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -18,29 +19,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.WindowConstants;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
@@ -49,8 +27,18 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.displayWrappers.RankDisplay;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * @author Jay Lawson
@@ -64,8 +52,8 @@ public class HireBulkPersonnelDialog extends JDialog {
     private Campaign campaign;
 
     private JComboBox<PersonTypeItem> choiceType;
-    private JComboBox<String> choiceRanks;
-    private DefaultComboBoxModel<String> rankModel;
+    private JComboBox<RankDisplay> choiceRanks;
+    private DefaultComboBoxModel<RankDisplay> rankModel;
     private JSpinner spnNumber;
     private JTextField jtf;
 
@@ -290,8 +278,8 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         while (number > 0) {
             Person p = campaign.newPerson(selectedItem.getRole());
-            p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getPrimaryRole().getProfession(),
-                    (String) choiceRanks.getSelectedItem()));
+            p.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+
             int age = p.getAge(today);
             if (useAge) {
                 if ((age > maxAgeVal) || (age < minAgeVal)) {
@@ -323,14 +311,10 @@ public class HireBulkPersonnelDialog extends JDialog {
         rankModel.removeAllElements();
 
         // Determine correct profession to pass into the loop
-        int profession = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole().getProfession();
-        while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
-            profession = campaign.getRanks().getAlternateProfession(profession);
-        }
+        final PersonnelRole role = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole();
+        rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
+                Profession.getProfessionFromPersonnelRole(role)));
 
-        for (String rankName : campaign.getAllRankNamesFor(profession)) {
-            rankModel.addElement(rankName);
-        }
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
     }
