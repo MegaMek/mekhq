@@ -53,6 +53,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
+import mekhq.campaign.personnel.randomProcreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -258,6 +260,9 @@ public class Campaign implements Serializable, ITechManager {
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
     private UnitMarket unitMarket; //AtB
+
+    private transient AbstractProcreation procreation;
+
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -317,6 +322,7 @@ public class Campaign implements Serializable, ITechManager {
         personnelMarket = new PersonnelMarket();
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
+        setProcreation(new DisabledRandomProcreation());
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -476,6 +482,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public void generateNewUnitMarket() {
         unitMarket.generateUnitOffers(this);
+    }
+
+    public AbstractProcreation getProcreation() {
+        return procreation;
+    }
+
+    public void setProcreation(final AbstractProcreation procreation) {
+        this.procreation = procreation;
     }
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
@@ -3259,15 +3273,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Procreation
-            if (getCampaignOptions().useProcreation() && p.getGender().isFemale()) {
-                if (p.isPregnant()) {
-                    if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                        p.birth(this, getLocalDate());
-                    }
-                } else {
-                    p.procreate(this, getLocalDate());
-                }
-            }
+            getProcreation().processNewDay(this, getLocalDate(), p);
         }
     }
 

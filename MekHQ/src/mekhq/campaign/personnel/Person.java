@@ -1150,8 +1150,8 @@ public class Person implements Serializable {
         return id;
     }
 
-    public boolean isChild() {
-        return (getAge(getCampaign().getLocalDate()) <= 13);
+    public boolean isChild(final LocalDate today) {
+        return getAge(today) <= 13;
     }
 
     public Genealogy getGenealogy() {
@@ -1204,34 +1204,7 @@ public class Person implements Serializable {
      */
     public boolean canProcreate(final LocalDate today) {
         return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(today) < 51);
-    }
-
-    /**
-     * This is used to determine if a person has conceived, and if so add a pregnancy with a
-     * conception date of the current date.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     */
-    public void procreate(final Campaign campaign, final LocalDate today) {
-        if (canProcreate(today)) {
-            boolean conceived = false;
-            if (getGenealogy().hasSpouse()) {
-                Person spouse = getGenealogy().getSpouse();
-                if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
-                        && !(spouse.getGender() == getGender())) {
-                    // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
-                    conceived = Compute.randomFloat() < campaign.getCampaignOptions().getChanceProcreation();
-                }
-            } else if (campaign.getCampaignOptions().useProcreationNoRelationship()) {
-                // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
-                conceived = Compute.randomFloat() < campaign.getCampaignOptions().getChanceProcreationNoRelationship();
-            }
-
-            if (conceived) {
-                addPregnancy(campaign, today);
-            }
-        }
+                && !isChild(today) && (getAge(today) < 51);
     }
 
     /**
