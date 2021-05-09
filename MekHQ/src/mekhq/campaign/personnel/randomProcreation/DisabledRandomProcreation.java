@@ -31,7 +31,7 @@ public class DisabledRandomProcreation extends AbstractProcreation {
     //endregion Constructors
 
     @Override
-    protected boolean procreates(final LocalDate today, final Person person) {
+    protected boolean randomlyProcreates(final LocalDate today, final Person person) {
         return false;
     }
 

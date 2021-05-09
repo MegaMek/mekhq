@@ -18,19 +18,19 @@
  */
 package mekhq.gui.utilities;
 
+import megamek.common.Entity;
+import megamek.common.UnitType;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
+import mekhq.campaign.unit.Unit;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
-
-import megamek.common.Entity;
-import megamek.common.UnitType;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
@@ -635,11 +635,13 @@ public class StaticChecks {
 
     /**
      * @param today the current date
+     * @param procreation the procreation type to use
      * @param people an array of people
      * @return true if any of the people can procreate, otherwise false
      */
-    public static boolean anyCanBePregnant(final LocalDate today, final Person... people) {
-        return Stream.of(people).anyMatch(p -> p.canProcreate(today));
+    public static boolean anyCanBePregnant(final LocalDate today, final AbstractProcreation procreation,
+                                           final Person... people) {
+        return Stream.of(people).anyMatch(p -> procreation.canProcreate(today, p));
     }
 
     /**

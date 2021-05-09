@@ -48,7 +48,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -62,14 +61,11 @@ import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.Divorce;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
 import mekhq.campaign.personnel.enums.Marriage;
@@ -133,9 +129,6 @@ public class Person implements Serializable {
     private boolean tryingToConceive;
     private LocalDate dueDate;
     private LocalDate expectedDueDate;
-
-    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
-    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
     //endregion Procreation
 
     //region Marriage
@@ -926,33 +919,7 @@ public class Person implements Serializable {
                 ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case PREGNANCY_COMPLICATIONS:
-                // The child might be able to be born, albeit into a world without their mother.
-                // This can be manually set by males and for those who are not pregnant. This is
-                // purposeful, to allow for player customization, and thus we first check if someone
-                // is pregnant before having the birth
-                if (isPregnant()) {
-                    int pregnancyWeek = getPregnancyWeek(campaign.getLocalDate());
-                    double babyBornChance;
-                    if (pregnancyWeek > 35) {
-                        babyBornChance = 0.99;
-                    } else if (pregnancyWeek > 29) {
-                        babyBornChance = 0.95;
-                    } else if (pregnancyWeek > 25) {
-                        babyBornChance = 0.9;
-                    } else if (pregnancyWeek == 25) {
-                        babyBornChance = 0.8;
-                    } else if (pregnancyWeek == 24) {
-                        babyBornChance = 0.5;
-                    } else if (pregnancyWeek == 23) {
-                        babyBornChance = 0.25;
-                    } else {
-                        babyBornChance = 0.0;
-                    }
-
-                    if (Compute.randomFloat() < babyBornChance) {
-                        birth(campaign, campaign.getLocalDate());
-                    }
-                }
+                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
                 ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
@@ -1187,162 +1154,8 @@ public class Person implements Serializable {
         this.expectedDueDate = expectedDueDate;
     }
 
-    public int getPregnancyWeek(final LocalDate today) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(getExpectedDueDate()
-                .minus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS), today));
-    }
-
     public boolean isPregnant() {
         return dueDate != null;
-    }
-
-    /**
-     * This is used to determine if a person can procreate
-     * @param today the current date
-     * @return true if they can, otherwise false
-     */
-    public boolean canProcreate(final LocalDate today) {
-        return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild(today) && (getAge(today) < 51);
-    }
-
-    /**
-     * This method is how a person becomes pregnant. They have their due date set and the size and
-     * parentage of the pregnancy determined.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     */
-    public void addPregnancy(final Campaign campaign, final LocalDate today) {
-        setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
-
-        final int size = determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences());
-        if (size <= 0) {
-            return;
-        }
-        getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
-        getExtraData().set(PREGNANCY_FATHER_DATA, getGenealogy().hasSpouse()
-                ? getGenealogy().getSpouse().getId().toString() : null);
-
-        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
-        campaign.addReport(String.format(resources.getString("Person.BabyConceived.report"), getHyperlinkedName(), babyAmount).trim());
-        if (campaign.getCampaignOptions().isLogProcreation()) {
-            MedicalLogger.hasConceived(this, today, babyAmount);
-            if (getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(getGenealogy().getSpouse(), getFullName(), today, babyAmount);
-            }
-        }
-    }
-
-    /**
-     * This method determines the number of babies a person will give birth to.
-     * @param multiplePregnancyChance the chance to have each baby after the first
-     * @return the number of babies the person will give birth to, limited to decuplets
-     */
-    private int determineNumberOfBabies(final int multiplePregnancyChance) {
-        int children = 1;
-        while ((Compute.randomInt(multiplePregnancyChance) == 0) && (children < 10)) {
-            children++;
-        }
-        return children;
-    }
-
-    /**
-     * This method determines the duration for a pregnancy, with a variance determined through a
-     * Gaussian distribution with a maximum spread of approximately six weeks.
-     *
-     * TODO : Swap me to instead use a distribution function that generates an overall length,
-     * TODO : Including pre-term and post-term births
-     *
-     * @return the pregnancy duration
-     */
-    private int determinePregnancyDuration() {
-        // This creates a random range of approximately six weeks with which to modify the standard
-        // pregnancy duration to create a randomized pregnancy duration
-        final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random()))
-                * Math.cos(2.0 * Math.PI * Math.random());
-        // To not get weird results, we limit the variance to +/- 4.0 (almost 6 weeks). A base
-        // length of 268 creates a solid enough duration for now.
-        return 268 + (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
-    }
-
-    /**
-     * Removes a pregnancy and clears all related data from the current person
-     */
-    public void removePregnancy() {
-        setDueDate(null);
-        setExpectedDueDate(null);
-        getExtraData().set(PREGNANCY_CHILDREN_DATA, null);
-        getExtraData().set(PREGNANCY_FATHER_DATA, null);
-    }
-
-    /**
-     * This method is how a person gives birth to a number of babies and have them added to the campaign
-     * @param campaign the campaign to add the baby in question to
-     * @param today today's date
-     */
-    public void birth(final Campaign campaign, final LocalDate today) {
-        // Determine the number of children
-        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
-
-        // Determine father information
-        Person father = (getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                ? campaign.getPerson(UUID.fromString(getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
-        father = campaign.getCampaignOptions().isDetermineFatherAtBirth()
-                ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
-
-        // Determine Prisoner Status
-        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
-                ? getPrisonerStatus() : PrisonerStatus.FREE;
-
-        // Output a specific report to the campaign if they are giving birth to multiple children
-        if (size > 1) {
-            campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
-                    resources.getString("babyAmount.text").split(",")[size - 1]));
-        }
-
-        // Create Babies
-        for (int i = 0; i < size; i++) {
-            // Create the specific baby
-            Person baby = campaign.newDependent(true);
-            String surname = campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(this, father, baby.getGender());
-            baby.setSurname(surname);
-            baby.setBirthday(today);
-
-            // Recruit the baby
-            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
-
-            // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, this);
-            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            if (father != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            }
-
-            // Founder Tag Assignment
-            if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
-                    && !prisonerStatus.isPrisoner()) {
-                baby.setFounder(true);
-            } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
-                baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
-            }
-
-            // Create reports and log the birth
-            campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            if (campaign.getCampaignOptions().isLogProcreation()) {
-                MedicalLogger.deliveredBaby(this, baby, today);
-                if (father != null) {
-                    PersonalLogger.ourChildBorn(father, baby, getFullName(), today);
-                }
-            }
-        }
-
-        // Cleanup Data
-        removePregnancy();
     }
     //endregion Pregnancy
 

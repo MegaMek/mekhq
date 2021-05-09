@@ -43,6 +43,8 @@ import megamek.common.options.OptionsConstants;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.randomProcreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.dialog.*;
@@ -1428,17 +1430,30 @@ public class CampaignGUI extends JPanel {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
-        boolean atb = getCampaign().getCampaignOptions().getUseAtB();
-        boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
-        boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
-        boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
-        boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
-        boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
+    /**
+     * @param evt the event triggering the opening of the Campaign Options Dialog
+     */
+    private void menuOptionsActionPerformed(final ActionEvent evt) {
+        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
+        // We need to handle it like this for now, as the options above get written to currently
+        boolean atb = oldOptions.getUseAtB();
+        boolean timeIn = oldOptions.getUseTimeInService();
+        boolean rankIn = oldOptions.getUseTimeInRank();
+        boolean retirementDateTracking = oldOptions.useRetirementDateTracking();
+        boolean staticRATs = oldOptions.useStaticRATs();
+        boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
+        final boolean useRelationshiplessProcreation = oldOptions.isUseRelationshiplessRandomProcreation();
+        final double percentageRandomProcreationRelationshipChance = oldOptions.getPercentageRandomProcreationRelationshipChance();
+        final double percentageRandomProcreationRelationshiplessChance = oldOptions.getPercentageRandomProcreationRelationshiplessChance();
+
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
-        if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+
+        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
+
+        if (timeIn != newOptions.getUseTimeInService()) {
+            if (newOptions.getUseTimeInService()) {
                 getCampaign().initTimeInService();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1447,8 +1462,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+        if (rankIn != newOptions.getUseTimeInRank()) {
+            if (newOptions.getUseTimeInRank()) {
                 getCampaign().initTimeInRank();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1457,8 +1472,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (retirementDateTracking != getCampaign().getCampaignOptions().useRetirementDateTracking()) {
-            if (getCampaign().getCampaignOptions().useRetirementDateTracking()) {
+        if (retirementDateTracking != newOptions.useRetirementDateTracking()) {
+            if (newOptions.useRetirementDateTracking()) {
                 getCampaign().initRetirementDateTracking();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1467,24 +1482,35 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        // Remove Pregnancies if they are disabled
-        if (!getCampaign().getCampaignOptions().isUseManualProcreation()
-                && getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone()) {
-            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
-                    .forEach(Person::removePregnancy);
+        // Procreation Updates
+        if ((randomProcreationMethod != newOptions.getRandomProcreationMethod())
+                || (useRelationshiplessProcreation != newOptions.isUseRelationshiplessRandomProcreation())) {
+            getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+        } else if (randomProcreationMethod.isPercentage()) {
+            if ((percentageRandomProcreationRelationshipChance != newOptions.getPercentageRandomProcreationRelationshipChance())
+                    || (percentageRandomProcreationRelationshiplessChance != newOptions.getPercentageRandomProcreationRelationshiplessChance())) {
+                getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+            }
         }
 
-        if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+        // Clear Procreation Data if Disabled
+        if (!newOptions.isUseManualProcreation()
+                && newOptions.getRandomProcreationMethod().isNone()) {
+            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
+                    .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
+        }
+
+        if (atb != newOptions.getUseAtB()) {
+            if (newOptions.getUseAtB()) {
                 getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+            miContractMarket.setVisible(newOptions.getUseAtB());
+            miUnitMarket.setVisible(newOptions.getUseAtB());
+            miShipSearch.setVisible(newOptions.getUseAtB());
+            miRetirementDefectionDialog.setVisible(newOptions.getUseAtB());
+            if (newOptions.getUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
@@ -1500,10 +1526,10 @@ public class CampaignGUI extends JPanel {
                 getCampaign().shutdownAtB();
             }
         }
-        if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
+        if (staticRATs != newOptions.useStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
-        if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
+        if (factionIntroDate != newOptions.useFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
@@ -2060,11 +2086,11 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p.isPregnant()) {
-                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
                     UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
                     if ((fatherId != null)
                             && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
-                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
+                        p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
                     }
                 }
             }

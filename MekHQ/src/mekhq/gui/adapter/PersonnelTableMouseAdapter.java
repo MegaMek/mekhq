@@ -495,16 +495,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                Stream.of(people).filter(p -> p.canProcreate(gui.getCampaign().getLocalDate())).forEach(p -> {
-                    p.addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate());
-                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                Stream.of(people)
+                        .filter(person -> gui.getCampaign().getProcreation().canProcreate(gui.getCampaign().getLocalDate(), person))
+                        .forEach(person -> {
+                    gui.getCampaign().getProcreation().addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                Stream.of(people).filter(Person::isPregnant).forEach(p -> {
-                    p.removePregnancy();
-                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    gui.getCampaign().getProcreation().removePregnancy(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 });
                 break;
             }
@@ -2644,7 +2646,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
-                if (StaticChecks.anyCanBePregnant(gui.getCampaign().getLocalDate(), selected)) {
+                if (StaticChecks.anyCanBePregnant(gui.getCampaign().getLocalDate(), gui.getCampaign().getProcreation(), selected)) {
                     menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
