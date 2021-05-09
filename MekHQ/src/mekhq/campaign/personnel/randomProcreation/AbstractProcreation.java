@@ -41,7 +41,6 @@ public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
     private final boolean useRelationshiplessProcreation;
-    private final String[] babyAmountNames;
 
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
@@ -54,7 +53,6 @@ public abstract class AbstractProcreation {
                                   final boolean useRelationshiplessProcreation) {
         this.method = method;
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
-        this.babyAmountNames = resources.getString("babyAmount.text").split(",");
     }
     //endregion Constructors
 
@@ -65,10 +63,6 @@ public abstract class AbstractProcreation {
 
     public boolean isUseRelationshiplessProcreation() {
         return useRelationshiplessProcreation;
-    }
-
-    public String[] getBabyAmountNames() {
-        return babyAmountNames;
     }
     //endregion Getters
 
@@ -110,7 +104,7 @@ public abstract class AbstractProcreation {
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
-        final String babyAmount = getBabyAmountNames()[size - 1];
+        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
         campaign.addReport(String.format(resources.getString("babyConceived.report"),
                 mother.getHyperlinkedName(), babyAmount).trim());
         if (campaign.getCampaignOptions().isLogProcreation()) {
@@ -187,7 +181,7 @@ public abstract class AbstractProcreation {
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
             campaign.addReport(String.format(resources.getString("multipleBabiesBorn.report"), mother.getHyperlinkedName(),
-                    getBabyAmountNames()[size - 1]));
+                    resources.getString("babyAmount.text").split(",")[size - 1]));
         }
 
         // Create Babies
