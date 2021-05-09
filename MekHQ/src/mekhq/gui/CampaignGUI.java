@@ -1468,7 +1468,8 @@ public class CampaignGUI extends JPanel {
         }
 
         // Remove Pregnancies if they are disabled
-        if (!getCampaign().getCampaignOptions().useProcreation()) {
+        if (!getCampaign().getCampaignOptions().isUseManualProcreation()
+                && getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone()) {
             getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
                     .forEach(Person::removePregnancy);
         }

@@ -32,6 +32,7 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -247,17 +248,18 @@ public class CampaignOptions implements Serializable {
     private double chanceRandomSameSexMarriages;
 
     // Procreation
-    private boolean useProcreation;
-    private double chanceProcreation;
-    private boolean useProcreationNoRelationship;
-    private double chanceProcreationNoRelationship;
+    private boolean useManualProcreation;
     private int multiplePregnancyOccurrences;
     private BabySurnameStyle babySurnameStyle;
     private boolean assignNonPrisonerBabiesFounderTag;
     private boolean assignChildrenOfFoundersFounderTag;
     private boolean determineFatherAtBirth;
     private boolean displayTrueDueDate;
-    private boolean logConception;
+    private boolean logProcreation;
+    private RandomProcreationMethod randomProcreationMethod;
+    private boolean useRelationshiplessRandomProcreation;
+    private double percentageRandomProcreationRelationshipChance;
+    private double percentageRandomProcreationRelationshiplessChance;
 
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
@@ -643,17 +645,18 @@ public class CampaignOptions implements Serializable {
         setChanceRandomSameSexMarriages(0.00002);
 
         // Procreation
-        setUseProcreation(false);
-        setChanceProcreation(0.0005);
-        setUseProcreationNoRelationship(false);
-        setChanceProcreationNoRelationship(0.00005);
+        setUseManualProcreation(false);
         setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
         setDetermineFatherAtBirth(false);
         setDisplayTrueDueDate(false);
-        setLogConception(false);
+        setLogProcreation(false);
+        setRandomProcreationMethod(RandomProcreationMethod.NONE);
+        setUseRelationshiplessRandomProcreation(false);
+        setPercentageRandomProcreationRelationshipChance(0.0005);
+        setPercentageRandomProcreationRelationshiplessChance(0.00005);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -1528,64 +1531,12 @@ public class CampaignOptions implements Serializable {
     //endregion Marriage
 
     //region Procreation
-    /**
-     * @return whether or not to use unofficial procreation
-     */
-    public boolean useProcreation() {
-        return useProcreation;
+    public boolean isUseManualProcreation() {
+        return useManualProcreation;
     }
 
-    /**
-     * @param useProcreation whether or not to use unofficial procreation
-     */
-    public void setUseProcreation(final boolean useProcreation) {
-        this.useProcreation = useProcreation;
-    }
-
-    /**
-     * This gets the decimal chance (between 0 and 1) of random procreation occurring
-     * @return the chance, with a value between 0 and 1
-     */
-    public double getChanceProcreation() {
-        return chanceProcreation;
-    }
-
-    /**
-     * This sets the decimal chance (between 0 and 1) of random procreation occurring
-     * @param chanceProcreation the chance, with a value between 0 and 1
-     */
-    public void setChanceProcreation(final double chanceProcreation) {
-        this.chanceProcreation = chanceProcreation;
-    }
-
-    /**
-     * @return whether or not to use procreation without a relationship
-     */
-    public boolean useProcreationNoRelationship() {
-        return useProcreationNoRelationship;
-    }
-
-    /**
-     * @param useProcreationNoRelationship whether or not to use unofficial procreation without a relationship
-     */
-    public void setUseProcreationNoRelationship(final boolean useProcreationNoRelationship) {
-        this.useProcreationNoRelationship = useProcreationNoRelationship;
-    }
-
-    /**
-     * This gets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
-     * @return the chance, with a value between 0 and 1
-     */
-    public double getChanceProcreationNoRelationship() {
-        return chanceProcreationNoRelationship;
-    }
-
-    /**
-     * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
-     * @param chanceProcreationNoRelationship the chance, with a value between 0 and 1
-     */
-    public void setChanceProcreationNoRelationship(final double chanceProcreationNoRelationship) {
-        this.chanceProcreationNoRelationship = chanceProcreationNoRelationship;
+    public void setUseManualProcreation(final boolean useManualProcreation) {
+        this.useManualProcreation = useManualProcreation;
     }
 
     /**
@@ -1636,7 +1587,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to determine the father at birth instead of at conception
      */
-    public boolean determineFatherAtBirth() {
+    public boolean isDetermineFatherAtBirth() {
         return determineFatherAtBirth;
     }
 
@@ -1650,7 +1601,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether to show the expected or actual due date for personnel
      */
-    public boolean getDisplayTrueDueDate() {
+    public boolean isDisplayTrueDueDate() {
         return displayTrueDueDate;
     }
 
@@ -1662,17 +1613,71 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * @return whether to log conception
+     * @return whether to log procreation
      */
-    public boolean logConception() {
-        return logConception;
+    public boolean isLogProcreation() {
+        return logProcreation;
     }
 
     /**
-     * @param logConception whether to log conception
+     * @param logProcreation whether to log procreation
      */
-    public void setLogConception(final boolean logConception) {
-        this.logConception = logConception;
+    public void setLogProcreation(final boolean logProcreation) {
+        this.logProcreation = logProcreation;
+    }
+
+    public RandomProcreationMethod getRandomProcreationMethod() {
+        return randomProcreationMethod;
+    }
+
+    public void setRandomProcreationMethod(final RandomProcreationMethod randomProcreationMethod) {
+        this.randomProcreationMethod = randomProcreationMethod;
+    }
+
+    /**
+     * @return whether or not to use random procreation for personnel without a spouse
+     */
+    public boolean isUseRelationshiplessRandomProcreation() {
+        return useRelationshiplessRandomProcreation;
+    }
+
+    /**
+     * @param useRelationshiplessRandomProcreation whether or not to use random procreation without a spouse
+     */
+    public void setUseRelationshiplessRandomProcreation(final boolean useRelationshiplessRandomProcreation) {
+        this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getPercentageRandomProcreationRelationshipChance() {
+        return percentageRandomProcreationRelationshipChance;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring
+     * @param percentageRandomProcreationRelationshipChance the chance, with a value between 0 and 1
+     */
+    public void setPercentageRandomProcreationRelationshipChance(final double percentageRandomProcreationRelationshipChance) {
+        this.percentageRandomProcreationRelationshipChance = percentageRandomProcreationRelationshipChance;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getPercentageRandomProcreationRelationshiplessChance() {
+        return percentageRandomProcreationRelationshiplessChance;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @param percentageRandomProcreationRelationshiplessChance the chance, with a value between 0 and 1
+     */
+    public void setPercentageRandomProcreationRelationshiplessChance(final double percentageRandomProcreationRelationshiplessChance) {
+        this.percentageRandomProcreationRelationshiplessChance = percentageRandomProcreationRelationshiplessChance;
     }
     //endregion Procreation
 
@@ -2589,8 +2594,7 @@ public class CampaignOptions implements Serializable {
     public void setUseStratCon(boolean useStratCon) {
         this.useStratCon = useStratCon;
     }
-    
-    
+
     public boolean getUseAtBUnitMarket() {
         return useAtBUnitMarket;
     }
@@ -3270,17 +3274,18 @@ public class CampaignOptions implements Serializable {
         //endregion Marriage
 
         //region Procreation
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreation", useProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreation", getChanceProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreationNoRelationship", useProcreationNoRelationship());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logConception", logConception());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", isDisplayTrueDueDate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logProcreation", isLogProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
         //endregion Procreation
 
         //region Death
@@ -3798,16 +3803,8 @@ public class CampaignOptions implements Serializable {
             //endregion Marriage
 
             //region Procreation
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useProcreation")) {
-                retVal.setUseProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
-                retVal.setChanceProcreation(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) {
-                retVal.setUseProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
-                retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
+                retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("multiplePregnancyOccurrences")) {
                 retVal.setMultiplePregnancyOccurrences(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
@@ -3820,8 +3817,16 @@ public class CampaignOptions implements Serializable {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
                 retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
-                retVal.setLogConception(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("logProcreation")) {
+                retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationMethod")) {
+                retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
+                retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshipChance")) {
+                retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshiplessChance")) {
+                retVal.setPercentageRandomProcreationRelationshiplessChance(Double.parseDouble(wn2.getTextContent().trim()));
             //endregion Procreation
 
             //region Death
@@ -4048,6 +4053,21 @@ public class CampaignOptions implements Serializable {
                 retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
 
             //region Legacy
+            // Removed in 0.49.*
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.0 removal
+                    || wn2.getNodeName().equalsIgnoreCase("useProcreation")) { // Legacy - 0.49.2 removal
+                retVal.setRandomProcreationMethod(RandomProcreationMethod.PERCENTAGE);
+                retVal.setUseManualProcreation(true);
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) { // Legacy - 0.49.2 removal
+                retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.0 removal
+                    || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) { // Legacy - 0.49.2 removal
+                retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) { // Legacy - 0.49.2 removal
+                retVal.setPercentageRandomProcreationRelationshiplessChance(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.2 removal
+                retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+
             // Removed in 0.47.*
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
                 if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
@@ -4085,6 +4105,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
                 retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             }
+            //endregion Legacy
         }
 
         MekHQ.getLogger().debug("Load Campaign Options Complete!");

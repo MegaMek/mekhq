@@ -27,14 +27,14 @@ import java.time.LocalDate;
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private final boolean enableRelationshiplessProcreation;
+    private final boolean useRelationshiplessProcreation;
     //endregion Variable Declarations
 
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method,
-                                  final boolean enableRelationshiplessProcreation) {
+                                  final boolean useRelationshiplessProcreation) {
         this.method = method;
-        this.enableRelationshiplessProcreation = enableRelationshiplessProcreation;
+        this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
     //endregion Constructors
 
@@ -43,8 +43,8 @@ public abstract class AbstractProcreation {
         return method;
     }
 
-    public boolean isEnableRelationshiplessProcreation() {
-        return enableRelationshiplessProcreation;
+    public boolean isUseRelationshiplessProcreation() {
+        return useRelationshiplessProcreation;
     }
     //endregion Getters
 
@@ -89,12 +89,12 @@ public abstract class AbstractProcreation {
             final Person spouse = person.getGenealogy().getSpouse();
             if (spouse.getGender().isMale() && !spouse.getStatus().isDeadOrMIA()
                     && !spouse.isDeployed() && !spouse.isChild(today)) {
-                return partneredProcreation(person);
+                return relationshipProcreation(person);
             } else {
                 return false;
             }
-        } else if (isEnableRelationshiplessProcreation()) {
-            return partnerlessProcreation(person);
+        } else if (isUseRelationshiplessProcreation()) {
+            return relationshiplessProcreation(person);
         } else {
             return false;
         }
@@ -105,12 +105,12 @@ public abstract class AbstractProcreation {
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean partneredProcreation(final Person person);
+    protected abstract boolean relationshipProcreation(final Person person);
 
     /**
      * Determines if a person without a partner procreates
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean partnerlessProcreation(final Person person);
+    protected abstract boolean relationshiplessProcreation(final Person person);
 }

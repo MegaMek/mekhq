@@ -31,9 +31,9 @@ public class PercentageRandomProcreation extends AbstractProcreation {
 
     //region Constructors
     public PercentageRandomProcreation(final CampaignOptions options) {
-        super(RandomProcreationMethod.PERCENTAGE, options.useProcreationNoRelationship());
-        this.percentage = options.getChanceProcreation();
-        this.relationshiplessPercentage = options.getChanceProcreationNoRelationship();
+        super(RandomProcreationMethod.PERCENTAGE, options.isUseRelationshiplessRandomProcreation());
+        this.percentage = options.getPercentageRandomProcreationRelationshipChance();
+        this.relationshiplessPercentage = options.getPercentageRandomProcreationRelationshiplessChance();
     }
     //endregion Constructors
 
@@ -48,12 +48,12 @@ public class PercentageRandomProcreation extends AbstractProcreation {
     //endregion Getters
 
     @Override
-    protected boolean partneredProcreation(final Person person) {
+    protected boolean relationshipProcreation(final Person person) {
         return Compute.randomFloat() < getPercentage();
     }
 
     @Override
-    protected boolean partnerlessProcreation(final Person person) {
+    protected boolean relationshiplessProcreation(final Person person) {
         return Compute.randomFloat() < getRelationshiplessPercentage();
     }
 }

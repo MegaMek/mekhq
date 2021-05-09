@@ -21,6 +21,8 @@ package mekhq.campaign.personnel.randomProcreation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
+import java.time.LocalDate;
+
 public class DisabledRandomProcreation extends AbstractProcreation {
     //region Constructors
     public DisabledRandomProcreation() {
@@ -29,12 +31,17 @@ public class DisabledRandomProcreation extends AbstractProcreation {
     //endregion Constructors
 
     @Override
-    protected boolean partneredProcreation(final Person person) {
+    protected boolean procreates(final LocalDate today, final Person person) {
         return false;
     }
 
     @Override
-    protected boolean partnerlessProcreation(final Person person) {
+    protected boolean relationshipProcreation(final Person person) {
+        return false;
+    }
+
+    @Override
+    protected boolean relationshiplessProcreation(final Person person) {
         return false;
     }
 }

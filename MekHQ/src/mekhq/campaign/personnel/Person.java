@@ -946,7 +946,7 @@ public class Person implements Serializable {
                     } else if (pregnancyWeek == 23) {
                         babyBornChance = 0.25;
                     } else {
-                        babyBornChance = 0;
+                        babyBornChance = 0.0;
                     }
 
                     if (Compute.randomFloat() < babyBornChance) {
@@ -1227,7 +1227,7 @@ public class Person implements Serializable {
 
         final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
         campaign.addReport(String.format(resources.getString("Person.BabyConceived.report"), getHyperlinkedName(), babyAmount).trim());
-        if (campaign.getCampaignOptions().logConception()) {
+        if (campaign.getCampaignOptions().isLogProcreation()) {
             MedicalLogger.hasConceived(this, today, babyAmount);
             if (getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(getGenealogy().getSpouse(), getFullName(), today, babyAmount);
@@ -1273,8 +1273,8 @@ public class Person implements Serializable {
     public void removePregnancy() {
         setDueDate(null);
         setExpectedDueDate(null);
-        extraData.set(PREGNANCY_CHILDREN_DATA, null);
-        extraData.set(PREGNANCY_FATHER_DATA, null);
+        getExtraData().set(PREGNANCY_CHILDREN_DATA, null);
+        getExtraData().set(PREGNANCY_FATHER_DATA, null);
     }
 
     /**
@@ -1289,7 +1289,7 @@ public class Person implements Serializable {
         // Determine father information
         Person father = (getExtraData().get(PREGNANCY_FATHER_DATA) != null)
                 ? campaign.getPerson(UUID.fromString(getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
-        father = campaign.getCampaignOptions().determineFatherAtBirth()
+        father = campaign.getCampaignOptions().isDetermineFatherAtBirth()
                 ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
 
         // Determine Prisoner Status
@@ -1333,7 +1333,7 @@ public class Person implements Serializable {
             // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            if (campaign.getCampaignOptions().logConception()) {
+            if (campaign.getCampaignOptions().isLogProcreation()) {
                 MedicalLogger.deliveredBaby(this, baby, today);
                 if (father != null) {
                     PersonalLogger.ourChildBorn(father, baby, getFullName(), today);

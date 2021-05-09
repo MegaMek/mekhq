@@ -2255,7 +2255,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && person.getGender().isFemale()) {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
                 cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
@@ -2454,7 +2455,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(cbMenuItem);
             }
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && StaticChecks.areAllFemale(selected)
                     && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
@@ -2641,7 +2643,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()) {
+            if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
                 if (StaticChecks.anyCanBePregnant(gui.getCampaign().getLocalDate(), selected)) {
                     menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
