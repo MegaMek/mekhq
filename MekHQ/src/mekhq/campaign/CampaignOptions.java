@@ -27,6 +27,7 @@ import java.util.List;
 
 import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -85,11 +86,6 @@ public class CampaignOptions implements Serializable {
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
-
-    public static final int PLANET_ACQUISITION_ALL = 0;
-    public static final int PLANET_ACQUISITION_NEUTRAL = 1;
-    public static final int PLANET_ACQUISITION_ALLY = 2;
-    public static final int PLANET_ACQUISITION_SELF = 3;
     //endregion Magic Numbers and Constants
 
     //region Unlisted Variables
@@ -156,7 +152,7 @@ public class CampaignOptions implements Serializable {
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
     private int maxJumpsPlanetaryAcquisition;
-    private int planetAcquisitionFactionLimit;
+    private PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
     private boolean planetAcquisitionNoClanCrossover;
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
@@ -483,7 +479,7 @@ public class CampaignOptions implements Serializable {
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
         maxJumpsPlanetaryAcquisition = 2;
-        planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
+        planetAcquisitionFactionLimit = PlanetaryAcquisitionFactionLimit.NEUTRAL;
         planetAcquisitionNoClanCrossover = true;
         noClanPartsFromIS = true;
         penaltyClanPartsFromIS = 4;
@@ -1867,21 +1863,6 @@ public class CampaignOptions implements Serializable {
         }
     }
 
-    public static String getFactionLimitName(int lvl) {
-        switch (lvl) {
-            case PLANET_ACQUISITION_ALL:
-                return "All factions";
-            case PLANET_ACQUISITION_NEUTRAL:
-                return "Neutral or allied factions";
-            case PLANET_ACQUISITION_ALLY:
-                return "Allied factions";
-            case PLANET_ACQUISITION_SELF:
-                return "Only own faction";
-            default:
-                return "Unknown";
-        }
-    }
-
     public static String getTransitUnitName(int unit) {
         switch (unit) {
             case TRANSIT_UNIT_DAY:
@@ -2327,12 +2308,12 @@ public class CampaignOptions implements Serializable {
         usePlanetaryAcquisition = b;
     }
 
-    public int getPlanetAcquisitionFactionLimit() {
+    public PlanetaryAcquisitionFactionLimit getPlanetAcquisitionFactionLimit() {
         return planetAcquisitionFactionLimit;
     }
 
-    public void setPlanetAcquisitionFactionLimit(int b) {
-        planetAcquisitionFactionLimit = b;
+    public void setPlanetAcquisitionFactionLimit(final PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit) {
+        this.planetAcquisitionFactionLimit = planetAcquisitionFactionLimit;
     }
 
     public boolean disallowPlanetAcquisitionClanCrossover() {
@@ -3129,7 +3110,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", planetAcquisitionFactionLimit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "noClanPartsFromIS", noClanPartsFromIS);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
@@ -3506,7 +3487,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryAcquisition")) {
                 retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionFactionLimit")) {
-                retVal.planetAcquisitionFactionLimit = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
                 retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("noClanPartsFromIS")) {
