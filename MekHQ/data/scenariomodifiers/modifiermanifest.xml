@@ -60,6 +60,9 @@
 			EnemyDropship.xml
 		</modifier>
 		<modifier>
+			GroundedEnemyDropship.xml
+		</modifier>
+		<modifier>
 			GoodIntel.xml
 		</modifier>
 		<modifier>
