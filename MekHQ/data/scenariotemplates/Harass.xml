@@ -3,6 +3,8 @@
     <name>Harass</name>
     <shortBriefing>Harass a superior enemy force.</shortBriefing>
     <detailedBriefing>Prevent 50% of the hostile force from reaching the opposite map edge.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>true</allowRotation>
@@ -38,6 +40,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -66,6 +69,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
@@ -95,6 +99,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -105,7 +110,9 @@
     </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
-            <associatedForceNames/>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+            </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
                 <successEffect>
