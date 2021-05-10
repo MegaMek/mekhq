@@ -1227,7 +1227,7 @@ public class StratconRulesManager {
      * modifier/type/alignment switches etc.
      */
     private static void switchFacilityOwner(StratconFacility facility) {
-        if (facility.getCapturedDefinition() != null && !facility.getCapturedDefinition().isBlank()) {
+        if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
             StratconFacility newOwnerData = 
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
             
