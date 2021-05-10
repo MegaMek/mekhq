@@ -47,6 +47,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.IAero;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -2301,8 +2302,14 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setStartingAltitude(List<Entity> entityList, int startingAltitude) {
         for (Entity entity : entityList) {
-            if (!entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+            if (entity instanceof IAero) {
                 entity.setAltitude(startingAltitude);
+                
+                // there's a lot of stuff that happens whan an aerospace unit
+                // "lands", so let's make sure it all happens
+                if (startingAltitude == 0) {
+                    ((IAero) entity).land();
+                }
             }
 
             entity.setElevation(startingAltitude);
