@@ -37,17 +37,11 @@ import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListener {
     //region Variable Declarations
     private final CampaignGUI gui;
-    private AtomicBoolean running;
-    private LocalDate tomorrow;
-    private LocalDate nextMonday;
-    private LocalDate nextMonth;
-    private LocalDate nextYear;
-    private LocalDate nextDecade;
+    private volatile boolean running = false; // volatile to ensure readers get the current version
 
     private JSpinner spnDays;
     private JButton btnStartAdvancement;
@@ -72,11 +66,11 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
         return gui;
     }
 
-    public AtomicBoolean getRunning() {
+    public boolean isRunning() {
         return running;
     }
 
-    public void setRunning(final AtomicBoolean running) {
+    public void setRunning(final boolean running) {
         this.running = running;
     }
 
@@ -235,7 +229,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     protected void finalizeInitialization() {
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent evt) {
+            public void windowClosing(final WindowEvent evt) {
                 // We need to unregister here as unregistering in the actionPerformed method will
                 // lead to incorrect behaviour if the user tries to advance days again without
                 // exiting this dialog
@@ -255,15 +249,20 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     //region Button Actions
     @Override
     protected void cancelActionPerformed(final ActionEvent evt) {
-
+        if (isRunning()) {
+            setRunning(false);
+        } else {
+            super.cancelActionPerformed(evt);
+        }
     }
     //endregion Button Actions
 
     //region ActionListener
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        if (evt.getSource().equals(btnStart) || evt.getSource().equals(btnNextWeek)
-                || evt.getSource().equals(btnNextMonth) || evt.getSource().equals(btnNextYear)) {
+        if (getBtnStartAdvancement().equals(evt.getSource()) || getBtnNewDay().equals(evt.getSource())
+                || getBtnNewWeek().equals(evt.getSource()) || getBtnNewMonth().equals(evt.getSource())
+                || getBtnNewYear().equals(evt.getSource()) || getBtnNewDecade().equals(evt.getSource())) {
             int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
@@ -320,7 +319,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     //endregion ActionListener
 
     @Subscribe(priority = 1)
-    public void reportOverride(ReportEvent evt) {
-        evt.cancel();
+    public void reportOverride(final ReportEvent evt) {
+        if (isModal()) {
+            evt.cancel();
+        }
     }
 }
