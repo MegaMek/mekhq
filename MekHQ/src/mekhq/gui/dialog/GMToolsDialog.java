@@ -20,19 +20,14 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.StringJoiner;
-import java.util.function.Predicate;
-
-import javax.swing.*;
-
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTabbedPanePreference;
+import megamek.client.ui.preferences.JTextFieldPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
@@ -42,7 +37,6 @@ import megamek.common.Messages;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -54,37 +48,46 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JTextFieldPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.displayWrappers.FactionDisplay;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.function.Predicate;
 
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 7724064095803583812L;
 
     //region GUI Variables
-    private JSpinner numDice;
-    private JSpinner sizeDice;
-    private JLabel totalDiceResult;
-    private JTextPane individualDiceResults;
+    private JTabbedPane tabbedPane;
 
-    private JComboBox<FactionChoice> factionPicker;
-    private JTextField yearPicker;
-    private JComboBox<String> qualityPicker;
-    private JComboBox<String> unitTypePicker;
-    private JComboBox<String> unitWeightPicker;
-    private JLabel unitPicked;
+    //region General Tab
+    private JSpinner spnNumberOfDice;
+    private JSpinner spnNumberOfSides;
+    private JLabel lblTotalDiceResult;
+    private JTextPane txtIndividualDiceResults;
 
-    private JComboBox<String> ethnicCodePicker;
-    private JComboBox<Gender> genderPicker;
-    private JComboBox<FactionChoice> nameGeneratorFactionPicker;
+    private MMComboBox<FactionDisplay> comboFaction;
+    private JTextField txtYear;
+    private MMComboBox<String> comboQuality;
+    private MMComboBox<String> comboUnitType;
+    private MMComboBox<String> comboUnitWeight;
+    private JLabel lblUnitPicked;
+    //endregion General Tab
+
+    //region Name Tab
+    private MMComboBox<String> ethnicCodePicker;
+    private MMComboBox<Gender> genderPicker;
+    private MMComboBox<FactionDisplay> nameGeneratorFactionPicker;
     private JCheckBox clannerPicker;
     private JSpinner numNames;
     private JLabel currentName;
@@ -94,14 +97,15 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JLabel currentCallsign;
     private JTextArea callsignGenerated;
 
-    private JComboBox<String> originClanPicker;
-    private JComboBox<Integer> bloodnameEraPicker;
-    private JComboBox<Phenotype> phenotypePicker;
+    private MMComboBox<String> originClanPicker;
+    private MMComboBox<Integer> bloodnameEraPicker;
+    private MMComboBox<Phenotype> phenotypePicker;
     private JLabel currentBloodname;
     private JLabel bloodnameGenerated;
     private JLabel originClanGenerated;
     private JLabel phenotypeGenerated;
     private JLabel bloodnameWarningLabel;
+    //endregion Name Tab
     //endregion GUI Variables
 
     //region Previously Generated Information
@@ -143,8 +147,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
     private static final Integer[] ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
     //endregion Constants
-
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GMToolsDialog", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -159,13 +161,25 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Constructors
 
     //region Getters/Setters
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public void setTabbedPane(final JTabbedPane tabbedPane) {
+        this.tabbedPane = tabbedPane;
+    }
+
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        return null;
+        setTabbedPane(new JTabbedPane());
+        getTabbedPane().setName("GMToolsTabbedPane");
+        getTabbedPane().addTab(resources.getString(""), createGeneralTab());
+        return getTabbedPane();
     }
+
     private void initComponents() {
         final JTabbedPane tabbedPane = new JTabbedPane();
         final JPanel generalPanel = new JPanel();
@@ -186,19 +200,19 @@ public class GMToolsDialog extends AbstractMHQDialog {
         dicePanel.setName("dicePanel");
         dicePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.text")));
 
-        numDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
-        numDice.setName("numDice");
-        ((JSpinner.DefaultEditor) numDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(numDice, newGridBagConstraints(gridx++, gridy));
+        spnNumberOfDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
+        spnNumberOfDice.setName("numDice");
+        ((JSpinner.DefaultEditor) spnNumberOfDice.getEditor()).getTextField().setEditable(true);
+        dicePanel.add(spnNumberOfDice, newGridBagConstraints(gridx++, gridy));
 
         JLabel sides = new JLabel(resources.getString("sides.text"));
         sides.setName("sides");
         dicePanel.add(sides, newGridBagConstraints(gridx++, gridy));
 
-        sizeDice = new JSpinner(new SpinnerNumberModel(6, 1, 200, 1));
-        sizeDice.setName("sizeDice");
-        ((JSpinner.DefaultEditor) sizeDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(sizeDice, newGridBagConstraints(gridx++, gridy++));
+        spnNumberOfSides = new JSpinner(new SpinnerNumberModel(6, 1, 200, 1));
+        spnNumberOfSides.setName("sizeDice");
+        ((JSpinner.DefaultEditor) spnNumberOfSides.getEditor()).getTextField().setEditable(true);
+        dicePanel.add(spnNumberOfSides, newGridBagConstraints(gridx++, gridy++));
 
         gridx = 0;
 
@@ -206,9 +220,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         totalDiceResultLabel.setName("totalDiceResultsLabel");
         dicePanel.add(totalDiceResultLabel, newGridBagConstraints(gridx++, gridy));
 
-        totalDiceResult = new JLabel("-");
-        totalDiceResult.setName("totalDiceResult");
-        dicePanel.add(totalDiceResult, newGridBagConstraints(gridx++, gridy));
+        lblTotalDiceResult = new JLabel("-");
+        lblTotalDiceResult.setName("totalDiceResult");
+        dicePanel.add(lblTotalDiceResult, newGridBagConstraints(gridx++, gridy));
 
         JButton diceRoll = new JButton(resources.getString("diceRoll.text"));
         diceRoll.setName("diceRoll");
@@ -221,11 +235,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         individualDiceResultsLabel.setName("individualDiceResultsLabel");
         dicePanel.add(individualDiceResultsLabel, newGridBagConstraints(gridx++, gridy));
 
-        individualDiceResults = new JTextPane();
-        individualDiceResults.setText("-");
-        individualDiceResults.setName("individualDiceResults");
-        individualDiceResults.setEditable(false);
-        dicePanel.add(individualDiceResults, newGridBagConstraints(gridx++, gridy, 3, 1));
+        txtIndividualDiceResults = new JTextPane();
+        txtIndividualDiceResults.setText("-");
+        txtIndividualDiceResults.setName("individualDiceResults");
+        txtIndividualDiceResults.setEditable(false);
+        dicePanel.add(txtIndividualDiceResults, newGridBagConstraints(gridx++, gridy, 3, 1));
 
         return dicePanel;
     }
@@ -241,10 +255,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         yearLabel.setName("yearLabel");
         ratPanel.add(yearLabel, newGridBagConstraints(0, 0));
 
-        yearPicker = new JTextField(5);
-        yearPicker.setText(String.valueOf(getGUI().getCampaign().getGameYear()));
-        yearPicker.setName("yearPicker");
-        ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
+        txtYear = new JTextField(5);
+        txtYear.setText(String.valueOf(getGUI().getCampaign().getGameYear()));
+        txtYear.setName("yearPicker");
+        ratPanel.add(txtYear, newGridBagConstraints(0, 1));
 
         JLabel factionLabel = new JLabel(resources.getString("factionLabel.text"));
         factionLabel.setName("factionLabel");
@@ -253,18 +267,18 @@ public class GMToolsDialog extends AbstractMHQDialog {
         List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
                 ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
-        factionPicker = new JComboBox<>(factionModel);
-        factionPicker.setName("factionPicker");
-        factionPicker.setSelectedIndex(0);
-        ratPanel.add(factionPicker, newGridBagConstraints(1, 1, 2, 1));
+        comboFaction = new JComboBox<>(factionModel);
+        comboFaction.setName("factionPicker");
+        comboFaction.setSelectedIndex(0);
+        ratPanel.add(comboFaction, newGridBagConstraints(1, 1, 2, 1));
 
         JLabel qualityLabel = new JLabel(resources.getString("qualityLabel.text"));
         qualityLabel.setName("qualityLabel");
         ratPanel.add(qualityLabel, newGridBagConstraints(3, 0));
 
-        qualityPicker = new JComboBox<>(QUALITY_NAMES);
-        qualityPicker.setName("qualityPicker");
-        ratPanel.add(qualityPicker, newGridBagConstraints(3, 1));
+        comboQuality = new JComboBox<>(QUALITY_NAMES);
+        comboQuality.setName("qualityPicker");
+        ratPanel.add(comboQuality, newGridBagConstraints(3, 1));
 
         JLabel unitTypeLabel = new JLabel(resources.getString("unitTypeLabel.text"));
         unitTypeLabel.setName("unitTypeLabel");
@@ -276,26 +290,26 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 unitTypeModel.addElement(UnitType.getTypeName(ut));
             }
         }
-        unitTypePicker = new JComboBox<>(unitTypeModel);
-        unitTypePicker.setName("unitTypePicker");
-        unitTypePicker.addItemListener(ev -> {
-            final String unitType = (String) Objects.requireNonNull(unitTypePicker.getSelectedItem());
-            unitWeightPicker.setEnabled(unitType.equals("Mek") || unitType.equals("Tank")
+        comboUnitType = new JComboBox<>(unitTypeModel);
+        comboUnitType.setName("unitTypePicker");
+        comboUnitType.addItemListener(ev -> {
+            final String unitType = (String) Objects.requireNonNull(comboUnitType.getSelectedItem());
+            comboUnitWeight.setEnabled(unitType.equals("Mek") || unitType.equals("Tank")
                     || unitType.equals("Aero"));
         });
-        ratPanel.add(unitTypePicker, newGridBagConstraints(4, 1));
+        ratPanel.add(comboUnitType, newGridBagConstraints(4, 1));
 
         JLabel unitWeightLabel = new JLabel(resources.getString("unitWeightLabel.text"));
         unitWeightLabel.setName("unitWeightLabel");
         ratPanel.add(unitWeightLabel, newGridBagConstraints(5, 0));
 
-        unitWeightPicker = new JComboBox<>(WEIGHT_NAMES);
-        unitWeightPicker.setName("unitWeightPicker");
-        ratPanel.add(unitWeightPicker, newGridBagConstraints(5, 1));
+        comboUnitWeight = new JComboBox<>(WEIGHT_NAMES);
+        comboUnitWeight.setName("unitWeightPicker");
+        ratPanel.add(comboUnitWeight, newGridBagConstraints(5, 1));
 
-        unitPicked = new JLabel("-");
-        unitPicked.setName("unitPicked");
-        ratPanel.add(unitPicked, newGridBagConstraints(0, 2, 4, 1));
+        lblUnitPicked = new JLabel("-");
+        lblUnitPicked.setName("unitPicked");
+        ratPanel.add(lblUnitPicked, newGridBagConstraints(0, 2, 4, 1));
 
         JButton ratRoll = new JButton(resources.getString("ratRoll.text"));
         ratRoll.setName("ratRoll");
@@ -599,49 +613,18 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Bloodname Generator Panel Initialization
     //endregion Names Tab
 
-    //region GridBagConstraint Simplification Methods
-    private GridBagConstraints newGridBagConstraints(int x, int y) {
-        return newGridBagConstraints(x, y, 1, 1);
-    }
 
-    private GridBagConstraints newGridBagConstraints(int x, int y, int width, int height) {
-        return new GridBagConstraints(x, y, width, height, 1.0, 1.0,
-            GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0, 3, 0, 3), 0, 0);
-    }
-    //endregion GridBagConstraint Simplification Methods
-
-    /**
-     * Gets a list of factions sorted by name.
-     */
-    private List<FactionChoice> getFactionChoices(int year) {
-        List<FactionChoice> factionChoices = new ArrayList<>();
-
-        for (Faction faction : Factions.getInstance().getFactions()) {
-            factionChoices.add(new FactionChoice(faction, year));
-        }
-
-        factionChoices.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
-
-        return factionChoices;
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(GMToolsDialog.class);
-
-        preferences.manage(new JIntNumberSpinnerPreference(numDice));
-
-        preferences.manage(new JIntNumberSpinnerPreference(sizeDice));
-
-        preferences.manage(new JTextFieldPreference(yearPicker));
-
-        preferences.manage(new JComboBoxPreference(factionPicker));
-
-        preferences.manage(new JComboBoxPreference(qualityPicker));
-
-        preferences.manage(new JComboBoxPreference(unitTypePicker));
-
-        preferences.manage(new JComboBoxPreference(unitWeightPicker));
-
+    @Override
+    protected void setCustomPreferences(PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JTabbedPanePreference(getTabbedPane()));
+        preferences.manage(new JIntNumberSpinnerPreference(spnNumberOfDice));
+        preferences.manage(new JIntNumberSpinnerPreference(spnNumberOfSides));
+        preferences.manage(new JTextFieldPreference(txtYear));
+        preferences.manage(new JComboBoxPreference(comboFaction));
+        preferences.manage(new JComboBoxPreference(comboQuality));
+        preferences.manage(new JComboBoxPreference(comboUnitType));
+        preferences.manage(new JComboBoxPreference(comboUnitWeight));
         if (numNames != null) {
             preferences.manage(new JIntNumberSpinnerPreference(numNames));
         }
@@ -649,9 +632,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
         if (numCallsigns != null) {
             preferences.manage(new JIntNumberSpinnerPreference(numCallsigns));
         }
-
-        setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 
     private void setValuesFromPerson() {
@@ -675,16 +655,17 @@ public class GMToolsDialog extends AbstractMHQDialog {
         clannerPicker.setSelected(getPerson().isClanner());
 
         // Now we figure out the person's origin faction
-        int factionIndex = findInitialSelectedFaction(getFactionChoices(getPerson().getBirthday().getYear()));
+        int factionIndex = findInitialSelectedFaction(FactionDisplay.getSortedValidFactionDisplays(
+                Factions.getInstance().getFactions(), getPerson().getBirthday()));
         if (factionIndex != 0) {
-            factionPicker.setSelectedIndex(factionIndex);
+            comboFaction.setSelectedIndex(factionIndex);
             nameGeneratorFactionPicker.setSelectedIndex(factionIndex);
         }
 
         // Finally, we determine the default unit type
-        for (int i = 0; i < unitTypePicker.getModel().getSize(); i++) {
-            if (doesPersonPrimarilyDriveUnitType(UnitType.determineUnitTypeCode(unitTypePicker.getItemAt(i)))) {
-                unitTypePicker.setSelectedIndex(i);
+        for (int i = 0; i < comboUnitType.getModel().getSize(); i++) {
+            if (doesPersonPrimarilyDriveUnitType(UnitType.determineUnitTypeCode(comboUnitType.getItemAt(i)))) {
+                comboUnitType.setSelectedIndex(i);
                 break;
             }
         }
@@ -713,7 +694,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
      * the dialog was launched for a specific person) or the campaign's
      * faction.
      */
-    private int findInitialSelectedFaction(List<FactionChoice> factionChoices) {
+    private int findInitialSelectedFaction(List<FactionDisplay> factionChoices) {
         String factionId = (getPerson() != null)
                 ? getPerson().getOriginFaction().getShortName()
                 : getGUI().getCampaign().getFactionCode();
@@ -722,7 +703,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         int index = 0;
-        for (FactionChoice factionChoice : factionChoices) {
+        for (FactionDisplay factionChoice : factionChoices) {
             if (factionChoice.id.equalsIgnoreCase(factionId)) {
                 return index;
             }
@@ -821,9 +802,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        List<Integer> individualDice = Compute.individualDice((Integer) numDice.getValue(),
-                (Integer) sizeDice.getValue());
-        totalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
+        List<Integer> individualDice = Compute.individualDice((Integer) spnNumberOfDice.getValue(),
+                (Integer) spnNumberOfSides.getValue());
+        lblTotalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
                 individualDice.get(0)));
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i < individualDice.size() - 1; i++) {
@@ -832,39 +813,39 @@ public class GMToolsDialog extends AbstractMHQDialog {
         sb.append(individualDice.get(individualDice.size() - 1));
 
         if (sb.length() > 0) {
-            individualDiceResults.setText(sb.toString());
+            txtIndividualDiceResults.setText(sb.toString());
         } else {
-            individualDiceResults.setText("-");
+            txtIndividualDiceResults.setText("-");
         }
     }
 
     private MechSummary performRollRat() {
         try {
             IUnitGenerator ug = getGUI().getCampaign().getUnitGenerator();
-            int unitType = UnitType.determineUnitTypeCode((String) unitTypePicker.getSelectedItem());
-            int unitWeight = unitWeightPicker.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
-            if (!unitWeightPicker.isEnabled()) {
+            int unitType = UnitType.determineUnitTypeCode((String) comboUnitType.getSelectedItem());
+            int unitWeight = comboUnitWeight.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
+            if (!comboUnitWeight.isEnabled()) {
                 unitWeight = AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
             }
-            int targetYear = Integer.parseInt(yearPicker.getText());
-            int unitQuality = qualityPicker.getSelectedIndex();
+            int targetYear = Integer.parseInt(txtYear.getText());
+            int unitQuality = comboQuality.getSelectedIndex();
 
             Campaign campaign = getGUI().getCampaign();
             Predicate<MechSummary> test = ms ->
                     (!campaign.getCampaignOptions().limitByYear() || (targetYear > ms.getYear()))
                             && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
                             && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
-            MechSummary ms = ug.generate(((FactionChoice) Objects.requireNonNull(factionPicker.getSelectedItem())).id,
+            MechSummary ms = ug.generate(((FactionChoice) Objects.requireNonNull(comboFaction.getSelectedItem())).id,
                     unitType, unitWeight, targetYear, unitQuality, test);
             if (ms != null) {
-                unitPicked.setText(ms.getName());
+                lblUnitPicked.setText(ms.getName());
                 return ms;
             }
         } catch (Exception e) {
-            unitPicked.setText(Messages.getString("invalidYear.error"));
+            lblUnitPicked.setText(Messages.getString("invalidYear.error"));
             return null;
         }
-        unitPicked.setText(Messages.getString("noValidUnit.error"));
+        lblUnitPicked.setText(Messages.getString("noValidUnit.error"));
         return null;
     }
 
@@ -888,7 +869,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             } catch (Exception ex) {
                 MekHQ.getLogger().error("Failed to load entity "
                         + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile(), ex);
-                unitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
+                lblUnitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
             }
         }
     }
@@ -1040,22 +1021,4 @@ public class GMToolsDialog extends AbstractMHQDialog {
         bloodnameWarningLabel.setText(txt);
     }
     //endregion ActionEvent Handlers
-
-    private static class FactionChoice {
-        public final String name;
-        public final String id;
-
-        private final String displayName;
-
-        public FactionChoice(Faction faction, int year) {
-            id = faction.getShortName();
-            name = faction.getFullName(year);
-            displayName = String.format("%s [%s]", name, id);
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-    }
 }

@@ -210,8 +210,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showGMToolsDialog() {
-        GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
-        gmTools.setVisible(true);
+        new GMToolsDialog(getFrame(), this, null).setVisible(true);
     }
 
     public void showMassMothballDialog(Unit[] units, boolean activate) {
