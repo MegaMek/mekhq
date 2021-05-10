@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>HostileCommsCenter.xml</capturedDefinition>
 	<displayableName>Comms Center</displayableName>
         <facilityType>CommandCenter</facilityType>
         <owner>Allied</owner>

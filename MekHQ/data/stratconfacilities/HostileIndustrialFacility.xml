@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>AlliedIndustrialFacility.xml</capturedDefinition>
 	<displayableName>Industrial Center</displayableName>
         <facilityType>IndustrialFacility</facilityType>
         <owner>Opposing</owner>

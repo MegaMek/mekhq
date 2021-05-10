@@ -1210,11 +1210,7 @@ public class StratconRulesManager {
                     updateStrategicObjectiveCount(victory, scenario, facility, campaignState);
 
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
-                        if (facility.getOwner() == ForceAlignment.Allied) {
-                            facility.setOwner(ForceAlignment.Opposing);
-                        } else {
-                            facility.setOwner(ForceAlignment.Allied);
-                        }
+                        switchFacilityOwner(facility);
                     }
 
                     processTrackForceReturnDates(track, rst.getCampaign().getLocalDate());
@@ -1223,6 +1219,36 @@ public class StratconRulesManager {
                     break;
                 }
             }
+        }
+    }
+    
+    /**
+     * Contains logic for what should happen when a facility gets captured:
+     * modifier/type/alignment switches etc.
+     */
+    private static void switchFacilityOwner(StratconFacility facility) {
+        if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
+            StratconFacility newOwnerData = 
+                    StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
+            
+            if (newOwnerData != null) {
+                // for now, we only need to change a limited subset of the captured facility's data
+                // the rest can be retained; we may revisit this assumption later
+                facility.setCapturedDefinition(newOwnerData.getCapturedDefinition());
+                facility.setLocalModifiers(new ArrayList<>(newOwnerData.getLocalModifiers()));
+                facility.setSharedModifiers(new ArrayList<>(newOwnerData.getSharedModifiers()));
+                facility.setOwner(newOwnerData.getOwner());
+                
+                return;
+            }
+        }
+        
+        // if we the facility didn't have any data defined for what happens when it's captured
+        // fall back to the default of just switching the owner
+        if (facility.getOwner() == ForceAlignment.Allied) {
+            facility.setOwner(ForceAlignment.Opposing);
+        } else {
+            facility.setOwner(ForceAlignment.Allied);
         }
     }
 
