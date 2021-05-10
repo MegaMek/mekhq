@@ -138,7 +138,9 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails>
+                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
+            </additionalDetails>
             <description>Destroy or cripple the following unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
