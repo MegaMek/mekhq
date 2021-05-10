@@ -14,6 +14,8 @@ VERSION HISTORY:
 + PR #2586: Fixing LAM Pilot Skill Level Calculation
 + PR #2599: Fixed multiple issues with deploying grounded dropships from MekHQ to MegaMek; 
 	Prevent putting scenario into error state when editing a non-resolved scenario in briefing room
++ Issue #2594: Allowing Scenario Date Nullable Comparison
++ Issue #2588: Fixing unmarketable check value for personnel table filter support check
 
 0.49.0 (2021-05-01 2130 UTC)
 + Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
