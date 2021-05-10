@@ -63,8 +63,9 @@ import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTextFieldPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.gui.baseComponents.AbstractMHQDialog;
 
-public class GMToolsDialog extends JDialog {
+public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 7724064095803583812L;
 
@@ -126,8 +127,8 @@ public class GMToolsDialog extends JDialog {
     //endregion Previously Generated Information
 
     //region Data Sources
-    private CampaignGUI gui;
-    private Person person;
+    private final CampaignGUI gui;
+    private final Person person;
     private List<Clan> clans = new ArrayList<>();
     //endregion Data Sources
 
@@ -147,37 +148,28 @@ public class GMToolsDialog extends JDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    /**
-     * Creates a generic GM Tools dialog, with a dice roller
-     * and a RAT roller that can add units to the campaign.
-     */
-    public GMToolsDialog(JFrame parent, CampaignGUI gui) {
-        this(parent, gui, null);
-    }
-
-    /**
-     * Creates a GM Tools dialog specific to a given person. The
-     * dice roller and RAT roller are both available, however, the
-     * RAT roller adds the unit directly to the person.
-     */
-    public GMToolsDialog(JFrame parent, CampaignGUI gui, @Nullable Person p) {
-        super(parent, false);
-        setGUI(gui);
-        setPerson(p);
-        setName("formGMTools");
-        setTitle("GM Tools" + ((p != null) ? (" - " + p.getFullName()) : ""));
-        getContentPane().setLayout(new GridBagLayout());
-        initComponents();
-        pack();
-        setLocationRelativeTo(parent);
-        setUserPreferences();
+    public GMToolsDialog(final JFrame frame, final CampaignGUI gui, final @Nullable Person person) {
+        super(frame, "GMToolsDialog", "GMToolsDialog.title");
+        this.gui = gui;
+        this.person = person;
+        initialize();
         setValuesFromPerson();
         validateBloodnameInput();
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    //endregion Getters/Setters
+
     //region Initialization
+    @Override
+    protected Container createCenterPane() {
+        return null;
+    }
     private void initComponents() {
+        final JTabbedPane tabbedPane = new JTabbedPane();
+        final JPanel generalPanel = new JPanel();
+        tabbedPane.addTab("General Tab", createGeneralTab());
         getContentPane().add(getDiceRoller(), newGridBagConstraints(0,0));
         getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
         getContentPane().add(getNameGenerator(), newGridBagConstraints(0, 2));
@@ -185,6 +177,7 @@ public class GMToolsDialog extends JDialog {
         getContentPane().add(getBloodnameGenerator(), newGridBagConstraints(0, 4));
     }
 
+    //region General Tab
     //region Dice Panel Initialization
     private JPanel getDiceRoller() {
         int gridx = 0, gridy = 0;
@@ -318,7 +311,9 @@ public class GMToolsDialog extends JDialog {
         return ratPanel;
     }
     //endregion RAT Roller Initialization
+    //endregion General Tab
 
+    //region Names Tab
     //region Name Generator Panel Initialization
     private JPanel getNameGenerator() {
         JPanel namePanel = new JPanel(new GridBagLayout());
@@ -602,6 +597,7 @@ public class GMToolsDialog extends JDialog {
         return namePanel;
     }
     //endregion Bloodname Generator Panel Initialization
+    //endregion Names Tab
 
     //region GridBagConstraint Simplification Methods
     private GridBagConstraints newGridBagConstraints(int x, int y) {
