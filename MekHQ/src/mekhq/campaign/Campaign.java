@@ -6036,25 +6036,35 @@ public class Campaign implements Serializable, ITechManager {
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
             if (getCampaignOptions().getOverageRepaymentInFinalPayment()
-                    && (contract.getSalvagePct() < 100)) {
-                Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
-                double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
-                double salvagePercent = contract.getSalvagePct() / 100.0;
+                    && (contract.getSalvagePct() < 100.0)) {
+                final double salvagePercent = contract.getSalvagePct() / 100.0;
+                MekHQ.getLogger().error("Salvage Percent: " + salvagePercent);
+                final Money maxSalvage = contract.getSalvagedByEmployer().multipliedBy(salvagePercent / (1 - salvagePercent));
+                MekHQ.getLogger().error("Maximum Salvage: " + maxSalvage);
+                MekHQ.getLogger().error("Salvage By Unit: " + contract.getSalvagedByUnit());
+                MekHQ.getLogger().error("Salvage By Employer: " + contract.getSalvagedByEmployer());
+                final Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
+                MekHQ.getLogger().error("Total Salvaged: " + totalSalvaged);
+                final double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
+                MekHQ.getLogger().error("Percent Salvaged: " + percentSalvaged);
 
                 if (salvagePercent < percentSalvaged) {
-                    Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
+                    final Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
+                    MekHQ.getLogger().error("Amount to Repay: " + amountToRepay);
+                    MekHQ.getLogger().error("Original Remaining Money: " + remainingMoney);
                     remainingMoney = remainingMoney.minus(amountToRepay);
+                    MekHQ.getLogger().error("New Remaining Money: " + remainingMoney);
                     contract.subtractSalvageByUnit(amountToRepay);
                 }
             }
 
             if (remainingMoney.isPositive()) {
-                finances.credit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), getLocalDate());
                 addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract " + contract.getName());
             } else if (remainingMoney.isNegative()) {
-                finances.debit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Repaying payment overages for " + contract.getName(), getLocalDate());
                 addReport("Your account has been debited for " + remainingMoney.toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
