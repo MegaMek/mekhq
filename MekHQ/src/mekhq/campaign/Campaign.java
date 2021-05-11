@@ -6038,22 +6038,10 @@ public class Campaign implements Serializable, ITechManager {
             if (getCampaignOptions().getOverageRepaymentInFinalPayment()
                     && (contract.getSalvagePct() < 100.0)) {
                 final double salvagePercent = contract.getSalvagePct() / 100.0;
-                MekHQ.getLogger().error("Salvage Percent: " + salvagePercent);
                 final Money maxSalvage = contract.getSalvagedByEmployer().multipliedBy(salvagePercent / (1 - salvagePercent));
-                MekHQ.getLogger().error("Maximum Salvage: " + maxSalvage);
-                MekHQ.getLogger().error("Salvage By Unit: " + contract.getSalvagedByUnit());
-                MekHQ.getLogger().error("Salvage By Employer: " + contract.getSalvagedByEmployer());
-                final Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
-                MekHQ.getLogger().error("Total Salvaged: " + totalSalvaged);
-                final double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
-                MekHQ.getLogger().error("Percent Salvaged: " + percentSalvaged);
-
-                if (salvagePercent < percentSalvaged) {
-                    final Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
-                    MekHQ.getLogger().error("Amount to Repay: " + amountToRepay);
-                    MekHQ.getLogger().error("Original Remaining Money: " + remainingMoney);
+                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
+                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
-                    MekHQ.getLogger().error("New Remaining Money: " + remainingMoney);
                     contract.subtractSalvageByUnit(amountToRepay);
                 }
             }
@@ -6066,7 +6054,7 @@ public class Campaign implements Serializable, ITechManager {
             } else if (remainingMoney.isNegative()) {
                 getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Repaying payment overages for " + contract.getName(), getLocalDate());
-                addReport("Your account has been debited for " + remainingMoney.toAmountAndSymbolString()
+                addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
             }
 
