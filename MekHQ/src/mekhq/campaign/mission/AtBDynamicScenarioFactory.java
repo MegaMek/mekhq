@@ -802,7 +802,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @param scenario The scenario to process.
      */
-    private static void setScenarioMapSize(AtBDynamicScenario scenario) {
+    public static void setScenarioMapSize(AtBDynamicScenario scenario) {
         int mapSizeX;
         int mapSizeY;
         ScenarioTemplate template = scenario.getTemplate();

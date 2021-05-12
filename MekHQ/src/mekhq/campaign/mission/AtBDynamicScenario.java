@@ -171,6 +171,11 @@ public class AtBDynamicScenario extends AtBScenario {
     public int getMapY() {
         return getMapSizeY();
     }
+    
+    @Override
+    public void setMapSize() {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this);
+    }
 
     /**
      * Adds a bot force to this scenario.
