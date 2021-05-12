@@ -150,9 +150,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         StratconScenario scenario = getSelectedScenario();
         
-        if (scenario == null) {
+        // can't stack more than one force on hex 
+        // can't "deploy" a force to a scenario (have to reinforce instead)
+        if ((scenario == null) && 
+                !currentTrack.getAssignedCoordForces().containsKey(coords)) {
             menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Force Assignments");
+            menuItemManageForceAssignments.setText("Manage Force Assignment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
