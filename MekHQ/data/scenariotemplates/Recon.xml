@@ -111,6 +111,7 @@
             <additionalDetails>
                 <additionalDetail>Scans may be conducted by weapons fire, TAG, spotting or physical attacks.</additionalDetail>
                 <additionalDetail>If the scan action requires a roll, it must be possible.</additionalDetail>
+                <additionalDetail>Note: This objective should be tracked manually outside of MegaMek.</additionalDetail>
             </additionalDetails>
             <description>Scan the following enemy unit(s) and force(s):</description>
             <destinationEdge>NONE</destinationEdge>

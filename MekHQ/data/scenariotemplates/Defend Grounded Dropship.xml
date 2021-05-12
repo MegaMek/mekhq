@@ -146,7 +146,9 @@
                     <howMuch>2</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails>
+                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
+            </additionalDetails>
             <description>Protect the following units:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
