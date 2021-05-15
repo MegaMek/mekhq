@@ -16,6 +16,9 @@ VERSION HISTORY:
 	Prevent putting scenario into error state when editing a non-resolved scenario in briefing room
 + Issue #2594: Allowing Scenario Date Nullable Comparison
 + Issue #2588: Fixing unmarketable check value for personnel table filter support check
++ PR #2602, #2611, #2615: StratCon Data Fixes
++ PR #2583: Dependent Swapover: Removing Parental and Spousal Abandonment, Fixing None Primary Role
++ Issue #2566: Ranks Warning Expansion and Change Tracking
 
 0.49.0 (2021-05-01 2130 UTC)
 + Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
