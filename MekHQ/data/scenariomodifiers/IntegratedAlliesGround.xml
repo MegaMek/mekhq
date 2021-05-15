@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>Your force will be deployed as part of an integrated unit. Keep the allied units alive.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>

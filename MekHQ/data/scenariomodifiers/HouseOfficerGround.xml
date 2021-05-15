@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>The house commanding officer will deploy alongside your units. Keep them alive.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
