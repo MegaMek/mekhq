@@ -90,7 +90,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY"; //$NON-NLS-1$
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES"; //$NON-NLS-1$
     private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
-    private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
     private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
@@ -983,19 +982,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                     gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle())); //$NON-NLS-1$
-                    gui.getCampaign().personUpdated(selectedPerson);
-                }
-                break;
-            }
-            case CMD_DEPENDENT: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isDependent();
-                    for (Person person : people) {
-                        person.setDependent(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setDependent(!selectedPerson.isDependent());
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
                 break;
@@ -2234,12 +2220,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             //endregion Edge Triggers
 
             menu = new JMenu(resourceMap.getString("specialFlags.text"));
-            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
-            cbMenuItem.setSelected(person.isDependent());
-            cbMenuItem.setActionCommand(CMD_DEPENDENT);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
-
             cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("commander.text"));
             cbMenuItem.setSelected(person.isCommander());
             cbMenuItem.setActionCommand(CMD_COMMANDER);
@@ -2435,14 +2415,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             menu = new JMenu(resourceMap.getString("specialFlags.text"));
-            if (StaticChecks.areEitherAllDependentsOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
-                cbMenuItem.setSelected(selected[0].isDependent());
-                cbMenuItem.setActionCommand(CMD_DEPENDENT);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
             if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
                 cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
