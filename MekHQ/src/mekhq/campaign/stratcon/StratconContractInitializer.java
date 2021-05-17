@@ -35,6 +35,7 @@ import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -98,6 +99,8 @@ public class StratconContractInitializer {
             for (int x = 0; x < trackObjects.size(); x++) {
                 int numObjects = trackObjects.get(x);
                 
+                List<StratconStrategicObjective> generatedObjectives = new ArrayList<>();
+                
                 switch (objectiveParams.objectiveType) {
                     case SpecificScenarioVictory:
                         initializeObjectiveScenarios(campaign, contract, campaignState.getTrack(x), numObjects,
@@ -115,8 +118,10 @@ public class StratconContractInitializer {
                         if (objectiveParams.objectiveScenarioModifiers != null) {
                             campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
                         }
-                    break;
+                        break;
                 }
+                
+                
             }
         }
         
@@ -226,12 +231,20 @@ public class StratconContractInitializer {
             StratconCoords coords = getUnoccupiedCoords(trackState);
             
             trackState.addFacility(coords, sf);
+            
+            StratconStrategicObjective sso = new StratconStrategicObjective();
+            sso.setObjectiveCoords(coords);
+            
             if (sf.getOwner() == ForceAlignment.Allied) {
                 trackState.getRevealedCoords().add(coords);
                 sf.setVisible(true);
+                sso.setObjectiveType(StrategicObjectiveType.AlliedFacilityControl);
             } else {
                 sf.setVisible(false);
+                sso.setObjectiveType(StrategicObjectiveType.HostileFacilityControl);
             }
+            
+            trackState.addStrategicObjective(sso);
         }
     }
     
@@ -285,6 +298,11 @@ public class StratconContractInitializer {
             }
             
             trackState.addScenario(scenario);
+
+            StratconStrategicObjective sso = new StratconStrategicObjective();
+            sso.setObjectiveCoords(coords);
+            sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+            trackState.addStrategicObjective(sso);
         }
     }
     

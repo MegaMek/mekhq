@@ -36,6 +36,7 @@ import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 /**
@@ -175,6 +176,7 @@ public class StratconTab extends CampaignGuiTab {
         if (!campaignState.strategicObjectivesBehaveAsVPs()) {
             sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
                 .append("/").append(campaignState.getPendingStrategicObjectiveCount());
+            sb.append("<span style='background-color: #245250;'>Click me</span>");
         }
         
         sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints())
@@ -184,6 +186,58 @@ public class StratconTab extends CampaignGuiTab {
             .append("</html>");
         
         campaignStatusText.setText(sb.toString());
+    }
+    
+    private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
+        StringBuilder sb = new StringBuilder();
+        
+//        for (//StratconTrackState )
+        // loop through all tracks
+        // for each track, loop through all objectives
+        // for each objective, grab the coordinates
+        // if !revealed, "locate and"
+        // if specific scenario "engage hostile forces"
+        // if hostile facility "capture or destroy [facility name]"
+        // if allied facility "maintain control of [facility name]"
+        // if revealed, " on track [current track] at coordinates [coords]
+        for (StratconTrackState track : campaignState.getTracks()) {
+            for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
+                boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
+                
+                if (!coordsRevealed) {
+                    sb.append("Locate and ");
+                }
+                
+                switch (objective.getObjectiveType()) {
+                    case SpecificScenarioVictory:
+                        sb.append("engage hostile forces");
+                        break;
+                    case HostileFacilityControl:
+                        sb.append("capture or destroy facility");
+                        break;
+                    case AlliedFacilityControl:
+                        sb.append("maintain control of facility");
+                        break;
+                    default:
+                        break;
+                }
+                
+                // need to add:
+                // global (campaign-state level) "keep VP count above 0" for liaison/house/integrated
+                // global (campaign-state level) "win X scenarios" for AnyScenarioVictory objective type
+                //      this probably means that StratconStrategicObjective needs "in progress/completed/failed" flag
+                // evaluate current state of facility control and "do X" objective
+                
+                if (coordsRevealed) {
+                    sb.append(" at ").append(objective.getObjectiveCoords().toFriendlyString())
+                        .append(" on track ").append(track.getDisplayableName());
+                }
+                
+                sb.append("<br/>");
+            }
+        }
+        
+        return sb.toString();
     }
     
     /**

@@ -15,8 +15,10 @@
 package mekhq.campaign.stratcon;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,6 +57,10 @@ public class StratconTrackState {
     private Set<Integer> stickyForces;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
     private Set<StratconCoords> revealedCoords;
+    
+    @XmlElementWrapper(name = "strategicObjectives")
+    @XmlElement(name = "strategicObjective")
+    private List<StratconStrategicObjective> strategicObjectives;
 
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
@@ -72,6 +78,7 @@ public class StratconTrackState {
         setAssignedForceReturnDatesForStorage(new HashMap<>());
         revealedCoords = new HashSet<>();
         stickyForces = new HashSet<>();
+        strategicObjectives = new ArrayList<>();
     }
     
     public String getDisplayableName() {
@@ -373,5 +380,17 @@ public class StratconTrackState {
     
     public void removeStickyForce(int forceID) {
         stickyForces.remove(forceID);
+    }
+
+    public List<StratconStrategicObjective> getStrategicObjectives() {
+        return strategicObjectives;
+    }
+
+    public void setStrategicObjectives(List<StratconStrategicObjective> strategicObjectives) {
+        this.strategicObjectives = strategicObjectives;
+    }
+    
+    public void addStrategicObjective(StratconStrategicObjective strategicObjective) {
+        getStrategicObjectives().add(strategicObjective);
     }
 }

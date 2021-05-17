@@ -186,7 +186,7 @@ public class StratconCampaignState {
     public void decrementStrategicObjectiveCompletedCount(int decrement) {
         completedStrategicObjectiveCount -= decrement;
     }
-    
+
     public void useSupportPoint() {
         supportPoints--;
     }
