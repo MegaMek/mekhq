@@ -381,6 +381,7 @@ public class ContractMarket implements Serializable {
             }
         }
 
+        // FIXME : Windchild : I don't work properly
         boolean isAttacker = !contract.getContractType().isGarrisonType()
                 || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
                 || contract.getEnemyCode().equals("REB");
@@ -483,6 +484,8 @@ public class ContractMarket implements Serializable {
                 contract.setEnemyCode(parent.getEnemyCode());
             }
         }
+
+        // FIXME : Windchild : I don't work properly
         boolean isAttacker = !contract.getContractType().isGarrisonType()
                 || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
                 || contract.getEnemyCode().equals("REB");

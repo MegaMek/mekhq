@@ -469,20 +469,22 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
         AtBContract contract = (AtBContract) this.contract;
         HashSet<String> systems = new HashSet<>();
-        if (contract.getContractType().isPlanetaryAssault() ||
-                getCurrentEnemyCode().equals("REB") ||
-                getCurrentEnemyCode().equals("PIR")) {
+        if (!contract.getContractType().isGarrisonType()
+                || getCurrentEnemyCode().equals("REB") || getCurrentEnemyCode().equals("PIR")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
-        if (contract.getContractType().isGarrisonType() && !contract.getEnemyCode().equals("REB")) {
+
+        if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty())
+                && !contract.getEnemyCode().equals("REB")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
+
         cbPlanets.removeAllItems();
         for (String system : systems) {
             cbPlanets.addItem(system);
