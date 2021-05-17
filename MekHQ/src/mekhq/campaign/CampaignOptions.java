@@ -2795,8 +2795,8 @@ public class CampaignOptions implements Serializable {
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
      */
-    public int getAtBBattleChance(AtBLanceRole role) {
-        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
+    public int getAtBBattleChance(final AtBLanceRole role) {
+        return role.isUnassigned() ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**

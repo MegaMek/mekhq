@@ -43,7 +43,6 @@ import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -177,7 +176,7 @@ public class AtBGameThread extends GameThread {
                  * delay for slower scout units.
                  */
                 boolean useDropship = false;
-                if (scenario.getLanceRole() == AtBLanceRole.SCOUTING) {
+                if (scenario.getLanceRole().isScouting()) {
                     for (Entity en : scenario.getAlliesPlayer()) {
                         if (en.getUnitType() == UnitType.DROPSHIP) {
                             useDropship = true;
@@ -226,8 +225,7 @@ public class AtBGameThread extends GameThread {
                         // Set scenario type-specific delay
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                        if ((scenario.getLanceRole() == AtBLanceRole.SCOUTING)
-                                && (scenario.getLance(campaign) != null)
+                        if (scenario.getLanceRole().isScouting() && (scenario.getLance(campaign) != null)
                                 && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
                                 && !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
@@ -280,9 +278,8 @@ public class AtBGameThread extends GameThread {
                             }
                         }
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                        if ((scenario.getLanceRole() == AtBLanceRole.SCOUTING)
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
-                                && !useDropship) {
+                        if (!useDropship && scenario.getLanceRole().isScouting()
+                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }

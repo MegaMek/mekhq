@@ -23,7 +23,6 @@ import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
@@ -334,7 +333,7 @@ public class StratconRulesManager {
             facility.setVisible(true);
         }
 
-        if (campaign.getLances().get(forceID).getRole() == AtBLanceRole.SCOUTING) {
+        if (campaign.getLances().get(forceID).getRole().isScouting()) {
             for (int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
 
@@ -503,7 +502,7 @@ public class StratconRulesManager {
         Unit commanderUnit = scenario.getLanceCommander(campaign).getUnit();
         Lance lance = campaign.getLances().get(commanderUnit.getForceId());
 
-        if ((lance != null) && (lance.getRole() == AtBLanceRole.DEFENCE)) {
+        if ((lance != null) && lance.getRole().isDefence()) {
             return true;
         }
 
@@ -1070,7 +1069,7 @@ public class StratconRulesManager {
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
         if (campaign.getLances().containsKey(forceID)
-                && (campaign.getLances().get(forceID).getRole() == AtBLanceRole.FIGHTING)) {
+                && campaign.getLances().get(forceID).getRole().isFighting()) {
             return ReinforcementEligibilityType.FightLance;
         }
 

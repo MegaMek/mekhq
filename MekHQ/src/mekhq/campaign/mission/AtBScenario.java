@@ -674,7 +674,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardMissionForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (lanceRole == AtBLanceRole.SCOUTING || lanceRole == AtBLanceRole.TRAINING) {
+        if (lanceRole.isScouting() || lanceRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
@@ -795,7 +795,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 campaign.getCampaignOptions().getRegionalMechVariations()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
-            } else if (getLanceRole() == AtBLanceRole.SCOUTING) {
+            } else if (getLanceRole().isScouting()) {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by dropship.
                  */
