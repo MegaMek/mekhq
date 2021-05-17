@@ -45,7 +45,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -355,11 +355,11 @@ class RequiredLancesTableModel extends DataTableModel {
                     return t + "/" + contract.getRequiredLances();
                 }
                 return Integer.toString(contract.getRequiredLances());
-            } else if (contract.getRequiredLanceType().ordinal() == column - 2) {
+            } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
                     if (data.get(row).equals(l.getContract(campaign))
-                            && (l.getRole() == l.getContract(campaign).getRequiredLanceType())
+                            && (l.getRole() == l.getContract(campaign).getContractType().getRequiredLanceRole())
                             && l.isEligible(campaign)) {
                         t++;
                     }

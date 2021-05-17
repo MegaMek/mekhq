@@ -38,7 +38,7 @@ import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
@@ -2971,10 +2971,11 @@ public class Campaign implements Serializable, ITechManager {
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
+        final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (Lance l : lances.values()) {
-            if ((l.getMissionId() == contract.getId()) && (l.getRole() != AtBLanceRole.UNASSIGNED)) {
+            if (!l.getRole().isUnassigned() && (l.getMissionId() == contract.getId())) {
                 total++;
-                if (l.getRole() == contract.getRequiredLanceType()) {
+                if (l.getRole() == requiredLanceRole) {
                     role++;
                 }
             }
@@ -3092,31 +3093,11 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (AtBContract contract : getActiveAtBContracts()) {
-            switch (contract.getMissionType()) {
-                case AtBContract.MT_GARRISONDUTY:
-                case AtBContract.MT_SECURITYDUTY:
-                case AtBContract.MT_CADREDUTY:
-                    fatigueLevel -= 1;
-                    break;
-                case AtBContract.MT_RIOTDUTY:
-                case AtBContract.MT_GUERRILLAWARFARE:
-                case AtBContract.MT_PIRATEHUNTING:
-                    fatigueLevel += 1;
-                    break;
-                case AtBContract.MT_RELIEFDUTY:
-                case AtBContract.MT_PLANETARYASSAULT:
-                    fatigueLevel += 2;
-                    break;
-                case AtBContract.MT_DIVERSIONARYRAID:
-                case AtBContract.MT_EXTRACTIONRAID:
-                case AtBContract.MT_RECONRAID:
-                case AtBContract.MT_OBJECTIVERAID:
-                    fatigueLevel += 3;
-                    break;
-            }
+        for (final AtBContract contract : getActiveAtBContracts()) {
+            fatigueLevel += contract.getContractType().getFatigue();
             inContract = true;
         }
+
         if (!inContract && location.isOnPlanet()) {
             fatigueLevel -= 2;
         }
@@ -3183,7 +3164,7 @@ public class Campaign implements Serializable, ITechManager {
 
             for (AtBContract contract : getActiveAtBContracts()) {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
-                addReport("Enemy morale is now " + contract.getMoraleLevelName()
+                addReport("Enemy morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
 

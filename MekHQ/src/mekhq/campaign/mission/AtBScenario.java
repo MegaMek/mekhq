@@ -41,7 +41,7 @@ import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -679,7 +679,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         int numAttachedPlayer = 0;
         int numAttachedBot = 0;
-        if (getContract(campaign).getMissionType() == AtBContract.MT_CADREDUTY) {
+        if (getContract(campaign).getContractType().isCadreDuty()) {
             numAttachedPlayer = 3;
         } else if (campaign.getFactionCode().equals("MERC")) {
             if (getContract(campaign).getCommandRights() == Contract.COM_INTEGRATED) {

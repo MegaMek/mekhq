@@ -23,7 +23,7 @@ import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
@@ -696,7 +696,7 @@ public class StratconRulesManager {
 
         // first, we determine the odds of having an allied unit present
         // TODO: move this override out to the contract definition
-        if (contract.getMissionType() == AtBContract.MT_RELIEFDUTY) {
+        if (contract.getContractType().isReliefDuty()) {
             alliedUnitOdds = 50;
         } else {
             switch (contract.getCommandRights()) {
@@ -740,7 +740,7 @@ public class StratconRulesManager {
                 || (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space);
 
         // if we're on cadre duty, we're getting three trainees, period
-        if (contract.getMissionType() == AtBContract.MT_CADREDUTY) {
+        if (contract.getContractType().isCadreDuty()) {
             if (airBattle) {
                 backingScenario.addScenarioModifier(
                         AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
@@ -967,11 +967,11 @@ public class StratconRulesManager {
 
         for (Unit u : campaign.getUnits()) {
             // the general idea is that we want a different unit type than the primary
-            // but also something that can be deployed to the scenario - 
+            // but also something that can be deployed to the scenario -
             // e.g. no infantry on air scenarios etc.
             boolean validUnitType = (primaryUnitType != u.getEntity().getUnitType()) &&
                     forceCompositionMatchesDeclaredUnitType(u.getEntity().getUnitType(), generalUnitType, true);
-            
+
             if (validUnitType && !u.isDeployed() && !u.isMothballed()
                     && u.isFunctional() && (u.getEntity().calculateBattleValue() < lowestBV)
                     && !isUnitDeployedToStratCon(u)) {
@@ -1102,22 +1102,22 @@ public class StratconRulesManager {
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-            case AtBContract.MORALE_ROUT:
+            case ROUT:
                 return 0;
-            case AtBContract.MORALE_VERYLOW:
+            case VERY_LOW:
                 if (playerDeployingForce) {
                     moraleModifier = -10;
                 } else {
                     return 0;
                 }
                 break;
-            case AtBContract.MORALE_LOW:
+            case LOW:
                 moraleModifier = -5;
                 break;
-            case AtBContract.MORALE_HIGH:
+            case HIGH:
                 moraleModifier = 5;
                 break;
-            case AtBContract.MORALE_INVINCIBLE:
+            case INVINCIBLE:
                 moraleModifier = 10;
                 break;
         }
@@ -1221,16 +1221,16 @@ public class StratconRulesManager {
             }
         }
     }
-    
+
     /**
      * Contains logic for what should happen when a facility gets captured:
      * modifier/type/alignment switches etc.
      */
     private static void switchFacilityOwner(StratconFacility facility) {
         if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
-            StratconFacility newOwnerData = 
+            StratconFacility newOwnerData =
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
-            
+
             if (newOwnerData != null) {
                 // for now, we only need to change a limited subset of the captured facility's data
                 // the rest can be retained; we may revisit this assumption later
@@ -1238,11 +1238,11 @@ public class StratconRulesManager {
                 facility.setLocalModifiers(new ArrayList<>(newOwnerData.getLocalModifiers()));
                 facility.setSharedModifiers(new ArrayList<>(newOwnerData.getSharedModifiers()));
                 facility.setOwner(newOwnerData.getOwner());
-                
+
                 return;
             }
         }
-        
+
         // if we the facility didn't have any data defined for what happens when it's captured
         // fall back to the default of just switching the owner
         if (facility.getOwner() == ForceAlignment.Allied) {

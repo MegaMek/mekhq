@@ -43,7 +43,7 @@ import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -164,7 +164,7 @@ public class AtBGameThread extends GameThread {
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
-                
+
                 //minefields
                 client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
                 client.getLocalPlayer().setNbrMFCommand(scenario.getNumPlayerMinefields(Minefield.TYPE_COMMAND_DETONATED));
@@ -239,7 +239,7 @@ public class AtBGameThread extends GameThread {
                     entities.add(entity);
                 }
                 client.sendAddEntity(entities);
-                
+
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
                 for (Unit unit : units) {
@@ -314,7 +314,7 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
-                    
+
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
@@ -406,7 +406,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
-                
+
                 String forceName = botClient.getLocalPlayer().getName() + "|1";
                 var entities = new ArrayList<Entity>();
                 for (Entity entity : botForce.getEntityList()) {

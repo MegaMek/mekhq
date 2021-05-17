@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import mekhq.Version;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
@@ -2533,8 +2533,8 @@ public class CampaignOptions implements Serializable {
     public void setUseStratCon(boolean useStratCon) {
         this.useStratCon = useStratCon;
     }
-    
-    
+
+
     public boolean getUseAtBUnitMarket() {
         return useAtBUnitMarket;
     }

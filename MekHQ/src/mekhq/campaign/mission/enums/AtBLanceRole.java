@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.againstTheBot.enums;
+package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 
 import java.util.ResourceBundle;
 
@@ -34,21 +33,40 @@ public enum AtBLanceRole {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    final String roleName;
+    private final String name;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
-    AtBLanceRole(String roleName) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtB",
-                new EncodeControl());
-        this.roleName = resources.getString(roleName);
+    //region Constructors
+    AtBLanceRole(final String name) {
+        this.name = resources.getString(name);
+    }
+    //endregion Constructors
+
+    //region Boolean Comparison Methods
+    public boolean isFighting() {
+        return this == FIGHTING;
     }
 
-    @Override
-    public String toString() {
-        return roleName;
+    public boolean isDefence() {
+        return this == DEFENCE;
     }
 
-    public static AtBLanceRole parseFromString(String text) {
+    public boolean isScouting() {
+        return this == SCOUTING;
+    }
+
+    public boolean isTraining() {
+        return this == TRAINING;
+    }
+
+    public boolean isUnassigned() {
+        return this == UNASSIGNED;
+    }
+    //endregion Boolean Comparison Methods
+
+    public static AtBLanceRole parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -68,14 +86,20 @@ public enum AtBLanceRole {
                     return SCOUTING;
                 case 4:
                     return TRAINING;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        MekHQ.getLogger().error(AtBLanceRole.class, "parseFromString",
-                "Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
+        MekHQ.getLogger().error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
 
         return FIGHTING;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

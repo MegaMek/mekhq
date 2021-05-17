@@ -933,8 +933,8 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblMorale, gridBagConstraints);
 
-        txtMorale.setName("txtMorale"); // NOI18N
-        txtMorale.setText(contract.getMoraleLevelName());
+        txtMorale.setName("txtMorale");
+        txtMorale.setText(contract.getMoraleLevel().toString());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
