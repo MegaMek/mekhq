@@ -91,7 +91,7 @@ public class StratconRulesManager {
     public static void generateScenariosForTrack(Campaign campaign, AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         List<StratconScenario> generatedScenarios = new ArrayList<>();
-        boolean autoAssignLances = contract.getCommandRights() == AtBContract.COM_INTEGRATED;
+        final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
         // get this list just so we have it available
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
@@ -158,7 +158,7 @@ public class StratconRulesManager {
 
         // if under liaison command, pick a random scenario from the ones generated
         // to set as required and attach liaison
-        if (contract.getCommandRights() == AtBContract.COM_LIAISON) {
+        if (contract.getCommandRights().isLiaison()) {
             StratconScenario randomScenario = Utilities.getRandomItem(generatedScenarios);
             randomScenario.setRequiredScenario(true);
             setAttachedUnitsModifier(randomScenario, contract);
@@ -613,8 +613,7 @@ public class StratconRulesManager {
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
-        if ((contract.getCommandRights() == AtBContract.COM_HOUSE)
-                || (contract.getCommandRights() == AtBContract.COM_INTEGRATED)) {
+        if (contract.getCommandRights().isHouse() || contract.getCommandRights().isIntegrated()) {
             scenario.setRequiredScenario(true);
         }
 
@@ -700,14 +699,16 @@ public class StratconRulesManager {
             alliedUnitOdds = 50;
         } else {
             switch (contract.getCommandRights()) {
-                case AtBContract.COM_INTEGRATED:
+                case INTEGRATED:
                     alliedUnitOdds = 50;
                     break;
-                case AtBContract.COM_HOUSE:
+                case HOUSE:
                     alliedUnitOdds = 30;
                     break;
-                case AtBContract.COM_LIAISON:
+                case LIAISON:
                     alliedUnitOdds = 10;
+                    break;
+                default:
                     break;
             }
         }
@@ -753,22 +754,24 @@ public class StratconRulesManager {
 
         // if we're under non-independent command rights, a supervisor may come along
         switch (contract.getCommandRights()) {
-            case AtBContract.COM_INTEGRATED:
+            case INTEGRATED:
                 backingScenario.addScenarioModifier(AtBScenarioModifier
                         .getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
                                 : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
                 break;
-            case AtBContract.COM_HOUSE:
+            case HOUSE:
                 backingScenario.addScenarioModifier(
                         AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
                                 : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
-            case AtBContract.COM_LIAISON:
+            case LIAISON:
                 if (scenario.isRequiredScenario()) {
                     backingScenario.addScenarioModifier(
                             AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
                                     : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
                 }
+                break;
+            default:
                 break;
         }
     }
@@ -967,11 +970,11 @@ public class StratconRulesManager {
 
         for (Unit u : campaign.getUnits()) {
             // the general idea is that we want a different unit type than the primary
-            // but also something that can be deployed to the scenario - 
+            // but also something that can be deployed to the scenario -
             // e.g. no infantry on air scenarios etc.
             boolean validUnitType = (primaryUnitType != u.getEntity().getUnitType()) &&
                     forceCompositionMatchesDeclaredUnitType(u.getEntity().getUnitType(), generalUnitType, true);
-            
+
             if (validUnitType && !u.isDeployed() && !u.isMothballed()
                     && u.isFunctional() && (u.getEntity().calculateBattleValue() < lowestBV)
                     && !isUnitDeployedToStratCon(u)) {
@@ -1046,7 +1049,7 @@ public class StratconRulesManager {
 
                 int unitType = unit.getEntity().getUnitType();
 
-                unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
+                unitTypeBuckets.merge(unitType, 1, Integer::sum);
 
                 if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
                     biggestBucketCount = unitTypeBuckets.get(unitType);
@@ -1221,16 +1224,16 @@ public class StratconRulesManager {
             }
         }
     }
-    
+
     /**
      * Contains logic for what should happen when a facility gets captured:
      * modifier/type/alignment switches etc.
      */
     private static void switchFacilityOwner(StratconFacility facility) {
         if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
-            StratconFacility newOwnerData = 
+            StratconFacility newOwnerData =
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
-            
+
             if (newOwnerData != null) {
                 // for now, we only need to change a limited subset of the captured facility's data
                 // the rest can be retained; we may revisit this assumption later
@@ -1238,11 +1241,11 @@ public class StratconRulesManager {
                 facility.setLocalModifiers(new ArrayList<>(newOwnerData.getLocalModifiers()));
                 facility.setSharedModifiers(new ArrayList<>(newOwnerData.getSharedModifiers()));
                 facility.setOwner(newOwnerData.getOwner());
-                
+
                 return;
             }
         }
-        
+
         // if we the facility didn't have any data defined for what happens when it's captured
         // fall back to the default of just switching the owner
         if (facility.getOwner() == ForceAlignment.Allied) {

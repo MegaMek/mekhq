@@ -20,7 +20,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -31,12 +31,14 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -49,12 +51,34 @@ import megamek.client.ui.preferences.PreferencesNode;
 /**
  * @author Taharqa
  */
-public class NewContractDialog extends javax.swing.JDialog {
+public class NewContractDialog extends JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;
     private JComboBox<Person> cboNegotiator;
+
+    protected JButton btnClose;
+    protected JButton btnOK;
+    protected JTextField txtName;
+    protected JTextField txtEmployer;
+    protected JTextField txtType;
+    protected MarkdownEditorPanel txtDesc;
+    protected JSuggestField suggestPlanet;
+
+    protected JButton btnDate;
+    protected JComboBox<String> choiceOverhead;
+    protected MMComboBox<ContractCommandRights> choiceCommand;
+    protected JSpinner spnLength;
+    protected JSpinner spnMultiplier;
+    protected JSpinner spnTransport;
+    protected JSpinner spnSalvageRights;
+    protected JCheckBox checkSalvageExchange;
+    protected JSpinner spnStraightSupport;
+    protected JSpinner spnBattleLossComp;
+    protected JSpinner spnSignBonus;
+    protected JSpinner spnAdvance;
+    protected JCheckBox checkMRBC;
 
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
@@ -364,12 +388,20 @@ public class NewContractDialog extends javax.swing.JDialog {
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
 
-        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<>();
-		for (int i = 0; i < Contract.COM_NUM; i++) {
-			commandModel.addElement(Contract.getCommandRightsName(i));
-		}
-		choiceCommand = new JComboBox<>(commandModel);
-		choiceCommand.setSelectedIndex(contract.getCommandRights());
+		choiceCommand = new MMComboBox<>("choiceCommand", ContractCommandRights.values());
+		choiceCommand.setSelectedItem(contract.getCommandRights());
+        choiceCommand.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ContractCommandRights) {
+                    list.setToolTipText(((ContractCommandRights) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 		choiceCommand.addActionListener(contractUpdateActionListener);
 
 		spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportComp(), 0, 100, 10));
@@ -647,10 +679,10 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setEmployer(txtEmployer.getText());
     	contract.setType(txtType.getText());
     	contract.setDesc(txtDesc.getText());
-    	contract.setCommandRights(choiceCommand.getSelectedIndex());
+    	contract.setCommandRights(choiceCommand.getSelectedItem());
     	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
-    	
+
     	campaign.addMission(contract);
 
     	// Negotiator XP
@@ -707,28 +739,6 @@ public class NewContractDialog extends javax.swing.JDialog {
     	setVisible(false);
     }
 
-    protected javax.swing.JButton btnClose;
-    protected javax.swing.JButton btnOK;
-    protected javax.swing.JTextField txtName;
-    protected javax.swing.JTextField txtEmployer;
-    protected javax.swing.JTextField txtType;
-    protected MarkdownEditorPanel txtDesc;
-    protected JSuggestField suggestPlanet;
-
-    protected javax.swing.JButton btnDate;
-    protected JComboBox<String> choiceOverhead;
-    protected JComboBox<String> choiceCommand;
-    protected JSpinner spnLength;
-    protected JSpinner spnMultiplier;
-    protected JSpinner spnTransport;
-    protected JSpinner spnSalvageRights;
-    protected JCheckBox checkSalvageExchange;
-    protected JSpinner spnStraightSupport;
-    protected JSpinner spnBattleLossComp;
-    protected JSpinner spnSignBonus;
-    protected JSpinner spnAdvance;
-    protected JCheckBox checkMRBC;
-
     protected FocusListener contractUpdateFocusListener = new FocusListener() {
         @Override
         public void focusGained(FocusEvent e) {
@@ -756,7 +766,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         } else if (choiceOverhead.equals(source)) {
             contract.setOverheadComp(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {
-            contract.setCommandRights(choiceCommand.getSelectedIndex());
+            contract.setCommandRights(choiceCommand.getSelectedItem());
         } else if (checkMRBC.equals(source)) {
             contract.setMRBCFee(checkMRBC.isSelected());
         } else if (checkSalvageExchange.equals(source)) {
