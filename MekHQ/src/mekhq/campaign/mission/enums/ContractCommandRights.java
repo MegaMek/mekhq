@@ -25,29 +25,35 @@ import java.util.ResourceBundle;
 
 public enum ContractCommandRights {
     //region Enum Declarations
-    INTEGRATED("ContractCommandRights.INTEGRATED.text", "ContractCommandRights.INTEGRATED.toolTipText"),
-    HOUSE("ContractCommandRights.HOUSE.text", "ContractCommandRights.HOUSE.toolTipText"),
-    LIAISON("ContractCommandRights.LIAISON.text", "ContractCommandRights.LIAISON.toolTipText"),
-    INDEPENDENT("ContractCommandRights.INDEPENDENT.text", "ContractCommandRights.INDEPENDENT.toolTipText");
+    INTEGRATED("ContractCommandRights.INTEGRATED.text", "ContractCommandRights.INTEGRATED.toolTipText", "ContractCommandRights.INTEGRATED.stratConText"),
+    HOUSE("ContractCommandRights.HOUSE.text", "ContractCommandRights.HOUSE.toolTipText", "ContractCommandRights.HOUSE.stratConText"),
+    LIAISON("ContractCommandRights.LIAISON.text", "ContractCommandRights.LIAISON.toolTipText", "ContractCommandRights.LIAISON.stratConText"),
+    INDEPENDENT("ContractCommandRights.INDEPENDENT.text", "ContractCommandRights.INDEPENDENT.toolTipText", "ContractCommandRights.INDEPENDENT.stratConText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
+    private final String stratConText;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    ContractCommandRights(final String name, final String toolTipText) {
+    ContractCommandRights(final String name, final String toolTipText, final String stratConText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
+        this.stratConText = resources.getString(stratConText);
     }
     //endregion Constructors
 
     //region Getters
     public String getToolTipText() {
         return toolTipText;
+    }
+
+    public String getStratConText() {
+        return stratConText;
     }
     //endregion Getters
 

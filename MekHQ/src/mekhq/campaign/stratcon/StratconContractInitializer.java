@@ -47,7 +47,7 @@ public class StratconContractInitializer {
      */
     public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
-        campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + generateCommandLevelText(contract));
+        campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
         campaignState.setStrategicObjectivesBehaveAsVPs(contractDefinition.objectivesBehaveAsVPs());
 
         // dependency: this is required here in order for scenario initialization to work properly
@@ -305,25 +305,6 @@ public class StratconContractInitializer {
         }
 
         return coords;
-    }
-
-    /**
-     * Generates additional instructional text based on the contract command rights
-     */
-    private static String generateCommandLevelText(final AtBContract contract) {
-        switch (contract.getCommandRights()) {
-            case INTEGRATED:
-                return "Lance assignments will be made by the employer. "
-                        + "Complete required scenarios to fulfill contract conditions.";
-            case HOUSE:
-                return "Complete required scenarios to fulfill contract conditions.";
-            case LIAISON:
-                return "Complete required scenarios and strategic objectives to fulfill contract conditions.";
-            case INDEPENDENT:
-                return "Complete strategic objectives to fulfill contract conditions.";
-            default:
-                return "";
-        }
     }
 
     /**
