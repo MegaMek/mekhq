@@ -977,6 +977,13 @@ public class Campaign implements Serializable, ITechManager {
     //endregion Missions/Contracts
 
     /**
+     * Adds scenario to existing mission, generating a report.
+     */
+    public void addScenario(Scenario s, Mission m) {
+        addScenario(s, m, false);
+    }
+    
+    /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
      * that it is a new scenario. It then adds the scenario to the scenarioId hash.
      *
@@ -987,15 +994,16 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param s - the Scenario to add
      * @param m - the mission to add the new scenario to
+     * @param suppressReport - whether or not to suppress the campaign report
      */
-    public void addScenario(Scenario s, Mission m) {
+    public void addScenario(Scenario s, Mission m, boolean suppressReport) {
         final boolean newScenario = s.getId() == Scenario.S_DEFAULT_ID;
         final int id = newScenario ? ++lastScenarioId : s.getId();
         s.setId(id);
         m.addScenario(s);
         scenarios.put(id, s);
 
-        if (newScenario) {
+        if (newScenario && !suppressReport) {
             addReport(MessageFormat.format(
                     resources.getString("newAtBMission.format"),
                     s.getName(), MekHQ.getMekHQOptions().getDisplayFormattedDate(s.getDate())));

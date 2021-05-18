@@ -327,7 +327,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
-        boolean isPlanetOwner = contract.getSystem().getFactions(currentDate).contains(factionCode);
+        boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                 forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
                 forceTemplate.getAllowedUnitType() == UnitType.AERO;
@@ -2437,5 +2437,18 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : scenario.getAlliesPlayer()) {
             csu.upgradeCrew(entity);
         }
+    }
+    
+    /**
+     * Highly paranoid function that will check if the given faction is one of the
+     * owners of the contract's location at the current date.
+     */
+    private static boolean isPlanetOwner(AtBContract contract, LocalDate currentDate, String factionCode) {
+        if ((contract == null) || (contract.getSystem() == null) ||
+                (contract.getSystem().getFactions(currentDate) == null)) {
+            return false;
+        }
+        
+        return contract.getSystem().getFactions(currentDate).contains(factionCode);
     }
 }

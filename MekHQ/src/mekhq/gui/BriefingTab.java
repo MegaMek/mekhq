@@ -904,7 +904,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void refreshScenarioTableData() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
-            scenarioModel.setData(m.getScenarios());
+            scenarioModel.setData(m.getVisibleScenarios());
         } else {
             scenarioModel.setData(new ArrayList<Scenario>());
         }
@@ -931,6 +931,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (ev.getScenario().getId() == selectedScenario) {
                 scenarioViewScheduler.schedule();
             }
+            scenarioDataScheduler.schedule();
         }
     }
 
