@@ -25,6 +25,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -225,6 +226,16 @@ public class StratconRulesManager {
 
         processForceDeployment(coords, forceID, campaign, track, sticky);
 
+        // we may stumble on a fixed objective scenario - in that case assign the force to it and finalize
+        // we also will not be encountering any of the other stuff so bug out afterwards
+        StratconScenario revealedScenario = track.getScenario(coords);
+        if (revealedScenario != null) {
+            revealedScenario.addPrimaryForce(forceID);
+            AtBDynamicScenarioFactory.finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+            commitPrimaryForces(campaign, revealedScenario, track);
+            return;
+        }
+        
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
@@ -325,13 +336,29 @@ public class StratconRulesManager {
 
     /**
      * Process the deployment of a force to the given coordinates on the given track.
+     * This does not include assigning the force to any scenarios
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
-            StratconTrackState track, boolean sticky) {
+            StratconTrackState track, boolean sticky) {        
+        // plan of action:
+        // reveal deployed coordinates
+        // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
+        // reveal scenario in deployed coordinates (and all adjacent coordinates for scout lances)
+        
         track.getRevealedCoords().add(coords);
+        
         StratconFacility facility = track.getFacility(coords);
         if (facility != null) {
             facility.setVisible(true);
+        }
+                
+        StratconScenario scenario = track.getScenario(coords);
+        // if we're deploying on top of a scenario and it's "cloaked"
+        // then we have to activate it
+        if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
+            scenario.getBackingScenario().setCloaked(false);
+            setScenarioDates(0, track, campaign, scenario); // must be called before commitPrimaryForces
+            MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
         if (campaign.getLances().get(forceID).getRole() == AtBLanceRole.SCOUTING) {
@@ -341,6 +368,15 @@ public class StratconRulesManager {
                 facility = track.getFacility(checkCoords);
                 if (facility != null) {
                     facility.setVisible(true);
+                }
+                
+                scenario = track.getScenario(checkCoords);
+                // if we've revealed a scenario and it's "cloaked"
+                // we have to activate it
+                if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
+                    scenario.getBackingScenario().setCloaked(false);
+                    setScenarioDates(0, track, campaign, scenario);
+                    MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
                 }
 
                 track.getRevealedCoords().add(coords.translate(direction));
@@ -626,7 +662,9 @@ public class StratconRulesManager {
         // with the campaign, so that the stratcon - backing scenario association is maintained
         // registering the scenario with the campaign should be done after setting
         // dates, otherwise, the report messages for new scenarios look weird
-        campaign.addScenario(backingScenario, contract);
+        // also, suppress the "new scenario" report if not generating a scenario
+        // for a specific force, as this indicates a contract initialization
+        campaign.addScenario(backingScenario, contract, forceID == Force.FORCE_NONE);
         scenario.setBackingScenarioID(backingScenario.getId());
 
         if (forceID > Force.FORCE_NONE) {
@@ -777,11 +815,19 @@ public class StratconRulesManager {
      * Worker function that sets scenario deploy/battle/return dates based on the track's properties and
      * current campaign date
      */
-    private static void setScenarioDates(StratconTrackState track, Campaign campaign, StratconScenario scenario) {
+    private static void setScenarioDates(StratconTrackState track, Campaign campaign, StratconScenario scenario)    {
+        int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
+        setScenarioDates(deploymentDay, track, campaign, scenario);
+    }
+        
+    /**
+     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and
+     * current campaign date. Takes a fixed deployment day of X days from campaign's today date.
+     */
+    private static void setScenarioDates(int deploymentDay, StratconTrackState track, Campaign campaign, StratconScenario scenario) {    
         // set up deployment day, battle day, return day here
         // safety code to prevent attempts to generate random int with upper bound of 0
         // which is apparently illegal
-        int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
         int battleDay = deploymentDay
                 + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
         int returnDay = deploymentDay + track.getDeploymentTime();
@@ -1434,7 +1480,8 @@ public class StratconRulesManager {
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {
-                        if (scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate()) &&
+                        if ((scenario.getDeploymentDate() != null) &&
+                                scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate()) &&
                                 scenario.getPrimaryForceIDs().isEmpty()) {
                             processIgnoredScenario(scenario, campaignState);
                         }
@@ -1459,7 +1506,7 @@ public class StratconRulesManager {
         List<StratconScenario> cleanupList = new ArrayList<>();
 
         for (StratconScenario scenario : track.getScenarios().values()) {
-            if (scenario.getDeploymentDate() == null) {
+            if ((scenario.getDeploymentDate() == null) && !scenario.isStrategicObjective()) {
                 cleanupList.add(scenario);
             }
         }
