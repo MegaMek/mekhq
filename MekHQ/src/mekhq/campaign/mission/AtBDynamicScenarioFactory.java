@@ -2444,8 +2444,8 @@ public class AtBDynamicScenarioFactory {
      * owners of the contract's location at the current date.
      */
     private static boolean isPlanetOwner(AtBContract contract, LocalDate currentDate, String factionCode) {
-        if (contract == null || contract.getSystem() == null ||
-                contract.getSystem().getFactions(currentDate) == null) {
+        if ((contract == null) || (contract.getSystem() == null) ||
+                (contract.getSystem().getFactions(currentDate) == null)) {
             return false;
         }
         
