@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@ package mekhq.gui.enums;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,52 +31,54 @@ import java.util.ResourceBundle;
 public enum PersonnelFilter {
     //region Personnel Filters
     //region Standard Personnel Filters
-    ALL("PersonnelFilter.ALL"),
-    ACTIVE("PersonnelFilter.ACTIVE"),
-    COMBAT("PersonnelFilter.COMBAT"),
-    SUPPORT("PersonnelFilter.SUPPORT"),
-    MECHWARRIOR("PersonnelFilter.MECHWARRIOR"),
-    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER", true, false),
-    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER", false, true),
-    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER", false, true),
-    VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER", false, true),
-    VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW", false, true),
-    VTOL_PILOT("PersonnelFilter.VTOL_PILOT", false, true),
-    AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT"),
-    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT"),
-    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT"),
-    BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR"),
-    SOLDIER("PersonnelFilter.SOLDIER"),
-    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER", true, false),
-    VESSEL_PILOT("PersonnelFilter.VESSEL_PILOT", false, true),
-    VESSEL_CREW("PersonnelFilter.VESSEL_CREW", false, true),
-    VESSEL_GUNNER("PersonnelFilter.VESSEL_GUNNER", false, true),
-    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR", false, true),
-    TECH("PersonnelFilter.TECH", true, false),
-    MECH_TECH("PersonnelFilter.MECH_TECH", false, true),
-    MECHANIC("PersonnelFilter.MECHANIC", false, true),
-    AERO_TECH("PersonnelFilter.AERO_TECH", false, true),
-    BA_TECH("PersonnelFilter.BA_TECH", false, true),
-    ASTECH("PersonnelFilter.ASTECH", false, true),
-    MEDICAL("PersonnelFilter.MEDICAL", true, false),
-    DOCTOR("PersonnelFilter.DOCTOR", false, true),
-    MEDIC("PersonnelFilter.MEDIC",  false, true),
-    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR", true, false),
-    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND", false, true),
-    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS", false, true),
-    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT", false, true),
-    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR", false, true),
+    ALL("PersonnelFilter.ALL.text"),
+    ACTIVE("PersonnelFilter.ACTIVE.text"),
+    COMBAT("PersonnelFilter.COMBAT.text"),
+    SUPPORT("PersonnelFilter.SUPPORT.text"),
+    MECHWARRIORS("PersonnelFilter.MECHWARRIORS.text"),
+    MECHWARRIOR("PersonnelFilter.MECHWARRIOR.text", false, true),
+    LAM_PILOT("PersonnelFilter.LAM_PILOT.text", false, true),
+    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", true, false),
+    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER.text", false, true),
+    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER.text", false, true),
+    VTOL_PILOT("PersonnelFilter.VTOL_PILOT.text", false, true),
+    VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER.text", false, true),
+    VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW.text", false, true),
+    AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT.text"),
+    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text"),
+    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT.text"),
+    BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR.text"),
+    SOLDIER("PersonnelFilter.SOLDIER.text"),
+    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER.text", true, false),
+    VESSEL_PILOT("PersonnelFilter.VESSEL_PILOT.text", false, true),
+    VESSEL_GUNNER("PersonnelFilter.VESSEL_GUNNER.text", false, true),
+    VESSEL_CREW("PersonnelFilter.VESSEL_CREW.text", false, true),
+    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR.text", false, true),
+    TECH("PersonnelFilter.TECH.text", true, false),
+    MECH_TECH("PersonnelFilter.MECH_TECH.text", false, true),
+    MECHANIC("PersonnelFilter.MECHANIC.text", false, true),
+    AERO_TECH("PersonnelFilter.AERO_TECH.text", false, true),
+    BA_TECH("PersonnelFilter.BA_TECH.text", false, true),
+    ASTECH("PersonnelFilter.ASTECH.text", false, true),
+    MEDICAL("PersonnelFilter.MEDICAL.text", true, false),
+    DOCTOR("PersonnelFilter.DOCTOR.text", false, true),
+    MEDIC("PersonnelFilter.MEDIC.text",  false, true),
+    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR.text", true, false),
+    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text", false, true),
+    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text", false, true),
+    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text", false, true),
+    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", false, true),
     //endregion Standard Personnel Filters
 
     //region Expanded Personnel Tab Filters
-    DEPENDENT("PersonnelFilter.DEPENDENT", false, false),
-    FOUNDER("PersonnelFilter.FOUNDER", false, false),
-    PRISONER("PersonnelFilter.PRISONER", false, false),
-    INACTIVE("PersonnelFilter.INACTIVE", false, false),
-    RETIRED("PersonnelFilter.RETIRED", false, false),
-    MIA("PersonnelFilter.MIA", false, false),
-    KIA("PersonnelFilter.KIA", false, false),
-    DEAD("PersonnelFilter.DEAD", false, false);
+    DEPENDENT("PersonnelFilter.DEPENDENT.text", false, false),
+    FOUNDER("PersonnelFilter.FOUNDER.text", false, false),
+    PRISONER("PersonnelFilter.PRISONER.text", false, false),
+    INACTIVE("PersonnelFilter.INACTIVE.text", false, false),
+    RETIRED("PersonnelFilter.RETIRED.text", false, false),
+    MIA("PersonnelFilter.MIA.text", false, false),
+    KIA("PersonnelFilter.KIA.text", false, false),
+    DEAD("PersonnelFilter.DEAD.text", false, false);
     //endregion Expanded Personnel Tab Filters
     //endregion Personnel Filters
 
@@ -181,109 +184,115 @@ public enum PersonnelFilter {
                 return active;
             case COMBAT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryCombatRole() : person.hasCombatRole());
+                        ? person.getPrimaryRole().isCombat() : person.hasCombatRole());
             case SUPPORT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimarySupportRole(true) : person.hasSupportRole(true));
+                        ? !person.getPrimaryRole().isCombat() : person.hasSupportRole(true));
+            case MECHWARRIORS:
+                return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
+                        ? person.getPrimaryRole().isMechWarriorGrouping()
+                        : (person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping()));
             case MECHWARRIOR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_MECHWARRIOR) : person.hasRole(Person.T_MECHWARRIOR));
+                        ? person.getPrimaryRole().isMechWarrior() : person.hasRole(PersonnelRole.MECHWARRIOR));
+            case LAM_PILOT:
+                return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
+                        ? person.getPrimaryRole().isLAMPilot() : person.hasRole(PersonnelRole.LAM_PILOT));
             case VEHICLE_CREWMEMBER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? (person.hasPrimaryRoleWithin(Person.T_GVEE_DRIVER, Person.T_VEE_GUNNER) || person.hasPrimaryRole(Person.T_VEHICLE_CREW))
-                        : (person.hasRoleWithin(Person.T_GVEE_DRIVER, Person.T_VEE_GUNNER) || person.hasRole(Person.T_VEHICLE_CREW)));
+                        ? person.getPrimaryRole().isVehicleCrewmember()
+                        : (person.getPrimaryRole().isVehicleCrewmember() || person.getSecondaryRole().isVehicleCrewmember()));
             case GROUND_VEHICLE_DRIVER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_GVEE_DRIVER) : person.hasRole(Person.T_GVEE_DRIVER));
+                        ? person.getPrimaryRole().isGroundVehicleDriver() : person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
             case NAVAL_VEHICLE_DRIVER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_NVEE_DRIVER) : person.hasRole(Person.T_NVEE_DRIVER));
+                        ? person.getPrimaryRole().isNavalVehicleDriver() : person.hasRole(PersonnelRole.NAVAL_VEHICLE_DRIVER));
             case VEHICLE_GUNNER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_VEE_GUNNER) : person.hasRole(Person.T_VEE_GUNNER));
+                        ? person.getPrimaryRole().isVehicleGunner() : person.hasRole(PersonnelRole.VEHICLE_GUNNER));
             case VEHICLE_CREW:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_VEHICLE_CREW) : person.hasRole(Person.T_VEHICLE_CREW));
+                        ? person.getPrimaryRole().isVehicleCrew() : person.hasRole(PersonnelRole.VEHICLE_CREW));
             case VTOL_PILOT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_VTOL_PILOT) : person.hasRole(Person.T_VTOL_PILOT));
+                        ? person.getPrimaryRole().isVTOLPilot() : person.hasRole(PersonnelRole.VTOL_PILOT));
             case AEROSPACE_PILOT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_AERO_PILOT) : person.hasRole(Person.T_AERO_PILOT));
+                        ? person.getPrimaryRole().isAerospacePilot() : person.hasRole(PersonnelRole.AEROSPACE_PILOT));
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_CONV_PILOT) : person.hasRole(Person.T_CONV_PILOT));
+                        ? person.getPrimaryRole().isConventionalAircraftPilot() : person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT));
             case PROTOMECH_PILOT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_PROTO_PILOT) : person.hasRole(Person.T_PROTO_PILOT));
+                        ? person.getPrimaryRole().isProtoMechPilot() : person.hasRole(PersonnelRole.PROTOMECH_PILOT));
             case BATTLE_ARMOUR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_BA) : person.hasRole(Person.T_BA));
+                        ? person.getPrimaryRole().isBattleArmour() : person.hasRole(PersonnelRole.BATTLE_ARMOUR));
             case SOLDIER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_INFANTRY) : person.hasRole(Person.T_INFANTRY));
+                        ? person.getPrimaryRole().isSoldier() : person.hasRole(PersonnelRole.SOLDIER));
             case VESSEL_CREWMEMBER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRoleWithin(Person.T_SPACE_PILOT, Person.T_NAVIGATOR)
-                        : person.hasRoleWithin(Person.T_SPACE_PILOT, Person.T_NAVIGATOR));
+                        ? person.getPrimaryRole().isVesselCrewmember()
+                        : (person.getPrimaryRole().isVesselCrewmember() || person.getSecondaryRole().isVesselCrewmember()));
             case VESSEL_PILOT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_SPACE_PILOT) : person.hasRole(Person.T_SPACE_PILOT));
+                        ? person.getPrimaryRole().isVesselPilot() : person.hasRole(PersonnelRole.VESSEL_PILOT));
             case VESSEL_CREW:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_SPACE_CREW) : person.hasRole(Person.T_SPACE_CREW));
+                        ? person.getPrimaryRole().isVesselCrew() : person.hasRole(PersonnelRole.VESSEL_CREW));
             case VESSEL_GUNNER:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_SPACE_GUNNER) : person.hasRole(Person.T_SPACE_GUNNER));
+                        ? person.getPrimaryRole().isVesselGunner() : person.hasRole(PersonnelRole.VESSEL_GUNNER));
             case VESSEL_NAVIGATOR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_NAVIGATOR) : person.hasRole(Person.T_NAVIGATOR));
+                        ? person.getPrimaryRole().isVesselNavigator() : person.hasRole(PersonnelRole.VESSEL_NAVIGATOR));
             case TECH:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.isTechPrimary() : person.isTech());
+                        ? person.getPrimaryRole().isTech() : person.isTech());
             case MECH_TECH:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_MECH_TECH) : person.hasRole(Person.T_MECH_TECH));
+                        ? person.getPrimaryRole().isMechTech() : person.hasRole(PersonnelRole.MECH_TECH));
             case MECHANIC:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_MECHANIC) : person.hasRole(Person.T_MECHANIC));
+                        ? person.getPrimaryRole().isMechanic() : person.hasRole(PersonnelRole.MECHANIC));
             case AERO_TECH:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_AERO_TECH) : person.hasRole(Person.T_AERO_TECH));
+                        ? person.getPrimaryRole().isAeroTech() : person.hasRole(PersonnelRole.AERO_TECH));
             case BA_TECH:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_BA_TECH) : person.hasRole(Person.T_BA_TECH));
+                        ? person.getPrimaryRole().isBATech() : person.hasRole(PersonnelRole.BA_TECH));
             case ASTECH:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_ASTECH) : person.hasRole(Person.T_ASTECH));
+                        ? person.getPrimaryRole().isAstech() : person.hasRole(PersonnelRole.ASTECH));
             case MEDICAL:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRoleWithin(Person.T_DOCTOR, Person.T_MEDIC)
-                        : person.hasRoleWithin(Person.T_DOCTOR, Person.T_MEDIC));
+                        ? person.getPrimaryRole().isMedicalStaff()
+                        : (person.getPrimaryRole().isMedicalStaff() || person.getSecondaryRole().isMedicalStaff()));
             case DOCTOR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_DOCTOR) : person.hasRole(Person.T_DOCTOR));
+                        ? person.getPrimaryRole().isDoctor() : person.hasRole(PersonnelRole.DOCTOR));
             case MEDIC:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_MEDIC) : person.hasRole(Person.T_MEDIC));
+                        ? person.getPrimaryRole().isMedic() : person.hasRole(PersonnelRole.MEDIC));
             case ADMINISTRATOR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR)
-                        : person.hasRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR));
+                        ? person.getPrimaryRole().isAdministrator() : person.isAdministrator());
             case ADMINISTRATOR_COMMAND:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_ADMIN_COM) : person.hasRole(Person.T_ADMIN_COM));
+                        ? person.getPrimaryRole().isAdministratorCommand() : person.hasRole(PersonnelRole.ADMINISTRATOR_COMMAND));
             case ADMINISTRATOR_LOGISTICS:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_ADMIN_LOG) : person.hasRole(Person.T_ADMIN_LOG));
+                        ? person.getPrimaryRole().isAdministratorLogistics() : person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS));
             case ADMINISTRATOR_TRANSPORT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_ADMIN_TRA) : person.hasRole(Person.T_ADMIN_TRA));
+                        ? person.getPrimaryRole().isAdministratorTransport() : person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT));
             case ADMINISTRATOR_HR:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.hasPrimaryRole(Person.T_ADMIN_HR) : person.hasRole(Person.T_ADMIN_HR));
+                        ? person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT:
-                return active && person.isDependent();
+                return active && person.getPrimaryRole().isDependent();
             case FOUNDER:
                 return person.isFounder();
             case PRISONER:

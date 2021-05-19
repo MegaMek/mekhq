@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>AlliedTankBase.xml</capturedDefinition>
 	<displayableName>Tank Base</displayableName>
         <facilityType>TankBase</facilityType>
         <localModifiers>EnemyTankGarrison.xml</localModifiers>

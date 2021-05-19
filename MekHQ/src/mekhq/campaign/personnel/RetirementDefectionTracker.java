@@ -33,8 +33,8 @@ import java.util.UUID;
 
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -129,19 +129,20 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getActivePersonnel()) {
-                if ((p.getPrimaryRole() == Person.T_NONE) || p.isDependent() || !p.getPrisonerStatus().isFree()) {
+                if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
-                if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
+                if (p.getPrimaryRole().isSupport()) {
                     support++;
                 } else if ((null == p.getUnit()) ||
                         ((null != p.getUnit()) && p.getUnit().isCommander(p))) {
-                    /* The AtB rules do not state that crews count as a
+                    /*
+                     * The AtB rules do not state that crews count as a
                      * single person for leadership purposes, but to do otherwise
                      * would tax all but the most exceptional commanders of
                      * vehicle or infantry units.
                      */
-                    if (p.getPrimaryRole() == Person.T_PROTO_PILOT) {
+                    if (p.getPrimaryRole().isProtoMechPilot()) {
                         proto++;
                     } else {
                         combat++;
@@ -167,7 +168,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-            if (p.isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
                     || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
                 continue;
             }
@@ -226,8 +227,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             } else {
                 //Bonus payments handled by dialog
             }
-            if (p.getPrimaryRole() == Person.T_INFANTRY) {
-                target.addModifier(-1, "Infantry");
+            if (p.getPrimaryRole().isSoldier()) {
+                target.addModifier(-1, p.getPrimaryRole().toString());
             }
             int injuryMod = 0;
             for (Injury i : p.getInjuries()) {
@@ -238,10 +239,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             if (injuryMod > 0) {
                 target.addModifier(injuryMod, "Permanent injuries");
             }
-            if (combatLeadershipMod != 0 && p.getPrimaryRole() < Person.T_MECH_TECH) {
+            if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
                 target.addModifier(combatLeadershipMod, "Leadership");
             }
-            if (supportLeadershipMod != 0 && p.getPrimaryRole() >= Person.T_MECH_TECH) {
+            if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
                 target.addModifier(supportLeadershipMod, "Leadership");
             }
 
@@ -298,14 +299,13 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * 					contract can be resolved.
      * @return			true if the person is due a payout; otherwise false
      */
-    public boolean removeFromCampaign(Person person, boolean killed,
-            int shares, Campaign campaign, AtBContract contract) {
+    public boolean removeFromCampaign(Person person, boolean killed, int shares, Campaign campaign,
+                                      AtBContract contract) {
         /* Payouts to Infantry/Battle armor platoons/squads/points are
          * handled as a unit in the AtB rules, so we're just going to ignore
          * them here.
          */
-        if (person.getPrimaryRole() == Person.T_INFANTRY || person.getPrimaryRole() == Person.T_BA
-                || !person.getPrisonerStatus().isFree()) {
+        if (person.getPrimaryRole().isSoldierOrBattleArmour() || !person.getPrisonerStatus().isFree()) {
             return false;
         }
         payouts.put(person.getId(), new Payout(person, getShareValue(campaign),
@@ -413,20 +413,22 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     /**
-     * @param person
-     * @return	The amount in C-bills required to get a bonus to the retirement/defection roll
+     * @param person the person to get the bonus cost for
+     * @return The amount in C-bills required to get a bonus to the retirement/defection roll
      */
-    public static Money getBonusCost(Person person) {
+    public static Money getBonusCost(final Person person) {
+        final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
+                person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(false)) {
             case SkillType.EXP_ELITE:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
+                return Money.of(isMechWarriorProfession ? 300000 : 150000);
             case SkillType.EXP_VETERAN:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
+                return Money.of(isMechWarriorProfession ? 150000 : 50000);
             case SkillType.EXP_REGULAR:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
+                return Money.of(isMechWarriorProfession ? 50000 : 20000);
             case SkillType.EXP_GREEN:
             default:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
+                return Money.of(isMechWarriorProfession ? 20000 : 10000);
         }
     }
 
@@ -435,14 +437,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * person.
      */
     public static class Payout {
-        int weightClass = 0;
-        int dependents = 0;
-        Money payoutAmount = Money.zero();
-        boolean recruit = false;
-        int recruitType = Person.T_NONE;
-        boolean heir = false;
-        boolean stolenUnit = false;
-        UUID stolenUnitId = null;
+        private int weightClass = 0;
+        private int dependents = 0;
+        private Money payoutAmount = Money.zero();
+        private boolean recruit = false;
+        private PersonnelRole recruitRole = PersonnelRole.NONE;
+        private boolean heir = false;
+        private boolean stolenUnit = false;
+        private UUID stolenUnitId = null;
 
         public Payout() {
 
@@ -486,11 +488,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     roll += 1;
                 }
             }
-            if (roll >= 6 && (p.getPrimaryRole() == Person.T_AERO_PILOT ||
-                    p.getSecondaryRole() == Person.T_AERO_PILOT)) {
+            if (roll >= 6 && (p.getPrimaryRole().isAerospacePilot() || p.getSecondaryRole().isAerospacePilot())) {
                 stolenUnit = true;
             } else {
-                if (p.getProfession() == Ranks.RPROF_INF) {
+                final Profession profession = Profession.getProfessionFromPersonnelRole(p.getPrimaryRole());
+                if (profession.isInfantry()) {
                     if (p.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
@@ -500,14 +502,13 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                         payoutAmount = payoutAmount.multipliedBy(2);
                     }
                 }
-                if (!shareSystem &&
-                        ((p.getProfession() == Ranks.RPROF_MW) || (p.getProfession() == Ranks.RPROF_ASF))
+
+                if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (p.getOriginalUnitWeight() > 0)) {
                     weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
                     if (roll <= 1) {
                         weightClass--;
-                    }
-                    if (roll >= 5) {
+                    } else if (roll >= 5) {
                         weightClass++;
                     }
                 }
@@ -546,12 +547,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             recruit = r;
         }
 
-        public int getRecruitType() {
-            return recruitType;
+        public PersonnelRole getRecruitRole() {
+            return recruitRole;
         }
 
-        public void setRecruitType(int type) {
-            recruitType = type;
+        public void setRecruitRole(PersonnelRole role) {
+            recruitRole = role;
         }
 
         public boolean hasHeir() {

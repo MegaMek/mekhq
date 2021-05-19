@@ -218,7 +218,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
     protected Map<String, Entity> externalIDLookup;
-    
+
     private Map<Integer, Integer> numPlayerMinefields;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
@@ -1641,7 +1641,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</transportLinkages>");
         }
-        
+
         if (numPlayerMinefields.size() > 0) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "numPlayerMinefields");
 
@@ -1906,7 +1906,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             transportLinkages.put(transportID, transportedUnitIDs);
         }
     }
-    
+
     /**
      * Worker function that loads the minefield counts for the player
      */
@@ -1915,23 +1915,23 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefield")) {
                 NodeList minefieldNodes = wn2.getChildNodes();
-                
+
                 int minefieldType = 0;
                 int minefieldCount = 0;
-                
+
                 for (int minefieldIndex = 0; minefieldIndex < minefieldNodes.getLength(); minefieldIndex++) {
                     Node wn3 = minefieldNodes.item(minefieldIndex);
-                    
+
                     if (wn3.getNodeName().equalsIgnoreCase("minefieldType")) {
                         minefieldType = Integer.parseInt(wn3.getTextContent());
                     } else if (wn3.getNodeName().equalsIgnoreCase("minefieldCount")) {
                         minefieldCount = Integer.parseInt(wn3.getTextContent());
                     }
                 }
-                
+
                 numPlayerMinefields.put(minefieldType, minefieldCount);
             }
         }
@@ -1960,26 +1960,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public AtBContract getContract(Campaign c) {
         return (AtBContract) c.getMission(getMissionId());
     }
-    
+
     /**
-     * Gets all the entities that are part of the given entity list and are 
+     * Gets all the entities that are part of the given entity list and are
      * not in this scenario's transport linkages as a transported unit.
      */
     public List<Entity> filterUntransportedUnits(List<Entity> entities) {
         List<Entity> retVal = new ArrayList<>();
-        
+
         // assemble a set of transported units for easier lookup
         Set<String> transportedUnits = new HashSet<>();
         for (List<String> transported : getTransportLinkages().values()) {
             transportedUnits.addAll(transported);
         }
-        
+
         for (Entity entity : entities) {
             if (!transportedUnits.contains(entity.getExternalIdAsString())) {
                 retVal.add(entity);
             }
         }
-        
+
         return retVal;
     }
 
@@ -2041,11 +2041,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getNumBots() {
-        if (isCurrent()) {
-            return botForces.size();
-        } else {
-            return botForceStubs.size();
-        }
+        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
     }
 
     public List<String> getAlliesPlayerStub() {

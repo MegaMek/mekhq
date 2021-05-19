@@ -275,6 +275,7 @@ public class StratconContractInitializer {
             scenario.setActionDate(null);
             scenario.setReturnDate(null);
             scenario.setStrategicObjective(true);
+            scenario.getBackingScenario().setCloaked(true);
             
             // apply objective mods
             if (objectiveModifiers != null) {

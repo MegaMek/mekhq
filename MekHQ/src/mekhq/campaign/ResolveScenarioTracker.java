@@ -45,6 +45,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -905,11 +906,11 @@ public class ResolveScenarioTracker {
             if (en instanceof Tank) {
                 //Prefer gunner over driver, as in Unit::getCommander
                 for (Person p : crew) {
-                    if (p.getPrimaryRole() == Person.T_VEE_GUNNER) {
+                    if (p.getPrimaryRole().isVehicleGunner()) {
                         commander = p;
-                    } else if (p.getPrimaryRole() == Person.T_GVEE_DRIVER
-                            || p.getPrimaryRole() == Person.T_VTOL_PILOT
-                            || p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                    } else if (p.getPrimaryRole().isGroundVehicleDriver()
+                            || p.getPrimaryRole().isNavalVehicleDriver()
+                            || p.getPrimaryRole().isVTOLPilot()) {
                         driver = p;
                     }
                 }
@@ -922,7 +923,8 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
-            if (commander == null && crew.size() > 0) {
+
+            if ((commander == null) && (crew.size() > 0)) {
                 commander = crew.get(0);
             }
 
@@ -1352,7 +1354,7 @@ public class ResolveScenarioTracker {
         return units;
     }
 
-    public void resolveScenario(int resolution, String report) {
+    public void resolveScenario(ScenarioStatus resolution, String report) {
         //lets start by generating a stub file for our records
         scenario.generateStub(campaign);
 
