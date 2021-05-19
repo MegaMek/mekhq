@@ -36,6 +36,7 @@ import megamek.common.icons.Camouflage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
@@ -1983,9 +1984,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         } catch (Exception ex) {
-            // Doh!
             MekHQ.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
+        }
+
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(retVal.getCamouflage());
         }
 
         if (retVal.id == null) {

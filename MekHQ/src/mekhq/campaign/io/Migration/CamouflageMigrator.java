@@ -25,7 +25,6 @@ import megamek.common.icons.Camouflage;
  * This migration occurred in 0.49.3.
  */
 public class CamouflageMigrator {
-
     public static void migrateCamouflage(final Camouflage camouflage) {
         camouflage.setCategory(migrateCategory(camouflage.getCategory()));
         camouflage.setFilename(migrateFilename(camouflage.getCategory(), camouflage.getFilename()));
@@ -33,97 +32,97 @@ public class CamouflageMigrator {
     }
 
     private static String migrateCategory(String text) {
-        if (text.startsWith("Periphery\\") || text.equalsIgnoreCase("Periphery")) {
-            text = text.replaceFirst("Periphery\\\\", "");
-        } else if (text.startsWith("Corporations") || text.equalsIgnoreCase("Corporations")) {
+        if (text.startsWith("Periphery/")) {
+            text = text.replaceFirst("Periphery/", "");
+        } else if (text.startsWith("Corporations/")) {
             text = text.replaceFirst("Corporations", "Misc");
         }
 
-        if (text.startsWith("Clans\\Hells Horses\\") || text.equalsIgnoreCase("Clans\\Hells Horses")) {
+        if (text.startsWith("Clans/Hells Horses/")) {
             text = text.replaceFirst("Hells Horses", "Hell's Horses");
-        } else if (text.startsWith("Clans\\Wolf in Exile\\") || text.equalsIgnoreCase("Clans\\Wolf in Exile")) {
+        } else if (text.startsWith("Clans/Wolf in Exile/")) {
             text = text.replaceFirst("Wolf in Exile", "Wolf-in-Exile");
-        } else if (text.startsWith("Comstar\\") || text.equalsIgnoreCase("Comstar")) {
+        } else if (text.startsWith("Comstar/")) {
             text = text.replaceFirst("Comstar", "ComStar");
-        } else if (text.startsWith("Kurita\\") || text.equalsIgnoreCase("Kurita")) {
+        } else if (text.startsWith("Kurita/")) {
             text = text.replaceFirst("Kurita", "Draconis Combine");
-        } else if (text.startsWith("Davion\\") || text.equalsIgnoreCase("Davion")) {
+        } else if (text.startsWith("Davion/")) {
             text = text.replaceFirst("Davion", "Federated Suns");
-        } else if (text.startsWith("Liao\\") || text.equalsIgnoreCase("Liao")) {
+        } else if (text.startsWith("Liao/")) {
             text = text.replaceFirst("Liao", "Capellan Confederation");
-        } else if (text.startsWith("Marik\\") || text.equalsIgnoreCase("Marik")) {
+        } else if (text.startsWith("Marik/")) {
             text = text.replaceFirst("Marik", "Free Worlds League");
-        } else if (text.startsWith("Mercs\\Wolfs Dragoons\\") || text.equalsIgnoreCase("Mercs\\Wolfs Dragoons")) {
+        } else if (text.startsWith("Mercs/Wolfs Dragoons/")) {
             text = text.replaceFirst("Wolfs Dragoons", "Wolf's Dragoons");
-        } else if (text.startsWith("Mercs\\Galatean Defence Force\\") || text.equalsIgnoreCase("Mercs\\Galatean Defence Force")) {
+        } else if (text.startsWith("Mercs/Galatean Defence Force/")) {
             text = text.replaceFirst("Galatean Defence Force", "Galatean Defense Force");
-        } else if (text.startsWith("Mercs\\Hamptons Hessens\\") || text.equalsIgnoreCase("Mercs\\Hamptons Hessens")) {
+        } else if (text.startsWith("Mercs/Hamptons Hessens/")) {
             text = text.replaceFirst("Hamptons Hessens", "Hampton's Hessens");
-        } else if (text.startsWith("Mercs\\Holts Hilltoppers\\") || text.equalsIgnoreCase("Mercs\\Holts Hilltoppers")) {
+        } else if (text.startsWith("Mercs/Holts Hilltoppers/")) {
             text = text.replaceFirst("Holts Hilltoppers", "Holt's Hilltoppers");
-        } else if (text.startsWith("Mercs\\Medusans\\") || text.equalsIgnoreCase("Mercs\\Medusans")) {
+        } else if (text.startsWith("Mercs/Medusans/")) {
             text = text.replaceFirst("Medusans", "The Medusans");
-        } else if (text.startsWith("Outworlds Alliance\\") || text.equalsIgnoreCase("Outworlds Alliance")) {
-            text = "Outworlds Alliance";
-        } else if (text.startsWith("Taurian Concordat\\") || text.equalsIgnoreCase("Taurian Concordat")) {
-            text = "Taurian Concordat";
-        } else if (text.startsWith("Nueva Castile\\") || text.equalsIgnoreCase("Nueva Castile")) {
-            text = "Minor Periphery";
-        } else if (text.startsWith("Umayyad Caliphate\\") || text.equalsIgnoreCase("Umayyad Caliphate")) {
-            text = "Minor Periphery";
-        } else if (text.startsWith("Rasalhague\\") || text.equalsIgnoreCase("Rasalhague")) {
+        } else if (text.startsWith("Outworlds Alliance/")) {
+            text = "Outworlds Alliance/";
+        } else if (text.startsWith("Taurian Concordat/")) {
+            text = "Taurian Concordat/";
+        } else if (text.startsWith("Nueva Castile/")) {
+            text = "Minor Periphery/";
+        } else if (text.startsWith("Umayyad Caliphate/")) {
+            text = "Minor Periphery/";
+        } else if (text.startsWith("Rasalhague/")) {
             text = text.replaceFirst("Rasalhague", "Free Rasalhague Republic");
-        } else if (text.startsWith("Star League\\") || text.equalsIgnoreCase("Star League")) {
-            text = "Star League Defense Force";
-        } else if (text.startsWith("Steiner\\") || text.equalsIgnoreCase("Steiner")) {
+        } else if (text.startsWith("Star League/")) {
+            text = "Star League Defense Force/";
+        } else if (text.startsWith("Steiner/")) {
             text = text.replaceFirst("Steiner", "Lyran Commonwealth");
-        } else if (text.startsWith("Republic of the Sphere\\Hastatis Sentinels\\") || text.equalsIgnoreCase("Republic of the Sphere\\Hastatis Sentinels")) {
-            text = "Republic of the Sphere";
-        } else if (text.startsWith("Republic of the Sphere\\Principes Guard\\") || text.equalsIgnoreCase("Republic of the Sphere\\Principes Guard")) {
-            text = "Republic of the Sphere";
-        } else if (text.startsWith("Republic of the Sphere\\Triarii Protectors\\") || text.equalsIgnoreCase("Republic of the Sphere\\Triarii Protectors")) {
-            text = "Republic of the Sphere";
-        } else if (text.startsWith("Rim Worlds Army\\") || text.equalsIgnoreCase("Rim Worlds Army")) {
-            text = "Rim Worlds Republic";
-        } else if (text.startsWith("Bloodwolf\\Gradient\\") || text.equalsIgnoreCase("Bloodwolf\\Gradient")) {
+        } else if (text.startsWith("Republic of the Sphere/Hastatis Sentinels/")) {
+            text = "Republic of the Sphere/";
+        } else if (text.startsWith("Republic of the Sphere/Principes Guard/")) {
+            text = "Republic of the Sphere/";
+        } else if (text.startsWith("Republic of the Sphere/Triarii Protectors/")) {
+            text = "Republic of the Sphere/";
+        } else if (text.startsWith("Rim Worlds Army/")) {
+            text = "Rim Worlds Republic/";
+        } else if (text.startsWith("Bloodwolf/Gradient/")) {
             text = text.replaceFirst("Bloodwolf", "Faction Camouflage");
-        } else if (text.startsWith("Bloodwolf\\Difference Clouds\\") || text.equalsIgnoreCase("Bloodwolf\\Difference Clouds")) {
+        } else if (text.startsWith("Bloodwolf/Difference Clouds/")) {
             text = text.replaceFirst("Bloodwolf", "Faction Camouflage");
-        } else if (text.startsWith("Standard Camouflage\\Jelley Bean\\") || text.equalsIgnoreCase("Standard Camouflage\\Jelley Bean")) {
+        } else if (text.startsWith("Standard Camouflage/Jelley Bean/")) {
             text = text.replaceFirst("Jelley Bean", "Jelly Bean");
         }
 
-        if (text.startsWith("Free Worlds League\\Free World Guard\\") || text.equalsIgnoreCase("Free Worlds League\\Free World Guard")) {
+        if (text.startsWith("Free Worlds League/Free World Guard/")) {
             text = text.replaceFirst("Free World Guard", "Free World Guards");
-        } else if (text.startsWith("Draconis Combine\\An Ting Legion\\") || text.equalsIgnoreCase("Draconis Combine\\An Ting Legion")) {
+        } else if (text.startsWith("Draconis Combine/An Ting Legion/")) {
             text = text.replaceFirst("An Ting Legion", "An Ting Legions");
-        } else if (text.startsWith("Draconis Combine\\Arkab Legion\\") || text.equalsIgnoreCase("Draconis Combine\\Arkab Legion")) {
+        } else if (text.startsWith("Draconis Combine/Arkab Legion/")) {
             text = text.replaceFirst("Arkab Legion", "Arkab Legions");
-        } else if (text.startsWith("Draconis Combine\\Independent\\") || text.equalsIgnoreCase("Draconis Combine\\Independent")) {
+        } else if (text.startsWith("Draconis Combine/Independent/")) {
             text = text.replaceFirst("Independent", "Independent Regiments");
-        } else if (text.startsWith("Draconis Combine\\Legion of Vega\\") || text.equalsIgnoreCase("Draconis Combine\\Legion of Vega")) {
+        } else if (text.startsWith("Draconis Combine/Legion of Vega/")) {
             text = text.replaceFirst("Legion of Vega", "Legions of Vega");
-        } else if (text.startsWith("Draconis Combine\\Prosperina Hussars\\") || text.equalsIgnoreCase("Draconis Combine\\Prosperina Hussars")) {
+        } else if (text.startsWith("Draconis Combine/Prosperina Hussars/")) {
             text = text.replaceFirst("Prosperina Hussars", "Proserpina Hussars");
-        } else if (text.startsWith("Federated Suns\\March Militias")) {
-            text = "Federated Suns\\March Militias";
-        } else if (text.startsWith("Capellan Confederation\\Citizens Honored\\") || text.equalsIgnoreCase("Capellan Confederation\\Citizens Honored")) {
+        } else if (text.startsWith("Federated Suns/March Militias/")) {
+            text = "Federated Suns/March Militias/";
+        } else if (text.startsWith("Capellan Confederation/Citizens Honored/")) {
             text = text.replaceFirst("Citizens Honored", "Citizen's Honored");
-        } else if (text.startsWith("Capellan Confederation\\Liao Chang-Cheng (Liao Reserves)\\") || text.equalsIgnoreCase("Capellan Confederation\\Liao Chang-Cheng (Liao Reserves)")) {
+        } else if (text.startsWith("Capellan Confederation/Liao Chang-Cheng (Liao Reserves)/")) {
             text = text.replaceFirst("Liao Chang-Cheng (Liao Reserves)", "Liao Cháng-Chéng");
-        } else if (text.startsWith("Capellan Confederation\\Victoria Commonality Regulars\\") || text.equalsIgnoreCase("Capellan Confederation\\Victoria Commonality Regulars")) {
+        } else if (text.startsWith("Capellan Confederation/Victoria Commonality Regulars/")) {
             text = text.replaceFirst("Victoria Commonality Regulars", "Victoria Rangers");
-        } else if (text.startsWith("Capellan Confederation\\McCarrons Armored Cavalry\\") || text.equalsIgnoreCase("Capellan Confederation\\McCarrons Armored Cavalry")) {
+        } else if (text.startsWith("Capellan Confederation/McCarrons Armored Cavalry/")) {
             text = text.replaceFirst("McCarrons Armored Cavalry", "McCarron's Armored Cavalry");
-        } else if (text.startsWith("Capellan Confederation\\Reserve Cavalry\\") || text.equalsIgnoreCase("Capellan Confederation\\Reserve Cavalry")) {
+        } else if (text.startsWith("Capellan Confederation/Reserve Cavalry/")) {
             text = text.replaceFirst("Reserve Cavalry", "Capellan Reserve Cavalry");
-        } else if (text.startsWith("Magistracy of Canopus\\Chasseurs a Cheval\\") || text.equalsIgnoreCase("Magistracy of Canopus\\Chasseurs a Cheval")) {
+        } else if (text.startsWith("Magistracy of Canopus/Chasseurs a Cheval/")) {
             text = text.replaceFirst("Chasseurs a Cheval", "Chasseurs á Cheval");
-        } else if (text.startsWith("Lyran Commonwealth\\Bolan Guard\\") || text.equalsIgnoreCase("Lyran Commonwealth\\Bolan Guard")) {
+        } else if (text.startsWith("Lyran Commonwealth/Bolan Guard/")) {
             text = text.replaceFirst("Bolan Guard", "Commonwealth Guards");
-        } else if (text.startsWith("Lyran Commonwealth\\Buena Guard\\") || text.equalsIgnoreCase("Lyran Commonwealth\\Buena Guard")) {
+        } else if (text.startsWith("Lyran Commonwealth/Buena Guard/")) {
             text = text.replaceFirst("Buena Guard", "Commonwealth Guards");
-        } else if (text.startsWith("Lyran Commonwealth\\Tikonov Republican\\") || text.equalsIgnoreCase("Lyran Commonwealth\\Tikonov Republican")) {
+        } else if (text.startsWith("Lyran Commonwealth/Tikonov Republican/")) {
             text = text.replaceFirst("Tikonov Republican", "Republican Guards");
         }
 
@@ -132,91 +131,91 @@ public class CamouflageMigrator {
 
     private static String migrateFilename(final String category, final String text) {
         switch (category) {
-            case "Clans\\Fire Mandrill":
+            case "Clans/Fire Mandrill/":
                 return migrateClanFireMandrill(text);
-            case "Clans\\Ghost Bear":
+            case "Clans/Ghost Bear/":
                 return text.equalsIgnoreCase("Rasalhaugue Galaxy.jpg") ? "Rasalhague Galaxy.jpg" : text;
-            case "Clans\\Smoke Jaguar":
+            case "Clans/Smoke Jaguar/":
                 return text.equalsIgnoreCase("Jaguars Den Galaxy.jpg") ? "Jaguar's Den Galaxy.jpg" : text;
-            case "ComStar":
+            case "ComStar/":
                 return migrateComStar(text);
-            case "Federated Suns":
+            case "Federated Suns/":
+            case "Draconis Combine/":
+            case "Word of Blake/":
                 return text.equalsIgnoreCase("FleetAssets.jpg") ? "Fleet Assets.jpg" : text;
-            case "Federated Suns\\Arcadian Cuirassiers":
+            case "Federated Suns/Arcadian Cuirassiers/":
                 return text.equalsIgnoreCase("Arcadian Cuirassers.jpg") ? "Arcadian Cuirassiers.jpg" : text;
-            case "Federated Suns\\Chisholm's Raiders":
+            case "Federated Suns/Chisholm's Raiders/":
                 return migrateChisholmsRaiders(text);
-            case "Federated Suns\\Crucis Lancers":
+            case "Federated Suns/Crucis Lancers/":
                 return migrateCrucisLancers(text);
-            case "Federated Suns\\FedCom RCT":
+            case "Federated Suns/FedCom RCT/":
                 return text.equalsIgnoreCase("3rd FedComRCT.jpg") ? "3rd FedCom RCT.jpg" : text;
-            case "Federated Suns\\Robinson Strikers":
+            case "Federated Suns/Robinson Strikers/":
                 return text.equalsIgnoreCase("5th Robinsons Strikers.jpg") ? "5th Robinson Strikers.jpg" : text;
-            case "Federated Suns\\Syrtis Fusiliers":
+            case "Federated Suns/Syrtis Fusiliers/":
                 return migrateSyrtisFusiliers(text);
-            case "Draconis Combine":
-                return text.equalsIgnoreCase("FleetAssets.jpg") ? "Fleet Assets.jpg" : text;
-            case "Draconis Combine\\Ghost Regiments":
+            case "Draconis Combine/Ghost Regiments/":
                 return migrateGhostRegiments(text);
-            case "Draconis Combine\\Ryuken":
+            case "Draconis Combine/Ryuken/":
                 return migrateRyuken(text);
-            case "Capellan Confederation\\Capellan Brigade":
+            case "Capellan Confederation/Capellan Brigade/":
                 return migrateCapellanBrigade(text);
-            case "Capellan Confederation\\Citizen's Honored":
+            case "Capellan Confederation/Citizen's Honored/":
                 return migrateCitizensHonored(text);
-            case "Capellan Confederation\\Free Capella":
+            case "Capellan Confederation/Free Capella/":
                 return text.equalsIgnoreCase("Borodins Vindicators.jpg") ? "Borodin's Vindicators.jpg" : text;
-            case "Capellan Confederation\\Liao Cháng-Chéng":
+            case "Capellan Confederation/Liao Cháng-Chéng/":
                 return migrateLiaoChangCheng(text);
-            case "Capellan Confederation\\McCarron's Armored Cavalry":
+            case "Capellan Confederation/McCarron's Armored Cavalry/":
                 return migrateMcCarronsArmoredCavalry(text);
-            case "Capellan Confederation\\St. Ives":
+            case "Capellan Confederation/St. Ives/":
                 return migrateStIves(text);
-            case "Capellan Confederation\\Victoria Rangers":
+            case "Capellan Confederation/Victoria Rangers/":
                 return migrateVictoriaRangers(text);
-            case "Capellan Confederation\\Warrior Houses":
+            case "Capellan Confederation/Warrior Houses/":
                 return migrateWarriorHouses(text);
-            case "Free Worlds League\\Fusiliers of Oriente":
+            case "Free Worlds League/Fusiliers of Oriente/":
                 return migrateFusiliersOfOriente(text);
-            case "Mercs\\DropShip Irregulars":
+            case "Mercs/DropShip Irregulars/":
                 return migrateDropShipIrregulars(text);
-            case "Mercs\\Galatean Defense Force":
+            case "Mercs/Galatean Defense Force/":
                 return migrateGalateanDefenseForce(text);
-            case "Mercs\\Hampton's Hessens":
+            case "Mercs/Hampton's Hessens/":
                 return migrateHamptonsHessens(text);
-            case "Mercs\\Holt's Hilltoppers":
+            case "Mercs/Holt's Hilltoppers/":
                 return migrateHoltsHilltoppers(text);
-            case "Mercs\\The Medusans":
+            case "Mercs/The Medusans/":
                 return migrateTheMedusans(text);
-            case "Mercs\\Northwind Highlanders":
+            case "Mercs/Northwind Highlanders/":
                 return text.equalsIgnoreCase("First Kearny.jpg") ? "First Kearny Highlanders.jpg" : text;
-            case "Mercs":
+            case "Mercs/":
                 return migrateMercs(text);
-            case "Magistracy of Canopus\\Magestrix Royal Guard":
+            case "Magistracy of Canopus/Magestrix Royal Guard/":
                 return migrateMagistracyOfCanopus(text);
-            case "Marian Hegemony":
+            case "Marian Hegemony/":
                 return migrateMarianHegemony(text);
-            case "Minor Periphery":
-                return text.equalsIgnoreCase("1st Umayyad Corps") ? "Umayyad 1st Corps" : text;
-            case "Pirates":
+            case "Minor Periphery/":
+                return text.equalsIgnoreCase("1st Umayyad Corps.jpg") ? "Umayyad 1st Corps.jpg" : text;
+            case "Pirates/":
                 return migratePirates(text);
-            case "Republic of the Sphere":
+            case "Republic of the Sphere/":
                 return migrateRepublicOfTheSphere(text);
-            case "Rim Worlds Republic":
+            case "Rim Worlds Republic/":
                 return text.equalsIgnoreCase("21st Rim Worlders.jpg") ? "21st Rim Worlds.jpg" : text;
-            case "Solaris Stables":
+            case "Solaris Stables/":
                 return migrateSolarisStables(text);
-            case "Star League Defence Force":
+            case "Star League Defence Force/":
                 return migrateStarLeagueDefenceForce(text);
-            case "Lyran Commonwealth\\Arcturan Guards":
-                return text.equalsIgnoreCase("20th Arcturan Guard") ? "20th Arcturan Guards" : text;
-            case "Lyran Commonwealth\\Commonwealth Guards":
+            case "Lyran Commonwealth/Arcturan Guards/":
+                return text.equalsIgnoreCase("20th Arcturan Guard.jpg") ? "20th Arcturan Guards.jpg" : text;
+            case "Lyran Commonwealth/Commonwealth Guards/":
                 return migrateCommonwealthGuards(text);
-            case "Faction Camouflage\\Difference Clouds":
+            case "Faction Camouflage/Difference Clouds/":
                 return migrateDifferenceClouds(text);
-            case "Faction Camouflage\\Gradients":
+            case "Faction Camouflage/Gradients/":
                 return migrateGradients(text);
-            case "Standard Camouflage\\Jelly Bean":
+            case "Standard Camouflage/Jelly Bean/":
                 return migrateJellyBean(text);
             default:
                 return text;
@@ -745,7 +744,7 @@ public class CamouflageMigrator {
     private static String migrateStarLeagueDefenceForce(final String text) {
         switch (text) {
             case "1st Royal Battlemech Regiment.jpg":
-                return "Royal Black Watch Regiment.jpg";
+                return "1st Royal BattleMech Regiment.jpg";
             case "SLDF drab.jpg":
                 return "SLDF Drab.jpg";
             default:
@@ -824,25 +823,25 @@ public class CamouflageMigrator {
      */
     private static void finalizeMigration(final Camouflage camouflage) {
         switch (camouflage.getCategory()) {
-            case "Star League Defense Force":
+            case "Star League Defense Force/":
                 if (camouflage.getFilename().equalsIgnoreCase("Eridani Light Horse.jpg")) {
-                    camouflage.setCategory("Mercs");
+                    camouflage.setCategory("Mercs/");
                 }
                 break;
-            case "Fiefdom of Randis":
+            case "Fiefdom of Randis/":
                 if (camouflage.getFilename().equalsIgnoreCase("Brotherhood of Randis.jpg")) {
-                    camouflage.setCategory("Mercs");
+                    camouflage.setCategory("Mercs/");
                 }
                 break;
-            case "Mercs\\Battle Corps":
+            case "Mercs/Battle Corps/":
                 if (camouflage.getFilename().equalsIgnoreCase("1st Battle Corps.jpg")) {
-                    camouflage.setCategory("Mercs");
+                    camouflage.setCategory("Mercs/");
                     camouflage.setFilename("The Battle Corps.jpg");
                 }
                 break;
-            case "Mercs\\Mobile Fire":
+            case "Mercs/Mobile Fire/":
                 if (camouflage.getFilename().equalsIgnoreCase("1st Mobile Fire.jpg")) {
-                    camouflage.setCategory("Mercs");
+                    camouflage.setCategory("Mercs/");
                     camouflage.setFilename("Mobile Fire.jpg");
                 }
                 break;
