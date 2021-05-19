@@ -57,9 +57,6 @@ public class StratconTrackState {
     private Set<Integer> stickyForces;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
     private Set<StratconCoords> revealedCoords;
-    
-    @XmlElementWrapper(name = "strategicObjectives")
-    @XmlElement(name = "strategicObjective")
     private List<StratconStrategicObjective> strategicObjectives;
 
     // don't serialize this
@@ -382,6 +379,8 @@ public class StratconTrackState {
         stickyForces.remove(forceID);
     }
 
+    @XmlElementWrapper(name = "instantiatedObjectives")
+    @XmlElement(name = "instantiatedObjective")
     public List<StratconStrategicObjective> getStrategicObjectives() {
         return strategicObjectives;
     }

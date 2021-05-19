@@ -1039,7 +1039,9 @@ public class StratconRulesManager {
         // this is a little inefficient, but probably there aren't too many active AtB
         // contracts at a time
         return u.getCampaign().getActiveAtBContracts().stream().
-            anyMatch(contract -> contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
+            anyMatch(contract ->
+                contract.getStratconCampaignState() != null &&
+                contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
     }
 
     /**

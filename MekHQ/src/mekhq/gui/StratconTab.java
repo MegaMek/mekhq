@@ -195,6 +195,7 @@ public class StratconTab extends CampaignGuiTab {
     
     private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
         
 //        for (//StratconTrackState )
         // loop through all tracks
@@ -242,6 +243,7 @@ public class StratconTab extends CampaignGuiTab {
             }
         }
         
+        sb.append("</html>");
         return sb.toString();
     }
     
