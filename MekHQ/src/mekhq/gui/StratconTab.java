@@ -51,6 +51,7 @@ public class StratconTab extends CampaignGuiTab {
     private JComboBox<TrackDropdownItem> cboCurrentTrack;
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
+    private JLabel objectiveStatusText;
 
     /**
      * Creates an instance of the StratconTab.
@@ -68,6 +69,7 @@ public class StratconTab extends CampaignGuiTab {
         
         infoPanelText = new JLabel();
         campaignStatusText = new JLabel();
+        objectiveStatusText = new JLabel();
         
         setLayout(new GridLayout());
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
@@ -93,6 +95,7 @@ public class StratconTab extends CampaignGuiTab {
         
         infoPanel.add(new JLabel("Current Campaign Status:"));
         infoPanel.add(campaignStatusText);        
+        infoPanel.add(objectiveStatusText);
 
         JLabel lblCurrentTrack = new JLabel("Current Track:");
         infoPanel.add(lblCurrentTrack);
@@ -186,6 +189,8 @@ public class StratconTab extends CampaignGuiTab {
             .append("</html>");
         
         campaignStatusText.setText(sb.toString());
+        
+        objectiveStatusText.setText(buildStrategicObjectiveText(campaignState));
     }
     
     private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
