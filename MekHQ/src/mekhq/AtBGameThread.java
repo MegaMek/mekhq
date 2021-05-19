@@ -235,7 +235,9 @@ public class AtBGameThread extends GameThread {
                     }
                     entity.setDeployRound(deploymentRound);
                     Force force = campaign.getForceFor(unit);
-                    entity.setForceString(force.getFullMMName());
+                    if (force != null) {
+                        entity.setForceString(force.getFullMMName());
+                    }
                     entities.add(entity);
                 }
                 client.sendAddEntity(entities);

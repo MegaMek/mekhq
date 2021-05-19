@@ -67,6 +67,7 @@ public class Scenario implements Serializable {
     private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
+    private boolean cloaked;
 
     //allow multiple loot objects for meeting different mission objectives
     private List<Loot> loots;
@@ -145,6 +146,17 @@ public class Scenario implements Serializable {
 
     public void setScenarioObjectives(List<ScenarioObjective> scenarioObjectives) {
         this.scenarioObjectives = scenarioObjectives;
+    }
+
+    /**
+     * This indicates that the scenario should not be displayed in the briefing tab.
+     */
+    public boolean isCloaked() {
+        return cloaked;
+    }
+
+    public void setCloaked(boolean cloaked) {
+        this.cloaked = cloaked;
     }
 
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
@@ -329,6 +341,8 @@ public class Scenario implements Serializable {
         if (null != date) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         }
+        
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "cloaked", isCloaked());
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -403,6 +417,8 @@ public class Scenario implements Serializable {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {
+                    retVal.cloaked = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

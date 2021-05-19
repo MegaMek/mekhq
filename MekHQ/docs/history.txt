@@ -19,6 +19,12 @@ VERSION HISTORY:
 + PR #2602, #2611, #2615: StratCon Data Fixes
 + PR #2583: Dependent Swapover: Removing Parental and Spousal Abandonment, Fixing None Primary Role
 + Issue #2566: Ranks Warning Expansion and Change Tracking
++ Multiple StratCon stability and data fixes:
+	- scenario data updates
+	- phantom scenarios no longer display in briefing room; fixed objective scenarios remain on tracks until encountered
+	- logic update for force deployment right click menu
+	- map size rerolls no longer generate tiny maps
+	- descriptive text updates
 
 0.49.0 (2021-05-01 2130 UTC)
 + Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
