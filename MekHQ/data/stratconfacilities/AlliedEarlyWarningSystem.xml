@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>HostileEarlyWarningSystem.xml</capturedDefinition>
 	<displayableName>Early Warning Center</displayableName>
         <facilityType>EarlyWarningSystem</facilityType>
         <owner>Allied</owner>

@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -284,7 +284,7 @@ public class StaticChecks {
                 && (!isTank || (u.getEntity().getWeightClass() == weightClass))));
     }
 
-    public static boolean areAllInfantry(Person... people) {
+    public static boolean areAllSoldiers(Person... people) {
         return Stream.of(people).allMatch(p -> p.getPrimaryRole().isSoldier());
     }
 
@@ -292,7 +292,7 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getPrimaryRole().isBattleArmour());
     }
 
-    public static boolean areAllVeeGunners(Person... people) {
+    public static boolean areAllVehicleGunners(Person... people) {
         return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVehicleGunner());
     }
 
@@ -325,11 +325,11 @@ public class StaticChecks {
         return areAllEligible(false, people);
     }
 
-    public static boolean areAllEligible(boolean ignorePrisonerStatus, Person... people) {
-        int profession = people[0].getPrimaryRole().getProfession();
+    public static boolean areAllEligible(final boolean ignorePrisonerStatus, final Person... people) {
+        final Profession profession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
         return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                && (p.getPrimaryRole().getProfession() == profession)
-                && (p.getRankSystem() == people[0].getRankSystem()));
+                && (profession == Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
+                && people[0].getRankSystem().equals(p.getRankSystem()));
     }
 
     /**
@@ -347,14 +347,6 @@ public class StaticChecks {
 
     public static boolean areAllPrisoners(Person... people) {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isPrisoner());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all dependents or all not dependents, otherwise false
-     */
-    public static boolean areEitherAllDependentsOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isDependent() == people[0].isDependent());
     }
 
     /**
@@ -393,12 +385,12 @@ public class StaticChecks {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isWillingToDefect());
     }
 
-    public static boolean areAllWoB(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getRankSystem() == Ranks.RS_WOB);
+    public static boolean areAllWoBMilitia(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getRankSystem().isWoBMilitia());
     }
 
-    public static boolean areAllWoBOrComstar(Person... people) {
-        return Stream.of(people).allMatch(p -> (p.getRankSystem() == Ranks.RS_WOB) || (p.getRankSystem() == Ranks.RS_COM));
+    public static boolean areAllWoBMilitiaOrComGuard(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getRankSystem().isCGOrWoBM());
     }
 
     public static boolean areAllSameSite(Unit... units) {

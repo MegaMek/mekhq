@@ -187,7 +187,7 @@ public enum PersonnelFilter {
                         ? person.getPrimaryRole().isCombat() : person.hasCombatRole());
             case SUPPORT:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? !person.getPrimaryRole().isCombat() : person.hasSupportRole(false));
+                        ? !person.getPrimaryRole().isCombat() : person.hasSupportRole(true));
             case MECHWARRIORS:
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isMechWarriorGrouping()
@@ -292,7 +292,7 @@ public enum PersonnelFilter {
                 return active && (MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT:
-                return active && person.isDependent();
+                return active && person.getPrimaryRole().isDependent();
             case FOUNDER:
                 return person.isFounder();
             case PRISONER:

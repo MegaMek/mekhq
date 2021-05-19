@@ -44,6 +44,7 @@ import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -52,7 +53,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
-import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -216,7 +218,7 @@ public class Campaign implements Serializable, ITechManager {
     private String factionCode;
     private int techFactionCode;
     private String retainerEmployerCode; //AtB
-    private Ranks ranks;
+    private RankSystem rankSystem;
 
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
@@ -294,7 +296,7 @@ public class Campaign implements Serializable, ITechManager {
         factionCode = "MERC";
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
-        ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
+        setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
         lances = new Hashtable<>();
@@ -542,7 +544,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return atbConfig;
     }
-    
+
     //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
@@ -870,17 +872,13 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Imports a {@link Mission} into a campaign.
-     * @param m Mission to import into the campaign.
+     * @param mission Mission to import into the campaign.
      */
-    public void importMission(Mission m) {
+    public void importMission(final Mission mission) {
         // add scenarios to the scenarioId hash
-        for (Scenario s : m.getScenarios()) {
-            importScenario(s);
-        }
-
-        addMissionWithoutId(m);
-        
-        StratconContractInitializer.restoreTransientStratconInformation(m, this);
+        mission.getScenarios().forEach(this::importScenario);
+        addMissionWithoutId(mission);
+        StratconContractInitializer.restoreTransientStratconInformation(mission, this);
     }
 
     private void addMissionWithoutId(Mission m) {
@@ -893,7 +891,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param id the mission's id
      * @return the mission in question
      */
-    public Mission getMission(int id) {
+    public @Nullable Mission getMission(int id) {
         return missions.get(id);
     }
 
@@ -979,6 +977,13 @@ public class Campaign implements Serializable, ITechManager {
     //endregion Missions/Contracts
 
     /**
+     * Adds scenario to existing mission, generating a report.
+     */
+    public void addScenario(Scenario s, Mission m) {
+        addScenario(s, m, false);
+    }
+    
+    /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
      * that it is a new scenario. It then adds the scenario to the scenarioId hash.
      *
@@ -989,15 +994,16 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param s - the Scenario to add
      * @param m - the mission to add the new scenario to
+     * @param suppressReport - whether or not to suppress the campaign report
      */
-    public void addScenario(Scenario s, Mission m) {
+    public void addScenario(Scenario s, Mission m, boolean suppressReport) {
         final boolean newScenario = s.getId() == Scenario.S_DEFAULT_ID;
         final int id = newScenario ? ++lastScenarioId : s.getId();
         s.setId(id);
         m.addScenario(s);
         scenarios.put(id, s);
 
-        if (newScenario) {
+        if (newScenario && !suppressReport) {
             addReport(MessageFormat.format(
                     resources.getString("newAtBMission.format"),
                     s.getName(), MekHQ.getMekHQOptions().getDisplayFormattedDate(s.getDate())));
@@ -1228,7 +1234,6 @@ public class Campaign implements Serializable, ITechManager {
                     new DefaultPlanetSelector(), Gender.RANDOMIZE);
         }
 
-        person.setDependent(true);
         return person;
     }
 
@@ -1313,7 +1318,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), false, true);
+        return recruitPerson(p, p.getPrisonerStatus(), false, true);
     }
 
     /**
@@ -1324,7 +1329,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), gmAdd, true);
+        return recruitPerson(p, p.getPrisonerStatus(), gmAdd, true);
     }
 
     /**
@@ -1334,24 +1339,23 @@ public class Campaign implements Serializable, ITechManager {
      * @return               true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
-        return recruitPerson(p, prisonerStatus, p.isDependent(), false, true);
+        return recruitPerson(p, prisonerStatus, false, true);
     }
 
     /**
      * @param p              the person being added
      * @param prisonerStatus the person's prisoner status upon recruitment
-     * @param dependent      if the person is a dependent or not. True means they are a dependent
      * @param gmAdd          false means that they need to pay to hire this person, true means it is added without paying
      * @param log            whether or not to write to logs
      * @return               true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean dependent,
-                                 boolean gmAdd, boolean log) {
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
+        if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
+                && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "Recruitment of " + p.getFullName(), getLocalDate())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1368,11 +1372,11 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (p.getPrimaryRole().isAstech()) {
-            astechPoolMinutes += 480;
-            astechPoolOvertime += 240;
+            astechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
+            astechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         } else if (p.getSecondaryRole().isAstech()) {
-            astechPoolMinutes += 240;
-            astechPoolOvertime += 120;
+            astechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
+            astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
         p.setPrisonerStatus(prisonerStatus, log);
@@ -1531,7 +1535,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Officers have better chance; no penalty for non-officer
-            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+            bloodnameTarget += Math.min(0, getRankSystem().getOfficerCut() - person.getRankNumeric());
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
@@ -3019,27 +3023,23 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
-            for (Scenario s : contract.getScenarios()) {
-                if (!s.isCurrent() || !(s instanceof AtBScenario)) {
-                    continue;
-                }
-                if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
-                    if (getCampaignOptions().getUseStratCon() &&
-                            (s instanceof AtBDynamicScenario)) {
-                        var stub = StratconRulesManager.processIgnoredScenario(
-                                (AtBDynamicScenario) s, contract.getStratconCampaignState());
-                        
+            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
+                if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
+                    if (getCampaignOptions().getUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
+                        final boolean stub = StratconRulesManager.processIgnoredScenario(
+                                (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
+
                         if (stub) {
-                            s.convertToStub(this, Scenario.S_DEFEAT);
-                            addReport("Failure to deploy for " + s.getName() + " resulted in defeat.");
+                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
+                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
                         } else {
-                            s.clearAllForcesAndPersonnel(this);
+                            scenario.clearAllForcesAndPersonnel(this);
                         }
                     } else {
-                        s.convertToStub(this, Scenario.S_DEFEAT);
+                        scenario.convertToStub(this, ScenarioStatus.DEFEAT);
                         contract.addPlayerMinorBreach();
-                        
-                        addReport("Failure to deploy for " + s.getName()
+
+                        addReport("Failure to deploy for " + scenario.getName()
                             + " resulted in defeat and a minor contract breach.");
                     }
                 }
@@ -3056,9 +3056,8 @@ public class Campaign implements Serializable, ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (Scenario s : contract.getScenarios()) {
-                if ((s instanceof AtBScenario) && (s.getDate() != null)
-                        && s.getDate().equals(getLocalDate())) {
+            for (Scenario s : contract.getCurrentAtBScenarios()) {
+                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
@@ -3155,7 +3154,7 @@ public class Campaign implements Serializable, ITechManager {
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
                 numPersonnel++;
-                if (p.isDependent()) {
+                if (p.getPrimaryRole().isDependent() && p.getGenealogy().isEmpty()) {
                     dependents.add(p);
                 }
             }
@@ -3404,8 +3403,20 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    /** @return <code>true</code> if the new day arrived */
+    /**
+     * @return <code>true</code> if the new day arrived
+     */
     public boolean newDay() {
+        // Refill Automated Pools, if the options are selected
+        if (MekHQ.getMekHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
+            fillAstechPool();
+        }
+
+        if (MekHQ.getMekHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
+            fillMedicPool();
+        }
+
+        // Ensure we don't have anything that would prevent the new day
         if (MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
@@ -3644,13 +3655,12 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void removeScenario(int id) {
-        Scenario scenario = getScenario(id);
+    public void removeScenario(final Scenario scenario) {
         scenario.clearAllForcesAndPersonnel(this);
-        Mission mission = getMission(scenario.getMissionId());
-        if (null != mission) {
-            mission.removeScenario(scenario.getId());
-            
+        final Mission mission = getMission(scenario.getMissionId());
+        if (mission != null) {
+            mission.getScenarios().remove(scenario);
+
             // if we GM-remove the scenario and it's attached to a StratCon scenario
             // then pretend like we let the StratCon scenario expire
             if ((mission instanceof AtBContract) &&
@@ -3660,23 +3670,19 @@ public class Campaign implements Serializable, ITechManager {
                         (AtBDynamicScenario) scenario, ((AtBContract) mission).getStratconCampaignState());
             }
         }
-        scenarios.remove(id);
+        scenarios.remove(scenario.getId());
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(int id) {
-        Mission mission = getMission(id);
-
+    public void removeMission(final Mission mission) {
         // Loop through scenarios here! We need to remove them as well.
-        if (null != mission) {
-            for (Scenario scenario : mission.getScenarios()) {
-                scenario.clearAllForcesAndPersonnel(this);
-                scenarios.remove(scenario.getId());
-            }
-            mission.clearScenarios();
+        for (Scenario scenario : mission.getScenarios()) {
+            scenario.clearAllForcesAndPersonnel(this);
+            scenarios.remove(scenario.getId());
         }
+        mission.clearScenarios();
 
-        missions.remove(id);
+        missions.remove(mission.getId());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -4061,8 +4067,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retainerEmployerCode", retainerEmployerCode);
         }
 
-        // Ranks
-        ranks.writeToXml(pw1, indent + 1);
+        getRankSystem().writeToXML(pw1, indent + 1, false);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nameGen",
                 RandomNameGenerator.getInstance().getChosenFaction());
@@ -4115,7 +4120,13 @@ public class Campaign implements Serializable, ITechManager {
 
         // Lists of objects:
         units.writeToXml(pw1, indent, "units"); // Units
-        writeMapToXml(pw1, indent, "personnel", personnel); // Personnel
+
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "personnel");
+        for (final Person person : getPersonnel()) {
+            person.writeToXML(this, pw1, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "personnel");
+
         writeMapToXml(pw1, indent, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
@@ -4152,8 +4163,7 @@ public class Campaign implements Serializable, ITechManager {
 
         writeGameOptions(pw1);
 
-        // Personnel Market
-        personnelMarket.writeToXml(pw1, indent);
+        getPersonnelMarket().writeToXML(this, pw1, indent);
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
@@ -4334,33 +4344,39 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, getLocalDate());
     }
 
-    public void setRanks(Ranks r) {
-        ranks = r;
+    //region Ranks
+    public RankSystem getRankSystem() {
+        return rankSystem;
     }
 
-    public Ranks getRanks() {
-        return ranks;
-    }
-
-    public List<String> getAllRankNamesFor(int p) {
-        List<String> retVal = new ArrayList<>();
-        for (Rank rank : getRanks().getAllRanks()) {
-            // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
-                if (rank.getName(p).equals("--")) {
-                    p = getRanks().getAlternateProfession(p);
-                } else if (rank.getName(p).startsWith("--")) {
-                    p = getRanks().getAlternateProfession(rank.getName(p));
-                }
-            }
-            if (rank.getName(p).equals("-")) {
-                continue;
-            }
-
-            retVal.add(rank.getName(p));
+    public void setRankSystem(final @Nullable RankSystem rankSystem) {
+        // If they are the same object, there hasn't been a change and thus don't need to process further
+        if (getRankSystem() == rankSystem) {
+            return;
         }
-        return retVal;
+
+        // Then, we need to validate the rank system. Null isn't valid to be set but may be the
+        // result of a cancelled load. However, validation will prevent that
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        // We need to know the old campaign rank system for personnel processing
+        final RankSystem oldRankSystem = getRankSystem();
+
+        // And with that, we can set the rank system
+        setRankSystemDirect(rankSystem);
+
+        // Finally, we fix all personnel ranks and ensure they are properly set
+        getPersonnel().stream().filter(person -> person.getRankSystem().equals(oldRankSystem))
+                .forEach(person -> person.setRankSystem(rankValidator, rankSystem));
     }
+
+    public void setRankSystemDirect(final RankSystem rankSystem) {
+        this.rankSystem = rankSystem;
+    }
+    //endregion Ranks
 
     public ArrayList<Force> getAllForces() {
         return new ArrayList<>(forceIds.values());
@@ -5258,6 +5274,10 @@ public class Campaign implements Serializable, ITechManager {
         return medicPool;
     }
 
+    public boolean requiresAdditionalAstechs() {
+        return getAstechNeed() > 0;
+    }
+
     public int getAstechNeed() {
         return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6)
                 - getNumberAstechs();
@@ -5389,6 +5409,10 @@ public class Campaign implements Serializable, ITechManager {
         return medics;
     }
 
+    public boolean requiresAdditionalMedics() {
+        return getMedicsNeed() > 0;
+    }
+
     public int getMedicsNeed() {
         return (getDoctors().size() * 4) - getNumberMedics();
     }
@@ -5408,35 +5432,6 @@ public class Campaign implements Serializable, ITechManager {
     public void decreaseMedicPool(int i) {
         medicPool = Math.max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
-    }
-
-    public void changeRank(Person person, int rank, boolean report) {
-        changeRank(person, rank, 0, report);
-    }
-
-    public void changeRank(Person person, int rank, int rankLevel, boolean report) {
-        int oldRank = person.getRankNumeric();
-        int oldRankLevel = person.getRankLevel();
-        person.setRankNumeric(rank);
-        person.setRankLevel(rankLevel);
-
-        if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
-                person.setLastRankChangeDate(getLocalDate());
-            } else {
-                person.setLastRankChangeDate(null);
-            }
-        }
-
-        personUpdated(person);
-
-        if (report) {
-            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(person, getLocalDate());
-            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(person, getLocalDate());
-            }
-        }
     }
 
     public GameOptions getGameOptions() {
@@ -6541,7 +6536,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
-            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
@@ -6561,8 +6556,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInRank() {
         for (Person p : getPersonnel()) {
-            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
-
+            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {

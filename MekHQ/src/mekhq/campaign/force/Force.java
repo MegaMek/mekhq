@@ -205,6 +205,32 @@ public class Force implements Serializable {
         }
         return toReturn;
     }
+    
+    /**
+     * @return A String representation of the full hierarchical force including ID for MM export
+     */
+    public String getFullMMName() {
+        var ancestors = new ArrayList<Force>();
+        ancestors.add(this);
+        var p = parentForce;
+        while (p != null) {
+            ancestors.add(p);
+            p = p.parentForce;
+        }
+        
+        var result = "";
+        int id = 0;
+        for (int i = ancestors.size() - 1; i >= 0; i--) {
+            Force ancestor = ancestors.get(i);
+            id = 17 * id + ancestor.id + 1;
+            result += "\\" + ancestor.getName() + "|" + id;
+        }
+        // Remove the backslash at the start
+        if (result.length() > 0) {
+            result = result.substring(1);
+        }
+        return result;
+    }
 
     /**
      * Add a subforce to the subforce vector. In general, this

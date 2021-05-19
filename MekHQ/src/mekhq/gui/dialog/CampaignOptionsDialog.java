@@ -42,6 +42,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarketDylan;
@@ -58,7 +59,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -66,7 +66,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
-import mekhq.gui.model.RankTableModel;
+import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -79,9 +79,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -91,10 +88,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Enumeration;
-import java.util.EventObject;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -186,7 +181,7 @@ public class CampaignOptionsDialog extends JDialog {
     //planetary acquisitions
     private JCheckBox usePlanetaryAcquisitions;
     private JSpinner spnMaxJumpPlanetaryAcquisitions;
-    private JComboBox<String> comboPlanetaryAcquisitionsFactionLimits;
+    private JComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
     private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
     private JCheckBox usePlanetaryAcquisitionsVerbose;
     private JSpinner[] spnPlanetAcquireTechBonus;
@@ -387,17 +382,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
-    private JPanel panRank;
-    private JComboBox<Ranks> comboRanks;
-    @SuppressWarnings("unused")
-    private JButton btnAddRank; // FIXME: Unused
-    @SuppressWarnings("unused")
-    private JButton btnDeleteRank; // FIXME: Unused
-    private JTable tableRanks;
-    private RankTableModel ranksModel;
-    private JScrollPane scrRanks;
-    // FIXME: Place in resource files
-    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
+    private RankSystemsPane rankSystemsPane;
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
@@ -542,7 +527,6 @@ public class CampaignOptionsDialog extends JDialog {
         panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
-        panRank = new JPanel();
         panXP = new JPanel();
         panSkill = new JPanel();
         panTech = new JPanel();
@@ -582,12 +566,10 @@ public class CampaignOptionsDialog extends JDialog {
         choiceTechLevel = new JComboBox<>();
         btnLoad = new JButton();
         btnCancel = new JButton();
-        scrRanks = new JScrollPane();
 
         usePlanetaryAcquisitions = new JCheckBox();
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
         disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
-        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<>();
         disallowClanPartsFromIS = new JCheckBox();
         useDamageMargin = new JCheckBox();
         useAeroSystemHitsBox = new JCheckBox();
@@ -1193,32 +1175,27 @@ public class CampaignOptionsDialog extends JDialog {
         spnMaxJumpPlanetaryAcquisitions = new JSpinner(new SpinnerNumberModel(2, 0, 5, 1));
         JPanel panMaxJump = new JPanel();
         panMaxJump.add(spnMaxJumpPlanetaryAcquisitions);
-        panMaxJump.add(new JLabel("Maximum number of jumps away to search for supplies"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        panMaxJump.add(new JLabel(resourceMap.getString("lblMaxJumpPlanetaryAcquisitions.text")));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panMaxJump, gridBagConstraints);
 
-        DefaultComboBoxModel<String> factionLimitComboBoxModel = new DefaultComboBoxModel<>();
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALL));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_NEUTRAL));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALLY));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_SELF));
-        comboPlanetaryAcquisitionsFactionLimits.setModel(factionLimitComboBoxModel);
+        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<>(PlanetaryAcquisitionFactionLimit.values());
         JPanel panFactionLimit = new JPanel();
-        panFactionLimit.add(new JLabel("Faction supply limitations"));
+        panFactionLimit.add(new JLabel(resourceMap.getString("lblPlanetaryAcquisitionsFactionLimits.text")));
         panFactionLimit.add(comboPlanetaryAcquisitionsFactionLimits);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panFactionLimit, gridBagConstraints);
 
         disallowPlanetaryAcquisitionClanCrossover.setText(resourceMap.getString("disallowPlanetaryAcquisitionClanCrossover.text"));
@@ -2550,97 +2527,9 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill);
         //endregion Skill Randomization Tab
 
-        //region Rank System Tab
-        panRank.setName("panRank");
-        panRank.setLayout(new java.awt.GridBagLayout());
-
-        JLabel lblRank = new JLabel(resourceMap.getString("lblRank.text"));
-        lblRank.setName("lblRank");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRank.add(lblRank, gridBagConstraints);
-
-        DefaultComboBoxModel<Ranks> rankModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Ranks.RS_NUM; i++) {
-            final Ranks ranks = Ranks.getRanksFromSystem(i);
-            if (ranks != null) {
-                rankModel.addElement(ranks);
-            }
-        }
-        comboRanks = new JComboBox<>(rankModel);
-        comboRanks.setName("comboRanks");
-        comboRanks.addActionListener(evt -> fillRankInfo());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panRank.add(comboRanks, gridBagConstraints);
-
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
-        tableRanks = new JTable(ranksModel);
-        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableRanks.setRowSelectionAllowed(false);
-        tableRanks.setColumnSelectionAllowed(false);
-        tableRanks.setCellSelectionEnabled(true);
-        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-        tableRanks.setShowGrid(false);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
-            }
-        }
-        tableRanks.getSelectionModel().addListSelectionListener(this::tableRanksValueChanged);
-        scrRanks.setViewportView(tableRanks);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        panRank.add(scrRanks, gridBagConstraints);
-
-        //scrRanks.setMinimumSize(new Dimension(500, 500));
-        //scrRanks.setPreferredSize(new Dimension(500, 500));
-        //scrRanks.setMaximumSize(new Dimension(500, 500));
-
-        JTextArea txtInstructionsRanks = new JTextArea();
-        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
-        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        //txtInstructionsRanks.setMinimumSize(new Dimension(400, 400));
-        panRank.add(txtInstructionsRanks, gridBagConstraints);
-
-        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank);
-        //endregion Rank System Tab
+        //region Rank Systems Tab
+        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab(frame, campaign));
+        //endregion Rank Systems Tab
 
         //region Name and Portrait Generation Tab
         panNameGen.setName("panNameGen");
@@ -4802,26 +4691,17 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Personnel Tab
 
+    //region Rank Systems Tab
+    private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
+        rankSystemsPane = new RankSystemsPane(frame, campaign);
+        return rankSystemsPane;
+    }
+    //endregion Rank Systems Tab
+
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
-        setName("dialog");
+        setName("CampaignOptionsDialog");
         preferences.manage(new JWindowPreference(this));
-    }
-
-    private void fillRankInfo() {
-        final Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
-        if (ranks != null) {
-            ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-            TableColumn column;
-            for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-                column = tableRanks.getColumnModel().getColumn(i);
-                column.setPreferredWidth(ranksModel.getColumnWidth(i));
-                column.setCellRenderer(ranksModel.getRenderer());
-                if (i == RankTableModel.COL_PAYMULT) {
-                    column.setCellEditor(new SpinnerEditor());
-                }
-            }
-        }
     }
 
     public void applyPreset(GamePreset gamePreset) {
@@ -4915,7 +4795,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
         spnMaxJumpPlanetaryAcquisitions.setValue(options.getMaxJumpsPlanetaryAcquisition());
-        comboPlanetaryAcquisitionsFactionLimits.setSelectedIndex(options.getPlanetAcquisitionFactionLimit());
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(options.getPlanetAcquisitionFactionLimit());
         disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
         disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
         spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFroIS());
@@ -5005,7 +4885,7 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
             spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
         }
-        for (int i = 1; i < spnBaseSalary.length; i++) {
+        for (int i = 0; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
 
@@ -5023,7 +4903,11 @@ public class CampaignOptionsDialog extends JDialog {
             spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeight(i) / 10.0);
         }
         if (chkUseRandomSameSexMarriages.isSelected() != options.useRandomSameSexMarriages()) {
-            chkUseRandomSameSexMarriages.doClick();
+            if (chkUseRandomSameSexMarriages.isEnabled()) {
+                chkUseRandomSameSexMarriages.doClick();
+            } else {
+                chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
+            }
         }
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
@@ -5033,7 +4917,11 @@ public class CampaignOptionsDialog extends JDialog {
         }
         spnChanceProcreation.setValue(options.getChanceProcreation() * 100.0);
         if (chkUseProcreationNoRelationship.isSelected() != options.useProcreationNoRelationship()) {
-            chkUseProcreationNoRelationship.doClick();
+            if (chkUseProcreationNoRelationship.isEnabled()) {
+                chkUseProcreationNoRelationship.doClick();
+            } else {
+                chkUseProcreationNoRelationship.setSelected(options.useProcreationNoRelationship());
+            }
         }
         spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
         chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
@@ -5278,45 +5166,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Initialization
 
-    @SuppressWarnings(value = "unused") // FIXME:
-    private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        int row = tableRanks.getSelectedRow();
-        //btnDeleteRank.setEnabled(row != -1);
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void addRank() {
-        Object[] rank = {"Unknown", false, 1.0};
-        int row = tableRanks.getSelectedRow();
-        if (row == -1) {
-            if (ranksModel.getRowCount() > 0) {
-                rank[1] = ranksModel.getValueAt(ranksModel.getRowCount() - 1, 1);
-            }
-            ranksModel.addRow(rank);
-            tableRanks.setRowSelectionInterval(tableRanks.getRowCount() - 1, tableRanks.getRowCount() - 1);
-        } else {
-            rank[1] = ranksModel.getValueAt(row, 1);
-            ranksModel.insertRow(row + 1, rank);
-            tableRanks.setRowSelectionInterval(row + 1, row + 1);
-        }
-    }
-
-    @SuppressWarnings(value = "unused") // FIXME
-    private void removeRank() {
-        int row = tableRanks.getSelectedRow();
-        if (row > -1) {
-            ranksModel.removeRow(row);
-        }
-        if (tableRanks.getRowCount() == 0) {
-            return;
-        }
-        if (tableRanks.getRowCount() > row) {
-            tableRanks.setRowSelectionInterval(row, row);
-        } else {
-            tableRanks.setRowSelectionInterval(row - 1, row - 1);
-        }
-    }
-
     private void btnLoadActionPerformed() {
         List<GamePreset> presets = GamePreset.getGamePresetsIn();
 
@@ -5401,10 +5250,7 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRanks((Ranks) Objects.requireNonNull(comboRanks.getSelectedItem()));
-        if (campaign.getRanks().isCustom()) {
-            campaign.getRanks().setRanksFromModel(ranksModel);
-        }
+        rankSystemsPane.applyToCampaign();
         campaign.setCamouflage(camouflage);
         campaign.setColour(colour);
 
@@ -5493,7 +5339,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
         options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
         options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
-        options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
+        options.setPlanetAcquisitionFactionLimit((PlanetaryAcquisitionFactionLimit) comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
+
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
             options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
             options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
@@ -6148,77 +5995,6 @@ public class CampaignOptionsDialog extends JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public static class SpinnerEditor extends DefaultCellEditor {
-        private static final long serialVersionUID = -2711422398394960413L;
-        JSpinner spinner;
-        JSpinner.NumberEditor editor;
-        JTextField textField;
-        boolean valueSet;
-
-        // Initializes the spinner.
-        public SpinnerEditor() {
-            super(new JTextField());
-            spinner = new JSpinner(new SpinnerNumberModel(1.0, 0, 10, 0.05));
-            editor = ((JSpinner.NumberEditor) spinner.getEditor());
-            textField = editor.getTextField();
-            textField.addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent fe) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (valueSet) {
-                            textField.setCaretPosition(1);
-                        }
-                    });
-                }
-
-                @Override
-                public void focusLost(FocusEvent fe) {
-                }
-            });
-            textField.addActionListener(ae -> stopCellEditing());
-        }
-
-        // Prepares the spinner component and returns it.
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            if (!valueSet) {
-                spinner.setValue(value);
-            }
-            SwingUtilities.invokeLater(() -> textField.requestFocus());
-            return spinner;
-        }
-
-        @Override
-        public boolean isCellEditable(EventObject eo) {
-            if (eo instanceof KeyEvent) {
-                KeyEvent ke = (KeyEvent) eo;
-                textField.setText(String.valueOf(ke.getKeyChar()));
-                valueSet = true;
-            } else {
-                valueSet = false;
-            }
-            return true;
-        }
-
-        // Returns the spinners current value.
-        @Override
-        public Object getCellEditorValue() {
-            return spinner.getValue();
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            try {
-                editor.commitEdit();
-                spinner.commitEdit();
-            } catch (java.text.ParseException e) {
-                JOptionPane.showMessageDialog(null, "Invalid value, discarding.");
-            }
-            return super.stopCellEditing();
         }
     }
 }

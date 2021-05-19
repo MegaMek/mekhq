@@ -23,6 +23,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -86,6 +87,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
                 StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX, 
                         campaign, ownerPanel.getCurrentTrack(), false, null));
         
+        availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
         

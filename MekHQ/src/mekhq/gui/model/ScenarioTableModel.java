@@ -18,15 +18,17 @@
  */
 package mekhq.gui.model;
 
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.SwingConstants;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * A table model for displaying scenarios
@@ -99,7 +101,7 @@ public class ScenarioTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        if (data.isEmpty()) {
+        if (getData().isEmpty()) {
             return "";
         }
         Scenario scenario = getScenario(row);
@@ -110,7 +112,7 @@ public class ScenarioTableModel extends DataTableModel {
         if (col == COL_NAME) {
             return scenario.getName();
         } else if (col == COL_STATUS) {
-            return scenario.getStatusName();
+            return scenario.getStatus();
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
                 return "-";
@@ -121,6 +123,23 @@ public class ScenarioTableModel extends DataTableModel {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();
         } else {
             return "?";
+        }
+    }
+
+    public Renderer getRenderer() {
+        return new Renderer();
+    }
+
+    public static class Renderer extends MekHqTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                                                       final boolean isSelected, final boolean hasFocus,
+                                                       final int row, final int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (value instanceof ScenarioStatus) {
+                setToolTipText(((ScenarioStatus) value).getToolTipText());
+            }
+            return this;
         }
     }
 }

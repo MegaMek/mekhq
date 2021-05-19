@@ -21,8 +21,40 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.Messages;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.MechViewPanel;
+import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.Entity;
+import megamek.common.GunEmplacement;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioObjectiveProcessor;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.unit.TestUnit;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.gui.view.PersonViewPanel;
+
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -31,35 +63,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.swing.*;
-
-import megamek.client.ui.Messages;
-import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.client.ui.swing.MechViewPanel;
-import megamek.common.Entity;
-import megamek.common.GunEmplacement;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
-import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjectiveProcessor;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.gui.view.PersonViewPanel;
-import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa
@@ -166,7 +169,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<Loot> loots;
 
     //region Preview Panel components
-    private JComboBox<String> choiceStatus;
+    private JComboBox<ScenarioStatus> choiceStatus;
     private JScrollPane scrRecoveredUnits;
     private JScrollPane scrRecoveredPilots;
     private JScrollPane scrMissingUnits;
@@ -819,17 +822,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JPanel pnlStatus = new JPanel();
 
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
-        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
-        for (int k = 1; k < Scenario.S_NUM; k++) {
-            statusModel.addElement(Scenario.getStatusName(k));
-        }
-        choiceStatus.setModel(statusModel);
+        DefaultComboBoxModel<ScenarioStatus> scenarioStatusModel = new DefaultComboBoxModel<>(ScenarioStatus.values());
+        scenarioStatusModel.removeElement(ScenarioStatus.CURRENT);
+        choiceStatus.setModel(scenarioStatusModel);
         choiceStatus.setName("choiceStatus");
 
         // dynamically update victory/defeat dropdown based on objective checkboxes
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
+        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<>(), getObjectiveUnitCounts());
-        choiceStatus.setSelectedIndex(scenarioStatus - 1);
+        choiceStatus.setSelectedItem(scenarioStatus);
 
         pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
         pnlStatus.add(lblStatus);
@@ -1377,7 +1378,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now process
-        tracker.resolveScenario(choiceStatus.getSelectedIndex() + 1, txtReport.getText());
+        tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
 
         if (tracker.getScenario().hasObjectives()) {
             // process objectives here
@@ -1572,9 +1573,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void updatePreviewPanel() {
         // set victory/defeat status based on scenario objectives
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
+        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<>(), getObjectiveUnitCounts());
-        choiceStatus.setSelectedIndex(scenarioStatus - 1);
+        choiceStatus.setSelectedItem(scenarioStatus);
 
         // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
