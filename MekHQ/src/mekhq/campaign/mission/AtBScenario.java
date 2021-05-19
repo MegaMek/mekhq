@@ -41,6 +41,7 @@ import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
+import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1712,8 +1713,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
-        super.loadFieldsFromXmlNode(wn);
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
+        super.loadFieldsFromXmlNode(wn, version);
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -1808,7 +1809,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 try {
                                     en = MekHqXmlUtil.getEntityFromXmlString(wn4);
                                 } catch (Exception e) {
-                                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                                    MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1822,12 +1823,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                 BotForce bf = new BotForce();
                 try {
-                    bf.setFieldsFromXmlNode(wn2);
+                    bf.setFieldsFromXmlNode(wn2, version);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                    MekHQ.getLogger().error("Error loading bot force in scenario", e);
                     bf = null;
                 }
-                if (null != bf) {
+
+                if (bf != null) {
                     addBotForce(bf);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {

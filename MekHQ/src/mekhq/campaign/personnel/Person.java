@@ -1573,12 +1573,7 @@ public class Person implements Serializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!getPortrait().hasDefaultCategory()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
-            }
-            if (!getPortrait().hasDefaultFilename()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
-            }
+            getPortrait().writeToXML(pw1, indent + 1);
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
             if (daysToWaitForHealing != 0) {
@@ -1816,9 +1811,11 @@ public class Person implements Serializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
+                    retVal.setPortrait(Portrait.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setCategory(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
