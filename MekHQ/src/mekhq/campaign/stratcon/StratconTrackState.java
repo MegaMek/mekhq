@@ -61,6 +61,7 @@ public class StratconTrackState {
 
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
+    private transient Map<StratconCoords, StratconStrategicObjective> specificStrategicObjectives;
     
     private int scenarioOdds;
     private int deploymentTime;
@@ -349,6 +350,21 @@ public class StratconTrackState {
         }
         
         return backingScenarioMap;
+    }
+    
+    /**
+     * Returns (and possibly initializes, if necessary) a map between
+     * coordinates and strategic objectives
+     */
+    public Map<StratconCoords, StratconStrategicObjective> getObjectivesByCoords() {
+        if (specificStrategicObjectives == null) {
+            specificStrategicObjectives = new HashMap<>();
+            for (StratconStrategicObjective objective : strategicObjectives) {
+                specificStrategicObjectives.put(objective.getObjectiveCoords(), objective);
+            }
+        }
+        
+        return specificStrategicObjectives;
     }
     
     /**

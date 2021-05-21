@@ -99,8 +99,6 @@ public class StratconContractInitializer {
             for (int x = 0; x < trackObjects.size(); x++) {
                 int numObjects = trackObjects.get(x);
                 
-                List<StratconStrategicObjective> generatedObjectives = new ArrayList<>();
-                
                 switch (objectiveParams.objectiveType) {
                     case SpecificScenarioVictory:
                         initializeObjectiveScenarios(campaign, contract, campaignState.getTrack(x), numObjects,
@@ -115,6 +113,13 @@ public class StratconContractInitializer {
                         initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, true);
                         break;
                     case AnyScenarioVictory:
+                        // set up a "win X scenarios" objective
+                        // todo: objective updates for scenario victory objective types
+                        StratconStrategicObjective sso = new StratconStrategicObjective();
+                        sso.setDesiredObjectiveCount(numObjects);
+                        sso.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+                        campaignState.getTrack(x).addStrategicObjective(sso);
+                        
                         if (objectiveParams.objectiveScenarioModifiers != null) {
                             campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
                         }
@@ -302,6 +307,7 @@ public class StratconContractInitializer {
             StratconStrategicObjective sso = new StratconStrategicObjective();
             sso.setObjectiveCoords(coords);
             sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+            sso.setDesiredObjectiveCount(1);
             trackState.addStrategicObjective(sso);
         }
     }

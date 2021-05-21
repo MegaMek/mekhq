@@ -19,6 +19,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Objects;
 
 import javax.swing.BoxLayout;
@@ -52,6 +54,7 @@ public class StratconTab extends CampaignGuiTab {
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
+    boolean objectivesCollapsed = true;
 
     /**
      * Creates an instance of the StratconTab.
@@ -70,6 +73,14 @@ public class StratconTab extends CampaignGuiTab {
         infoPanelText = new JLabel();
         campaignStatusText = new JLabel();
         objectiveStatusText = new JLabel();
+        objectiveStatusText.addMouseListener(new MouseAdapter() { 
+            public void mousePressed(MouseEvent me) { 
+                TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+                StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
+                objectivesCollapsed = !objectivesCollapsed;
+                objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
+              } 
+            });
         
         setLayout(new GridLayout());
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
@@ -175,13 +186,6 @@ public class StratconTab extends CampaignGuiTab {
             .append("<br/>")
             .append(campaignState.getBriefingText());
         
-        // avoid confusing users by showing strategic objectives when there are none to show
-        if (!campaignState.strategicObjectivesBehaveAsVPs()) {
-            sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
-                .append("/").append(campaignState.getPendingStrategicObjectiveCount());
-            sb.append("<span style='background-color: #245250;'>Click me</span>");
-        }
-        
         sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints())
             .append("<br/>Support Points: ").append(campaignState.getSupportPoints())
             .append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime())
@@ -190,14 +194,63 @@ public class StratconTab extends CampaignGuiTab {
         
         campaignStatusText.setText(sb.toString());
         
-        objectiveStatusText.setText(buildStrategicObjectiveText(campaignState));
+        objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
     }
     
+    /**
+     * Builds strategic objective text, appropriately appending details
+     * if the objectives are not "collapsed".
+     */
+    private String getStrategicObjectiveText(StratconCampaignState campaignState) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>")
+            .append(buildShortStrategicObjectiveText(campaignState));
+        
+        if (objectivesCollapsed) {
+            sb.append(" [+] ");
+        } else {
+            sb.append(" [-]<br/>")
+                .append(buildStrategicObjectiveText(campaignState));
+        }
+        
+        sb.append("</html>");
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Builds strategic objective one-liner summary
+     */
+    private String buildShortStrategicObjectiveText(StratconCampaignState campaignState) {
+        int completedObjectives = 0, desiredObjectives = 0;
+        
+        for (StratconTrackState track : campaignState.getTracks()) {
+            for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
+                desiredObjectives++;
+                
+                if (objective.isObjectiveCompleted(track)) {
+                    completedObjectives++;
+                }
+            }
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        if (completedObjectives >= desiredObjectives) {
+            sb.append("<span color='green'>");
+        } else {
+            sb.append("<span color='red'>");
+        }
+
+        sb.append("Strategic objectives: " + completedObjectives + "/" + desiredObjectives + " completed</span>");
+        return sb.toString();
+    }
+    
+    /**
+     * Builds detailed strategic objective list
+     */
     private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
         
-//        for (//StratconTrackState )
         // loop through all tracks
         // for each track, loop through all objectives
         // for each objective, grab the coordinates
@@ -209,20 +262,30 @@ public class StratconTab extends CampaignGuiTab {
         for (StratconTrackState track : campaignState.getTracks()) {
             for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
                 boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
+                boolean objectiveCompleted = objective.isObjectiveCompleted(track);
                 
+                if (objectiveCompleted) {
+                    sb.append("<span color='green'>");
+                } else {
+                    sb.append("<span color='red'>");
+                }
+                 
                 if (!coordsRevealed) {
                     sb.append("Locate and ");
                 }
                 
                 switch (objective.getObjectiveType()) {
                     case SpecificScenarioVictory:
-                        sb.append("engage hostile forces");
+                        sb.append(coordsRevealed ? "E" : "e");
+                        sb.append("ngage hostile forces");
                         break;
                     case HostileFacilityControl:
-                        sb.append("capture or destroy facility");
+                        sb.append(coordsRevealed ? "C" : "c");
+                        sb.append("apture or destroy designated facility");
                         break;
                     case AlliedFacilityControl:
-                        sb.append("maintain control of facility");
+                        sb.append(coordsRevealed ? "M" : "m");
+                        sb.append("aintain control of designated facility");
                         break;
                     default:
                         break;
@@ -236,14 +299,14 @@ public class StratconTab extends CampaignGuiTab {
                 
                 if (coordsRevealed) {
                     sb.append(" at ").append(objective.getObjectiveCoords().toFriendlyString())
-                        .append(" on track ").append(track.getDisplayableName());
+                        .append(" on ").append(track.getDisplayableName());
                 }
                 
+                sb.append("</span>");
                 sb.append("<br/>");
             }
         }
         
-        sb.append("</html>");
         return sb.toString();
     }
     
