@@ -92,8 +92,6 @@ public class StratconContractInitializer {
                     (int) objectiveParams.objectiveCount :
                     (int) (-objectiveParams.objectiveCount * contract.getRequiredLances());
                     
-            campaignState.incrementPendingStrategicObjectiveCount(objectiveCount);
-                    
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size()); 
                    
             for (int x = 0; x < trackObjects.size(); x++) {
@@ -106,7 +104,6 @@ public class StratconContractInitializer {
                         break;
                     case AlliedFacilityControl:
                         initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, true);
-                        campaignState.incrementStrategicObjectiveCompletedCount(numObjects);
                         break;
                     case HostileFacilityControl:
                     case FacilityDestruction:
@@ -114,19 +111,22 @@ public class StratconContractInitializer {
                         break;
                     case AnyScenarioVictory:
                         // set up a "win X scenarios" objective
-                        // todo: objective updates for scenario victory objective types
                         StratconStrategicObjective sso = new StratconStrategicObjective();
                         sso.setDesiredObjectiveCount(numObjects);
                         sso.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
                         campaignState.getTrack(x).addStrategicObjective(sso);
-                        
-                        if (objectiveParams.objectiveScenarioModifiers != null) {
-                            campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
-                        }
                         break;
                 }
-                
-                
+            }
+            
+            // if any modifiers are to be applied across all scenarios in the campaign
+            // do so here; do not add duplicates
+            if (objectiveParams.objectiveScenarioModifiers != null) {
+                for (String modifier : objectiveParams.objectiveScenarioModifiers) {
+                    if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
+                        campaignState.getGlobalScenarioModifiers().add(modifier);
+                    }
+                }
             }
         }
         
@@ -237,19 +237,21 @@ public class StratconContractInitializer {
             
             trackState.addFacility(coords, sf);
             
-            StratconStrategicObjective sso = new StratconStrategicObjective();
-            sso.setObjectiveCoords(coords);
-            
-            if (sf.getOwner() == ForceAlignment.Allied) {
-                trackState.getRevealedCoords().add(coords);
-                sf.setVisible(true);
-                sso.setObjectiveType(StrategicObjectiveType.AlliedFacilityControl);
-            } else {
-                sf.setVisible(false);
-                sso.setObjectiveType(StrategicObjectiveType.HostileFacilityControl);
+            if (strategicObjective) {
+                StratconStrategicObjective sso = new StratconStrategicObjective();
+                sso.setObjectiveCoords(coords);
+                
+                if (sf.getOwner() == ForceAlignment.Allied) {
+                    trackState.getRevealedCoords().add(coords);
+                    sf.setVisible(true);
+                    sso.setObjectiveType(StrategicObjectiveType.AlliedFacilityControl);
+                } else {
+                    sf.setVisible(false);
+                    sso.setObjectiveType(StrategicObjectiveType.HostileFacilityControl);
+                }
+                
+                trackState.addStrategicObjective(sso);
             }
-            
-            trackState.addStrategicObjective(sso);
         }
     }
     

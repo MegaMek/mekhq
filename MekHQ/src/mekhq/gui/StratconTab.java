@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -54,6 +55,7 @@ public class StratconTab extends CampaignGuiTab {
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
+    JScrollPane expandedObjectivePanel;
     boolean objectivesCollapsed = true;
 
     /**
@@ -71,8 +73,16 @@ public class StratconTab extends CampaignGuiTab {
         removeAll();
         
         infoPanelText = new JLabel();
+        infoPanelText.setHorizontalAlignment(SwingConstants.LEFT);
+        infoPanelText.setVerticalAlignment(SwingConstants.TOP);
+        
         campaignStatusText = new JLabel();
+        campaignStatusText.setHorizontalAlignment(SwingConstants.LEFT);
+        campaignStatusText.setVerticalAlignment(SwingConstants.TOP);
+        
         objectiveStatusText = new JLabel();
+        objectiveStatusText.setHorizontalAlignment(SwingConstants.LEFT);
+        objectiveStatusText.setVerticalAlignment(SwingConstants.TOP);
         objectiveStatusText.addMouseListener(new MouseAdapter() { 
             public void mousePressed(MouseEvent me) { 
                 TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
@@ -102,11 +112,15 @@ public class StratconTab extends CampaignGuiTab {
      */
     private void initializeInfoPanel() {
         infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
         
         infoPanel.add(new JLabel("Current Campaign Status:"));
-        infoPanel.add(campaignStatusText);        
-        infoPanel.add(objectiveStatusText);
+        infoPanel.add(campaignStatusText);
+        
+        expandedObjectivePanel = new JScrollPane(objectiveStatusText);
+        expandedObjectivePanel.setMaximumSize(new Dimension(400, 300));
+        expandedObjectivePanel.setAlignmentX(LEFT_ALIGNMENT);
+        infoPanel.add(expandedObjectivePanel);
 
         JLabel lblCurrentTrack = new JLabel("Current Track:");
         infoPanel.add(lblCurrentTrack);
@@ -145,8 +159,8 @@ public class StratconTab extends CampaignGuiTab {
     
     @Override
     public void repaint() {
-        super.repaint();
         updateCampaignState();
+        super.repaint();
     }
     
     @Override
@@ -175,10 +189,20 @@ public class StratconTab extends CampaignGuiTab {
         // current support points
         TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
         if (currentTDI == null) {
+            campaignStatusText.setText("No active contract selected.");
+            expandedObjectivePanel.setVisible(false);
             return;
         }
         AtBContract currentContract = currentTDI.contract;
+        
+        if (!currentContract.isActiveOn(getCampaignGui().getCampaign().getLocalDate())) {
+            campaignStatusText.setText("Contract has not started.");
+            expandedObjectivePanel.setVisible(false);
+            return;
+        }
+        
         StratconCampaignState campaignState = currentContract.getStratconCampaignState();
+        expandedObjectivePanel.setVisible(true);
         
         StringBuilder sb = new StringBuilder();
         sb.append("<html>")
@@ -240,6 +264,15 @@ public class StratconTab extends CampaignGuiTab {
         } else {
             sb.append("<span color='red'>");
         }
+        
+        // special logic for non-independent command clauses
+        if (campaignState.getContract().getCommandRights() <= Contract.COM_LIAISON) {
+            desiredObjectives++;
+            
+            if (campaignState.getVictoryPoints() > 0) {
+                completedObjectives++;
+            }
+        }
 
         sb.append("Strategic objectives: " + completedObjectives + "/" + desiredObjectives + " completed</span>");
         return sb.toString();
@@ -262,6 +295,7 @@ public class StratconTab extends CampaignGuiTab {
         for (StratconTrackState track : campaignState.getTracks()) {
             for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
                 boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
+                boolean displayCoordinateData = objective.getObjectiveCoords() != null;
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
                 
                 if (objectiveCompleted) {
@@ -270,14 +304,14 @@ public class StratconTab extends CampaignGuiTab {
                     sb.append("<span color='red'>");
                 }
                  
-                if (!coordsRevealed) {
+                if (!coordsRevealed && displayCoordinateData) {
                     sb.append("Locate and ");
                 }
                 
                 switch (objective.getObjectiveType()) {
                     case SpecificScenarioVictory:
                         sb.append(coordsRevealed ? "E" : "e");
-                        sb.append("ngage hostile forces");
+                        sb.append("ngage and defeat hostile forces");
                         break;
                     case HostileFacilityControl:
                         sb.append(coordsRevealed ? "C" : "c");
@@ -287,24 +321,38 @@ public class StratconTab extends CampaignGuiTab {
                         sb.append(coordsRevealed ? "M" : "m");
                         sb.append("aintain control of designated facility");
                         break;
+                    case AnyScenarioVictory:
+                        sb.append("Engage and defeat hostile forces in ")
+                        .append(objective.getCurrentObjectiveCount()).append("/")
+                        .append(objective.getDesiredObjectiveCount())
+                        .append(" scenarios on ").append(track.getDisplayableName());
+                        break;
                     default:
                         break;
                 }
                 
                 // need to add:
                 // global (campaign-state level) "keep VP count above 0" for liaison/house/integrated
-                // global (campaign-state level) "win X scenarios" for AnyScenarioVictory objective type
-                //      this probably means that StratconStrategicObjective needs "in progress/completed/failed" flag
-                // evaluate current state of facility control and "do X" objective
                 
-                if (coordsRevealed) {
+                if (coordsRevealed && displayCoordinateData) {
                     sb.append(" at ").append(objective.getObjectiveCoords().toFriendlyString())
                         .append(" on ").append(track.getDisplayableName());
                 }
                 
-                sb.append("</span>");
-                sb.append("<br/>");
+                sb.append("</span><br/>");
             }
+        }
+        
+        // special case text reminding player to complete required scenarios
+        if (campaignState.getContract().getCommandRights() <= Contract.COM_LIAISON) {
+            if (campaignState.getVictoryPoints() > 0) {
+                sb.append("<span color='green'>");
+            } else {
+                sb.append("<span color='red'>");
+            }
+            
+            sb.append("Maintain victory point count above 0 by completing required scenarios")
+                .append("</span><br/>");
         }
         
         return sb.toString();

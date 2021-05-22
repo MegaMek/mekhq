@@ -38,6 +38,10 @@ public class StratconStrategicObjective {
     public void setCurrentObjectiveCount(int currentObjectiveCount) {
         this.currentObjectiveCount = currentObjectiveCount;
     }
+    
+    public void incrementCurrentObjectiveCount() {
+        currentObjectiveCount++;
+    }
 
     public int getDesiredObjectiveCount() {
         return desiredObjectiveCount;

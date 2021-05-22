@@ -201,6 +201,15 @@ public class StratconTrackState {
     public void setGmRevealed(boolean gmRevealed) {
         this.gmRevealed = gmRevealed;
     }
+    
+    /**
+     * Convenience function that determins if there are any forces
+     * deployed to the given coordinates.
+     */
+    public boolean areAnyForceDeployedTo(StratconCoords coords) {
+        return getAssignedCoordForces().containsKey(coords) &&
+                getAssignedCoordForces().get(coords).size() > 0;
+    }
 
     /**
      * Handles the assignment of a force to the given coordinates on this track on the given date.

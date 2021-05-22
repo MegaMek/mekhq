@@ -40,6 +40,7 @@ import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
@@ -244,6 +245,7 @@ public class StratconRulesManager {
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
+            setScenarioDates(0, track, campaign, scenario); // we deploy immediately in this case, since it's an 
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             commitPrimaryForces(campaign, scenario, track);
         }
@@ -719,6 +721,9 @@ public class StratconRulesManager {
                     continue;
                 }
 
+                modifier.setAdditionalBriefingText(
+                        "(from " + facility.getDisplayableName() + ") " +
+                        modifier.getAdditionalBriefingText());
                 scenario.getBackingScenario().addScenarioModifier(modifier);
             }
         }
@@ -1253,9 +1258,10 @@ public class StratconRulesManager {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
-                    // this must be done before updating ownership change to avoid
-                    // updating SO counts in the wrong direction.
-                    updateStrategicObjectiveCount(victory, scenario, facility, campaignState);
+                    // this must be done before removing the scenario from the track
+                    // in case any objectives are linked to the scenario's coordinates
+                    updateStrategicObjectives(victory, scenario, track, campaignState);
+                    //updateStrategicObjectiveCount(victory, scenario, facility, campaignState);
 
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                         switchFacilityOwner(facility);
@@ -1266,6 +1272,30 @@ public class StratconRulesManager {
                     track.removeScenario(scenario);
                     break;
                 }
+            }
+        }
+    }
+    
+    /**
+     * Worker function that updates strategic objectives relevant to the passed in
+     * scenario, track and campaign state. For example, "win scenario A" or "win X scenarios".
+     */
+    private static void updateStrategicObjectives(boolean victory, StratconScenario scenario, 
+            StratconTrackState track, StratconCampaignState campaignState) {
+        
+        // first, we check if this scenario is associated with any specific scenario objectives
+        StratconStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
+        if (victory && (specificObjective != null) && 
+                (specificObjective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory)) {
+            specificObjective.incrementCurrentObjectiveCount();
+        }
+        
+        // "any scenario victory" is not linked to any specific coordinates, so we have to
+        // search through the track's objectives and update those.
+        for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
+            if ((objective.getObjectiveType() == StrategicObjectiveType.AnyScenarioVictory) &&
+                    victory) {
+                objective.incrementCurrentObjectiveCount();
             }
         }
     }
@@ -1297,53 +1327,6 @@ public class StratconRulesManager {
             facility.setOwner(ForceAlignment.Opposing);
         } else {
             facility.setOwner(ForceAlignment.Allied);
-        }
-    }
-
-    /**
-     * Worker function that contains logic for updating strategic objective counts
-     * in a given campaign.
-     */
-    private static void updateStrategicObjectiveCount(boolean victory,
-            StratconScenario scenario, StratconFacility facility, StratconCampaignState campaignState) {
-        // if neither the scenario nor facility are strategic objectives,
-        // then we are done here.
-        if (((scenario == null) || !scenario.isStrategicObjective()) &&
-                ((facility == null) || !facility.isStrategicObjective())) {
-            return;
-        }
-
-        // simple situation - if the strategic objective items simply increase VP count
-        // then we do that here
-        if (campaignState.strategicObjectivesBehaveAsVPs()) {
-            campaignState.updateVictoryPoints(victory ? 1 : -1);
-        } else {
-            // if a victory and the scenario is a strategic objective, SO++
-            // if a victory and facility is a strategic objective:
-            //      for allied facilities, do nothing
-            //      for hostile facilities, SO++
-            // if defeat and facility is a strategic objective:
-            //      for allied facilities, SO--
-            //      for hostile facilities, nothing
-            // the basic idea is that you're supposed to *hold* allied facilities
-            // and *seize* hostile facilities
-
-            if ((scenario != null) && scenario.isStrategicObjective() && victory) {
-                campaignState.incrementStrategicObjectiveCompletedCount();
-                return;
-            }
-
-            if (facility == null) {
-                return;
-            }
-
-            boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
-
-            if (facility.isStrategicObjective() && alliedFacility && !victory) {
-                campaignState.decrementStrategicObjectiveCompletedCount();
-            } else if (facility.isStrategicObjective() && !alliedFacility && victory) {
-                campaignState.incrementStrategicObjectiveCompletedCount();
-            }
         }
     }
 
@@ -1406,10 +1389,6 @@ public class StratconRulesManager {
                     // then it'll get captured, and the player will possibly lose a SO
                     if (localFacility.getOwner() == ForceAlignment.Allied) {
                         localFacility.setOwner(ForceAlignment.Opposing);
-
-                        if (localFacility.isStrategicObjective()) {
-                            campaignState.decrementStrategicObjectiveCompletedCount();
-                        }
                     }
 
                     return true;
