@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.49.1-SNAPSHOT
+0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
 + PR #2571: Fixing MechWarrior Salary
 + Issue #2569: Adding userdata to the build script
