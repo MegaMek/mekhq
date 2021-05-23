@@ -208,7 +208,7 @@ public class StratconTrackState {
      */
     public boolean areAnyForceDeployedTo(StratconCoords coords) {
         return getAssignedCoordForces().containsKey(coords) &&
-                getAssignedCoordForces().get(coords).size() > 0;
+                (getAssignedCoordForces().get(coords).size() > 0);
     }
 
     /**

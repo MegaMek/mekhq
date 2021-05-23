@@ -55,8 +55,8 @@ public class StratconTab extends CampaignGuiTab {
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
-    JScrollPane expandedObjectivePanel;
-    boolean objectivesCollapsed = true;
+    private JScrollPane expandedObjectivePanel;
+    private boolean objectivesCollapsed = true;
 
     /**
      * Creates an instance of the StratconTab.
@@ -83,7 +83,8 @@ public class StratconTab extends CampaignGuiTab {
         objectiveStatusText = new JLabel();
         objectiveStatusText.setHorizontalAlignment(SwingConstants.LEFT);
         objectiveStatusText.setVerticalAlignment(SwingConstants.TOP);
-        objectiveStatusText.addMouseListener(new MouseAdapter() { 
+        objectiveStatusText.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent me) { 
                 TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
                 StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
@@ -310,22 +311,22 @@ public class StratconTab extends CampaignGuiTab {
                 
                 switch (objective.getObjectiveType()) {
                     case SpecificScenarioVictory:
-                        sb.append(coordsRevealed ? "E" : "e");
-                        sb.append("ngage and defeat hostile forces");
+                        sb.append(coordsRevealed ? "E" : "e")
+                            .append("ngage and defeat hostile forces");
                         break;
                     case HostileFacilityControl:
-                        sb.append(coordsRevealed ? "C" : "c");
-                        sb.append("apture or destroy designated facility");
+                        sb.append(coordsRevealed ? "C" : "c")
+                            .append("apture or destroy designated facility");
                         break;
                     case AlliedFacilityControl:
-                        sb.append(coordsRevealed ? "M" : "m");
-                        sb.append("aintain control of designated facility");
+                        sb.append(coordsRevealed ? "M" : "m")
+                            .append("aintain control of designated facility");
                         break;
                     case AnyScenarioVictory:
                         sb.append("Engage and defeat hostile forces in ")
-                        .append(objective.getCurrentObjectiveCount()).append("/")
-                        .append(objective.getDesiredObjectiveCount())
-                        .append(" scenarios on ").append(track.getDisplayableName());
+                            .append(objective.getCurrentObjectiveCount()).append("/")
+                            .append(objective.getDesiredObjectiveCount())
+                            .append(" scenarios on ").append(track.getDisplayableName());
                         break;
                     default:
                         break;

@@ -245,7 +245,8 @@ public class StratconRulesManager {
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
-            setScenarioDates(0, track, campaign, scenario); // we deploy immediately in this case, since it's an 
+            // we deploy immediately in this case, since we deployed the force manually 
+            setScenarioDates(0, track, campaign, scenario);  
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             commitPrimaryForces(campaign, scenario, track);
         }
@@ -1045,7 +1046,7 @@ public class StratconRulesManager {
         // contracts at a time
         return u.getCampaign().getActiveAtBContracts().stream().
             anyMatch(contract ->
-                contract.getStratconCampaignState() != null &&
+                (contract.getStratconCampaignState()) != null &&
                 contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
     }
 
@@ -1260,8 +1261,7 @@ public class StratconRulesManager {
 
                     // this must be done before removing the scenario from the track
                     // in case any objectives are linked to the scenario's coordinates
-                    updateStrategicObjectives(victory, scenario, track, campaignState);
-                    //updateStrategicObjectiveCount(victory, scenario, facility, campaignState);
+                    updateStrategicObjectives(victory, scenario, track);
 
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                         switchFacilityOwner(facility);
@@ -1281,7 +1281,7 @@ public class StratconRulesManager {
      * scenario, track and campaign state. For example, "win scenario A" or "win X scenarios".
      */
     private static void updateStrategicObjectives(boolean victory, StratconScenario scenario, 
-            StratconTrackState track, StratconCampaignState campaignState) {
+            StratconTrackState track) {
         
         // first, we check if this scenario is associated with any specific scenario objectives
         StratconStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
@@ -1293,8 +1293,7 @@ public class StratconRulesManager {
         // "any scenario victory" is not linked to any specific coordinates, so we have to
         // search through the track's objectives and update those.
         for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
-            if ((objective.getObjectiveType() == StrategicObjectiveType.AnyScenarioVictory) &&
-                    victory) {
+            if ((objective.getObjectiveType() == StrategicObjectiveType.AnyScenarioVictory) && victory) {
                 objective.incrementCurrentObjectiveCount();
             }
         }
