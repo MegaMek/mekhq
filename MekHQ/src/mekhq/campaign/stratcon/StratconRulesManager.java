@@ -1046,7 +1046,7 @@ public class StratconRulesManager {
         // contracts at a time
         return u.getCampaign().getActiveAtBContracts().stream().
             anyMatch(contract ->
-                (contract.getStratconCampaignState()) != null &&
+                (contract.getStratconCampaignState() != null) &&
                 contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
     }
 
