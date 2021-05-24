@@ -530,14 +530,17 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
+        campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
+                "Advance monies for " + contract.getName(), campaign.getLocalDate());
+        campaign.addMission(contract);
+        
+        // note that the contract must be initialized after the mission is added to the campaign
+        // to ensure presence of mission ID
         if (campaign.getCampaignOptions().getUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
                     StratconContractDefinition.getContractDefinition(contract.getContractType()));
         }
-
-        campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
-                "Advance monies for " + contract.getName(), campaign.getLocalDate());
-        campaign.addMission(contract);
+        
         setVisible(false);
     }
 

@@ -15,8 +15,10 @@
 package mekhq.campaign.stratcon;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,9 +57,11 @@ public class StratconTrackState {
     private Set<Integer> stickyForces;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
     private Set<StratconCoords> revealedCoords;
+    private List<StratconStrategicObjective> strategicObjectives;
 
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
+    private transient Map<StratconCoords, StratconStrategicObjective> specificStrategicObjectives;
     
     private int scenarioOdds;
     private int deploymentTime;
@@ -72,6 +76,7 @@ public class StratconTrackState {
         setAssignedForceReturnDatesForStorage(new HashMap<>());
         revealedCoords = new HashSet<>();
         stickyForces = new HashSet<>();
+        strategicObjectives = new ArrayList<>();
     }
     
     public String getDisplayableName() {
@@ -195,6 +200,15 @@ public class StratconTrackState {
 
     public void setGmRevealed(boolean gmRevealed) {
         this.gmRevealed = gmRevealed;
+    }
+    
+    /**
+     * Convenience function that determins if there are any forces
+     * deployed to the given coordinates.
+     */
+    public boolean areAnyForceDeployedTo(StratconCoords coords) {
+        return getAssignedCoordForces().containsKey(coords) &&
+                (getAssignedCoordForces().get(coords).size() > 0);
     }
 
     /**
@@ -348,6 +362,21 @@ public class StratconTrackState {
     }
     
     /**
+     * Returns (and possibly initializes, if necessary) a map between
+     * coordinates and strategic objectives
+     */
+    public Map<StratconCoords, StratconStrategicObjective> getObjectivesByCoords() {
+        if (specificStrategicObjectives == null) {
+            specificStrategicObjectives = new HashMap<>();
+            for (StratconStrategicObjective objective : strategicObjectives) {
+                specificStrategicObjectives.put(objective.getObjectiveCoords(), objective);
+            }
+        }
+        
+        return specificStrategicObjectives;
+    }
+    
+    /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
     public boolean isForceDeployed(int forceID) {
@@ -373,5 +402,19 @@ public class StratconTrackState {
     
     public void removeStickyForce(int forceID) {
         stickyForces.remove(forceID);
+    }
+
+    @XmlElementWrapper(name = "instantiatedObjectives")
+    @XmlElement(name = "instantiatedObjective")
+    public List<StratconStrategicObjective> getStrategicObjectives() {
+        return strategicObjectives;
+    }
+
+    public void setStrategicObjectives(List<StratconStrategicObjective> strategicObjectives) {
+        this.strategicObjectives = strategicObjectives;
+    }
+    
+    public void addStrategicObjective(StratconStrategicObjective strategicObjective) {
+        getStrategicObjectives().add(strategicObjective);
     }
 }

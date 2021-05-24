@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-0.49.1-SNAPSHOT
+0.49.2-SNAPSHOT
+
+0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
 + PR #2571: Fixing MechWarrior Salary
 + Issue #2569: Adding userdata to the build script
@@ -19,6 +21,18 @@ VERSION HISTORY:
 + PR #2602, #2611, #2615: StratCon Data Fixes
 + PR #2583: Dependent Swapover: Removing Parental and Spousal Abandonment, Fixing None Primary Role
 + Issue #2566: Ranks Warning Expansion and Change Tracking
++ Multiple StratCon stability and data fixes:
+	- scenario data updates
+	- phantom scenarios no longer display in briefing room; fixed objective scenarios remain on tracks until encountered
+	- logic update for force deployment right click menu
+	- map size rerolls no longer generate tiny maps
+	- descriptive text updates
+	- fixes for various issues when loading campaign saves
+	- improved objective generation and tracking
+	- prevent excessive spam of fixed contract modifiers for some contracts (notably, cadre duty and guerilla)
+	- temporarily prevent deployment of more than one force/hex (further re-work coming)
++ Issue #2607: Fixing Payment Overage Option Implementation
++ PR #2581: Modernizing Presets to 0.49.1 Standards
 
 0.49.0 (2021-05-01 2130 UTC)
 + Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort

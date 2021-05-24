@@ -105,6 +105,11 @@ public class StratconContractDefinition {
         SpecificScenarioVictory,
 
         /**
+         * Victory in scenarios designated as "required" (usually per contract command clause)
+         */
+        RequiredScenarioVictory,
+        
+        /**
          * Control of allied facilities generated at contract start time
          * Each track will be seeded with some number of allied facilities
          * They must not be destroyed and the player must have control of them at the end-of-contract date
