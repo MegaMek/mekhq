@@ -92,6 +92,19 @@ public class LanceAssignmentView extends JPanel {
         });
 
         cbRole = new JComboBox<>(AtBLanceRole.values());
+        cbRole.setName("cbRole");
+        cbRole.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBLanceRole) {
+                    list.setToolTipText(((AtBLanceRole) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

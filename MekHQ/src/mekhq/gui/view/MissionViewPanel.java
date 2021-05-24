@@ -686,8 +686,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtEnemy, gridBagConstraints);
 
-        lblType.setName("lblType"); // NOI18N
+        lblType.setName("lblType");
         lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -695,8 +696,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
-        txtType.setName("txtType"); // NOI18N
+        txtType.setName("txtType");
         txtType.setText(contract.getType());
+        txtType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -924,8 +926,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvagePct, gridBagConstraints);
 
-        lblMorale.setName("lblMorale"); // NOI18N
+        lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
+        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -935,6 +938,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtMorale.setName("txtMorale");
         txtMorale.setText(contract.getMoraleLevel().toString());
+        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

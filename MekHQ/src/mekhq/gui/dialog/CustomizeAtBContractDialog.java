@@ -20,10 +20,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
@@ -141,7 +138,21 @@ public class CustomizeAtBContractDialog extends JDialog {
         cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
+
         comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
+        comboContractType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBContractType) {
+                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
         JLabel lblType = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
@@ -175,7 +186,20 @@ public class CustomizeAtBContractDialog extends JDialog {
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
                         null,null,1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
+
         comboEnemyMorale = new MMComboBox<>("comboEnemyMorale", AtBMoraleLevel.values());
+        comboContractType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBMoraleLevel) {
+                    list.setToolTipText(((AtBMoraleLevel) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         int y = 0;
 

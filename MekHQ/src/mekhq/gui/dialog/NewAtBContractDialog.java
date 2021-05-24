@@ -20,8 +20,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -36,6 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -284,6 +284,18 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
         comboContractType.setSelectedItem(contract.getContractType());
+        comboContractType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBContractType) {
+                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -533,14 +545,14 @@ public class NewAtBContractDialog extends NewContractDialog {
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
         campaign.addMission(contract);
-        
+
         // note that the contract must be initialized after the mission is added to the campaign
         // to ensure presence of mission ID
         if (campaign.getCampaignOptions().getUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
                     StratconContractDefinition.getContractDefinition(contract.getContractType()));
         }
-        
+
         setVisible(false);
     }
 
