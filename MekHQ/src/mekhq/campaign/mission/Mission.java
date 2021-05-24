@@ -152,6 +152,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     public List<Scenario> getScenarios() {
         return scenarios;
     }
+    
+    public List<Scenario> getVisibleScenarios() {
+        return getScenarios().stream().filter(scenario -> !scenario.isCloaked()).collect(Collectors.toList()); 
+    }
 
     public List<Scenario> getCurrentScenarios() {
         return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent()).collect(Collectors.toList());

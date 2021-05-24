@@ -318,7 +318,11 @@ public class CustomizeScenarioDialog extends JDialog {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
-            scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
+            
+            if (choiceStatus.getSelectedItem() != null) {
+                scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
+            }
+            
             scenario.setDate(date);
         }
         scenario.resetLoot();

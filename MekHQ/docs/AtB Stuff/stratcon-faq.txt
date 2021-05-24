@@ -64,7 +64,7 @@ Might be a hostile facility or three on the track. Better do some recon and take
 
 
 How do I capture a hostile facility?
-You'll need to complete the 'capture' objective in an attack scenario on it, without completing the 'destroy' objective. Meaning, you'll need to leave the facility turrets intact (though disabling them via crew kills, equipment destruction or ammo depletion is fine), while routing any mobile enemy ground units
+You'll need to complete the 'capture' objective in an attack scenario on it, without completing the 'destroy' objective. Meaning, you'll need to leave (by default, 75% of) the facility turrets intact (though disabling them via crew kills, equipment destruction or ammo depletion is fine), while routing any mobile enemy ground units (usually, crippling 75% of all non-aerospace units will do the trick). 
 
 
 How do I manually deploy units to a track?
@@ -77,3 +77,11 @@ You've probably got them deployed to a StratCon track. Wait for them to come bac
 
 I want to design my own scenarios, how do I do that?
 Use the Scenario Template Editor to put together a scenario template. I recommend using the Briefing Room -> Add Scenario -> Generate From Template mechanism to test the template out. Now, go to your data\scenariomodifiers directory and create (if it doesn't exist already) a file called UserScenarioManifest.xml. It should be formatted exactly like ScenarioManifest. Make sure not to overlap with the ID numbers or file names in ScenarioManifest, as that "may cause unpredictable behavior". Now that you've got your scenario in the UserScenarioManifest file, it'll be added to the pool of scenarios StratCon draws from when generating battles.
+
+
+Do I use BV or unit count to determine whether I've completed an objective?
+You can use either, that's entirely up to you. Maybe even both! 
+
+
+How do I determine if I control the battlefield after a battle?
+By default, crippling or destroying 50% of the opposition (not including aerospace units on ground maps) will grant you control of the battlefield for salvage, search & rescue or any other purposes. The exception being a hostile facility, which requires crippling or destroying 75% of the opposition (again, not including aerospace units on ground maps) to gain battlefield control.
