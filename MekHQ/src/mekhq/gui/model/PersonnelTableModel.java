@@ -34,6 +34,7 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -47,6 +48,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.MekHqColors;
+import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -674,12 +676,8 @@ public class PersonnelTableModel extends DataTableModel {
         }
     }
 
-    public TableCellRenderer getRenderer(boolean graphic) {
-        if (graphic) {
-            return new PersonnelTableModel.VisualRenderer();
-        } else {
-            return new PersonnelTableModel.Renderer();
-        }
+    public TableCellRenderer getRenderer(final @Nullable PersonnelTabView view) {
+        return ((view != null) && view.isGraphic()) ? new VisualRenderer() : new Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {
