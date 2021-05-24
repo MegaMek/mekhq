@@ -561,6 +561,24 @@ public class Person implements Serializable {
     }
 
     /**
+     * This is used to create the full name of the person, based on their first and last names
+     */
+    public void setFullName() {
+        final String lastName = getLastName();
+        setFullNameDirect(getFirstName()
+                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""))
+                + (lastName.isBlank() ? "" : " " + lastName));
+    }
+
+    /**
+     * @param fullName this sets the full name to be equal to the input string. This can ONLY be
+     *                 called by {@link Person#setFullName()} or its overrides.
+     */
+    protected void setFullNameDirect(final String fullName) {
+        this.fullName = fullName;
+    }
+
+    /**
      * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
@@ -581,24 +599,6 @@ public class Person implements Serializable {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
-    }
-
-    /**
-     * This is used to create the full name of the person, based on their first and last names
-     */
-    public void setFullName() {
-        final String lastName = getLastName();
-        setFullNameDirect(getFirstName()
-                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""))
-                + (lastName.isBlank() ? "" : lastName));
-    }
-
-    /**
-     * @param fullName this sets the full name to be equal to the input string. This can ONLY be
-     *                 called by {@link Person#setFullName()} or its overrides.
-     */
-    protected void setFullNameDirect(final String fullName) {
-        this.fullName = fullName;
     }
 
     /**
