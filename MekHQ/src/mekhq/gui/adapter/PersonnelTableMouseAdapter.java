@@ -1604,7 +1604,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         soldierEntityWeightMenu = new JMenu(weightClassName);
                     }
 
-                    if (StaticChecks.areAllInfantrySoldiers(selected)) {
+                    if (StaticChecks.areAllSoldiers(selected)) {
                         if (!unit.isConventionalInfantry()) {
                             continue;
                         }
