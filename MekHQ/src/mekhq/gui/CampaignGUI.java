@@ -2014,16 +2014,14 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    // Error condition of sorts!
-                    // Errr, what should we do here?
                     MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if (getCampaign().getPerson(p.getId()) != null
-                        && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
-                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
+                if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
+                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
+                            + p.getFullName() + ", Id " + p.getId() + ")");
                     p = null;
                 }
 

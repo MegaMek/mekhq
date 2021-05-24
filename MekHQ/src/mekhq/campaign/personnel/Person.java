@@ -564,8 +564,7 @@ public class Person implements Serializable {
      * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
-        return (getPreNominal().isBlank() ? "" : (getPreNominal() + " ")) + getGivenName()
-                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""));
+        return (getPreNominal().isBlank() ? "" : (getPreNominal() + " ")) + getGivenName();
     }
 
     /**
@@ -589,8 +588,9 @@ public class Person implements Serializable {
      */
     public void setFullName() {
         final String lastName = getLastName();
-        setFullNameDirect(StringUtil.isNullOrEmpty(lastName) ? getFirstName()
-                : (getFirstName() + " " + lastName));
+        setFullNameDirect(getFirstName()
+                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""))
+                + (lastName.isBlank() ? "" : lastName));
     }
 
     /**
@@ -1852,17 +1852,17 @@ public class Person implements Serializable {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
                     retVal.migrateName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
-                    retVal.preNominal = wn2.getTextContent().trim();
+                    retVal.setPreNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
+                    retVal.setGivenNameDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
+                    retVal.setSurnameDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
-                    retVal.postNominal = wn2.getTextContent().trim();
+                    retVal.setPostNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
+                    retVal.setMaidenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
+                    retVal.setCallsignDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
@@ -2115,7 +2115,7 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
-                    retVal.setPostNominal(wn2.getTextContent());
+                    retVal.setPostNominalDirect(wn2.getTextContent());
                 }
             }
 
