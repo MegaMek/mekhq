@@ -57,6 +57,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
@@ -1001,21 +1002,14 @@ public class Person implements Serializable {
 
         if (!status.isActive()) {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+
             // If we're assigned to a unit, remove us from it
             if (getUnit() != null) {
                 getUnit().remove(this, true);
             }
 
-            // If we're assigned as a tech for any unit, remove us from it/them
-            for (Unit unitWeTech : new ArrayList<>(getTechUnits())) {
-                unitWeTech.remove(this, true);
-            }
-            // If we're assigned to any repairs or refits, remove that assignment
-            for (Part part : campaign.getParts()) {
-                if (this == part.getTech()) {
-                    part.cancelAssignment();
-                }
-            }
+            // Clear Tech Setup
+            removeAllTechJobs(campaign);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -2963,6 +2957,30 @@ public class Person implements Serializable {
 
     public List<Unit> getTechUnits() {
         return Collections.unmodifiableList(techUnits);
+    }
+
+    public void removeAllTechJobs(final Campaign campaign) {
+        campaign.getHangar().forEachUnit(u -> {
+            if (equals(u.getTech())) {
+                u.remove(this, true);
+            }
+
+            if ((u.getRefit() != null) && equals(u.getRefit().getTech())) {
+                u.getRefit().setTech(null);
+            }
+        });
+
+        for (final Part part : campaign.getWarehouse().getParts()) {
+            if (equals(part.getTech())) {
+                part.cancelAssignment();
+            }
+        }
+
+        for (final Force force : campaign.getAllForces()) {
+            if (getId().equals(force.getTechID())) {
+                force.setTechID(null);
+            }
+        }
     }
 
     public int getMinutesLeft() {
