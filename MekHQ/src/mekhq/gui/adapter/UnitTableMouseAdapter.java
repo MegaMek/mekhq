@@ -40,6 +40,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import megamek.client.ui.dialogs.BVDisplayDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
@@ -68,7 +69,6 @@ import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.RestoreUnitAction;
-import mekhq.campaign.unit.actions.ShowUnitBvAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
@@ -85,8 +85,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
-    private ResourceBundle resourceMap = ResourceBundle
-            .getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl());
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl());
 
     //region Commands
     //region Standard Commands
@@ -130,7 +129,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
-    public static final String COMMAND_SHOW_BV_CALC = "SHOW_BV_CALC";
     //endregion Standard Commands
 
     //region GM Commands
@@ -488,9 +486,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     selectedUnit.getFluffName());
             selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-        } else if (command.equals(COMMAND_SHOW_BV_CALC)) {
-            IUnitAction showUnitBvAction = new ShowUnitBvAction();
-            showUnitBvAction.execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
             IUnitAction restoreUnitAction = new RestoreUnitAction();
             for (Unit u : units) {
@@ -1008,8 +1003,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             if (oneSelected) {
                 menuItem = new JMenuItem("Show BV Calculation");
-                menuItem.setActionCommand(COMMAND_SHOW_BV_CALC);
-                menuItem.addActionListener(this);
+                menuItem.addActionListener(evt -> {
+                    if (unit.getEntity() != null) {
+                        unit.getEntity().calculateBattleValue();
+                        new BVDisplayDialog(gui.getFrame(), unit.getEntity()).setVisible(true);
+                    }
+                });
                 popup.add(menuItem);
             }
 

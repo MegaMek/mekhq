@@ -108,6 +108,8 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
+     * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
+     * 
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ TODO: Some of
      * this may want to be back-ported into entity itself in MM and then
@@ -160,6 +162,8 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
          if (tgtEnt instanceof Infantry) {
              retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN()));
          }
+
+         retVal.append(String.format("\" %s=\"%d", MULParser.ALTITUDE, tgtEnt.getAltitude()));
 
         retVal.append("\">\n");
 

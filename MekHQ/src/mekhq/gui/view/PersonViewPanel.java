@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -72,7 +73,7 @@ import mekhq.gui.utilities.WrapLayout;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends ScrollablePanel {
+public class PersonViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -85,6 +86,7 @@ public class PersonViewPanel extends ScrollablePanel {
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+        super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
@@ -656,11 +658,10 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free non-dependent, or if the
-        // person has tracked total earnings
+        // We show the following if track total earnings is on for a free person, or if the
+        // person has previously tracked total earnings
         if (campaign.getCampaignOptions().trackTotalEarnings()
-                && ((person.getPrisonerStatus().isFree() && !person.isDependent())
-                || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
+                && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
@@ -1234,7 +1235,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(false)) {
+            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(true)) {
                 //Add the Edge Available field for support personnel only
                 lblEdgeAvail1.setName("lblEdgeAvail1");
                 lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));

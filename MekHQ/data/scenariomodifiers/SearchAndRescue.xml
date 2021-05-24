@@ -1,4 +1,8 @@
 <AtBScenarioModifier>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<additionalBriefingText>Minor detention facility reported here. Rescue targets from designated buildings.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
@@ -28,26 +32,30 @@
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 	</forceDefinition>
-	<scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Designated Facilities</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
-                    <effectScaling>Linear</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects/>
-            <additionalDetails/>
-            <description>Extract from or do not destroy units from the following force(s) for additional support points:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <fixedAmount>1</fixedAmount>
-            <objectiveCriterion>Capture</objectiveCriterion>
-            <percentage>1</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
+	<objectives>
+		<objective>
+			<associatedForceNames>
+				<associatedForceName>Designated Facilities</associatedForceName>
+			</associatedForceNames>
+			<successEffects>
+				<successEffect>
+					<effectType>SupportPointUpdate</effectType>
+					<effectScaling>Linear</effectScaling>
+					<howMuch>1</howMuch>
+				</successEffect>
+			</successEffects>
+			<description>Extract from, or, leave intact while maintaining battlefield control, units from the following force(s) for additional support points:</description>
+			<additionalDetails>
+				<additionalDetail>
+					1 support point will be awarded per intact unit remaining.
+				</additionalDetail>
+			</additionalDetails>
+			<destinationEdge>NONE</destinationEdge>
+			<fixedAmount>1</fixedAmount>
+			<objectiveCriterion>Capture</objectiveCriterion>
+			<percentage>1</percentage>
+			<timeLimitAtMost>true</timeLimitAtMost>
+			<timeLimitType>None</timeLimitType>
+		</objective>
+        </objectives>
 </AtBScenarioModifier>

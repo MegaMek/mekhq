@@ -57,6 +57,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public BotForce() {
         setCamouflage(new Camouflage());
+        setColour(PlayerColour.BLUE);
         this.entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
@@ -231,7 +232,15 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         if (!getCamouflage().hasDefaultFilename()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoFileName", getCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        
+        // if we've got a legitimate color, great. Otherwise, write out something default
+        if (getColour() != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        } else {
+            MekHQ.getLogger().error("Null colour specified for bot force; defaulting to FIRE BRICK");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", PlayerColour.FIRE_BRICK.name());
+        }
+        
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {

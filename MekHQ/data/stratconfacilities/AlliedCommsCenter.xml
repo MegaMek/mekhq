@@ -1,0 +1,8 @@
+<StratconFacility>
+	<capturedDefinition>HostileCommsCenter.xml</capturedDefinition>
+	<displayableName>Comms Center</displayableName>
+        <facilityType>CommandCenter</facilityType>
+        <owner>Allied</owner>
+	<sharedModifiers>GoodEvent.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>

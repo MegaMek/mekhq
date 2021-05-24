@@ -1,0 +1,35 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>This location is defended by additional fixed turrets.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>false</allowAeroBombs>
+		<allowedUnitType>7</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
+		<deploymentZones>
+			<deploymentZone>10</deploymentZone>
+		</deploymentZones>
+		<destinationZone>4</destinationZone>
+		<fixedUnitCount>0</fixedUnitCount>
+		<forceAlignment>2</forceAlignment>
+		<forceMultiplier>1.0</forceMultiplier>
+		<forceName>Local Fixed Defences</forceName>
+		<generationMethod>2</generationMethod>
+		<generationOrder>3</generationOrder>
+		<maxWeightClass>4</maxWeightClass>
+		<retreatThreshold>50</retreatThreshold>
+		<objectiveLinkedForces>
+			<objectiveLinkedForce>Base Turrets</objectiveLinkedForce>
+		</objectiveLinkedForces>
+		<syncDeploymentType>None</syncDeploymentType>
+	</forceDefinition>
+</AtBScenarioModifier>

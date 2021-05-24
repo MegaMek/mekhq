@@ -41,13 +41,14 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ScenarioViewPanel extends ScrollablePanel {
+public class ScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Scenario scenario;
@@ -63,13 +64,10 @@ public class ScenarioViewPanel extends ScrollablePanel {
     private StubTreeModel forceModel;
 
     public ScenarioViewPanel(Scenario s, Campaign c) {
+        super();
         this.scenario = s;
         this.campaign = c;
-        if (s.isCurrent()) {
-            this.forces = new ForceStub(s.getForces(campaign), campaign);
-        } else {
-            this.forces = s.getForceStub();
-        }
+        this.forces = s.getStatus().isCurrent() ? new ForceStub(s.getForces(c), c) : s.getForceStub();
         forceModel = new StubTreeModel(forces);
         initComponents();
     }
@@ -141,8 +139,9 @@ public class ScenarioViewPanel extends ScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + scenario.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + scenario.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

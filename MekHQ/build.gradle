@@ -28,6 +28,7 @@ sourceSets {
 
 configurations {
     jarbundler
+    all*.exclude group: 'xml-apis', module: 'xml-apis'
 }
 
 dependencies {
@@ -59,6 +60,7 @@ mainClassName = 'mekhq.MekHQ'
 
 ext {
     jvmOptions = ['-Xmx1024m']
+    userdata='userdata'
     data = 'data'
     conf = 'mmconf'
     log = 'logs'
@@ -174,8 +176,11 @@ task stageFiles(type: Copy) {
     include "${data}/images/universe/"
     include "${data}/scenariomodifiers/"
     include "${data}/scenariotemplates/"
+    include "${data}/stratconcontractdefinitions/"
+    include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
+    include "${userdata}/"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -360,7 +365,7 @@ createExe {
     jar = "${project.tasks.getByName("jar").archiveFile.get()}"
     icon = "${projectDir}/data/images/misc/mekhq.ico"
     internalName = 'MekHQ'
-	classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
+    classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -379,7 +384,7 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     outfile = 'MegaMek.exe'
     mainClassName = 'megamek.MegaMek'
     jar = "lib/${mmJar.archiveFileName.get()}"
-	classpath = project.sourceSets.main.runtimeClasspath.files
+    classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
@@ -401,7 +406,7 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
     jar = "lib/${mmlJar.archiveFileName.get()}"
-	classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
+    classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"

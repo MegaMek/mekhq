@@ -1,0 +1,87 @@
+StratCon reference and FAQ
+
+How do I get this started?
+Go to the AtB tab in Campaign Options and check "Use StratCon" at the very bottom.
+
+
+How do I use the StratCon tab?
+It's a graphical representation of one or more theatres of operations for your current AtB contract. It will have meaningful data once you arrive on the contract planet and the contract begins.
+
+Hexes where you've conducted recon are displayed as light gray, hexes where you have not are dark gray. Pro tip: if you want to reveal hexes faster, use a lance with the "scout" disposition, that'll reveal all hexes around the deployment hex.
+
+Allied facilities are displayed as green squares.
+Hostile facilities are displayed as red squares.
+Your forces deployed to the track are displayed as cyan circles.
+Pending scenarios against hostile forces are concentric red squares.
+
+
+That's great, how do I win?
+Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. 
+
+Under Liaison command, you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives. On defensive contracts, this may include keeping allied facilities intact and under allied control. On offensive contracts, it's usually capturing/destroying facilities or winning specific scenarios. VPs are only affected by scenarios in which a liaison participates.
+
+Under Independent command, you're only responsible for completing strategic objectives.
+
+
+This scenario looks pretty tough, how do I bring in more forces?
+Right click on it and select 'manage scenario'. Now you have a couple of options:
+
+If your primary lance leader has leadership, and you have "auxiliary units" available (ones that are not of the same type as the main unit type of the primary force), you can deploy as many auxiliaries as you have leadership points.
+
+If your primary lance is in a 'defend' role, you can deploy up to 2 * (x + 1) your lance leader's tactics skill in infantry, battle armor squads and minefields. Any "left-over" defensive points are automatically converted into standard minefields.
+
+Finally, you can bring in additional lances, with rules as follows:
+- If the lance is already on the same track as the scenario, you can just deploy it as is.
+- If you have a support point or a victory point to spare, you can deploy the lance as is.
+- If the lance is in a 'fight' role, you can deploy it. However, on a 8 or less on a 2d6, it will add an extra negative modifier to the scenario.
+- Otherwise, you can attempt to deploy a lance anyway. On a 2d6 roll, 2-5 means deployment failure, 6-8 adds extra negative modifier, 9 or more succeeds.
+
+
+I want to leave a lance deployed in the field so I don't have to pay SPs or risk extra negative modifiers, can I do that?
+Yep, right click on it and select 'remain deployed'. Now it will stay in the field until you uncheck that setting and be able to reinforce any scenarios you want without problems. However, you won't be able to carry out repairs or reloads.
+
+
+I don't want to do this scenario, can I skip it?
+Under integrated or house command, or if the liaison is coming along for the ride, you will lose a VP.
+Additionally, if there's an allied facility on the track, the scenario will move towards the nearest allied facility. Sometimes, you need to keep those intact as part of the contract. And if they get captured without a fight, the enemy will put them to use, making subsequent scenarios more difficult.
+
+
+How are the opposing forces generated?
+The primary opposing forces are usually generated via the "scaled BV" method. This takes into account the difficulty rating and your current CamOps or FMM unit rating. The algorithm is roughly as follows:
+
+Your unit rating determines the BV floor. This is a percentage from 50-100, inclusive.
+Your difficulty determines the BV ceiling. This a percentage between 80-120, inclusive.
+Multiply the above percentages by the BV of your primary forces. The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly-picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight. 
+
+1. The scaled opfor receives one lance off the appropriate RAT. If the BV is under the floor, repeat.
+2. If the BV is between the floor and ceiling, we roll a 1d100 and compare it to the ratio of current opposition BV / ceiling. If the roll is lower than the ratio, then we stop. Otherwise, go back to 1 and add another lance.
+
+The intention here is that, as the unit gets better, it will face tougher opposition, while giving a bit of a break to starting units. This mechanism may not produce very fair results for very low-BV forces, so there is no expectation of a balanced scenario for four squads of foot rifle infantry. For very high-BV forces, you are likely to see excessive numbers of hostile units.
+
+
+There seems to be an excessive amount of enemy reinforcements coming into my battles, what gives?
+Might be a hostile facility or three on the track. Better do some recon and take them out, or, even better, capture them so you can use them. Or, you might just be having bad luck - each scenario can receive up to three modifiers.
+
+
+How do I capture a hostile facility?
+You'll need to complete the 'capture' objective in an attack scenario on it, without completing the 'destroy' objective. Meaning, you'll need to leave (by default, 75% of) the facility turrets intact (though disabling them via crew kills, equipment destruction or ammo depletion is fine), while routing any mobile enemy ground units (usually, crippling 75% of all non-aerospace units will do the trick). 
+
+
+How do I manually deploy units to a track?
+Right click on the desired hex, and click the 'deploy force' item, then pick a force. Easy! Just watch out, the hostiles might not like it and may intercept your force.
+
+
+My units aren't showing up in the repair tab! Why?
+You've probably got them deployed to a StratCon track. Wait for them to come back, and don't deploy them to any additional scenarios.
+
+
+I want to design my own scenarios, how do I do that?
+Use the Scenario Template Editor to put together a scenario template. I recommend using the Briefing Room -> Add Scenario -> Generate From Template mechanism to test the template out. Now, go to your data\scenariomodifiers directory and create (if it doesn't exist already) a file called UserScenarioManifest.xml. It should be formatted exactly like ScenarioManifest. Make sure not to overlap with the ID numbers or file names in ScenarioManifest, as that "may cause unpredictable behavior". Now that you've got your scenario in the UserScenarioManifest file, it'll be added to the pool of scenarios StratCon draws from when generating battles.
+
+
+Do I use BV or unit count to determine whether I've completed an objective?
+You can use either, that's entirely up to you. Maybe even both! 
+
+
+How do I determine if I control the battlefield after a battle?
+By default, crippling or destroying 50% of the opposition (not including aerospace units on ground maps) will grant you control of the battlefield for salvage, search & rescue or any other purposes. The exception being a hostile facility, which requires crippling or destroying 75% of the opposition (again, not including aerospace units on ground maps) to gain battlefield control.

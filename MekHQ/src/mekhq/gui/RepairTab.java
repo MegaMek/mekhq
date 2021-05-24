@@ -50,6 +50,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -598,23 +599,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             return;
         }
         if (part instanceof Part && ((Part) part).onBadHipOrShoulder() && !part.isSalvaging()) {
-            if (part instanceof MekLocation && ((MekLocation) part).isBreached()
-                    && 0 != JOptionPane.showConfirmDialog(getFrame(),
-                            "You are sealing a limb with a bad shoulder or hip.\n"
-                                    + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                    + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                    + "Do you wish to continue?",
-                            "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
-                return;
-            } else if (part instanceof MekLocation && ((MekLocation) part).isBlownOff()
-                    && 0 != JOptionPane.showConfirmDialog(getFrame(),
-                            "You are re-attaching a limb with a bad shoulder or hip.\n"
-                                    + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                    + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                    + "Do you wish to continue?",
-                            "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
-                return;
-            } else if (0 != JOptionPane.showConfirmDialog(getFrame(),
+            if (0 != JOptionPane.showConfirmDialog(getFrame(),
                     "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
                             + "You may continue, but this limb cannot be repaired and you will have to\n"
                             + "remove this equipment if you wish to scrap and then replace the limb.\n"
@@ -723,13 +708,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 if ((unit != null) && unit.isSelfCrewed()) {
-                    if (tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                    if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;
                     }
                     // check whether the engineer is assigned to the correct
                     // unit
                     return unit.equals(tech.getUnit());
-                } else if ((tech.getPrimaryRole() == Person.T_SPACE_CREW) && (unit != null) && !unit.isSelfCrewed()) {
+                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
                     return false;
@@ -904,6 +889,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(StratconDeploymentEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 

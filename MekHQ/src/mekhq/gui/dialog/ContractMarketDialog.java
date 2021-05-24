@@ -444,7 +444,10 @@ public class ContractMarketDialog extends JDialog {
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(selectedContract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                     "Advance monies for " + selectedContract.getName(), campaign.getLocalDate());
+            
             campaign.addMission(selectedContract);
+            // must be invoked after campaign.addMission to ensure presence of mission ID
+            selectedContract.acceptContract(campaign);
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts
                     .convertRowIndexToModel(tableContracts.getSelectedRow()));

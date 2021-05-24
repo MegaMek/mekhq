@@ -53,7 +53,10 @@ Data
 		krazzyharry
 
 	Against the Bot Guide
-		CampaignAnon 
+		CampaignAnon
+		
+	Tutorial Guide
+		boomboomf22 
 
 	News
 		Jason Schmetzer

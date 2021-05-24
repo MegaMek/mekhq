@@ -35,12 +35,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.model.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -75,9 +77,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewAtBContractDialog.class);
-
-        this.setName("dialog");
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
+        setName("NewAtBContractDialog");
         preferences.manage(new JWindowPreference(this));
     }
 
@@ -87,7 +88,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         employerSet = RandomFactionGenerator.getInstance().getEmployerSet();
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
-        ((AtBContract)contract).initContractDetails(campaign);
+        ((AtBContract) contract).initContractDetails(campaign);
         IUnitRating rating = campaign.getUnitRating();
         dragoonRating = rating.getUnitRatingAsInteger();
         super.initComponents();
@@ -122,7 +123,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract)(this.contract);
 
         java.awt.GridBagConstraints gbc;
-        txtName = new javax.swing.JTextField();
+        txtName = new JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
         cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
@@ -130,13 +131,13 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
-        cbPlanets = new JComboBox<String>();
-        cbPlanets.setModel(new SortedComboBoxModel<String>());
+        cbPlanets = new JComboBox<>();
+        cbPlanets.setModel(new SortedComboBoxModel<>());
         chkShowAllPlanets = new JCheckBox();
-        cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+        cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
@@ -177,8 +178,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(txtName, gbc);
 
         if (campaign.getFactionCode().equals("MERC")) {
-            lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
-            lblEmployer.setName("lblEmployer"); // NOI18N
+            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            lblEmployer.setName("lblEmployer");
             gbc.gridx = 0;
             gbc.gridy = y;
             gbc.gridwidth = 1;
@@ -186,7 +187,6 @@ public class NewAtBContractDialog extends NewContractDialog {
             gbc.insets = new java.awt.Insets(5, 5, 5, 5);
             descPanel.add(lblEmployer, gbc);
 
-//        	cbEmployer.setSelectedIndex(0);
             gbc.gridx = 1;
             gbc.gridy = y++;
             gbc.gridwidth = 2;
@@ -196,8 +196,8 @@ public class NewAtBContractDialog extends NewContractDialog {
             descPanel.add(cbEmployer, gbc);
         }
 
-        lblEnemy.setText(resourceMap.getString("lblEnemy.text")); // NOI18N
-        lblEnemy.setName("lblEnemy"); // NOI18N
+        lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
+        lblEnemy.setName("lblEnemy");
 
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -430,7 +430,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
         cbEnemy.addFactionEntries(RandomFactionGenerator.getInstance().
                 getEnemyList(getCurrentEmployerCode()), campaign.getGameYear());
-        cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
+        cbEnemy.setSelectedItemByKey(((AtBContract) contract).getEnemyCode());
     }
 
     private void showAllFactions(boolean show) {
@@ -441,12 +441,12 @@ public class NewAtBContractDialog extends NewContractDialog {
             cbEnemy.removeAllItems();
             cbEmployer.addFactionEntries(currentFactions, campaign.getGameYear());
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
-            cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
-            cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
+            cbEmployer.setSelectedItemByKey(((AtBContract) contract).getEmployerCode());
+            cbEnemy.setSelectedItemByKey(((AtBContract) contract).getEnemyCode());
         } else {
             cbEmployer.removeAllItems();
             cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
-            cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
+            cbEmployer.setSelectedItemByKey(((AtBContract) contract).getEmployerCode());
             updateEnemies();
         }
         addAllListeners();
@@ -532,7 +532,15 @@ public class NewAtBContractDialog extends NewContractDialog {
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
         campaign.addMission(contract);
-        this.setVisible(false);
+        
+        // note that the contract must be initialized after the mission is added to the campaign
+        // to ensure presence of mission ID
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.initializeCampaignState(contract, campaign,
+                    StratconContractDefinition.getContractDefinition(contract.getMissionType()));
+        }
+        
+        setVisible(false);
     }
 
     @Override
@@ -548,20 +556,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "Setting employer code to " + getCurrentEmployerCode());
+            MekHQ.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
             long time = System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to set employer code: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updateEnemies();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update enemies: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updatePlanets();
-            MekHQ.getLogger().info(getClass(), "doUpdateContract",
-                    "to update planets: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

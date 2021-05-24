@@ -20,34 +20,14 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import megamek.common.Mounted;
-import megamek.common.annotations.Nullable;
-import megamek.common.util.WeightedMap;
-import mekhq.campaign.CampaignOptions;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.EquipmentType;
+import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.autocannons.LBXACWeapon;
@@ -59,6 +39,25 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
@@ -585,7 +584,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
      */
     public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel,
                                                               final int year, final boolean clusterOnly) {
-        final WeightedMap<EquipmentType> weapons = new WeightedMap<>();
+        final WeightedIntMap<EquipmentType> weapons = new WeightedIntMap<>();
         // First try to generate based on the person's unit
         if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
             for (final Mounted mounted : person.getUnit().getEntity().getEquipment()) {
@@ -617,7 +616,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     private static void addValidWeaponryToMap(final EquipmentType equipmentType,
                                               final Person person, final int techLevel,
                                               final int year, final boolean clusterOnly,
-                                              final WeightedMap<EquipmentType> weapons) {
+                                              final WeightedIntMap<EquipmentType> weapons) {
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is IS for
         // IS personnel and Clan for Clan personnel
         if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
@@ -647,10 +646,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
     /**
      * Worker function that determines if a piece of equipment is eligible for being selected for an SPA.
      * @param et Equipment type to check
-     * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
+     * @param role Person's primary role. This check is ignored if PersonnelRole.NONE is passed in.
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
-    public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
+    public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
         }
@@ -668,15 +667,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return false;
         }
 
-        if (type > Person.T_NONE &&
-                !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
-                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
-                        || type == Person.T_NVEE_DRIVER
-                        || type == Person.T_GVEE_DRIVER
-                        || type == Person.T_VTOL_PILOT))
-                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+        if (!role.isDependentOrNone()
+                && !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && !role.isMechWarrior())
+                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
+                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
+                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMechPilot()))) {
             return false;
         }
 
@@ -703,7 +699,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             toReturn += getDisplayName(prereq) + "<br>";
         }
         for (SkillPrereq skPr : prereqSkills) {
-            toReturn += skPr.toString() + "<br>";
+            toReturn += skPr + "<br>";
         }
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";

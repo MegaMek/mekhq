@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <alliedFacilityCount>0</alliedFacilityCount>
+    <briefing>Engage hostile forces. Be quick.</briefing>
+    <contractTypeName>Guerilla Warfare</contractTypeName>
+    <hostileFacilityCount>-1</hostileFacilityCount>
+	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
+	<scenarioOdds>
+		<scenarioOdds>10</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+		<scenarioOdds>40</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+	</scenarioOdds>
+	<deploymentTimes>
+		<deploymentTimes>0</deploymentTimes>
+		<deploymentTimes>1</deploymentTimes>
+		<deploymentTimes>2</deploymentTimes>
+		<deploymentTimes>3</deploymentTimes>
+	</deploymentTimes>
+    <objectiveParameters>
+        <objectiveParameter>
+		<objectiveCount>-1</objectiveCount>
+		<objectiveType>AnyScenarioVictory</objectiveType>
+		<objectiveScenarioModifiers>										<objectiveScenarioModifier>OverwhelmingEnemyGroundReinforcements.xml</objectiveScenarioModifier>
+			<objectiveScenarioModifier>OverwhelmingEnemyAirReinforcements.xml</objectiveScenarioModifier>
+		</objectiveScenarioModifiers>
+        </objectiveParameter>
+    </objectiveParameters>
+</ScenarioTemplate>

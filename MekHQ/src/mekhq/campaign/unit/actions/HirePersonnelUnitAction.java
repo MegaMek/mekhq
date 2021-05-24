@@ -1,7 +1,7 @@
 /*
  * HirePersonnelUnitAction.java
  *
- * Copyright (c) 2020 The Megamek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,19 +18,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 /**
  * Hires a full complement of personnel for a unit.
  */
 public class HirePersonnelUnitAction implements IUnitAction {
-
     private final boolean isGM;
 
     /**
@@ -47,35 +46,35 @@ public class HirePersonnelUnitAction implements IUnitAction {
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
             if (unit.getEntity() instanceof LandAirMech) {
-                p = campaign.newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+                p = campaign.newPerson(PersonnelRole.LAM_PILOT);
             } else if (unit.getEntity() instanceof Mech) {
-                p = campaign.newPerson(Person.T_MECHWARRIOR);
+                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
-                p = campaign.newPerson(Person.T_SPACE_PILOT);
+                p = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                p = campaign.newPerson(Person.T_CONV_PILOT);
+                p = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             } else if (unit.getEntity() instanceof Aero) {
-                p = campaign.newPerson(Person.T_AERO_PILOT);
+                p = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
                 switch (unit.getEntity().getMovementMode()) {
                     case VTOL:
-                        p = campaign.newPerson(Person.T_VTOL_PILOT);
+                        p = campaign.newPerson(PersonnelRole.VTOL_PILOT);
                         break;
                     case NAVAL:
                     case HYDROFOIL:
                     case SUBMARINE:
-                        p = campaign.newPerson(Person.T_NVEE_DRIVER);
+                        p = campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                         break;
                     default:
-                        p = campaign.newPerson(Person.T_GVEE_DRIVER);
+                        p = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 }
             } else if (unit.getEntity() instanceof Protomech) {
-                p = campaign.newPerson(Person.T_PROTO_PILOT);
+                p = campaign.newPerson(PersonnelRole.PROTOMECH_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
-                p = campaign.newPerson(Person.T_BA);
+                p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
             } else if (unit.getEntity() instanceof Infantry) {
-                p = campaign.newPerson(Person.T_INFANTRY);
+                p = campaign.newPerson(PersonnelRole.SOLDIER);
             }
             if (p == null) {
                 break;
@@ -95,12 +94,12 @@ public class HirePersonnelUnitAction implements IUnitAction {
         while (unit.canTakeMoreGunners()) {
             Person p = null;
             if (unit.getEntity() instanceof Tank) {
-                p = campaign.newPerson(Person.T_VEE_GUNNER);
+                p = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
-                p = campaign.newPerson(Person.T_SPACE_GUNNER);
+                p = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mech) {
-                p = campaign.newPerson(Person.T_MECHWARRIOR);
+                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
             }
             if (p == null) {
                 break;
@@ -112,7 +111,8 @@ public class HirePersonnelUnitAction implements IUnitAction {
         }
 
         while (unit.canTakeMoreVesselCrew()) {
-            Person p = campaign.newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
+            Person p = campaign.newPerson(unit.getEntity().isSupportVehicle()
+                    ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
             if (p == null) {
                 break;
             }
@@ -123,7 +123,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
         }
 
         if (unit.canTakeNavigator()) {
-            Person p = campaign.newPerson(Person.T_NAVIGATOR);
+            Person p = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR);
             if (!campaign.recruitPerson(p, isGM)) {
                 return;
             }
@@ -134,9 +134,9 @@ public class HirePersonnelUnitAction implements IUnitAction {
             Person p;
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
-                p = campaign.newPerson(Person.T_VEE_GUNNER);
+                p = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else {
-                p = campaign.newPerson(Person.T_MECHWARRIOR);
+                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
             }
             if (!campaign.recruitPerson(p, isGM)) {
                 return;

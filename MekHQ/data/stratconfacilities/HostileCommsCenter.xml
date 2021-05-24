@@ -1,0 +1,8 @@
+<StratconFacility>
+	<capturedDefinition>AlliedCommsCenter.xml</capturedDefinition>
+	<displayableName>Comms Center</displayableName>
+        <facilityType>CommandCenter</facilityType>
+        <owner>Opposing</owner>
+	<sharedModifiers>BadEvent.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>
