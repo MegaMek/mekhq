@@ -74,6 +74,7 @@ public enum AtBLanceRole {
     }
     //endregion Boolean Comparison Methods
 
+    //region File I/O
     public static AtBLanceRole parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -81,7 +82,6 @@ public enum AtBLanceRole {
 
         }
 
-        // Magic Number Save Format
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
@@ -105,6 +105,7 @@ public enum AtBLanceRole {
 
         return FIGHTING;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {

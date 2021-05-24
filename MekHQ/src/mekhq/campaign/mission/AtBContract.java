@@ -406,18 +406,21 @@ public class AtBContract extends Contract implements Serializable {
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
     }
 
-    public int getRepairLocation(int dragoonRating) {
-        int retval = Unit.SITE_BAY;
+    public int getRepairLocation(final int unitRating) {
+        int repairLocation;
         if (getContractType().isGuerrillaWarfare() || getContractType().isRaidType()) {
-            retval = Unit.SITE_FIELD;
+            repairLocation = Unit.SITE_FIELD;
         } else if (!getContractType().isGarrisonType()) {
-            retval = Unit.SITE_MOBILE_BASE;
+            repairLocation = Unit.SITE_MOBILE_BASE;
+        } else {
+            repairLocation = Unit.SITE_BAY;
         }
 
-        if (dragoonRating >= IUnitRating.DRAGOON_B) {
-            retval++;
+        if (unitRating >= IUnitRating.DRAGOON_B) {
+            repairLocation++;
         }
-        return Math.min(retval, Unit.SITE_BAY);
+
+        return Math.min(repairLocation, Unit.SITE_BAY);
     }
 
     public void addMoraleMod(int mod) {
