@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.options.AbstractOptionsInfo;
 import megamek.common.options.IBasicOptionGroup;
 import megamek.common.options.IOption;
@@ -139,7 +140,10 @@ public class PersonnelOptions extends PilotOptions {
         return new Vector<IOption>().elements();
     }
 
-    public void acquireAbility(String type, String name, Object value) {
+    public void acquireAbility(final String type, final String name, final @Nullable Object value) {
+        if (value == null) {
+            return;
+        }
         //we might also need to remove some prior abilities
         SpecialAbility spa = SpecialAbility.getAbility(name);
         Vector<String> toRemove = new Vector<>();

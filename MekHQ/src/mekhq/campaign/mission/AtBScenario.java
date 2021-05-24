@@ -27,10 +27,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
@@ -38,6 +40,7 @@ import java.util.Vector;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
+import mekhq.MekHqConstants;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,7 +51,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
@@ -70,6 +72,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     //region Variable Declarations
     private static final long serialVersionUID = 1148105510264408943L;
 
+    public static final int DYNAMIC = -1;
     public static final int BASEATTACK = 0;
     public static final int EXTRACTION = 1;
     public static final int CHASE = 2;
@@ -214,7 +217,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
-    private Map<String, Entity> externalIDLookup;
+    protected Map<String, Entity> externalIDLookup;
+
+    private Map<Integer, Integer> numPlayerMinefields;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     //endregion Variable Declarations
@@ -232,6 +237,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<>();
         transportLinkages = new HashMap<>();
         externalIDLookup = new HashMap<>();
+        numPlayerMinefields = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -695,6 +701,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         /* The entities in the attachedAllies list will be added to the player's forces
          * in MM and don't require a separate BotForce */
+        final Camouflage camouflage = getContract(campaign).getAllyCamouflage();
         for (int i = 0; i < numAttachedPlayer; i++) {
             Entity en = getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -705,8 +712,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 externalIDLookup.put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                    en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                    en.setCamoFileName(getContract(campaign).getAllyColour().name());
+                    en.setCamouflage(camouflage.clone());
                 }
             } else {
                 MekHQ.getLogger().error("Entity for player-controlled allies is null");
@@ -1309,11 +1315,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
 
         // aerotechs are rarer, so spawn them less often
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() >
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
 
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
@@ -1377,13 +1383,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
         boolean spawnConventionalInfantry = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
 
         // battle armor is more rare
         boolean spawnBattleArmor = !opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
@@ -1473,7 +1479,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
-                c.getAllyCamoCategory(), c.getAllyCamoFileName(), c.getAllyColour());
+                c.getAllyCamouflage().clone(), c.getAllyColour());
     }
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
@@ -1482,7 +1488,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
-                c.getEnemyCamoCategory(), c.getEnemyCamoFileName(), c.getEnemyColour());
+                c.getEnemyCamouflage().clone(), c.getEnemyColour());
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
@@ -1634,6 +1640,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
 
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</transportLinkages>");
+        }
+
+        if (numPlayerMinefields.size() > 0) {
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "numPlayerMinefields");
+
+            for (int key : numPlayerMinefields.keySet()) {
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 2, "numPlayerMinefield");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldType", key);
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldCount", numPlayerMinefields.get(key).toString());
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 2, "numPlayerMinefield");
+            }
+
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "numPlayerMinefields");
         }
 
         super.writeToXmlEnd(pw1, indent);
@@ -1833,6 +1852,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } catch (Exception e) {
                     MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefields")) {
+                try {
+                    loadMinefieldCounts(wn2);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error("Error loading minefield counts in scenario", e);
+                }
             }
         }
         /* In the event a discrepancy occurs between a RAT entry and the unit lookup name,
@@ -1882,6 +1907,36 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
+    /**
+     * Worker function that loads the minefield counts for the player
+     */
+    private void loadMinefieldCounts(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefield")) {
+                NodeList minefieldNodes = wn2.getChildNodes();
+
+                int minefieldType = 0;
+                int minefieldCount = 0;
+
+                for (int minefieldIndex = 0; minefieldIndex < minefieldNodes.getLength(); minefieldIndex++) {
+                    Node wn3 = minefieldNodes.item(minefieldIndex);
+
+                    if (wn3.getNodeName().equalsIgnoreCase("minefieldType")) {
+                        minefieldType = Integer.parseInt(wn3.getTextContent());
+                    } else if (wn3.getNodeName().equalsIgnoreCase("minefieldCount")) {
+                        minefieldCount = Integer.parseInt(wn3.getTextContent());
+                    }
+                }
+
+                numPlayerMinefields.put(minefieldType, minefieldCount);
+            }
+        }
+    }
+
     private List<String> getEntityStub(Node wn) {
         List<String> stub = new ArrayList<>();
         NodeList nl = wn.getChildNodes();
@@ -1904,6 +1959,28 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public AtBContract getContract(Campaign c) {
         return (AtBContract) c.getMission(getMissionId());
+    }
+
+    /**
+     * Gets all the entities that are part of the given entity list and are
+     * not in this scenario's transport linkages as a transported unit.
+     */
+    public List<Entity> filterUntransportedUnits(List<Entity> entities) {
+        List<Entity> retVal = new ArrayList<>();
+
+        // assemble a set of transported units for easier lookup
+        Set<String> transportedUnits = new HashSet<>();
+        for (List<String> transported : getTransportLinkages().values()) {
+            transportedUnits.addAll(transported);
+        }
+
+        for (Entity entity : entities) {
+            if (!transportedUnits.contains(entity.getExternalIdAsString())) {
+                retVal.add(entity);
+            }
+        }
+
+        return retVal;
     }
 
     public int getLanceForceId() {
@@ -1964,11 +2041,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getNumBots() {
-        if (isCurrent()) {
-            return botForces.size();
-        } else {
-            return botForceStubs.size();
-        }
+        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
     }
 
     public List<String> getAlliesPlayerStub() {
@@ -2091,7 +2164,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         rerollsRemaining--;
     }
 
-    protected void setRerolls(int rerolls) {
+    public void setRerolls(int rerolls) {
         rerollsRemaining = rerolls;
     }
 
@@ -2101,6 +2174,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setEnemyHome(int enemyHome) {
         this.enemyHome = enemyHome;
+    }
+
+    public int getNumPlayerMinefields(int minefieldType) {
+        return numPlayerMinefields.containsKey(minefieldType) ? numPlayerMinefields.get(minefieldType) : 0;
+    }
+
+    public void setNumPlayerMinefields(int minefieldType, int numPlayerMinefields) {
+        this.numPlayerMinefields.put(minefieldType, numPlayerMinefields);
     }
 
     public Map<String, List<String>> getTransportLinkages() {

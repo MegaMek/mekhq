@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,6 +26,7 @@ import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
@@ -50,129 +51,135 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             if (roll == 2) {
                 switch (Compute.randomInt(4)) {
                 case 0:
-                    p = c.newPerson(Person.T_ADMIN_COM);
+                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
                     break;
                 case 1:
-                    p = c.newPerson(Person.T_ADMIN_HR);
+                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
                     break;
                 case 2:
-                    p = c.newPerson(Person.T_ADMIN_LOG);
+                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
                     break;
                 case 3:
-                    p = c.newPerson(Person.T_ADMIN_TRA);
+                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
                     break;
                 }
             } else if (roll == 3 || roll == 11) {
                 int r = Compute.d6();
                 if ((r == 1) && (c.getGameYear() > (c.getFaction().isClan() ? 2870 : 3050))) {
-                    p = c.newPerson(Person.T_BA_TECH);
+                    p = c.newPerson(PersonnelRole.BA_TECH);
                 } else if (r < 4) {
-                    p = c.newPerson(Person.T_MECHANIC);
+                    p = c.newPerson(PersonnelRole.MECHANIC);
                 } else if (r == 4 && c.getCampaignOptions().getUseAero()) {
-                    p = c.newPerson(Person.T_AERO_TECH);
+                    p = c.newPerson(PersonnelRole.AERO_TECH);
                 } else {
-                    p = c.newPerson(Person.T_MECH_TECH);
+                    p = c.newPerson(PersonnelRole.MECH_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
-                p = c.newPerson(Person.T_MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MECHWARRIOR);
             } else if (roll == 5 && c.getCampaignOptions().getUseAero()) {
-                p = c.newPerson(Person.T_AERO_PILOT);
+                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
-                p = c.newPerson(Person.T_MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MECHWARRIOR);
             } else if (roll == 5) {
                 int r = Compute.d6(2);
                 if (r == 2) {
-                    p = c.newPerson(Person.T_VTOL_PILOT);
+                    p = c.newPerson(PersonnelRole.VTOL_PILOT);
                     //Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
                 } else if (r <= 5) {
-                    p = c.newPerson(Person.T_GVEE_DRIVER);
+                    p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 } else {
-                    p = c.newPerson(Person.T_VEE_GUNNER);
+                    p = c.newPerson(PersonnelRole.VEHICLE_GUNNER);
                 }
             } else if (roll == 6 || roll == 8) {
                 if (c.getFaction().isClan() && (c.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
-                    p = c.newPerson(Person.T_BA);
+                    p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
                 } else if (!c.getFaction().isClan() && (c.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
-                    p = c.newPerson(Person.T_BA);
+                    p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
                 } else {
-                    p = c.newPerson(Person.T_INFANTRY);
+                    p = c.newPerson(PersonnelRole.SOLDIER);
                 }
             } else if (roll == 12) {
-                p = c.newPerson(Person.T_DOCTOR);
+                p = c.newPerson(PersonnelRole.DOCTOR);
             }
 
             if (null != p) {
                 retVal.add(p);
 
-                if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
+                if (p.getPrimaryRole().isGroundVehicleDriver()) {
                     /* Replace driver with 1-6 crew with equal
                      * chances of being drivers or gunners */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        retVal.add(c.newPerson((Compute.d6() < 4) ? Person.T_GVEE_DRIVER : Person.T_VEE_GUNNER));
+                        retVal.add(c.newPerson((Compute.d6() < 4) ? PersonnelRole.GROUND_VEHICLE_DRIVER
+                                : PersonnelRole.VEHICLE_GUNNER));
                     }
                 }
 
-                Person adminHR = c.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                Person adminHR = c.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
+                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminHRExp) {
-                case SkillType.EXP_ULTRA_GREEN:
-                    gunneryMod = -1;
-                    pilotingMod = -1;
-                    break;
-                case SkillType.EXP_GREEN:
-                    if (Compute.d6() < 4) {
+                    case SkillType.EXP_ULTRA_GREEN:
                         gunneryMod = -1;
-                    } else {
                         pilotingMod = -1;
-                    }
-                    break;
-                case SkillType.EXP_VETERAN:
-                    if (Compute.d6() < 4) {
+                        break;
+                    case SkillType.EXP_GREEN:
+                        if (Compute.d6() < 4) {
+                            gunneryMod = -1;
+                        } else {
+                            pilotingMod = -1;
+                        }
+                        break;
+                    case SkillType.EXP_VETERAN:
+                        if (Compute.d6() < 4) {
+                            gunneryMod = 1;
+                        } else {
+                            pilotingMod = 1;
+                        }
+                        break;
+                    case SkillType.EXP_ELITE:
                         gunneryMod = 1;
-                    } else {
                         pilotingMod = 1;
-                    }
-                    break;
-                case SkillType.EXP_ELITE:
-                    gunneryMod = 1;
-                    pilotingMod = 1;
+                        break;
+                    default:
+                        break;
                 }
 
                 switch (p.getPrimaryRole()) {
-                case Person.T_MECHWARRIOR:
-                    adjustSkill(p, SkillType.S_GUN_MECH, gunneryMod);
-                    adjustSkill(p, SkillType.S_PILOT_MECH, pilotingMod);
-                    break;
-                case Person.T_GVEE_DRIVER:
-                    adjustSkill(p, SkillType.S_PILOT_GVEE, pilotingMod);
-                    break;
-                case Person.T_NVEE_DRIVER:
-                    adjustSkill(p, SkillType.S_PILOT_NVEE, pilotingMod);
-                    break;
-                case Person.T_VTOL_PILOT:
-                    adjustSkill(p, SkillType.S_PILOT_VTOL, pilotingMod);
-                    break;
-                case Person.T_VEE_GUNNER:
-                    adjustSkill(p, SkillType.S_GUN_VEE, gunneryMod);
-                    break;
-                case Person.T_AERO_PILOT:
-                    adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
-                    adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
-                    break;
-                case Person.T_INFANTRY:
-                    adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
-                    adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
-                    break;
-                case Person.T_BA:
-                    adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
-                    adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
-                    break;
-                case Person.T_PROTO_PILOT:
-                    adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
-                    break;
+                    case MECHWARRIOR:
+                        adjustSkill(p, SkillType.S_GUN_MECH, gunneryMod);
+                        adjustSkill(p, SkillType.S_PILOT_MECH, pilotingMod);
+                        break;
+                    case GROUND_VEHICLE_DRIVER:
+                        adjustSkill(p, SkillType.S_PILOT_GVEE, pilotingMod);
+                        break;
+                    case NAVAL_VEHICLE_DRIVER:
+                        adjustSkill(p, SkillType.S_PILOT_NVEE, pilotingMod);
+                        break;
+                    case VTOL_PILOT:
+                        adjustSkill(p, SkillType.S_PILOT_VTOL, pilotingMod);
+                        break;
+                    case VEHICLE_GUNNER:
+                        adjustSkill(p, SkillType.S_GUN_VEE, gunneryMod);
+                        break;
+                    case AEROSPACE_PILOT:
+                        adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
+                        adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
+                        break;
+                    case PROTOMECH_PILOT:
+                        adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
+                        break;
+                    case BATTLE_ARMOUR:
+                        adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
+                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        break;
+                    case SOLDIER:
+                        adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
+                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        break;
+                    default:
+                        break;
                 }
             }
             return retVal;

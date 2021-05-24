@@ -1,7 +1,6 @@
 /*
- * AddOrEditPersonnelEntryDialog.java
- *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,170 +19,138 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.time.LocalDate;
-import java.util.Optional;
-import java.util.ResourceBundle;
 
 import javax.swing.*;
 
-import megamek.common.util.EncodeControl;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
  * @author  Taharqa
  */
-public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
+public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
+    //region Variable Declarations
 	private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private JFrame frame;
-    private int operationType;
-    private LogEntry entry;
+    private final Person person;
+    private final LogEntry entry;
     private LocalDate date;
-    private LocalDate originalDate;
-    private String originalDescription;
 
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JButton btnDate;
-    private javax.swing.JPanel panBtn;
-    private javax.swing.JPanel panMain;
+    private JTextArea txtDescription;
+    private JButton btnDate;
+    //endregion Variable Declarations
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
-        this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
+    //region Constructors
+    public AddOrEditPersonnelEntryDialog(final JFrame parent, final @Nullable Person person,
+                                         final LocalDate entryDate) {
+        this(parent, ADD_OPERATION, person, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
-        this(parent, modal, EDIT_OPERATION, entry);
+    public AddOrEditPersonnelEntryDialog(final JFrame parent, final @Nullable Person person,
+                                         final LogEntry entry) {
+        this(parent, EDIT_OPERATION, person, entry);
     }
 
-    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
-        super(parent, modal);
-
+    private AddOrEditPersonnelEntryDialog(final JFrame parent, final int operationType,
+                                          final @Nullable Person person, final LogEntry entry) {
+        super(parent, "AddOrEditPersonnelEntryDialog", (operationType == ADD_OPERATION)
+                ? "AddOrEditPersonnelEntryDialog.AddEntry.title" : "AddOrEditPersonnelEntryDialog.EditEntry.title");
         assert entry != null;
 
-        this.frame = parent;
-        this.operationType = operationType;
+        this.person = person;
         this.entry = entry;
 
-        this.date = this.entry.getDate();
-        this.originalDate = this.entry.getDate();
-        this.originalDescription = this.entry.getDesc();
+        setDate(entry.getDate());
 
-        initComponents();
-        setLocationRelativeTo(parent);
-        setUserPreferences();
+        initialize();
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public @Nullable Person getPerson() {
+        return person;
     }
 
-    public Optional<LogEntry> getEntry() {
-        return Optional.ofNullable(entry);
+    public LogEntry getEntry() {
+        return entry;
     }
 
-    private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl());
-    	java.awt.GridBagConstraints gridBagConstraints;
+    public LocalDate getDate() {
+        return date;
+    }
 
-        panMain = new javax.swing.JPanel();
-        btnDate = new javax.swing.JButton();
-        txtDesc = new javax.swing.JTextArea();
+    public void setDate(final LocalDate date) {
+        this.date = date;
+    }
+    //endregion Getters/Setters
 
-        panBtn = new javax.swing.JPanel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
-        if (this.operationType == ADD_OPERATION) {
-            setTitle(resourceMap.getString("dialogAdd.title"));
-        } else {
-            setTitle(resourceMap.getString("dialogEdit.title"));
-        }
-        getContentPane().setLayout(new BorderLayout());
-        panBtn.setLayout(new GridLayout(0,2));
-        panMain.setLayout(new GridBagLayout());
-
-        btnDate = new javax.swing.JButton();
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+    //region Initialization
+    @Override
+    protected Container createCenterPane() {
+        // Create Panel Components
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
+        btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(btnDate, gridBagConstraints);
 
-        txtDesc.setText(entry.getDesc());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Description"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtDesc.setPreferredSize(new Dimension(250,75));
-        txtDesc.setMinimumSize(new Dimension(250,75));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(txtDesc, gridBagConstraints);
+        txtDescription = new JTextArea(getEntry().getDesc());
+        txtDescription.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resources.getString("txtDescription.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        txtDescription.setName("txtDescription");
+        txtDescription.setMinimumSize(new Dimension(250,75));
+        txtDescription.setPreferredSize(new Dimension(250,75));
+        txtDescription.setEditable(true);
+        txtDescription.setLineWrap(true);
+        txtDescription.setWrapStyleWord(true);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(this::btnOKActionPerformed);
-        panBtn.add(btnOK);
+        // Layout the UI
+        JPanel panel = new JPanel();
+        panel.setName("entryPanel");
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(this::btnCloseActionPerformed);
-        panBtn.add(btnClose);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
-        getContentPane().add(panMain, BorderLayout.CENTER);
-        getContentPane().add(panBtn, BorderLayout.PAGE_END);
-        pack();
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(btnDate)
+                        .addComponent(txtDescription)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(btnDate)
+                        .addComponent(txtDescription)
+        );
+
+        return panel;
     }
+    //endregion Initialization
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditPersonnelEntryDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
-    }
-
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
-    	entry.setDate(date);
-    	entry.setDesc(txtDesc.getText());
-    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), null);
-    	this.setVisible(false);
-    }
-
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-    	entry = null;
-    	this.setVisible(false);
+    @Override
+    protected void okAction() {
+        final LocalDate originalDate = getEntry().getDate();
+        final String originalDescription = getEntry().getDesc();
+        getEntry().setDate(getDate());
+        getEntry().setDesc(txtDescription.getText());
+        getEntry().onLogEntryEdited(originalDate, getDate(), originalDescription,
+                txtDescription.getText(), getPerson());
     }
 
     private void changeDate() {
-        DateChooser dc = new DateChooser(frame, date);
+        DateChooser dc = new DateChooser(getFrame(), getDate());
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            setDate(dc.getDate());
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
         }
     }
 }

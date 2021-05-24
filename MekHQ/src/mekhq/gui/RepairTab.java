@@ -50,6 +50,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -68,12 +69,12 @@ import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
 
@@ -238,8 +239,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
         servicedUnitTable.setShowGrid(false);
         servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
-        servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter(getCampaignGui(),
-                servicedUnitTable, servicedUnitModel));
+        ServicedUnitsTableMouseAdapter.connect(getCampaignGui(), servicedUnitTable, servicedUnitModel);
         JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
         scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
@@ -393,7 +393,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
-        taskTable.addMouseListener(new TaskTableMouseAdapter(getCampaignGui(), taskTable, taskModel));
+        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -599,23 +599,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             return;
         }
         if (part instanceof Part && ((Part) part).onBadHipOrShoulder() && !part.isSalvaging()) {
-            if (part instanceof MekLocation && ((MekLocation) part).isBreached()
-                    && 0 != JOptionPane.showConfirmDialog(getFrame(),
-                            "You are sealing a limb with a bad shoulder or hip.\n"
-                                    + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                    + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                    + "Do you wish to continue?",
-                            "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
-                return;
-            } else if (part instanceof MekLocation && ((MekLocation) part).isBlownOff()
-                    && 0 != JOptionPane.showConfirmDialog(getFrame(),
-                            "You are re-attaching a limb with a bad shoulder or hip.\n"
-                                    + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                    + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                    + "Do you wish to continue?",
-                            "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
-                return;
-            } else if (0 != JOptionPane.showConfirmDialog(getFrame(),
+            if (0 != JOptionPane.showConfirmDialog(getFrame(),
                     "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
                             + "You may continue, but this limb cannot be repaired and you will have to\n"
                             + "remove this equipment if you wish to scrap and then replace the limb.\n"
@@ -724,13 +708,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 if ((unit != null) && unit.isSelfCrewed()) {
-                    if (tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                    if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;
                     }
                     // check whether the engineer is assigned to the correct
                     // unit
                     return unit.equals(tech.getUnit());
-                } else if ((tech.getPrimaryRole() == Person.T_SPACE_CREW) && (unit != null) && !unit.isSelfCrewed()) {
+                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
                     return false;
@@ -844,7 +828,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
         // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
-        List<Person> techs = getCampaign().getTechs(true, null, true, false);
+        List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         if ((selected > -1) && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);
@@ -905,6 +889,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(StratconDeploymentEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 

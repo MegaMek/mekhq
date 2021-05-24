@@ -43,9 +43,9 @@ import javax.swing.SwingUtilities;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
     private static final long serialVersionUID = -8742160448355293487L;

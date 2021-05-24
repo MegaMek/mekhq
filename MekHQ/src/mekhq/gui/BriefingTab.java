@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.Entity;
@@ -64,6 +65,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -78,7 +80,6 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.ScenarioStatusComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -226,11 +227,15 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioSorter = new TableRowSorter<>(scenarioModel);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        scenarioSorter.setComparator(ScenarioTableModel.COL_STATUS, new ScenarioStatusComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
+        ScenarioTableMouseAdapter.connect(getCampaignGui(), scenarioTable, scenarioModel);
+        for (int i = 0; i < ScenarioTableModel.N_COL; i++) {
+            final TableColumn column = scenarioTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(scenarioModel.getColumnWidth(i));
+            column.setCellRenderer(scenarioModel.getRenderer());
+        }
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 
@@ -376,7 +381,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
         cmd.setVisible(true);
-        if (cmd.getStatus() <= Mission.S_ACTIVE) {
+        if (cmd.getStatus().isActive()) {
             return;
         }
 
@@ -401,9 +406,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 } else {
                     if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
-                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
-                        for (int role : admins) {
+                        for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                             if (admin != null) {
                                 admin.awardXP(1);
@@ -419,33 +422,31 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaign().completeMission(mission.getId(), cmd.getStatus());
+        getCampaign().completeMission(mission, cmd.getStatus());
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
     }
 
     private void deleteMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
+        final Mission mission = getCampaign().getMission(selectedMission);
+        if (mission == null) {
+            MekHQ.getLogger().error("Cannot remove null mission with id " + selectedMission);
+            return;
+        }
         MekHQ.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
         }
-        getCampaign().removeMission(mission.getId());
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        getCampaign().removeMission(mission);
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -777,21 +778,22 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(),
+                    "The following units could not be deployed:" + undeployed,
                     "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
     }
 
     public void refreshMissions() {
         choiceMission.removeAllItems();
-        for (Mission m : getCampaign().getSortedMissions()) {
+        List<Mission> missions = getCampaign().getSortedMissions();
+        for (Mission m : missions) {
             String desc = m.getName();
-            if (!m.isActive()) {
+            if (m.getStatus().isCompleted()) {
                 desc += " (Complete)";
             }
             choiceMission.addItem(desc);
@@ -799,8 +801,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 choiceMission.setSelectedItem(m.getName());
             }
         }
-        if (choiceMission.getSelectedIndex() == -1 && getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
+        if ((choiceMission.getSelectedIndex() == -1) && !missions.isEmpty()) {
+            selectedMission = missions.get(0).getId();
             choiceMission.setSelectedIndex(0);
         }
         changeMission();
@@ -837,19 +839,22 @@ public final class BriefingTab extends CampaignGuiTab {
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
-        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).size() > 0;
-        boolean canStartGame = scenario.isCurrent() && unitsAssigned;
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
-        }
-        btnStartGame.setEnabled(canStartGame);
-        btnJoinGame.setEnabled(canStartGame);
-        btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
+        SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
+
+        // The following has some confusing naming. canStartAnyGame is used for any check that
+        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
+        // the additional date check is required.
+        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
+        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
+        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
+                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
+        btnStartGame.setEnabled(canStartAtBGame);
+        btnJoinGame.setEnabled(canStartAtBGame);
+        btnLoadGame.setEnabled(canStartAtBGame);
+        btnGetMul.setEnabled(canStartAnyGame);
+        btnClearAssignedUnits.setEnabled(canStartAnyGame);
+        btnResolveScenario.setEnabled(canStartAtBGame);
+        btnPrintRS.setEnabled(canStartAnyGame);
     }
 
     public void refreshLanceAssignments() {
@@ -874,23 +879,21 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.setEnabled(false);
         btnAddScenario.setEnabled(false);
         btnGMGenerateScenarios.setEnabled(false);
-        if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
-            Mission m = getCampaign().getSortedMissions().get(idx);
-            if (null != m) {
+        List<Mission> missions = getCampaign().getSortedMissions();
+        if ((idx >= 0) && (idx < missions.size())) {
+            Mission m = missions.get(idx);
+            if (m != null) {
                 selectedMission = m.getId();
                 scrollMissionView.setViewportView(new MissionViewPanel(m, scenarioTable, getCampaignGui()));
-                // This odd code is to make sure that the scrollbar stays at the
-                // top
-                // I can't just call it here, because it ends up getting reset
-                // somewhere later
+                // This odd code is to make sure that the scrollbar stays at the top
+                // I can't just call it here, because it ends up getting reset somewhere later
                 javax.swing.SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));
                 btnEditMission.setEnabled(true);
-                btnCompleteMission.setEnabled(m.isActive());
+                btnCompleteMission.setEnabled(m.getStatus().isActive());
                 btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.isActive());
-                btnGMGenerateScenarios.setEnabled(m.isActive() && getCampaign().isGM());
+                btnAddScenario.setEnabled(m.isActiveOn(getCampaign().getLocalDate()));
+                btnGMGenerateScenarios.setEnabled(m.isActiveOn(getCampaign().getLocalDate()) && getCampaign().isGM());
             }
-
         } else {
             selectedMission = -1;
             scrollMissionView.setViewportView(null);
@@ -901,7 +904,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void refreshScenarioTableData() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
-            scenarioModel.setData(m.getScenarios());
+            scenarioModel.setData(m.getVisibleScenarios());
         } else {
             scenarioModel.setData(new ArrayList<Scenario>());
         }
@@ -928,6 +931,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (ev.getScenario().getId() == selectedScenario) {
                 scenarioViewScheduler.schedule();
             }
+            scenarioDataScheduler.schedule();
         }
     }
 

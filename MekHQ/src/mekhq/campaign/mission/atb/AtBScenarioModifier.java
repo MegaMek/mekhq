@@ -37,9 +37,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
-import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -47,13 +48,14 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 
-@XmlRootElement(name="AtBScenarioModifier")
-public class AtBScenarioModifier {
-
+/**
+ * Data structure representing a scenario modifier for dynamic AtB scenarios
+ * @author NickAragua
+ */
+@XmlRootElement(name = "AtBScenarioModifier")
+public class AtBScenarioModifier implements Cloneable {    
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
-     * @author NickAragua
-     *
      */
     public enum EventTiming {
         PreForceGeneration,
@@ -75,67 +77,10 @@ public class AtBScenarioModifier {
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
     private Boolean switchSides = null;
+    private Integer numExtraEvents = null;
     private List<ScenarioObjective> objectives = new ArrayList<>();
     
-    public static AtBScenarioModifier generateTestModifier() {
-        AtBScenarioModifier sm = new AtBScenarioModifier();
-        sm.objectives = new ArrayList<>();
-        sm.objectives.add(new ScenarioObjective());
-        
-        return sm;
-    }
-    
-    /**
-     * Process this scenario modifier for a particular scenario, given a particular timing indicator.
-     * @param scenario
-     * @param campaign
-     * @param eventTiming Whether this is occurring before or after primary forces have been generated.
-     */
-    public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if(eventTiming == this.getEventTiming()) {
-            if(getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
-                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, getAdditionalBriefingText());
-            }
-            
-            if(getForceDefinition() != null) {
-                AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
-            }
-            
-            if(getSkillAdjustment() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
-            }
-            
-            if(getQualityAdjustment() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
-            }
-            
-            if(getBattleDamageIntensity() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
-            }
-            
-            if(getAmmoExpenditureIntensity() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
-            }
-            
-            if(getUnitRemovalCount() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
-            }
-            
-            if(getUseAmbushLogic() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
-            }
-            
-            if(getSwitchSides() != null && getEventRecipient() != null) {
-                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
-            }
-            
-            if(getObjectives() != null && getObjectives().size() > 0) {
-                for(ScenarioObjective objective : getObjectives()) {
-                    AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
-                }
-            }
-        }
-    }
+    private Map<String, String> linkedModifiers = new HashMap<>(); 
     
     // ----------------------------------------------------------------
     // This section contains static variables and methods
@@ -147,7 +92,17 @@ public class AtBScenarioModifier {
     }
     
     private static Map<String, AtBScenarioModifier> scenarioModifiers;
-    private static List<String> scenarioModifierKeys;
+    private static List<String> scenarioModifierKeys = new ArrayList<>();
+    private static List<String> requiredHostileFacilityModifierKeys = new ArrayList<>();
+    private static List<String> hostileFacilityModifierKeys = new ArrayList<>();
+    private static List<String> alliedFacilityModifierKeys = new ArrayList<>();
+    private static List<String> groundBattleModifierKeys = new ArrayList<>();
+    private static List<String> airBattleModifierKeys = new ArrayList<>();
+    private static List<String> positiveGroundBattleModifierKeys = new ArrayList<>();
+    private static List<String> positiveAirBattleModifierKeys = new ArrayList<>();
+    private static List<String> negativeGroundBattleModifierKeys = new ArrayList<>();
+    private static List<String> negativeAirBattleModifierKeys = new ArrayList<>();
+    private static List<String> primaryPlayerForceModifierKeys = new ArrayList<>();
     
     public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
@@ -157,23 +112,136 @@ public class AtBScenarioModifier {
         return scenarioModifierKeys;
     }
     
-    public static AtBScenarioModifier getRandomScenarioModifier() {
-        int modIndex = Compute.randomInt(scenarioModifierKeys.size());
-        return scenarioModifiers.get(scenarioModifierKeys.get(modIndex));
-    }
-    
     /**
      * Convenience method to get a scenario modifier with the specified key.
      * @param key The key
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getScenarioModifier(String key) {
-        return scenarioModifiers.get(key);
+        if (!scenarioModifiers.containsKey(key)) {
+            MekHQ.getLogger().error("Scenario modifier " + key + " does not exist.");
+            return null;
+        }
+        
+        // clone it to avoid calling code changing the modifier
+        return scenarioModifiers.get(key).clone();
+    }
+    
+    /**
+     * Convenience method to get all the 'required' hostile facility modifiers()
+     */
+    public static List<AtBScenarioModifier> getRequiredHostileFacilityModifiers() {
+        List<AtBScenarioModifier> retval = new ArrayList<>();
+        for (String key : requiredHostileFacilityModifierKeys) {
+            retval.add(scenarioModifiers.get(key).clone());
+        }
+        
+        return retval;
+    }
+    
+    /**
+     * Convenience method to get a random hostile facility modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomHostileFacilityModifier() {
+        return getScenarioModifier(Utilities.getRandomItem(hostileFacilityModifierKeys));
+    }
+    
+    /**
+     * Convenience method to get a random allied facility modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomAlliedFacilityModifier() {
+        return getScenarioModifier(Utilities.getRandomItem(alliedFacilityModifierKeys));
+    }
+    
+    /**
+     * Get a random modifier, appropriate for the map location (space, atmo, ground)
+     */
+    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation) {
+        return getRandomBattleModifier(mapLocation, null);
+    }
+    
+    /**
+     * Convenience method to get a random battle modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
+        List<String> keyList = null;
+        
+        switch (mapLocation) {
+            case Space:
+            case LowAtmosphere:
+                if (beneficial == null) {
+                    keyList = airBattleModifierKeys;
+                } else if (beneficial) {
+                    keyList = positiveAirBattleModifierKeys;
+                } else if (!beneficial) {
+                    keyList = negativeAirBattleModifierKeys;
+                }
+                break;
+            case AllGroundTerrain:
+            case SpecificGroundTerrain:
+            default:
+                if (beneficial == null) {
+                    keyList = groundBattleModifierKeys;
+                } else if (beneficial) {
+                    keyList = positiveGroundBattleModifierKeys;
+                } else if (!beneficial) {
+                    keyList = negativeGroundBattleModifierKeys;
+                }
+                break;
+        }
+        
+        if (keyList == null) {
+            return null;
+        }
+        
+        return getScenarioModifier(Utilities.getRandomItem(keyList));
     }
     
     static {
         loadManifest();
         loadScenarioModifiers();
+
+        initializeSpecificManifest(MekHqConstants.STRATCON_REQUIRED_HOSTILE_FACILITY_MODS, requiredHostileFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_GROUND_MODS, groundBattleModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_AIR_MODS, airBattleModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
+        
+        initializePositiveNegativeManifests(groundBattleModifierKeys, positiveGroundBattleModifierKeys, negativeGroundBattleModifierKeys);
+        initializePositiveNegativeManifests(airBattleModifierKeys, positiveAirBattleModifierKeys, negativeAirBattleModifierKeys);
+    }
+    
+    /**
+     * Initializes a specific manifest file name list from a file with the given name
+     */
+    private static void initializeSpecificManifest(String manifestFileName, List<String> keyCollection) {
+        ScenarioModifierManifest manifest = ScenarioModifierManifest.Deserialize(manifestFileName);
+        
+        // add trimmed versions of each file name to the given collection
+        for (String modifierName : manifest.fileNameList) {
+            keyCollection.add(modifierName.trim());
+        }
+    }
+    
+    /**
+     * Divides the given modifiers into a positive and negative bucket.
+     */
+    private static void initializePositiveNegativeManifests(List<String> modifiers, List<String> positiveKeyCollection, List<String> negativeKeyCollection) {
+        for (String modifier : modifiers) {
+            if (!scenarioModifiers.containsKey(modifier)) {
+                continue;
+            }
+            
+            if (scenarioModifiers.get(modifier).benefitsPlayer) {
+                positiveKeyCollection.add(modifier);
+            } else {
+                negativeKeyCollection.add(modifier);
+            }
+        }
     }
     
     /**
@@ -184,12 +252,12 @@ public class AtBScenarioModifier {
         
         // load user-specified modifier list
         ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml");
-        if(userModList != null) {
+        if (userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
         
         // go through each entry and clean it up for preceding/trailing white space
-        for(int x = 0; x < scenarioModifierManifest.fileNameList.size(); x++) {
+        for (int x = 0; x < scenarioModifierManifest.fileNameList.size(); x++) {
             scenarioModifierManifest.fileNameList.set(x, scenarioModifierManifest.fileNameList.get(x).trim());
         }
     }
@@ -201,27 +269,25 @@ public class AtBScenarioModifier {
         scenarioModifiers = new HashMap<>();
         scenarioModifierKeys = new ArrayList<String>();
         
-        for(String fileName : scenarioModifierManifest.fileNameList) {
+        for (String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/scenariomodifiers/%s", fileName);
             
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
                 
-                if(modifier != null) {
-                    if(modifier.getModifierName() == null) {
+                if (modifier != null) {
+                    scenarioModifiers.put(fileName, modifier);
+                    scenarioModifierKeys.add(fileName);
+                    
+                    if (modifier.getModifierName() == null) {
                         modifier.setModifierName(fileName);
                     }
-                    
-                    scenarioModifiers.put(modifier.getModifierName(), modifier);
-                    scenarioModifierKeys.add(modifier.getModifierName());
                 }
-            }
-            catch(Exception e) {
-                MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", 
-                        String.format("Error Loading Scenario %s", filePath), e);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
             }
         }
-        
+
         scenarioModifierKeys.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -236,27 +302,27 @@ public class AtBScenarioModifier {
      * @return Possibly an instance of a scenario modifier list
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
-        AtBScenarioModifier resultingList = null;
+        AtBScenarioModifier resultingModifier = null;
 
         try {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
-            if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(AtBScenarioModifier.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            if (!xmlFile.exists()) {
+                MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
             try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
-                resultingList = templateElement.getValue();
+                JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
+                resultingModifier = modifierElement.getValue();
             }
-        } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier: " + fileName, e);
+        } catch (Exception e) {
+            MekHQ.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
-        return resultingList;
+        return resultingModifier;
     }
     
     /**
@@ -271,8 +337,63 @@ public class AtBScenarioModifier {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch(Exception e) {
-            MekHQ.getLogger().error(AtBScenarioModifier.class, "Serialize", e.getMessage());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
+    
+    /**
+     * Process this scenario modifier for a particular scenario, given a particular timing indicator.
+     * @param eventTiming Whether this is occurring before or after primary forces have been generated.
+     */
+    public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
+        if (eventTiming == getEventTiming()) {
+            if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
+                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
+                        String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
+            }
+            
+            if (getForceDefinition() != null) {
+                AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
+            }
+            
+            if ((getSkillAdjustment() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
+            }
+            
+            if ((getQualityAdjustment() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
+            }
+            
+            if ((getBattleDamageIntensity() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
+            }
+            
+            if ((getAmmoExpenditureIntensity() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
+            }
+            
+            if ((getUnitRemovalCount() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
+            }
+            
+            if ((getUseAmbushLogic() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
+            }
+            
+            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
+            }
+            
+            if ((getObjectives() != null) && !getObjectives().isEmpty()) {
+                for (ScenarioObjective objective : getObjectives()) {
+                    AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
+                }
+            }
+            
+            if ((getNumExtraEvents() != null) && (getNumExtraEvents() > 0)) {
+                AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
+            }
         }
     }
     
@@ -280,7 +401,30 @@ public class AtBScenarioModifier {
     public String toString() {
         return getModifierName();
     }
-
+    
+    @Override
+    public AtBScenarioModifier clone() {
+        final AtBScenarioModifier copy = new AtBScenarioModifier();
+        copy.additionalBriefingText = additionalBriefingText;
+        copy.allowedMapLocations = allowedMapLocations == null ? new ArrayList<>() : new ArrayList<>(allowedMapLocations);
+        copy.ammoExpenditureIntensity = ammoExpenditureIntensity;
+        copy.battleDamageIntensity = battleDamageIntensity;
+        copy.benefitsPlayer = benefitsPlayer;
+        copy.blockFurtherEvents = blockFurtherEvents;
+        copy.eventRecipient = eventRecipient;
+        copy.eventTiming = eventTiming;
+        copy.forceDefinition = forceDefinition != null ? new ScenarioForceTemplate(forceDefinition) : null;
+        copy.modifierName = modifierName;
+        copy.qualityAdjustment = qualityAdjustment;
+        copy.skillAdjustment = skillAdjustment;
+        copy.switchSides = switchSides;
+        copy.unitRemovalCount = unitRemovalCount;
+        copy.useAmbushLogic = useAmbushLogic;
+        copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
+        copy.objectives = objectives == null ? new ArrayList<>() : new ArrayList<>(objectives);
+        return copy;
+    }
+    
     public String getModifierName() {
         return modifierName;
     }
@@ -377,6 +521,8 @@ public class AtBScenarioModifier {
         this.unitRemovalCount = unitRemovalCount;
     }
 
+    @XmlElementWrapper(name = "allowedMapLocations")
+    @XmlElement(name = "allowedMapLocation")
     public List<MapLocation> getAllowedMapLocations() {
         return allowedMapLocations;
     }
@@ -401,10 +547,30 @@ public class AtBScenarioModifier {
         this.switchSides = switchSides;
     }
     
-    @XmlElementWrapper(name="objectives")
-    @XmlElement(name="objective")
+    @XmlElementWrapper(name = "objectives")
+    @XmlElement(name = "objective")
     public List<ScenarioObjective> getObjectives() {
         return objectives;
+    }
+    
+    public Integer getNumExtraEvents() {
+        return numExtraEvents;
+    }
+
+    public void setNumExtraEvents(Integer numExtraEvents) {
+        this.numExtraEvents = numExtraEvents;
+    }
+    
+    /**
+     * Map containing string tuples:
+     * "Alternate" briefing description, name of file containing other modifiers associated with this one
+     */
+    public Map<String, String> getLinkedModifiers() {
+        return linkedModifiers;
+    }
+    
+    public void setLinkedModifiers(Map<String, String> linkedModifiers) {
+        this.linkedModifiers = linkedModifiers;
     }
 }
 
@@ -413,10 +579,10 @@ public class AtBScenarioModifier {
  * @author NickAragua
  *
  */
-@XmlRootElement(name="scenarioModifierManifest")
+@XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
-    @XmlElementWrapper(name="modifiers")
-    @XmlElement(name="modifier")
+    @XmlElementWrapper(name = "modifiers")
+    @XmlElement(name = "modifier")
     public List<String> fileNameList = new ArrayList<>();
     
     /**
@@ -431,8 +597,8 @@ class ScenarioModifierManifest {
             JAXBContext context = JAXBContext.newInstance(ScenarioModifierManifest.class);
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
-            if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            if (!xmlFile.exists()) {
+                MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
@@ -441,8 +607,8 @@ class ScenarioModifierManifest {
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }
-        } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier List", e);
+        } catch (Exception e) {
+            MekHQ.getLogger().error("Error Deserializing Scenario Modifier List", e);
         }
 
         return resultingList;

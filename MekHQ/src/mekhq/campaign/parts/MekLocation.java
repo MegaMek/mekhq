@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
+import megamek.common.MiscType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -43,6 +44,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 
 /**
@@ -191,18 +193,22 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof MekLocation
-                && getLoc() == ((MekLocation) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage()
-                && isTsm() == ((MekLocation) part).isTsm()
-                && getStructureType() == ((MekLocation) part).getStructureType()
+        if (!(part instanceof MekLocation)) {
+            return false;
+        }
+
+        MekLocation other = (MekLocation) part;
+        return (getLoc() == other.getLoc())
+                && (getUnitTonnage() == other.getUnitTonnage())
+                && (isTsm() == other.isTsm())
+                && (getStructureType() == other.getStructureType())
                 && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
-                        || (isClan() == part.isClan()))
-                && (!isArm() || forQuad == ((MekLocation) part).forQuad)
+                        || (isClan() == other.isClan()))
+                && (!isArm() || forQuad() == other.forQuad())
                 // Sensors and life support only matter if we're comparing two parts in the warehouse.
-                && ((getUnit() != null) || (part.getUnit() != null)
-                        || (hasSensors() == ((MekLocation) part).hasSensors()
-                        && hasLifeSupport() == ((MekLocation) part).hasLifeSupport()));
+                && ((getUnit() != null) || (other.getUnit() != null)
+                        || (hasSensors() == other.hasSensors()
+                                && hasLifeSupport() == other.hasLifeSupport()));
     }
 
     @Override
@@ -212,6 +218,14 @@ public class MekLocation extends Part {
 
     public double getPercent() {
         return percent;
+    }
+
+    /**
+     * Sets the percent armor remaining.
+     * @param percent The percent armor remaining, expressed as a fraction.
+     */
+    protected void setPercent(double percent) {
+        this.percent = Math.max(0.0, Math.min(percent, 1.0));
     }
 
     @Override
@@ -271,8 +285,6 @@ public class MekLocation extends Part {
                 clan = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
                 percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
                 tsm = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
@@ -290,90 +302,101 @@ public class MekLocation extends Part {
     @Override
     public void fix() {
         super.fix();
-        if (isBlownOff()) {
-            blownOff = false;
-            if (null != unit) {
-                unit.getEntity().setLocationBlownOff(loc, false);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                    // ignore empty & non-hittable slots
-                    if (slot == null) {
-                        continue;
-                    }
-                    slot.setMissing(false);
-                    Mounted m = slot.getMount();
-                    if (null != m) {
-                        m.setMissing(false);
-                    }
+
+        final Unit unit = getUnit();
+        if ((unit != null) && isBlownOff()) {
+            setBlownOff(false);
+
+            unit.getEntity().setLocationBlownOff(loc, false);
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                // ignore empty slots
+                if (slot == null) {
+                    continue;
+                }
+
+                slot.setMissing(false);
+                Mounted m = slot.getMount();
+                if (null != m) {
+                    m.setMissing(false);
                 }
             }
-        } else if (isBreached()) {
-            breached = false;
-            if (null != unit) {
-                unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                    // ignore empty & non-hittable slots
-                    if (slot == null) {
-                        continue;
-                    }
-                    slot.setBreached(false);
-                    Mounted m = slot.getMount();
-                    if (null != m) {
-                        m.setBreached(false);
-                    }
+        } else if ((unit != null) && isBreached()) {
+            setBreached(false);
+
+            unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                // ignore empty slots
+                if (slot == null) {
+                    continue;
+                }
+
+                slot.setBreached(false);
+                Mounted m = slot.getMount();
+                if (null != m) {
+                    m.setBreached(false);
                 }
             }
         } else {
-            percent = 1.0;
-            if (null != unit) {
+            setPercent(1.0);
+            if (unit != null) {
                 unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
             }
         }
     }
 
     @Override
-    public MissingPart getMissingPart() {
+    public MissingMekLocation getMissingPart() {
         return new MissingMekLocation(loc, getUnitTonnage(), structureType, clan, tsm, forQuad, campaign);
     }
 
     @Override
     public void remove(boolean salvage) {
-        blownOff = false;
-        breached = false;
-        if (null != unit) {
-            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            unit.getEntity().setLocationBlownOff(loc, false);
-            unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if (!salvage) {
-                campaign.getWarehouse().removePart(this);
-            } else if (null != spare) {
-                spare.incrementQuantity();
-                campaign.getWarehouse().removePart(this);
-            }
-            //if this is a head. check for life support and sensors
-            if (loc == Mech.LOC_HEAD) {
+        setBlownOff(false);
+        setBreached(false);
+
+        final Unit unit = getUnit();
+        if (unit != null) {
+            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, getLoc());
+            unit.getEntity().setLocationBlownOff(getLoc(), false);
+            unit.getEntity().setLocationStatus(getLoc(), ILocationExposureStatus.NORMAL, true);
+
+            // If this is a head. check for life support and sensors
+            if (getLoc() == Mech.LOC_HEAD) {
                 removeHeadComponents();
             }
+
             unit.removePart(this);
-            if (loc != Mech.LOC_CT) {
+            setUnit(null);
+
+            if (salvage) {
+                // Return this part to the warehouse as a spare
+                getCampaign().getWarehouse().addPart(this);
+            } else {
+                // Remove this part from the campaign
+                getCampaign().getWarehouse().removePart(this);
+            }
+
+            if (getLoc() != Mech.LOC_CT) {
                 Part missing = getMissingPart();
+                assert(missing != null);
+
                 unit.addPart(missing);
                 campaign.getQuartermaster().addPart(missing, 0);
+
+                missing.updateConditionFromEntity(false);
             }
         }
-        setUnit(null);
-        updateConditionFromEntity(false);
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if (null != unit) {
-            blownOff = unit.getEntity().isLocationBlownOff(loc);
-            breached = unit.isLocationBreached(loc);
-            percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
-            if (percent <= 0.0) {
+        if (getUnit() != null) {
+            setBlownOff(getUnit().getEntity().isLocationBlownOff(getLoc()));
+            setBreached(getUnit().isLocationBreached(getLoc()));
+            setPercent(getUnit().getEntity().getInternalForReal(getLoc()) / ((double) getUnit().getEntity().getOInternal(getLoc())));
+            if (getPercent() <= 0.0) {
                 remove(false);
             }
         }
@@ -422,6 +445,7 @@ public class MekLocation extends Part {
     private int getRepairOrSalvageTime() {
         // StratOps p184 Master Repair Table
         // NOTE: MissingMekLocation handles destroyed locations
+        final double percent = getPercent();
         if (percent < 0.25) {
             return 270;
         } else if (percent < 0.5) {
@@ -474,6 +498,7 @@ public class MekLocation extends Part {
     private int getRepairOrSalvageDifficulty() {
         // StrapOps p184 Master Repair Table
         // NOTE: MissingMekLocation handles destroyed locations
+        final double percent = getPercent();
         if (percent < 0.25) {
             return 2;
         } else if (percent < 0.5) {
@@ -486,18 +511,40 @@ public class MekLocation extends Part {
         }
     }
 
+    /**
+     * Gets a value indicating whether or not this location is breached.
+     */
     public boolean isBreached() {
-        return breached;
+        return (getUnit() != null) && breached;
     }
 
+    /**
+     * Sets a value indicating whether or not the location is breached.
+     * @param breached A value indicating whether or not the location is breached.
+     */
+    protected void setBreached(boolean breached) {
+        this.breached = breached;
+    }
+
+    /**
+     * Gets a value indicating whether or not this location is blown off.
+     */
     public boolean isBlownOff() {
-        return blownOff;
+        return (getUnit() != null) && blownOff;
+    }
+
+    /**
+     * Sets a value indicating whether or not the location is blown off.
+     * @param blownOff A value indicating whether or not the location is blown off.
+     */
+    protected void setBlownOff(boolean blownOff) {
+        this.blownOff = blownOff;
     }
 
     @Override
     public boolean needsFixing() {
-        return percent < 1.0 || breached || blownOff
-                || (unit != null && unit.hasBadHipOrShoulder(loc));
+        return (getPercent() < 1.0) || isBreached() || isBlownOff()
+                || ((getUnit() != null) && getUnit().hasBadHipOrShoulder(getLoc()));
     }
 
     @Override
@@ -507,24 +554,15 @@ public class MekLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        String toReturn = "";
-        if (null != unit) {
-            toReturn = unit.getEntity().getLocationName(loc);
-            if (includeRepairDetails) {
-                if (isBlownOff()) {
-                    toReturn += " (Blown Off)";
-                } else if (isBreached()) {
-                    toReturn += " (Breached)";
-                } else {
-                    toReturn += " (" + Math.round(100*percent) + "%)";
-                }
-            }
-            return toReturn;
+        if (getUnit() != null) {
+            return getDetailsOnUnit(includeRepairDetails);
         }
-        toReturn += getUnitTonnage() + " tons";
+
+        String toReturn = getUnitTonnage() + " tons";
         if (includeRepairDetails) {
-            toReturn += " (" + Math.round(100*percent) + "%)";
+            toReturn += " (" + Math.round(100 * getPercent()) + "%)";
         }
+
         if (loc == Mech.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
@@ -537,13 +575,33 @@ public class MekLocation extends Part {
                 toReturn += " [" + components.toString() + "]";
             }
         }
+
+        return toReturn;
+    }
+
+    private String getDetailsOnUnit(boolean includeRepairDetails) {
+        assert(getUnit() != null);
+
+        String toReturn = getUnit().getEntity().getLocationName(loc);
+        if (includeRepairDetails) {
+            if (isBlownOff()) {
+                toReturn += " (Blown Off)";
+            } else if (isBreached()) {
+                toReturn += " (Breached)";
+            } else if (onBadHipOrShoulder()) {
+                toReturn += " (Bad Hip/Shoulder)";
+            } else {
+                toReturn += " (" + Math.round(100 * getPercent()) + "%)";
+            }
+        }
+
         return toReturn;
     }
 
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+            unit.getEntity().setInternal((int) Math.round(getPercent() * unit.getEntity().getOInternal(loc)), loc);
             //TODO: we need to cycle through slots and remove crits on non-hittable ones
             //We shouldn't have to do this, these slots should not be hit in MM
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -554,10 +612,12 @@ public class MekLocation extends Part {
                     slot.setRepairable(true);
                     slot.setMissing(false);
                     Mounted m = slot.getMount();
-                    m.setHit(false);
-                    m.setDestroyed(false);
-                    m.setMissing(false);
-                    m.setRepairable(true);
+                    if (m != null) {
+                        m.setHit(false);
+                        m.setDestroyed(false);
+                        m.setMissing(false);
+                        m.setRepairable(true);
+                    }
                 }
             }
         }
@@ -565,41 +625,28 @@ public class MekLocation extends Part {
 
     @Override
     public String checkFixable() {
-        if (null == unit) {
+        if (unit == null) {
             return null;
         }
+
         if (isBlownOff() && !isSalvaging()) {
             if (loc == Mech.LOC_LARM && unit.isLocationDestroyed(Mech.LOC_LT)) {
                 return "must replace left torso first";
             } else if (loc == Mech.LOC_RARM && unit.isLocationDestroyed(Mech.LOC_RT)) {
                 return "must replace right torso first";
             } else if (unit.isLocationDestroyed(Mech.LOC_CT)) {
-                //we shouldnt get here
-                return "cannot replace head on destroyed unit";
+                // we shouldnt get here
+                return "cannot repair part on destroyed unit";
             }
         } else if (isSalvaging()) {
             return checkSalvagable();
         } else if (!isBreached() && !isBlownOff()) {
-            //check for damaged hips and shoulders
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                if ((slot == null) || !slot.isEverHittable()) {
-                    continue;
-                }
-                if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                        && slot.getIndex() == Mech.ACTUATOR_HIP
-                        && slot.isDestroyed()) {
-                    return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
-
-                }
-                if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                        && slot.getIndex() == Mech.ACTUATOR_SHOULDER
-                        && slot.isDestroyed()) {
-                    return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
-
-                }
+            // check for damaged hips and shoulders
+            if (onBadHipOrShoulder()) {
+                return "You cannot repair a limb with a busted hip/shoulder. You must scrap and replace it instead.";
             }
         }
+
         return null;
     }
 
@@ -617,10 +664,7 @@ public class MekLocation extends Part {
             return "You cannot salvage a limb with a busted hip/shoulder. You must scrap it instead.";
         }
         //cant salvage torsos until arms and legs are gone
-        String limbName = " arm ";
-        if (forQuad) {
-            limbName = " front leg ";
-        }
+        String limbName = forQuad ? " front leg " : " arm ";
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
             return "must salvage/scrap right" + limbName + "first";
         }
@@ -641,11 +685,11 @@ public class MekLocation extends Part {
             }
 
             //certain other specific crits need to be left out (uggh, must be a better way to do this!)
-            if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                    && (slot.getIndex() == Mech.ACTUATOR_HIP
-                        || slot.getIndex() == Mech.ACTUATOR_SHOULDER
-                        || slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT
-                        || slot.getIndex() == Mech.SYSTEM_SENSORS)) {
+            if ((slot.getType() == CriticalSlot.TYPE_SYSTEM)
+                    && ((slot.getIndex() == Mech.ACTUATOR_HIP)
+                        || (slot.getIndex() == Mech.ACTUATOR_SHOULDER)
+                        || (slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT)
+                        || (slot.getIndex() == Mech.SYSTEM_SENSORS))) {
                 continue;
             }
 
@@ -663,6 +707,19 @@ public class MekLocation extends Part {
                         continue;
                     } else {
                         return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                }
+            }
+
+            if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
+                if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
+                    EquipmentType equipmentType = slot.getMount().getType();
+                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                            return "Null-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                        return "Void-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
+                        return "Chameleon shield must be salvaged or scrapped first.";
                     }
                 }
             }
@@ -694,15 +751,19 @@ public class MekLocation extends Part {
         //otherwise you will get weirdness where armor and actuators are
         //still attached but everything else is scrapped
         //cant salvage torsos until arms and legs are gone
+        String limbName = " arm ";
+        if (forQuad) {
+            limbName = " front leg ";
+        }
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-            return "You must first remove the right arm before you scrap the right torso";
+            return "You must first remove the right " + limbName + " before you scrap the right torso";
         }
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-            return "You must first remove the left arm before you scrap the left torso";
+            return "You must first remove the left " + limbName + " before you scrap the left torso";
         }
         //check for armor
-        if (unit.getEntity().getArmor(loc, false) > 0
-                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
+        if (unit.getEntity().getArmorForReal(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
             return "You must first remove the armor from this location before you scrap it";
         }
         //you can only salvage a location that has nothing left on it
@@ -800,7 +861,7 @@ public class MekLocation extends Part {
 
     @Override
     public boolean onBadHipOrShoulder() {
-        return null != unit && unit.hasBadHipOrShoulder(loc);
+        return (getUnit() != null) && getUnit().hasBadHipOrShoulder(getLoc());
     }
 
     @Override
@@ -840,20 +901,21 @@ public class MekLocation extends Part {
         }
         if (null != sensor) {
             sensor.remove(false);
-            sensors = true;
+            setSensors(true);
         }
         if (null != support) {
             support.remove(false);
-            lifeSupport = true;
+            setLifeSupport(true);
         }
     }
 
      @Override
      public void doMaintenanceDamage(int d) {
-         int points = unit.getEntity().getInternal(loc);
-         points = Math.max(points -d, 1);
-         unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity(false);
+        if ((getUnit() != null) && (d > 0)) {
+            int points = getUnit().getEntity().getInternal(getLoc());
+            getUnit().getEntity().setInternal(Math.max(points - d, 1), getLoc());
+            updateConditionFromEntity(false);
+        }
      }
 
     @Override

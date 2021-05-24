@@ -1,0 +1,7 @@
+<StratconFacility>
+	<capturedDefinition>AlliedSupplyDepot.xml</capturedDefinition>
+	<displayableName>Supply Depot</displayableName>
+        <facilityType>SupplyDepot</facilityType>
+        <owner>Opposing</owner>
+        <visible>false</visible>
+</StratconFacility>

@@ -77,12 +77,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged
@@ -224,8 +224,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             filterTechs();
             updateTechTarget();
         });
-        partsTable.addMouseListener(new PartsTableMouseAdapter(getCampaignGui(),
-                partsTable, partsModel));
+        PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
         JScrollPane scrollPartsTable = new JScrollPane(partsTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -565,7 +564,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public void refreshTechsList() {
         // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
-        techsModel.setData(getCampaign().getTechs(true, null, true, false));
+        techsModel.setData(getCampaign().getTechs(true));
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";

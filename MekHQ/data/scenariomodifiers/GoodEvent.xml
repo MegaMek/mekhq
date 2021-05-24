@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Additional allied support will be provided.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Allied</eventRecipient>
+	<numExtraEvents>1</numExtraEvents>
+</AtBScenarioModifier>

@@ -24,7 +24,6 @@ import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -41,7 +40,7 @@ import java.util.UUID;
 /**
  * This class is the Minimum Viable Product for a Person in MekHQ.
  */
-public abstract class AbstractPerson implements Serializable, MekHqXmlSerializable {
+public abstract class AbstractPerson implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = 2190101430016271321L;
 
@@ -105,7 +104,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         setPortrait(new Portrait());
         setBirthday(LocalDate.now());
         setDateOfDeath(null);
-        genealogy = new Genealogy(getId());
+        genealogy = new Genealogy(this);
         setBiography("");
         //endregion Personal Information
     }
@@ -392,11 +391,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @return Whether or not this AbstractPerson is an Ancestor
      */
     public abstract boolean isAncestor();
-
-    /**
-     * @return whether or not this AbstractPerson is a Dependent
-     */
-    public abstract boolean isDependent();
     //endregion Abstract Methods
 
     //region File I/O
@@ -406,7 +400,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param pw1       The PrintWriter to print to
      * @param indent    The indent level to use
      */
-    @Override
     public void writeToXml(final PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", getId().toString());
 
@@ -499,7 +492,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
                     retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
+                    retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {

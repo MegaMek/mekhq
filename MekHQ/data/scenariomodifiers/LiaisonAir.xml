@@ -53,9 +53,6 @@
                     <howMuch>-1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-		<additionalDetail>If the liaison is irrevocably destroyed, it will reduce contract score by 1.</additionalDetail>
-            </additionalDetails>
             <description>Preserve 100% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>

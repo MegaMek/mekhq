@@ -278,7 +278,7 @@ public class CampaignExportWizard extends JDialog {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
         List<Person> people = sourceCampaign.getActivePersonnel();
-        people.sort(Comparator.comparingInt(Person::getPrimaryRole));
+        people.sort(Comparator.comparing(Person::getPrimaryRole));
         for (Person person : people) {
             personListModel.addElement(person);
         }
@@ -484,8 +484,7 @@ public class CampaignExportWizard extends JDialog {
 
         if (chkExportState.isSelected()) {
             destinationCampaign.setFactionCode(sourceCampaign.getFactionCode());
-            destinationCampaign.setCamoCategory(sourceCampaign.getCamoCategory());
-            destinationCampaign.setCamoFileName(sourceCampaign.getCamoFileName());
+            destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
             destinationCampaign.setLocation(sourceCampaign.getLocation());
         }
@@ -497,10 +496,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (Mission mission : sourceCampaign.getMissions()) {
-                if (!mission.isActive()) {
-                    destinationCampaign.importMission(mission);
-                }
+            for (Mission mission : sourceCampaign.getCompletedMissions()) {
+                destinationCampaign.importMission(mission);
             }
         }
 

@@ -99,6 +99,9 @@ public class Warehouse {
 
         if (isNewPart) {
             MekHQ.triggerEvent(new PartNewEvent(part));
+        } else {
+            // Part was removed from a unit, or something similar
+            MekHQ.triggerEvent(new PartChangedEvent(part));
         }
 
         return part;

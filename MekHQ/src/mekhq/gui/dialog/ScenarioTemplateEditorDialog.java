@@ -75,8 +75,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -1253,8 +1253,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Force needs to be synced or have explicit deployment zones");
         }
 
-        if(txtForceName.getText().trim().isEmpty()) {
-            if(valBuilder.length() > 0) {
+        if (txtForceName.getText().isBlank()) {
+            if (valBuilder.length() > 0) {
                 valBuilder.append("\n");
             }
 

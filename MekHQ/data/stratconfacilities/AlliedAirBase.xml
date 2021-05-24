@@ -1,0 +1,9 @@
+<StratconFacility>
+	<capturedDefinition>HostileAirBase.xml</capturedDefinition>
+	<displayableName>Air Base</displayableName>
+        <facilityType>AirBase</facilityType>
+        <localModifiers>AlliedAirGarrison.xml</localModifiers>
+        <owner>Allied</owner>
+        <sharedModifiers>AlliedAirSupport.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>

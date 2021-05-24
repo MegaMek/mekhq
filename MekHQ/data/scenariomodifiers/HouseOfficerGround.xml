@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dicatate retreat conditions.</additionalBriefingText>
+	<additionalBriefingText>The house commanding officer will deploy alongside your units. Keep them alive.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
@@ -8,9 +12,9 @@
 		<allowedUnitType>0</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
-		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
 		<destinationZone>4</destinationZone>
@@ -53,9 +57,6 @@
                     <howMuch>-1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-		<additionalDetail>If the house unit is irrevocably destroyed, it will reduce contract score by 1.</additionalDetail>
-            </additionalDetails>
             <description>Preserve 100% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>

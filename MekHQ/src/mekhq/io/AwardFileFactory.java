@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * TODO : Java 11: Ensure I am still required and cannot be replaced with ImageFileFactory
+ * FIXME : I am a bandaid that allows award pngs to be loaded despite having features not supported by Java.
+ * FIXME : I should be removed when that is fixed.
  */
 public class AwardFileFactory extends ImageFileFactory {
     //region Constructors
