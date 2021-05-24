@@ -23,7 +23,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.AbstractPerson;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import org.w3c.dom.Node;
@@ -46,10 +46,10 @@ import java.util.Set;
 public class Genealogy implements Serializable {
     //region Variables
     private static final long serialVersionUID = -6350146649504329173L;
-    private Person origin;
-    private Person spouse;
+    private AbstractPerson origin;
+    private AbstractPerson spouse;
     private List<FormerSpouse> formerSpouses;
-    private Map<FamilialRelationshipType, List<Person>> family;
+    private Map<FamilialRelationshipType, List<AbstractPerson>> family;
     //endregion Variables
 
     //region Constructors
@@ -57,7 +57,7 @@ public class Genealogy implements Serializable {
      * This is the standard constructor, and follow the below warning
      * @param origin the origin person
      */
-    public Genealogy(final Person origin) {
+    public Genealogy(final AbstractPerson origin) {
         setOrigin(origin);
         setSpouse(null);
         formerSpouses = new ArrayList<>();
@@ -69,28 +69,28 @@ public class Genealogy implements Serializable {
     /**
      * @return the origin person
      */
-    public Person getOrigin() {
+    public AbstractPerson getOrigin() {
         return origin;
     }
 
     /**
      * @param origin the origin person
      */
-    public void setOrigin(Person origin) {
+    public void setOrigin(AbstractPerson origin) {
         this.origin = Objects.requireNonNull(origin);
     }
 
     /**
      * @return the current person's spouse
      */
-    public @Nullable Person getSpouse() {
+    public @Nullable AbstractPerson getSpouse() {
         return spouse;
     }
 
     /**
      * @param spouse the new spouse for the current person
      */
-    public void setSpouse(@Nullable Person spouse) {
+    public void setSpouse(@Nullable AbstractPerson spouse) {
         this.spouse = spouse;
     }
 
@@ -111,21 +111,21 @@ public class Genealogy implements Serializable {
     /**
      * @param formerSpouse the former spouse to remove from the current person's list
      */
-    public void removeFormerSpouse(Person formerSpouse) {
+    public void removeFormerSpouse(AbstractPerson formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
     }
 
     /**
      * @return the family map for this person
      */
-    public Map<FamilialRelationshipType, List<Person>> getFamily() {
+    public Map<FamilialRelationshipType, List<AbstractPerson>> getFamily() {
         return family;
     }
 
     /**
      * @param family the new family map for this person
      */
-    public void setFamily(Map<FamilialRelationshipType, List<Person>> family) {
+    public void setFamily(Map<FamilialRelationshipType, List<AbstractPerson>> family) {
         this.family = family;
     }
 
@@ -134,7 +134,7 @@ public class Genealogy implements Serializable {
      * @param relationshipType the relationship type between the two people
      * @param person the person to add
      */
-    public void addFamilyMember(FamilialRelationshipType relationshipType, @Nullable Person person) {
+    public void addFamilyMember(FamilialRelationshipType relationshipType, @Nullable AbstractPerson person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
             getFamily().get(relationshipType).add(person);
@@ -145,10 +145,10 @@ public class Genealogy implements Serializable {
      * @param relationshipType the FamilialRelationshipType of the person to remove
      * @param person the person to remove
      */
-    public void removeFamilyMember(@Nullable FamilialRelationshipType relationshipType, Person person) {
+    public void removeFamilyMember(@Nullable FamilialRelationshipType relationshipType, AbstractPerson person) {
         if (relationshipType == null) {
             for (FamilialRelationshipType type : FamilialRelationshipType.values()) {
-                List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
+                List<AbstractPerson> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
                 if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
                     familyMembers.remove(person);
                     if (familyMembers.isEmpty()) {
@@ -159,9 +159,9 @@ public class Genealogy implements Serializable {
             }
         } else if (getFamily().get(relationshipType) == null) {
             MekHQ.getLogger().error("Could not remove unknown family member of relationship "
-                    + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId() + ".");
+                    + relationshipType.name() + " and person " + person.getFullName() + " " + person.getId() + ".");
         } else {
-            List<Person> familyTypeMembers = getFamily().get(relationshipType);
+            List<AbstractPerson> familyTypeMembers = getFamily().get(relationshipType);
             familyTypeMembers.remove(person);
             if (familyTypeMembers.isEmpty()) {
                 getFamily().remove(relationshipType);
@@ -201,7 +201,7 @@ public class Genealogy implements Serializable {
     }
 
     /**
-     * @return true if the Person has any parents, otherwise false
+     * @return true if the AbstractPerson has any parents, otherwise false
      */
     public boolean hasParents() {
         return getFamily().get(FamilialRelationshipType.PARENT) != null;
@@ -213,7 +213,7 @@ public class Genealogy implements Serializable {
      * @param campaign the campaign the two people are a part of
      * @return true if they have mutual ancestors, otherwise false
      */
-    public boolean checkMutualAncestors(Person person, Campaign campaign) {
+    public boolean checkMutualAncestors(AbstractPerson person, Campaign campaign) {
         if (getOrigin().equals(person)) {
             // Same person will always return true, to prevent any weirdness
             return true;
@@ -225,10 +225,10 @@ public class Genealogy implements Serializable {
             return false;
         }
 
-        Set<Person> originAncestors = getAncestors(depth);
-        Set<Person> checkAncestors = person.getGenealogy().getAncestors(depth);
+        Set<AbstractPerson> originAncestors = getAncestors(depth);
+        Set<AbstractPerson> checkAncestors = person.getGenealogy().getAncestors(depth);
 
-        for (Person ancestor : checkAncestors) {
+        for (AbstractPerson ancestor : checkAncestors) {
             if (originAncestors.contains(ancestor)) {
                 return true;
             }
@@ -242,9 +242,9 @@ public class Genealogy implements Serializable {
      * @return a set of all unique ancestors of a person back depth generations
      * @note this is a recursive search to ensure it goes to a specified depth of relation
      */
-    private Set<Person> getAncestors(int depth) {
+    private Set<AbstractPerson> getAncestors(int depth) {
         // Create the return value
-        Set<Person> ancestors = new HashSet<>();
+        Set<AbstractPerson> ancestors = new HashSet<>();
 
         // Add this person to the return set
         ancestors.add(getOrigin());
@@ -254,7 +254,7 @@ public class Genealogy implements Serializable {
             // If so, decrease remaining search depth
             depth--;
             // Then parse through the parents
-            for (Person parent : getParents()) {
+            for (AbstractPerson parent : getParents()) {
                 // And add all of their returned ancestors to the list
                 ancestors.addAll(parent.getGenealogy().getAncestors(depth));
             }
@@ -269,11 +269,11 @@ public class Genealogy implements Serializable {
     /**
      * @return a list of the current person's grandparent(s)
      */
-    public List<Person> getGrandparents() {
-        List<Person> grandparents = new ArrayList<>();
-        List<Person> tempGrandparents;
+    public List<AbstractPerson> getGrandparents() {
+        List<AbstractPerson> grandparents = new ArrayList<>();
+        List<AbstractPerson> tempGrandparents;
 
-        for (Person parent : getParents()) {
+        for (AbstractPerson parent : getParents()) {
             tempGrandparents = parent.getGenealogy().getParents();
             // prevents duplicates, if anyone uses a small number of depth for their ancestry
             grandparents.removeAll(tempGrandparents);
@@ -286,7 +286,7 @@ public class Genealogy implements Serializable {
     /**
      * @return the person's parent(s)
      */
-    public List<Person> getParents() {
+    public List<AbstractPerson> getParents() {
         return getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>());
     }
 
@@ -294,9 +294,9 @@ public class Genealogy implements Serializable {
      * @param gender the gender of the parent(s) to get
      * @return a list of the person's parent(s) of the specified gender
      */
-    public List<Person> getParentsByGender(Gender gender) {
-        List<Person> parents = new ArrayList<>();
-        for (Person parent : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
+    public List<AbstractPerson> getParentsByGender(Gender gender) {
+        List<AbstractPerson> parents = new ArrayList<>();
+        for (AbstractPerson parent : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
             if (parent.getGender() == gender) {
                 parents.add(parent);
             }
@@ -308,14 +308,14 @@ public class Genealogy implements Serializable {
     /**
      * @return the person's father(s)
      */
-    public List<Person> getFathers() {
+    public List<AbstractPerson> getFathers() {
         return getParentsByGender(Gender.MALE);
     }
 
     /**
      * @return the person's mother(s)
      */
-    public List<Person> getMothers() {
+    public List<AbstractPerson> getMothers() {
         return getParentsByGender(Gender.FEMALE);
     }
 
@@ -323,10 +323,10 @@ public class Genealogy implements Serializable {
      * Siblings are defined as sharing either parent. Inlaws are not counted.
      * @return the siblings of the current person
      */
-    public List<Person> getSiblings() {
-        List<Person> siblings = new ArrayList<>();
-        for (Person parent : getParents()) {
-            for (Person sibling : parent.getGenealogy().getChildren()) {
+    public List<AbstractPerson> getSiblings() {
+        List<AbstractPerson> siblings = new ArrayList<>();
+        for (AbstractPerson parent : getParents()) {
+            for (AbstractPerson sibling : parent.getGenealogy().getChildren()) {
                 if (!getOrigin().equals(sibling)) {
                     siblings.remove(sibling);
                     siblings.add(sibling);
@@ -340,14 +340,14 @@ public class Genealogy implements Serializable {
     /**
      * @return a list of the person's siblings with spouses (if any)
      */
-    public List<Person> getSiblingsAndSpouses() {
-        List<Person> siblingsAndSpouses = new ArrayList<>();
-        for (Person parent : getParents()) {
-            for (Person sibling : parent.getGenealogy().getChildren()) {
+    public List<AbstractPerson> getSiblingsAndSpouses() {
+        List<AbstractPerson> siblingsAndSpouses = new ArrayList<>();
+        for (AbstractPerson parent : getParents()) {
+            for (AbstractPerson sibling : parent.getGenealogy().getChildren()) {
                 if (!getOrigin().equals(sibling)) {
                     siblingsAndSpouses.remove(sibling);
                     siblingsAndSpouses.add(sibling);
-                    Person spouse = sibling.getGenealogy().getSpouse();
+                    AbstractPerson spouse = sibling.getGenealogy().getSpouse();
                     if (spouse != null) {
                         siblingsAndSpouses.remove(spouse);
                         siblingsAndSpouses.add(spouse);
@@ -362,17 +362,17 @@ public class Genealogy implements Serializable {
     /**
      * @return a list of the current person's children
      */
-    public List<Person> getChildren() {
+    public List<AbstractPerson> getChildren() {
         return getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>());
     }
 
     /**
      * @return a list of the person's grandchildren
      */
-    public List<Person> getGrandchildren() {
-        List<Person> grandchildren = new ArrayList<>();
-        List<Person> tempGrandchildren;
-        for (Person child : getChildren()) {
+    public List<AbstractPerson> getGrandchildren() {
+        List<AbstractPerson> grandchildren = new ArrayList<>();
+        List<AbstractPerson> tempGrandchildren;
+        for (AbstractPerson child : getChildren()) {
             // We want to get the children of any children, without duplicates
             tempGrandchildren = child.getGenealogy().getChildren();
             grandchildren.removeAll(tempGrandchildren);
@@ -385,10 +385,10 @@ public class Genealogy implements Serializable {
     /**
      * @return a list of the person's Aunts and Uncles
      */
-    public List<Person> getsAuntsAndUncles() {
-        List<Person> auntsAndUncles = new ArrayList<>();
-        List<Person> tempAuntsAndUncles;
-        for (Person parent : getParents()) {
+    public List<AbstractPerson> getsAuntsAndUncles() {
+        List<AbstractPerson> auntsAndUncles = new ArrayList<>();
+        List<AbstractPerson> tempAuntsAndUncles;
+        for (AbstractPerson parent : getParents()) {
             tempAuntsAndUncles = parent.getGenealogy().getSiblingsAndSpouses();
             auntsAndUncles.removeAll(tempAuntsAndUncles);
             auntsAndUncles.addAll(tempAuntsAndUncles);
@@ -400,11 +400,11 @@ public class Genealogy implements Serializable {
     /**
      * @return a list of the person's cousins
      */
-    public List<Person> getCousins() {
-        List<Person> cousins = new ArrayList<>();
-        List<Person> tempCousins;
+    public List<AbstractPerson> getCousins() {
+        List<AbstractPerson> cousins = new ArrayList<>();
+        List<AbstractPerson> tempCousins;
 
-        for (Person auntOrUncle : getsAuntsAndUncles()) {
+        for (AbstractPerson auntOrUncle : getsAuntsAndUncles()) {
             tempCousins = auntOrUncle.getGenealogy().getChildren();
             cousins.removeAll(tempCousins);
             cousins.addAll(tempCousins);
@@ -438,7 +438,7 @@ public class Genealogy implements Serializable {
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "relationship");
                 MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", relationshipType.name());
-                for (Person person : getFamily().get(relationshipType)) {
+                for (AbstractPerson person : getFamily().get(relationshipType)) {
                     MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "personId", person.getId());
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "relationship");
@@ -510,7 +510,7 @@ public class Genealogy implements Serializable {
                 final NodeList nl2 = wn.getChildNodes();
                 // The default value should never be used, but it is useful to have a default
                 FamilialRelationshipType type = FamilialRelationshipType.PARENT;
-                final List<Person> people = new ArrayList<>();
+                final List<AbstractPerson> people = new ArrayList<>();
                 for (int i = 0; i < nl2.getLength(); i++) {
                     Node wn2 = nl2.item(i);
                     if (wn2.getNodeName().equalsIgnoreCase("type")) {
@@ -536,7 +536,7 @@ public class Genealogy implements Serializable {
      * (i.e. spouse and formerSpouses are not included, just family)
      */
     public boolean familyIsEmpty() {
-        for (List<Person> list : getFamily().values()) {
+        for (List<AbstractPerson> list : getFamily().values()) {
             if ((list != null) && !list.isEmpty()) {
                 return false;
             }
@@ -559,7 +559,7 @@ public class Genealogy implements Serializable {
         // Clear Former Spouses
         if (!getFormerSpouses().isEmpty()) {
             for (FormerSpouse formerSpouse : getFormerSpouses()) {
-                Person person = formerSpouse.getFormerSpouse();
+                AbstractPerson person = formerSpouse.getFormerSpouse();
                 if (person != null) {
                     person.getGenealogy().removeFormerSpouse(getOrigin());
                 }
@@ -568,8 +568,8 @@ public class Genealogy implements Serializable {
 
         // Clear Family
         if (!familyIsEmpty()) {
-            for (List<Person> list : getFamily().values()) {
-                for (Person person : list) {
+            for (List<AbstractPerson> list : getFamily().values()) {
+                for (AbstractPerson person : list) {
                     person.getGenealogy().removeFamilyMember(null, getOrigin());
                 }
             }
