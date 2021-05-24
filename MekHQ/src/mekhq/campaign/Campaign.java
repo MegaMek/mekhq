@@ -6042,27 +6042,25 @@ public class Campaign implements Serializable, ITechManager {
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
             if (getCampaignOptions().getOverageRepaymentInFinalPayment()
-                    && (contract.getSalvagePct() < 100)) {
-                Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
-                double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
-                double salvagePercent = contract.getSalvagePct() / 100.0;
-
-                if (salvagePercent < percentSalvaged) {
-                    Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
+                    && (contract.getSalvagePct() < 100.0)) {
+                final double salvagePercent = contract.getSalvagePct() / 100.0;
+                final Money maxSalvage = contract.getSalvagedByEmployer().multipliedBy(salvagePercent / (1 - salvagePercent));
+                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
+                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
                     contract.subtractSalvageByUnit(amountToRepay);
                 }
             }
 
             if (remainingMoney.isPositive()) {
-                finances.credit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), getLocalDate());
                 addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract " + contract.getName());
             } else if (remainingMoney.isNegative()) {
-                finances.debit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Repaying payment overages for " + contract.getName(), getLocalDate());
-                addReport("Your account has been debited for " + remainingMoney.toAmountAndSymbolString()
+                addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
             }
 

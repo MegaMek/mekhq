@@ -49,7 +49,6 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
 import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
@@ -151,9 +150,10 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         StratconScenario scenario = getSelectedScenario();
         
-        // display "Manage Force Assignment" if
-        // there is not a force already on the hex
-        if (!currentTrack.getAssignedCoordForces().containsKey(coords)) {
+        // display "Manage Force Assignment" if there is not a force already on the hex
+        // except if there is already a non-cloaked scenario here.
+        if (!currentTrack.areAnyForceDeployedTo(coords) &&
+                ((scenario == null) || scenario.getBackingScenario().isCloaked())) {
             menuItemManageForceAssignments = new JMenuItem();
             menuItemManageForceAssignments.setText("Manage Force Assignment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
@@ -162,9 +162,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
         
         // display "Manage Scenario" if
-        // there is already a scenario on the hex that hasn't been resolved
-        if ((scenario != null) &&
-                (scenario.getCurrentState() != ScenarioState.UNRESOLVED)) {
+        // there is already a visible scenario on the hex
+        if ((scenario != null) && !scenario.getBackingScenario().isCloaked()) {
             menuItemManageScenario = new JMenuItem();
             menuItemManageScenario.setText("Manage Scenario");
             menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
