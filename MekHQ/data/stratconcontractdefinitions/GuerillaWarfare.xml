@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
+    <contractType>GUERRILLA_WARFARE</contractType>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Engage hostile forces. Be quick.</briefing>
-    <contractTypeName>Guerilla Warfare</contractTypeName>
     <hostileFacilityCount>-1</hostileFacilityCount>
 	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
 	<scenarioOdds>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
+    <contractType>DIVERSIONARY_RAID</contractType>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Engage hostile forces.</briefing>
-    <contractTypeName>Diversionary Raid</contractTypeName>
     <hostileFacilityCount>-1</hostileFacilityCount>
 	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
 	<scenarioOdds>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.stratcon;
 
 import java.io.File;
@@ -108,7 +107,7 @@ public class StratconContractDefinition {
          * Victory in scenarios designated as "required" (usually per contract command clause)
          */
         RequiredScenarioVictory,
-        
+
         /**
          * Control of allied facilities generated at contract start time
          * Each track will be seeded with some number of allied facilities
@@ -131,7 +130,7 @@ public class StratconContractDefinition {
         FacilityDestruction
     }
 
-    private String contractTypeName;
+    private AtBContractType contractType;
     private String briefing;
 
     /**
@@ -174,12 +173,18 @@ public class StratconContractDefinition {
 
     private List<Integer> deploymentTimes;
 
-    public String getContractTypeName() {
-        return contractTypeName;
+    /**
+     * @return the contract type
+     */
+    public AtBContractType getContractType() {
+        return contractType;
     }
 
-    public void setContractTypeName(String contractTypeName) {
-        this.contractTypeName = contractTypeName;
+    /**
+     * @param contractType the contract type to set
+     */
+    public void setContractType(final AtBContractType contractType) {
+        this.contractType = contractType;
     }
 
     /**
@@ -330,7 +335,7 @@ public class StratconContractDefinition {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
-            MekHQ.getLogger().error("Erorr serializing " + outputFile.getPath(), e);
+            MekHQ.getLogger().error("Error serializing " + outputFile.getPath(), e);
         }
     }
 

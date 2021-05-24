@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import mekhq.campaign.mission.enums.AtBContractType;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -158,6 +159,7 @@ public class ContractMarketIntegrationTest {
         AtBContract existing = mock(AtBContract.class);
         when(existing.getId()).thenReturn(1);
         when(existing.getScenarios()).thenReturn(new ArrayList<>());
+        when(existing.getContractType()).thenReturn(AtBContractType.GARRISON_DUTY);
         when(existing.getStatus()).thenReturn(MissionStatus.ACTIVE);
         when(existing.getEmployerCode()).thenReturn("FWL");
         when(existing.getEnemyCode()).thenReturn("CC");
