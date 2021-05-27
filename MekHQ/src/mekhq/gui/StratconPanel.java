@@ -48,6 +48,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -152,8 +153,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
-        if (!currentTrack.areAnyForceDeployedTo(coords) &&
-                ((scenario == null) || scenario.getBackingScenario().isCloaked())) {
+        if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
             menuItemManageForceAssignments.setText("Manage Force Assignment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
