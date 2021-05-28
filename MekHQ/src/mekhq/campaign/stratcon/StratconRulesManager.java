@@ -150,11 +150,6 @@ public class StratconRulesManager {
 
                 StratconScenario scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
                 generatedScenarios.add(scenario);
-
-                // if we're auto-assigning lances, deploy the force to the track as well
-                if (autoAssignLances) {
-                    processForceDeployment(scenarioCoords, randomForceID, campaign, track, false);
-                }
             }
         }
 
@@ -181,6 +176,10 @@ public class StratconRulesManager {
                 track.addScenario(scenario);
             } else {
                 commitPrimaryForces(campaign, scenario, track);
+                // if we're auto-assigning lances, deploy all assigned forces to the track as well
+                for (int forceID : scenario.getPrimaryForceIDs()) {
+                    processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+                }
             }
         }
     }
