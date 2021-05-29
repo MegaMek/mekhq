@@ -343,9 +343,9 @@ public class AtBContract extends Contract implements Serializable {
         return (int) numUnits;
     }
 
-    public static boolean isMinorPower(String fName) {
-        Faction faction = Factions.getInstance().getFaction(fName);
-        return (faction != null) && !faction.isISMajorOrSuperPower() && !faction.isClan();
+    public static boolean isMinorPower(final String factionCode) {
+        final Faction faction = Factions.getInstance().getFaction(factionCode);
+        return !faction.isMajorOrSuperPower() && !faction.isClan();
     }
 
     public void calculatePaymentMultiplier(Campaign campaign) {

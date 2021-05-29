@@ -160,10 +160,8 @@ public class ContractMarket implements Serializable {
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
         if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
                 || newCampaign) {
-            Contract[] list = contracts.toArray(new Contract[0]);
-            for (Contract c : list) {
-                removeContract(c);
-            }
+            // need to copy to prevent concurrent modification errors
+            new ArrayList<>(contracts).forEach(this::removeContract);
 
             int unitRatingMod = campaign.getUnitRatingMod();
 
