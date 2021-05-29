@@ -4,6 +4,7 @@ VERSION HISTORY:
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
 + Issue #2625: Properly Clear Tech Units on Person removal/retirement
 + PR #2617: Contract Command Rights Enum and Tool Tips
++ PR #2637: Personnel Names
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
