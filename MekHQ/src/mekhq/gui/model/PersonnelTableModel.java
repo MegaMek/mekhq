@@ -94,29 +94,30 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_ANTI_MECH       = 27;
     public static final int COL_TACTICS         = 28;
     public static final int COL_STRATEGY        = 29;
-    public static final int COL_TECH_MECH       = 30;
-    public static final int COL_TECH_AERO       = 31;
-    public static final int COL_TECH_VEE        = 32;
-    public static final int COL_TECH_BA         = 33;
-    public static final int COL_MEDICAL         = 34;
-    public static final int COL_ADMIN           = 35;
-    public static final int COL_NEG             = 36;
-    public static final int COL_SCROUNGE        = 37;
-    public static final int COL_HITS            = 38;
-    public static final int COL_KILLS           = 39;
-    public static final int COL_SALARY          = 40;
-    public static final int COL_XP              = 41;
-    public static final int COL_ORIGIN_FACTION  = 42;
-    public static final int COL_ORIGIN_PLANET   = 43;
-    public static final int COL_RECRUIT_DATE    = 44;
-    public static final int COL_DEATH_DATE      = 45;
+    public static final int COL_LEADERSHIP      = 30;
+    public static final int COL_TECH_MECH       = 31;
+    public static final int COL_TECH_AERO       = 32;
+    public static final int COL_TECH_VEE        = 33;
+    public static final int COL_TECH_BA         = 34;
+    public static final int COL_MEDICAL         = 35;
+    public static final int COL_ADMIN           = 36;
+    public static final int COL_NEG             = 37;
+    public static final int COL_SCROUNGE        = 38;
+    public static final int COL_HITS            = 39;
+    public static final int COL_KILLS           = 40;
+    public static final int COL_SALARY          = 41;
+    public static final int COL_XP              = 42;
+    public static final int COL_ORIGIN_FACTION  = 43;
+    public static final int COL_ORIGIN_PLANET   = 44;
+    public static final int COL_RECRUIT_DATE    = 45;
+    public static final int COL_DEATH_DATE      = 46;
     //Export Only Columns
-    public static final int COL_TOUGH           = 46;
-    public static final int COL_EDGE            = 47;
-    public static final int COL_NABIL           = 48;
-    public static final int COL_NIMP            = 49;
-    public static final int COL_PORTRAIT        = 50;
-    public static final int N_COL               = 51;
+    public static final int COL_TOUGH           = 47;
+    public static final int COL_EDGE            = 48;
+    public static final int COL_NABIL           = 49;
+    public static final int COL_NIMP            = 50;
+    public static final int COL_PORTRAIT        = 51;
+    public static final int N_COL               = 52;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -207,6 +208,8 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_tactics.text");
             case COL_STRATEGY:
                 return resources.getString("col_strategy.text");
+            case COL_LEADERSHIP:
+                return resources.getString("col_leadership.text");
             case COL_TECH_MECH:
                 return resources.getString("col_tech_mech.text");
             case COL_TECH_AERO:
@@ -528,6 +531,11 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_STRATEGY:
                 if (p.hasSkill(SkillType.S_STRATEGY)) {
                     return Integer.toString(p.getSkill(SkillType.S_STRATEGY).getFinalSkillValue());
+                }
+                break;
+            case COL_LEADERSHIP:
+                if (p.hasSkill(SkillType.S_LEADER)) {
+                    return Integer.toString(p.getSkill(SkillType.S_LEADER).getFinalSkillValue());
                 }
                 break;
             case COL_TECH_MECH:

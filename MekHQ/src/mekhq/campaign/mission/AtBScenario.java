@@ -682,20 +682,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (getContract(campaign).getMissionType() == AtBContract.MT_CADREDUTY) {
             numAttachedPlayer = 3;
         } else if (campaign.getFactionCode().equals("MERC")) {
-            if (getContract(campaign).getCommandRights() == Contract.COM_INTEGRATED) {
-                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
-                    numAttachedPlayer = 2;
-                } else {
-                    numAttachedBot = 2;
-                }
-            } else if (getContract(campaign).getCommandRights() == Contract.COM_HOUSE) {
-                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+            switch (getContract(campaign).getCommandRights()) {
+                case INTEGRATED:
+                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                        numAttachedPlayer = 2;
+                    } else {
+                        numAttachedBot = 2;
+                    }
+                    break;
+                case HOUSE:
+                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                        numAttachedPlayer = 1;
+                    } else {
+                        numAttachedBot = 1;
+                    }
+                    break;
+                case LIAISON:
                     numAttachedPlayer = 1;
-                } else {
-                    numAttachedBot = 1;
-                }
-            } else if (getContract(campaign).getCommandRights() == Contract.COM_LIAISON) {
-                numAttachedPlayer = 1;
+                    break;
+                default:
+                    break;
             }
         }
 
