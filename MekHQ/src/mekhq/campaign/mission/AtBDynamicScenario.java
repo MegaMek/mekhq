@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -170,6 +171,11 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public int getMapY() {
         return getMapSizeY();
+    }
+    
+    @Override
+    public void setMapSize() {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this);
     }
 
     /**
@@ -406,6 +412,8 @@ public class AtBDynamicScenario extends AtBScenario {
         // in its current state
         if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
+            
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
         }
 
         super.writeToXmlEnd(pw1, indent);
@@ -420,6 +428,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 template = ScenarioTemplate.Deserialize(wn2);
+            } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
+                setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
             }
         }
 

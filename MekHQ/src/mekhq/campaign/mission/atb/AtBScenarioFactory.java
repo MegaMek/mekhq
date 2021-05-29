@@ -107,7 +107,7 @@ public class AtBScenarioFactory {
 
             return s;
         } catch (Exception e) {
-            MekHQ.getLogger().error(AtBScenarioFactory.class, e);
+            MekHQ.getLogger().error(e);
         }
 
         return null;
@@ -116,9 +116,9 @@ public class AtBScenarioFactory {
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
         if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-            MekHQ.getLogger().error(AtBScenarioFactory.class,
-                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
-                            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+            MekHQ.getLogger().error(String.format(
+                    "Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
+                    scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
         } else {
             int type = scenario.getScenarioType();
             List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
@@ -316,7 +316,7 @@ public class AtBScenarioFactory {
             //region Add to Campaign
             // Finally, sort the scenarios by date and add to the campaign, and generate forces
             // for the scenario if required
-            sList.sort(Comparator.comparing(Scenario::getDate));
+            sList.sort((s1, s2) -> Utilities.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, contract);
                 if (!dontGenerateForces.contains(atbScenario.getId())) {

@@ -150,7 +150,7 @@ public class PersonnelReport extends Report {
 
         for (Person p : getCampaign().getPersonnel()) {
             // Add them to the total count
-            final boolean primarySupport = p.getPrimaryRole().isSupport();
+            final boolean primarySupport = p.getPrimaryRole().isSupport(true);
 
             if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
@@ -180,7 +180,7 @@ public class PersonnelReport extends Report {
                 countDead++;
             }
 
-            if (p.isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
+            if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
                 dependents++;
             }
         }
@@ -190,7 +190,7 @@ public class PersonnelReport extends Report {
         sb.append(String.format("%-30s        %4s\n", "Total Support Personnel", countTotal));
 
         for (PersonnelRole role : personnelRoles) {
-            if (role.isSupport()) {
+            if (role.isSupport(true)) {
                 sb.append(String.format("    %-30s    %4s\n", role.getName(getCampaign().getFaction().isClan()),
                         countPersonByType[role.ordinal()]));
             }

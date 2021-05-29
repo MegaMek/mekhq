@@ -179,6 +179,22 @@ public final class MekHQOptions {
     //endregion Autosave
 
     //region New Day
+    public boolean getNewDayAstechPoolFill() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_ASTECH_POOL_FILL, true);
+    }
+
+    public void setNewDayAstechPoolFill(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_ASTECH_POOL_FILL, value);
+    }
+
+    public boolean getNewDayMedicPoolFill() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MEDIC_POOL_FILL, true);
+    }
+
+    public void setNewDayMedicPoolFill(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MEDIC_POOL_FILL, value);
+    }
+
     public boolean getNewDayMRMS() {
         return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
     }

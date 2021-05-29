@@ -129,7 +129,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrimaryRole().isNone() || p.isDependent() || !p.getPrisonerStatus().isFree()) {
+                if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
                 if (p.getPrimaryRole().isSupport()) {
@@ -168,7 +168,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-            if (p.isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
                     || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
                 continue;
             }

@@ -74,7 +74,6 @@ public class Force implements Serializable {
     private Force parentForce;
     private Vector<Force> subForces;
     private Vector<UUID> units;
-    private Vector<Integer> oldUnits;
     private int scenarioId;
 
     protected UUID techId;
@@ -90,7 +89,6 @@ public class Force implements Serializable {
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
-        this.oldUnits = new Vector<>();
         this.scenarioId = -1;
 
         // Initialize the Force Icon
@@ -205,7 +203,7 @@ public class Force implements Serializable {
         }
         return toReturn;
     }
-    
+
     /**
      * @return A String representation of the full hierarchical force including ID for MM export
      */
@@ -217,7 +215,7 @@ public class Force implements Serializable {
             ancestors.add(p);
             p = p.parentForce;
         }
-        
+
         var result = "";
         int id = 0;
         for (int i = ancestors.size() - 1; i >= 0; i--) {
@@ -438,7 +436,7 @@ public class Force implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
-        
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
 
         if (units.size() > 0) {
@@ -616,18 +614,6 @@ public class Force implements Serializable {
         return Objects.hash(getId(), getFullName());
     }
 
-    public void fixIdReferences(Map<Integer, UUID> uHash) {
-        for (int oid : oldUnits) {
-            UUID nid = uHash.get(oid);
-            if (null != nid) {
-                units.add(nid);
-            }
-        }
-        for (Force sub : subForces) {
-            sub.fixIdReferences(uHash);
-        }
-    }
-    
     /**
      * Calculates the force's total BV, including sub forces.
      * @param c The working campaign.
@@ -651,7 +637,7 @@ public class Force implements Serializable {
 
         return bvTotal;
     }
-    
+
     /**
      * Calculates the unit type most represented in this force
      * and all subforces.
@@ -662,18 +648,18 @@ public class Force implements Serializable {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
-        
+
         for (UUID id : getUnits()) {
             int unitType = c.getUnit(id).getEntity().getUnitType();
 
-            unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
-            
+            unitTypeBuckets.merge(unitType, 1, Integer::sum);
+
             if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
                 biggestBucketCount = unitTypeBuckets.get(unitType);
                 biggestBucketID = unitType;
             }
         }
-        
+
         return biggestBucketID;
     }
 }

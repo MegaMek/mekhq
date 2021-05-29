@@ -249,6 +249,19 @@ public class Utilities {
         return result;
     }
 
+    public static <T> int compareNullable(final @Nullable T a, final @Nullable T b,
+                                          final Comparator<? super T> comparator) {
+        if (a == b) { // Strict comparison is desired, to handle both null too
+            return 0;
+        } else if (a == null) {
+            return 1;
+        } else if (b == null) {
+            return -1;
+        } else {
+            return comparator.compare(a, b);
+        }
+    }
+
     public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
         if (currentAmmoType == null) {
             return Collections.emptyList();

@@ -235,7 +235,9 @@ public class AtBGameThread extends GameThread {
                     }
                     entity.setDeployRound(deploymentRound);
                     Force force = campaign.getForceFor(unit);
-                    entity.setForceString(force.getFullMMName());
+                    if (force != null) {
+                        entity.setForceString(force.getFullMMName());
+                    }
                     entities.add(entity);
                 }
                 client.sendAddEntity(entities);
@@ -313,10 +315,13 @@ public class AtBGameThread extends GameThread {
                     }
                     swingGui.getBots().put(name, botClient);
 
+                    // chill out while bot is created and connects to megamek
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                     configureBot(botClient, bf);
-
+                    
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                     if (scenario != null) {
                         AtBDynamicScenarioFactory.loadTransports(scenario, botClient);
                     }

@@ -3063,7 +3063,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToAdd.add(gravDeckPart);
                 }
             }
-            
+
             //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
                 int hsinks = ((Aero)entity).getOHeatSinks()
@@ -3075,7 +3075,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
                     sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
                 }
-                
+
                 // add busted heat sinks even if they're "engine free" so they can be repaired
                 if (hsinks == 0) {
                     for (int x = 0; x < ((Aero) entity).getHeatSinkHits(); x++) {
@@ -4233,7 +4233,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
+            getCampaign().recruitPerson(p, p.getPrisonerStatus(), true,  false);
             MekHQ.getLogger().warning(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }

@@ -56,6 +56,8 @@ public final class MekHqConstants {
 
     //region New Day
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
+    public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
+    public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     //endregion New Day
 
