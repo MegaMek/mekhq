@@ -18,19 +18,17 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-
+import megamek.client.generator.RandomCallsignGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
 import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.Crew;
+import megamek.common.Mech;
+import megamek.common.Mounted;
+import megamek.common.Tank;
+import megamek.common.UnitType;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -38,15 +36,28 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
-import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.AwardsFactory;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.Divorce;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -54,14 +65,46 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
-import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.AddOrEditKillEntryDialog;
+import mekhq.gui.dialog.AddOrEditMissionEntryDialog;
+import mekhq.gui.dialog.AddOrEditPersonnelEntryDialog;
+import mekhq.gui.dialog.CustomizePersonDialog;
+import mekhq.gui.dialog.EditKillLogDialog;
+import mekhq.gui.dialog.EditMissionLogDialog;
+import mekhq.gui.dialog.EditPersonnelHitsDialog;
+import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
+import mekhq.gui.dialog.EditPersonnelLogDialog;
+import mekhq.gui.dialog.GMToolsDialog;
+import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.dialog.PopupValueChoiceDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -86,7 +129,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
-    private static final String CMD_BLOODNAME = "BLOODNAME";
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
@@ -107,7 +149,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
-    private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
@@ -148,6 +189,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit";
     private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit";
     private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost";
+
+    //region Randomization Menu
+    private static final String CMD_RANDOM_NAME = "RANDOM_NAME";
+    private static final String CMD_RANDOM_BLOODNAME = "RANDOM_BLOODNAME";
+    private static final String CMD_RANDOM_CALLSIGN = "RANDOM_CALLSIGN";
+    private static final String CMD_RANDOM_PORTRAIT = "RANDOM_PORTRAIT";
+    private static final String CMD_RANDOM_ORIGIN = "RANDOM_ORIGIN";
+    private static final String CMD_RANDOM_ORIGIN_FACTION = "RANDOM_ORIGIN_FACTION";
+    private static final String CMD_RANDOM_ORIGIN_PLANET = "RANDOM_ORIGIN_PLANET";
+    //endregion Randomization Menu
 
     private static final String SEPARATOR = "@";
     private static final String TRUE = String.valueOf(true);
@@ -206,9 +257,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
-        String command = data[0];
 
-        switch (command) {
+        switch (data[0]) {
             case CMD_RANKSYSTEM: {
                 final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
                 final RankValidator rankValidator = new RankValidator();
@@ -802,13 +852,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().personUpdated(selectedPerson);
                 break;
             }
-            case CMD_RANDOM_PORTRAIT: {
-                for (Person person : people) {
-                    gui.getCampaign().assignRandomPortraitFor(person);
-                    gui.getCampaign().personUpdated(person);
-                }
-                break;
-            }
             case CMD_EDIT_PORTRAIT: {
                 AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
                         selectedPerson.getPortrait());
@@ -1071,12 +1114,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
-            case CMD_BLOODNAME: {
-                for (Person p : people) {
-                    gui.getCampaign().checkBloodnameAdd(p, true);
-                }
-                break;
-            }
             case CMD_EDIT_SALARY: {
                 PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(
                         gui.getFrame(),
@@ -1096,8 +1133,71 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            default:
+
+            //region Randomization Menu
+            case CMD_RANDOM_NAME: {
+                for (final Person person : people) {
+                    final String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                            person.getGender(), person.isClanner(), person.getOriginFaction().getShortName());
+                    person.setGivenName(name[0]);
+                    person.setSurname(name[1]);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
                 break;
+            }
+            case CMD_RANDOM_BLOODNAME: {
+                final boolean ignoreDice = Boolean.parseBoolean(data[1]);
+                for (final Person person : people) {
+                    gui.getCampaign().checkBloodnameAdd(person, ignoreDice);
+                }
+                break;
+            }
+            case CMD_RANDOM_CALLSIGN: {
+                for (final Person person : people) {
+                    person.setCallsign(RandomCallsignGenerator.getInstance().generate());
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_RANDOM_PORTRAIT: {
+                for (final Person person : people) {
+                    gui.getCampaign().assignRandomPortraitFor(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_RANDOM_ORIGIN: {
+                for (final Person person : people) {
+                    gui.getCampaign().assignRandomOriginFor(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_RANDOM_ORIGIN_FACTION: {
+                for (final Person person : people) {
+                    final Faction faction = gui.getCampaign().getFactionSelector().selectFaction(gui.getCampaign());
+                    if (faction != null) {
+                        person.setOriginFaction(faction);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                }
+                break;
+            }
+            case CMD_RANDOM_ORIGIN_PLANET: {
+                for (final Person person : people) {
+                    final Planet planet = gui.getCampaign().getPlanetSelector().selectPlanet(gui.getCampaign());
+                    if (planet != null) {
+                        person.setOriginPlanet(planet);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                }
+                break;
+            }
+            //endregion Randomization Menu
+
+            default: {
+                break;
+            }
         }
     }
 
@@ -1297,14 +1397,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-
-        // Bloodnames
-        if (StaticChecks.areAllClanEligible(selected) && StaticChecks.areAllActive(selected)) {
-            menuItem = new JMenuItem(resourceMap.getString("giveRandomBloodname.text"));
-            menuItem.setActionCommand(CMD_BLOODNAME);
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
-        }
 
         // change salary
         if (gui.getCampaign().getCampaignOptions().payForSalaries() && StaticChecks.areAllActive(selected)) {
@@ -2445,12 +2537,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
-        // generate new appropriate random portrait
-        menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text"));
-        menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
-        menuItem.addActionListener(this);
-        popup.add(menuItem);
-
         // change portrait
         menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "changePortrait.text" : "bulkAssignSinglePortrait.text"));
         menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
@@ -2501,6 +2587,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
+
         if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
             menuItem = new JMenuItem(resourceMap.getString("assignKill.text"));
             menuItem.setActionCommand(CMD_ADD_KILL);
@@ -2508,6 +2595,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
+
         menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text"));
         menuItem.addActionListener(gui::miExportPersonActionPerformed);
         menuItem.setEnabled(true);
@@ -2519,6 +2607,75 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
+
+        //region Randomization Menu
+        // This Menu contains the following options, in the specified order:
+        // 1) Random Name
+        // 2) Random Bloodname Check
+        // 3) Random Bloodname Assignment
+        // 4) Random Callsign
+        // 5) Random Portrait
+        // 6) Random Origin
+        // 7) Random Origin Faction
+        // 8) Random Origin Planet
+        menu = new JMenu(resourceMap.getString("randomizationMenu.text"));
+
+        menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomName.single.text" : "miRandomName.bulk.text"));
+        menuItem.setName("miRandomName");
+        menuItem.setActionCommand(CMD_RANDOM_NAME);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+
+        if (StaticChecks.areAllClanEligible(selected)) {
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomBloodnameCheck.single.text" : "miRandomBloodnameCheck.bulk.text"));
+            menuItem.setName("miRandomBloodnameCheck");
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_BLOODNAME, String.valueOf(false)));
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            if (gui.getCampaign().isGM()) {
+                menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomBloodname.single.text" : "miRandomBloodname.bulk.text"));
+                menuItem.setName("miRandomBloodname");
+                menuItem.setActionCommand(makeCommand(CMD_RANDOM_BLOODNAME, String.valueOf(true)));
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+        }
+
+        menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomCallsign.single.text" : "miRandomCallsign.bulk.text"));
+        menuItem.setName("miRandomCallsign");
+        menuItem.setActionCommand(CMD_RANDOM_CALLSIGN);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomPortrait.single.text" : "miRandomPortrait.bulk.text"));
+        menuItem.setName("miRandomPortrait");
+        menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+
+        if (gui.getCampaign().getCampaignOptions().randomizeOrigin()) {
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomOrigin.single.text" : "miRandomOrigin.bulk.text"));
+            menuItem.setName("miRandomOrigin");
+            menuItem.setActionCommand(CMD_RANDOM_ORIGIN);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomOriginFaction.single.text" : "miRandomOriginFaction.bulk.text"));
+            menuItem.setName("miRandomOriginFaction");
+            menuItem.setActionCommand(CMD_RANDOM_ORIGIN_FACTION);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "miRandomOriginPlanet.single.text" : "miRandomOriginPlanet.bulk.text"));
+            menuItem.setName("miRandomOriginPlanet");
+            menuItem.setActionCommand(CMD_RANDOM_ORIGIN_PLANET);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+        }
+
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        //endregion Randomization Menu
 
         //region GM Menu
         if (gui.getCampaign().isGM()) {
