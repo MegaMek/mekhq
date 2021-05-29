@@ -64,6 +64,7 @@ import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
+    //region Variable Declarations
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK";
@@ -75,79 +76,95 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_UNIT = "REMOVE_UNIT";
     private static final String CMD_ADD_PILOT = "ADD_PILOT";
     private static final String CMD_ADD_SOLDIER = "ADD_SOLDIER";
-    private static final String CMD_ADD_DRIVER = "ADD_DRIVER"; //$NON-NLS-1$
-    private static final String CMD_ADD_VESSEL_PILOT = "ADD_VESSEL_PILOT"; //$NON-NLS-1$
-    private static final String CMD_ADD_GUNNER = "ADD_GUNNER"; //$NON-NLS-1$
-    private static final String CMD_ADD_CREW = "ADD_CREW"; //$NON-NLS-1$
-    private static final String CMD_ADD_NAVIGATOR = "ADD_NAV"; //$NON-NLS-1$
-    private static final String CMD_ADD_TECH_OFFICER = "ADD_TECH_OFFICER"; //$NON-NLS-1$
+    private static final String CMD_ADD_DRIVER = "ADD_DRIVER";
+    private static final String CMD_ADD_VESSEL_PILOT = "ADD_VESSEL_PILOT";
+    private static final String CMD_ADD_GUNNER = "ADD_GUNNER";
+    private static final String CMD_ADD_CREW = "ADD_CREW";
+    private static final String CMD_ADD_NAVIGATOR = "ADD_NAV";
+    private static final String CMD_ADD_TECH_OFFICER = "ADD_TECH_OFFICER";
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
 
-    private static final String CMD_EDIT_SALARY = "SALARY"; //$NON-NLS-1$
-    private static final String CMD_BLOODNAME = "BLOODNAME"; //$NON-NLS-1$
-    private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY"; //$NON-NLS-1$
-    private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES"; //$NON-NLS-1$
-    private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
-    private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
+    private static final String CMD_EDIT_SALARY = "SALARY";
+    private static final String CMD_BLOODNAME = "BLOODNAME";
+    private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
+    private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
+    private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
+    private static final String CMD_CALLSIGN = "CALLSIGN";
+    private static final String CMD_COMMANDER = "COMMANDER";
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
     private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
     private static final String CMD_FOUNDER = "FOUNDER";
-    private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
-    private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
-    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
-    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
-    private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
-    private static final String CMD_ADD_KILL = "ADD_KILL"; //$NON-NLS-1$
-    private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
-    private static final String CMD_SET_EDGE = "EDGE_SET"; //$NON-NLS-1$
-    private static final String CMD_SET_XP = "XP_SET"; //$NON-NLS-1$
-    private static final String CMD_ADD_1_XP = "XP_ADD_1"; //$NON-NLS-1$
-    private static final String CMD_ADD_XP = "XP_ADD"; //$NON-NLS-1$
-    private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY"; //$NON-NLS-1$
-    private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT"; //$NON-NLS-1$
-    private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
-    private static final String CMD_EDIT_HITS = "EDIT_HITS"; //$NON-NLS-1$
-    private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
-    private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
-    private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
-    private static final String CMD_EDGE_TRIGGER = "EDGE"; //$NON-NLS-1$
-    private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS"; //$NON-NLS-1$
-    private static final String CMD_CHANGE_STATUS = "STATUS"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE"; //$NON-NLS-1$
-    private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
-    private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
+    private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
+    private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
+    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG";
+    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY";
+    private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
+    private static final String CMD_ADD_KILL = "ADD_KILL";
+    private static final String CMD_BUY_EDGE = "EDGE_BUY";
+    private static final String CMD_SET_EDGE = "EDGE_SET";
+    private static final String CMD_SET_XP = "XP_SET";
+    private static final String CMD_ADD_1_XP = "XP_ADD_1";
+    private static final String CMD_ADD_XP = "XP_ADD";
+    private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
+    private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT";
+    private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
+    private static final String CMD_EDIT_HITS = "EDIT_HITS";
+    private static final String CMD_EDIT = "EDIT";
+    private static final String CMD_SACK = "SACK";
+    private static final String CMD_REMOVE = "REMOVE";
+    private static final String CMD_EDGE_TRIGGER = "EDGE";
+    private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
+    private static final String CMD_CHANGE_STATUS = "STATUS";
+    private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST";
+    private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST";
+    private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER";
+    private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
+    private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
+    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_IMPROVE = "IMPROVE";
+    private static final String CMD_ADD_SPOUSE = "SPOUSE";
+    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
+    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
+    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_ADD_TECH = "ADD_TECH";
 
-    private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
-    private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
-    private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
+    private static final String CMD_IMPRISON = "IMPRISON";
+    private static final String CMD_FREE = "FREE";
+    private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_RANSOM = "RANSOM";
 
-    private static final String SEPARATOR = "@"; //$NON-NLS-1$
+    // MechWarrior Edge Options
+    private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails";
+    private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion";
+    private static final String OPT_EDGE_KO = "edge_when_ko";
+    private static final String OPT_EDGE_TAC = "edge_when_tac";
+    private static final String OPT_EDGE_HEADHIT = "edge_when_headhit";
+
+    // Aero Edge Options
+    private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss";
+    private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion";
+    private static final String OPT_EDGE_WHEN_AERO_KO= "edge_when_aero_ko";
+    private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit";
+    private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit";
+    private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost";
+
+    private static final String SEPARATOR = "@";
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
     private final CampaignGUI gui;
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
-    private final ResourceBundle resourceMap;
+
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl());
+    //endregion Variable Declarations
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
-                                      PersonnelTableModel personnelModel) {
+                                         PersonnelTableModel personnelModel) {
         this.gui = gui;
         this.personnelTable = personnelTable;
         this.personnelModel = personnelModel;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable,
@@ -170,23 +187,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }.connect(personnelTable);
     }
-
-    // MechWarrior Edge Options
-    private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
-    private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
-    private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
-    private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
-    private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
-
-    // Aero Edge Options
-    private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss"; //$NON-NLS-1$
-    private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion"; //$NON-NLS-1$
-    private static final String OPT_EDGE_WHEN_AERO_KO= "edge_when_aero_ko"; //$NON-NLS-1$
-    private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit"; //$NON-NLS-1$
-    private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit"; //$NON-NLS-1$
-    private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost"; //$NON-NLS-1$
-
-    private static final int MAX_POPUP_ITEMS = 20;
 
     private String makeCommand(String ... parts) {
         return Utilities.combineString(Arrays.asList(parts), SEPARATOR);
@@ -695,7 +695,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
                         String.format(resourceMap.getString("ransomQ.format"), people.length, total.toAmountAndSymbolString()),
-                        resourceMap.getString("ransom.text"), //$NON-NLS-1$
+                        resourceMap.getString("ransom.text"),
                         JOptionPane.YES_NO_OPTION)) {
 
                     gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total.toAmountAndSymbolString()));
@@ -771,12 +771,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 } else {
                     String question;
                     if (people.length > 1) {
-                        question = resourceMap.getString("confirmRemoveMultiple.text"); //$NON-NLS-1$
+                        question = resourceMap.getString("confirmRemoveMultiple.text");
                     } else {
-                        question = String.format(resourceMap.getString("confirmRemove.format"), people[0].getFullTitle()); //$NON-NLS-1$
+                        question = String.format(resourceMap.getString("confirmRemove.format"), people[0].getFullTitle());
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                            null, question, resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                            null, question, resourceMap.getString("removeQ.text"),
                             JOptionPane.YES_NO_OPTION)) {
                         for (Person person : people) {
                             gui.getCampaign().removePerson(person.getId());
@@ -885,7 +885,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_SET_EDGE: {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        gui.getFrame(), true, resourceMap.getString("edge.text"), selectedPerson.getEdge(), 0, //$NON-NLS-1$
+                        gui.getFrame(), true, resourceMap.getString("edge.text"), selectedPerson.getEdge(), 0,
                         10);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
@@ -977,11 +977,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Person p : gui.getCampaign().getPersonnel()) {
                         if (p.isCommander() && !p.getId().equals(selectedPerson.getId())) {
                             p.setCommander(false);
-                            gui.getCampaign().addReport(String.format(resourceMap.getString("removedCommander.format"), p.getHyperlinkedFullTitle())); //$NON-NLS-1$
+                            gui.getCampaign().addReport(String.format(resourceMap.getString("removedCommander.format"), p.getHyperlinkedFullTitle()));
                             gui.getCampaign().personUpdated(p);
                         }
                     }
-                    gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle())); //$NON-NLS-1$
+                    gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle()));
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
                 break;
@@ -1081,7 +1081,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(
                         gui.getFrame(),
                         true,
-                        resourceMap.getString("changeSalary.text"), //$NON-NLS-1$
+                        resourceMap.getString("changeSalary.text"),
                         selectedPerson.getSalary().getAmount().intValue(),
                         -1,
                         100000);
@@ -1231,7 +1231,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 menu.add(cbMenuItem);
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
             menu = new JMenu(resourceMap.getString("changeSecondaryDesignation.text"));
             for (ROMDesignation romDesignation : ROMDesignation.values()) {
@@ -1243,7 +1243,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 menu.add(cbMenuItem);
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         menu = new JMenu(resourceMap.getString("changeStatus.text"));
         for (PersonnelStatus status : PersonnelStatus.values()) {
@@ -1316,32 +1316,32 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (!person.isDeployed()) {
             // Assign pilot to unit/none
-            menu = new JMenu(resourceMap.getString("assignToUnit.text")); //$NON-NLS-1$
-            JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text")); //$NON-NLS-1$
+            menu = new JMenu(resourceMap.getString("assignToUnit.text"));
+            JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text"));
             JMenu pilotUnitTypeMenu = new JMenu();
             JMenu pilotEntityWeightMenu = new JMenu();
-            JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text")); //$NON-NLS-1$
+            JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text"));
             JMenu driverUnitTypeMenu = new JMenu();
             JMenu driverEntityWeightMenu = new JMenu();
-            JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
+            JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text"));
             JMenu crewUnitTypeMenu = new JMenu();
             JMenu crewEntityWeightMenu = new JMenu();
-            JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
+            JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text"));
             JMenu gunnerUnitTypeMenu = new JMenu();
             JMenu gunnerEntityWeightMenu = new JMenu();
-            JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
+            JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text"));
             JMenu navUnitTypeMenu = new JMenu();
             JMenu navEntityWeightMenu = new JMenu();
-            JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
+            JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text"));
             JMenu soldierUnitTypeMenu = new JMenu();
             JMenu soldierEntityWeightMenu = new JMenu();
-            JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
+            JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text"));
             JMenu techOfficerUnitTypeMenu = new JMenu();
             JMenu techOfficerEntityWeightMenu = new JMenu();
-            JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
+            JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text"));
             JMenu consoleCmdrUnitTypeMenu = new JMenu();
             JMenu consoleCmdrEntityWeightMenu = new JMenu();
-            JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
+            JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text"));
             JMenu techUnitTypeMenu = new JMenu();
             JMenu techEntityWeightMenu = new JMenu();
 
@@ -1359,26 +1359,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         String weightClassName = unit.getEntity().getWeightClassName();
 
                         // Add Weight Menus to Unit Type Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu);
 
                         // Then add the Unit Type Menus to the Role Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu);
 
                         // Create new UnitType and EntityWeight Menus
                         pilotUnitTypeMenu = new JMenu(unitTypeName);
@@ -1403,15 +1403,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         weightClass = unit.getEntity().getWeightClass();
                         String weightClassName = unit.getEntity().getWeightClassName();
 
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu);
 
                         pilotEntityWeightMenu = new JMenu(weightClassName);
                         driverEntityWeightMenu = new JMenu(weightClassName);
@@ -1500,7 +1500,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     if (unit.canTakeTech() && person.canTech(unit.getEntity())
                             && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
-                        cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
+                        cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"),
                                 unit.getName(), unit.getMaintenanceTime()));
                         cbMenuItem.setSelected(unit.equals(person.getUnit()));
                         cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
@@ -1519,20 +1519,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         String weightClassName = unit.getEntity().getWeightClassName();
 
                         // Add Weight Menus to Unit Type Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
 
                         // Then add the Unit Type Menus to the Role Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
 
                         // Create new UnitType and EntityWeight Menus
                         pilotUnitTypeMenu = new JMenu(unitTypeName);
@@ -1551,12 +1551,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         weightClass = unit.getEntity().getWeightClass();
                         String weightClassName = unit.getEntity().getWeightClassName();
 
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
 
                         pilotEntityWeightMenu = new JMenu(weightClassName);
                         driverEntityWeightMenu = new JMenu(weightClassName);
@@ -1651,37 +1651,37 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // Add the last grouping of entity weight menus to the last grouping of entity menus
-            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
+            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu);
 
             // then add the last grouping of entity menus to the primary menus
-            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu);
+            JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu);
 
             // and finally add any non-empty menus to the primary menu
-            JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, gunnerMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, navMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, soldierMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, techOfficerMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu, MAX_POPUP_ITEMS);
-            JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, gunnerMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, navMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, soldierMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, techOfficerMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, techMenu);
 
             // and we always include the None checkbox
             cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text"));
@@ -1691,7 +1691,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if ((menu.getItemCount() > 1) || (person.getUnit() != null)
                     || !person.getTechUnits().isEmpty()) {
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
         }
 
@@ -1739,14 +1739,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (person.getGender().isMale()) {
-                    JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu);
                 } else {
-                    JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu);
                 }
 
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 
             if (person.getGenealogy().hasSpouse()) {
@@ -1759,7 +1759,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(divorceMenu);
                 }
 
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
         }
 
@@ -1805,7 +1805,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 setAwardMenu.add(menuItem);
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu);
         }
 
         if (StaticChecks.doAnyHaveAnAward(selected)) {
@@ -1824,7 +1824,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         specificAwardMenu.addActionListener(this);
                         singleAwardMenu.add(specificAwardMenu);
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu);
                 }
             } else {
                 Set<Award> awards = new TreeSet<>((a1, a2) -> {
@@ -1845,7 +1845,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     removeAwardMenu.add(singleAwardMenu);
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
+            JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu);
         }
         popup.add(awardMenu);
         //endregion Awards Menu
@@ -2459,57 +2459,57 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (oneSelected) {
             // change Biography
-            menuItem = new JMenuItem(resourceMap.getString("changeBiography.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("changeBiography.text"));
             menuItem.setActionCommand(CMD_EDIT_BIOGRAPHY);
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            menuItem = new JMenuItem(resourceMap.getString("changeCallsign.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("changeCallsign.text"));
             menuItem.setActionCommand(CMD_CALLSIGN);
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            menuItem = new JMenuItem(resourceMap.getString("editPersonnelLog.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("editPersonnelLog.text"));
             menuItem.setActionCommand(CMD_EDIT_PERSONNEL_LOG);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
 
-        menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
+        menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text"));
         menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
         if (oneSelected) {
             // Edit mission log
-            menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text"));
             menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
 
         // Add one item to all personnel mission logs
-        menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
+        menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text"));
         menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
         if (oneSelected) {
-            menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("editKillLog.text"));
             menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
             menuItem.addActionListener(this);
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
         if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
-            menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("assignKill.text"));
             menuItem.setActionCommand(CMD_ADD_KILL);
             menuItem.addActionListener(this);
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
         menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text"));
-        menuItem.addActionListener(ev -> gui.miExportPersonActionPerformed(ev));
+        menuItem.addActionListener(gui::miExportPersonActionPerformed);
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
@@ -2631,14 +2631,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private JMenuItem newMenuItem(String text, String command) {
-        return newMenuItem(text, command, true);
-    }
-
-    private JMenuItem newMenuItem(String text, String command, boolean enabled) {
         JMenuItem result = new JMenuItem(text);
         result.setActionCommand(command);
         result.addActionListener(this);
-        result.setEnabled(enabled);
         return result;
     }
 
