@@ -90,7 +90,7 @@ public class StratconContractInitializer {
         for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
             int objectiveCount = objectiveParams.objectiveCount > 0 ?
                     (int) objectiveParams.objectiveCount :
-                    (int) (-objectiveParams.objectiveCount * contract.getRequiredLances());
+                    (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredLances());
 
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size());
 
