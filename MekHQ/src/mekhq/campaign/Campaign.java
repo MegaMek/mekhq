@@ -308,8 +308,7 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
         partsStore = new PartsStore(this);
         gameOptions = new GameOptions();
-        gameOptions.initialize();
-        gameOptions.getOption("year").setValue(getGameYear());
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
         game.setOptions(gameOptions);
         customs = new ArrayList<>();
         shoppingList = new ShoppingList();
@@ -4141,7 +4140,7 @@ public class Campaign implements Serializable, ITechManager {
         // parts is the biggest so it goes last
         parts.writeToXml(pw1, indent, "parts"); // Parts
 
-        writeGameOptions(pw1);
+        getGameOptions().writeToXML(pw1, indent);
 
         getPersonnelMarket().writeToXML(this, pw1, indent);
 
@@ -4225,19 +4224,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Okay, we're done.
         // Close everything out and be done with it.
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent - 1, "campaign");
-    }
-
-    public void writeGameOptions(PrintWriter pw1) {
-        pw1.println("\t<gameOptions>");
-        for (IBasicOption option : getGameOptionsVector()) {
-            pw1.println("\t\t<gameoption>"); //$NON-NLS-1$
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "name", option.getName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "value", option.getValue()
-                    .toString());
-            pw1.println("\t\t</gameoption>"); //$NON-NLS-1$
-        }
-        pw1.println("\t</gameOptions>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaign");
     }
 
     /**

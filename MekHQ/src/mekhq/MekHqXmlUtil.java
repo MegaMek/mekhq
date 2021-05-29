@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +34,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import megamek.common.annotations.Nullable;
 import megamek.utils.MegaMekXmlUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -109,7 +112,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     /**
      * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
-     * 
+     *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ TODO: Some of
      * this may want to be back-ported into entity itself in MM and then
@@ -523,5 +526,30 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
+    }
+
+    /**
+     * This writes a String or an array of Strings to file, with an the possible addition of an
+     * attribute and its value
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param attributeName the attribute to write as part of the XML tag
+     * @param attributeValue the value of the attribute
+     * @param values the String or String[] to write to XML
+     */
+    public static void writeSimpleXMLAttributedTag(final PrintWriter pw, final int indent,
+                                                   final String name,
+                                                   final @Nullable String attributeName,
+                                                   final @Nullable String attributeValue,
+                                                   final String... values) {
+        if (values.length > 0) {
+            final boolean hasAttribute = attributeValue != null;
+            pw.print(indentStr(indent) + "<" + name);
+            if (hasAttribute) {
+                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
+            }
+            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
+        }
     }
 }

@@ -82,7 +82,9 @@ public final class MekHqConstants {
     // This holds all required file paths not saved as part of MekHQ Options
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
+    public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
+    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
     //endregion File Paths
 
     // This is used in creating the name of save files, e.g. the MekHQ campaign file
