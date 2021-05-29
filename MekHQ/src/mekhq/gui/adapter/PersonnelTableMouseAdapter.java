@@ -1146,7 +1146,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANDOM_BLOODNAME: {
-                final boolean ignoreDice = Boolean.parseBoolean(data[1]);
+                final boolean ignoreDice = (data.length > 1) && Boolean.parseBoolean(data[1]);
                 for (final Person person : people) {
                     gui.getCampaign().checkBloodnameAdd(person, ignoreDice);
                 }
@@ -1185,7 +1185,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_ORIGIN_PLANET: {
                 for (final Person person : people) {
-                    final Planet planet = gui.getCampaign().getPlanetSelector().selectPlanet(gui.getCampaign());
+                    final Planet planet = gui.getCampaign().getPlanetSelector().selectPlanet(
+                            gui.getCampaign(), person.getOriginFaction());
                     if (planet != null) {
                         person.setOriginPlanet(planet);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
