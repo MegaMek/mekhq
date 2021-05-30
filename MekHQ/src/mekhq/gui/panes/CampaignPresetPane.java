@@ -21,6 +21,7 @@ package mekhq.gui.panes;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.renderers.CampaignPresetRenderer;
 
 import javax.swing.*;
@@ -33,7 +34,7 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
 
     //region Constructors
     public CampaignPresetPane(final JFrame frame) {
-        super(frame, "CampaignPresetSelectionPane", JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        super(frame, "CampaignPresetPane", JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         initialize();
     }
@@ -48,8 +49,7 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         this.presets = presets;
     }
 
-    public @Nullable
-    CampaignPreset getSelectedPreset() {
+    public @Nullable CampaignPreset getSelectedPreset() {
         return getPresets().getSelectedValue();
     }
     //endregion Getters/Setters
@@ -57,20 +57,21 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
     //region Initialization
     @Override
     protected void initialize() {
-        setLayout(new GridLayout(1, 1));
-        setMinimumSize(new Dimension(335, 130));
-        setPreferredSize(new Dimension(500, 400));
-
-        DefaultListModel<CampaignPreset> listModel = new DefaultListModel<>();
+        final DefaultListModel<CampaignPreset> listModel = new DefaultListModel<>();
         listModel.addAll(CampaignPreset.getCampaignPresets());
-
         setPresets(new JList<>(listModel));
         getPresets().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         getPresets().setSelectedIndex(0);
         getPresets().setLayoutOrientation(JList.VERTICAL);
-        getPresets().setCellRenderer(new CampaignPresetRenderer());
+        getPresets().setCellRenderer(new CampaignPresetRenderer(getFrame()));
 
-        add(getPresets());
+        final JPanel panel = new JScrollablePanel(new GridLayout(1, 1));
+        panel.setName("campaignPresetPanel");
+        panel.add(getPresets());
+
+        setViewportView(panel);
+        setMinimumSize(new Dimension(350, 150));
+        setPreferredSize(new Dimension(500, 400));
     }
     //endregion Initialization
 }

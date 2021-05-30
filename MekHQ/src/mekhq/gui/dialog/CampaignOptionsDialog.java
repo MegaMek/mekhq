@@ -3550,8 +3550,9 @@ public class CampaignOptionsDialog extends JDialog {
         btnLoad.setName("btnLoad");
         btnLoad.addActionListener(evt -> {
             final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
-            presetSelectionDialog.showDialog();
-            applyPreset(presetSelectionDialog.getSelectedPreset());
+            if (presetSelectionDialog.showDialog().isConfirmed()) {
+                applyPreset(presetSelectionDialog.getSelectedPreset());
+            }
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -4700,22 +4701,22 @@ public class CampaignOptionsDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    public void applyPreset(CampaignPreset campaignPreset) {
+    public void applyPreset(final CampaignPreset preset) {
         // Handle CampaignOptions and RandomSkillPreferences
-        setOptions(campaignPreset.getCampaignOptions(), campaignPreset.getRandomSkillPreferences());
+        setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
 
         // Handle SPAs
-        tempSPA = (campaignPreset.getSpecialAbilities() != null) ? campaignPreset.getSpecialAbilities() : new Hashtable<>();
+        tempSPA = (preset.getSpecialAbilities() != null) ? preset.getSpecialAbilities() : new Hashtable<>();
         recreateSPAPanel(!getUnusedSPA().isEmpty());
 
-        if (campaignPreset.getSkills() != null) {
+        if (preset.getSkills() != null) {
             // Overwriting XP Table
-            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(campaignPreset.getSkills()), TABLE_XP_COLUMN_NAMES));
+            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(preset.getSkills()), TABLE_XP_COLUMN_NAMES));
             ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
 
             // Overwriting Skill List
             for (String skillName : SkillType.getSkillList()) {
-                SkillType skillType = campaignPreset.getSkills().get(skillName);
+                SkillType skillType = preset.getSkills().get(skillName);
 
                 JSpinner spnTarget = hashSkillTargets.get(skillName);
                 if (spnTarget == null) {
@@ -5517,6 +5518,11 @@ public class CampaignOptionsDialog extends JDialog {
             updateOptions();
             this.setVisible(false);
         }
+    }
+
+    private void btnSaveActionPerformed() {
+        // FIXME : Windchild I'm completely unimplemented
+
     }
 
     private void updateXPCosts() {

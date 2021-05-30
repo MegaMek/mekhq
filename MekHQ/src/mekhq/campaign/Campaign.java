@@ -5539,23 +5539,27 @@ public class Campaign implements Serializable, ITechManager {
         rskillPrefs = prefs;
     }
 
-    public void setStartingSystem() {
-        Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
-        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
+    /**
+     * @param planet the starting planet, or null to use the faction default
+     */
+    public void setStartingSystem(final @Nullable Planet planet) {
+        PlanetarySystem startingSystem;
+        if (planet == null) {
+            Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
-        if (startingSystem == null) {
-            startingSystem = systemList.get(JOptionPane.showInputDialog(
-                    "This faction does not have a starting planet for this era. Please choose a planet."));
-            while (startingSystem == null) {
-                startingSystem = systemList.get(JOptionPane
-                        .showInputDialog("This planet you entered does not exist. Please choose a valid planet."));
+            if (startingSystem == null) {
+                startingSystem = systemList.get(JOptionPane.showInputDialog(
+                        "This faction does not have a starting planet for this era. Please choose a planet."));
+                while (startingSystem == null) {
+                    startingSystem = systemList.get(JOptionPane.showInputDialog(
+                            "This planet you entered does not exist. Please choose a valid planet."));
+                }
             }
+        } else {
+            startingSystem = planet.getParentSystem();
         }
         location = new CurrentLocation(startingSystem, 0);
-    }
-
-    public void addLogEntry(Person p, LogEntry entry) {
-        p.addLogEntry(entry);
     }
 
     /**

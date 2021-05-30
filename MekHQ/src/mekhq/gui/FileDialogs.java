@@ -137,32 +137,19 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> openCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Campaign Options",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue());
-
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
-        return value;
+    public static Optional<File> openCampaignPreset(final JFrame frame) {
+        return GUI.fileDialogOpen(frame, "Select Campaign Preset", FileType.XML,
+                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Campaign Options as Presets",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue(),
-                "myoptions.xml");
-
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
-        return value;
+    public static Optional<File> saveCampaignPreset(final JFrame frame, final Campaign campaign) {
+        return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
+                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY, campaign.getName() + " Preset.xml");
     }
 
     /**

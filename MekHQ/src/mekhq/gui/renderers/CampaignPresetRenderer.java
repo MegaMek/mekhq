@@ -18,62 +18,20 @@
  */
 package mekhq.gui.renderers;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.CampaignPreset;
+import mekhq.gui.panels.CampaignPresetPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
-public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<CampaignPreset> {
-    //region Variable Declarations
-    private JLabel lblTitle;
-    private JTextArea txtDescription;
-    //endregion Variable Declarations
-
+public class CampaignPresetRenderer extends CampaignPresetPanel implements ListCellRenderer<CampaignPreset> {
     //region Constructors
-    public CampaignPresetRenderer() {
-        initialize();
+    public CampaignPresetRenderer(final JFrame frame) {
+        super(frame, null);
     }
     //endregion Constructors
-
-    //region Getters/Setters
-    public JLabel getLblTitle() {
-        return lblTitle;
-    }
-
-    public void setLblTitle(final JLabel lblTitle) {
-        this.lblTitle = lblTitle;
-    }
-
-    public JTextArea getTxtDescription() {
-        return txtDescription;
-    }
-
-    public void setTxtDescription(final JTextArea txtDescription) {
-        this.txtDescription = txtDescription;
-    }
-    //endregion Getters/Setters
-
-    //region Initialization
-    private void initialize() {
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createLineBorder(Color.BLACK, 2)));
-        setName("campaignPresetPanel");
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        setLblTitle(new JLabel());
-        getLblTitle().setName("lblTitle");
-        getLblTitle().setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(getLblTitle());
-
-        setTxtDescription(new JTextArea());
-        getTxtDescription().setName("txtDescription");
-        getTxtDescription().setEditable(false);
-        getTxtDescription().setLineWrap(true);
-        getTxtDescription().setWrapStyleWord(true);
-        add(getTxtDescription());
-    }
-    //endregion Initialization
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends CampaignPreset> list,
@@ -88,11 +46,11 @@ public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<C
                 ? "Table.selectionBackground" : "Table.background").getRGB());
         setForeground(foreground);
         setBackground(background);
+
         getTxtDescription().setForeground(foreground);
         getTxtDescription().setBackground(background);
 
-        getLblTitle().setText(value.getTitle());
-        getTxtDescription().setText(value.getDescription());
+        updateFromPreset(value);
 
         return this;
     }

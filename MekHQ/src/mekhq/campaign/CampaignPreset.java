@@ -1,7 +1,5 @@
 /*
- * GamePreset.java
- *
- * Copyright (c) 2015 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +24,6 @@ import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.SkillType;
@@ -37,13 +34,11 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.FileDialogs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -73,6 +67,8 @@ import java.util.ResourceBundle;
 public class CampaignPreset implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = 7753055687319002688L;
+
+    private final boolean userData;
 
     private String title;
     private String description;
@@ -94,19 +90,24 @@ public class CampaignPreset implements Serializable {
 
     //region Constructors
     public CampaignPreset() {
-        this("Title missing", "", null, null, null, null,
+        this(false);
+    }
+
+    public CampaignPreset(final boolean userData) {
+        this("Title", "", userData, null, null, null, null,
                 2, null, null, null,
                 new Hashtable<>(), new Hashtable<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
-        this(campaign.getTitle(), "", campaign.getLocalDate(), campaign.getFaction(),
+        this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
                 campaign.getGameOptions(), campaign.getCampaignOptions(),
-                campaign.getRandomSkillPreferences(), );
+                campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
+                SpecialAbility.getAllSpecialAbilities());
     }
 
-    public CampaignPreset(final String title, final String description,
+    public CampaignPreset(final String title, final String description, final boolean userData,
                           final @Nullable LocalDate date, final @Nullable Faction faction,
                           final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
                           final int contractCount, final @Nullable GameOptions gameOptions,
@@ -114,6 +115,8 @@ public class CampaignPreset implements Serializable {
                           final @Nullable RandomSkillPreferences randomSkillPreferences,
                           final Hashtable<String, SkillType> skills,
                           final Hashtable<String, SpecialAbility> specialAbilities) {
+        this.userData = userData;
+
         setTitle(title);
         setDescription(description);
 
@@ -134,6 +137,10 @@ public class CampaignPreset implements Serializable {
     //endregion Constructors
 
     //region Getters/Setters
+    public boolean isUserData() {
+        return userData;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -236,6 +243,7 @@ public class CampaignPreset implements Serializable {
     //endregion Getters/Setters
 
     /**
+     * TODO : I need a way of ensuring uniqueness and proper sort order
      * @return a list of all of the campaign presets in the default and userdata folders
      */
     public static List<CampaignPreset> getCampaignPresets() {
@@ -392,7 +400,7 @@ public class CampaignPreset implements Serializable {
         final CampaignPreset preset = new CampaignPreset();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
-                Node wn = nl.item(x);
+                final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
@@ -457,7 +465,7 @@ public class CampaignPreset implements Serializable {
                             Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
-                            } else if (wn2.getNodeName().equalsIgnoreCase("ability")) {
+                            } else if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                                 MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                                 continue;
                             }
@@ -478,66 +486,4 @@ public class CampaignPreset implements Serializable {
         return preset;
     }
     //endregion File I/O
-
-    @Deprecated
-    private void btnSaveActionPerformed() {
-        if (txtName.getText().length() == 0) {
-            return;
-        }
-        GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true,
-                "Enter a title", "Enter description of preset");
-        gpdd.setVisible(true);
-        if (!gpdd.wasChanged()) {
-            return;
-        }
-
-        MekHQ.getLogger().info("Saving campaign options...");
-        // Choose a file...
-        Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
-
-        if (!maybeFile.isPresent()) {
-            return;
-        }
-
-        File file = maybeFile.get();
-
-        String path = file.getPath();
-        if (!path.endsWith(".xml")) {
-            path += ".xml";
-            file = new File(path);
-        }
-
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
-
-        updateOptions();
-        CampaignPreset preset = new CampaignPreset(gpdd.getTitle(), gpdd.getDesc(), options, rSkillPrefs,
-                SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
-
-        // Then save it out to that file.
-        try (FileOutputStream fos = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-            preset.writeToXml(pw, 1);
-            pw.flush();
-            MekHQ.getLogger().info("Campaign options saved to " + file);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
-            JOptionPane.showMessageDialog(null,
-                    "Whoops, for some reason the game presets could not be saved",
-                    "Could not save presets", JOptionPane.ERROR_MESSAGE);
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-            }
-        }
-        if (backupFile.exists()) {
-            backupFile.delete();
-        }
-
-        this.setVisible(false);
-    }
 }

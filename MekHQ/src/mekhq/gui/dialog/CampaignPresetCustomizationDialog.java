@@ -18,7 +18,76 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.enums.ValidationState;
+import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
+import mekhq.gui.displayWrappers.FactionDisplay;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class CampaignPresetCustomizationDialog extends AbstractMHQValidationButtonDialog {
+    //region Variable Declarations
+    private final CampaignPreset preset;
+
+    private JTextField txtTitle;
+    private JTextField txtDescription;
+
+    //region Startup
+    private JCheckBox chkSpecifyDate;
+    private JCheckBox chkSpecifyFaction;
+    private MMComboBox<FactionDisplay> comboFaction;
+    private JCheckBox chkSpecifyPlanet;
+    private JCheckBox chkSpecifyRankSystem;
+    private JSpinner spnContractCount;
+    private JCheckBox chkSpecifyGameOptions;
+    //endregion Startup
+
+    //endregion Variable Declarations
+
+    //region Constructors
+    public CampaignPresetCustomizationDialog(final JFrame frame, final CampaignPreset preset) {
+        super(frame, "CampaignPresetCustomizationDialog", "CampaignPresetCustomizationDialog.title");
+        this.preset = preset;
+        initialize();
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public CampaignPreset getPreset() {
+        return preset;
+    }
+    //endregion Getters/Setters
+
+    //region Initialization
+    @Override
+    protected Container createCenterPane() {
+
+        //region Startup
+        //endregion Startup
+
+        //region Continuous
+        //endregion Continuous
+
+        return null;
+    }
+    //endregion Initialization
+
+    //region Button Actions
+    @Override
+    protected ValidationState validateAction(final boolean display) {
+        return null;
+    }
+    //endregion Button Actions
+
+    public void updatePreset(final CampaignPreset preset) {
+        if (!getState().isSuccess()) {
+            validateButtonActionPerformed(null);
+        }
+
+        if (getState().isSuccess() || getState().isWarning()) {
+            // TODO : Update the preset based on the dialog
+        }
+    }
 }
