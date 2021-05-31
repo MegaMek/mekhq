@@ -1174,25 +1174,7 @@ public class StratconRulesManager {
         boolean alliedFacility = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
         
         return (!track.areAnyForceDeployedTo(coords) || alliedFacility) && nonCloakedOrNoscenario;
-    }
-    
-    /**
-     * Can the given force be manually deployed to the given coordinates on the given track
-     */
-    public static boolean canManuallyDeployForce(StratconCoords coords, 
-            StratconTrackState track, AtBContract contract, Force force, AtBLanceRole forceRole) {        
-        // can't do it under integrated command clause, period
-        
-        // defend lances can stack up on allied facilities
-        
-        // can't deploy if a force has already been deployed to these coordinates
-        
-        // can't deploy if a scenario exists on these coordinates, unless it's invisible
-        
-        
-        return false;
-    }
-    
+    }    
 
     /**
      * Given a track and the current campaign state, and if the player is deploying a force or not,
