@@ -25,6 +25,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum PersonnelRole {
     //region Enum Declarations
@@ -316,6 +318,13 @@ public enum PersonnelRole {
             }
         }
         return marketableRoles;
+    }
+
+    /**
+     * @return a list of roles that are potential primary roles. Currently this is all bar NONE
+     */
+    public static List<PersonnelRole> getPrimaryRoles() {
+        return Stream.of(values()).filter(role -> !role.isNone()).collect(Collectors.toList());
     }
 
     /**
