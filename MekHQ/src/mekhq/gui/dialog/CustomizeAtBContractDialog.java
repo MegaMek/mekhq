@@ -97,6 +97,10 @@ public class CustomizeAtBContractDialog extends JDialog {
         setUserPreferences();
     }
 
+    public AtBContract getAtBContract() {
+        return contract;
+    }
+
     private void initComponents() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -547,9 +551,4 @@ public class CustomizeAtBContractDialog extends JDialog {
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
         }
     }
-
-    public int getMissionId() {
-        return contract.getId();
-    }
-
 }
