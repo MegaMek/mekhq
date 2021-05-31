@@ -33,13 +33,12 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
-import mekhq.gui.preferences.ColorPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -72,8 +71,6 @@ public class UnitTableModel extends DataTableModel {
     public final static int N_COL =          19;
 
     private Campaign campaign;
-
-    private final MekHqColors colors = new MekHqColors();
     //endregion Variable Declarations
 
     public UnitTableModel(Campaign c) {
@@ -285,36 +282,41 @@ public class UnitTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (u.isDeployed()) {
-                    applyColors(colors.getDeployed());
+                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 } else if (!u.isPresent()) {
-                    applyColors(colors.getInTransit());
+                    setForeground(MekHQ.getMekHQOptions().getInTransitForeground());
+                    setBackground(MekHQ.getMekHQOptions().getInTransitBackground());
                 } else if (u.isRefitting()) {
-                    applyColors(colors.getRefitting());
+                    setForeground(MekHQ.getMekHQOptions().getRefittingForeground());
+                    setBackground(MekHQ.getMekHQOptions().getRefittingBackground());
                 } else if (u.isMothballing()) {
-                    applyColors(colors.getMothballing());
+                    setForeground(MekHQ.getMekHQOptions().getMothballingForeground());
+                    setBackground(MekHQ.getMekHQOptions().getMothballingBackground());
                 } else if (u.isMothballed()) {
-                    applyColors(colors.getMothballed());
+                    setForeground(MekHQ.getMekHQOptions().getMothballedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getMothballedBackground());
                 } else if (u.isUnmaintained()) {
-                    applyColors(colors.getUnmaintained());
+                    setForeground(MekHQ.getMekHQOptions().getUnmaintainedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getUnmaintainedBackground());
                 } else if (!u.isRepairable()) {
-                    applyColors(colors.getNotRepairable());
+                    setForeground(MekHQ.getMekHQOptions().getNotRepairableForeground());
+                    setBackground(MekHQ.getMekHQOptions().getNotRepairableBackground());
                 } else if (!u.isFunctional()) {
-                    applyColors(colors.getNonFunctional());
+                    setForeground(MekHQ.getMekHQOptions().getNonFunctionalForeground());
+                    setBackground(MekHQ.getMekHQOptions().getNonFunctionalBackground());
                 } else if (u.hasPartsNeedingFixing()) {
-                    applyColors(colors.getNeedsPartsFixed());
+                    setForeground(MekHQ.getMekHQOptions().getNeedsPartsFixedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getNeedsPartsFixedBackground());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    applyColors(colors.getUncrewed());
+                    setForeground(MekHQ.getMekHQOptions().getUncrewedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getUncrewedBackground());
                 } else {
                     setForeground(UIManager.getColor("Table.foreground"));
                     setBackground(UIManager.getColor("Table.background"));
                 }
             }
             return this;
-        }
-
-        private void applyColors(ColorPreference c) {
-            setBackground(c.getColor().orElseGet(() -> UIManager.getColor("Table.background")));
-            setForeground(c.getAlternateColor().orElseGet(() -> UIManager.getColor("Table.foreground")));
         }
     }
 
