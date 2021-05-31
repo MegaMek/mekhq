@@ -3691,9 +3691,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //console we will flag the entity as using the console commander, which has the effect of limiting
         //the tank to a single commander. As the console commander is not counted against crew requirements,
         //we do not increase nCrew if present.
-        if (entity instanceof Tank && ((Tank)entity).hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+        if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
             if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
-                ((Tank)entity).setUsingConsoleCommander(true);
+                ((Tank) entity).setUsingConsoleCommander(true);
             }
         }
 
@@ -3710,9 +3710,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
                 //armor when a perfectly good suit is waiting further down the line.
                 Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
-                    if (entity.getInternal(i)<0) {
+                    if (entity.getInternal(i) < 0) {
                         bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
                     }
                     bestSuits = Utilities.sortMapByValue(bestSuits, true);
@@ -4577,14 +4577,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 crew.add(p);
             }
         }
-        for (Person p : vesselCrew) {
-            crew.add(p);
-        }
+        crew.addAll(vesselCrew);
         if (navigator != null) {
             crew.add(navigator);
         }
         if (techOfficer != null) {
-                crew.add(techOfficer);
+            crew.add(techOfficer);
         }
         return crew;
     }
@@ -4953,7 +4951,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         for (Part part : getParts()) {
             if (part instanceof MissingBattleArmorEquipmentPart &&
-                    ((MissingBattleArmorEquipmentPart)part).getTrooper() == trooper) {
+                    ((MissingBattleArmorEquipmentPart) part).getTrooper() == trooper) {
                 return false;
             }
         }
@@ -5411,6 +5409,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
+
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
@@ -5420,6 +5419,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         getId(), getName(), id));
             }
         }
+
         if (navigator instanceof UnitPersonRef) {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
@@ -5429,6 +5429,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         getId(), getName(), id));
             }
         }
+
+        if (getTechOfficer() instanceof UnitPersonRef) {
+            final UUID id = getTechOfficer().getId();
+            techOfficer = campaign.getPerson(id);
+            if (getTechOfficer() == null) {
+                MekHQ.getLogger().error(
+                        String.format("Unit %s ('%s') references missing tech officer %s",
+                                getId(), getName(), id));
+            }
+        }
+
         if (mothballInfo != null) {
             mothballInfo.fixReferences(campaign);
         }
