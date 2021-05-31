@@ -3901,12 +3901,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (!isUnmanned()) {
                 engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
                 engineer.setEngineer(true);
+                engineer.setClanner(getCommander().isClanner());
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
                 engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
                 engineer.setRank(getCommander().getRankNumeric());
-                //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
+                // will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
             } else {
                 engineer = null;
@@ -3964,6 +3965,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (nCrew > 0) {
                     engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
                     engineer.setEngineer(true);
+                    engineer.setClanner(getCommander().isClanner());
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
