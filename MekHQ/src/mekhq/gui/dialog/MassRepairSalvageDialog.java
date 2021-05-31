@@ -881,7 +881,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
     private void btnStartMassRepairActionPerformed(ActionEvent evt) {
         // Not enough Astechs to run the tech teams
-        if (campaignGUI.getCampaign().getAstechNeed() > 0) {
+        if (campaignGUI.getCampaign().requiresAdditionalAstechs()) {
             int savePrompt = JOptionPane.showConfirmDialog(null,
                     resources.getString("NotEnoughAstechs.error"),
                     resources.getString("NotEnoughAstechs.errorTitle"),

@@ -20,18 +20,9 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.swing.*;
-
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
+import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
@@ -43,10 +34,15 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author Neoancient
@@ -99,6 +95,10 @@ public class CustomizeAtBContractDialog extends JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
+    }
+
+    public AtBContract getAtBContract() {
+        return contract;
     }
 
     private void initComponents() {
@@ -489,18 +489,16 @@ public class CustomizeAtBContractDialog extends JDialog {
             CamoChooserDialog ccd;
             if (e.getSource().equals(btnAllyCamo)) {
                 ccd = new CamoChooserDialog(frame, allyCamouflage);
-                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
-                    return;
+                if (ccd.showDialog().isConfirmed()) {
+                    allyCamouflage = ccd.getSelectedItem();
+                    btnAllyCamo.setIcon(allyCamouflage.getImageIcon());
                 }
-                allyCamouflage = ccd.getSelectedItem();
-                btnAllyCamo.setIcon(allyCamouflage.getImageIcon());
             } else {
                 ccd = new CamoChooserDialog(frame, enemyCamouflage);
-                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
-                    return;
+                if (ccd.showDialog().isConfirmed()) {
+                    enemyCamouflage = ccd.getSelectedItem();
+                    btnEnemyCamo.setIcon(enemyCamouflage.getImageIcon());
                 }
-                enemyCamouflage = ccd.getSelectedItem();
-                btnEnemyCamo.setIcon(enemyCamouflage.getImageIcon());
             }
         }
     };
@@ -553,9 +551,4 @@ public class CustomizeAtBContractDialog extends JDialog {
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
         }
     }
-
-    public int getMissionId() {
-        return contract.getId();
-    }
-
 }

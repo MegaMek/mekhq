@@ -18,35 +18,9 @@
  */
 package mekhq.campaign.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.icons.Camouflage;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
@@ -58,6 +32,7 @@ import megamek.common.Mounted;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -67,16 +42,17 @@ import mekhq.MhqFileUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -103,11 +79,12 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
@@ -115,9 +92,29 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CampaignXmlParser {
-
     private InputStream is;
     private MekHQ app;
 
@@ -266,7 +263,7 @@ public class CampaignXmlParser {
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
+                    retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } /* We don't need this since info is processed above in the first iteration...
                 else if (xn.equalsIgnoreCase("info")) {
                     processInfoNode(retVal, wn, version);
@@ -332,12 +329,16 @@ public class CampaignXmlParser {
             }
         }
 
-        // Fix any Person Id References
-        PersonIdReference.fixPersonIdReferences(retVal);
-
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
+        // Apply Migration
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(retVal.getCamouflage());
+        }
+
         // We need to do a post-process pass to restore a number of references.
+        // Fix any Person Id References
+        PersonIdReference.fixPersonIdReferences(retVal);
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
@@ -607,14 +608,10 @@ public class CampaignXmlParser {
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
-     * @throws ParseException
      * @throws DOMException
      */
-    private static void processInfoNode(Campaign retVal, Node wni, Version version) throws DOMException, CampaignXmlParseException {
+    private static void processInfoNode(Campaign retVal, Node wni, Version version) throws DOMException {
         NodeList nl = wni.getChildNodes();
-
-        String rankNames = null;
-        int officerCut = 0;
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
@@ -631,6 +628,8 @@ public class CampaignXmlParser {
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
                     retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
+                    retVal.setCamouflage(Camouflage.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
 
@@ -707,10 +706,15 @@ public class CampaignXmlParser {
                     retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
-                } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
-                    Ranks r = Ranks.generateInstanceFromXML(wn, version, false);
-                    if (r != null) {
-                        retVal.setRanks(r);
+                } else if (xn.equalsIgnoreCase("rankSystem")) {
+                    if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
+                        continue;
+                    }
+                    final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version);
+                    // If the system is valid (either not campaign or validates), set it. Otherwise,
+                    // keep the default
+                    if (!rankSystem.getType().isCampaign() || new RankValidator().validate(rankSystem, true)) {
+                        retVal.setRankSystemDirect(rankSystem);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
                     retVal.setGMMode(Boolean.parseBoolean(wn.getTextContent().trim()));

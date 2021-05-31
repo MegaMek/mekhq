@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,6 +27,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -36,59 +37,63 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
-
-    Campaign campaign;
-    String username;
-    String hostname;
-    String passwd;
-    String table;
-    int port;
+    //region Variable Declarations
+    private Campaign campaign;
+    private String username;
+    private String hostname;
+    private String passwd;
+    private String table;
+    private int port;
     private Statement statement = null;
     private Connection connect = null;
     private PreparedStatement preparedStatement = null;
     private Properties conProperties;
 
     //we also need some hashes to cross-reference stuff by id
-    HashMap<String, Integer> skillHash;
-    HashMap<UUID, Integer> personHash;
-    HashMap<UUID, Integer> forceHash;
+    private Map<String, Integer> skillHash;
+    private Map<UUID, Integer> personHash;
+    private Map<UUID, Integer> forceHash;
 
     //to track progress
     private String progressNote;
     private int progressTicker;
+    //endregion Variable Declarations
 
+    //region Constructors
     public MercRosterAccess(String h, int port, String t, String u, String p, Campaign c) {
-      username = u;
-      hostname = h;
-      table = t;
-      this.port = port;
-      passwd = p;
-      campaign = c;
-      skillHash = new HashMap<>();
-      personHash = new HashMap<>();
-      forceHash = new HashMap<>();
-      progressNote = "";
-      progressTicker = 0;
+        username = u;
+        hostname = h;
+        table = t;
+        this.port = port;
+        passwd = p;
+        campaign = c;
+        skillHash = new HashMap<>();
+        personHash = new HashMap<>();
+        forceHash = new HashMap<>();
+        progressNote = "";
+        progressTicker = 0;
     }
+    //endregion Constructors
 
     public void connect() throws SQLException {
-    	conProperties = new Properties();
-    	conProperties.put("user", username);
-    	conProperties.put("password", passwd);
+        conProperties = new Properties();
+        conProperties.put("user", username);
+        conProperties.put("password", passwd);
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + table, conProperties);
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
-            MekHQ.getLogger().error(getClass(), "connect", e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -97,7 +102,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement = connect.createStatement();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeCampaignData", e);
+            MekHQ.getLogger().error(e);
         }
 
         writeBasicData();
@@ -117,7 +122,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(1, truncateString(campaign.getName(), 100));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
 
         progressNote = "Uploading dates";
@@ -128,7 +133,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setDate(1, Date.valueOf(campaign.getLocalDate().toString()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
         progressTicker++;
         progressNote = "Uploading ranks";
@@ -137,18 +142,18 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".ranks");
             int i = 0;
-            for (Rank rank : campaign.getRanks().getAllRanks()) {
+            for (Rank rank : campaign.getRankSystem().getRanks()) {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
                 // TODO: This currently only exports MechWarrior Ranks. MercRoster software needs adjusted before this can be.
-                preparedStatement.setString(2, truncateString(rank.getName(Ranks.RPROF_MW), 45));
+                preparedStatement.setString(2, truncateString(rank.getName(Profession.MECHWARRIOR), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;
                 determineProgress();
             }
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
         //write skill types
         progressNote = "Uploading skill types";
@@ -165,7 +170,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
         //write crewtypes
         progressNote = "Uploading personnel types";
@@ -174,172 +179,191 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".crewtypes");
             statement.execute("TRUNCATE TABLE " + table + ".skillrequirements");
-            for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
+            for (PersonnelRole role : PersonnelRole.values()) {
                 //write skill requirements
                 int equipment = 0;
-                switch (i) {
-                    case Person.T_MECHWARRIOR:
+                switch (role) {
+                    case MECHWARRIOR:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MECH));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MECH));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_AERO_PILOT:
+                    case LAM_PILOT:
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MECH));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MECH));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_AERO));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_AERO));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_GVEE_DRIVER:
+                    case GROUND_VEHICLE_DRIVER:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_GVEE));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_NVEE_DRIVER:
+                    case NAVAL_VEHICLE_DRIVER:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_NVEE));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_VTOL_PILOT:
+                    case VTOL_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_VTOL));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_VEE_GUNNER:
+                    case VEHICLE_GUNNER:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_VEE));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_BA:
+                    case VEHICLE_CREW:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_BA));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECHANIC));
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_INFANTRY:
+                    case AEROSPACE_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_SMALL_ARMS));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_AERO));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_AERO));
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_CONV_PILOT:
+                    case CONVENTIONAL_AIRCRAFT_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_JET));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_JET));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_SPACE_PILOT:
+                    case BATTLE_ARMOUR:
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_BA));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        equipment = 1;
+                        break;
+                    case SOLDIER:
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_SMALL_ARMS));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        equipment = 1;
+                        break;
+                    case VESSEL_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_SPACE));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_SPACE_GUNNER:
+                    case VESSEL_GUNNER:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_SPACE));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_SPACE_CREW:
+                    case VESSEL_CREW:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_VESSEL));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_NAVIGATOR:
+                    case VESSEL_NAVIGATOR:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_NAV));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case Person.T_MECH_TECH:
+                    case MECH_TECH:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECH));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case Person.T_AERO_TECH:
+                    case AERO_TECH:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_AERO));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case Person.T_MECHANIC:
+                    case MECHANIC:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECHANIC));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case Person.T_BA_TECH:
+                    case BA_TECH:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_BA));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case Person.T_DOCTOR:
+                    case DOCTOR:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_DOCTOR));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case Person.T_ADMIN_COM:
-                    case Person.T_ADMIN_HR:
-                    case Person.T_ADMIN_LOG:
-                    case Person.T_ADMIN_TRA:
+                    case ADMINISTRATOR_COMMAND:
+                    case ADMINISTRATOR_HR:
+                    case ADMINISTRATOR_LOGISTICS:
+                    case ADMINISTRATOR_TRANSPORT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_ADMIN));
-                        preparedStatement.setInt(2, i);
+                        preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
-                        break;
-                    case Person.T_VEHICLE_CREW:
-                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECHANIC));
-                        preparedStatement.setInt(2, i);
-                        preparedStatement.executeUpdate();
-                        equipment = 1;
                         break;
                 }
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crewtypes (type, squad, vehicletype, prefpos, equipment) VALUES (?, ?, ?, ?, ?)");
-                preparedStatement.setString(1, truncateString(Person.getRoleDesc(i, campaign.getFaction().isClan()), 45));
+                preparedStatement.setString(1, truncateString(role.getName(campaign.getFaction().isClan()), 45));
                 preparedStatement.setInt(2, 0);
                 preparedStatement.setInt(3, 1);
-                preparedStatement.setInt(4, i);
+                preparedStatement.setInt(4, role.ordinal());
                 preparedStatement.setInt(5, equipment);
                 preparedStatement.executeUpdate();
                 progressTicker += 2;
                 determineProgress();
             }
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
 
         //write equipment types
@@ -369,7 +393,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -386,7 +410,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, campaign.getForces().getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeForceData", e);
+            MekHQ.getLogger().error(e);
         }
 
         progressNote = "Uploading force data";
@@ -414,7 +438,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, force.getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeForce", e);
+            MekHQ.getLogger().error(e);
         }
         //retrieve the MercRoster id of this force
         int id = parent;
@@ -422,7 +446,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             rs.next();
             id = rs.getInt("id");
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeForce", e);
+            MekHQ.getLogger().error(e);
         }
 
         progressTicker += 2;
@@ -453,7 +477,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
+            MekHQ.getLogger().error(e);
         }
 
         progressNote = "Uploading personnel data";
@@ -507,7 +531,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 personHash.put(p.getId(), id);
                 //assign the personnel position
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".personnelpositions (personneltype, person) VALUES (?, ?)");
-                preparedStatement.setInt(1, (p.getPrimaryRole()));
+                preparedStatement.setInt(1, p.getPrimaryRole().ordinal());
                 preparedStatement.setInt(2, id);
                 preparedStatement.executeUpdate();
                 //write out skills to skills table
@@ -535,7 +559,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 4;
                 determineProgress();
             } catch (SQLException e) {
-                MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -552,7 +576,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
             rs.close();
         } catch (SQLException e) {
-            MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
+            MekHQ.getLogger().error(e);
         }
 
         progressNote = "Uploading equipment data";
@@ -593,7 +617,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 1;
                 determineProgress();
             } catch (SQLException e) {
-                MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -631,11 +655,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private static String truncateString(String s, int len) {
-        if (s.length() < len) {
-            return s;
-        } else {
-            return s.substring(0, len - 1);
-        }
+        return (s.length() < len) ? s : s.substring(0, len - 1);
     }
 
     @Override
@@ -654,7 +674,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private int getLengthOfTask() {
-        return 2 + campaign.getRanks().getAllRanks().size() + SkillType.skillList.length + Person.T_NUM * 2 + UnitType.SIZE + campaign.getPersonnel().size() * 4 + campaign.getHangar().getUnits().size() + campaign.getAllForces().size() * 2;
+        return 2 + campaign.getRankSystem().getRanks().size() + SkillType.skillList.length
+                + PersonnelRole.values().length * 2 + UnitType.SIZE + campaign.getPersonnel().size() *
+                + campaign.getHangar().getUnits().size() + campaign.getAllForces().size() * 2;
     }
 
     public void determineProgress() {

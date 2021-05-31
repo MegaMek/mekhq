@@ -60,23 +60,19 @@ public class RandomPortraitGenerator {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, Person.getRoleDesc(p.getPrimaryRole(), p.isClanner()));
+        File searchFile = new File(genderFile, p.getPrimaryRole().getName(p.isClanner()));
 
         possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
         if (possiblePortraits.isEmpty()) {
             String searchCat_RoleGroup = "";
-            if (p.isAdminPrimary()) {
+            if (p.getPrimaryRole().isAdministrator()) {
                 searchCat_RoleGroup = "Admin";
-            } else if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                    || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                    || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                    || p.getPrimaryRole() == Person.T_NAVIGATOR) {
+            } else if (p.getPrimaryRole().isVesselCrew()) {
                 searchCat_RoleGroup = "Vessel Crew";
-            } else if (p.isTechPrimary()) {
+            } else if (p.getPrimaryRole().isTech()) {
                 searchCat_RoleGroup = "Tech";
-            } else if (p.getPrimaryRole() == Person.T_MEDIC
-                    || p.getPrimaryRole() == Person.T_DOCTOR) {
+            } else if (p.getPrimaryRole().isMedicalStaff()) {
                 searchCat_RoleGroup = "Medical";
             }
 
@@ -87,7 +83,7 @@ public class RandomPortraitGenerator {
         }
 
         if (possiblePortraits.isEmpty()) {
-            searchFile = new File(genderFile, p.hasPrimaryCombatRole() ? "Combat" : "Support");
+            searchFile = new File(genderFile, p.getPrimaryRole().isCombat() ? "Combat" : "Support");
             possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
         }
 

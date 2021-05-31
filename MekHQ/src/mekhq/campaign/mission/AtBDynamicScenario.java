@@ -28,12 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -172,6 +174,11 @@ public class AtBDynamicScenario extends AtBScenario {
         return getMapSizeY();
     }
 
+    @Override
+    public void setMapSize() {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this);
+    }
+
     /**
      * Adds a bot force to this scenario.
      */
@@ -259,12 +266,12 @@ public class AtBDynamicScenario extends AtBScenario {
     /**
      * This is used to indicate that player forces have been assigned to this scenario
      * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
-     * generate opposing forces and their bots, apply any present scenario modifiers, 
+     * generate opposing forces and their bots, apply any present scenario modifiers,
      * set up deployment turns, calculate which units belong to which objectives, and many other things.
-     * 
-     * Further "post-force-generation" modifiers can be applied to this scenario, but calling 
+     *
+     * Further "post-force-generation" modifiers can be applied to this scenario, but calling
      * finalizeScenario() on it again will lead to "unsupported" behavior.
-     * 
+     *
      * Can be called as a short hand way of telling "is this scenario ready to play".
      */
     public boolean isFinalized() {
@@ -282,7 +289,7 @@ public class AtBDynamicScenario extends AtBScenario {
         List<Integer> retval = new ArrayList<>();
 
         for (int forceID : getForceIDs()) {
-            if(getPlayerForceTemplates().containsKey(forceID)) {
+            if (getPlayerForceTemplates().containsKey(forceID)) {
                 retval.add(forceID);
             }
         }
@@ -388,7 +395,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public String getDesc() {
         return getScenarioTypeDescription();
     }
-    
+
     @Override
     public String getScenarioTypeDescription() {
         return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
@@ -404,26 +411,30 @@ public class AtBDynamicScenario extends AtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
-        if (template != null && isCurrent()) {
+        if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
+            
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
         }
 
         super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 template = ScenarioTemplate.Deserialize(wn2);
+            } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
+                setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
             }
         }
 
-        super.loadFieldsFromXmlNode(wn);
+        super.loadFieldsFromXmlNode(wn, version);
     }
 
     @Override

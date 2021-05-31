@@ -41,6 +41,7 @@ import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
+import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -218,7 +219,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
     protected Map<String, Entity> externalIDLookup;
-    
+
     private Map<Integer, Integer> numPlayerMinefields;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
@@ -682,20 +683,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (getContract(campaign).getMissionType() == AtBContract.MT_CADREDUTY) {
             numAttachedPlayer = 3;
         } else if (campaign.getFactionCode().equals("MERC")) {
-            if (getContract(campaign).getCommandRights() == Contract.COM_INTEGRATED) {
-                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
-                    numAttachedPlayer = 2;
-                } else {
-                    numAttachedBot = 2;
-                }
-            } else if (getContract(campaign).getCommandRights() == Contract.COM_HOUSE) {
-                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+            switch (getContract(campaign).getCommandRights()) {
+                case INTEGRATED:
+                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                        numAttachedPlayer = 2;
+                    } else {
+                        numAttachedBot = 2;
+                    }
+                    break;
+                case HOUSE:
+                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                        numAttachedPlayer = 1;
+                    } else {
+                        numAttachedBot = 1;
+                    }
+                    break;
+                case LIAISON:
                     numAttachedPlayer = 1;
-                } else {
-                    numAttachedBot = 1;
-                }
-            } else if (getContract(campaign).getCommandRights() == Contract.COM_LIAISON) {
-                numAttachedPlayer = 1;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -1641,7 +1648,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</transportLinkages>");
         }
-        
+
         if (numPlayerMinefields.size() > 0) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "numPlayerMinefields");
 
@@ -1712,8 +1719,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
-        super.loadFieldsFromXmlNode(wn);
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
+        super.loadFieldsFromXmlNode(wn, version);
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -1808,7 +1815,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 try {
                                     en = MekHqXmlUtil.getEntityFromXmlString(wn4);
                                 } catch (Exception e) {
-                                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                                    MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1822,12 +1829,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                 BotForce bf = new BotForce();
                 try {
-                    bf.setFieldsFromXmlNode(wn2);
+                    bf.setFieldsFromXmlNode(wn2, version);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                    MekHQ.getLogger().error("Error loading bot force in scenario", e);
                     bf = null;
                 }
-                if (null != bf) {
+
+                if (bf != null) {
                     addBotForce(bf);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {
@@ -1906,7 +1914,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             transportLinkages.put(transportID, transportedUnitIDs);
         }
     }
-    
+
     /**
      * Worker function that loads the minefield counts for the player
      */
@@ -1915,23 +1923,23 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefield")) {
                 NodeList minefieldNodes = wn2.getChildNodes();
-                
+
                 int minefieldType = 0;
                 int minefieldCount = 0;
-                
+
                 for (int minefieldIndex = 0; minefieldIndex < minefieldNodes.getLength(); minefieldIndex++) {
                     Node wn3 = minefieldNodes.item(minefieldIndex);
-                    
+
                     if (wn3.getNodeName().equalsIgnoreCase("minefieldType")) {
                         minefieldType = Integer.parseInt(wn3.getTextContent());
                     } else if (wn3.getNodeName().equalsIgnoreCase("minefieldCount")) {
                         minefieldCount = Integer.parseInt(wn3.getTextContent());
                     }
                 }
-                
+
                 numPlayerMinefields.put(minefieldType, minefieldCount);
             }
         }
@@ -1960,26 +1968,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public AtBContract getContract(Campaign c) {
         return (AtBContract) c.getMission(getMissionId());
     }
-    
+
     /**
-     * Gets all the entities that are part of the given entity list and are 
+     * Gets all the entities that are part of the given entity list and are
      * not in this scenario's transport linkages as a transported unit.
      */
     public List<Entity> filterUntransportedUnits(List<Entity> entities) {
         List<Entity> retVal = new ArrayList<>();
-        
+
         // assemble a set of transported units for easier lookup
         Set<String> transportedUnits = new HashSet<>();
         for (List<String> transported : getTransportLinkages().values()) {
             transportedUnits.addAll(transported);
         }
-        
+
         for (Entity entity : entities) {
             if (!transportedUnits.contains(entity.getExternalIdAsString())) {
                 retVal.add(entity);
             }
         }
-        
+
         return retVal;
     }
 
@@ -2041,11 +2049,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getNumBots() {
-        if (isCurrent()) {
-            return botForces.size();
-        } else {
-            return botForceStubs.size();
-        }
+        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
     }
 
     public List<String> getAlliesPlayerStub() {

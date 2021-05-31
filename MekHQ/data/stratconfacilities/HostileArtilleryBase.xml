@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>AlliedArtilleryBase.xml</capturedDefinition>
 	<displayableName>Artillery Base</displayableName>
         <facilityType>ArtilleryBase</facilityType>
         <localModifiers>EnemyArtyGarrison.xml</localModifiers>

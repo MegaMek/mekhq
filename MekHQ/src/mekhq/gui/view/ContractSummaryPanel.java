@@ -2,7 +2,7 @@
  * ContractSummaryPanel.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.GuiTabType;
 
@@ -80,13 +81,13 @@ public class ContractSummaryPanel extends JPanel {
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
         if (allowRerolls) {
-            Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
+            Person admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_NEG, SkillType.S_ADMIN);
             cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_NEG, SkillType.S_ADMIN);
             logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_NEG, SkillType.S_ADMIN);
             tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
         }
@@ -296,7 +297,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
-        txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand = new JLabel(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         txtCommand.setName("txtCommand");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -325,7 +327,8 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             ContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
-                    txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+                    txtCommand.setText(contract.getCommandRights().toString());
+                    txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);

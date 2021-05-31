@@ -954,7 +954,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     <faction>
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
-        <startingPlanet>Granda</startingPlanet>
+        <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <nameGenerator>General</nameGenerator>
         <colorRGB>238,232,170</colorRGB>
