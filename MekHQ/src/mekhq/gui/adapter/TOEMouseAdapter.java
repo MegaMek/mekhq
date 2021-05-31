@@ -18,26 +18,13 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.*;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.gui.utilities.JMenuHelpers;
-
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -51,13 +38,29 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.Vector;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
@@ -359,8 +362,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             if (singleForce != null) {
                 CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
                         singleForce.getCamouflageOrElse(gui.getCampaign().getCamouflage()), true);
-
-                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                if (ccd.showDialog().isCancelled()) {
                     return;
                 }
                 singleForce.setCamouflage(ccd.getSelectedItem());

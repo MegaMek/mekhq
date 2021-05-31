@@ -40,6 +40,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
@@ -742,10 +743,52 @@ public class CampaignGUI extends JPanel {
         //endregion menuExport
 
         //region Menu Refresh
-        // The Import menu uses the following Mnemonic keys as of 05-APR-2021:
-        // R
+        // The Import menu uses the following Mnemonic keys as of 29-MAY-2021:
+        // A, C, F, P, R, U
         JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
         menuRefresh.setMnemonic(KeyEvent.VK_R);
+
+        JMenuItem miRefreshUnitCache = new JMenuItem(resourceMap.getString("miRefreshUnitCache.text"));
+        miRefreshUnitCache.setName("miRefreshUnitCache");
+        miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
+        miRefreshUnitCache.addActionListener(evt -> MechSummaryCache.refreshUnitData(false));
+        menuRefresh.add(miRefreshUnitCache);
+
+        JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
+        miRefreshCamouflage.setName("miRefreshCamouflage");
+        miRefreshCamouflage.setMnemonic(KeyEvent.VK_C);
+        miRefreshCamouflage.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshCamouflageDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshCamouflage);
+
+        JMenuItem miRefreshPortraits = new JMenuItem(resourceMap.getString("miRefreshPortraits.text"));
+        miRefreshPortraits.setName("miRefreshPortraits");
+        miRefreshPortraits.setMnemonic(KeyEvent.VK_P);
+        miRefreshPortraits.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshPortraitDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshPortraits);
+
+        JMenuItem miRefreshForceIcons = new JMenuItem(resourceMap.getString("miRefreshForceIcons.text"));
+        miRefreshForceIcons.setName("miRefreshForceIcons");
+        miRefreshForceIcons.setMnemonic(KeyEvent.VK_F);
+        miRefreshForceIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshForceIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshForceIcons);
+
+        JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
+        miRefreshAwards.setName("miRefreshAwards");
+        miRefreshAwards.setMnemonic(KeyEvent.VK_A);
+        miRefreshAwards.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshAwardIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshAwards);
 
         JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
         miRefreshRanks.setName("miRefreshRanks");

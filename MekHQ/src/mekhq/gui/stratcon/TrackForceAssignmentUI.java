@@ -85,7 +85,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         // if we're waiting to assign primary forces, we can only do so from the current track 
         lanceModel = new ScenarioWizardLanceModel(campaign, 
                 StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX, 
-                        campaign, ownerPanel.getCurrentTrack(), false, null));
+                        campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
         
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
