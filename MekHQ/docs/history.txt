@@ -17,6 +17,7 @@ VERSION HISTORY:
 + PR #2656: Cleaning up a few erroneous Campaign GUI properties
 + PR #2655: Ensuring BotForce has a Valid Base Camouflage
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
++ PR #2653: Expanding File/Refresh Capabilities
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
