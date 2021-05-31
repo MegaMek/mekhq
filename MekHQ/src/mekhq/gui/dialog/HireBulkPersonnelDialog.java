@@ -111,8 +111,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         getContentPane().add(new JLabel(resourceMap.getString("lblType.text")), newConstraints(0, 0));
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
-        final PersonnelRole[] personnelRoles = PersonnelRole.values();
-        for (PersonnelRole personnelRole : personnelRoles) {
+        for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
             personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole));
         }
         choiceType.setModel(personTypeModel);

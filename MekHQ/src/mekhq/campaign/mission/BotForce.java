@@ -28,6 +28,8 @@ import java.util.Objects;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
+import mekhq.Version;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,14 +53,12 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private List<Entity> entityList;
     private int team;
     private int start;
-    private Camouflage camouflage;
-    private PlayerColour colour;
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
+    private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
-        setCamouflage(new Camouflage());
-        setColour(PlayerColour.BLUE);
-        this.entityList = new ArrayList<>();
+        entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -226,21 +226,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent++, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "team", team);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "start", start);
-        if (!getCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoCategory", getCamouflage().getCategory());
-        }
-        if (!getCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoFileName", getCamouflage().getFilename());
-        }
-        
-        // if we've got a legitimate color, great. Otherwise, write out something default
-        if (getColour() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
-        } else {
-            MekHQ.getLogger().error("Null colour specified for bot force; defaulting to FIRE BRICK");
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", PlayerColour.FIRE_BRICK.name());
-        }
-        
+        getCamouflage().writeToXML(pw1, indent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
@@ -264,7 +251,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "behaviorSettings");
     }
 
-    public void setFieldsFromXmlNode(Node wn) {
+    public void setFieldsFromXmlNode(final Node wn, final Version version) {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -274,9 +261,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 team = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                 start = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
+                setCamouflage(Camouflage.parseFromXML(wn2));
+            } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal
                 getCamouflage().setCategory(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) { // Legacy - 0.49.3 removal
                 getCamouflage().setFilename(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
                 setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
@@ -329,6 +318,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 }
             }
+        }
+
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(getCamouflage());
         }
     }
 }
