@@ -138,6 +138,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
+    public static final String COMMAND_SHOW_BV_CALC = "SHOW_BV_CALC";
+    public static final String COMMAND_CHANGE_MAINT_MULTI = "CHANGE_MAINT_MULT";
     //endregion Standard Commands
 
     //region GM Commands
@@ -523,6 +525,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new UnitChangedEvent(u));
                 }
             }
+        } else if (command.startsWith(COMMAND_CHANGE_MAINT_MULTI)) {
+            int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
+            
+            for (Unit u : units) {
+                if (!u.isSelfCrewed()) {
+                    u.setMaintenanceMultiplier(multiplier);
+                }
+            }
         }
     }
 
@@ -871,6 +881,29 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(menu, menuUltraGreen);
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 }
+            }
+            
+            // if we're using maintenance and have selected something that requires maintenance
+            if (gui.getCampaign().getCampaignOptions().checkMaintenance() &&
+                    (maintenanceTime > 0)) {
+                menuItem = new JMenu("Set Maintenance Extra Time");
+                
+                for (int x = 1; x <= 4; x++) {
+                    JMenuItem maintenanceMultiplierItem = new JCheckBoxMenuItem("x" + x);
+                    
+                    // if we've got just one unit selected, 
+                    // have the courtesy to show the multiplier if relevant
+                    if (oneSelected && (unit.getMaintenanceMultiplier() == x) 
+                            && !unit.isSelfCrewed()) {
+                        maintenanceMultiplierItem.setSelected(true);
+                    }
+                    
+                    maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINT_MULTI + ":" + x);
+                    maintenanceMultiplierItem.addActionListener(this);
+                    menuItem.add(maintenanceMultiplierItem);
+                }
+                
+                popup.add(menuItem);
             }
 
             if (oneSelected && unit.requiresMaintenance()) {
