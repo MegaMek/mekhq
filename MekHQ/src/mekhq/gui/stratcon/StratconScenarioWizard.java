@@ -417,7 +417,7 @@ public class StratconScenarioWizard extends JDialog {
         StringBuilder costBuilder = new StringBuilder();
         costBuilder.append("(");
         
-        switch(StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
+        switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
         case SupportPoint:
             costBuilder.append(resourceMap.getString("supportPoint.text"));
             if (currentCampaignState.getSupportPoints() <= 0) {
