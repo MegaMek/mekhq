@@ -150,11 +150,6 @@ public class StratconRulesManager {
 
                 StratconScenario scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
                 generatedScenarios.add(scenario);
-
-                // if we're auto-assigning lances, deploy the force to the track as well
-                if (autoAssignLances) {
-                    processForceDeployment(scenarioCoords, randomForceID, campaign, track, false);
-                }
             }
         }
 
@@ -181,6 +176,10 @@ public class StratconRulesManager {
                 track.addScenario(scenario);
             } else {
                 commitPrimaryForces(campaign, scenario, track);
+                // if we're auto-assigning lances, deploy all assigned forces to the track as well
+                for (int forceID : scenario.getPrimaryForceIDs()) {
+                    processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+                }
             }
         }
     }
@@ -924,7 +923,7 @@ public class StratconRulesManager {
      * scenario d) if attempting to deploy as reinforcements, haven't already failed to deploy
      */
     public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack,
-            boolean reinforcements, @Nullable StratconScenario currentScenario) {
+            boolean reinforcements, @Nullable StratconScenario currentScenario, StratconCampaignState campaignState) {
         List<Integer> retVal = new ArrayList<>();
 
         Set<Integer> forcesInTracks = new HashSet<>();
@@ -951,9 +950,12 @@ public class StratconRulesManager {
             }
 
             int primaryUnitType = force.getPrimaryUnitType(campaign);
+            boolean noReinforcementRestriction = !reinforcements || (reinforcements 
+                    && (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.None));
             if (!force.isDeployed() && (force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
                     && !forcesInTracks.contains(force.getId())
-                    && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)) {
+                    && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
+                    && noReinforcementRestriction) {
                 retVal.add(force.getId());
             }
         }
@@ -980,7 +982,8 @@ public class StratconRulesManager {
             if ((isEligibleInfantry || isEligibleGunEmplacement)
                     && !u.isDeployed()
                     && !u.isMothballed()
-                    && u.isFunctional()) {
+                    && (u.checkDeployment() == null)
+                    && !isUnitDeployedToStratCon(u)) {
 
                 // this is a little inefficient, but probably there aren't too many active AtB
                 // contracts at a time
@@ -1028,7 +1031,8 @@ public class StratconRulesManager {
                     forceCompositionMatchesDeclaredUnitType(u.getEntity().getUnitType(), generalUnitType, true);
 
             if (validUnitType && !u.isDeployed() && !u.isMothballed()
-                    && u.isFunctional() && (u.getEntity().calculateBattleValue() < lowestBV)
+                    && (u.getEntity().calculateBattleValue() < lowestBV)
+                    && (u.checkDeployment() == null)
                     && !isUnitDeployedToStratCon(u)) {
                 retVal.add(u);
             }
@@ -1119,18 +1123,7 @@ public class StratconRulesManager {
      * Determines what rules to use when deploying a force for reinforcements to the given track.
      */
     public static ReinforcementEligibilityType getReinforcementType(int forceID, StratconTrackState trackState,
-            Campaign campaign) {
-        // if the force is currently deployed to the track, it'll be able to deploy "for free"
-        if (trackState.isForceDeployed(forceID)) {
-            return ReinforcementEligibilityType.ChainedScenario;
-        }
-
-        // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
-        if (campaign.getLances().containsKey(forceID)
-                && (campaign.getLances().get(forceID).getRole() == AtBLanceRole.FIGHTING)) {
-            return ReinforcementEligibilityType.FightLance;
-        }
-
+            Campaign campaign, StratconCampaignState campaignState) {
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
@@ -1139,10 +1132,49 @@ public class StratconRulesManager {
                 }
             }
         }
+        
+        // TODO: If the force has completed a scenario which allows it, 
+        // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
+        
+        // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
+        if (campaign.getLances().containsKey(forceID)
+                && (campaign.getLances().get(forceID).getRole() == AtBLanceRole.FIGHTING)) {
+            return ReinforcementEligibilityType.FightLance;
+        }
 
         // otherwise, the force requires support points / vps to deploy
-        return ReinforcementEligibilityType.SupportPoint;
+        if ((campaignState.getSupportPoints() > 0) ||
+                (campaignState.getVictoryPoints() > 0)) {
+            return ReinforcementEligibilityType.SupportPoint;
+        }
+        
+        /// if we don't have any of these things, it can't be deployed
+        return ReinforcementEligibilityType.None;
     }
+    
+    /**
+     * Can any force be manually deployed to the given coordinates on the given track
+     * for the given contract?
+     */
+    public static boolean canManuallyDeployAnyForce(StratconCoords coords,
+            StratconTrackState track, AtBContract contract) {
+        // Rules: can't manually deploy under integrated command
+        // can't manually deploy if there's already a force deployed there
+        //      exception: on allied facilities
+        // can't manually deploy if there's a non-cloaked scenario
+        
+        if (contract.getCommandRights().isIntegrated()) {
+            return false;
+        }
+        
+        StratconScenario scenario = track.getScenario(coords);
+        boolean nonCloakedOrNoscenario = (scenario == null) || scenario.getBackingScenario().isCloaked();
+        
+        StratconFacility facility = track.getFacility(coords);
+        boolean alliedFacility = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
+        
+        return (!track.areAnyForceDeployedTo(coords) || alliedFacility) && nonCloakedOrNoscenario;
+    }    
 
     /**
      * Given a track and the current campaign state, and if the player is deploying a force or not,
@@ -1459,6 +1491,12 @@ public class StratconRulesManager {
             if (campaignState != null) {
                 for (StratconTrackState track : campaignState.getTracks()) {
                     cleanupPhantomScenarios(track);
+                    
+                    // check if some of the forces have finished deployment
+                    // please do this before generating scenarios for track
+                    // to avoid unintentionally cleaning out integrated force deployments on
+                    // 0-deployment-length tracks
+                    processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
 
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences
@@ -1474,9 +1512,6 @@ public class StratconRulesManager {
                     if (isMonday) {
                         generateScenariosForTrack(ev.getCampaign(), contract, track);
                     }
-
-                    // check if some of the forces have finished deployment
-                    processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                 }
             }
         }

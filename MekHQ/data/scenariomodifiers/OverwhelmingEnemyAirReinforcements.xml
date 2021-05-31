@@ -38,6 +38,7 @@
 		<objectiveLinkedForces>
                     <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
                 </objectiveLinkedForces>
+		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
 	</forceDefinition>

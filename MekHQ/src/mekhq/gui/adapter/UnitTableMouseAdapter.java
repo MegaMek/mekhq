@@ -18,32 +18,22 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.UIManager;
-
 import megamek.client.ui.dialogs.BVDisplayDialog;
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.GunEmplacement;
+import megamek.common.IBomber;
+import megamek.common.Infantry;
+import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.Protomech;
+import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
@@ -75,10 +65,29 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.BombsDialog;
+import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
+import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.dialog.QuirksDialog;
+import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -422,7 +431,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
             CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
                     selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
-            if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+            if (ccd.showDialog().isCancelled()) {
                 return;
             }
             selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());

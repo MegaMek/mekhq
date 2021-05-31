@@ -20,9 +20,9 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -5672,11 +5672,10 @@ public class CampaignOptionsDialog extends JDialog {
 
     private void btnCamoActionPerformed(ActionEvent evt) {
         CamoChooserDialog ccd = new CamoChooserDialog(frame, camouflage);
-        if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
-            return;
+        if (ccd.showDialog().isConfirmed()) {
+            camouflage = ccd.getSelectedItem();
+            btnCamo.setIcon(camouflage.getImageIcon());
         }
-        camouflage = ccd.getSelectedItem();
-        btnCamo.setIcon(camouflage.getImageIcon());
     }
 
     private Vector<String> getUnusedSPA() {

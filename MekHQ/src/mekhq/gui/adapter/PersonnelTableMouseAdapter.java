@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,8 +20,8 @@ package mekhq.gui.adapter;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
-import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
+import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
@@ -855,8 +855,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_EDIT_PORTRAIT: {
                 AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
                         selectedPerson.getPortrait());
-                int result = portraitDialog.showDialog();
-                if ((result == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
+                if (portraitDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
                         if (!person.getPortrait().equals(portraitDialog.getSelectedItem())) {
                             person.setPortrait(portraitDialog.getSelectedItem());
