@@ -19,6 +19,12 @@ VERSION HISTORY:
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
 + PR #2653: Expanding File/Refresh Capabilities
 + PR #2652: Personnel Table Expanded Randomization Functionality
++ Issue #2659: Hangar Report: Adding IndustrialMech Section and Missing Combat Vehicle Super Heavy Nodes
++ Issue #2642: StratCon Tab: Force Table Background Doesn't Work Properly in Nimbus
++ Issue #2610: Adding Tech Officer migration from the reference class
++ Issue #2534: Fixing Missing Clan Check For Endo Steel Location Repairs
++ Issue #2382: Large Vessel Clan Repair and Maintenance modifier no longer applies to Clanners
++ PR #2667: Preventing NONE Primary Role Hiring
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
