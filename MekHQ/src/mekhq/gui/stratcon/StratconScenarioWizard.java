@@ -19,7 +19,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -294,7 +293,7 @@ public class StratconScenarioWizard extends JDialog {
                 StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), 
                         campaign, currentTrackState,
                         (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
-                        currentScenario));
+                        currentScenario, currentCampaignState));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -418,7 +417,7 @@ public class StratconScenarioWizard extends JDialog {
         StringBuilder costBuilder = new StringBuilder();
         costBuilder.append("(");
         
-        switch(StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign)) {
+        switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
         case SupportPoint:
             costBuilder.append(resourceMap.getString("supportPoint.text"));
             if (currentCampaignState.getSupportPoints() <= 0) {
@@ -480,7 +479,8 @@ public class StratconScenarioWizard extends JDialog {
                 // if we are assigning reinforcements, pay the price if appropriate
                 if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
                     ReinforcementEligibilityType reinforcementType = 
-                            StratconRulesManager.getReinforcementType(force.getId(), currentTrackState, campaign);
+                            StratconRulesManager.getReinforcementType(force.getId(), currentTrackState, 
+                                    campaign, currentCampaignState);
                     
                     // if we failed to deploy as reinforcements, move on to the next force
                     if (!StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState, currentScenario, campaign)) {

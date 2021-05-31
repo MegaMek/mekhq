@@ -53,14 +53,12 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private List<Entity> entityList;
     private int team;
     private int start;
-    private Camouflage camouflage;
-    private PlayerColour colour;
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
+    private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
-        setCamouflage(new Camouflage());
-        setColour(PlayerColour.BLUE);
-        this.entityList = new ArrayList<>();
+        entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
