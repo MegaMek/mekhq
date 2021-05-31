@@ -174,6 +174,7 @@ public class StratconScenario implements IStratconDisplayable {
         
         if (this.isRequiredScenario()) {
             stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='red'>-1 VP if lost/ignored; +1 VP if won</span>").append(html ? "<br/>" : "");
         }
         
         stateBuilder.append("Status: ")
