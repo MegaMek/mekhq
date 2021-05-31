@@ -56,6 +56,7 @@ Second, each rank system requires a rank entry for every one of the E0-E20, WO1-
 
 Third, you will need to add the now complete system to the userdata rank file. Ensure the whole system is wrapped with rankSystem tags, then add it to the bottom of the file. You can then, through Campaign Options Dialog, reload the rank systems from file, or it will be automatically loaded when loading a campaign file.
 
+Finally, you can add the optional "useROMDesignation" tag to use ROM Designations and the optional "useManeiDomini" tag to use Manei Domini Classes and Manei Domini Ranks for the specified rank system.
 
 
 What NOT to do when working with Ranks:
