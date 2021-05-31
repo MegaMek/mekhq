@@ -529,7 +529,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(comboContractType.getSelectedItem());
         contract.setDesc(txtDesc.getText());
-        contract.setCommandRights(choiceCommand.getSelectedIndex());
+        contract.setCommandRights(choiceCommand.getSelectedItem());
 
         contract.setEnemyCode(getCurrentEnemyCode());
         contract.setAllySkill(cbAllySkill.getSelectedIndex());

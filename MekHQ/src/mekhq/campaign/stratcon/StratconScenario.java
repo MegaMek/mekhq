@@ -88,6 +88,7 @@ public class StratconScenario implements IStratconDisplayable {
      */
     public void addPrimaryForce(int forceID) {
         backingScenario.addForce(forceID, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+        primaryForceIDs.add(forceID);
     }
     
     /**

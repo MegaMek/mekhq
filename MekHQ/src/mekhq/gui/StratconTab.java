@@ -266,7 +266,7 @@ public class StratconTab extends CampaignGuiTab {
         }
 
         // special logic for non-independent command clauses
-        if (campaignState.getContract().getCommandRights() <= Contract.COM_LIAISON) {
+        if (!campaignState.getContract().getCommandRights().isIndependent()) {
             desiredObjectives++;
 
             if (campaignState.getVictoryPoints() > 0) {
@@ -344,7 +344,7 @@ public class StratconTab extends CampaignGuiTab {
         }
 
         // special case text reminding player to complete required scenarios
-        if (campaignState.getContract().getCommandRights() <= Contract.COM_LIAISON) {
+        if (!campaignState.getContract().getCommandRights().isIndependent()) {
             if (campaignState.getVictoryPoints() > 0) {
                 sb.append("<span color='green'>");
             } else {

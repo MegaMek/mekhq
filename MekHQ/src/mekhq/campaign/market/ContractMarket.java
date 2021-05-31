@@ -31,6 +31,7 @@ import java.util.Set;
 
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -427,9 +428,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s %s",
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern("yyyy")), employer,
-                        contract.getSystem().getName(campaign.getLocalDate()),
-                        contract.getContractType()));
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), employer,
+                        contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
     }
@@ -499,8 +499,7 @@ public class ContractMarket implements Serializable {
         }
         contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
 
-        contract.setCommandRights(Math.max(parent.getCommandRights() - 1,
-                Contract.COM_INTEGRATED));
+        contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
         contract.setSalvagePct(Math.max(parent.getSalvagePct() - 10, 0));
         contract.setStraightSupport(Math.max(parent.getStraightSupport() - 20,
@@ -517,6 +516,10 @@ public class ContractMarket implements Serializable {
         contract.calculatePaymentMultiplier(campaign);
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
+
+        contract.setName(String.format("%s - %s - %s Subcontract %s",
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), contract.getEmployer(),
+                contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
     }
@@ -760,19 +763,24 @@ public class ContractMarket implements Serializable {
         if (campaign.getFactionCode().equals("MERC")) {
             rollCommandClause(contract, mods.mods[CLAUSE_COMMAND]);
         } else {
-            contract.setCommandRights(Contract.COM_INTEGRATED);
+            contract.setCommandRights(ContractCommandRights.INTEGRATED);
         }
         rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE]);
         rollSupportClause(contract, mods.mods[CLAUSE_SUPPORT]);
         rollTransportClause(contract, mods.mods[CLAUSE_TRANSPORT]);
     }
 
-    private void rollCommandClause(AtBContract contract, int mod) {
-        int roll = Compute.d6(2) + mod;
-        if (roll < 3) contract.setCommandRights(Contract.COM_INTEGRATED);
-        else if (roll < 8) contract.setCommandRights(Contract.COM_HOUSE);
-        else if (roll < 12) contract.setCommandRights(Contract.COM_LIAISON);
-        else contract.setCommandRights(Contract.COM_INDEP);
+    private void rollCommandClause(final Contract contract, final int modifier) {
+        final int roll = Compute.d6(2) + modifier;
+        if (roll < 3) {
+            contract.setCommandRights(ContractCommandRights.INTEGRATED);
+        } else if (roll < 8) {
+            contract.setCommandRights(ContractCommandRights.HOUSE);
+        } else if (roll < 12) {
+            contract.setCommandRights(ContractCommandRights.LIAISON);
+        } else {
+            contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+        }
     }
 
     private void rollSalvageClause(AtBContract contract, int mod) {
