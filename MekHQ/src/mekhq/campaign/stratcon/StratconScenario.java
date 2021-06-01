@@ -159,7 +159,7 @@ public class StratconScenario implements IStratconDisplayable {
     public String getInfo(boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
 
-        if (this.isStrategicObjective) {
+        if (isStrategicObjective()) {
             stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
         }
         
@@ -172,9 +172,9 @@ public class StratconScenario implements IStratconDisplayable {
                 .append(html ? "<br/>" : "");
         }
         
-        if (this.isRequiredScenario()) {
-            stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "");
-            stateBuilder.append("<span color='red'>-1 VP if lost/ignored; +1 VP if won</span>").append(html ? "<br/>" : "");
+        if (isRequiredScenario()) {
+            stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "")
+                .append("<span color='red'>-1 VP if lost/ignored; +1 VP if won</span>").append(html ? "<br/>" : "");
         }
         
         stateBuilder.append("Status: ")
