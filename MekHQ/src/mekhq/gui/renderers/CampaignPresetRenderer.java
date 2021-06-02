@@ -18,13 +18,11 @@
  */
 package mekhq.gui.renderers;
 
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.panels.CampaignPresetPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 public class CampaignPresetRenderer extends CampaignPresetPanel implements ListCellRenderer<CampaignPreset> {
     //region Constructors
@@ -40,10 +38,10 @@ public class CampaignPresetRenderer extends CampaignPresetPanel implements ListC
                                                   final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return, but by recreating the colour it works properly
-        final Color foreground = new Color(UIManager.getColor(isSelected
-                ? "Table.selectionForeground" : "Table.foreground").getRGB());
-        final Color background = new Color(UIManager.getColor(isSelected
-                ? "Table.selectionBackground" : "Table.background").getRGB());
+        final Color foreground = new Color((isSelected
+                ? list.getSelectionForeground() : list.getForeground()).getRGB());
+        final Color background = new Color((isSelected
+                ? list.getSelectionBackground() : list.getBackground()).getRGB());
         setForeground(foreground);
         setBackground(background);
 
@@ -51,6 +49,7 @@ public class CampaignPresetRenderer extends CampaignPresetPanel implements ListC
         getTxtDescription().setBackground(background);
 
         updateFromPreset(value);
+        this.revalidate();
 
         return this;
     }

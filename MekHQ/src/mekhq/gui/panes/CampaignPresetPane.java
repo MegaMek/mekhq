@@ -18,6 +18,8 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.preferences.JListPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
@@ -60,6 +62,7 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         final DefaultListModel<CampaignPreset> listModel = new DefaultListModel<>();
         listModel.addAll(CampaignPreset.getCampaignPresets());
         setPresets(new JList<>(listModel));
+        getPresets().setName("campaignPresetList");
         getPresets().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         getPresets().setSelectedIndex(0);
         getPresets().setLayoutOrientation(JList.VERTICAL);
@@ -72,6 +75,14 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         setViewportView(panel);
         setMinimumSize(new Dimension(350, 150));
         setPreferredSize(new Dimension(500, 400));
+
+        setPreferences();
+    }
+
+    @Override
+    protected void setCustomPreferences(PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JListPreference(getPresets()));
     }
     //endregion Initialization
 }

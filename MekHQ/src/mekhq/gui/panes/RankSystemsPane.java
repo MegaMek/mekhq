@@ -174,7 +174,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 BorderFactory.createTitledBorder(resources.getString("txtInstructionsRanks.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
+        txtInstructionsRanks.setMinimumSize(new Dimension());
         txtInstructionsRanks.setEditable(false);
         txtInstructionsRanks.setLineWrap(true);
         txtInstructionsRanks.setWrapStyleWord(true);

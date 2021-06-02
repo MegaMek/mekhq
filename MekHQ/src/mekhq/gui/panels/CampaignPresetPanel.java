@@ -68,6 +68,8 @@ public class CampaignPresetPanel extends JPanel {
 
     //region Initialization
     private void initialize(final @Nullable CampaignPreset preset) {
+        final boolean editPreset = (preset != null) && preset.isUserData();
+
         // Setup the Panel
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
@@ -76,20 +78,18 @@ public class CampaignPresetPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         // Create the Constraints
-
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
 
         // Create Components and Layout
         setLblTitle(new JLabel(""));
         getLblTitle().setName("lblTitle");
         getLblTitle().setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(getLblTitle(), gbc);
 
-        setTxtDescription(new JTextArea(""));
-        getTxtDescription().setName("txtDescription");
-        getTxtDescription().setEditable(false);
-        getTxtDescription().setLineWrap(true);
-        getTxtDescription().setWrapStyleWord(true);
-
-        if ((preset != null) && preset.isUserData()) {
+        if (editPreset) {
             final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
                     resources.getString("btnEditPreset.toolTipText"), evt -> {
                 final CampaignPresetCustomizationDialog dialog = new CampaignPresetCustomizationDialog(frame, preset);
@@ -98,7 +98,24 @@ public class CampaignPresetPanel extends JPanel {
                     updateFromPreset(preset);
                 }
             });
+            gbc.gridx++;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            add(btnEditPreset, gbc);
         }
+
+        setTxtDescription(new JTextArea(""));
+        getTxtDescription().setName("txtDescription");
+        getTxtDescription().setMinimumSize(new Dimension(400, 120));
+        getTxtDescription().setEditable(false);
+        getTxtDescription().setLineWrap(true);
+        getTxtDescription().setWrapStyleWord(true);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = editPreset ? 2 : 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        add(getTxtDescription(), gbc);
     }
     //endregion Initialization
 
