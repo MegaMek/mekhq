@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
@@ -43,9 +44,11 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
     private final List<Rank> ranks;
 
     private JTextField txtRankSystemCode;
+    private MMComboBox<RankSystemType> comboRankSystemType;
     private JTextField txtRankSystemName;
-    private JComboBox<RankSystemType> comboRankSystemType;
     private JTextField txtRankSystemDescription;
+    private JCheckBox chkUseROMDesignation;
+    private JCheckBox chkUseManeiDomini;
     private JCheckBox chkSwapToRankSystem;
     //endregion Variable Declarations
 
@@ -86,6 +89,14 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         this.txtRankSystemCode = txtRankSystemCode;
     }
 
+    public MMComboBox<RankSystemType> getComboRankSystemType() {
+        return comboRankSystemType;
+    }
+
+    public void setComboRankSystemType(final MMComboBox<RankSystemType> comboRankSystemType) {
+        this.comboRankSystemType = comboRankSystemType;
+    }
+
     public JTextField getTxtRankSystemName() {
         return txtRankSystemName;
     }
@@ -94,20 +105,28 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         this.txtRankSystemName = txtRankSystemName;
     }
 
-    public JComboBox<RankSystemType> getComboRankSystemType() {
-        return comboRankSystemType;
-    }
-
-    public void setComboRankSystemType(final JComboBox<RankSystemType> comboRankSystemType) {
-        this.comboRankSystemType = comboRankSystemType;
-    }
-
     public JTextField getTxtRankSystemDescription() {
         return txtRankSystemDescription;
     }
 
     public void setTxtRankSystemDescription(final JTextField txtRankSystemDescription) {
         this.txtRankSystemDescription = txtRankSystemDescription;
+    }
+
+    public JCheckBox getChkUseROMDesignation() {
+        return chkUseROMDesignation;
+    }
+
+    public void setChkUseROMDesignation(final JCheckBox chkUseROMDesignation) {
+        this.chkUseROMDesignation = chkUseROMDesignation;
+    }
+
+    public JCheckBox getChkUseManeiDomini() {
+        return chkUseManeiDomini;
+    }
+
+    public void setChkUseManeiDomini(final JCheckBox chkUseManeiDomini) {
+        this.chkUseManeiDomini = chkUseManeiDomini;
     }
 
     public JCheckBox getChkSwapToRankSystem() {
@@ -126,6 +145,28 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         final JLabel lblRankSystemCode = new JLabel(resources.getString("lblRankSystemCode.text"));
         lblRankSystemCode.setToolTipText(resources.getString("lblRankSystemCode.toolTipText"));
         lblRankSystemCode.setName("lblRankSystemCode");
+
+        final JLabel lblRankSystemType = new JLabel(resources.getString("lblRankSystemType.text"));
+        lblRankSystemType.setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
+        lblRankSystemType.setName("lblRankSystemType");
+
+        final DefaultComboBoxModel<RankSystemType> rankSystemTypeModel = new DefaultComboBoxModel<>(RankSystemType.values());
+        rankSystemTypeModel.removeElement(RankSystemType.DEFAULT);
+        setComboRankSystemType(new MMComboBox<>("comboRankSystemType", rankSystemTypeModel));
+        getComboRankSystemType().setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
+        getComboRankSystemType().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RankSystemType) {
+                    list.setToolTipText(((RankSystemType) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        getComboRankSystemType().addActionListener(evt -> setState(ValidationState.PENDING));
 
         setTxtRankSystemCode(new JTextField());
         getTxtRankSystemCode().setToolTipText(resources.getString("lblRankSystemCode.toolTipText"));
@@ -179,28 +220,13 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         getTxtRankSystemDescription().setToolTipText(resources.getString("lblRankSystemDescription.toolTipText"));
         getTxtRankSystemDescription().setName("txtRankSystemDescription");
 
-        final JLabel lblRankSystemType = new JLabel(resources.getString("lblRankSystemType.text"));
-        lblRankSystemType.setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
-        lblRankSystemType.setName("lblRankSystemType");
+        setChkUseROMDesignation(new JCheckBox(resources.getString("chkUseROMDesignation.text")));
+        getChkUseROMDesignation().setToolTipText(resources.getString("chkUseROMDesignation.toolTipText"));
+        getChkUseROMDesignation().setName("chkUseROMDesignation");
 
-        final DefaultComboBoxModel<RankSystemType> rankSystemTypeModel = new DefaultComboBoxModel<>(RankSystemType.values());
-        rankSystemTypeModel.removeElement(RankSystemType.DEFAULT);
-        setComboRankSystemType(new JComboBox<>(rankSystemTypeModel));
-        getComboRankSystemType().setToolTipText(resources.getString("lblRankSystemType.toolTipText"));
-        getComboRankSystemType().setName("comboRankSystemType");
-        getComboRankSystemType().setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RankSystemType) {
-                    list.setToolTipText(((RankSystemType) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        getComboRankSystemType().addActionListener(evt -> setState(ValidationState.PENDING));
+        setChkUseManeiDomini(new JCheckBox(resources.getString("chkUseManeiDomini.text")));
+        getChkUseManeiDomini().setToolTipText(resources.getString("chkUseManeiDomini.toolTipText"));
+        getChkUseManeiDomini().setName("chkUseManeiDomini");
 
         setChkSwapToRankSystem(new JCheckBox(resources.getString("chkSwapToRankSystem.text")));
         getChkSwapToRankSystem().setToolTipText(resources.getString("chkSwapToRankSystem.toolTipText"));
@@ -227,14 +253,16 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
                                 .addComponent(lblRankSystemCode)
                                 .addComponent(getTxtRankSystemCode(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRankSystemType)
+                                .addComponent(getComboRankSystemType(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblRankSystemName)
                                 .addComponent(getTxtRankSystemName(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblRankSystemDescription)
                                 .addComponent(getTxtRankSystemDescription(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystemType)
-                                .addComponent(getComboRankSystemType(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkUseROMDesignation())
+                        .addComponent(getChkUseManeiDomini())
                         .addComponent(getChkSwapToRankSystem())
         );
 
@@ -244,14 +272,16 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
                                 .addComponent(lblRankSystemCode)
                                 .addComponent(getTxtRankSystemCode()))
                         .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRankSystemType)
+                                .addComponent(getComboRankSystemType()))
+                        .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRankSystemName)
                                 .addComponent(getTxtRankSystemName()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRankSystemDescription)
                                 .addComponent(getTxtRankSystemDescription()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystemType)
-                                .addComponent(getComboRankSystemType()))
+                        .addComponent(getChkUseROMDesignation())
+                        .addComponent(getChkUseManeiDomini())
                         .addComponent(getChkSwapToRankSystem())
         );
 
@@ -274,7 +304,10 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         // First, we need to create the new rank system
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
                 getTxtRankSystemName().getText(), getTxtRankSystemDescription().getText(),
-                (RankSystemType) getComboRankSystemType().getSelectedItem()));
+                getComboRankSystemType().getSelectedItem()));
+
+        getRankSystem().setUseROMDesignation(getChkUseROMDesignation().isSelected());
+        getRankSystem().setUseManeiDomini(getChkUseManeiDomini().isSelected());
 
         // Then, we need to clone out the rank setup
         getRankSystem().setRanks(new ArrayList<>());
