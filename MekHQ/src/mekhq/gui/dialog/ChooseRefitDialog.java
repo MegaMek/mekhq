@@ -150,7 +150,7 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
                  BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
                  BorderFactory.createEmptyBorder(5,5,5,5)));
-        MechView mv = new MechView(unit.getEntity(), false, true);
+        MechView mv = new MechView(unit.getEntity(), false, true, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new java.awt.Dimension(300, 400));
