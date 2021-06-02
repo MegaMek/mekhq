@@ -2316,7 +2316,7 @@ public class Person implements Serializable {
         String rankName = getRank().getName(profession.getProfession(getRankSystem(), getRank()));
 
         // Manei Domini Additions
-        if (getRankSystem().isWoBMilitia()) {
+        if (getRankSystem().isUseManeiDomini()) {
             if (!getManeiDominiClass().isNone()) {
                 rankName = getManeiDominiClass() + " " + rankName;
             }
@@ -2326,7 +2326,7 @@ public class Person implements Serializable {
             }
         }
 
-        if (getRankSystem().isCGOrWoBM()) {
+        if (getRankSystem().isUseROMDesignation()) {
             rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
