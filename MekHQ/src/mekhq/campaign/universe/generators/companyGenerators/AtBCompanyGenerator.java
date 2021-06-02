@@ -30,7 +30,7 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
     public AtBCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
-        super(campaign, CompanyGenerationMethod.AGAINST_THE_BOT, options);
+        super(CompanyGenerationMethod.AGAINST_THE_BOT, campaign, options);
     }
     //endregion Constructors
 

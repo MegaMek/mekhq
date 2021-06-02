@@ -127,7 +127,7 @@ public abstract class AbstractCompanyGenerator {
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractCompanyGenerator(final Campaign campaign, final CompanyGenerationMethod method,
+    protected AbstractCompanyGenerator(final CompanyGenerationMethod method, final Campaign campaign,
                                        final CompanyGenerationOptions options) {
         this.method = method;
         setOptions(options);

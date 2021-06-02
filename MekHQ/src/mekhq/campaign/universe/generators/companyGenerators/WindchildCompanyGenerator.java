@@ -30,7 +30,7 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
     public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
-        super(campaign, CompanyGenerationMethod.WINDCHILD, options);
+        super(CompanyGenerationMethod.WINDCHILD, campaign, options);
     }
     //endregion Constructors
 
