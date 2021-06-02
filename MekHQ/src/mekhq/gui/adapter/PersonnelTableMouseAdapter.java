@@ -105,6 +105,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -1292,7 +1293,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
-        if (StaticChecks.areAllWoBMilitia(selected)) {
+        if (Stream.of(selected).allMatch(p -> p.getRankSystem().isUseManeiDomini())) {
             // MD Classes
             menu = new JMenu(resourceMap.getString("changeMDClass.text"));
             for (ManeiDominiClass maneiDominiClass : ManeiDominiClass.values()) {
@@ -1320,7 +1321,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
-        if (StaticChecks.areAllWoBMilitiaOrComGuard(selected)) {
+        if (Stream.of(selected).allMatch(p -> p.getRankSystem().isUseROMDesignation())) {
             menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text"));
             for (ROMDesignation romDesignation : ROMDesignation.values()) {
                 cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());

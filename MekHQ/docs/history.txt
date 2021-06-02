@@ -28,6 +28,9 @@ VERSION HISTORY:
 + Issue #2485: Default Subcontract Name, Briefing Tab Mission Tracking
 + PR #2284: MHQ Options: Adding Colours Customizability
 + Issue #2491: Allow extra time for maintenance per StratOps/New CamOps repair/maintenance rules.
++ Issue #2661: Can no longer select the same unit across multiple selectors in StratCon scenario management UI.
++ Issue #2548: Making ROM Designation and Manei Domini Class and Rank part of the rank system data
++ Issue #2529: Fixing refit display so it no longer includes the pilot's BV
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
