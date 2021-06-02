@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,17 +31,16 @@ import mekhq.gui.baseComponents.AbstractMHQDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListener {
+public class AdvanceDaysDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private final CampaignGUI gui;
-    private volatile boolean running = false; // volatile to ensure readers get the current version
 
     private JSpinner spnDays;
     private JButton btnStartAdvancement;
@@ -49,6 +48,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     private JButton btnNewWeek;
     private JButton btnNewMonth;
     private JButton btnNewYear;
+    private JButton btnNewQuinquennial;
     private JButton btnNewDecade;
     private DailyReportLogPanel dailyLogPanel;
     //endregion Variable Declarations
@@ -66,14 +66,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
         return gui;
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setRunning(final boolean running) {
-        this.running = running;
-    }
-
     public JSpinner getSpnDays() {
         return spnDays;
     }
@@ -86,7 +78,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
         return btnStartAdvancement;
     }
 
-    public void setBtnStartAdvancement(JButton btnStartAdvancement) {
+    public void setBtnStartAdvancement(final JButton btnStartAdvancement) {
         this.btnStartAdvancement = btnStartAdvancement;
     }
 
@@ -122,6 +114,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
         this.btnNewYear = btnNewYear;
     }
 
+    public JButton getBtnNewQuinquennial() {
+        return btnNewQuinquennial;
+    }
+
+    public void setBtnNewQuinquennial(final JButton btnNewQuinquennial) {
+        this.btnNewQuinquennial = btnNewQuinquennial;
+    }
+
     public JButton getBtnNewDecade() {
         return btnNewDecade;
     }
@@ -143,43 +143,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     @Override
     protected Container createCenterPane() {
         // Create Panel Components
-        // Maxing out at 100 years for dev testing reasons, which is cancellable by pressing escape
-        setSpnDays(new JSpinner(new SpinnerNumberModel(7, 1, 36525, 1)));
-        getSpnDays().setName("spnDays");
-
-        final JLabel lblDays = new JLabel(resources.getString("lblDays.text"));
-        lblDays.setName("lblDays");
-        lblDays.setLabelFor(getSpnDays());
-
-        setBtnStartAdvancement(new MMButton("btnStartAdvancement", resources.getString("btnStartAdvancement.text"),
-                String.format(resources.getString("btnStartAdvancement.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
-
-        setBtnNewDay(new MMButton("btnNewDay", resources.getString("btnNewDay.text"),
-                String.format(resources.getString("advanceToDay.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
-
-        setBtnNewWeek(new MMButton("btnNewWeek", resources.getString("btnNewWeek.text"),
-                String.format(resources.getString("advanceToDay.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
-
-        setBtnNewMonth(new MMButton("btnNewMonth", resources.getString("btnNewMonth.text"),
-                String.format(resources.getString("advanceToDay.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
-
-        setBtnNewYear(new MMButton("btnNewYear", resources.getString("btnNewYear.text"),
-                String.format(resources.getString("advanceToDay.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
-
-        setBtnNewDecade(new MMButton("btnNewDecade", resources.getString("btnNewDecade.text"),
-                String.format(resources.getString("advanceToDay.toolTipText"),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(getGUI().getCampaign().getLocalDate())),
-                this::validateButtonActionPerformed));
+        final JPanel advanceDaysDurationPanel = createDurationPanel();
 
         setDailyLogPanel(new DailyReportLogPanel(getGUI()));
 
@@ -194,33 +158,62 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(getSpnDays())
-                                .addComponent(lblDays)
-                                .addComponent(getBtnStartAdvancement(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnst)
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(advanceDaysDurationPanel)
+                        .addComponent(getDailyLogPanel())
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreation)
-                                .addComponent(spnChanceProcreation))
-                        .addComponent(chkUseProcreationNoRelationship)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblBabySurnameStyle)
-                                .addComponent(comboBabySurnameStyle))
-                        .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(advanceDaysDurationPanel)
+                        .addComponent(getDailyLogPanel())
         );
+
+        return panel;
+    }
+
+    private JPanel createDurationPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 3));
+        panel.setName("advanceDaysDurationPanel");
+
+        // Maxing out at 100 years for dev testing reasons, which is cancellable by pressing escape
+        setSpnDays(new JSpinner(new SpinnerNumberModel(7, 1, 36525, 1)));
+        getSpnDays().setToolTipText(resources.getString("spnDays.toolTipText"));
+        getSpnDays().setName("spnDays");
+        panel.add(getSpnDays());
+
+        final JLabel lblDays = new JLabel(resources.getString("lblDays.text"));
+        lblDays.setToolTipText(resources.getString("spnDays.toolTipText"));
+        lblDays.setName("lblDays");
+        lblDays.setLabelFor(getSpnDays());
+        panel.add(lblDays);
+
+        setBtnStartAdvancement(new MMButton("btnStartAdvancement", resources.getString("btnStartAdvancement.text"),
+                resources.getString("btnStartAdvancement.toolTipText"), this::startAdvancement));
+        panel.add(getBtnStartAdvancement());
+
+        setBtnNewDay(new MMButton("btnNewDay", resources.getString("btnNewDay.text"),
+                resources.getString("btnNewDay.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewDay());
+
+        setBtnNewWeek(new MMButton("btnNewWeek", resources.getString("btnNewWeek.text"),
+                resources.getString("btnNewWeek.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewWeek());
+
+        setBtnNewMonth(new MMButton("btnNewMonth", resources.getString("btnNewMonth.text"),
+                resources.getString("btnNewMonth.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewMonth());
+
+        setBtnNewYear(new MMButton("btnNewYear", resources.getString("btnNewYear.text"),
+                resources.getString("btnNewYear.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewYear());
+
+        setBtnNewQuinquennial(new MMButton("btnNewQuinquennial", resources.getString("btnNewQuinquennial.text"),
+                resources.getString("btnNewQuinquennial.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewQuinquennial());
+
+        setBtnNewDecade(new MMButton("btnNewDecade", resources.getString("btnNewDecade.text"),
+                resources.getString("btnNewDecade.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewDecade());
 
         return panel;
     }
@@ -246,77 +239,78 @@ public class AdvanceDaysDialog extends AbstractMHQDialog implements ActionListen
     }
     //endregion Initialization
 
-    //region Button Actions
-    @Override
-    protected void cancelActionPerformed(final ActionEvent evt) {
-        if (isRunning()) {
-            setRunning(false);
+    public void startAdvancement(final ActionEvent evt) {
+        MekHQ.registerHandler(this);
+        final LocalDate today = gui.getCampaign().getLocalDate();
+        int days;
+
+        if (getBtnStartAdvancement().equals(evt.getSource())) {
+            days = (int) getSpnDays().getValue();
+        } else if (getBtnNewDay().equals(evt.getSource())) {
+            days = 1;
+        } else if (getBtnNewWeek().equals(evt.getSource())) {
+            // The number of days until the next monday is eight days (a week and a day) minus
+            // the current day of the week. The additional one is added to ensure we get the next
+            // Monday instead of the Sunday
+            days = 8 - today.getDayOfWeek().getValue();
+        } else if (getBtnNewMonth().equals(evt.getSource())) {
+            // The number of days until the next month is the length of the month plus one minus
+            // the current day, with the one added because otherwise we get the last day of the same
+            // month
+            days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
+        } else if (getBtnNewYear().equals(evt.getSource())) {
+            // The number of days until the next year is the length of the year plus one minus
+            // the current day, with the one added because otherwise we get the last day of the same
+            // year
+            days = today.lengthOfYear() + 1 - today.getDayOfYear();
+        } else if (getBtnNewQuinquennial().equals(evt.getSource())) {
+            days = Math.toIntExact(ChronoUnit.DAYS.between(today,
+                    LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
+        } else if (getBtnNewDecade().equals(evt.getSource())) {
+            days = Math.toIntExact(ChronoUnit.DAYS.between(today,
+                    LocalDate.ofYearDay(today.getYear() + 10 - (today.getYear() % 10), 1)));
         } else {
-            super.cancelActionPerformed(evt);
+            MekHQ.getLogger().error("Unknown source to start advancing days. Advancing to tomorrow.");
+            days = 1;
         }
-    }
-    //endregion Button Actions
 
-    //region ActionListener
-    @Override
-    public void actionPerformed(final ActionEvent evt) {
-        if (getBtnStartAdvancement().equals(evt.getSource()) || getBtnNewDay().equals(evt.getSource())
-                || getBtnNewWeek().equals(evt.getSource()) || getBtnNewMonth().equals(evt.getSource())
-                || getBtnNewYear().equals(evt.getSource()) || getBtnNewDecade().equals(evt.getSource())) {
-            int days = (int) spnDays.getValue();
-            boolean firstDay = true;
-            MekHQ.registerHandler(this);
+        setModal(days > 1);
 
-            LocalDate today = gui.getCampaign().getLocalDate();
-            if (btnNextWeek.equals(evt.getSource())) {
-                // The number of days till the next monday is eight days (a week and a day) minus
-                // the current day of the week. The additional one is added to ensure we get the next
-                // Monday instead of the Sunday
-                days = 8 - today.getDayOfWeek().getValue();
-            } else if (btnNextMonth.equals(evt.getSource())) {
-                // The number of days till the next month is the length of the month plus one minus
-                // the current day, with the one added because otherwise we get the last day of the same
-                // month
-                days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
-            } else if (btnNextYear.equals(evt.getSource())) {
-                // The number of days till the next year is the length of the year plus one minus
-                // the current day, with the one added because otherwise we get the last day of the same
-                // year
-                days = today.lengthOfYear() + 1 - today.getDayOfYear();
+        boolean firstDay = true;
+        final List<String> reports = new ArrayList<>();
+        for (; days > 0; days--) {
+            if (!getGUI().getCampaign().newDay()) {
+                break;
             }
 
-            List<String> reports = new ArrayList<>();
-            for (; days > 0; days--) {
-                if (!getRunning().get()) {
-                    break;
-                } else if (!getGUI().getCampaign().newDay()) {
-                    break;
-                }
-                final String report = gui.getCampaign().getCurrentReportHTML();
-                if (firstDay) {
-                    logPanel.refreshLog(report);
-                    firstDay = false;
-                } else {
-                    reports.add("<hr/>");
-                    reports.add(report);
-                }
-                gui.getCampaign().fetchAndClearNewReports();
-            }
-            logPanel.appendLog(reports);
-
-            // We couldn't advance all days for some reason,
-            // set the spinner to the number of remaining days
-            if (days > 0) {
-                this.spnDays.setValue(days);
+            if (days <= 1) {
+                setModal(false);
             }
 
-            gui.refreshCalendar();
-            gui.refreshLocation();
-
-            gui.refreshAllTabs();
+            final String report = getGUI().getCampaign().getCurrentReportHTML();
+            if (firstDay) {
+                getDailyLogPanel().refreshLog(report);
+                firstDay = false;
+            } else {
+                reports.add("<hr/>");
+                reports.add(report);
+            }
+            getGUI().getCampaign().fetchAndClearNewReports();
         }
+
+        setModal(false);
+        getDailyLogPanel().appendLog(reports);
+
+        // We couldn't advance all days for some reason,
+        // set the spinner to the number of remaining days
+        if (days > 0) {
+            getSpnDays().setValue(days);
+        }
+
+        getGUI().refreshCalendar();
+        getGUI().refreshLocation();
+        getGUI().refreshAllTabs();
     }
-    //endregion ActionListener
 
     @Subscribe(priority = 1)
     public void reportOverride(final ReportEvent evt) {
