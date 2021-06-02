@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -29,13 +30,14 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public UnresolvedStratConContactsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "UnresolvedStratConContactsNagDialog", "UnresolvedStratConContactsNagDialog.title",
-                campaign, MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+                "", campaign, MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        if (!campaign.getCampaignOptions().getUseStratCon()) {
+        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+                || !campaign.getCampaignOptions().getUseStratCon()) {
             return false;
         }
 

@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
@@ -28,12 +29,16 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "InsufficientAstechsNagDialog", "InsufficientAstechsNagDialog.title",
-                campaign, MekHqConstants.NAG_INSUFFICIENT_ASTECHS);
+                "", campaign, MekHqConstants.NAG_INSUFFICIENT_ASTECHS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
+        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())) {
+            return false;
+        }
+
         final int need = campaign.getAstechNeed();
         if (need > 0) {
             setDescription(String.format(resources.getString("InsufficientAstechsNagDialog.text"), need));

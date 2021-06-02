@@ -28,18 +28,19 @@ import java.awt.*;
 public abstract class AbstractMHQNagDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private final String key;
-    private final boolean show;
     private String description;
+    private final boolean show;
     private JCheckBox chkIgnore;
     //endregion Variable Declarations
 
     //region Constructors
     protected AbstractMHQNagDialog(final JFrame frame, final String name, final String title,
-                                   final Campaign campaign, final String key) {
+                                   final String description, final Campaign campaign,
+                                   final String key) {
         super(frame, name, title);
         this.key = key;
+        setDescription(description.isBlank() ? description : resources.getString(description));
         this.show = checkNag(campaign);
-        setDescription("");
         if (isShow()) {
             initialize();
         } else {
@@ -53,16 +54,16 @@ public abstract class AbstractMHQNagDialog extends AbstractMHQButtonDialog {
         return key;
     }
 
-    public boolean isShow() {
-        return show;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public boolean isShow() {
+        return show;
     }
 
     public JCheckBox getChkIgnore() {

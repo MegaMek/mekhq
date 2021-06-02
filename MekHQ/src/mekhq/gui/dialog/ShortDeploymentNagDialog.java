@@ -30,8 +30,7 @@ public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "ShortDeploymentNagDialog", "ShortDeploymentNagDialog.title",
-                campaign, MekHqConstants.NAG_SHORT_DEPLOYMENT);
-        setDescription(resources.getString("ShortDeploymentNagDialog.text"));
+                "ShortDeploymentNagDialog.text", campaign, MekHqConstants.NAG_SHORT_DEPLOYMENT);
     }
     //endregion Constructors
 
