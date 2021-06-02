@@ -48,6 +48,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -150,15 +151,19 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         StratconScenario scenario = getSelectedScenario();
         
-        if (scenario == null) {
+        // display "Manage Force Assignment" if there is not a force already on the hex
+        // except if there is already a non-cloaked scenario here.
+        if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Force Assignments");
+            menuItemManageForceAssignments.setText("Manage Force Assignment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
         }
         
-        if (scenario != null) {
+        // display "Manage Scenario" if
+        // there is already a visible scenario on the hex
+        if ((scenario != null) && !scenario.getBackingScenario().isCloaked()) {
             menuItemManageScenario = new JMenuItem();
             menuItemManageScenario.setText("Manage Scenario");
             menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
@@ -350,9 +355,12 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconScenario scenario = currentTrack.getScenario(currentCoords);
                 
                 // if there's a scenario here that has a deployment/battle date
+                // or if there's a scenario here and the hex has been revealed
                 // or if there's a scenario here and we've gm-revealed everything
                 if ((scenario != null) &&
-                        ((scenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
+                        ((scenario.getDeploymentDate() != null) ||
+                         (scenario.isStrategicObjective() && currentTrack.getRevealedCoords().contains(currentCoords)) ||
+                                currentTrack.isGmRevealed())) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                     g2D.drawPolygon(scenarioMarker2);

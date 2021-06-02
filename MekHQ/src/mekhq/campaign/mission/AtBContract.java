@@ -21,37 +21,24 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-
-import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.icons.Camouflage;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.enums.UnitMarketType;
-import mekhq.campaign.mission.enums.MissionStatus;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.util.WeightedMap;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -62,6 +49,17 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -167,7 +165,7 @@ public class AtBContract extends Contract implements Serializable {
     protected int battleTypeMod;
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
-    
+
     private StratconCampaignState stratconCampaignState;
 
     protected AtBContract() {
@@ -554,18 +552,18 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     /**
-     * Changes the enemy to a randomly selected faction that's an enemy of 
+     * Changes the enemy to a randomly selected faction that's an enemy of
      * the current employer
      */
     private void updateEnemy(LocalDate today) {
         String enemyCode = RandomFactionGenerator.getInstance().getEnemy(
                 Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
-        
+
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
     }
-    
+
     public int getRepairLocation(int dragoonRating) {
         int retval = Unit.SITE_BAY;
         if ((missionType == MT_GUERRILLAWARFARE) ||
@@ -1212,7 +1210,7 @@ public class AtBContract extends Contract implements Serializable {
                     MekHqXmlUtil.saveFormattedDate(specialEventScenarioDate));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioType", specialEventScenarioType);
         }
-        
+
         if(stratconCampaignState != null) {
             stratconCampaignState.Serialize(pw1);
         }
@@ -1524,11 +1522,11 @@ public class AtBContract extends Contract implements Serializable {
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
-    
+
     public StratconCampaignState getStratconCampaignState() {
         return stratconCampaignState;
     }
-    
+
     public void setStratconCampaignState(StratconCampaignState state) {
         stratconCampaignState = state;
     }
@@ -1536,11 +1534,11 @@ public class AtBContract extends Contract implements Serializable {
     @Override
     public void acceptContract(Campaign campaign) {
         if (campaign.getCampaignOptions().getUseStratCon()) {
-            StratconContractInitializer.initializeCampaignState(this, campaign, 
+            StratconContractInitializer.initializeCampaignState(this, campaign,
                     StratconContractDefinition.getContractDefinition(getMissionType()));
         }
     }
-    
+
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
 

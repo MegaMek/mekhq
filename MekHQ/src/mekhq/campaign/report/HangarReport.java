@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,13 +64,14 @@ public class HangarReport extends Report {
     private int countDamagedUnits = 0;
     private int countDeployedUnits = 0;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports", new EncodeControl());
     //endregion Variable Declarations
 
+    //region Constructors
     public HangarReport(Campaign c) {
         super(c);
     }
+    //endregion Constructors
 
     @Override
     public String getTitle() {
@@ -80,11 +81,10 @@ public class HangarReport extends Report {
     public JTree getHangarTree() {
         //region Variable Declarations
         //region BattleMechs
-        // boolean expandMechs = false;
         int countMechs = 0;
 
         int countBattleMechs = 0;
-        int colossalMech = 0;
+        int superHeavyMech = 0;
         int assaultMech = 0;
         int heavyMech = 0;
         int mediumMech = 0;
@@ -92,16 +92,22 @@ public class HangarReport extends Report {
         int ultralightMech = 0;
 
         int countOmniMechs = 0;
-        int colossalOmniMech = 0;
+        int superHeavyOmniMech = 0;
         int assaultOmniMech = 0;
         int heavyOmniMech = 0;
         int mediumOmniMech = 0;
         int lightOmniMech = 0;
         int ultralightOmniMech = 0;
+
+        int countIndustrialMechs = 0;
+        int superHeavyIndustrialMech = 0;
+        int assaultIndustrialMech = 0;
+        int heavyIndustrialMech = 0;
+        int mediumIndustrialMech = 0;
+        int lightIndustrialMech = 0;
         //endregion BattleMechs
 
         //region ASF
-        //boolean expandASF = false;
         int countASF = 0;
 
         int countStandardASF = 0;
@@ -116,46 +122,49 @@ public class HangarReport extends Report {
         //endregion ASF
 
         //region Vehicles
-        //boolean expandVees = false;
         int countVees = 0;
 
         int countStandardVees = 0;
 
         int countTracked = 0;
-        int countTrackedColossal = 0;
+        int countTrackedSuperHeavy = 0;
         int countTrackedAssault = 0;
         int countTrackedHeavy = 0;
         int countTrackedMedium = 0;
         int countTrackedLight = 0;
 
         int countWheeled = 0;
+        int countWheeledSuperHeavy = 0;
         int countWheeledAssault = 0;
         int countWheeledHeavy = 0;
         int countWheeledMedium = 0;
         int countWheeledLight = 0;
 
         int countHover = 0;
+        int countHoverSuperHeavy = 0;
         int countHoverMedium = 0;
         int countHoverLight = 0;
 
         int countVTOL = 0;
+        int countVTOLSuperHeavy = 0;
         int countVTOLLight = 0;
 
         int countWiGE = 0;
+        int countWiGESuperHeavy = 0;
         int countWiGEAssault = 0;
         int countWiGEHeavy = 0;
         int countWiGEMedium = 0;
         int countWiGELight = 0;
 
         int countNaval = 0;
-        int countNavalColossal = 0;
+        int countNavalSuperHeavy = 0;
         int countNavalAssault = 0;
         int countNavalHeavy = 0;
         int countNavalMedium = 0;
         int countNavalLight = 0;
 
         int countSub = 0;
-        int countSubColossal = 0;
+        int countSubSuperHeavy = 0;
         int countSubAssault = 0;
         int countSubHeavy = 0;
         int countSubMedium = 0;
@@ -170,40 +179,44 @@ public class HangarReport extends Report {
         int countOmniVees = 0;
 
         int countOmniTracked = 0;
-        int countOmniTrackedColossal = 0;
+        int countOmniTrackedSuperHeavy = 0;
         int countOmniTrackedAssault = 0;
         int countOmniTrackedHeavy = 0;
         int countOmniTrackedMedium = 0;
         int countOmniTrackedLight = 0;
 
         int countOmniWheeled = 0;
+        int countOmniWheeledSuperHeavy = 0;
         int countOmniWheeledAssault = 0;
         int countOmniWheeledHeavy = 0;
         int countOmniWheeledMedium = 0;
         int countOmniWheeledLight = 0;
 
         int countOmniHover = 0;
+        int countOmniHoverSuperHeavy = 0;
         int countOmniHoverMedium = 0;
         int countOmniHoverLight = 0;
 
         int countOmniVTOL = 0;
+        int countOmniVTOLSuperHeavy = 0;
         int countOmniVTOLLight = 0;
 
         int countOmniWiGE = 0;
+        int countOmniWiGESuperHeavy = 0;
         int countOmniWiGEAssault = 0;
         int countOmniWiGEHeavy = 0;
         int countOmniWiGEMedium = 0;
         int countOmniWiGELight = 0;
 
         int countOmniNaval = 0;
-        int countOmniNavalColossal = 0;
+        int countOmniNavalSuperHeavy = 0;
         int countOmniNavalAssault = 0;
         int countOmniNavalHeavy = 0;
         int countOmniNavalMedium = 0;
         int countOmniNavalLight = 0;
 
         int countOmniSub = 0;
-        int countOmniSubColossal = 0;
+        int countOmniSubSuperHeavy = 0;
         int countOmniSubAssault = 0;
         int countOmniSubHeavy = 0;
         int countOmniSubMedium = 0;
@@ -217,7 +230,6 @@ public class HangarReport extends Report {
         //endregion Vehicles
 
         //region Support Vehicles
-        //boolean expandSupportVees = false;
         int countSupportVees = 0;
 
         int countSupportStandardVees = 0;
@@ -353,7 +365,6 @@ public class HangarReport extends Report {
         //endregion Vehicles
 
         //region Battle Armor and Infantry
-        //boolean expandInfantry = false;
         int countInfantry = 0;
 
         int countFootInfantry = 0;
@@ -373,7 +384,6 @@ public class HangarReport extends Report {
         int countConv = 0;
 
         //region ProtoMechs
-        //boolean expandProtos = false;
         int countProtos = 0;
         int countAssaultProtos = 0;
         int countHeavyProtos = 0;
@@ -385,7 +395,6 @@ public class HangarReport extends Report {
         int countGE = 0;
 
         //region JumpShips, WarShips, DropShips, and SmallCraft
-        //boolean expandSpace = false;
         int countSpace = 0;
 
         int countSmallCraft = 0;
@@ -404,7 +413,6 @@ public class HangarReport extends Report {
 
         // Space Stations
         int countSpaceStations = 0;
-
         //endregion Variable Declarations
 
         //region Tree Creation
@@ -414,25 +422,25 @@ public class HangarReport extends Report {
         // Mech Nodes
         final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode();
 
-        DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode();
-        mechs.add(battlemechs);
-        DefaultMutableTreeNode colossalMechs = new DefaultMutableTreeNode();
-        battlemechs.add(colossalMechs);
+        DefaultMutableTreeNode battleMechs = new DefaultMutableTreeNode();
+        mechs.add(battleMechs);
+        DefaultMutableTreeNode superHeavyMechs = new DefaultMutableTreeNode();
+        battleMechs.add(superHeavyMechs);
         DefaultMutableTreeNode assaultMechs = new DefaultMutableTreeNode();
-        battlemechs.add(assaultMechs);
+        battleMechs.add(assaultMechs);
         DefaultMutableTreeNode heavyMechs = new DefaultMutableTreeNode();
-        battlemechs.add(heavyMechs);
+        battleMechs.add(heavyMechs);
         DefaultMutableTreeNode mediumMechs = new DefaultMutableTreeNode();
-        battlemechs.add(mediumMechs);
+        battleMechs.add(mediumMechs);
         DefaultMutableTreeNode lightMechs = new DefaultMutableTreeNode();
-        battlemechs.add(lightMechs);
+        battleMechs.add(lightMechs);
         DefaultMutableTreeNode ultralightMechs = new DefaultMutableTreeNode();
-        battlemechs.add(ultralightMechs);
+        battleMechs.add(ultralightMechs);
 
         DefaultMutableTreeNode omnis = new DefaultMutableTreeNode();
         mechs.add(omnis);
-        DefaultMutableTreeNode colossalOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(colossalOmniMechs);
+        DefaultMutableTreeNode superHeavyOmniMechs = new DefaultMutableTreeNode();
+        omnis.add(superHeavyOmniMechs);
         DefaultMutableTreeNode assaultOmniMechs = new DefaultMutableTreeNode();
         omnis.add(assaultOmniMechs);
         DefaultMutableTreeNode heavyOmniMechs = new DefaultMutableTreeNode();
@@ -443,6 +451,19 @@ public class HangarReport extends Report {
         omnis.add(lightOmniMechs);
         DefaultMutableTreeNode ultralightOmniMechs = new DefaultMutableTreeNode();
         omnis.add(ultralightOmniMechs);
+
+        DefaultMutableTreeNode industrialMechs = new DefaultMutableTreeNode();
+        mechs.add(industrialMechs);
+        DefaultMutableTreeNode superHeavyIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(superHeavyIndustrialMechs);
+        DefaultMutableTreeNode assaultIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(assaultIndustrialMechs);
+        DefaultMutableTreeNode heavyIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(heavyIndustrialMechs);
+        DefaultMutableTreeNode mediumIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(mediumIndustrialMechs);
+        DefaultMutableTreeNode lightIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(lightIndustrialMechs);
 
         top.add(mechs);
 
@@ -477,8 +498,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sTracked = new DefaultMutableTreeNode();
         sVees.add(sTracked);
-        DefaultMutableTreeNode sTrackedColossal = new DefaultMutableTreeNode();
-        sTracked.add(sTrackedColossal);
+        DefaultMutableTreeNode sTrackedSuperHeavy = new DefaultMutableTreeNode();
+        sTracked.add(sTrackedSuperHeavy);
         DefaultMutableTreeNode sTrackedAssault = new DefaultMutableTreeNode();
         sTracked.add(sTrackedAssault);
         DefaultMutableTreeNode sTrackedHeavy = new DefaultMutableTreeNode();
@@ -490,6 +511,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sWheeled = new DefaultMutableTreeNode();
         sVees.add(sWheeled);
+        DefaultMutableTreeNode sWheeledSuperHeavy = new DefaultMutableTreeNode();
+        sWheeled.add(sWheeledSuperHeavy);
         DefaultMutableTreeNode sWheeledAssault = new DefaultMutableTreeNode();
         sWheeled.add(sWheeledAssault);
         DefaultMutableTreeNode sWheeledHeavy = new DefaultMutableTreeNode();
@@ -501,6 +524,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sHover = new DefaultMutableTreeNode();
         sVees.add(sHover);
+        DefaultMutableTreeNode sHoverSuperHeavy = new DefaultMutableTreeNode( );
+        sHover.add(sHoverSuperHeavy);
         DefaultMutableTreeNode sHoverMedium = new DefaultMutableTreeNode( );
         sHover.add(sHoverMedium);
         DefaultMutableTreeNode sHoverLight = new DefaultMutableTreeNode();
@@ -508,11 +533,15 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sVTOL = new DefaultMutableTreeNode();
         sVees.add(sVTOL);
+        DefaultMutableTreeNode sVTOLSuperHeavy = new DefaultMutableTreeNode();
+        sVTOL.add(sVTOLSuperHeavy);
         DefaultMutableTreeNode sVTOLLight = new DefaultMutableTreeNode();
         sVTOL.add(sVTOLLight);
 
         DefaultMutableTreeNode sWiGE = new DefaultMutableTreeNode();
         sVees.add(sWiGE);
+        DefaultMutableTreeNode sWiGESuperHeavy = new DefaultMutableTreeNode();
+        sWiGE.add(sWiGESuperHeavy);
         DefaultMutableTreeNode sWiGEAssault = new DefaultMutableTreeNode();
         sWiGE.add(sWiGEAssault);
         DefaultMutableTreeNode sWiGEHeavy = new DefaultMutableTreeNode();
@@ -524,8 +553,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sNaval = new DefaultMutableTreeNode();
         sVees.add(sNaval);
-        DefaultMutableTreeNode sNavalColossal = new DefaultMutableTreeNode();
-        sNaval.add(sNavalColossal);
+        DefaultMutableTreeNode sNavalSuperHeavy = new DefaultMutableTreeNode();
+        sNaval.add(sNavalSuperHeavy);
         DefaultMutableTreeNode sNavalAssault = new DefaultMutableTreeNode();
         sNaval.add(sNavalAssault);
         DefaultMutableTreeNode sNavalHeavy = new DefaultMutableTreeNode();
@@ -537,8 +566,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode sSub = new DefaultMutableTreeNode();
         sVees.add(sSub);
-        DefaultMutableTreeNode sSubColossal = new DefaultMutableTreeNode();
-        sSub.add(sSubColossal);
+        DefaultMutableTreeNode sSubSuperHeavy = new DefaultMutableTreeNode();
+        sSub.add(sSubSuperHeavy);
         DefaultMutableTreeNode sSubAssault = new DefaultMutableTreeNode();
         sSub.add(sSubAssault);
         DefaultMutableTreeNode sSubHeavy = new DefaultMutableTreeNode();
@@ -564,8 +593,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oTracked = new DefaultMutableTreeNode();
         oVees.add(oTracked);
-        DefaultMutableTreeNode oTrackedColossal = new DefaultMutableTreeNode();
-        oTracked.add(oTrackedColossal);
+        DefaultMutableTreeNode oTrackedSuperHeavy = new DefaultMutableTreeNode();
+        oTracked.add(oTrackedSuperHeavy);
         DefaultMutableTreeNode oTrackedAssault = new DefaultMutableTreeNode();
         oTracked.add(oTrackedAssault);
         DefaultMutableTreeNode oTrackedHeavy = new DefaultMutableTreeNode();
@@ -577,6 +606,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oWheeled = new DefaultMutableTreeNode();
         oVees.add(oWheeled);
+        DefaultMutableTreeNode oWheeledSuperHeavy = new DefaultMutableTreeNode();
+        oWheeled.add(oWheeledSuperHeavy);
         DefaultMutableTreeNode oWheeledAssault = new DefaultMutableTreeNode();
         oWheeled.add(oWheeledAssault);
         DefaultMutableTreeNode oWheeledHeavy = new DefaultMutableTreeNode();
@@ -588,6 +619,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oHover = new DefaultMutableTreeNode();
         oVees.add(oHover);
+        DefaultMutableTreeNode oHoverSuperHeavy = new DefaultMutableTreeNode();
+        oHover.add(oHoverSuperHeavy);
         DefaultMutableTreeNode oHoverMedium = new DefaultMutableTreeNode();
         oHover.add(oHoverMedium);
         DefaultMutableTreeNode oHoverLight = new DefaultMutableTreeNode();
@@ -595,11 +628,15 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oVTOL = new DefaultMutableTreeNode();
         oVees.add(oVTOL);
+        DefaultMutableTreeNode oVTOLSuperHeavy = new DefaultMutableTreeNode();
+        oVTOL.add(oVTOLSuperHeavy);
         DefaultMutableTreeNode oVTOLLight = new DefaultMutableTreeNode();
         oVTOL.add(oVTOLLight);
 
         DefaultMutableTreeNode oWiGE = new DefaultMutableTreeNode();
         oVees.add(oWiGE);
+        DefaultMutableTreeNode oWiGESuperHeavy = new DefaultMutableTreeNode();
+        oWiGE.add(oWiGESuperHeavy);
         DefaultMutableTreeNode oWiGEAssault = new DefaultMutableTreeNode();
         oWiGE.add(oWiGEAssault);
         DefaultMutableTreeNode oWiGEHeavy = new DefaultMutableTreeNode();
@@ -611,8 +648,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oNaval = new DefaultMutableTreeNode();
         oVees.add(oNaval);
-        DefaultMutableTreeNode oNavalColossal = new DefaultMutableTreeNode();
-        oNaval.add(oNavalColossal);
+        DefaultMutableTreeNode oNavalSuperHeavy = new DefaultMutableTreeNode();
+        oNaval.add(oNavalSuperHeavy);
         DefaultMutableTreeNode oNavalAssault = new DefaultMutableTreeNode();
         oNaval.add(oNavalAssault);
         DefaultMutableTreeNode oNavalHeavy = new DefaultMutableTreeNode();
@@ -624,8 +661,8 @@ public class HangarReport extends Report {
 
         DefaultMutableTreeNode oSub = new DefaultMutableTreeNode();
         oVees.add(oSub);
-        DefaultMutableTreeNode oSubColossal = new DefaultMutableTreeNode();
-        oSub.add(oSubColossal);
+        DefaultMutableTreeNode oSubSuperHeavy = new DefaultMutableTreeNode();
+        oSub.add(oSubSuperHeavy);
         DefaultMutableTreeNode oSubAssault = new DefaultMutableTreeNode();
         oSub.add(oSubAssault);
         DefaultMutableTreeNode oSubHeavy = new DefaultMutableTreeNode();
@@ -995,22 +1032,48 @@ public class HangarReport extends Report {
             } else {
                 countUnitsInTransit++;
             }
+
             if (u.isDamaged()) {
                 countDamagedUnits++;
             }
+
             if (u.isDeployed()) {
                 countDeployedUnits++;
             }
 
-            //Determine what type of unit, and add it to the proper subtree
+            // Determine what type of unit, and add it to the proper subtree
             if (e instanceof Mech) {
                 countMechs++;
-                if (e.isOmni()) {
+                if (((Mech) e).isIndustrial()) {
+                    countIndustrialMechs++;
+                    switch (e.getWeightClass()) {
+                        case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                            superHeavyIndustrialMech++;
+                            superHeavyIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                        case EntityWeightClass.WEIGHT_ASSAULT:
+                            assaultIndustrialMech++;
+                            assaultIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                        case EntityWeightClass.WEIGHT_HEAVY:
+                            heavyIndustrialMech++;
+                            heavyIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                        case EntityWeightClass.WEIGHT_MEDIUM:
+                            mediumIndustrialMech++;
+                            mediumIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                        case EntityWeightClass.WEIGHT_LIGHT:
+                            lightIndustrialMech++;
+                            lightIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                    }
+                } else if (e.isOmni()) {
                     countOmniMechs++;
                     switch (e.getWeightClass()) {
-                        case EntityWeightClass.WEIGHT_COLOSSAL:
-                            colossalOmniMech++;
-                            colossalOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                            superHeavyOmniMech++;
+                            superHeavyOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
                             assaultOmniMech++;
@@ -1036,9 +1099,9 @@ public class HangarReport extends Report {
                 } else {
                     countBattleMechs++;
                     switch (e.getWeightClass()) {
-                        case EntityWeightClass.WEIGHT_COLOSSAL:
-                            colossalMech++;
-                            colossalMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                            superHeavyMech++;
+                            superHeavyMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
                             assaultMech++;
@@ -1598,9 +1661,9 @@ public class HangarReport extends Report {
                     if (e.getMovementMode() == EntityMovementMode.TRACKED) {
                         countOmniTracked++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countOmniTrackedColossal++;
-                                oTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniTrackedSuperHeavy++;
+                                oTrackedSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniTrackedAssault++;
@@ -1622,6 +1685,10 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
                         countOmniWheeled++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniWheeledSuperHeavy++;
+                                oWheeledSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWheeledAssault++;
                                 oWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1642,6 +1709,10 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
                         countOmniHover++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniHoverSuperHeavy++;
+                                oHoverSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniHoverMedium++;
                                 oHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1653,13 +1724,23 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
                         countOmniVTOL++;
-                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-                            countOmniVTOLLight++;
-                            oVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniVTOLSuperHeavy++;
+                                oVTOLSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
+                            case EntityWeightClass.WEIGHT_LIGHT:
+                                countOmniVTOLLight++;
+                                oVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countOmniWiGE++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniWiGESuperHeavy++;
+                                oWiGESuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWiGEAssault++;
                                 oWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1680,9 +1761,9 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
                         countOmniNaval++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countOmniNavalColossal++;
-                                oNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniNavalSuperHeavy++;
+                                oNavalSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniNavalAssault++;
@@ -1704,9 +1785,9 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
                         countOmniSub++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countOmniSubColossal++;
-                                oSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countOmniSubSuperHeavy++;
+                                oSubSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniSubAssault++;
@@ -1751,9 +1832,9 @@ public class HangarReport extends Report {
                     if (e.getMovementMode() == EntityMovementMode.TRACKED) {
                         countTracked++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countTrackedColossal++;
-                                sTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countTrackedSuperHeavy++;
+                                sTrackedSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countTrackedAssault++;
@@ -1775,6 +1856,10 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
                         countWheeled++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countWheeledSuperHeavy++;
+                                sWheeledSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWheeledAssault++;
                                 sWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1795,6 +1880,10 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
                         countHover++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countHoverSuperHeavy++;
+                                sHoverSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countHoverMedium++;
                                 sHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1806,13 +1895,23 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
                         countVTOL++;
-                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-                            countVTOLLight++;
-                            sVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countVTOLSuperHeavy++;
+                                sVTOLSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
+                            case EntityWeightClass.WEIGHT_LIGHT:
+                                countVTOLLight++;
+                                sVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countWiGE++;
                         switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countWiGESuperHeavy++;
+                                sWiGESuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWiGEAssault++;
                                 sWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1833,9 +1932,9 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
                         countNaval++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countNavalColossal++;
-                                sNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countNavalSuperHeavy++;
+                                sNavalSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countNavalAssault++;
@@ -1857,9 +1956,9 @@ public class HangarReport extends Report {
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
                         countSub++;
                         switch (e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_COLOSSAL:
-                                countSubColossal++;
-                                sSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+                                countSubSuperHeavy++;
+                                sSubSuperHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countSubAssault++;
@@ -1947,8 +2046,8 @@ public class HangarReport extends Report {
         // Mech Nodes
         mechs.setUserObject(resources.getString("HangarReport.Mechs") + " " + countMechs);
 
-        battlemechs.setUserObject(resources.getString("HangarReport.BattleMechs") + " " + countBattleMechs);
-        colossalMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + colossalMech);
+        battleMechs.setUserObject(resources.getString("HangarReport.BattleMechs") + " " + countBattleMechs);
+        superHeavyMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyMech);
         assaultMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultMech);
         heavyMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyMech);
         mediumMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumMech);
@@ -1956,12 +2055,19 @@ public class HangarReport extends Report {
         ultralightMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightMech);
 
         omnis.setUserObject(resources.getString("HangarReport.OmniMechs") + " " + countOmniMechs);
-        colossalOmniMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + colossalOmniMech);
+        superHeavyOmniMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyOmniMech);
         assaultOmniMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultOmniMech);
         heavyOmniMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyOmniMech);
         mediumOmniMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumOmniMech);
         lightOmniMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightOmniMech);
         ultralightOmniMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightOmniMech);
+
+        industrialMechs.setUserObject(resources.getString("HangarReport.IndustrialMechs") + " " + countIndustrialMechs);
+        superHeavyIndustrialMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyIndustrialMech);
+        assaultIndustrialMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultIndustrialMech);
+        heavyIndustrialMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyIndustrialMech);
+        mediumIndustrialMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumIndustrialMech);
+        lightIndustrialMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightIndustrialMech);
 
         // ASF Nodes
         ASF.setUserObject(resources.getString("HangarReport.AerospaceFighters") + " " + countASF);
@@ -1982,40 +2088,44 @@ public class HangarReport extends Report {
         sVees.setUserObject(resources.getString("HangarReport.Standard") + " " + countStandardVees);
 
         sTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countTracked);
-        sTrackedColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countTrackedColossal);
+        sTrackedSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countTrackedSuperHeavy);
         sTrackedAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countTrackedAssault);
         sTrackedHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countTrackedHeavy);
         sTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countTrackedMedium);
         sTrackedLight.setUserObject(resources.getString("HangarReport.Light") + " " + countTrackedLight);
 
         sWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countWheeled);
+        sWheeledSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countWheeledSuperHeavy);
         sWheeledAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countWheeledAssault);
         sWheeledHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countWheeledHeavy);
         sWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countWheeledMedium);
         sWheeledLight.setUserObject(resources.getString("HangarReport.Light") + " " + countWheeledLight);
 
         sHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countHover);
+        sHoverSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countHoverSuperHeavy);
         sHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countHoverMedium);
         sHoverLight.setUserObject(resources.getString("HangarReport.Light") + " " + countHoverLight);
 
         sVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countVTOL);
+        sVTOLSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countVTOLSuperHeavy);
         sVTOLLight.setUserObject(resources.getString("HangarReport.Light") + " " + countVTOLLight);
 
         sWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countWiGE);
+        sWiGESuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countWiGESuperHeavy);
         sWiGEAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countWiGEAssault);
         sWiGEHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countWiGEHeavy);
         sWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countWiGEMedium);
         sWiGELight.setUserObject(resources.getString("HangarReport.Light") + " " + countWiGELight);
 
         sNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countNaval);
-        sNavalColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countNavalColossal);
+        sNavalSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countNavalSuperHeavy);
         sNavalAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countNavalAssault);
         sNavalHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countNavalHeavy);
         sNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countNavalMedium);
         sNavalLight.setUserObject(resources.getString("HangarReport.Light") + " " + countNavalLight);
 
         sSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countSub);
-        sSubColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countSubColossal);
+        sSubSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countSubSuperHeavy);
         sSubAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countSubAssault);
         sSubHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countSubHeavy);
         sSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSubMedium);
@@ -2030,40 +2140,44 @@ public class HangarReport extends Report {
         oVees.setUserObject(resources.getString("HangarReport.OmniVees") + " " + countOmniVees);
 
         oTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countOmniTracked);
-        oTrackedColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniTrackedColossal);
+        oTrackedSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniTrackedSuperHeavy);
         oTrackedAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniTrackedAssault);
         oTrackedHeavy.setUserObject(resources.getString("HangarReport.Heavy") +countOmniTrackedHeavy);
         oTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniTrackedMedium);
         oTrackedLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniTrackedLight);
 
         oWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countOmniWheeled);
+        oWheeledSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniWheeledSuperHeavy);
         oWheeledAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniWheeledAssault);
         oWheeledHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniWheeledHeavy);
         oWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniWheeledMedium);
         oWheeledLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniWheeledLight);
 
         oHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countOmniHover);
+        oHoverSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniHoverSuperHeavy);
         oHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniHoverMedium);
         oHoverLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniHoverLight);
 
         oVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countOmniVTOL);
+        oVTOLSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniVTOLSuperHeavy);
         oVTOLLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniVTOLLight);
 
         oWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countOmniWiGE);
+        oWiGESuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniWiGESuperHeavy);
         oWiGEAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniWiGEAssault);
         oWiGEHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniWiGEHeavy);
         oWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniWiGEMedium);
         oWiGELight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniWiGELight);
 
         oNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countOmniNaval);
-        oNavalColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniNavalColossal);
+        oNavalSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniNavalSuperHeavy);
         oNavalAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniNavalAssault);
         oNavalHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniNavalHeavy);
         oNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniNavalMedium);
         oNavalLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniNavalLight);
 
         oSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countOmniSub);
-        oSubColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniSubColossal);
+        oSubSuperHeavy.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniSubSuperHeavy);
         oSubAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniSubAssault);
         oSubHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniSubHeavy);
         oSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniSubMedium);
@@ -2266,37 +2380,6 @@ public class HangarReport extends Report {
 
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));
-
-        // TODO : Implement an automatically expanding path for the paths that have units, although preferably with a
-        // TODO : way to enable or disable it as desired
-        /*
-        // Reset our UI
-        final boolean expandMechsFinal = expandMechs;
-        final boolean expandASFFinal = expandASF;
-        final boolean expandVeesFinal = expandVees;
-        final boolean expandInfantryFinal = expandInfantry;
-        final boolean expandSpaceFinal = expandSpace;
-        final boolean expandProtosFinal = expandProtos;
-
-        if (expandMechsFinal) {
-            overviewHangarTree.expandPath(new TreePath(mechs.getPath()));
-        }
-        if (expandASFFinal) {
-            overviewHangarTree.expandPath(new TreePath(ASF.getPath()));
-        }
-        if (expandVeesFinal) {
-            overviewHangarTree.expandPath(new TreePath(vees.getPath()));
-        }
-        if (expandInfantryFinal) {
-            overviewHangarTree.expandPath(new TreePath(inf.getPath()));
-        }
-        if (expandSpaceFinal) {
-            overviewHangarTree.expandPath(new TreePath(space.getPath()));
-        }
-        if (expandProtosFinal) {
-            overviewHangarTree.expandPath(new TreePath(protos.getPath()));
-        }
-        */
 
         return overviewHangarTree;
     }

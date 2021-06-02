@@ -23,6 +23,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -84,8 +85,9 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         // if we're waiting to assign primary forces, we can only do so from the current track 
         lanceModel = new ScenarioWizardLanceModel(campaign, 
                 StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX, 
-                        campaign, ownerPanel.getCurrentTrack(), false, null));
+                        campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
         
+        availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
         

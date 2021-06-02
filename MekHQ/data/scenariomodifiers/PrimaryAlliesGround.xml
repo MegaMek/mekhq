@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>To compensate for the presence of a large opposing force, allied units will be working alongside us on this operation.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>

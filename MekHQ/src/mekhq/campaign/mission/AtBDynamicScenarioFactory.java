@@ -47,6 +47,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.IAero;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -326,7 +327,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
-        boolean isPlanetOwner = contract.getSystem().getFactions(currentDate).contains(factionCode);
+        boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                 forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
                 forceTemplate.getAllowedUnitType() == UnitType.AERO;
@@ -801,7 +802,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @param scenario The scenario to process.
      */
-    private static void setScenarioMapSize(AtBDynamicScenario scenario) {
+    public static void setScenarioMapSize(AtBDynamicScenario scenario) {
         int mapSizeX;
         int mapSizeY;
         ScenarioTemplate template = scenario.getTemplate();
@@ -2294,18 +2295,22 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Helper function that puts the units in the given list at the given altitude, and
-     * VTOLs at the elevation. Use with caution, as may lead to splattering.
+     * Helper function that puts the units in the given list at the given altitude. 
+     * Use with caution, as may lead to splattering or aerospace units starting on the ground.
      * @param entityList The entity list to process.
      * @param startingAltitude Starting altitude.
      */
     private static void setStartingAltitude(List<Entity> entityList, int startingAltitude) {
         for (Entity entity : entityList) {
-            if (!entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+            if (entity instanceof IAero) {
                 entity.setAltitude(startingAltitude);
+                
+                // there's a lot of stuff that happens whan an aerospace unit
+                // "lands", so let's make sure it all happens
+                if (startingAltitude == 0) {
+                    ((IAero) entity).land();
+                }
             }
-
-            entity.setElevation(startingAltitude);
         }
     }
 
@@ -2430,5 +2435,18 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : scenario.getAlliesPlayer()) {
             csu.upgradeCrew(entity);
         }
+    }
+    
+    /**
+     * Highly paranoid function that will check if the given faction is one of the
+     * owners of the contract's location at the current date.
+     */
+    private static boolean isPlanetOwner(AtBContract contract, LocalDate currentDate, String factionCode) {
+        if ((contract == null) || (contract.getSystem() == null) ||
+                (contract.getSystem().getFactions(currentDate) == null)) {
+            return false;
+        }
+        
+        return contract.getSystem().getFactions(currentDate).contains(factionCode);
     }
 }

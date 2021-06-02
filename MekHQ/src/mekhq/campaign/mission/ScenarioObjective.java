@@ -382,7 +382,11 @@ public class ScenarioObjective {
             result.append("<br/>");
         }
         
-        result.replace(result.lastIndexOf("<br/>"), result.length(), "");
+        int breakIndex = result.lastIndexOf("<br/>");
+        
+        if (breakIndex >= 0) {
+            result.replace(breakIndex, result.length(), "");
+        }
         
         return result.toString();
     }

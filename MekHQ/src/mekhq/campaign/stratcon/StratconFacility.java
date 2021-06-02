@@ -17,9 +17,7 @@ package mekhq.campaign.stratcon;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -58,6 +56,7 @@ public class StratconFacility implements Cloneable {
     private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
+    private String capturedDefinition;
     //TODO: post-MVP
     //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
@@ -77,6 +76,7 @@ public class StratconFacility implements Cloneable {
         clone.visible = visible;
         clone.sharedModifiers = new ArrayList<>(sharedModifiers);
         clone.localModifiers = new ArrayList<>(localModifiers);
+        clone.setCapturedDefinition(capturedDefinition); 
         return clone;
     }
     
@@ -174,6 +174,18 @@ public class StratconFacility implements Cloneable {
         return ownershipChangeScore;
     }
     
+    /**
+     * If present, this is the name of the definition file to draw from
+     * when switching facility ownership.
+     */
+    public String getCapturedDefinition() {
+        return capturedDefinition;
+    }
+
+    public void setCapturedDefinition(String capturedDefinition) {
+        this.capturedDefinition = capturedDefinition;
+    }
+
     /**
      * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      * @return Possibly an instance of a StratconFacility

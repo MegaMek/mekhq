@@ -29,7 +29,7 @@ public final class MekHqConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
 
-    // region Command Center
+    //region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
@@ -38,6 +38,39 @@ public final class MekHqConstants {
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
     //endregion Personnel Tab Display Options
+
+    //region Colours
+    public static final String DEPLOYED_FOREGROUND = "deployedForeground";
+    public static final String DEPLOYED_BACKGROUND = "deployedBackground";
+    public static final String BELOW_CONTRACT_MINIMUM_FOREGROUND = "belowContractMinimumForeground";
+    public static final String BELOW_CONTRACT_MINIMUM_BACKGROUND = "belowContractMinimumBackground";
+    public static final String IN_TRANSIT_FOREGROUND = "inTransitForeground";
+    public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
+    public static final String REFITTING_FOREGROUND = "refittingForeground";
+    public static final String REFITTING_BACKGROUND = "refittingBackground";
+    public static final String MOTHBALLING_FOREGROUND = "mothballingForeground";
+    public static final String MOTHBALLING_BACKGROUND = "mothballingBackground";
+    public static final String MOTHBALLED_FOREGROUND = "mothballedForeground";
+    public static final String MOTHBALLED_BACKGROUND = "mothballedBackground";
+    public static final String NOT_REPAIRABLE_FOREGROUND = "notRepairableForeground";
+    public static final String NOT_REPAIRABLE_BACKGROUND = "notRepairableBackground";
+    public static final String NON_FUNCTIONAL_FOREGROUND = "nonFunctionalForeground";
+    public static final String NON_FUNCTIONAL_BACKGROUND = "nonFunctionalBackground";
+    public static final String NEEDS_PARTS_FIXED_FOREGROUND = "needsPartsFixedForeground";
+    public static final String NEEDS_PARTS_FIXED_BACKGROUND = "needsPartsFixedBackground";
+    public static final String UNMAINTAINED_FOREGROUND = "unmaintainedForeground";
+    public static final String UNMAINTAINED_BACKGROUND = "unmaintainedBackground";
+    public static final String UNCREWED_FOREGROUND = "uncrewedForeground";
+    public static final String UNCREWED_BACKGROUND = "uncrewedBackground";
+    public static final String LOAN_OVERDUE_FOREGROUND = "loanOverdueForeground";
+    public static final String LOAN_OVERDUE_BACKGROUND = "loanOverdueBackground";
+    public static final String INJURED_FOREGROUND = "injuredForeground";
+    public static final String INJURED_BACKGROUND = "injuredBackground";
+    public static final String HEALED_INJURIES_FOREGROUND = "healedInjuriesForeground";
+    public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
+    public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
+    public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
+    //endregion Colours
     //endregion Display
 
     //region Autosave
@@ -54,6 +87,8 @@ public final class MekHqConstants {
 
     //region New Day
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
+    public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
+    public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     //endregion New Day
 
@@ -87,11 +122,11 @@ public final class MekHqConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 
     public static final int MAXIMUM_D6_VALUE = 6;
-    
+
     /**
      * Paths to StratCon definition files
      */
-    
+
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
     public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
     public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
@@ -107,10 +142,10 @@ public final class MekHqConstants {
     public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
     public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
     public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
-    
+
     public static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
-    
+
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
     public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
@@ -124,5 +159,5 @@ public final class MekHqConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
-    
+
 }

@@ -40,6 +40,7 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import megamek.common.options.OptionsConstants;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -693,10 +694,52 @@ public class CampaignGUI extends JPanel {
         //endregion menuExport
 
         //region Menu Refresh
-        // The Import menu uses the following Mnemonic keys as of 05-APR-2021:
-        // R
+        // The Import menu uses the following Mnemonic keys as of 29-MAY-2021:
+        // A, C, F, P, R, U
         JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
         menuRefresh.setMnemonic(KeyEvent.VK_R);
+
+        JMenuItem miRefreshUnitCache = new JMenuItem(resourceMap.getString("miRefreshUnitCache.text"));
+        miRefreshUnitCache.setName("miRefreshUnitCache");
+        miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
+        miRefreshUnitCache.addActionListener(evt -> MechSummaryCache.refreshUnitData(false));
+        menuRefresh.add(miRefreshUnitCache);
+
+        JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
+        miRefreshCamouflage.setName("miRefreshCamouflage");
+        miRefreshCamouflage.setMnemonic(KeyEvent.VK_C);
+        miRefreshCamouflage.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshCamouflageDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshCamouflage);
+
+        JMenuItem miRefreshPortraits = new JMenuItem(resourceMap.getString("miRefreshPortraits.text"));
+        miRefreshPortraits.setName("miRefreshPortraits");
+        miRefreshPortraits.setMnemonic(KeyEvent.VK_P);
+        miRefreshPortraits.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshPortraitDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshPortraits);
+
+        JMenuItem miRefreshForceIcons = new JMenuItem(resourceMap.getString("miRefreshForceIcons.text"));
+        miRefreshForceIcons.setName("miRefreshForceIcons");
+        miRefreshForceIcons.setMnemonic(KeyEvent.VK_F);
+        miRefreshForceIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshForceIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshForceIcons);
+
+        JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
+        miRefreshAwards.setName("miRefreshAwards");
+        miRefreshAwards.setMnemonic(KeyEvent.VK_A);
+        miRefreshAwards.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshAwardIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshAwards);
 
         JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
         miRefreshRanks.setName("miRefreshRanks");
@@ -786,7 +829,7 @@ public class CampaignGUI extends JPanel {
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
-        for (PersonnelRole role : PersonnelRole.values()) {
+        for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
             JMenuItem miHire = new JMenuItem(role.getName(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
@@ -2011,16 +2054,14 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    // Error condition of sorts!
-                    // Errr, what should we do here?
                     MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if (getCampaign().getPerson(p.getId()) != null
-                        && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
-                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
+                if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
+                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
+                            + p.getFullName() + ", Id " + p.getId() + ")");
                     p = null;
                 }
 
