@@ -4078,12 +4078,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        if (!getCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
-        }
-        if (!getCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
-        }
+        getCamouflage().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
@@ -4980,6 +4975,12 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
+            }
+            
+            // like repairs, per CamOps page 208 extra time gives a
+            // reduction to the TN based on x2, x3, x4
+            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
             }
         }
 

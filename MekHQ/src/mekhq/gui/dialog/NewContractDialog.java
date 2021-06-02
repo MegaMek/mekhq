@@ -94,6 +94,10 @@ public class NewContractDialog extends JDialog {
         setUserPreferences();
     }
 
+    public Contract getContract() {
+        return contract;
+    }
+
     protected void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -710,26 +714,6 @@ public class NewContractDialog extends JDialog {
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
-
-    public int getContractId() {
-        return contract.getId();
-    }
-
-    /*
-    private void refreshTotals() {
-        lblBaseAmount2.setText(formatter.format(contract.getBaseAmount()));
-        lblOverheadAmount2.setText("+" + formatter.format(contract.getOverheadAmount()));
-        lblSupportAmount2.setText("+" + formatter.format(contract.getSupportAmount()));
-        lblTransitAmount2.setText("+" + formatter.format(contract.getTransitAmount()));
-        lblTransportAmount2.setText("+" + formatter.format(contract.getTransportAmount()));
-        lblTotalAmount2.setText(formatter.format(contract.getTotalAmount()));
-        lblSignBonusAmount2.setText("+" + formatter.format(contract.getSigningBonusAmount()));
-        lblFeeAmount2.setText("-" + formatter.format(contract.getFeeAmount()));
-        lblTotalAmountPlus2.setText(formatter.format(contract.getTotalAmountPlusFeesAndBonuses()));
-        lblAdvanceMoney2.setText(formatter.format(contract.getTotalAdvanceAmount()));
-        lblMonthlyAmount2.setText(formatter.format(contract.getMonthlyPayOut()));
-        lblProfit2.setText(formatter.format(contract.getEstimatedTotalProfit(campaign)));
-    }*/
 
     private void btnCloseActionPerformed(ActionEvent evt) {
         if (!btnClose.equals(evt.getSource())) {
