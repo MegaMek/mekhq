@@ -245,12 +245,10 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
-        DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
-
+        final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
         for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(false)) {
             personGroupModel.addElement(filter);
         }
-
         return personGroupModel;
     }
 
@@ -291,7 +289,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     public void filterPersonnel() {
-        PersonnelFilter filter = (choicePerson.getSelectedItem() == null)
+        final PersonnelFilter filter = (choicePerson.getSelectedItem() == null)
                 ? PersonnelFilter.ACTIVE : choicePerson.getSelectedItem();
         personnelSorter.setRowFilter(new RowFilter<>() {
             @Override
@@ -302,7 +300,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     private void changePersonnelView() {
-        PersonnelTabView view = (choicePersonView.getSelectedItem() == null)
+        final PersonnelTabView view = (choicePersonView.getSelectedItem() == null)
                 ? PersonnelTabView.GENERAL : choicePersonView.getSelectedItem();
         XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
         personnelTable.setRowHeight(15);
