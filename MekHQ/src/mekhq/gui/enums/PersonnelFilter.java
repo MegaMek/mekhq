@@ -23,10 +23,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum PersonnelFilter {
     //region Enum Declarations
@@ -68,10 +69,10 @@ public enum PersonnelFilter {
     ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text", "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
     ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text", "PersonnelFilter.ADMINISTRATOR_TRANSPORT.toolTipText", false, true),
     ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false, true),
+    DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
     //endregion Standard Personnel Filters
 
     //region Expanded Personnel Tab Filters
-    DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText", false, false),
     FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
     INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
@@ -313,57 +314,34 @@ public enum PersonnelFilter {
     //endregion Boolean Comparison Methods
 
     public static List<PersonnelFilter> getStandardPersonnelFilters() {
-        List<PersonnelFilter> standardFilters = new ArrayList<>();
-        for (PersonnelFilter filter : values()) {
-            if (filter.isBaseline() || filter.isStandard()) {
-                standardFilters.add(filter);
-            }
-        }
-        return standardFilters;
+        return Stream.of(values()).filter(filter -> filter.isBaseline() || filter.isStandard())
+                .collect(Collectors.toList());
     }
 
     public static List<PersonnelFilter> getExpandedPersonnelFilters() {
-        List<PersonnelFilter> expandedFilters = new ArrayList<>();
-        for (PersonnelFilter filter : values()) {
-            if (filter.isBaseline() || !filter.isIndividualRole()) {
-                expandedFilters.add(filter);
-            }
-        }
-        return expandedFilters;
+        return Stream.of(values()).filter(filter -> filter.isBaseline() || !filter.isIndividualRole())
+                .collect(Collectors.toList());
     }
 
     public static List<PersonnelFilter> getIndividualRolesStandardPersonnelFilters() {
-        List<PersonnelFilter> individualRolesStandardFilters = new ArrayList<>();
-        for (PersonnelFilter filter : values()) {
-            if (filter.isBaseline() || filter.isIndividualRole()) {
-                individualRolesStandardFilters.add(filter);
-            }
-        }
-        return individualRolesStandardFilters;
+        return Stream.of(values()).filter(filter -> filter.isBaseline() || filter.isIndividualRole())
+                .collect(Collectors.toList());
     }
 
     public static List<PersonnelFilter> getIndividualRolesExpandedPersonnelFilters() {
-        List<PersonnelFilter> individualRolesExpandedFilters = new ArrayList<>();
-        for (PersonnelFilter filter : values()) {
-            if (filter.isBaseline() || !filter.isStandard() || filter.isIndividualRole()) {
-                individualRolesExpandedFilters.add(filter);
-            }
-        }
-        return individualRolesExpandedFilters;
+        return Stream.of(values())
+                .filter(filter -> filter.isBaseline() || !filter.isStandard() || filter.isIndividualRole())
+                .collect(Collectors.toList());
     }
 
     public static List<PersonnelFilter> getAllStandardFilters() {
-        List<PersonnelFilter> allStandardFilters = new ArrayList<>();
-        for (PersonnelFilter filter : values()) {
-            if (filter.isBaseline() || filter.isStandard() || filter.isIndividualRole()) {
-                allStandardFilters.add(filter);
-            }
-        }
-        return allStandardFilters;
+        return Stream.of(values())
+                .filter(filter -> filter.isBaseline() || filter.isStandard() || filter.isIndividualRole())
+                .collect(Collectors.toList());
     }
 
     public static List<PersonnelFilter> getAllIndividualRoleFilters() {
-        return new ArrayList<>(Arrays.asList(values()));
+        return Arrays.asList(values());
     }
 
     public boolean getFilteredInformation(final Person person) {
