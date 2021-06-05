@@ -349,7 +349,7 @@ public class Scenario implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
     }
 
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         //do nothing
     }
 
@@ -394,7 +394,7 @@ public class Scenario implements Serializable {
                 retVal = (Scenario) Class.forName(className).newInstance();
             }
 
-            retVal.loadFieldsFromXmlNode(wn);
+            retVal.loadFieldsFromXmlNode(wn, version);
             retVal.scenarioObjectives = new ArrayList<>();
 
             // Okay, now load Part-specific fields!

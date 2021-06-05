@@ -34,24 +34,25 @@ import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import megamek.client.ui.preferences.PreferencesNode;
 
+import javax.swing.*;
+
 /**
  * @author  Taharqa
  */
 public class CustomizeMissionDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
 
-    /** Creates new form NewTeamDialog */
-    public CustomizeMissionDialog(java.awt.Frame parent, boolean modal, Mission m, Campaign c) {
+    public CustomizeMissionDialog(JFrame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
-        if(null == m) {
-        	mission = new Mission("New Mission");
-        	newMission = true;
+        if (null == m) {
+            mission = new Mission("New Mission");
+            newMission = true;
         } else {
-        	mission = m;
-        	newMission = false;
+            mission = m;
+            newMission = false;
         }
         campaign = c;
         initComponents();
@@ -60,8 +61,12 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         pack();
     }
 
+    public Mission getMission() {
+        return mission;
+    }
+
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
@@ -194,36 +199,30 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+        mission.setName(txtName.getText());
+        mission.setType(txtType.getText());
 
-    	mission.setName(txtName.getText());
-    	mission.setType(txtType.getText());
-
-    	PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
+        PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                 campaign.getLocalDate());
 
-    	if (canonSystem != null) {
-    	    mission.setSystemId(canonSystem.getId());
-    	} else {
-    	    mission.setSystemId(null);
-    	    mission.setLegacyPlanetName(suggestPlanet.getText());
-    	}
+        if (canonSystem != null) {
+            mission.setSystemId(canonSystem.getId());
+        } else {
+            mission.setSystemId(null);
+            mission.setLegacyPlanetName(suggestPlanet.getText());
+        }
 
-    	mission.setDesc(txtDesc.getText());
-    	if (newMission) {
-    		campaign.addMission(mission);
-    	}
-    	this.setVisible(false);
-    }
-
-    public int getMissionId() {
-    	return mission.getId();
+        mission.setDesc(txtDesc.getText());
+        if (newMission) {
+            campaign.addMission(mission);
+        }
+        this.setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	this.setVisible(false);
+        this.setVisible(false);
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
@@ -232,9 +231,5 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtType;
     private MarkdownEditorPanel txtDesc;
     private javax.swing.JLabel lblPlanetName;
-	private JSuggestField suggestPlanet;
-
-
-    // End of variables declaration//GEN-END:variables
-
+    private JSuggestField suggestPlanet;
 }

@@ -28,12 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -171,7 +173,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public int getMapY() {
         return getMapSizeY();
     }
-    
+
     @Override
     public void setMapSize() {
         AtBDynamicScenarioFactory.setScenarioMapSize(this);
@@ -411,24 +413,28 @@ public class AtBDynamicScenario extends AtBScenario {
         // in its current state
         if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
+            
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
         }
 
         super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 template = ScenarioTemplate.Deserialize(wn2);
+            } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
+                setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
             }
         }
 
-        super.loadFieldsFromXmlNode(wn);
+        super.loadFieldsFromXmlNode(wn, version);
     }
 
     @Override

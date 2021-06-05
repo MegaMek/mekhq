@@ -416,6 +416,10 @@ public class Campaign implements Serializable, ITechManager {
         return forces;
     }
 
+    public List<Force> getAllForces() {
+        return new ArrayList<>(forceIds.values());
+    }
+
     public void importLance(Lance l) {
         lances.put(l.getForceId(), l);
     }
@@ -982,7 +986,7 @@ public class Campaign implements Serializable, ITechManager {
     public void addScenario(Scenario s, Mission m) {
         addScenario(s, m, false);
     }
-    
+
     /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
      * that it is a new scenario. It then adds the scenario to the scenarioId hash.
@@ -3541,7 +3545,7 @@ public class Campaign implements Serializable, ITechManager {
             u.remove(person, true);
         }
         removeAllPatientsFor(person);
-        removeAllTechJobsFor(person);
+        person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
 
@@ -3627,30 +3631,6 @@ public class Campaign implements Serializable, ITechManager {
                     && p.getDoctorId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
                         .getNaturalHealingWaitingPeriod());
-            }
-        }
-    }
-
-    public void removeAllTechJobsFor(Person tech) {
-        if (tech == null || tech.getId() == null) {
-            return;
-        }
-        getHangar().forEachUnit(u -> {
-            if (tech.equals(u.getTech())) {
-                u.removeTech();
-            }
-            if ((u.getRefit() != null) && tech.equals(u.getRefit().getTech())) {
-                u.getRefit().setTech(null);
-            }
-        });
-        for (Part p : getParts()) {
-            if (tech.equals(p.getTech())) {
-                p.setTech(null);
-            }
-        }
-        for (Force f : forceIds.values()) {
-            if (tech.getId().equals(f.getTechID())) {
-                f.setTechID(null);
             }
         }
     }
@@ -4081,12 +4061,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        if (!getCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
-        }
-        if (!getCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
-        }
+        getCamouflage().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
@@ -4377,10 +4352,6 @@ public class Campaign implements Serializable, ITechManager {
         this.rankSystem = rankSystem;
     }
     //endregion Ranks
-
-    public ArrayList<Force> getAllForces() {
-        return new ArrayList<>(forceIds.values());
-    }
 
     public void setFinances(Finances f) {
         finances = f;
@@ -4987,6 +4958,12 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
+            }
+            
+            // like repairs, per CamOps page 208 extra time gives a
+            // reduction to the TN based on x2, x3, x4
+            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
             }
         }
 
@@ -6042,27 +6019,25 @@ public class Campaign implements Serializable, ITechManager {
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
             if (getCampaignOptions().getOverageRepaymentInFinalPayment()
-                    && (contract.getSalvagePct() < 100)) {
-                Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
-                double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
-                double salvagePercent = contract.getSalvagePct() / 100.0;
-
-                if (salvagePercent < percentSalvaged) {
-                    Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
+                    && (contract.getSalvagePct() < 100.0)) {
+                final double salvagePercent = contract.getSalvagePct() / 100.0;
+                final Money maxSalvage = contract.getSalvagedByEmployer().multipliedBy(salvagePercent / (1 - salvagePercent));
+                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
+                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
                     contract.subtractSalvageByUnit(amountToRepay);
                 }
             }
 
             if (remainingMoney.isPositive()) {
-                finances.credit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), getLocalDate());
                 addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract " + contract.getName());
             } else if (remainingMoney.isNegative()) {
-                finances.debit(remainingMoney, Transaction.C_CONTRACT,
+                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
                         "Repaying payment overages for " + contract.getName(), getLocalDate());
-                addReport("Your account has been debited for " + remainingMoney.toAmountAndSymbolString()
+                addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
             }
 

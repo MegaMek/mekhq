@@ -53,8 +53,6 @@ public class StratconCampaignState {
     private double globalOpforBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
-    private int pendingStrategicObjectiveCount;
-    private int completedStrategicObjectiveCount;
     private String briefingText; 
     private boolean strategicObjectivesBehaveAsVPs;
     
@@ -151,42 +149,6 @@ public class StratconCampaignState {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }
 
-    public int getPendingStrategicObjectiveCount() {
-        return pendingStrategicObjectiveCount;
-    }
-
-    public void setPendingStrategicObjectiveCount(int pendingStrategicObjectiveCount) {
-        this.pendingStrategicObjectiveCount = pendingStrategicObjectiveCount;
-    }
-    
-    public void incrementPendingStrategicObjectiveCount(int increment) {
-        pendingStrategicObjectiveCount += increment;
-    }
-    
-    public void incrementPendingStrategicObjectiveCount() {
-        pendingStrategicObjectiveCount++;
-    }
-    
-    public int getStrategicObjectiveCompletedCount() {
-        return completedStrategicObjectiveCount;
-    }
-    
-    public void incrementStrategicObjectiveCompletedCount() {
-        completedStrategicObjectiveCount++;
-    }
-    
-    public void decrementStrategicObjectiveCompletedCount() {
-        completedStrategicObjectiveCount--;
-    }
-    
-    public void incrementStrategicObjectiveCompletedCount(int increment) {
-        completedStrategicObjectiveCount += increment;
-    }
-    
-    public void decrementStrategicObjectiveCompletedCount(int decrement) {
-        completedStrategicObjectiveCount -= decrement;
-    }
-    
     public void useSupportPoint() {
         supportPoints--;
     }
