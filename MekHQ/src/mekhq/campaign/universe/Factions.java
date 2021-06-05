@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,19 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,21 +45,23 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
 public class Factions {
+    //region Variable Declarations
     private static Factions instance;
 
     private Map<String, Faction> factions = new HashMap<>();
-    private Map<Integer, Faction> factionIdMap = new HashMap<>();
-    private List<String> choosableFactionCodes = Collections.singletonList("MERC");
 
     private RATGenerator ratGenerator;
+    //endregion Variable Declarations
 
-    public Factions() {
+    //region Constructors
+    private Factions() {
         this(RATGenerator.getInstance());
     }
 
-    public Factions(RATGenerator ratGenerator) {
+    private Factions(final RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
+    //endregion Constructors
 
     public static Factions getInstance() {
         if (instance == null) {
@@ -83,14 +83,8 @@ public class Factions {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
 
-    public List<String> getChoosableFactionCodes() {
-        return choosableFactionCodes;
-    }
-
-    public void setChoosableFactionCodes(String... choosableFactionCodes) {
-        if (choosableFactionCodes.length > 0) {
-            this.choosableFactionCodes = Arrays.asList(choosableFactionCodes);
-        }
+    public List<Faction> getChoosableFactions() {
+        return getFactions().stream().filter(Faction::isPlayable).collect(Collectors.toList());
     }
 
     public Collection<Faction> getFactions() {
@@ -110,10 +104,6 @@ public class Factions {
         }
     }
 
-    public Faction getFactionFromFullName(String fname, int year) {
-        return getFactionFromFullNameAndYear(fname, year);
-    }
-
     public Faction getFactionFromFullNameAndYear(String fname, int year) {
         Faction faction = null;
         for (Faction f : factions.values()) {
@@ -128,21 +118,21 @@ public class Factions {
     /**
      * Helper function that gets the faction record for the specified faction, or a
      * fallback general faction record. Useful for RAT generator activity.
-     * 
+     *
      * @param faction The faction whose MegaMek faction record to retrieve.
      * @return Found faction record or null.
      */
     public FactionRecord getFactionRecordOrFallback(String faction) {
-        FactionRecord fRec = ratGenerator.getFaction(faction);
+        FactionRecord fRec = getRATGenerator().getFaction(faction);
         if (fRec == null) {
             Faction f = getFaction(faction);
             if (f != null) {
                 if (f.isPeriphery()) {
-                    fRec = ratGenerator.getFaction("Periphery");
+                    fRec = getRATGenerator().getFaction("Periphery");
                 } else if (f.isClan()) {
-                    fRec = ratGenerator.getFaction("CLAN");
+                    fRec = getRATGenerator().getFaction("CLAN");
                 } else {
-                    fRec = ratGenerator.getFaction("IS");
+                    fRec = getRATGenerator().getFaction("IS");
                 }
             }
 
@@ -154,20 +144,15 @@ public class Factions {
         return fRec;
     }
 
-    public String getFactionCode(int faction) {
-        Faction f = factionIdMap.get(faction);
-        return (null != f) ? f.getShortName() : "IND";
-    }
-
     /**
      * Loads the default Factions data.
-     * 
+     *
      * @throws DOMException
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws SAXException
      */
-    public static Factions loadDefault() 
+    public static Factions loadDefault()
             throws DOMException, SAXException, IOException, ParserConfigurationException {
         MekHQ.getLogger().info("Starting load of faction data from XML...");
 
@@ -180,9 +165,9 @@ public class Factions {
 
     /**
      * Loads Factions data from a file.
-     * 
+     *
      * @param factionsPath The path to the XML file containing Factions data.
-     * 
+     *
      * @throws DOMException
      * @throws ParserConfigurationException
      * @throws IOException
@@ -220,33 +205,17 @@ public class Factions {
             int xc = wn.getNodeType();
 
             if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("faction")) {
-                    Faction f = Faction.getFactionFromXML(wn);
-                    if (!retVal.factions.containsKey(f.getShortName())) {
-                        retVal.factions.put(f.getShortName(), f);
-                        if (null != f.getId()) {
-                            if (!retVal.factionIdMap.containsKey(f.getId())) {
-                                retVal.factionIdMap.put(f.getId(), f);
-                            } else {
-                                MekHQ.getLogger().error(
-                                        String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
-                                                f.getId(), retVal.factionIdMap.get(f.getId()).getFullName(0),
-                                                f.getFullName(0)));
-                            }
-                        }
+                    Faction faction = Faction.getFactionFromXML(wn);
+                    if (!retVal.factions.containsKey(faction.getShortName())) {
+                        retVal.factions.put(faction.getShortName(), faction);
                     } else {
                         MekHQ.getLogger().error(
                                 String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                        f.getShortName(), retVal.factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
+                                        faction.getShortName(), retVal.factions.get(faction.getShortName()).getFullName(0), faction.getFullName(0)));
                     }
-                } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
-                    retVal.setChoosableFactionCodes(wn.getTextContent().split(","));
                 }
             }
         }

@@ -105,9 +105,9 @@ public class RandomFactionGenerator {
         borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
         MekHQ.registerHandler(borderTracker);
         MekHQ.registerHandler(this);
-        for (Faction f : Factions.getInstance().getFactions()) {
-            if (factionHints.isDeepPeriphery(f)) {
-                borderTracker.setBorderSize(f, BORDER_RANGE_DEEP_PERIPHERY);
+        for (final Faction faction : Factions.getInstance().getFactions()) {
+            if (faction.isDeepPeriphery()) {
+                borderTracker.setBorderSize(faction, BORDER_RANGE_DEEP_PERIPHERY);
             }
         }
     }
@@ -285,7 +285,7 @@ public class RandomFactionGenerator {
             return enemy.getShortName();
         }
 
-        MekHQ.getLogger().error("Could not find enemy for " + employerName); //$NON-NLS-1$
+        MekHQ.getLogger().error("Could not find enemy for " + employerName);
 
         // Fallback; there are always pirates.
         return "PIR";

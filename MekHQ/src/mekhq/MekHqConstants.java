@@ -21,6 +21,10 @@
 package mekhq;
 
 public final class MekHqConstants {
+    // This is used in creating the name of save files, e.g. the MekHQ campaign file
+    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
+    public static final int MAXIMUM_D6_VALUE = 6;
+
     //region MekHQ Options
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
@@ -116,6 +120,8 @@ public final class MekHqConstants {
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
+    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String RATINFO_DIR = "data/universe/ratdata";
     public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Type/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
@@ -124,16 +130,8 @@ public final class MekHqConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
-    //endregion File Paths
 
-    // This is used in creating the name of save files, e.g. the MekHQ campaign file
-    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
-
-    public static final int MAXIMUM_D6_VALUE = 6;
-
-    /**
-     * Paths to StratCon definition files
-     */
+    //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
     public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
     public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
@@ -149,10 +147,8 @@ public final class MekHqConstants {
     public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
     public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
     public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
-
-    public static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    public static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
-
+    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
+    public static final String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
     public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
@@ -166,5 +162,6 @@ public final class MekHqConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
-
+    //endregion StratCon
+    //endregion File Paths
 }
