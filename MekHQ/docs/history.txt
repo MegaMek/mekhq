@@ -31,6 +31,8 @@ VERSION HISTORY:
 + Issue #2661: Can no longer select the same unit across multiple selectors in StratCon scenario management UI.
 + Issue #2548: Making ROM Designation and Manei Domini Class and Rank part of the rank system data
 + Issue #2529: Fixing refit display so it no longer includes the pilot's BV
++ PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
++ PR #2540: Factions Data Customizability Expansion and Cleanup
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
