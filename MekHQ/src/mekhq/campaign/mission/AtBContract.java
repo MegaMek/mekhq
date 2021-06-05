@@ -344,6 +344,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public static boolean isMinorPower(final String factionCode) {
+        // TODO : Windchild move me to AtBContractMarket
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         return !faction.isMajorOrSuperPower() && !faction.isClan();
     }

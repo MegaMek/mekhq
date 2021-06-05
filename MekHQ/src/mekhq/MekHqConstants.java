@@ -21,6 +21,10 @@
 package mekhq;
 
 public final class MekHqConstants {
+    // This is used in creating the name of save files, e.g. the MekHQ campaign file
+    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
+    public static final int MAXIMUM_D6_VALUE = 6;
+
     //region MekHQ Options
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
@@ -111,11 +115,6 @@ public final class MekHqConstants {
     //endregion Miscellaneous Options
     //endregion MekHQ Options
 
-    // This is used in creating the name of save files, e.g. the MekHQ campaign file
-    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
-
-    public static final int MAXIMUM_D6_VALUE = 6;
-
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
@@ -123,6 +122,14 @@ public final class MekHqConstants {
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String RATINFO_DIR = "data/universe/ratdata";
+    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Type/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
+    public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
+    public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_PATH = "Pieces/Alphanumerics/";
+    public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
+    public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
+    public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
+    public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
 
     //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
