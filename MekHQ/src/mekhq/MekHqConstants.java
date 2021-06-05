@@ -116,6 +116,14 @@ public final class MekHqConstants {
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
+    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Type/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
+    public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
+    public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_PATH = "Pieces/Alphanumerics/";
+    public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
+    public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
+    public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
+    public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
     //endregion File Paths
 
     // This is used in creating the name of save files, e.g. the MekHQ campaign file
@@ -126,7 +134,6 @@ public final class MekHqConstants {
     /**
      * Paths to StratCon definition files
      */
-
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
     public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
     public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
