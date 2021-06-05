@@ -1865,7 +1865,7 @@ public class AtBDynamicScenarioFactory {
         int actualDestinationEdge = forceTemplate.getDestinationZone();
 
         // set the 'auto flee' flag to true if the bot has a destination edge
-        if (actualDestinationEdge != CardinalEdge.NEAREST_OR_NONE.ordinal()) {
+        if (actualDestinationEdge != CardinalEdge.NONE.getIndex()) {
             force.getBehaviorSettings().setAutoFlee(true);
         }
 
