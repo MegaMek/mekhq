@@ -935,9 +935,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             mods.append(unit.getSiteMod());
             if (unit.getEntity().hasQuirk("easy_maintain")) {
                 mods.addModifier(-1, "easy to maintain");
-            }
-            else if (unit.getEntity().hasQuirk("difficult_maintain")) {
+            } else if (unit.getEntity().hasQuirk("difficult_maintain")) {
                 mods.addModifier(1, "difficult to maintain");
+            }
+            if (unit.hasPrototypeTSM() &&
+                    ((this instanceof MekLocation)
+                    || (this instanceof MissingMekLocation)
+                    || (this instanceof MekActuator)
+                    || (this instanceof MissingMekActuator))) {
+                mods.addModifier(2, "prototype TSM");
             }
         }
         if (isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
