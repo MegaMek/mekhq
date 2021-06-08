@@ -413,10 +413,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /**
      * Sets the number of hits on the part.
-     * 
+     *
      * NOTE: It is the caller's responsibilty to update the condition
      * of the part and any attached unit.
-     * 
+     *
      * @param hits The number of hits on the part.
      */
     public void setHits(int hits) {
@@ -991,6 +991,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                         && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
                     mods.addModifier(2, "Clan tech");
                 }
+            }
+
+            if (getUnit().hasPrototypeTSM()) {
+                mods.addModifier(1, "prototype TSM");
             }
         }
 
