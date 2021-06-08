@@ -599,7 +599,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_F);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech)newUnit.getEntity()).hasTSM() != ((Mech)oldUnit.getEntity()).hasTSM()) {
+                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
                     updateRefitClass(CLASS_E);
                 } else {
                     updateRefitClass(CLASS_F);
