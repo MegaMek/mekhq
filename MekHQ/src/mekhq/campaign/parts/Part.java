@@ -849,7 +849,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public int getActualTime() {
-        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+        double time = getBaseTime() * mode.timeMultiplier;
+        if ((getUnit() != null) && (getUnit().hasPrototypeTSM())) {
+            time *= 2;
+        }
+        return (int) Math.ceil(time);
     }
 
     @Override

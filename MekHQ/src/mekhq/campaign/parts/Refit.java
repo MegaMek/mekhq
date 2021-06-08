@@ -1015,6 +1015,9 @@ public class Refit extends Part implements IAcquisitionWork {
             // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
             cost = oldUnit.getBuyCost().multipliedBy(0.1);
         }
+        if (oldUnit.hasPrototypeTSM() || newUnit.hasPrototypeTSM()) {
+            time *= 2;
+        }
     }
 
     public void begin() throws EntityLoadingException, IOException {
