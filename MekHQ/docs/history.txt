@@ -33,6 +33,7 @@ VERSION HISTORY:
 + Issue #2529: Fixing refit display so it no longer includes the pilot's BV
 + PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
 + PR #2540: Factions Data Customizability Expansion and Cleanup
++ PR #2677: Ignorable Nag Dialogs
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
