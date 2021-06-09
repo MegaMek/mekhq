@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -29,7 +29,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
-import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying active loans
@@ -47,8 +46,6 @@ public class LoanTableModel extends DataTableModel {
     public final static int COL_NLEFT      =   7;
     public final static int COL_NEXT_PAY   =   8;
     public final static int N_COL            = 9;
-
-    private static final transient MekHqColors colors = new MekHqColors();
 
     public LoanTableModel() {
         data = new ArrayList<Loan>();
@@ -175,8 +172,8 @@ public class LoanTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (loan.isOverdue()) {
-                    colors.getLoanOverdue().getColor().ifPresent(this::setBackground);
-                    colors.getLoanOverdue().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getLoanOverdueForeground());
+                    setBackground(MekHQ.getMekHQOptions().getLoanOverdueBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }

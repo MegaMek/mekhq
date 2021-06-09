@@ -4,6 +4,8 @@ Each Rank System consists of the following fields:
 Code: The unique String code for the system.
 Name: The display name for the system.
 Description: The display description for the system.
+useROMDesignation: The system uses ROM branch designations.
+useManeiDomini: The system uses Manei Domini Class and Rank designations.
 Rank:
 	Rank Names: An array of names or alternatives for the rank based on the individual professions.
 	Officer: Whether the rank is considered to be an officer.
@@ -2614,6 +2616,7 @@ Rank:
 		<code>CG</code>
 		<name>Com Guard</name>
 		<description>This is the rank system used by the Com Guard.</description>
+		<useROMDesignation>true</useROMDesignation>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH,--ADMIN</rankNames>
 			<officer>false</officer>
@@ -2874,6 +2877,8 @@ Rank:
 		<code>WOBM</code>
 		<name>Word of Blake Militia</name>
 		<description>This is the rank system used by the Word of Blake Militia.</description>
+		<useROMDesignation>true</useROMDesignation>
+		<useManeiDomini>true</useManeiDomini>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH,--ADMIN</rankNames>
 			<officer>false</officer>

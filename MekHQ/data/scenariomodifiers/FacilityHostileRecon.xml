@@ -30,9 +30,10 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-			<additionalDetail>End a unit's turn within 4 hexes of one of the designated buildings and forego firing or physical attacks to conduct a scan.</additionalDetail>
-			<additionalDetail>Units with active probes, the improved sensors quirk or sensor geek SPA can fire and conduct physical attacks while scanning.</additionalDetail>
+			<additionalDetail>Scans may be conducted by moving a unit within three hexes of the target and foregoing all attacks.</additionalDetail>
+                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
 			<additionalDetail>Scans cannot be conducted on destroyed buildings.</additionalDetail>
+			<additionalDetail>Note: This objective needs to be tracked outside of MegaMek.</additionalDetail>
 		</additionalDetails>
             <description>Scan the buildings designated by placed turrets.</description>
             <destinationEdge>NONE</destinationEdge>

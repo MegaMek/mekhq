@@ -599,7 +599,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_F);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech)newUnit.getEntity()).hasTSM() != ((Mech)oldUnit.getEntity()).hasTSM()) {
+                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
                     updateRefitClass(CLASS_E);
                 } else {
                     updateRefitClass(CLASS_F);
@@ -1014,6 +1014,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
             cost = oldUnit.getBuyCost().multipliedBy(0.1);
+        }
+        if (oldUnit.hasPrototypeTSM() || newUnit.hasPrototypeTSM()) {
+            time *= 2;
         }
     }
 

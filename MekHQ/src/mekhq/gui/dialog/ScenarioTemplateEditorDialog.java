@@ -157,11 +157,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     static {
         destinationZoneMapping = new HashMap<>();
-        destinationZoneMapping.put(0, CardinalEdge.NORTH.ordinal());
-        destinationZoneMapping.put(1, CardinalEdge.EAST.ordinal());
-        destinationZoneMapping.put(2, CardinalEdge.SOUTH.ordinal());
-        destinationZoneMapping.put(3, CardinalEdge.WEST.ordinal());
-        destinationZoneMapping.put(4, CardinalEdge.NEAREST_OR_NONE.ordinal());
+        destinationZoneMapping.put(0, CardinalEdge.NORTH.getIndex());
+        destinationZoneMapping.put(1, CardinalEdge.EAST.getIndex());
+        destinationZoneMapping.put(2, CardinalEdge.SOUTH.getIndex());
+        destinationZoneMapping.put(3, CardinalEdge.WEST.getIndex());
+        destinationZoneMapping.put(4, CardinalEdge.NONE.getIndex());
         destinationZoneMapping.put(5, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
         destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
     }
@@ -416,7 +416,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblDestinationZones, gbc);
 
         cboDestinationZone = new JComboBox<String>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
-        cboDestinationZone.setSelectedIndex(CardinalEdge.NEAREST_OR_NONE.ordinal());
+        cboDestinationZone.setSelectedIndex(CardinalEdge.NONE.getIndex());
         gbc.gridx = 1;
         forcedPanel.add(cboDestinationZone, gbc);
 

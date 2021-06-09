@@ -297,7 +297,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
-        txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand = new JLabel(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         txtCommand.setName("txtCommand");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -326,7 +327,8 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             ContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
-                    txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+                    txtCommand.setText(contract.getCommandRights().toString());
+                    txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);

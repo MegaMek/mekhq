@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
@@ -695,16 +696,15 @@ public class GMToolsDialog extends AbstractMHQDialog {
      * faction.
      */
     private int findInitialSelectedFaction(List<FactionDisplay> factionChoices) {
-        String factionId = (getPerson() != null)
-                ? getPerson().getOriginFaction().getShortName()
-                : getGUI().getCampaign().getFactionCode();
-        if ((factionId == null) || factionId.isEmpty()) {
+        final Faction faction = (getPerson() != null)
+                ? getPerson().getOriginFaction() : getGUI().getCampaign().getFaction();
+        if (faction == null) {
             return 0;
         }
 
         int index = 0;
         for (FactionDisplay factionChoice : factionChoices) {
-            if (factionChoice.id.equalsIgnoreCase(factionId)) {
+            if (factionChoice.getFaction().equals(faction)) {
                 return index;
             }
 
@@ -822,7 +822,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private MechSummary performRollRat() {
         try {
             IUnitGenerator ug = getGUI().getCampaign().getUnitGenerator();
-            int unitType = UnitType.determineUnitTypeCode((String) comboUnitType.getSelectedItem());
+            int unitType = UnitType.determineUnitTypeCode(comboUnitType.getSelectedItem());
             int unitWeight = comboUnitWeight.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
             if (!comboUnitWeight.isEnabled()) {
                 unitWeight = AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
@@ -835,7 +835,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                     (!campaign.getCampaignOptions().limitByYear() || (targetYear > ms.getYear()))
                             && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
                             && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
-            MechSummary ms = ug.generate(((FactionChoice) Objects.requireNonNull(comboFaction.getSelectedItem())).id,
+            MechSummary ms = ug.generate(Objects.requireNonNull(comboFaction.getSelectedItem()).getFaction().getShortName(),
                     unitType, unitWeight, targetYear, unitQuality, test);
             if (ms != null) {
                 lblUnitPicked.setText(ms.getName());
@@ -845,6 +845,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             lblUnitPicked.setText(Messages.getString("invalidYear.error"));
             return null;
         }
+
         lblUnitPicked.setText(Messages.getString("noValidUnit.error"));
         return null;
     }
@@ -896,7 +897,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         if (ethnicCode == 0) {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
                     (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(),
-                    ((FactionChoice) Objects.requireNonNull(nameGeneratorFactionPicker.getSelectedItem())).id);
+                    ((FactionChoice) Objects.requireNonNull(nameGeneratorFactionPicker.getSelectedItem()))
+                            .getFaction().getShortName());
         } else {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplitWithEthnicCode(
                     (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(), ethnicCode);

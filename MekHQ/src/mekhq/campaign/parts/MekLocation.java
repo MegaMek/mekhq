@@ -111,49 +111,51 @@ public class MekLocation extends Part {
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
-        switch(loc) {
-        case(Mech.LOC_HEAD):
-            this.name = "Mech Head";
-            break;
-        case(Mech.LOC_CT):
-            this.name = "Mech Center Torso";
-            break;
-        case(Mech.LOC_LT):
-            this.name = "Mech Left Torso";
-            break;
-        case(Mech.LOC_RT):
-            this.name = "Mech Right Torso";
-            break;
-        case(Mech.LOC_LARM):
-            this.name = "Mech Left Arm";
-            if (forQuad) {
-                this.name = "Mech Front Left Leg";
-            }
-            break;
-        case(Mech.LOC_RARM):
-            this.name = "Mech Right Arm";
-            if (forQuad) {
-                this.name = "Mech Front Right Leg";
-            }
-            break;
-        case(Mech.LOC_LLEG):
-            this.name = "Mech Left Leg";
-            if (forQuad) {
-                this.name = "Mech Rear Left Leg";
-            }
-            break;
-        case(Mech.LOC_RLEG):
-            this.name = "Mech Right Leg";
-            if (forQuad) {
-                this.name = "Mech Rear Right Leg";
-            }
-            break;
+        switch (loc) {
+            case(Mech.LOC_HEAD):
+                this.name = "Mech Head";
+                break;
+            case(Mech.LOC_CT):
+                this.name = "Mech Center Torso";
+                break;
+            case(Mech.LOC_LT):
+                this.name = "Mech Left Torso";
+                break;
+            case(Mech.LOC_RT):
+                this.name = "Mech Right Torso";
+                break;
+            case(Mech.LOC_LARM):
+                this.name = "Mech Left Arm";
+                if (forQuad) {
+                    this.name = "Mech Front Left Leg";
+                }
+                break;
+            case(Mech.LOC_RARM):
+                this.name = "Mech Right Arm";
+                if (forQuad) {
+                    this.name = "Mech Front Right Leg";
+                }
+                break;
+            case(Mech.LOC_LLEG):
+                this.name = "Mech Left Leg";
+                if (forQuad) {
+                    this.name = "Mech Rear Left Leg";
+                }
+                break;
+            case(Mech.LOC_RLEG):
+                this.name = "Mech Right Leg";
+                if (forQuad) {
+                    this.name = "Mech Rear Right Leg";
+                }
+                break;
         }
+
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType, isClan()) + ")";
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType, clan) + ")";
         } else if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
             this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
+
         if (tsm) {
             this.name += " (TSM)";
         }
