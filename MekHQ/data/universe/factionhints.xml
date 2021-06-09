@@ -19,12 +19,8 @@ War, alliance, and rivals nodes each have optional name, start, and end attribut
 <neutral> nodes work like the inverse of alliance nodes. The faction named in the required "faction" atribute is considered to be allied with all factions not explicitly named by one or more <exception> tags. The <neutral> tag does not take start or end dates, but the <exception> tags may.
 
 <location> nodes have the same optional name, start, and end attributes as <war>, <alliance>, and <rivals> tags. The faction that controls the space in question is marked as <outer> and the faction contained within that space is marked as <inner>. An optional <fraction> tag indicates what portion of the outer faction's border should be apportioned to the inner faction. If empty, the full border is apportioned to both. The optional <opponents> tag restricts attacks by and against the inner faction to those listed (e.g. during Operation Bulldog, SL forces within the DC attack only Smoke Jaguar and not DC or any of its neighbors, and DC and its neighbors (other than SJ) do not attack SL forces).
-
-There are also some minor tags that appear only at the beginning of the file that are used in contract generation.
 -->
 <factionHints>
- <deepPeriphery>HL,CI,NC,UC,KE,JF,TD,</deepPeriphery>
- <majorPowers>CC,DC,FS,FWL,LA,FC,TH</majorPowers>
  <neutral faction="CS">
  	<exceptions>PIR,TD,GV,MV,BoS,MM,WOB,IND,PIND</exceptions>
 	<exceptions end="3012-01-01">OC</exceptions>

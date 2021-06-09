@@ -161,33 +161,25 @@ public class ContractMarket implements Serializable {
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
         if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
                 || newCampaign) {
-			Contract[] list = contracts.toArray(new Contract[contracts.size()]);
-			for (Contract c : list) {
-				removeContract(c);
-			}
+            // need to copy to prevent concurrent modification errors
+            new ArrayList<>(contracts).forEach(this::removeContract);
 
-			int unitRatingMod = campaign.getUnitRatingMod();
+            int unitRatingMod = campaign.getUnitRatingMod();
 
-			for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
-			}
+            }
 
-			int numContracts = Compute.d6() - 4 + unitRatingMod;
+            int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-			Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
-			boolean inMinorFaction = true;
-			for (Faction f : currentFactions) {
-				if (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(f)
-                        || f.isClan()) {
-					inMinorFaction = false;
-					break;
-				}
-			}
-			if (inMinorFaction) {
-				numContracts--;
-			}
+            Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
+            final boolean inMinorFaction = currentFactions.stream().noneMatch(faction ->
+                    faction.isISMajorOrSuperPower() || faction.isClan());
+            if (inMinorFaction) {
+                numContracts--;
+            }
 
-			boolean inBackwater = true;
+            boolean inBackwater = true;
             if (currentFactions.size() > 1) {
                 // More than one faction, if any is *not* periphery, we're not in backwater either
                 for (Faction f : currentFactions) {
@@ -351,8 +343,7 @@ public class ContractMarket implements Serializable {
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
-                RandomFactionGenerator.getInstance().getFactionHints()
-                        .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
+                Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING) {
             contract.setEnemyCode("PIR");
@@ -438,8 +429,7 @@ public class ContractMarket implements Serializable {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
-                RandomFactionGenerator.getInstance().getFactionHints()
-                    .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
+                Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
             contract.setEnemyCode("PIR");
@@ -737,8 +727,7 @@ public class ContractMarket implements Serializable {
             mods.mods[i] += missionMods[contract.getMissionType()][i];
         }
 
-        if (RandomFactionGenerator.getInstance().getFactionHints()
-                .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))) {
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()) {
             mods.mods[CLAUSE_SALVAGE] += -1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
         }

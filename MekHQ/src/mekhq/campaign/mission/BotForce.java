@@ -91,8 +91,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         } catch (PrincessException ex) {
             MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
         }
-        behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
-        behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
+        behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
+        behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
     }
 
     /* Convert from MM's Board to Princess's HomeEdge */
@@ -117,7 +117,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             case Board.START_ANY:
                 return CardinalEdge.getCardinalEdge(Compute.randomInt(4));
             default:
-                return CardinalEdge.NEAREST_OR_NONE;
+                return CardinalEdge.NONE;
         }
     }
 
