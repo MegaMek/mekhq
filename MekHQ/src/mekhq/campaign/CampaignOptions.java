@@ -80,10 +80,6 @@ public class CampaignOptions implements Serializable {
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
 
-    public static final int REPAIR_SYSTEM_STRATOPS = 0;
-    public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
@@ -91,9 +87,6 @@ public class CampaignOptions implements Serializable {
     //endregion Magic Numbers and Constants
 
     //region Unlisted Variables
-    private int repairSystem;
-    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"}; // FIXME: This needs to be localized
-
     //Mass Repair/Salvage Options
     private boolean massRepairUseRepair;
     private boolean massRepairUseSalvage;
@@ -420,8 +413,6 @@ public class CampaignOptions implements Serializable {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
         //region Unlisted Variables
-        repairSystem = REPAIR_SYSTEM_STRATOPS;
-
         //Mass Repair/Salvage Options
         massRepairUseRepair = true;
         massRepairUseSalvage = true;
@@ -1974,10 +1965,6 @@ public class CampaignOptions implements Serializable {
     //endregion Contract Market
     //endregion Markets Tab
 
-    public static String getRepairSystemName(int repairSystem) {
-        return REPAIR_SYSTEM_NAMES[repairSystem];
-    }
-
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
             case TECH_INTRO:
@@ -2030,14 +2017,6 @@ public class CampaignOptions implements Serializable {
 
     public void setResetToFirstTech(boolean resetToFirstTech) {
         this.resetToFirstTech = resetToFirstTech;
-    }
-
-    public int getRepairSystem() {
-        return repairSystem;
-    }
-
-    public void setRepairSystem(int i) {
-        this.repairSystem = i;
     }
 
     /**
@@ -3102,7 +3081,6 @@ public class CampaignOptions implements Serializable {
         //endregion Repair and Maintenance Tab
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
@@ -3465,8 +3443,6 @@ public class CampaignOptions implements Serializable {
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                 retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
-                retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
                 retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {

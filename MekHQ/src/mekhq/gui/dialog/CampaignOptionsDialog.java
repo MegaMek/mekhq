@@ -20,9 +20,9 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -631,10 +631,9 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
-            Faction f = Factions.getInstance().getFaction(sName);
-            if (f.validIn(date.getYear())) {
-                factionModel.addElement(f.getFullName(date.getYear()));
+        for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+            if (faction.validIn(date.getYear())) {
+                factionModel.addElement(faction.getFullName(date.getYear()));
             }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
@@ -5818,10 +5817,9 @@ public class CampaignOptionsDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
-                Faction f = Factions.getInstance().getFaction(sname);
-                if (f.validIn(date.getYear())) {
-                    factionModel.addElement(f.getFullName(date.getYear()));
+            for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+                if (faction.validIn(date.getYear())) {
+                    factionModel.addElement(faction.getFullName(date.getYear()));
                 }
             }
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
@@ -5842,11 +5840,10 @@ public class CampaignOptionsDialog extends JDialog {
 
     private void btnCamoActionPerformed(ActionEvent evt) {
         CamoChooserDialog ccd = new CamoChooserDialog(frame, camouflage);
-        if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
-            return;
+        if (ccd.showDialog().isConfirmed()) {
+            camouflage = ccd.getSelectedItem();
+            btnCamo.setIcon(camouflage.getImageIcon());
         }
-        camouflage = ccd.getSelectedItem();
-        btnCamo.setIcon(camouflage.getImageIcon());
     }
 
     private Vector<String> getUnusedSPA() {

@@ -57,6 +57,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
@@ -173,12 +174,16 @@ public class Person implements Serializable {
 
     private UUID id;
 
-    private String fullName;
+    //region Name
+    private transient String fullName; // this is a runtime variable, and shouldn't be saved
+    private String preNominal;
     private String givenName;
     private String surname;
-    private String honorific;
+    private String postNominal;
     private String maidenName;
     private String callsign;
+    //endregion Name
+
     private Gender gender;
     private AbstractIcon portrait;
 
@@ -321,30 +326,37 @@ public class Person implements Serializable {
     }
 
     public Person(String givenName, String surname, @Nullable Campaign campaign, String factionCode) {
-        this(givenName, surname, "", campaign, factionCode);
+        this("", givenName, surname, "", campaign, factionCode);
     }
 
     /**
      * Primary Person constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
+     * @param preNominal    the person's pre-nominal
      * @param givenName     the person's given name
      * @param surname       the person's surname
-     * @param honorific     the person's honorific
+     * @param postNominal   the person's post-nominal
      * @param campaign      the campaign this person is a part of, or null (unit testing only)
      * @param factionCode   the faction this person was borne into
      */
-    public Person(String givenName, String surname, String honorific, @Nullable Campaign campaign,
-                  String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname,
+                  final String postNominal, final @Nullable Campaign campaign,
+                  final String factionCode) {
         // First, we assign campaign
         this.campaign = campaign;
 
         // Then, we assign the variables in XML file order
         id = UUID.randomUUID();
-        this.givenName = givenName;
-        this.surname = surname;
-        this.honorific = honorific;
-        maidenName = null; // this is set to null to handle divorce cases
-        callsign = "";
+
+        //region Name
+        setPreNominalDirect(preNominal);
+        setGivenNameDirect(givenName);
+        setSurnameDirect(surname);
+        setPostNominalDirect(postNominal);
+        setMaidenName(null); // this is set to null to handle divorce cases
+        setCallsignDirect("");
+        //endregion Name
+
         primaryRole = PersonnelRole.NONE;
         secondaryRole = PersonnelRole.NONE;
         primaryDesignator = ROMDesignation.NONE;
@@ -534,81 +546,178 @@ public class Person implements Serializable {
     }
     //endregion Text Getters
 
-    //region Names
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public void setGivenName(String n) {
-        this.givenName = n;
-        setFullName();
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String n) {
-        this.surname = n;
-        setFullName();
-    }
-
-    public String getHonorific() {
-        return honorific;
-    }
-
-    public void setHonorific(String n) {
-        this.honorific = n;
-        setFullName();
-    }
-
-    public String getMaidenName() {
-        return maidenName;
-    }
-
-    public void setMaidenName(String n) {
-        this.maidenName = n;
+    //region Name
+    /**
+     * @return the person's full name
+     */
+    public String getFullName() {
+        return fullName;
     }
 
     /**
-     * return a full last name which may be a bloodname or a surname with or without honorifics.
+     * @return a hyperlinked string for the person's name
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='PERSON:%s'>%s</a>", getId(), getFullName());
+    }
+
+    /**
+     * This is used to create the full name of the person, based on their first and last names
+     */
+    public void setFullName() {
+        final String lastName = getLastName();
+        setFullNameDirect(getFirstName()
+                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""))
+                + (lastName.isBlank() ? "" : " " + lastName));
+    }
+
+    /**
+     * @param fullName this sets the full name to be equal to the input string. This can ONLY be
+     *                 called by {@link Person#setFullName()} or its overrides.
+     */
+    protected void setFullNameDirect(final String fullName) {
+        this.fullName = fullName;
+    }
+
+    /**
+     * @return a String containing the person's first name including their pre-nominal
+     */
+    public String getFirstName() {
+        return (getPreNominal().isBlank() ? "" : (getPreNominal() + " ")) + getGivenName();
+    }
+
+    /**
+     * Return a full last name which may be a bloodname or a surname with or without a post-nominal.
      * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
      * player wants to input them
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = "";
-        if (!StringUtil.isNullOrEmpty(bloodname)) {
-            lastName = bloodname;
-        } else if (!StringUtil.isNullOrEmpty(surname)) {
-            lastName = surname;
-        }
-
-        if (!StringUtil.isNullOrEmpty(honorific)) {
-            lastName += " " + honorific;
+        String lastName = !StringUtil.isNullOrEmpty(getBloodname()) ? getBloodname()
+                : !StringUtil.isNullOrEmpty(getSurname()) ? getSurname()
+                : "";
+        if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+            lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName() {
-        String lastName = getLastName();
-        if (!StringUtil.isNullOrEmpty(lastName)) {
-            fullName = givenName + " " + lastName;
-        } else {
-            fullName = givenName;
-        }
+    /**
+     * @return the person's pre-nominal
+     */
+    public String getPreNominal() {
+        return preNominal;
     }
 
     /**
-     * This method is used to migrate names from being a joined name to split between given name and surname,
-     * as part of the Personnel changes in MekHQ 0.47.4.
-     * @param n the name to be migrated
+     * @param preNominal the person's new pre-nominal
      */
-    public void migrateName(String n) {
+    public void setPreNominal(final String preNominal) {
+        setPreNominalDirect(preNominal);
+        setFullName();
+    }
+
+    protected void setPreNominalDirect(final String preNominal) {
+        this.preNominal = preNominal;
+    }
+
+    /**
+     * @return the person's given name
+     */
+    public String getGivenName() {
+        return givenName;
+    }
+
+    /**
+     * @param givenName the person's new given name
+     */
+    public void setGivenName(final String givenName) {
+        setGivenNameDirect(givenName);
+        setFullName();
+    }
+
+    protected void setGivenNameDirect(final String givenName) {
+        this.givenName = givenName;
+    }
+
+    /**
+     * @return the person's surname
+     */
+    public String getSurname() {
+        return surname;
+    }
+
+    /**
+     * @param surname the person's new surname
+     */
+    public void setSurname(final String surname) {
+        setSurnameDirect(surname);
+        setFullName();
+    }
+
+    protected void setSurnameDirect(final String surname) {
+        this.surname = surname;
+    }
+
+    /**
+     * @return the person's post-nominal
+     */
+    public String getPostNominal() {
+        return postNominal;
+    }
+
+    /**
+     * @param postNominal the person's new post-nominal
+     */
+    public void setPostNominal(final String postNominal) {
+        setPostNominalDirect(postNominal);
+        setFullName();
+    }
+
+    protected void setPostNominalDirect(final String postNominal) {
+        this.postNominal = postNominal;
+    }
+
+    /**
+     * @return the person's maiden name
+     */
+    public @Nullable String getMaidenName() {
+        return maidenName;
+    }
+
+    /**
+     * @param maidenName the person's new maiden name
+     */
+    public void setMaidenName(final @Nullable String maidenName) {
+        this.maidenName = maidenName;
+    }
+
+    /**
+     * @return the person's callsign
+     */
+    public String getCallsign() {
+        return callsign;
+    }
+
+    /**
+     * @param callsign the person's new callsign
+     */
+    public void setCallsign(final String callsign) {
+        setCallsignDirect(callsign);
+        setFullName();
+    }
+
+    protected void setCallsignDirect(final String callsign) {
+        this.callsign = callsign;
+    }
+
+    /**
+     * This method is used to migrate names from being a joined name to split between given name and
+     * surname, as part of the Personnel changes in MekHQ 0.47.4, and is used to migrate from
+     * MM-style names to MHQ-style names
+     * @param text text containing the name to be migrated
+     */
+    public void migrateName(final String text) {
         // How this works:
         // Takes the input name, and splits it into individual parts.
         // Then, it depends on whether the person is a Clanner or not.
@@ -623,53 +732,40 @@ public class Person implements Serializable {
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
         // Then, the full name is set
-        String[] name = n.trim().split("\\s+");
-
-        givenName = name[0];
+        final String[] name = text.trim().split("\\s+");
+        final StringBuilder givenName = new StringBuilder(name[0]);
 
         if (isClanner()) {
             if (name.length > 1) {
                 int i;
                 for (i = 1; i < name.length - 1; i++) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
 
                 if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
             }
         } else {
             if (name.length == 2) {
-                surname = name[1];
+                setSurnameDirect(name[1]);
             } else if (name.length == 3) {
-                surname = name[1] + " " + name[2];
+                setSurnameDirect(name[1] + " " + name[2]);
             } else if (name.length > 3) {
                 int i;
                 for (i = 1; i < name.length - 2; i++) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
-
-                surname = name[i] + " " + name[i + 1];
+                setSurnameDirect(name[i] + " " + name[i + 1]);
             }
         }
 
-        if ((surname == null) || (surname.equals(RandomNameGenerator.UNNAMED_SURNAME))) {
-            surname = "";
+        if ((getSurname() == null) || getSurname().equals(RandomNameGenerator.UNNAMED_SURNAME)) {
+            setSurnameDirect("");
         }
 
+        setGivenNameDirect(givenName.toString());
         setFullName();
-    }
-
-    public String getHyperlinkedName() {
-        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
-    }
-
-    public String getCallsign() {
-        return callsign;
-    }
-
-    public void setCallsign(String n) {
-        this.callsign = n;
     }
     //endregion Names
 
@@ -1001,21 +1097,14 @@ public class Person implements Serializable {
 
         if (!status.isActive()) {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+
             // If we're assigned to a unit, remove us from it
             if (getUnit() != null) {
                 getUnit().remove(this, true);
             }
 
-            // If we're assigned as a tech for any unit, remove us from it/them
-            for (Unit unitWeTech : new ArrayList<>(getTechUnits())) {
-                unitWeTech.remove(this, true);
-            }
-            // If we're assigned to any repairs or refits, remove that assignment
-            for (Part part : campaign.getParts()) {
-                if (this == part.getTech()) {
-                    part.cancelAssignment();
-                }
-            }
+            // Clear Tech Setup
+            removeAllTechJobs(campaign);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1503,21 +1592,30 @@ public class Person implements Serializable {
 
     //region File I/O
     public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", givenName);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", surname);
-            if (!StringUtil.isNullOrEmpty(honorific)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "honorific", honorific);
+
+            //region Name
+            if (!StringUtil.isNullOrEmpty(getPreNominal())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "preNominal", getPreNominal());
             }
-            if (maidenName != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", maidenName);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "surname", getSurname());
+            if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "postNominal", getPostNominal());
             }
-            if (!StringUtil.isNullOrEmpty(callsign)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", callsign);
+
+            if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maidenName", getMaidenName());
             }
+
+            if (!StringUtil.isNullOrEmpty(getCallsign())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "callsign", getCallsign());
+            }
+            //endregion Name
+
             // Always save the primary role
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", getPrimaryRole().name());
             if (!getSecondaryRole().isNone()) {
@@ -1573,12 +1671,7 @@ public class Person implements Serializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!getPortrait().hasDefaultCategory()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
-            }
-            if (!getPortrait().hasDefaultFilename()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
-            }
+            getPortrait().writeToXML(pw1, indent + 1);
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
             if (daysToWaitForHealing != 0) {
@@ -1747,16 +1840,18 @@ public class Person implements Serializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
                     retVal.migrateName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
+                    retVal.setPreNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
+                    retVal.setGivenNameDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) {
-                    retVal.honorific = wn2.getTextContent();
+                    retVal.setSurnameDirect(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
+                    retVal.setPostNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
+                    retVal.setMaidenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
+                    retVal.setCallsignDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
@@ -1816,9 +1911,11 @@ public class Person implements Serializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
+                    retVal.setPortrait(Portrait.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setCategory(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
@@ -2008,6 +2105,8 @@ public class Person implements Serializable {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
+                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
+                    retVal.setPostNominalDirect(wn2.getTextContent());
                 }
             }
 
@@ -2217,7 +2316,7 @@ public class Person implements Serializable {
         String rankName = getRank().getName(profession.getProfession(getRankSystem(), getRank()));
 
         // Manei Domini Additions
-        if (getRankSystem().isWoBMilitia()) {
+        if (getRankSystem().isUseManeiDomini()) {
             if (!getManeiDominiClass().isNone()) {
                 rankName = getManeiDominiClass() + " " + rankName;
             }
@@ -2227,7 +2326,7 @@ public class Person implements Serializable {
             }
         }
 
-        if (getRankSystem().isCGOrWoBM()) {
+        if (getRankSystem().isUseROMDesignation()) {
             rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
@@ -2963,6 +3062,30 @@ public class Person implements Serializable {
 
     public List<Unit> getTechUnits() {
         return Collections.unmodifiableList(techUnits);
+    }
+
+    public void removeAllTechJobs(final Campaign campaign) {
+        campaign.getHangar().forEachUnit(u -> {
+            if (equals(u.getTech())) {
+                u.remove(this, true);
+            }
+
+            if ((u.getRefit() != null) && equals(u.getRefit().getTech())) {
+                u.getRefit().setTech(null);
+            }
+        });
+
+        for (final Part part : campaign.getWarehouse().getParts()) {
+            if (equals(part.getTech())) {
+                part.cancelAssignment();
+            }
+        }
+
+        for (final Force force : campaign.getAllForces()) {
+            if (getId().equals(force.getTechID())) {
+                force.setTechID(null);
+            }
+        }
     }
 
     public int getMinutesLeft() {

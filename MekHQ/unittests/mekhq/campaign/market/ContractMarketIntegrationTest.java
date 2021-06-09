@@ -48,6 +48,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -165,6 +166,7 @@ public class ContractMarketIntegrationTest {
         when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
         when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
         when(existing.isActiveOn(campaign.getLocalDate(), false)).thenCallRealMethod();
+        when(existing.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
         campaign.importMission(existing);
 
         ContractMarket market = new ContractMarket();

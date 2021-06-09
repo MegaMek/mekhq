@@ -385,14 +385,6 @@ public class StaticChecks {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isWillingToDefect());
     }
 
-    public static boolean areAllWoBMilitia(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getRankSystem().isWoBMilitia());
-    }
-
-    public static boolean areAllWoBMilitiaOrComGuard(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getRankSystem().isCGOrWoBM());
-    }
-
     public static boolean areAllSameSite(Unit... units) {
         return Stream.of(units).allMatch(u -> u.getSite() == units[0].getSite());
     }

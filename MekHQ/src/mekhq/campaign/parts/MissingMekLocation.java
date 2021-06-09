@@ -113,9 +113,13 @@ public class MissingMekLocation extends MissingPart {
                 }
                 break;
         }
-        if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
+
+        if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType, clan) + ")";
+        } else if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
             this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
+
         if (tsm) {
             this.name += " (TSM)";
         }
@@ -197,25 +201,20 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (loc == Mech.LOC_CT && !refit) {
+        if ((loc == Mech.LOC_CT) && !refit) {
             //you can't replace a center torso
             return false;
+        } else if (part instanceof MekLocation) {
+            MekLocation mekLoc = (MekLocation) part;
+            return (mekLoc.getLoc() == loc)
+                    && (mekLoc.getUnitTonnage() == getUnitTonnage())
+                    && (mekLoc.isTsm() == tsm)
+                    && (mekLoc.clan == clan)
+                    && (mekLoc.getStructureType() == structureType)
+                    && (!isArm() || (mekLoc.forQuad() == forQuad));
+        } else {
+            return false;
         }
-        if (part instanceof MekLocation) {
-            MekLocation mekLoc = (MekLocation)part;
-            /*if(mekLoc.getLoc() == Mech.LOC_HEAD && null != unit) {
-                //cockpit must either be none, or match
-                if(mekLoc.hasCockpit() && mekLoc.getCockpitType() != ((Mech)unit.getEntity()).getCockpitType()) {
-                    return false;
-                }
-            }*/
-            return mekLoc.getLoc() == loc
-                && mekLoc.getUnitTonnage() == getUnitTonnage()
-                && mekLoc.isTsm() == tsm
-                && mekLoc.getStructureType() == structureType
-                && (!isArm() || mekLoc.forQuad() == forQuad);
-        }
-        return false;
     }
 
     @Override

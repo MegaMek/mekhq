@@ -1865,7 +1865,7 @@ public class AtBDynamicScenarioFactory {
         int actualDestinationEdge = forceTemplate.getDestinationZone();
 
         // set the 'auto flee' flag to true if the bot has a destination edge
-        if (actualDestinationEdge != CardinalEdge.NEAREST_OR_NONE.ordinal()) {
+        if (actualDestinationEdge != CardinalEdge.NONE.getIndex()) {
             force.getBehaviorSettings().setAutoFlee(true);
         }
 
@@ -2295,8 +2295,8 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Helper function that puts the units in the given list at the given altitude, and
-     * VTOLs at the elevation. Use with caution, as may lead to splattering.
+     * Helper function that puts the units in the given list at the given altitude. 
+     * Use with caution, as may lead to splattering or aerospace units starting on the ground.
      * @param entityList The entity list to process.
      * @param startingAltitude Starting altitude.
      */
@@ -2311,8 +2311,6 @@ public class AtBDynamicScenarioFactory {
                     ((IAero) entity).land();
                 }
             }
-
-            entity.setElevation(startingAltitude);
         }
     }
 

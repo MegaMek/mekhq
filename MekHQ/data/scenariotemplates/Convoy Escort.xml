@@ -3,6 +3,8 @@
     <name>Convoy Escort</name>
     <shortBriefing>Protect an allied supply convoy.</shortBriefing>
     <detailedBriefing>Escort the allied convoy across the map or rout the attacking force.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>false</allowRotation>
@@ -36,6 +38,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
@@ -65,6 +68,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -99,6 +103,7 @@
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -108,7 +113,9 @@
     </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
-            <associatedForceNames/>
+            <associatedForceNames>
+                <associatedForceName>Convoy</associatedForceName>
+            </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
                 <successEffect>

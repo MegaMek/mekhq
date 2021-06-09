@@ -425,15 +425,15 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 objectiveBuilder.append("\n");
             }
 
+            objectiveBuilder.append("\t");
+            objectiveBuilder.append(objective.getTimeLimitString());
+            objectiveBuilder.append("\n");
+            
             for (String detail : objective.getDetails()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(detail);
                 objectiveBuilder.append("\n");
             }
-
-            objectiveBuilder.append("\t");
-            objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
 
             objectiveBuilder.append("\n");
         }
