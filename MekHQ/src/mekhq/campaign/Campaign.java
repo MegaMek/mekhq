@@ -2969,11 +2969,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * TODO : I should be part of AtBContract, not Campaign
      * @param contract an active AtBContract
      * @return the current deployment deficit for the contract
      */
     public int getDeploymentDeficit(AtBContract contract) {
-        if (contract.isActiveOn(getLocalDate())) {
+        if (!contract.isActiveOn(getLocalDate()) || contract.getStartDate().isEqual(getLocalDate())) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet
@@ -4959,7 +4960,7 @@ public class Campaign implements Serializable, ITechManager {
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
             }
-            
+
             // like repairs, per CamOps page 208 extra time gives a
             // reduction to the TN based on x2, x3, x4
             if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
