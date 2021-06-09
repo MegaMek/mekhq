@@ -241,7 +241,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
 
     public void startAdvancement(final ActionEvent evt) {
         MekHQ.registerHandler(this);
-        final LocalDate today = gui.getCampaign().getLocalDate();
+        final LocalDate today = getGUI().getCampaign().getLocalDate();
         int days;
 
         if (getBtnStartAdvancement().equals(evt.getSource())) {
@@ -274,17 +274,13 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
             days = 1;
         }
 
-        setModal(days > 1);
+        setModal(true);
 
         boolean firstDay = true;
         final List<String> reports = new ArrayList<>();
         for (; days > 0; days--) {
             if (!getGUI().getCampaign().newDay()) {
                 break;
-            }
-
-            if (days <= 1) {
-                setModal(false);
             }
 
             final String report = getGUI().getCampaign().getCurrentReportHTML();
@@ -316,6 +312,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     public void reportOverride(final ReportEvent evt) {
         if (isModal()) {
             evt.cancel();
+        } else {
+            getDailyLogPanel().refreshLog(getGUI().getCampaign().getCurrentReportHTML());
         }
     }
 }
