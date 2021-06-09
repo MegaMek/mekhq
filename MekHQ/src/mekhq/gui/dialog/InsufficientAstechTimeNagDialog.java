@@ -41,6 +41,9 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
             return false;
         }
 
+        // Units are only valid if the are maintained, present, and not self crewed (as the crew
+        // maintain it in that case). For each unit this is valid for, we need six astechs to assist
+        // the tech for the maintenance.
         final int need = campaign.getHangar().getUnitsStream()
                 .filter(unit -> !unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed())
                 .mapToInt(unit -> unit.getMaintenanceTime() * 6).sum();

@@ -36,6 +36,8 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
+        // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
+        // date is today
         return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
                 && campaign.getActiveAtBContracts(true).stream()
                         .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
