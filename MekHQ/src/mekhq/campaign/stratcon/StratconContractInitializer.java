@@ -49,7 +49,6 @@ public class StratconContractInitializer {
     public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
-        campaignState.setStrategicObjectivesBehaveAsVPs(contractDefinition.objectivesBehaveAsVPs());
 
         // dependency: this is required here in order for scenario initialization to work properly
         contract.setStratconCampaignState(campaignState);
@@ -103,11 +102,13 @@ public class StratconContractInitializer {
                                 objectiveParams.objectiveScenarios, objectiveParams.objectiveScenarioModifiers);
                         break;
                     case AlliedFacilityControl:
-                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, true);
+                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, 
+                                true, objectiveParams.objectiveScenarioModifiers);
                         break;
                     case HostileFacilityControl:
                     case FacilityDestruction:
-                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, true);
+                        initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, 
+                                true, objectiveParams.objectiveScenarioModifiers);
                         break;
                     case AnyScenarioVictory:
                         // set up a "win X scenarios" objective
@@ -115,17 +116,29 @@ public class StratconContractInitializer {
                         sso.setDesiredObjectiveCount(numObjects);
                         sso.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
                         campaignState.getTrack(x).addStrategicObjective(sso);
+                        
+                        // modifiers defined for "any scenario" by definition apply to any scenario
+                        // so they get added to the global campaign modifiers. Use sparingly since
+                        // this can snowball pretty quickly.
+                        if (objectiveParams.objectiveScenarioModifiers != null) {
+                            for (String modifier : objectiveParams.objectiveScenarioModifiers) {
+                                if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
+                                    campaignState.getGlobalScenarioModifiers().add(modifier);
+                                }
+                            }
+                        }
+                        
                         break;
                 }
             }
-
-            // if any modifiers are to be applied across all scenarios in the campaign
-            // do so here; do not add duplicates
-            if (objectiveParams.objectiveScenarioModifiers != null) {
-                for (String modifier : objectiveParams.objectiveScenarioModifiers) {
-                    if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
-                        campaignState.getGlobalScenarioModifiers().add(modifier);
-                    }
+        }
+        
+        // if any modifiers are to be applied across all scenarios in the campaign
+        // do so here; do not add duplicates
+        if (contractDefinition.getGlobalScenarioModifiers() != null) {
+            for (String modifier : contractDefinition.getGlobalScenarioModifiers() ) {
+                if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
+                    campaignState.getGlobalScenarioModifiers().add(modifier);
                 }
             }
         }
@@ -140,7 +153,8 @@ public class StratconContractInitializer {
         for (int x = 0; x < trackObjects.size(); x++) {
             int numObjects = trackObjects.get(x);
 
-            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, false);
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, 
+                    false, Collections.emptyList());
         }
 
         // non-objective hostile facilities
@@ -153,7 +167,8 @@ public class StratconContractInitializer {
         for (int x = 0; x < trackObjects.size(); x++) {
             int numObjects = trackObjects.get(x);
 
-            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, false);
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, 
+                    false, Collections.emptyList());
         }
 
         // now we're done
@@ -216,7 +231,7 @@ public class StratconContractInitializer {
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic objective flag.
      */
     private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities,
-            ForceAlignment owner, boolean strategicObjective) {
+            ForceAlignment owner, boolean strategicObjective, List<String> modifiers) {
 
         int trackSize = trackState.getWidth() * trackState.getHeight();
 
@@ -232,6 +247,7 @@ public class StratconContractInitializer {
 
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
+            sf.getLocalModifiers().addAll(modifiers);
 
             StratconCoords coords = getUnoccupiedCoords(trackState);
 
