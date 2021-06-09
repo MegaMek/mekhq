@@ -34,9 +34,11 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
@@ -46,7 +48,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
+import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -62,7 +64,6 @@ public class PersonnelTableModel extends DataTableModel {
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
 
-    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_FIRST_NAME      = 1;
@@ -696,12 +697,8 @@ public class PersonnelTableModel extends DataTableModel {
         }
     }
 
-    public TableCellRenderer getRenderer(boolean graphic) {
-        if (graphic) {
-            return new PersonnelTableModel.VisualRenderer();
-        } else {
-            return new PersonnelTableModel.Renderer();
-        }
+    public TableCellRenderer getRenderer(final @Nullable PersonnelTabView view) {
+        return ((view != null) && view.isGraphic()) ? new VisualRenderer() : new Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {
@@ -719,15 +716,15 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (isDeployed(actualRow)) {
-                    colors.getDeployed().getColor().ifPresent(this::setBackground);
-                    colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
                         || getPerson(actualRow).hasInjuries(true)) {
-                    colors.getInjured().getColor().ifPresent(this::setBackground);
-                    colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
+                    setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
-                    colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
+                    setBackground(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

@@ -222,14 +222,10 @@ public class AtBContract extends Contract implements Serializable {
         return (int) numUnits;
     }
 
-    public static boolean isMinorPower(String fName) {
-        Faction faction = Factions.getInstance().getFaction(fName);
-        if (null != faction) {
-            return !RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(faction) &&
-                    !faction.isClan();
-        } else {
-            return false;
-        }
+    public static boolean isMinorPower(final String factionCode) {
+        // TODO : Windchild move me to AtBContractMarket
+        final Faction faction = Factions.getInstance().getFaction(factionCode);
+        return !faction.isMajorOrSuperPower() && !faction.isClan();
     }
 
     public void calculatePaymentMultiplier(Campaign campaign) {
@@ -252,18 +248,17 @@ public class AtBContract extends Contract implements Serializable {
 
         multiplier *= getContractType().getPaymentMultiplier();
 
-        Faction employer = Factions.getInstance().getFaction(employerCode);
-        if ((null != employer)
-                && (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(employer)
-                || employer.isClan())) {
+        final Faction employer = Factions.getInstance().getFaction(employerCode);
+        final Faction enemy = getEnemy();
+        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
             multiplier *= 1.2;
-        } else if (enemyCode.equals("IND") ||
-                enemyCode.equals("PIND")) {
+        } else if (enemy.isIndependent()) {
             multiplier *= 1.0;
         } else {
             multiplier *= 1.1;
         }
-        if (enemyCode.equals("REB") || enemyCode.equals("PIR")) {
+
+        if (enemy.isRebelOrPirate()) {
             multiplier *= 1.1;
         }
 
@@ -1012,6 +1007,10 @@ public class AtBContract extends Contract implements Serializable {
                     Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
         }
         return Factions.getInstance().getFaction(employerCode).getFullName(year);
+    }
+
+    public Faction getEnemy() {
+        return Factions.getInstance().getFaction(getEnemyCode());
     }
 
     public String getEnemyCode() {

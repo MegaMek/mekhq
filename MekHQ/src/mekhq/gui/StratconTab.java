@@ -11,8 +11,6 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
-
 package mekhq.gui;
 
 import java.awt.Dimension;
@@ -21,6 +19,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.swing.BoxLayout;
@@ -37,7 +36,6 @@ import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -196,7 +194,9 @@ public class StratconTab extends CampaignGuiTab {
         }
         AtBContract currentContract = currentTDI.contract;
 
-        if (!currentContract.isActiveOn(getCampaignGui().getCampaign().getLocalDate())) {
+        LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
+
+        if (currentContract.getStartDate().isAfter(currentDate)) {
             campaignStatusText.setText("Contract has not started.");
             expandedObjectivePanel.setVisible(false);
             return;
@@ -210,6 +210,11 @@ public class StratconTab extends CampaignGuiTab {
             .append(currentContract.getContractType()).append(": ").append(currentContract.getName())
             .append("<br/>")
             .append(campaignState.getBriefingText());
+
+        if (currentContract.getEndingDate().isBefore(currentDate)) {
+            sb.append("<br/>Contract term has expired!");
+        }
+
         sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints())
             .append("<br/>Support Points: ").append(campaignState.getSupportPoints())
             .append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime())
@@ -366,12 +371,10 @@ public class StratconTab extends CampaignGuiTab {
         cboCurrentTrack.removeAllItems();
 
         // track dropdown is populated with all tracks across all active contracts
-        for (Contract contract : getCampaignGui().getCampaign().getActiveContracts()) {
-            if ((contract instanceof AtBContract) &&
-            		contract.isActiveOn(getCampaignGui().getCampaign().getLocalDate()) &&
-            		(((AtBContract) contract).getStratconCampaignState() != null)) {
-                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    TrackDropdownItem tdi = new TrackDropdownItem((AtBContract) contract, track);
+        for (AtBContract contract : getCampaignGui().getCampaign().getActiveAtBContracts(true)) {
+            if (contract.getStratconCampaignState() != null) {
+                for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                    TrackDropdownItem tdi = new TrackDropdownItem(contract, track);
                     cboCurrentTrack.addItem(tdi);
 
                     if ((currentTDI != null) && currentTDI.equals(tdi)) {

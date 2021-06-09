@@ -4940,6 +4940,12 @@ public class Campaign implements Serializable, ITechManager {
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
             }
+            
+            // like repairs, per CamOps page 208 extra time gives a
+            // reduction to the TN based on x2, x3, x4
+            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
+            }
         }
 
         return target;

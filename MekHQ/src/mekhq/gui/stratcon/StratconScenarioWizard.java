@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -579,6 +580,22 @@ public class StratconScenarioWizard extends JDialog {
             btnCommit.setEnabled(true);
         }
 
+        // go through the other unit lists in the wizard and deselect the selected units
+        // to avoid "issues" and "unpredictable behavior"
+        for (JList<Unit> unitList : availableUnitLists.values()) {
+            if (!changedList.equals(unitList)) {
+                unselectDuplicateUnits(unitList, changedList.getSelectedValuesList());
+            }
+        }
+        
+        if (!changedList.equals(availableInfantryUnits)) {
+            unselectDuplicateUnits(availableInfantryUnits, changedList.getSelectedValuesList());
+        }
+        
+        if (!changedList.equals(availableLeadershipUnits)) {
+            unselectDuplicateUnits(availableLeadershipUnits, changedList.getSelectedValuesList());
+        }
+        
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
 
@@ -590,6 +607,23 @@ public class StratconScenarioWizard extends JDialog {
 
         unitStatusLabel.setText(sb.toString());
         pack();
+    }
+    
+    /**
+     * Worker function that de-selects duplicate units.
+     * @param listToProcess
+     * @param selectedUnits
+     */
+    private void unselectDuplicateUnits(JList<Unit> listToProcess, List<Unit> selectedUnits) {
+        for (Unit selectedUnit : selectedUnits) {
+            for (int potentialClearIndex : listToProcess.getSelectedIndices()) {
+                Unit potentialClearTarget = listToProcess.getModel().getElementAt(potentialClearIndex);
+                
+                if (potentialClearTarget.getId().equals(selectedUnit.getId())) {
+                    listToProcess.removeSelectionInterval(potentialClearIndex, potentialClearIndex);
+                }
+            }
+        }
     }
 
     /**
