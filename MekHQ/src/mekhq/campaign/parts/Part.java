@@ -413,10 +413,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /**
      * Sets the number of hits on the part.
-     * 
+     *
      * NOTE: It is the caller's responsibilty to update the condition
      * of the part and any attached unit.
-     * 
+     *
      * @param hits The number of hits on the part.
      */
     public void setHits(int hits) {
@@ -849,7 +849,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public int getActualTime() {
-        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+        double time = getBaseTime() * mode.timeMultiplier;
+        if ((getUnit() != null) && (getUnit().hasPrototypeTSM())) {
+            time *= 2;
+        }
+        return (int) Math.ceil(time);
     }
 
     @Override
@@ -931,9 +935,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             mods.append(unit.getSiteMod());
             if (unit.getEntity().hasQuirk("easy_maintain")) {
                 mods.addModifier(-1, "easy to maintain");
-            }
-            else if (unit.getEntity().hasQuirk("difficult_maintain")) {
+            } else if (unit.getEntity().hasQuirk("difficult_maintain")) {
                 mods.addModifier(1, "difficult to maintain");
+            }
+            if (unit.hasPrototypeTSM() &&
+                    ((this instanceof MekLocation)
+                    || (this instanceof MissingMekLocation)
+                    || (this instanceof MekActuator)
+                    || (this instanceof MissingMekActuator))) {
+                mods.addModifier(2, "prototype TSM");
             }
         }
         if (isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
@@ -991,6 +1001,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                         && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
                     mods.addModifier(2, "Clan tech");
                 }
+            }
+
+            if (getUnit().hasPrototypeTSM()) {
+                mods.addModifier(1, "prototype TSM");
             }
         }
 

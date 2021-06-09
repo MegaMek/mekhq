@@ -1839,7 +1839,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (astechDaysMaintained > 0) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "astechDaysMaintained", astechDaysMaintained);
         }
-        
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maintenanceMultiplier", maintenanceMultiplier);
 
         if (mothballTime > 0) {
@@ -1905,7 +1905,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
                     retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) { 
+                } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) {
                     retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
                     retVal.drivers.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
@@ -4596,6 +4596,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     /**
+     * Prototype TSM makes a unit harder to repair and maintain.
+     *
+     * @return Whether the unit has prototype TSM
+     */
+    public boolean hasPrototypeTSM() {
+        for (Mounted m : getEntity().getMisc()) {
+            if (m.getType().hasFlag(MiscType.F_TSM) && m.getType().hasFlag(MiscType.F_PROTOTYPE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a personnel count for each marine platoon/squad assigned to this unit
      * @return The number of marines aboard
      */
@@ -4735,7 +4749,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public int getMaintenanceTime() {
         int retVal = 0;
-        
+
         if (getEntity() instanceof Mech) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
@@ -4811,7 +4825,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     break;
             }
         }
-                
+
         // default value for retVal is zero, so anything that didn't fall into one of the
         // above classifications is self-maintaining, meaning zero.
         return retVal * getMaintenanceMultiplier();
@@ -4851,11 +4865,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public int getAstechsMaintained() {
         return (int) Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
     }
-    
+
     public int getMaintenanceMultiplier() {
         return maintenanceMultiplier;
     }
-    
+
     public void setMaintenanceMultiplier(int value) {
         maintenanceMultiplier = value;
     }
