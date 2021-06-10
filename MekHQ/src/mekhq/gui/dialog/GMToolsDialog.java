@@ -84,7 +84,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private MMComboBox<String> comboUnitType;
     private MMComboBox<String> comboUnitWeight;
     private JLabel lblUnitPicked;
-    private MechSummary lastRolledUnit;
+    private Entity lastRolledUnit;
     //endregion General Tab
 
     //region Name Tab
@@ -242,17 +242,16 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblUnitPicked = lblUnitPicked;
     }
 
-    public MechSummary getLastRolledUnit() {
+    public @Nullable Entity getLastRolledUnit() {
         return lastRolledUnit;
     }
 
-    public void setLastRolledUnit(final MechSummary lastRolledUnit) {
+    public void setLastRolledUnit(final @Nullable Entity lastRolledUnit) {
         this.lastRolledUnit = lastRolledUnit;
     }
     //endregion General Tab
 
     //region Name Tab
-
     public MMComboBox<String> getComboEthnicCode() {
         return comboEthnicCode;
     }
@@ -309,11 +308,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtNamesGenerated = txtNamesGenerated;
     }
 
-    public String[] getLastGeneratedName() {
+    public @Nullable String[] getLastGeneratedName() {
         return lastGeneratedName;
     }
 
-    public void setLastGeneratedName(final String... lastGeneratedName) {
+    public void setLastGeneratedName(final @Nullable String... lastGeneratedName) {
         this.lastGeneratedName = lastGeneratedName;
     }
 
@@ -341,11 +340,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtCallsignsGenerated = txtCallsignsGenerated;
     }
 
-    public String getLastGeneratedCallsign() {
+    public @Nullable String getLastGeneratedCallsign() {
         return lastGeneratedCallsign;
     }
 
-    public void setLastGeneratedCallsign(final String lastGeneratedCallsign) {
+    public void setLastGeneratedCallsign(final @Nullable String lastGeneratedCallsign) {
         this.lastGeneratedCallsign = lastGeneratedCallsign;
     }
 
@@ -413,11 +412,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblBloodnameWarning = lblBloodnameWarning;
     }
 
-    public Clan getOriginClan() {
+    public @Nullable Clan getOriginClan() {
         return originClan;
     }
 
-    public void setOriginClan(final Clan originClan) {
+    public void setOriginClan(final @Nullable Clan originClan) {
         this.originClan = originClan;
     }
 
@@ -429,19 +428,19 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.bloodnameYear = bloodnameYear;
     }
 
-    public Phenotype getSelectedPhenotype() {
+    public @Nullable Phenotype getSelectedPhenotype() {
         return selectedPhenotype;
     }
 
-    public void setSelectedPhenotype(final Phenotype selectedPhenotype) {
+    public void setSelectedPhenotype(final @Nullable Phenotype selectedPhenotype) {
         this.selectedPhenotype = selectedPhenotype;
     }
 
-    public String getLastGeneratedBloodname() {
+    public @Nullable String getLastGeneratedBloodname() {
         return lastGeneratedBloodname;
     }
 
-    public void setLastGeneratedBloodname(final String lastGeneratedBloodname) {
+    public void setLastGeneratedBloodname(final @Nullable String lastGeneratedBloodname) {
         this.lastGeneratedBloodname = lastGeneratedBloodname;
     }
     //endregion Name Tab
@@ -502,6 +501,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         final int maxGridX;
 
@@ -523,12 +523,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JLabel lblSides = new JLabel(resources.getString("lblSides.text"));
         lblSides.setName("lblSides");
         gbc.gridx++;
-        panel.add(lblRolls, gbc);
+        panel.add(lblSides, gbc);
 
         setSpnDiceSides(new JSpinner(new SpinnerNumberModel(6, 1, 200, 1)));
         getSpnDiceSides().setName("spnDiceSides");
         gbc.gridx++;
-        panel.add(lblRolls, gbc);
+        panel.add(getSpnDiceSides(), gbc);
 
         maxGridX = gbc.gridx;
 
@@ -581,6 +581,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         final int maxGridX;
 
@@ -718,7 +719,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         final int maxGridX;
 
@@ -769,13 +771,13 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getComboEthnicCode().setSelectedIndex(0);
         getComboEthnicCode().addActionListener(evt -> getComboNameGeneratorFaction().setEnabled(getComboEthnicCode().getSelectedIndex() == 0));
         gbc.gridx++;
-        panel.add(getComboNameGeneratorFaction(), gbc);
+        panel.add(getComboEthnicCode(), gbc);
 
         setChkClanner(new JCheckBox());
         getChkClanner().setName("clannerPicker");
-        getChkClanner().getAccessibleContext().setAccessibleName(resources.getString("lblClanner.text.text"));
+        getChkClanner().getAccessibleContext().setAccessibleName(resources.getString("lblClanner.text"));
         gbc.gridx++;
-        panel.add(getComboNameGeneratorFaction(), gbc);
+        panel.add(getChkClanner(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -819,6 +821,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             final JButton btnAssignName = new MMButton("btnAssignName", resources,
                     "btnAssignName.text", "btnAssignName.toolTipText", evt-> assignName());
             gbc.gridx = maxGridX - 1;
+            gbc.gridy++;
             panel.add(btnAssignName, gbc);
 
             final JButton btnGenerateName = new MMButton("btnGenerateName", resources,
@@ -848,7 +851,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         final int maxGridX;
 
@@ -875,15 +879,15 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         setTxtCallsignsGenerated(new JTextArea("-"));
         getTxtCallsignsGenerated().setName((getPerson() == null) ? "txtCallsignsGenerated" : "txtCallsignGenerated");
-        panel.add(lblCallsignGenerated, gbc);
+        gbc.gridx++;
+        panel.add(getTxtCallsignsGenerated(), gbc);
 
-        gbc.gridy++;
         maxGridX = gbc.gridx;
 
         if (getPerson() == null) {
             setSpnCallsignNumber(new JSpinner(new SpinnerNumberModel(1, 1, 10, 1)));
             getSpnCallsignNumber().setName("spnCallsignNumber");
-            gbc.gridx = maxGridX - 1;
+            gbc.gridx++;
             panel.add(getSpnCallsignNumber(), gbc);
 
             final JButton btnGenerateCallsigns = new MMButton("btnGenerateCallsigns", resources,
@@ -894,6 +898,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             final JButton btnAssignCallsign = new MMButton("btnAssignCallsign", resources,
                     "btnAssignCallsign.text", "btnAssignCallsign.toolTipText", evt -> assignCallsign());
             gbc.gridx = maxGridX - 1;
+            gbc.gridy++;
             panel.add(btnAssignCallsign, gbc);
 
             final JButton btnGenerateCallsign = new MMButton("btnGenerateCallsign", resources,
@@ -920,6 +925,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 3, 0, 3);
 
         final int maxGridX;
 
@@ -1002,8 +1008,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx++;
         panel.add(getLblBloodnameGenerated(), gbc);
 
-        maxGridX = gbc.gridx;
-
         final JLabel lblOriginClanGenerated = new JLabel(resources.getString("lblOriginClanGenerated.text"));
         lblOriginClanGenerated.setName("lblOriginClanGenerated");
         gbc.gridx = 0;
@@ -1017,13 +1021,15 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final JLabel lblPhenotypeGenerated = new JLabel(resources.getString("lblPhenotypeGenerated.text"));
         lblPhenotypeGenerated.setName("lblPhenotypeGenerated");
-        gbc.gridy++;
+        gbc.gridx++;
         panel.add(lblPhenotypeGenerated, gbc);
 
         setLblPhenotypeGenerated(new JLabel("-"));
         getLblPhenotypeGenerated().setName("lblPhenotypeGenerated");
         gbc.gridx++;
         panel.add(getLblPhenotypeGenerated(), gbc);
+
+        maxGridX = gbc.gridx;
 
         setLblBloodnameWarning(new JLabel(""));
         getLblBloodnameWarning().setName("lblBloodnameWarning");
@@ -1186,32 +1192,43 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getTxtIndividualDiceResults().setText((sb.length() > 0) ? sb.toString() : "-");
     }
 
-    private @Nullable MechSummary performRATRoll() {
+    private @Nullable Entity performRATRoll() {
+        final int targetYear;
         try {
-            final int targetYear = Integer.parseInt(getTxtYear().getText());
-            final Predicate<MechSummary> predicate = summary ->
-                    (!getGUI().getCampaign().getCampaignOptions().limitByYear() || (targetYear > summary.getYear()))
-                            && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowClanPurchases())
-                            && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowISPurchases());
-            final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
-            final int unitWeight = getComboUnitWeight().isEnabled()
-                    ? getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT
-                    : AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
-
-            final MechSummary summary = getGUI().getCampaign().getUnitGenerator()
-                    .generate(Objects.requireNonNull(getComboRATFaction().getSelectedItem()).getFaction().getShortName(),
-                            unitType, unitWeight, targetYear, getComboQuality().getSelectedIndex(), predicate);
-            if (summary != null) {
-                getLblUnitPicked().setText(summary.getName());
-                return summary;
-            }
+            targetYear = Integer.parseInt(getTxtYear().getText());
         } catch (Exception ignored) {
-            getLblUnitPicked().setText(Messages.getString("invalidYear.error"));
+            getLblUnitPicked().setText(Messages.getString("yearParsingFailure.error"));
             return null;
         }
 
-        getLblUnitPicked().setText(Messages.getString("noValidUnit.error"));
-        return null;
+        final Predicate<MechSummary> predicate = summary ->
+                (!getGUI().getCampaign().getCampaignOptions().limitByYear() || (targetYear > summary.getYear()))
+                        && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowClanPurchases())
+                        && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowISPurchases());
+        final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
+        final int unitWeight = getComboUnitWeight().isEnabled()
+                ? getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT
+                : AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
+        final MechSummary summary = getGUI().getCampaign().getUnitGenerator()
+                .generate(Objects.requireNonNull(getComboRATFaction().getSelectedItem()).getFaction().getShortName(),
+                        unitType, unitWeight, targetYear, getComboQuality().getSelectedIndex(), predicate);
+
+        if (summary == null) {
+            getLblUnitPicked().setText(Messages.getString("noValidUnit.error"));
+            return null;
+        }
+
+        getLblUnitPicked().setText(summary.getName());
+
+        try {
+            return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+        } catch (Exception e) {
+            final String message = String.format(Messages.getString("entityLoadFailure.error"),
+                    summary.getName(), summary.getSourceFile());
+            MekHQ.getLogger().error(message, e);
+            getLblUnitPicked().setText(message);
+            return null;
+        }
     }
 
     private void addRATRolledUnit() {
@@ -1220,20 +1237,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         if (getLastRolledUnit() != null) {
-            try {
-                final Entity entity = new MechFileParser(getLastRolledUnit().getSourceFile(),
-                        getLastRolledUnit().getEntryName()).getEntity();
-                final Unit unit = getGUI().getCampaign().addNewUnit(entity, false, 0);
-                if ((getPerson() != null) && (getPerson().getUnit() == null)) {
-                    unit.addPilotOrSoldier(getPerson());
-                    getPerson().setOriginalUnit(unit);
-                }
-                setLastRolledUnit(null);
-            } catch (Exception e) {
-                final String message = String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName(), getLastRolledUnit().getSourceFile());
-                MekHQ.getLogger().error(message, e);
-                getLblUnitPicked().setText(message);
+            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0);
+            if ((getPerson() != null) && (getPerson().getUnit() == null)) {
+                unit.addPilotOrSoldier(getPerson());
+                getPerson().setOriginalUnit(unit);
             }
+            setLastRolledUnit(null);
         }
     }
 
@@ -1273,11 +1282,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateName();
         }
 
-        getLblCurrentName().setText((getLastGeneratedName()[0] + " " + getLastGeneratedName()[1]).trim());
-        getPerson().setGivenName(getLastGeneratedName()[0]);
-        getPerson().setSurname(getLastGeneratedName()[1]);
-
-        MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        if (getLastGeneratedName() != null) {
+            getLblCurrentName().setText((getLastGeneratedName()[0] + " " + getLastGeneratedName()[1]).trim());
+            getPerson().setGivenName(getLastGeneratedName()[0]);
+            getPerson().setSurname(getLastGeneratedName()[1]);
+            MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        }
     }
 
     private void generateCallsign() {
@@ -1298,10 +1308,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateCallsign();
         }
 
-        getLblCurrentCallsign().setText(getLastGeneratedCallsign());
-        getPerson().setCallsign(getLastGeneratedCallsign());
-
-        MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        if (getLastGeneratedCallsign() != null) {
+            getLblCurrentCallsign().setText(getLastGeneratedCallsign());
+            getPerson().setCallsign(getLastGeneratedCallsign());
+            MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        }
     }
 
     private void generateBloodname() {
@@ -1320,10 +1331,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateBloodname();
         }
 
-        getLblCurrentBloodname().setText(getLastGeneratedBloodname());
-        getPerson().setBloodname(getLastGeneratedBloodname());
-
-        MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        if (getLastGeneratedBloodname() != null) {
+            getLblCurrentBloodname().setText(getLastGeneratedBloodname());
+            getPerson().setBloodname(getLastGeneratedBloodname());
+            MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+        }
     }
 
     private void validateBloodnameInput() {
