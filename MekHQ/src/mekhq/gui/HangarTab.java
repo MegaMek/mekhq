@@ -176,10 +176,12 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.createDefaultColumnsFromModel();
         unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_NAME, new NaturalOrderComparator());
-        unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
+        unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
+        unitSorter.setComparator(UnitTableModel.COL_PILOT, new PersonTitleStringSorter(getCampaign()));
+        unitSorter.setComparator(UnitTableModel.COL_TECH_CRW, new PersonTitleStringSorter(getCampaign()));
         unitTable.setRowSorter(unitSorter);
         List<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
