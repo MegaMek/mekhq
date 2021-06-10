@@ -109,6 +109,17 @@ public final class MekHqConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     //endregion File Paths
 
+    //region Nag Tab
+    public static final String NAG_NODE = "mekhq/prefs/nags";
+    public static final String NAG_UNMAINTAINED_UNITS = "nagUnmaintainedUnits";
+    public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
+    public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
+    public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
+    public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
+    public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
+    public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    //endregion Nag Tab
+
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";

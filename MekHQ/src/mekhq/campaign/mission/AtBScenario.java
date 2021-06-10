@@ -42,8 +42,8 @@ import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
 import mekhq.Version;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -675,12 +675,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardMissionForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (lanceRole == AtBLanceRole.SCOUTING || lanceRole == AtBLanceRole.TRAINING) {
+        if (lanceRole.isScouting() || lanceRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
         int numAttachedBot = 0;
-        if (getContract(campaign).getMissionType() == AtBContract.MT_CADREDUTY) {
+        if (getContract(campaign).getContractType().isCadreDuty()) {
             numAttachedPlayer = 3;
         } else if (campaign.getFactionCode().equals("MERC")) {
             switch (getContract(campaign).getCommandRights()) {
@@ -801,7 +801,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, getContract(campaign).getEnemy()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
-            } else if (getLanceRole() == AtBLanceRole.SCOUTING) {
+            } else if (getLanceRole().isScouting()) {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by DropShip.
                  */

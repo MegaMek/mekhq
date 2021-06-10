@@ -21,50 +21,29 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.*;
-import megamek.common.options.OptionsConstants;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHqConstants;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.gui.dialog.*;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import chat.ChatClient;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GameOptionsDialog;
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.MULParser;
+import megamek.common.MechSummaryCache;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -85,26 +64,99 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.RatingReport;
 import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
-import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.BatchXPDialog;
+import mekhq.gui.dialog.CampaignExportWizard;
+import mekhq.gui.dialog.CampaignOptionsDialog;
+import mekhq.gui.dialog.ContractMarketDialog;
+import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.GMToolsDialog;
+import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.HistoricalDailyReportDialog;
+import mekhq.gui.dialog.InsufficientAstechTimeNagDialog;
+import mekhq.gui.dialog.InsufficientAstechsNagDialog;
+import mekhq.gui.dialog.InsufficientMedicsNagDialog;
+import mekhq.gui.dialog.MaintenanceReportDialog;
+import mekhq.gui.dialog.MassMothballDialog;
+import mekhq.gui.dialog.MekHQAboutBox;
+import mekhq.gui.dialog.MekHQUnitSelectorDialog;
+import mekhq.gui.dialog.MekHqOptionsDialog;
+import mekhq.gui.dialog.MercRosterDialog;
+import mekhq.gui.dialog.NewRecruitDialog;
+import mekhq.gui.dialog.NewsReportDialog;
+import mekhq.gui.dialog.OutstandingScenariosNagDialog;
+import mekhq.gui.dialog.PartsStoreDialog;
+import mekhq.gui.dialog.PersonnelMarketDialog;
+import mekhq.gui.dialog.PopupValueChoiceDialog;
+import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.ReportDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
+import mekhq.gui.dialog.ShipSearchDialog;
+import mekhq.gui.dialog.ShortDeploymentNagDialog;
+import mekhq.gui.dialog.UnitCostReportDialog;
+import mekhq.gui.dialog.UnitMarketDialog;
+import mekhq.gui.dialog.UnmaintainedUnitsNagDialog;
+import mekhq.gui.dialog.UnresolvedStratConContactsNagDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The application's main frame.
@@ -222,10 +274,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAdvanceDaysDialog() {
-        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this);
-        advanceDaysDialog.setModal(true);
-        advanceDaysDialog.setVisible(true);
-        advanceDaysDialog.dispose();
+        new AdvanceDaysDialog(getFrame(), this).setVisible(true);
     }
 
     public void randomizeAllBloodnames() {
@@ -1241,92 +1290,6 @@ public class CampaignGUI extends JPanel {
             NewsReportDialog nrd = new NewsReportDialog(frame, news);
             nrd.setVisible(true);
         }
-    }
-
-    public boolean nagShortMaintenance() {
-        if (!getCampaign().getCampaignOptions().checkMaintenance()) {
-            return false;
-        }
-        Vector<Unit> notMaintained = new Vector<>();
-        int totalAstechMinutesNeeded = 0;
-        for (Unit u : getCampaign().getHangar().getUnits()) {
-            if (u.isUnmaintained()) {
-                notMaintained.add(u);
-            } else if (u.isPresent() && (u.getEngineer() == null)) {
-                // only add astech minutes for non-crewed units who are present
-                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
-            }
-        }
-
-        if (notMaintained.size() > 0) {
-            if (JOptionPane.YES_OPTION != JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "You have unmaintained units. Do you really wish to advance the day?",
-                            "Unmaintained Units", JOptionPane.YES_NO_OPTION)) {
-                return true;
-            }
-        }
-
-        int minutesAvail = getCampaign().getPossibleAstechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            minutesAvail += getCampaign().getPossibleAstechPoolOvertime();
-        }
-        if (minutesAvail < totalAstechMinutesNeeded) {
-            int needed = (int) Math.ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
-            return JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
-                    "You do not have enough astechs to provide for full maintenance. You need "
-                            + needed + " more astech(s). Do you wish to proceed?",
-                    "Astech shortage", JOptionPane.YES_NO_OPTION);
-        }
-
-        return false;
-    }
-
-    public boolean nagShortDeployments() {
-        if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
-            return false;
-        }
-        for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
-            if (!getCampaign().getLocation().isOnPlanet()) {
-                continue;
-            }
-
-            if (getCampaign().getDeploymentDeficit(contract) > 0) {
-                return 0 != JOptionPane.showConfirmDialog(null,
-                        "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
-                        "Unmet deployment requirements", JOptionPane.YES_NO_OPTION);
-            }
-        }
-        return false;
-    }
-
-    public boolean nagOutstandingScenarios() {
-        for (final AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
-            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
-                if (getCampaign().getLocalDate().equals(scenario.getDate())) {
-                    return 0 != JOptionPane.showConfirmDialog(null,
-                            "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
-                            "Pending battle", JOptionPane.YES_NO_OPTION);
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Displays a nag if the StratCon UI has unresolved hostile forces
-     */
-    public boolean nagUnresolvedStratconContacts() {
-        String nagText = StratconRulesManager.nagUnresolvedContacts(getCampaign());
-
-        if (!nagText.isEmpty()) {
-            return 0 != JOptionPane.showConfirmDialog(null,
-                    String.format("You have unresolved contacts on the StratCon interface:\n%s\nAdvance day anyway?", nagText),
-                    "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
-        }
-
-        return false;
     }
 
     private void hirePerson(final ActionEvent evt) {
@@ -2601,43 +2564,61 @@ public class CampaignGUI extends JPanel {
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     @Subscribe
-    public void handleDayEnding(DayEndingEvent ev) {
+    public void handleDayEnding(DayEndingEvent evt) {
         // first check for overdue loan payments - don't allow advancement until
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
             showOverdueLoansDialog();
-            ev.cancel();
+            evt.cancel();
             return;
         }
+
         if (getCampaign().checkRetirementDefections()) {
             showRetirementDefectionDialog();
-            ev.cancel();
+            evt.cancel();
             return;
         }
+
         if (getCampaign().checkYearlyRetirements()) {
             showRetirementDefectionDialog();
-            ev.cancel();
+            evt.cancel();
             return;
         }
-        if (nagShortMaintenance()) {
-            ev.cancel();
+
+        if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
             return;
         }
+
+        if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (getCampaign().getCampaignOptions().getUseAtB()) {
-            if (nagShortDeployments()) {
-                ev.cancel();
+            if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().getUseStratCon() &&
-                    nagUnresolvedStratconContacts()) {
-                ev.cancel();
+            if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
                 return;
             }
 
-            if (nagOutstandingScenarios()) {
-                ev.cancel();
+            if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
                 return;
             }
         }
