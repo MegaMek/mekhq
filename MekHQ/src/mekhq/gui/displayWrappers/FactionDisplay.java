@@ -18,6 +18,7 @@
  */
 package mekhq.gui.displayWrappers;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.universe.Faction;
 
@@ -59,5 +60,25 @@ public class FactionDisplay {
     @Override
     public String toString() {
         return displayName;
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (other == null) {
+            return false;
+        } else if (this == other) {
+            return true;
+        } else if (other instanceof FactionDisplay) {
+            return getFaction().equals(((FactionDisplay) other).getFaction());
+        } else if (other instanceof Faction) {
+            return getFaction().equals(other);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getFaction().hashCode();
     }
 }

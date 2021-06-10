@@ -34,8 +34,9 @@ import java.util.*;
 
 /**
  * This is used to supply clan data needed to generate bloodnames
- * TODO : This should probably be merged into Faction
+ * TODO : I should be part of faction, and hence I am deprecated
  */
+@Deprecated
 public class Clan {
     //region Variable Declarations
     private static Map<String, Clan> allClans;
@@ -232,7 +233,7 @@ public class Clan {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, "loadClanData()", "Could not parse clans.xml", ex);
+            MekHQ.getLogger().error("Could not parse clans.xml", ex);
             return;
         }
 

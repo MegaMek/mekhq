@@ -39,25 +39,20 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -68,85 +63,59 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 7724064095803583812L;
 
+    private final CampaignGUI gui;
+    private final Person person;
+
     //region GUI Variables
     private JTabbedPane tabbedPane;
 
     //region General Tab
-    private JSpinner spnNumberOfDice;
-    private JSpinner spnNumberOfSides;
+    private JSpinner spnDiceCount;
+    private JSpinner spnDiceNumber;
+    private JSpinner spnDiceSides;
     private JLabel lblTotalDiceResult;
     private JTextPane txtIndividualDiceResults;
 
-    private MMComboBox<FactionDisplay> comboFaction;
+    private MMComboBox<FactionDisplay> comboRATFaction;
     private JTextField txtYear;
     private MMComboBox<String> comboQuality;
     private MMComboBox<String> comboUnitType;
     private MMComboBox<String> comboUnitWeight;
     private JLabel lblUnitPicked;
+    private MechSummary lastRolledUnit;
     //endregion General Tab
 
     //region Name Tab
-    private MMComboBox<String> ethnicCodePicker;
-    private MMComboBox<Gender> genderPicker;
-    private MMComboBox<FactionDisplay> nameGeneratorFactionPicker;
-    private JCheckBox clannerPicker;
-    private JSpinner numNames;
-    private JLabel currentName;
-    private JTextArea nameGenerated;
-
-    private JSpinner numCallsigns;
-    private JLabel currentCallsign;
-    private JTextArea callsignGenerated;
-
-    private MMComboBox<String> originClanPicker;
-    private MMComboBox<Integer> bloodnameEraPicker;
-    private MMComboBox<Phenotype> phenotypePicker;
-    private JLabel currentBloodname;
-    private JLabel bloodnameGenerated;
-    private JLabel originClanGenerated;
-    private JLabel phenotypeGenerated;
-    private JLabel bloodnameWarningLabel;
-    //endregion Name Tab
-    //endregion GUI Variables
-
-    //region Previously Generated Information
-    /**
-     * The last unit rolled, used when clicking 'Add Random Unit' after Roll for RAT is clicked
-     */
-    private MechSummary lastRolledUnit;
-
-    /**
-     * The last name rolled, used when clicking 'Set Generated Name' after Generate Name is clicked
-     */
+    private MMComboBox<String> comboEthnicCode;
+    private MMComboBox<Gender> comboGender;
+    private MMComboBox<FactionDisplay> comboNameGeneratorFaction;
+    private JCheckBox chkClanner;
+    private JSpinner spnNameNumber;
+    private JLabel lblCurrentName;
+    private JTextArea txtNamesGenerated;
     private String[] lastGeneratedName;
 
-    /**
-     * The last callsign rolled, used when clicking 'Set Generated Callsign' after Generate Callsign is clicked
-     */
+    private JSpinner spnCallsignNumber;
+    private JLabel lblCurrentCallsign;
+    private JTextArea lblCallsignsGenerated;
     private String lastGeneratedCallsign;
 
-    /**
-     * The last bloodname rolled, used when clicking 'Set Generated Bloodname' after Generate Bloodname is clicked
-     */
+    private MMComboBox<Clan> comboOriginClan;
+    private MMComboBox<Integer> comboBloodnameEra;
+    private MMComboBox<Phenotype> comboPhenotype;
+    private JLabel lblCurrentBloodname;
+    private JLabel lblBloodnameGenerated;
+    private JLabel lblOriginClanGenerated;
+    private JLabel lblPhenotypeGenerated;
+    private JLabel lblBloodnameWarning;
     private String lastGeneratedBloodname;
-    //endregion Previously Generated Information
-
-    //region Data Sources
-    private final CampaignGUI gui;
-    private final Person person;
-    private List<Clan> clans = new ArrayList<>();
-    //endregion Data Sources
-
-    //region Bloodname Information
-    private int originClan;
-    private Phenotype selectedPhenotype;
-    private int bloodnameYear;
-    //endregion Bloodname Information
+    //endregion Name Tab
+    //endregion GUI Variables
 
     //region Constants
     private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
     private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
-    private static final Integer[] ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
+    private static final Integer[] BLOODNAME_ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
     //endregion Constants
     //endregion Variable Declarations
 
@@ -161,7 +130,16 @@ public class GMToolsDialog extends AbstractMHQDialog {
     }
     //endregion Constructors
 
-    //region Getters/Setters
+    //region Getters and Setters
+    public CampaignGUI getGUI() {
+        return gui;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    //region GUI Variables
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
     }
@@ -170,29 +148,293 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.tabbedPane = tabbedPane;
     }
 
-    //endregion Getters/Setters
+    //region General Tab
+    public JSpinner getSpnDiceCount() {
+        return spnDiceCount;
+    }
+
+    public void setSpnDiceCount(final JSpinner spnDiceCount) {
+        this.spnDiceCount = spnDiceCount;
+    }
+
+    public JSpinner getSpnDiceNumber() {
+        return spnDiceNumber;
+    }
+
+    public void setSpnDiceNumber(final JSpinner spnDiceNumber) {
+        this.spnDiceNumber = spnDiceNumber;
+    }
+
+    public JSpinner getSpnDiceSides() {
+        return spnDiceSides;
+    }
+
+    public void setSpnDiceSides(final JSpinner spnDiceSides) {
+        this.spnDiceSides = spnDiceSides;
+    }
+
+    public JLabel getLblTotalDiceResult() {
+        return lblTotalDiceResult;
+    }
+
+    public void setLblTotalDiceResult(final JLabel lblTotalDiceResult) {
+        this.lblTotalDiceResult = lblTotalDiceResult;
+    }
+
+    public JTextPane getTxtIndividualDiceResults() {
+        return txtIndividualDiceResults;
+    }
+
+    public void setTxtIndividualDiceResults(final JTextPane txtIndividualDiceResults) {
+        this.txtIndividualDiceResults = txtIndividualDiceResults;
+    }
+
+    public MMComboBox<FactionDisplay> getComboRATFaction() {
+        return comboRATFaction;
+    }
+
+    public void setComboRATFaction(final MMComboBox<FactionDisplay> comboRATFaction) {
+        this.comboRATFaction = comboRATFaction;
+    }
+
+    public JTextField getTxtYear() {
+        return txtYear;
+    }
+
+    public void setTxtYear(final JTextField txtYear) {
+        this.txtYear = txtYear;
+    }
+
+    public MMComboBox<String> getComboQuality() {
+        return comboQuality;
+    }
+
+    public void setComboQuality(final MMComboBox<String> comboQuality) {
+        this.comboQuality = comboQuality;
+    }
+
+    public MMComboBox<String> getComboUnitType() {
+        return comboUnitType;
+    }
+
+    public void setComboUnitType(final MMComboBox<String> comboUnitType) {
+        this.comboUnitType = comboUnitType;
+    }
+
+    public MMComboBox<String> getComboUnitWeight() {
+        return comboUnitWeight;
+    }
+
+    public void setComboUnitWeight(final MMComboBox<String> comboUnitWeight) {
+        this.comboUnitWeight = comboUnitWeight;
+    }
+
+    public JLabel getLblUnitPicked() {
+        return lblUnitPicked;
+    }
+
+    public void setLblUnitPicked(final JLabel lblUnitPicked) {
+        this.lblUnitPicked = lblUnitPicked;
+    }
+
+    public MechSummary getLastRolledUnit() {
+        return lastRolledUnit;
+    }
+
+    public void setLastRolledUnit(final MechSummary lastRolledUnit) {
+        this.lastRolledUnit = lastRolledUnit;
+    }
+    //endregion General Tab
+
+    //region Name Tab
+
+    public MMComboBox<String> getComboEthnicCode() {
+        return comboEthnicCode;
+    }
+
+    public void setComboEthnicCode(final MMComboBox<String> comboEthnicCode) {
+        this.comboEthnicCode = comboEthnicCode;
+    }
+
+    public MMComboBox<Gender> getComboGender() {
+        return comboGender;
+    }
+
+    public void setComboGender(final MMComboBox<Gender> comboGender) {
+        this.comboGender = comboGender;
+    }
+
+    public MMComboBox<FactionDisplay> getComboNameGeneratorFaction() {
+        return comboNameGeneratorFaction;
+    }
+
+    public void setComboNameGeneratorFaction(final MMComboBox<FactionDisplay> comboNameGeneratorFaction) {
+        this.comboNameGeneratorFaction = comboNameGeneratorFaction;
+    }
+
+    public JCheckBox getChkClanner() {
+        return chkClanner;
+    }
+
+    public void setChkClanner(final JCheckBox chkClanner) {
+        this.chkClanner = chkClanner;
+    }
+
+    public JSpinner getSpnNameNumber() {
+        return spnNameNumber;
+    }
+
+    public void setSpnNameNumber(final JSpinner spnNameNumber) {
+        this.spnNameNumber = spnNameNumber;
+    }
+
+    public JLabel getLblCurrentName() {
+        return lblCurrentName;
+    }
+
+    public void setLblCurrentName(final JLabel lblCurrentName) {
+        this.lblCurrentName = lblCurrentName;
+    }
+
+    public JTextArea getTxtNamesGenerated() {
+        return txtNamesGenerated;
+    }
+
+    public void setTxtNamesGenerated(final JTextArea txtNamesGenerated) {
+        this.txtNamesGenerated = txtNamesGenerated;
+    }
+
+    public String[] getLastGeneratedName() {
+        return lastGeneratedName;
+    }
+
+    public void setLastGeneratedName(final String... lastGeneratedName) {
+        this.lastGeneratedName = lastGeneratedName;
+    }
+
+    public JSpinner getSpnCallsignNumber() {
+        return spnCallsignNumber;
+    }
+
+    public void setSpnCallsignNumber(final JSpinner spnCallsignNumber) {
+        this.spnCallsignNumber = spnCallsignNumber;
+    }
+
+    public JLabel getLblCurrentCallsign() {
+        return lblCurrentCallsign;
+    }
+
+    public void setLblCurrentCallsign(JLabel lblCurrentCallsign) {
+        this.lblCurrentCallsign = lblCurrentCallsign;
+    }
+
+    public JTextArea getLblCallsignsGenerated() {
+        return lblCallsignsGenerated;
+    }
+
+    public void setLblCallsignsGenerated(final JTextArea lblCallsignsGenerated) {
+        this.lblCallsignsGenerated = lblCallsignsGenerated;
+    }
+
+    public String getLastGeneratedCallsign() {
+        return lastGeneratedCallsign;
+    }
+
+    public void setLastGeneratedCallsign(final String lastGeneratedCallsign) {
+        this.lastGeneratedCallsign = lastGeneratedCallsign;
+    }
+
+    public MMComboBox<Clan> getComboOriginClan() {
+        return comboOriginClan;
+    }
+
+    public void setComboOriginClan(final MMComboBox<Clan> comboOriginClan) {
+        this.comboOriginClan = comboOriginClan;
+    }
+
+    public MMComboBox<Integer> getComboBloodnameEra() {
+        return comboBloodnameEra;
+    }
+
+    public void setComboBloodnameEra(final MMComboBox<Integer> comboBloodnameEra) {
+        this.comboBloodnameEra = comboBloodnameEra;
+    }
+
+    public MMComboBox<Phenotype> getComboPhenotype() {
+        return comboPhenotype;
+    }
+
+    public void setComboPhenotype(final MMComboBox<Phenotype> comboPhenotype) {
+        this.comboPhenotype = comboPhenotype;
+    }
+
+    public JLabel getLblCurrentBloodname() {
+        return lblCurrentBloodname;
+    }
+
+    public void setLblCurrentBloodname(final JLabel lblCurrentBloodname) {
+        this.lblCurrentBloodname = lblCurrentBloodname;
+    }
+
+    public JLabel getLblBloodnameGenerated() {
+        return lblBloodnameGenerated;
+    }
+
+    public void setLblBloodnameGenerated(final JLabel lblBloodnameGenerated) {
+        this.lblBloodnameGenerated = lblBloodnameGenerated;
+    }
+
+    public JLabel getLblOriginClanGenerated() {
+        return lblOriginClanGenerated;
+    }
+
+    public void setLblOriginClanGenerated(final JLabel lblOriginClanGenerated) {
+        this.lblOriginClanGenerated = lblOriginClanGenerated;
+    }
+
+    public JLabel getLblPhenotypeGenerated() {
+        return lblPhenotypeGenerated;
+    }
+
+    public void setLblPhenotypeGenerated(final JLabel lblPhenotypeGenerated) {
+        this.lblPhenotypeGenerated = lblPhenotypeGenerated;
+    }
+
+    public JLabel getLblBloodnameWarning() {
+        return lblBloodnameWarning;
+    }
+
+    public void setLblBloodnameWarning(final JLabel lblBloodnameWarning) {
+        this.lblBloodnameWarning = lblBloodnameWarning;
+    }
+
+    public String getLastGeneratedBloodname() {
+        return lastGeneratedBloodname;
+    }
+
+    public void setLastGeneratedBloodname(final String lastGeneratedBloodname) {
+        this.lastGeneratedBloodname = lastGeneratedBloodname;
+    }
+    //endregion Name Tab
+    //endregion GUI Variables
+    //endregion Getters and Setters
 
     //region Initialization
     @Override
     protected Container createCenterPane() {
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("GMToolsTabbedPane");
-        getTabbedPane().addTab(resources.getString(""), createGeneralTab());
+        getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
+        getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
+        //getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
         return getTabbedPane();
     }
 
-    private void initComponents() {
-        final JTabbedPane tabbedPane = new JTabbedPane();
-        final JPanel generalPanel = new JPanel();
-        tabbedPane.addTab("General Tab", createGeneralTab());
-        getContentPane().add(getDiceRoller(), newGridBagConstraints(0,0));
-        getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
-        getContentPane().add(getNameGenerator(), newGridBagConstraints(0, 2));
-        getContentPane().add(getCallsignGenerator(), newGridBagConstraints(0, 3));
-        getContentPane().add(getBloodnameGenerator(), newGridBagConstraints(0, 4));
+    //region General Tab
+    private JScrollPane createGeneralTab() {
+
     }
 
-    //region General Tab
     //region Dice Panel Initialization
     private JPanel getDiceRoller() {
         int gridx = 0, gridy = 0;
@@ -201,10 +443,16 @@ public class GMToolsDialog extends AbstractMHQDialog {
         dicePanel.setName("dicePanel");
         dicePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.text")));
 
-        spnNumberOfDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
-        spnNumberOfDice.setName("numDice");
-        ((JSpinner.DefaultEditor) spnNumberOfDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(spnNumberOfDice, newGridBagConstraints(gridx++, gridy));
+        countDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
+        countDice.setName("countDice");
+        dicePanel.add(countDice, newGridBagConstraints(gridx++, gridy));
+
+        JLabel rolls = new JLabel(resources.getString("rolls.text"));
+        dicePanel.add(rolls, newGridBagConstraints(gridx++, gridy));
+
+        numberDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
+        numberDice.setName("numberDice");
+        dicePanel.add(numberDice, newGridBagConstraints(gridx++, gridy));
 
         JLabel sides = new JLabel(resources.getString("sides.text"));
         sides.setName("sides");
@@ -242,7 +490,45 @@ public class GMToolsDialog extends AbstractMHQDialog {
         txtIndividualDiceResults.setEditable(false);
         dicePanel.add(txtIndividualDiceResults, newGridBagConstraints(gridx++, gridy, 3, 1));
 
-        return dicePanel;
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.title")));
+        panel.setName("dicePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseTactics)
+                        .addComponent(chkUseInitiativeBonus)
+                        .addComponent(chkUseToughness)
+                        .addComponent(chkUseArtillery)
+                        .addComponent(chkUseAbilities)
+                        .addComponent(chkUseEdge)
+                        .addComponent(chkUseSupportEdge)
+                        .addComponent(chkUseImplants)
+                        .addComponent(chkUseAlternativeQualityAveraging)
+                        .addComponent(chkUseTransfers)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(chkUseTactics)
+                        .addComponent(chkUseInitiativeBonus)
+                        .addComponent(chkUseToughness)
+                        .addComponent(chkUseArtillery)
+                        .addComponent(chkUseAbilities)
+                        .addComponent(chkUseEdge)
+                        .addComponent(chkUseSupportEdge)
+                        .addComponent(chkUseImplants)
+                        .addComponent(chkUseAlternativeQualityAveraging)
+                        .addComponent(chkUseTransfers)
+        );
+
+        return panel;
     }
     //endregion Dice Panel Initialization
 
@@ -268,10 +554,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
                 ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
-        comboFaction = new JComboBox<>(factionModel);
-        comboFaction.setName("factionPicker");
-        comboFaction.setSelectedIndex(0);
-        ratPanel.add(comboFaction, newGridBagConstraints(1, 1, 2, 1));
+        comboRATFaction = new JComboBox<>(factionModel);
+        comboRATFaction.setName("factionPicker");
+        comboRATFaction.setSelectedIndex(0);
+        ratPanel.add(comboRATFaction, newGridBagConstraints(1, 1, 2, 1));
 
         JLabel qualityLabel = new JLabel(resources.getString("qualityLabel.text"));
         qualityLabel.setName("qualityLabel");
@@ -294,7 +580,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         comboUnitType = new JComboBox<>(unitTypeModel);
         comboUnitType.setName("unitTypePicker");
         comboUnitType.addItemListener(ev -> {
-            final String unitType = (String) Objects.requireNonNull(comboUnitType.getSelectedItem());
+            final String unitType = Objects.requireNonNull(comboUnitType.getSelectedItem());
             comboUnitWeight.setEnabled(unitType.equals("Mek") || unitType.equals("Tank")
                     || unitType.equals("Aero"));
         });
@@ -314,7 +600,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         JButton ratRoll = new JButton(resources.getString("ratRoll.text"));
         ratRoll.setName("ratRoll");
-        ratRoll.addActionListener(evt -> setLastRolledUnit(performRollRat()));
+        ratRoll.addActionListener(evt -> setLastRolledUnit(performRATRoll()));
         ratPanel.add(ratRoll, newGridBagConstraints(5, 3));
 
         if (getGUI().getCampaign().isGM()) {
@@ -329,6 +615,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion General Tab
 
     //region Names Tab
+    private JScrollPane createNamesTab() {
+
+    }
+
     //region Name Generator Panel Initialization
     private JPanel getNameGenerator() {
         JPanel namePanel = new JPanel(new GridBagLayout());
@@ -342,10 +632,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         namePanel.add(genderLabel, newGridBagConstraints(gridx, 0));
 
         DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>(Gender.getExternalOptions().toArray(new Gender[]{}));
-        genderPicker = new JComboBox<>(genderModel);
-        genderPicker.setName("genderPicker");
-        genderPicker.setSelectedIndex(0);
-        namePanel.add(genderPicker, newGridBagConstraints(gridx++, 1));
+        comboGender = new JComboBox<>(genderModel);
+        comboGender.setName("genderPicker");
+        comboGender.setSelectedIndex(0);
+        namePanel.add(comboGender, newGridBagConstraints(gridx++, 1));
 
         JLabel originFactionLabel = new JLabel(resources.getString("originFactionLabel.text"));
         originFactionLabel.setName("originFactionLabel");
@@ -354,10 +644,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
                 ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
-        nameGeneratorFactionPicker = new JComboBox<>(factionModel);
-        nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
-        nameGeneratorFactionPicker.setSelectedIndex(0);
-        namePanel.add(nameGeneratorFactionPicker, newGridBagConstraints(gridx++, 1));
+        comboNameGeneratorFaction = new JComboBox<>(factionModel);
+        comboNameGeneratorFaction.setName("nameGeneratorFactionPicker");
+        comboNameGeneratorFaction.setSelectedIndex(0);
+        namePanel.add(comboNameGeneratorFaction, newGridBagConstraints(gridx++, 1));
 
         JLabel historicalEthnicityLabel = new JLabel(resources.getString("historicalEthnicityLabel.text"));
         historicalEthnicityLabel.setName("historicalEthnicityLabel");
@@ -368,20 +658,20 @@ public class GMToolsDialog extends AbstractMHQDialog {
         for (String historicalEthnicity : RandomNameGenerator.getInstance().getHistoricalEthnicity().values()) {
             historicalEthnicityModel.addElement(historicalEthnicity);
         }
-        ethnicCodePicker = new JComboBox<>(historicalEthnicityModel);
-        ethnicCodePicker.setName("ethnicCodePicker");
-        ethnicCodePicker.setSelectedIndex(0);
-        ethnicCodePicker.addActionListener(evt -> nameGeneratorFactionPicker.setEnabled(ethnicCodePicker.getSelectedIndex() == 0));
-        namePanel.add(ethnicCodePicker, newGridBagConstraints(gridx++, 1));
+        comboEthnicCode = new JComboBox<>(historicalEthnicityModel);
+        comboEthnicCode.setName("ethnicCodePicker");
+        comboEthnicCode.setSelectedIndex(0);
+        comboEthnicCode.addActionListener(evt -> comboNameGeneratorFaction.setEnabled(comboEthnicCode.getSelectedIndex() == 0));
+        namePanel.add(comboEthnicCode, newGridBagConstraints(gridx++, 1));
 
         JLabel clannerLabel = new JLabel(resources.getString("clannerLabel.text"));
         clannerLabel.setName("clannerLabel");
         namePanel.add(clannerLabel, newGridBagConstraints(gridx, 0));
 
-        clannerPicker = new JCheckBox();
-        clannerPicker.setName("clannerPicker");
-        clannerPicker.getAccessibleContext().setAccessibleName(resources.getString("clannerLabel.text"));
-        namePanel.add(clannerPicker, newGridBagConstraints(gridx++, 1));
+        chkClanner = new JCheckBox();
+        chkClanner.setName("clannerPicker");
+        chkClanner.getAccessibleContext().setAccessibleName(resources.getString("clannerLabel.text"));
+        namePanel.add(chkClanner, newGridBagConstraints(gridx++, 1));
 
         gridxMax = gridx - 1;
         gridx = 0;
@@ -391,9 +681,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
             currentNameLabel.setName("currentNameLabel");
             namePanel.add(currentNameLabel, newGridBagConstraints(gridx++, 3));
 
-            currentName = new JLabel("-");
-            currentName.setName("currentName");
-            namePanel.add(currentName, newGridBagConstraints(gridx++, 3));
+            lblCurrentName = new JLabel("-");
+            lblCurrentName.setName("currentName");
+            namePanel.add(lblCurrentName, newGridBagConstraints(gridx++, 3));
         }
 
         JLabel nameGeneratedLabel = new JLabel(resources.getString((getPerson() == null)
@@ -401,9 +691,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         nameGeneratedLabel.setName("nameGeneratedLabel");
         namePanel.add(nameGeneratedLabel, newGridBagConstraints(gridx++, 3));
 
-        nameGenerated = new JTextArea("-");
-        nameGenerated.setName("nameGenerated");
-        namePanel.add(nameGenerated, newGridBagConstraints(gridx++, 3));
+        txtNamesGenerated = new JTextArea("-");
+        txtNamesGenerated.setName("nameGenerated");
+        namePanel.add(txtNamesGenerated, newGridBagConstraints(gridx++, 3));
 
         JButton generateNameButton = new JButton(resources.getString((getPerson() == null)
                 ? "generateNamesButton.text" : "generateNameButton.text"));
@@ -418,10 +708,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         namePanel.add(generateNameButton, newGridBagConstraints(gridxMax--, 4));
 
         if (getPerson() == null) {
-            numNames = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-            numNames.setName("numNames");
-            ((JSpinner.DefaultEditor) numNames.getEditor()).getTextField().setEditable(true);
-            namePanel.add(numNames, newGridBagConstraints(gridxMax--, 4));
+            spnNameNumber = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+            spnNameNumber.setName("numNames");
+            ((JSpinner.DefaultEditor) spnNameNumber.getEditor()).getTextField().setEditable(true);
+            namePanel.add(spnNameNumber, newGridBagConstraints(gridxMax--, 4));
         } else {
             JButton assignNameButton = new JButton(resources.getString("assignNameButton.text"));
             assignNameButton.setName("assignNameButton");
@@ -446,9 +736,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
             currentCallsignLabel.setName("currentCallsignLabel");
             callsignPanel.add(currentCallsignLabel, newGridBagConstraints(gridx++, gridy));
 
-            currentCallsign = new JLabel("-");
-            currentCallsign.setName("currentCallsign");
-            callsignPanel.add(currentCallsign, newGridBagConstraints(gridx++, gridy));
+            lblCurrentCallsign = new JLabel("-");
+            lblCurrentCallsign.setName("currentCallsign");
+            callsignPanel.add(lblCurrentCallsign, newGridBagConstraints(gridx++, gridy));
         }
 
         JLabel callsignGeneratedLabel = new JLabel(resources.getString((getPerson() == null)
@@ -456,9 +746,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         callsignGeneratedLabel.setName("callsignGeneratedLabel");
         callsignPanel.add(callsignGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
-        callsignGenerated = new JTextArea("-");
-        callsignGenerated.setName("callsignGenerated");
-        callsignPanel.add(callsignGenerated, newGridBagConstraints(gridx++, gridy));
+        lblCallsignsGenerated = new JTextArea("-");
+        lblCallsignsGenerated.setName("callsignGenerated");
+        callsignPanel.add(lblCallsignsGenerated, newGridBagConstraints(gridx++, gridy));
 
         gridy++;
 
@@ -475,10 +765,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         callsignPanel.add(generateCallsignButton, newGridBagConstraints(gridx--, gridy));
 
         if (getPerson() == null) {
-            numCallsigns = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-            numCallsigns.setName("numCallsigns");
-            ((JSpinner.DefaultEditor) numCallsigns.getEditor()).getTextField().setEditable(true);
-            callsignPanel.add(numCallsigns, newGridBagConstraints(gridx--, gridy));
+            spnCallsignNumber = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+            spnCallsignNumber.setName("numCallsigns");
+            ((JSpinner.DefaultEditor) spnCallsignNumber.getEditor()).getTextField().setEditable(true);
+            callsignPanel.add(spnCallsignNumber, newGridBagConstraints(gridx--, gridy));
         } else {
             JButton assignCallsignButton = new JButton(resources.getString("assignCallsignButton.text"));
             assignCallsignButton.setName("assignCallsignButton");
@@ -508,21 +798,21 @@ public class GMToolsDialog extends AbstractMHQDialog {
         for (Clan clan : clans) {
             originClanModel.addElement(clan.getFullName(bloodnameYear));
         }
-        originClanPicker = new JComboBox<>(originClanModel);
-        originClanPicker.setName("originClanPicker");
-        originClanPicker.setSelectedIndex(0);
-        originClanPicker.addActionListener(evt -> validateBloodnameInput());
-        namePanel.add(originClanPicker, newGridBagConstraints(gridx++, gridy + 1));
+        comboOriginClan = new JComboBox<>(originClanModel);
+        comboOriginClan.setName("originClanPicker");
+        comboOriginClan.setSelectedIndex(0);
+        comboOriginClan.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(comboOriginClan, newGridBagConstraints(gridx++, gridy + 1));
 
         JLabel bloodnameEraLabel = new JLabel(resources.getString("bloodnameEraLabel.text"));
         bloodnameEraLabel.setName("bloodnameEraLabel");
         namePanel.add(bloodnameEraLabel, newGridBagConstraints(gridx, gridy));
 
-        bloodnameEraPicker = new JComboBox<>(ERAS);
-        bloodnameEraPicker.setName("bloodnameEraPicker");
-        bloodnameEraPicker.setSelectedIndex(0);
-        bloodnameEraPicker.addActionListener(evt -> validateBloodnameInput());
-        namePanel.add(bloodnameEraPicker, newGridBagConstraints(gridx++, gridy + 1));
+        comboBloodnameEra = new JComboBox<>(BLOODNAME_ERAS);
+        comboBloodnameEra.setName("bloodnameEraPicker");
+        comboBloodnameEra.setSelectedIndex(0);
+        comboBloodnameEra.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(comboBloodnameEra, newGridBagConstraints(gridx++, gridy + 1));
 
         JLabel phenotypeLabel = new JLabel(resources.getString("phenotypeLabel.text"));
         phenotypeLabel.setName("phenotypeLabel");
@@ -533,10 +823,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         for (Phenotype phenotype : Phenotype.getExternalPhenotypes()) {
             phenotypeModel.addElement(phenotype);
         }
-        phenotypePicker = new JComboBox<>(phenotypeModel);
-        phenotypePicker.setName("phenotypePicker");
-        phenotypePicker.setSelectedItem(Phenotype.GENERAL);
-        phenotypePicker.setRenderer(new DefaultListCellRenderer() {
+        comboPhenotype = new JComboBox<>(phenotypeModel);
+        comboPhenotype.setName("phenotypePicker");
+        comboPhenotype.setSelectedItem(Phenotype.GENERAL);
+        comboPhenotype.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
@@ -547,8 +837,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 return this;
             }
         });
-        phenotypePicker.addActionListener(evt -> validateBloodnameInput());
-        namePanel.add(phenotypePicker, newGridBagConstraints(gridx++, gridy + 1));
+        comboPhenotype.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(comboPhenotype, newGridBagConstraints(gridx++, gridy + 1));
 
         gridx = 0;
         gridy = 2;
@@ -558,18 +848,18 @@ public class GMToolsDialog extends AbstractMHQDialog {
             currentBloodnameLabel.setName("currentBloodnameLabel");
             namePanel.add(currentBloodnameLabel, newGridBagConstraints(gridx++, gridy));
 
-            currentBloodname = new JLabel("-");
-            currentBloodname.setName("currentBloodname");
-            namePanel.add(currentBloodname, newGridBagConstraints(gridx++, gridy));
+            lblCurrentBloodname = new JLabel("-");
+            lblCurrentBloodname.setName("currentBloodname");
+            namePanel.add(lblCurrentBloodname, newGridBagConstraints(gridx++, gridy));
         }
 
         JLabel bloodnameGeneratedLabel = new JLabel(resources.getString("bloodnameGeneratedLabel.text"));
         bloodnameGeneratedLabel.setName("nameGeneratedLabel");
         namePanel.add(bloodnameGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
-        bloodnameGenerated = new JLabel("-");
-        bloodnameGenerated.setName("bloodnameGenerated");
-        namePanel.add(bloodnameGenerated, newGridBagConstraints(gridx++, gridy++));
+        lblBloodnameGenerated = new JLabel("-");
+        lblBloodnameGenerated.setName("bloodnameGenerated");
+        namePanel.add(lblBloodnameGenerated, newGridBagConstraints(gridx++, gridy++));
 
         gridx = 0;
 
@@ -577,25 +867,25 @@ public class GMToolsDialog extends AbstractMHQDialog {
         originClanGeneratedLabel.setName("originClanGeneratedLabel");
         namePanel.add(originClanGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
-        originClanGenerated = new JLabel("-");
-        originClanGenerated.setName("originClanGenerated");
-        namePanel.add(originClanGenerated, newGridBagConstraints(gridx++, gridy));
+        lblOriginClanGenerated = new JLabel("-");
+        lblOriginClanGenerated.setName("originClanGenerated");
+        namePanel.add(lblOriginClanGenerated, newGridBagConstraints(gridx++, gridy));
 
         JLabel phenotypeGeneratedLabel = new JLabel(resources.getString("phenotypeGeneratedLabel.text"));
         phenotypeGeneratedLabel.setName("phenotypeGeneratedLabel");
         namePanel.add(phenotypeGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
-        phenotypeGenerated = new JLabel("-");
-        phenotypeGenerated.setName("phenotypeGenerated");
-        namePanel.add(phenotypeGenerated, newGridBagConstraints(gridx++, gridy++));
+        lblPhenotypeGenerated = new JLabel("-");
+        lblPhenotypeGenerated.setName("phenotypeGenerated");
+        namePanel.add(lblPhenotypeGenerated, newGridBagConstraints(gridx++, gridy++));
 
         gridxMax = gridx - 1;
         gridx = 0;
 
-        bloodnameWarningLabel = new JLabel("");
+        lblBloodnameWarning = new JLabel("");
         GridBagConstraints gridBagConstraints = newGridBagConstraints(gridx++, gridy, 1, 1);
         gridBagConstraints.gridwidth = 2;
-        namePanel.add(bloodnameWarningLabel, gridBagConstraints);
+        namePanel.add(lblBloodnameWarning, gridBagConstraints);
 
         if (getPerson() != null) {
             JButton assignBloodnameButton = new JButton(resources.getString("assignBloodnameButton.text"));
@@ -614,24 +904,26 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Bloodname Generator Panel Initialization
     //endregion Names Tab
 
-
     @Override
-    protected void setCustomPreferences(PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
-        preferences.manage(new JIntNumberSpinnerPreference(spnNumberOfDice));
-        preferences.manage(new JIntNumberSpinnerPreference(spnNumberOfSides));
-        preferences.manage(new JTextFieldPreference(txtYear));
-        preferences.manage(new JComboBoxPreference(comboFaction));
-        preferences.manage(new JComboBoxPreference(comboQuality));
-        preferences.manage(new JComboBoxPreference(comboUnitType));
-        preferences.manage(new JComboBoxPreference(comboUnitWeight));
-        if (numNames != null) {
-            preferences.manage(new JIntNumberSpinnerPreference(numNames));
+        preferences.manage(new JIntNumberSpinnerPreference(getSpnDiceCount()));
+        preferences.manage(new JIntNumberSpinnerPreference(getSpnDiceNumber()));
+        preferences.manage(new JIntNumberSpinnerPreference(getSpnDiceSides()));
+
+        preferences.manage(new JComboBoxPreference(getComboRATFaction()));
+        preferences.manage(new JTextFieldPreference(getTxtYear()));
+        preferences.manage(new JComboBoxPreference(getComboQuality()));
+        preferences.manage(new JComboBoxPreference(getComboUnitType()));
+        preferences.manage(new JComboBoxPreference(getComboUnitWeight()));
+
+        if (getSpnNameNumber() != null) {
+            preferences.manage(new JIntNumberSpinnerPreference(getSpnNameNumber()));
         }
 
-        if (numCallsigns != null) {
-            preferences.manage(new JIntNumberSpinnerPreference(numCallsigns));
+        if (getSpnCallsignNumber() != null) {
+            preferences.manage(new JIntNumberSpinnerPreference(getSpnCallsignNumber()));
         }
     }
 
@@ -641,267 +933,182 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         // Current Name is the Person's full name
-        currentName.setText(getPerson().getFullName());
+        getLblCurrentName().setText(getPerson().getFullName());
 
         // Gender is set based on the person's gender
-        genderPicker.setSelectedItem(person.getGender().isExternal() ? person.getGender()
+        getComboGender().setSelectedItem(getPerson().getGender().isExternal() ? getPerson().getGender()
                 : getPerson().getGender().getExternalVariant());
 
         // Current Callsign is set if applicable
         if (!StringUtil.isNullOrEmpty(getPerson().getCallsign())) {
-            currentCallsign.setText(getPerson().getCallsign());
+            getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
         // We set the clanner value based on whether or not the person is a clanner
-        clannerPicker.setSelected(getPerson().isClanner());
+        getChkClanner().setSelected(getPerson().isClanner());
 
         // Now we figure out the person's origin faction
-        int factionIndex = findInitialSelectedFaction(FactionDisplay.getSortedValidFactionDisplays(
-                Factions.getInstance().getFactions(), getPerson().getBirthday()));
-        if (factionIndex != 0) {
-            comboFaction.setSelectedIndex(factionIndex);
-            nameGeneratorFactionPicker.setSelectedIndex(factionIndex);
-        }
+        final Faction faction = (getPerson() == null)
+                ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction();
+        getComboRATFaction().setSelectedItem(faction);
+        getComboNameGeneratorFaction().setSelectedItem(faction);
 
         // Finally, we determine the default unit type
-        for (int i = 0; i < comboUnitType.getModel().getSize(); i++) {
-            if (doesPersonPrimarilyDriveUnitType(UnitType.determineUnitTypeCode(comboUnitType.getItemAt(i)))) {
-                comboUnitType.setSelectedIndex(i);
+        for (int i = 0; i < getComboUnitType().getModel().getSize(); i++) {
+            if (doesPersonPrimarilyDriveUnitType(UnitType.determineUnitTypeCode(getComboUnitType().getItemAt(i)))) {
+                getComboUnitType().setSelectedIndex(i);
                 break;
             }
         }
 
         if (!StringUtil.isNullOrEmpty(getPerson().getBloodname())) {
-            currentBloodname.setText(getPerson().getBloodname());
+            getLblCurrentBloodname().setText(getPerson().getBloodname());
         }
 
-        int year = gui.getCampaign().getGameYear();
-        for (int i = ERAS.length - 1; i >= 0; i--) {
-            if (ERAS[i] <= year) {
-                bloodnameEraPicker.setSelectedIndex(i);
-                year = ERAS[i];
+        int year = getGUI().getCampaign().getGameYear();
+        for (int i = BLOODNAME_ERAS.length - 1; i >= 0; i--) {
+            if (BLOODNAME_ERAS[i] <= year) {
+                getComboBloodnameEra().setSelectedIndex(i);
+                year = BLOODNAME_ERAS[i];
                 break;
             }
         }
 
-        originClanPicker.setSelectedItem((gui.getCampaign().getFaction().isClan()
-                ? gui.getCampaign().getFaction() : getPerson().getOriginFaction()).getFullName(year));
+        getComboOriginClan().setSelectedItem((getGUI().getCampaign().getFaction().isClan()
+                ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction()).getFullName(year));
 
-        phenotypePicker.setSelectedItem(getPerson().getPhenotype());
-    }
-
-    /**
-     * Finds the initial faction, which is either the person's faction (if
-     * the dialog was launched for a specific person) or the campaign's
-     * faction.
-     */
-    private int findInitialSelectedFaction(List<FactionDisplay> factionChoices) {
-        final Faction faction = (getPerson() != null)
-                ? getPerson().getOriginFaction() : getGUI().getCampaign().getFaction();
-        if (faction == null) {
-            return 0;
-        }
-
-        int index = 0;
-        for (FactionDisplay factionChoice : factionChoices) {
-            if (factionChoice.getFaction().equals(faction)) {
-                return index;
-            }
-
-            index++;
-        }
-
-        return 0;
+        getComboPhenotype().setSelectedItem(getPerson().getPhenotype());
     }
 
     /**
      * Determine if a person's primary role supports operating a
      * given unit type.
      */
-    private boolean doesPersonPrimarilyDriveUnitType(int unitType) {
-        PersonnelRole primaryRole = getPerson().getPrimaryRole();
+    private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
         switch (unitType) {
             case UnitType.AERO:
-                return primaryRole.isAerospacePilot();
+                return getPerson().getPrimaryRole().isAerospacePilot();
             case UnitType.BATTLE_ARMOR:
-                return primaryRole.isBattleArmour();
+                return getPerson().getPrimaryRole().isBattleArmour();
             case UnitType.CONV_FIGHTER:
-                return primaryRole.isConventionalAircraftPilot() || primaryRole.isAerospacePilot();
+                return getPerson().getPrimaryRole().isConventionalAircraftPilot()
+                        || getPerson().getPrimaryRole().isAerospacePilot();
             case UnitType.DROPSHIP:
             case UnitType.JUMPSHIP:
             case UnitType.SMALL_CRAFT:
             case UnitType.WARSHIP:
-                return primaryRole.isVesselPilot();
+                return getPerson().getPrimaryRole().isVesselPilot();
             case UnitType.INFANTRY:
-                return primaryRole.isSoldier();
+                return getPerson().getPrimaryRole().isSoldier();
             case UnitType.MEK:
-                return primaryRole.isMechWarrior();
+                return getPerson().getPrimaryRole().isMechWarrior();
             case UnitType.NAVAL:
-                return primaryRole.isNavalVehicleDriver();
+                return getPerson().getPrimaryRole().isNavalVehicleDriver();
             case UnitType.PROTOMEK:
-                return primaryRole.isProtoMechPilot();
+                return getPerson().getPrimaryRole().isProtoMechPilot();
             case UnitType.TANK:
-                return primaryRole.isGroundVehicleDriver();
+                return getPerson().getPrimaryRole().isGroundVehicleDriver();
             case UnitType.VTOL:
-                return primaryRole.isVTOLPilot();
+                return getPerson().getPrimaryRole().isVTOLPilot();
             default:
                 return false;
         }
     }
     //endregion Initialization
 
-    //region Getters and Setters
-    public CampaignGUI getGUI() {
-        return gui;
-    }
-
-    public void setGUI(CampaignGUI gui) {
-        this.gui = gui;
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
-
-    public MechSummary getLastRolledUnit() {
-        return lastRolledUnit;
-    }
-
-    public void setLastRolledUnit(MechSummary lastRolledUnit) {
-        this.lastRolledUnit = lastRolledUnit;
-    }
-
-    public String[] getLastGeneratedName() {
-        return lastGeneratedName;
-    }
-
-    public void setLastGeneratedName(String... lastGeneratedName) {
-        this.lastGeneratedName = lastGeneratedName;
-    }
-
-    public String getLastGeneratedCallsign() {
-        return lastGeneratedCallsign;
-    }
-
-    public void setLastGeneratedCallsign(String lastGeneratedCallsign) {
-        this.lastGeneratedCallsign = lastGeneratedCallsign;
-    }
-
-    public String getLastGeneratedBloodname() {
-        return lastGeneratedBloodname;
-    }
-
-    public void setLastGeneratedBloodname(String lastGeneratedBloodname) {
-        this.lastGeneratedBloodname = lastGeneratedBloodname;
-    }
-    //endregion Getters and Setters
-
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        List<Integer> individualDice = Compute.individualDice((Integer) spnNumberOfDice.getValue(),
-                (Integer) spnNumberOfSides.getValue());
-        lblTotalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
-                individualDice.get(0)));
-        StringBuilder sb = new StringBuilder();
+        final List<Integer> individualDice = Compute.individualRolls((Integer) getSpnDiceCount().getValue(),
+                (Integer) getSpnDiceNumber().getValue(), (Integer) getSpnDiceSides().getValue());
+        getLblTotalDiceResult().setText(String.format(resources.getString("totalDiceResult.text"), individualDice.get(0)));
+
+        final StringBuilder sb = new StringBuilder();
         for (int i = 1; i < individualDice.size() - 1; i++) {
             sb.append(individualDice.get(i)).append(", ");
         }
         sb.append(individualDice.get(individualDice.size() - 1));
 
-        if (sb.length() > 0) {
-            txtIndividualDiceResults.setText(sb.toString());
-        } else {
-            txtIndividualDiceResults.setText("-");
-        }
+        getTxtIndividualDiceResults().setText((sb.length() > 0) ? sb.toString() : "-");
     }
 
-    private MechSummary performRollRat() {
+    private @Nullable MechSummary performRATRoll() {
         try {
-            IUnitGenerator ug = getGUI().getCampaign().getUnitGenerator();
-            int unitType = UnitType.determineUnitTypeCode(comboUnitType.getSelectedItem());
-            int unitWeight = comboUnitWeight.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
-            if (!comboUnitWeight.isEnabled()) {
-                unitWeight = AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
-            }
-            int targetYear = Integer.parseInt(txtYear.getText());
-            int unitQuality = comboQuality.getSelectedIndex();
+            final int targetYear = Integer.parseInt(getTxtYear().getText());
+            final Predicate<MechSummary> predicate = summary ->
+                    (!getGUI().getCampaign().getCampaignOptions().limitByYear() || (targetYear > summary.getYear()))
+                            && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowClanPurchases())
+                            && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowISPurchases());
+            final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
+            final int unitWeight = getComboUnitWeight().isEnabled()
+                    ? getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT
+                    : AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
 
-            Campaign campaign = getGUI().getCampaign();
-            Predicate<MechSummary> test = ms ->
-                    (!campaign.getCampaignOptions().limitByYear() || (targetYear > ms.getYear()))
-                            && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                            && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
-            MechSummary ms = ug.generate(Objects.requireNonNull(comboFaction.getSelectedItem()).getFaction().getShortName(),
-                    unitType, unitWeight, targetYear, unitQuality, test);
-            if (ms != null) {
-                lblUnitPicked.setText(ms.getName());
-                return ms;
+            final MechSummary summary = getGUI().getCampaign().getUnitGenerator()
+                    .generate(Objects.requireNonNull(getComboRATFaction().getSelectedItem()).getFaction().getShortName(),
+                            unitType, unitWeight, targetYear, getComboQuality().getSelectedIndex(), predicate);
+            if (summary != null) {
+                getLblUnitPicked().setText(summary.getName());
+                return summary;
             }
-        } catch (Exception e) {
-            lblUnitPicked.setText(Messages.getString("invalidYear.error"));
+        } catch (Exception ignored) {
+            getLblUnitPicked().setText(Messages.getString("invalidYear.error"));
             return null;
         }
 
-        lblUnitPicked.setText(Messages.getString("noValidUnit.error"));
+        getLblUnitPicked().setText(Messages.getString("noValidUnit.error"));
         return null;
     }
 
     private void addRATRolledUnit() {
         if (getLastRolledUnit() == null) {
-            setLastRolledUnit(performRollRat());
+            setLastRolledUnit(performRATRoll());
         }
 
         if (getLastRolledUnit() != null) {
-            Entity e;
             try {
-                e = new MechFileParser(getLastRolledUnit().getSourceFile(),
+                final Entity entity = new MechFileParser(getLastRolledUnit().getSourceFile(),
                         getLastRolledUnit().getEntryName()).getEntity();
-                Unit u = getGUI().getCampaign().addNewUnit(e, false, 0);
+                final Unit unit = getGUI().getCampaign().addNewUnit(entity, false, 0);
                 if ((getPerson() != null) && (getPerson().getUnit() == null)) {
-                    u.addPilotOrSoldier(getPerson());
-                    getPerson().setOriginalUnit(u);
-                    setVisible(false);
+                    unit.addPilotOrSoldier(getPerson());
+                    getPerson().setOriginalUnit(unit);
                 }
                 setLastRolledUnit(null);
-            } catch (Exception ex) {
-                MekHQ.getLogger().error("Failed to load entity "
-                        + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile(), ex);
-                lblUnitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
+            } catch (Exception e) {
+                final String message = String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName(), getLastRolledUnit().getSourceFile());
+                MekHQ.getLogger().error(message, e);
+                getLblUnitPicked().setText(message);
             }
         }
     }
 
     private void generateName() {
-        String[] name = generateIndividualName();
-        nameGenerated.setText((name[0] + " " + name[1]).trim());
+        final String[] name = generateIndividualName();
+        getTxtNamesGenerated().setText((name[0] + " " + name[1]).trim());
         setLastGeneratedName(name);
     }
 
     private void generateNames() {
-        StringJoiner sj = new StringJoiner("\n");
-        for (int i = 0; i < (Integer) numNames.getValue(); i++) {
+        final StringJoiner sj = new StringJoiner("\n");
+        for (int i = 0; i < (Integer) getSpnNameNumber().getValue(); i++) {
             final String[] name = generateIndividualName();
             sj.add((name[0] + " " + name[1]).trim());
         }
-        nameGenerated.setText(sj.toString());
+        getTxtNamesGenerated().setText(sj.toString());
     }
 
     private String[] generateIndividualName() {
-        final int ethnicCode = ethnicCodePicker.getSelectedIndex();
-        String[] name;
+        final int ethnicCode = getComboEthnicCode().getSelectedIndex();
+        final String[] name;
 
         if (ethnicCode == 0) {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                    (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(),
-                    ((FactionChoice) Objects.requireNonNull(nameGeneratorFactionPicker.getSelectedItem()))
+                    getComboGender().getSelectedItem(), getChkClanner().isSelected(),
+                    (Objects.requireNonNull(getComboNameGeneratorFaction().getSelectedItem()))
                             .getFaction().getShortName());
         } else {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplitWithEthnicCode(
-                    (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(), ethnicCode);
+                    getComboGender().getSelectedItem(), getChkClanner().isSelected(), ethnicCode);
         }
         return name;
     }
@@ -911,7 +1118,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateName();
         }
 
-        currentName.setText((getLastGeneratedName()[0] + " " + getLastGeneratedName()[1]).trim());
+        getLblCurrentName().setText((getLastGeneratedName()[0] + " " + getLastGeneratedName()[1]).trim());
         getPerson().setGivenName(getLastGeneratedName()[0]);
         getPerson().setSurname(getLastGeneratedName()[1]);
 
@@ -919,17 +1126,16 @@ public class GMToolsDialog extends AbstractMHQDialog {
     }
 
     private void generateCallsign() {
-        String callsign = RandomCallsignGenerator.getInstance().generate();
-        callsignGenerated.setText(callsign);
-        setLastGeneratedCallsign(callsign);
+        getLblCallsignsGenerated().setText(RandomCallsignGenerator.getInstance().generate());
+        setLastGeneratedCallsign(getLblCallsignsGenerated().getText());
     }
 
     private void generateCallsigns() {
-        StringJoiner sj = new StringJoiner("\n");
-        for (int i = 0; i < (Integer) numCallsigns.getValue(); i++) {
+        final StringJoiner sj = new StringJoiner("\n");
+        for (int i = 0; i < (Integer) getSpnCallsignNumber().getValue(); i++) {
             sj.add(RandomCallsignGenerator.getInstance().generate());
         }
-        callsignGenerated.setText(sj.toString());
+        getLblCallsignsGenerated().setText(sj.toString());
     }
 
     private void assignCallsign() {
@@ -937,7 +1143,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateCallsign();
         }
 
-        currentCallsign.setText(getLastGeneratedCallsign());
+        getLblCurrentCallsign().setText(getLastGeneratedCallsign());
         getPerson().setCallsign(getLastGeneratedCallsign());
 
         MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
@@ -947,9 +1153,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         Bloodname bloodname = Bloodname.randomBloodname(clans.get(originClan),
                 selectedPhenotype, bloodnameYear);
         if (bloodname != null) {
-            bloodnameGenerated.setText(bloodname.getName() + " (" + bloodname.getFounder() + ")");
-            originClanGenerated.setText(Clan.getClan(bloodname.getOrigClan()).getFullName(bloodnameYear));
-            phenotypeGenerated.setText(bloodname.getPhenotype().getGroupingName());
+            getLblBloodnameGenerated().setText(bloodname.getName() + " (" + bloodname.getFounder() + ")");
+            getLblOriginClanGenerated().setText(Clan.getClan(bloodname.getOrigClan()).getFullName(bloodnameYear));
+            getLblPhenotypeGenerated().setText(bloodname.getPhenotype().getGroupingName());
             setLastGeneratedBloodname(bloodname.getName());
         }
     }
@@ -959,7 +1165,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             generateBloodname();
         }
 
-        currentBloodname.setText(getLastGeneratedBloodname());
+        getLblCurrentBloodname().setText(getLastGeneratedBloodname());
         getPerson().setBloodname(getLastGeneratedBloodname());
 
         MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
@@ -967,9 +1173,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
 
     private void validateBloodnameInput() {
-        originClan = originClanPicker.getSelectedIndex();
-        bloodnameYear = ERAS[bloodnameEraPicker.getSelectedIndex()];
-        selectedPhenotype = (Phenotype) phenotypePicker.getSelectedItem();
+        originClan = comboOriginClan.getSelectedItem();
+        bloodnameYear = BLOODNAME_ERAS[comboBloodnameEra.getSelectedIndex()];
+        selectedPhenotype = comboPhenotype.getSelectedItem();
 
         if ((originClan < 0) || (selectedPhenotype == Phenotype.NONE) || (selectedPhenotype == null)) {
             return;
@@ -979,7 +1185,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         String txt = "<html>";
 
         if (bloodnameYear < selectedClan.getStartDate()) {
-            for (int era : ERAS) {
+            for (int era : BLOODNAME_ERAS) {
                 if (era >= selectedClan.getStartDate()) {
                     bloodnameYear = era;
                     txt += "<div>" + selectedClan.getFullName(bloodnameYear) + " formed in "
@@ -992,9 +1198,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 bloodnameYear = selectedClan.getStartDate();
             }
         } else if (bloodnameYear > selectedClan.getEndDate()) {
-            for (int i = ERAS.length - 1; i >= 0; i--) {
-                if (ERAS[i] <= selectedClan.getEndDate()) {
-                    bloodnameYear = ERAS[i];
+            for (int i = BLOODNAME_ERAS.length - 1; i >= 0; i--) {
+                if (BLOODNAME_ERAS[i] <= selectedClan.getEndDate()) {
+                    bloodnameYear = BLOODNAME_ERAS[i];
                     txt += "<div>" + selectedClan.getFullName(bloodnameYear) + " ceased to existed in "
                             + selectedClan.getEndDate() + ". Using " + bloodnameYear + ".</div>";
                     break;
@@ -1020,7 +1226,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             bloodnameYear = 3100;
         }
         txt += "</html>";
-        bloodnameWarningLabel.setText(txt);
+        lblBloodnameWarning.setText(txt);
     }
     //endregion ActionEvent Handlers
 }
