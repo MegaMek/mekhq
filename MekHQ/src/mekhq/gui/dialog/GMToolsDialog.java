@@ -24,6 +24,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.dialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;
@@ -52,10 +53,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -102,7 +106,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JTextArea txtCallsignsGenerated;
     private String lastGeneratedCallsign;
 
-    private MMComboBox<Clan> comboOriginClan;
+    private MMComboBox<ClanDisplay> comboOriginClan;
     private MMComboBox<Integer> comboBloodnameEra;
     private MMComboBox<Phenotype> comboPhenotype;
     private JLabel lblCurrentBloodname;
@@ -348,11 +352,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lastGeneratedCallsign = lastGeneratedCallsign;
     }
 
-    public MMComboBox<Clan> getComboOriginClan() {
+    public MMComboBox<ClanDisplay> getComboOriginClan() {
         return comboOriginClan;
     }
 
-    public void setComboOriginClan(final MMComboBox<Clan> comboOriginClan) {
+    public void setComboOriginClan(final MMComboBox<ClanDisplay> comboOriginClan) {
         this.comboOriginClan = comboOriginClan;
     }
 
@@ -652,6 +656,15 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         setLblUnitPicked(new JLabel("-"));
         getLblUnitPicked().setName("lblUnitPicked");
+        getLblUnitPicked().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        getLblUnitPicked().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent evt) {
+                if (getLastRolledUnit() != null) {
+                    new EntityReadoutDialog(getFrame(), getLastRolledUnit()).setVisible(true);
+                }
+            }
+        });
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = maxGridX - (getGUI().getCampaign().isGM() ? 2 : 1);
@@ -944,8 +957,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx++;
         panel.add(lblPhenotype, gbc);
 
-        final DefaultComboBoxModel<Clan> originClanModel = new DefaultComboBoxModel<>();
-        originClanModel.addAll(Clan.getClans());
+        final DefaultComboBoxModel<ClanDisplay> originClanModel = new DefaultComboBoxModel<>();
+        originClanModel.addAll(ClanDisplay.getSortedClanDisplays(Clan.getClans(),
+                getGUI().getCampaign().getLocalDate()));
         setComboOriginClan(new MMComboBox<>("comboOriginClan", originClanModel));
         getComboOriginClan().setSelectedIndex(0);
         getComboOriginClan().addActionListener(evt -> validateBloodnameInput());
@@ -1218,10 +1232,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
             return null;
         }
 
-        getLblUnitPicked().setText(summary.getName());
-
         try {
-            return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            final Entity entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            getLblUnitPicked().setText(String.format("<html><a href='ENTITY'>%s</html>", summary.getName()));
+            return entity;
         } catch (Exception e) {
             final String message = String.format(Messages.getString("entityLoadFailure.error"),
                     summary.getName(), summary.getSourceFile());
@@ -1339,7 +1353,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
     }
 
     private void validateBloodnameInput() {
-        setOriginClan(getComboOriginClan().getSelectedItem());
+        setOriginClan((getComboOriginClan().getSelectedItem() == null) ? null
+                : getComboOriginClan().getSelectedItem().getClan());
         setBloodnameYear(BLOODNAME_ERAS[getComboBloodnameEra().getSelectedIndex()]);
         setSelectedPhenotype(getComboPhenotype().getSelectedItem());
 
