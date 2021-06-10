@@ -131,7 +131,7 @@ public class StratconContractDefinition {
         FacilityDestruction
     }
 
-    private AtBContractType contractType;
+    private String contractTypeName;
     private String briefing;
 
     /**
@@ -176,17 +176,17 @@ public class StratconContractDefinition {
     private List<Integer> deploymentTimes;
 
     /**
-     * @return the contract type
+     * @return the contract type name
      */
-    public AtBContractType getContractType() {
-        return contractType;
+    public String getContractTypeName() {
+        return contractTypeName;
     }
 
     /**
-     * @param contractType the contract type to set
+     * @param contractTypeName the contract type name to set
      */
-    public void setContractType(final AtBContractType contractType) {
-        this.contractType = contractType;
+    public void setContractTypeName(final String contractTypeName) {
+        this.contractTypeName = contractTypeName;
     }
 
     /**

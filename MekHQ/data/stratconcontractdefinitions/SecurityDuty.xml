@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>SECURITY_DUTY</contractType>
+    <contractTypeName>Security Duty</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Defend designated facilities.</briefing>
     <hostileFacilityCount>0</hostileFacilityCount>

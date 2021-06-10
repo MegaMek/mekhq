@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>CADRE_DUTY</contractType>
+    <contractTypeName>Cadre Duty</contractTypeName>
     <alliedFacilityCount>-0.3</alliedFacilityCount>
     <briefing>Protect attached trainees.</briefing>
     <hostileFacilityCount>0</hostileFacilityCount>

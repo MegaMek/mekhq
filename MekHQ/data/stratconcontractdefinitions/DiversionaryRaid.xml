@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>DIVERSIONARY_RAID</contractType>
+    <contractTypeName>Diversionary Raid</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Engage hostile forces.</briefing>
     <hostileFacilityCount>-1</hostileFacilityCount>

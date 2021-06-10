@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>RELIEF_DUTY</contractType>
+    <contractTypeName>Relief Duty</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Destroy or capture designated facilities while holding existing gains.</briefing>
     <hostileFacilityCount>0</hostileFacilityCount>

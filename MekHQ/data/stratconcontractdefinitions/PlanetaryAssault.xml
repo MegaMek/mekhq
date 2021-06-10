@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>PLANETARY_ASSAULT</contractType>
+    <contractTypeName>Planetary Assault</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Destroy or capture designated facilities.</briefing>
     <hostileFacilityCount>0</hostileFacilityCount>
