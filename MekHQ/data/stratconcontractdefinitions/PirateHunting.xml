@@ -19,14 +19,14 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>FacilityDestruction</objectiveType>
-		<objectiveCount>-0.3</objectiveCount>
+		<objectiveCount>-0.33</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>AlliedFacilityControl</objectiveType>
-		<objectiveCount>-0.3</objectiveCount>
+		<objectiveCount>-0.33</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
-		<objectiveCount>-0.3</objectiveCount>
+		<objectiveCount>-0.33</objectiveCount>
 		<objectiveType>AnyScenarioVictory</objectiveType>
 		<objectiveScenarios>
                 	<objectiveScenario>Destroy Grounded Dropship.xml</objectiveScenario>

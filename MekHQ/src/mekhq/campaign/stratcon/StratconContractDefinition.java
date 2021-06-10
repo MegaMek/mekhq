@@ -21,6 +21,7 @@ package mekhq.campaign.stratcon;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,9 +166,10 @@ public class StratconContractDefinition {
     private List<ObjectiveParameters> objectiveParameters;
 
     /**
-     * If true, strategic objective scenarios contribute to the VP count
+     * This is a list of scenario modifier names that apply to
+     * *every* mission generated in this contract. Use very sparingly.
      */
-    private boolean objectivesBehaveAsVPs;
+    private List<String> globalScenarioModifiers = new ArrayList<>();
 
     private List<Integer> scenarioOdds;
 
@@ -259,14 +261,6 @@ public class StratconContractDefinition {
         this.objectiveParameters = objectiveParameters;
     }
 
-    public boolean objectivesBehaveAsVPs() {
-        return objectivesBehaveAsVPs;
-    }
-
-    public void setObjectivesBehaveAsVPs(boolean objectivesBehaveAsVPs) {
-        this.objectivesBehaveAsVPs = objectivesBehaveAsVPs;
-    }
-
     @XmlElementWrapper(name = "scenarioOdds")
     @XmlElement(name = "scenarioOdds")
     public List<Integer> getScenarioOdds() {
@@ -285,6 +279,14 @@ public class StratconContractDefinition {
 
     public void setDeploymentTimes(List<Integer> deploymentTimes) {
         this.deploymentTimes = deploymentTimes;
+    }
+
+    public List<String> getGlobalScenarioModifiers() {
+        return globalScenarioModifiers;
+    }
+
+    public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
+        this.globalScenarioModifiers = globalScenarioModifiers;
     }
 
     /**
@@ -311,7 +313,7 @@ public class StratconContractDefinition {
          */
         @XmlElementWrapper(name = "objectiveScenarios")
         @XmlElement(name = "objectiveScenario")
-        List<String> objectiveScenarios;
+        List<String> objectiveScenarios = new ArrayList<>();
 
         /**
          * If a particular scenario being generated is a strategic objective, it will have
@@ -319,7 +321,7 @@ public class StratconContractDefinition {
          */
         @XmlElementWrapper(name = "objectiveScenarioModifiers")
         @XmlElement(name = "objectiveScenarioModifier")
-        List<String> objectiveScenarioModifiers;
+        List<String> objectiveScenarioModifiers = new ArrayList<>();
     }
 
     /**

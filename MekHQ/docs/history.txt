@@ -5,7 +5,7 @@ VERSION HISTORY:
 + Issue #2625: Properly Clear Tech Units on Person removal/retirement
 + PR #2617: Contract Command Rights Enum and Tool Tips
 + PR #2637: Personnel Names
-+ PR #2651: Various StratCon fixes:
++ PR #2651, #2688: Various StratCon fixes:
   - Updated arrival altitude for aerospace fighter reinforcement modifiers (they were showing up on the ground)
   - Standardized "recon" type scenarios to have the same criteria as Tukayyid scenarios
   - Various briefing text clarifications
@@ -14,6 +14,8 @@ VERSION HISTORY:
   - Adjusted manual force deployment rules (unlimited stacking on allied facilities, one per hex otherwise, no manual deployment under integrated command)
   - Tighten up reinforcement restrictions (can't deploy units that can't actually deploy; can't double deploy units; can now only deploy fight lances or have to use a support point/VP)
   - VTOLs no longer start on the ground in certain situations
+  - Removed extraneous "recon turrets" modifier span for recon raid contracts
+  - Tighten up strategic objective generation; correct objective coordinate display
 + PR #2656: Cleaning up a few erroneous Campaign GUI properties
 + PR #2655: Ensuring BotForce has a Valid Base Camouflage
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
@@ -33,6 +35,7 @@ VERSION HISTORY:
 + Issue #2529: Fixing refit display so it no longer includes the pilot's BV
 + PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
 + PR #2540: Factions Data Customizability Expansion and Cleanup
++ PR #2677: Ignorable Nag Dialogs
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names

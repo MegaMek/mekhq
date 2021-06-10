@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractType>RIOT_DUTY</contractType>
+    <contractTypeName>Riot Duty</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Defend designated facilities.</briefing>
     <hostileFacilityCount>0</hostileFacilityCount>
@@ -23,7 +23,7 @@
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveCount>-0.5</objectiveCount>
-		<objectiveType>AnyScenarioVictory</objectiveType>
+		<objectiveType>SpecificScenarioVictory</objectiveType>
 		<objectiveScenarios>
                 	<objectiveScenario>Irregular Forces.xml</objectiveScenario>
 		</objectiveScenarios>

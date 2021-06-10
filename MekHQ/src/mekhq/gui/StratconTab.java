@@ -335,12 +335,8 @@ public class StratconTab extends CampaignGuiTab {
                     default:
                         break;
                 }
-
-                // need to add:
-                // global (campaign-state level) "keep VP count above 0" for liaison/house/integrated
-
                 if (coordsRevealed && displayCoordinateData) {
-                    sb.append(" at ").append(objective.getObjectiveCoords().toFriendlyString())
+                    sb.append(" at ").append(objective.getObjectiveCoords().toString())
                         .append(" on ").append(track.getDisplayableName());
                 }
 
