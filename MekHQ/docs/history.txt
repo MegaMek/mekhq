@@ -36,6 +36,7 @@ VERSION HISTORY:
 + PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
 + PR #2540: Factions Data Customizability Expansion and Cleanup
 + PR #2677: Ignorable Nag Dialogs
++ Issues #2636 and #2658: AdvanceDaysDialog Rework: Advancement-based Modality, Expanded Buttons, Persistent Daily Report
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
