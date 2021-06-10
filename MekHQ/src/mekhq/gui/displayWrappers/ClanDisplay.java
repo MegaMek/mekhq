@@ -35,24 +35,20 @@ import java.util.stream.Collectors;
 public class ClanDisplay {
     //region Variable Declarations
     private final Clan clan;
-    private String displayName;
+    private final String displayName;
     //endregion Variable Declarations
 
     //region Constructors
     public ClanDisplay(final Clan clan, final LocalDate today) {
         this.clan = clan;
-        setDisplayName(today);
+        this.displayName = String.format("%s [%s]", getClan().getFullName(today.getYear()),
+                getClan().getCode());
     }
     //endregion Constructors
 
     //region Getters/Setters
     public Clan getClan() {
         return clan;
-    }
-
-    public void setDisplayName(final LocalDate today) {
-        this.displayName = String.format("%s [%s]", getClan().getFullName(today.getYear()),
-                getClan().getCode());
     }
     //endregion Getters/Setters
 

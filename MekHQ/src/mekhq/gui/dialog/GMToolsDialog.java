@@ -1123,8 +1123,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getChkClanner().setSelected(getPerson().isClanner());
 
         // Now we figure out the person's origin faction
-        final Faction faction = (getPerson() == null)
-                ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction();
+        final FactionDisplay faction = new FactionDisplay(getPerson().getOriginFaction(), getPerson().getBirthday());
         getComboRATFaction().setSelectedItem(faction);
         getComboNameGeneratorFaction().setSelectedItem(faction);
 
@@ -1149,8 +1148,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        getComboOriginClan().setSelectedItem((getGUI().getCampaign().getFaction().isClan()
-                ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction()).getFullName(year));
+        final Clan clan = Clan.getClan((getGUI().getCampaign().getFaction().isClan()
+                ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction()).getShortName());
+        if (clan != null) {
+            getComboOriginClan().setSelectedItem(new ClanDisplay(clan, getGUI().getCampaign().getLocalDate()));
+        }
 
         getComboPhenotype().setSelectedItem(getPerson().getPhenotype());
     }
