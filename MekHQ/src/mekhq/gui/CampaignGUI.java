@@ -273,10 +273,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAdvanceDaysDialog() {
-        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this);
-        advanceDaysDialog.setModal(true);
-        advanceDaysDialog.setVisible(true);
-        advanceDaysDialog.dispose();
+        new AdvanceDaysDialog(getFrame(), this).setVisible(true);
     }
 
     public void randomizeAllBloodnames() {
