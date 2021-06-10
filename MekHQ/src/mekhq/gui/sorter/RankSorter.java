@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -33,48 +34,77 @@ import mekhq.campaign.personnel.Person;
  * @author Jay Lawson
  */
 public class RankSorter implements Comparator<String>, Serializable {
+    //region Variable Declarations
     private static final long serialVersionUID = -7004206878096279028L;
-    private PrisonerStatusSorter prisonerStatusSorter = new PrisonerStatusSorter();
-    private Campaign campaign;
-    private Pattern pattern;
+    private final Campaign campaign;
+    private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
+    private final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+    private final PrisonerStatusSorter prisonerStatusSorter = new PrisonerStatusSorter();
+    //endregion Variable Declarations
 
-    public RankSorter(Campaign c) {
-        campaign = c;
-        pattern = Pattern.compile("id=\"([^\"]+)\"");
+    //region Constructors
+    public RankSorter(final Campaign campaign) {
+        this.campaign = campaign;
+    }
+    //endregion Constructors
+
+    //region Getters
+    public Campaign getCampaign() {
+        return campaign;
     }
 
+    public Pattern getPattern() {
+        return pattern;
+    }
+
+    public NaturalOrderComparator getNaturalOrderComparator() {
+        return naturalOrderComparator;
+    }
+
+    public PrisonerStatusSorter getPrisonerStatusSorter() {
+        return prisonerStatusSorter;
+    }
+    //endregion Getters
+
     @Override
-    public int compare(String s0, String s1) {
+    public int compare(final String s0, final String s1) {
         // get the numbers associated with each rank string, and compare
-        Matcher matcher = pattern.matcher(s0);
+        Matcher matcher = getPattern().matcher(s0);
         matcher.find();
-        String s00 = matcher.group(1);
-        matcher = pattern.matcher(s1);
+        final String s00 = matcher.group(1);
+        matcher = getPattern().matcher(s1);
         matcher.find();
-        String s11 = matcher.group(1);
+        final String s11 = matcher.group(1);
         try {
-            Person p0 = campaign.getPerson(UUID.fromString(s00));
-            Person p1 = campaign.getPerson(UUID.fromString(s11));
+            final Person p0 = getCampaign().getPerson(UUID.fromString(s00));
+            final Person p1 = getCampaign().getPerson(UUID.fromString(s11));
 
             // First we sort based on prisoner status
-            int prisonerStatusComparison = prisonerStatusSorter.compare(p0.getPrisonerStatus(), p1.getPrisonerStatus());
+            final int prisonerStatusComparison = getPrisonerStatusSorter().compare(
+                    p0.getPrisonerStatus(), p1.getPrisonerStatus());
             if (prisonerStatusComparison != 0) {
                 return prisonerStatusComparison;
             }
 
             // Both have the same prisoner status, so now we sort based on the ranks
-            // the rank orders match, try comparing the levels
+            // This is done in the following way:
+            // 1. Rank Numeric
+            // 2. Rank Level
+            // 3. Manei Domini Rank
+            // 4. Rank Name (natural order)
             if (p0.getRankNumeric() == p1.getRankNumeric()) {
-                // the levels match too, try comparing MD rank
                 if (p0.getRankLevel() == p1.getRankLevel()) {
                     if (p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
-                        return s0.compareTo(s1);
+                        return getNaturalOrderComparator().compare(s0, s1);
+                    } else {
+                        return Integer.compare(p0.getManeiDominiRank().ordinal(), p1.getManeiDominiRank().ordinal());
                     }
-                    return Integer.compare(p0.getManeiDominiRank().ordinal(), p1.getManeiDominiRank().ordinal());
+                } else {
+                    return Integer.compare(p0.getRankLevel(), p1.getRankLevel());
                 }
-                return Integer.compare(p0.getRankLevel(), p1.getRankLevel());
+            } else {
+                return Integer.compare(p0.getRankNumeric(), p1.getRankNumeric());
             }
-            return Integer.compare(p0.getRankNumeric(), p1.getRankNumeric());
         } catch (Exception e) {
             MekHQ.getLogger().error(String.format("RankSorter Exception, s0: %s, s1: %s", s00, s11), e);
             return 0;
