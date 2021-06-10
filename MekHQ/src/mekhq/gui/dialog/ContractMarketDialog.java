@@ -224,10 +224,11 @@ public class ContractMarketDialog extends JDialog {
         for (Contract c : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract) {
-                ((AtBContract) c).initContractDetails(campaign);
-                ((AtBContract) c).calculatePaymentMultiplier(campaign);
-                ((AtBContract) c).calculatePartsAvailabilityLevel(campaign);
-                ((AtBContract) c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+                final AtBContract atbContract = (AtBContract) c;
+                atbContract.initContractDetails(campaign);
+                atbContract.calculatePaymentMultiplier(campaign);
+                atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
+                atbContract.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
                         ? (Integer) spnSharePct.getValue() : 0);
             }
             c.setStartDate(null);
@@ -241,9 +242,9 @@ public class ContractMarketDialog extends JDialog {
                 row.add(((AtBContract) c).getEmployerName(campaign.getGameYear()));
                 row.add(((AtBContract) c).getEnemyName(campaign.getGameYear()));
                 if (((AtBContract) c).isSubcontract()) {
-                    row.add(((AtBContract) c).getMissionTypeName() + " (Subcontract)");
+                    row.add(((AtBContract) c).getContractType() + " (Subcontract)");
                 } else {
-                    row.add(((AtBContract) c).getMissionTypeName());
+                    row.add(((AtBContract) c).getContractType().toString());
                 }
             } else {
                 row.add(c.getEmployer());
@@ -371,7 +372,7 @@ public class ContractMarketDialog extends JDialog {
             }
 
             c.initContractDetails(campaign);
-            c.calculatePartsAvailabilityLevel(campaign);
+            c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
             c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
                     ? (Integer) spnSharePct.getValue() : 0);
             c.setStartDate(null);
@@ -383,7 +384,7 @@ public class ContractMarketDialog extends JDialog {
             Vector<String> row = new Vector<>();
             row.add(c.getEmployerName(campaign.getGameYear()));
             row.add(c.getEnemyName(campaign.getGameYear()));
-            row.add(c.getMissionTypeName());
+            row.add(c.getContractType().toString());
 
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
@@ -444,7 +445,6 @@ public class ContractMarketDialog extends JDialog {
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(selectedContract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                     "Advance monies for " + selectedContract.getName(), campaign.getLocalDate());
-            
             campaign.addMission(selectedContract);
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);

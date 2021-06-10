@@ -23,12 +23,13 @@ import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
-public enum MissionStatus {
+public enum AtBLanceRole {
     //region Enum Declarations
-    ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
-    SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
-    FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
-    BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
+    FIGHTING("AtBLanceRole.FIGHTING.text", "AtBLanceRole.FIGHTING.toolTipText"),
+    DEFENCE("AtBLanceRole.DEFENCE.text", "AtBLanceRole.DEFENCE.toolTipText"),
+    SCOUTING("AtBLanceRole.SCOUTING.text", "AtBLanceRole.SCOUTING.toolTipText"),
+    TRAINING("AtBLanceRole.TRAINING.text", "AtBLanceRole.TRAINING.toolTipText"),
+    UNASSIGNED("AtBLanceRole.UNASSIGNED.text", "AtBLanceRole.UNASSIGNED.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -39,7 +40,7 @@ public enum MissionStatus {
     //endregion Variable Declarations
 
     //region Constructors
-    MissionStatus(final String name, final String toolTipText) {
+    AtBLanceRole(final String name, final String toolTipText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -52,38 +53,29 @@ public enum MissionStatus {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isActive() {
-        return this == ACTIVE;
+    public boolean isFighting() {
+        return this == FIGHTING;
     }
 
-    public boolean isSuccess() {
-        return this == SUCCESS;
+    public boolean isDefence() {
+        return this == DEFENCE;
     }
 
-    public boolean isFailed() {
-        return this == FAILED;
+    public boolean isScouting() {
+        return this == SCOUTING;
     }
 
-    public boolean isBreach() {
-        return this == BREACH;
+    public boolean isTraining() {
+        return this == TRAINING;
     }
 
-    /**
-     * This is used to determine whether a status means that the mission is completed.
-     * This is purposefully not a check to see if it is active for future proofing reasons
-     * @return true if the mission has been completed, otherwise false
-     */
-    public boolean isCompleted() {
-        return isSuccess() || isFailed() || isBreach();
+    public boolean isUnassigned() {
+        return this == UNASSIGNED;
     }
     //endregion Boolean Comparison Methods
 
     //region File I/O
-    /**
-     * @param text containing the MissionStatus
-     * @return the saved MissionStatus
-     */
-    public static MissionStatus parseFromString(final String text) {
+    public static AtBLanceRole parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -93,13 +85,15 @@ public enum MissionStatus {
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
-                    return ACTIVE;
+                    return UNASSIGNED;
                 case 1:
-                    return SUCCESS;
+                    return FIGHTING;
                 case 2:
-                    return FAILED;
+                    return DEFENCE;
                 case 3:
-                    return BREACH;
+                    return SCOUTING;
+                case 4:
+                    return TRAINING;
                 default:
                     break;
             }
@@ -107,9 +101,9 @@ public enum MissionStatus {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
+        MekHQ.getLogger().error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
 
-        return ACTIVE;
+        return FIGHTING;
     }
     //endregion File I/O
 

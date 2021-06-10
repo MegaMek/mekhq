@@ -18,15 +18,12 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.time.LocalDate;
-import java.util.*;
-
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.scenario.AceDuelBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AlliedTraitorsBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AllyRescueBuiltInScenario;
@@ -49,6 +46,14 @@ import mekhq.campaign.mission.atb.scenario.ReconRaidBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StandUpBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache1BuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class AtBScenarioFactory {
     private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
@@ -199,12 +204,12 @@ public class AtBScenarioFactory {
                     }
 
                     // Assign training experience
-                    if (lance.getRole() == AtBLanceRole.TRAINING) {
+                    if (lance.getRole().isTraining()) {
                         c.awardTrainingXP(lance);
                     }
 
-                    // Don't generate scenarios for contracts with morale below the morale limit
-                    if (contract.getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
+                    // Don't generate scenarios for contracts with morale below the morale limit of Low
+                    if (contract.getMoraleLevel().isVeryLow() || contract.getMoraleLevel().isRout()) {
                         continue;
                     }
 
@@ -236,15 +241,14 @@ public class AtBScenarioFactory {
 
             //region Invincible Morale Missions
             // Make sure invincible morale missions have a base attack scenario generated
-            if (!hasBaseAttack && (contract.getMoraleLevel() == AtBContract.MORALE_INVINCIBLE)) {
+            if (!hasBaseAttack && contract.getMoraleLevel().isInvincible()) {
                 /* find a lance to act as defender, giving preference
                  * first to those assigned to the same contract,
                  * then to those assigned to defense roles
                  */
                 List<Lance> lList = new ArrayList<>();
                 for (Lance l : lances.values()) {
-                    if ((l.getMissionId() == contract.getId()) && (l.getRole() == AtBLanceRole.DEFENCE)
-                            && l.isEligible(c)) {
+                    if ((l.getMissionId() == contract.getId()) && l.getRole().isDefence() && l.isEligible(c)) {
                         lList.add(l);
                     }
                 }
