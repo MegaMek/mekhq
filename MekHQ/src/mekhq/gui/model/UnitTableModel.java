@@ -296,7 +296,7 @@ public class UnitTableModel extends DataTableModel {
                 } else if (u.isMothballed()) {
                     setForeground(MekHQ.getMekHQOptions().getMothballedForeground());
                     setBackground(MekHQ.getMekHQOptions().getMothballedBackground());
-                } else if (u.isUnmaintained()) {
+                } else if (getCampaign().getCampaignOptions().checkMaintenance() && u.isUnmaintained()) {
                     setForeground(MekHQ.getMekHQOptions().getUnmaintainedForeground());
                     setBackground(MekHQ.getMekHQOptions().getUnmaintainedBackground());
                 } else if (!u.isRepairable()) {
