@@ -56,7 +56,7 @@ public enum ScenarioStatus {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isCurrent() {
         return this == CURRENT;
     }
@@ -100,7 +100,7 @@ public enum ScenarioStatus {
     public boolean isOverallDefeat() {
         return isDecisiveDefeat() || isDefeat() || isMarginalDefeat();
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     //region File I/O
     public static ScenarioStatus parseFromString(final String text) {

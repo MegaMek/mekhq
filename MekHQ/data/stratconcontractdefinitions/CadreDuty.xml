@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
+    <contractTypeName>Cadre Duty</contractTypeName>
     <alliedFacilityCount>-0.3</alliedFacilityCount>
     <briefing>Protect attached trainees.</briefing>
-    <contractTypeName>Cadre Duty</contractTypeName>
     <hostileFacilityCount>0</hostileFacilityCount>
 	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
 	<scenarioOdds>
@@ -19,6 +19,7 @@
 	</deploymentTimes>
     <objectiveParameters>
         <objectiveParameter>
+		<objectiveCount>-1</objectiveCount>
 		<objectiveType>AnyScenarioVictory</objectiveType>
 		<objectiveScenarioModifiers>
                 	<objectiveScenarioModifier>AlliedTraineesGround.xml</objectiveScenarioModifier>

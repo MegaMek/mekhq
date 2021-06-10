@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,12 +23,14 @@ import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
-public enum MissionStatus {
+public enum AtBMoraleLevel {
     //region Enum Declarations
-    ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
-    SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
-    FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
-    BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
+    ROUT("AtBMoraleLevel.ROUT.text", "AtBMoraleLevel.ROUT.toolTipText"),
+    VERY_LOW("AtBMoraleLevel.VERY_LOW.text", "AtBMoraleLevel.VERY_LOW.toolTipText"),
+    LOW("AtBMoraleLevel.LOW.text", "AtBMoraleLevel.LOW.toolTipText"),
+    NORMAL("AtBMoraleLevel.NORMAL.text", "AtBMoraleLevel.NORMAL.toolTipText"),
+    HIGH("AtBMoraleLevel.HIGH.text", "AtBMoraleLevel.HIGH.toolTipText"),
+    INVINCIBLE("AtBMoraleLevel.INVINCIBLE.text", "AtBMoraleLevel.INVINCIBLE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -39,7 +41,7 @@ public enum MissionStatus {
     //endregion Variable Declarations
 
     //region Constructors
-    MissionStatus(final String name, final String toolTipText) {
+    AtBMoraleLevel(final String name, final String toolTipText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -52,38 +54,37 @@ public enum MissionStatus {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isActive() {
-        return this == ACTIVE;
+    public boolean isRout() {
+        return this == ROUT;
     }
 
-    public boolean isSuccess() {
-        return this == SUCCESS;
+    public boolean isVeryLow() {
+        return this == VERY_LOW;
     }
 
-    public boolean isFailed() {
-        return this == FAILED;
+    public boolean isLow() {
+        return this == LOW;
     }
 
-    public boolean isBreach() {
-        return this == BREACH;
+    public boolean isNormal() {
+        return this == NORMAL;
     }
 
-    /**
-     * This is used to determine whether a status means that the mission is completed.
-     * This is purposefully not a check to see if it is active for future proofing reasons
-     * @return true if the mission has been completed, otherwise false
-     */
-    public boolean isCompleted() {
-        return isSuccess() || isFailed() || isBreach();
+    public boolean isHigh() {
+        return this == HIGH;
+    }
+
+    public boolean isInvincible() {
+        return this == INVINCIBLE;
     }
     //endregion Boolean Comparison Methods
 
     //region File I/O
     /**
-     * @param text containing the MissionStatus
-     * @return the saved MissionStatus
+     * @param text containing the AtBMoraleLevel
+     * @return the saved AtBMoraleLevel
      */
-    public static MissionStatus parseFromString(final String text) {
+    public static AtBMoraleLevel parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -93,13 +94,17 @@ public enum MissionStatus {
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
-                    return ACTIVE;
+                    return ROUT;
                 case 1:
-                    return SUCCESS;
+                    return VERY_LOW;
                 case 2:
-                    return FAILED;
+                    return LOW;
                 case 3:
-                    return BREACH;
+                    return NORMAL;
+                case 4:
+                    return HIGH;
+                case 5:
+                    return INVINCIBLE;
                 default:
                     break;
             }
@@ -107,9 +112,9 @@ public enum MissionStatus {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
+        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
 
-        return ACTIVE;
+        return NORMAL;
     }
     //endregion File I/O
 
