@@ -38,7 +38,6 @@ import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -339,11 +338,8 @@ public class StratconTab extends CampaignGuiTab {
                         break;
                 }
                 
-                // need to add:
-                // global (campaign-state level) "keep VP count above 0" for liaison/house/integrated
-                
                 if (coordsRevealed && displayCoordinateData) {
-                    sb.append(" at ").append(objective.getObjectiveCoords().toFriendlyString())
+                    sb.append(" at ").append(objective.getObjectiveCoords().toString())
                         .append(" on ").append(track.getDisplayableName());
                 }
                 

@@ -85,4 +85,9 @@ public class StratconCoords extends Coords {
         StratconCoords other = (StratconCoords) object;
         return (other.getX() == this.getX()) && (other.getY() == this.getY());
     }
+    
+    @Override
+    public String toString() {
+        return String.format("%s, %s", getX(), getY());
+    }
 }
