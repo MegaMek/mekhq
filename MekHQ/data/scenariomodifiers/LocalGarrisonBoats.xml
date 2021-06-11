@@ -22,14 +22,12 @@
 		<fixedUnitCount>0</fixedUnitCount>
 		<forceAlignment>4</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Local Fixed Defences</forceName>
+		<forceName>Local Naval Units</forceName>
 		<generationMethod>2</generationMethod>
 		<generationOrder>2</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
-		<objectiveLinkedForces>
-			<objectiveLinkedForce>Base Turrets</objectiveLinkedForce>
-		</objectiveLinkedForces>
+		<objectiveLinkedForces />
 		<syncDeploymentType>None</syncDeploymentType>
 	</forceDefinition>
 </AtBScenarioModifier>
