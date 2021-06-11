@@ -48,7 +48,7 @@ import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.view.PersonViewPanel;
 
 import javax.swing.*;
@@ -192,7 +192,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<>(personModel);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(getCampaign()));
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new PersonRankStringSorter(getCampaign()));
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
             personnelSorter.setComparator(i, new BonusSorter());
