@@ -156,6 +156,10 @@ public class Faction {
         return tags.contains(tag);
     }
 
+    public boolean validIn(final LocalDate today) {
+        return validIn(today.getYear());
+    }
+
     public boolean validIn(int year) {
         return (year >= start) && (year <= end);
     }
