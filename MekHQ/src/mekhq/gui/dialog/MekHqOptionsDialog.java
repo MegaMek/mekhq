@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
@@ -110,6 +111,16 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionSaveCompanyGenerationOptions;
     //endregion Campaign XML Save
 
+    //region Nag Tab
+    private JCheckBox optionUnmaintainedUnitsNag;
+    private JCheckBox optionInsufficientAstechsNag;
+    private JCheckBox optionInsufficientAstechTimeNag;
+    private JCheckBox optionInsufficientMedicsNag;
+    private JCheckBox optionShortDeploymentNag;
+    private JCheckBox optionUnresolvedStratConContactsNag;
+    private JCheckBox optionOutstandingScenariosNag;
+    //endregion Nag Tab
+
     //region Miscellaneous
     private JSpinner optionStartGameDelay;
     private JComboBox<CompanyGenerationMethod> optionDefaultCompanyGenerationMethod;
@@ -139,6 +150,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionsTabbedPane.add(resources.getString("autosaveTab.title"), new JScrollPane(createAutosaveTab()));
         optionsTabbedPane.add(resources.getString("newDayTab.title"), new JScrollPane(createNewDayTab()));
         optionsTabbedPane.add(resources.getString("campaignXMLSaveTab.title"), new JScrollPane(createCampaignXMLSaveTab()));
+        optionsTabbedPane.add(resources.getString("nagTab.title"), new JScrollPane(createNagTab()));
         optionsTabbedPane.add(resources.getString("miscellaneousTab.title"), new JScrollPane(createMiscellaneousTab()));
 
         return optionsTabbedPane;
@@ -590,6 +602,69 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         return body;
     }
 
+    private JPanel createNagTab() {
+        // Create Panel Components
+        optionUnmaintainedUnitsNag = new JCheckBox(resources.getString("optionUnmaintainedUnitsNag.text"));
+        optionUnmaintainedUnitsNag.setToolTipText(resources.getString("optionUnmaintainedUnitsNag.toolTipText"));
+        optionUnmaintainedUnitsNag.setName("optionUnmaintainedUnitsNag");
+
+        optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
+        optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
+        optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
+
+        optionInsufficientAstechTimeNag = new JCheckBox(resources.getString("optionInsufficientAstechTimeNag.text"));
+        optionInsufficientAstechTimeNag.setToolTipText(resources.getString("optionInsufficientAstechTimeNag.toolTipText"));
+        optionInsufficientAstechTimeNag.setName("optionInsufficientAstechTimeNag");
+
+        optionInsufficientMedicsNag = new JCheckBox(resources.getString("optionInsufficientMedicsNag.text"));
+        optionInsufficientMedicsNag.setToolTipText(resources.getString("optionInsufficientMedicsNag.toolTipText"));
+        optionInsufficientMedicsNag.setName("optionInsufficientMedicsNag");
+
+        optionShortDeploymentNag = new JCheckBox(resources.getString("optionShortDeploymentNag.text"));
+        optionShortDeploymentNag.setToolTipText(resources.getString("optionShortDeploymentNag.toolTipText"));
+        optionShortDeploymentNag.setName("optionShortDeploymentNag");
+
+        optionUnresolvedStratConContactsNag = new JCheckBox(resources.getString("optionUnresolvedStratConContactsNag.text"));
+        optionUnresolvedStratConContactsNag.setToolTipText(resources.getString("optionUnresolvedStratConContactsNag.toolTipText"));
+        optionUnresolvedStratConContactsNag.setName("optionUnresolvedStratConContactsNag");
+
+        optionOutstandingScenariosNag = new JCheckBox(resources.getString("optionOutstandingScenariosNag.text"));
+        optionOutstandingScenariosNag.setToolTipText(resources.getString("optionOutstandingScenariosNag.toolTipText"));
+        optionOutstandingScenariosNag.setName("optionOutstandingScenariosNag");
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setName("nagPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionInsufficientAstechsNag)
+                        .addComponent(optionInsufficientAstechTimeNag)
+                        .addComponent(optionInsufficientMedicsNag)
+                        .addComponent(optionShortDeploymentNag)
+                        .addComponent(optionUnresolvedStratConContactsNag)
+                        .addComponent(optionOutstandingScenariosNag)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionInsufficientAstechsNag)
+                        .addComponent(optionInsufficientAstechTimeNag)
+                        .addComponent(optionInsufficientMedicsNag)
+                        .addComponent(optionShortDeploymentNag)
+                        .addComponent(optionUnresolvedStratConContactsNag)
+                        .addComponent(optionOutstandingScenariosNag)
+        );
+
+        return panel;
+    }
+
     private JPanel createMiscellaneousTab() {
         // Create Panel Components
         JLabel labelStartGameDelay = new JLabel(resources.getString("labelStartGameDelay.text"));
@@ -712,6 +787,14 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
         MekHQ.getMekHQOptions().setSaveCompanyGenerationOptions(optionSaveCompanyGenerationOptions.isSelected());
 
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
+
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
         MekHQ.getMekHQOptions().setDefaultCompanyGenerationMethod((CompanyGenerationMethod) Objects.requireNonNull(optionDefaultCompanyGenerationMethod.getSelectedItem()));
 
@@ -777,12 +860,20 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
         optionSaveCompanyGenerationOptions.setSelected(MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions());
 
+        optionUnmaintainedUnitsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS));
+        optionInsufficientAstechsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS));
+        optionInsufficientAstechTimeNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME));
+        optionInsufficientMedicsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS));
+        optionShortDeploymentNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT));
+        optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
+        optionOutstandingScenariosNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS));
+
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
         optionDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
     }
 
     //region Data Validation
-    private boolean validateDateFormat(String format) {
+    private boolean validateDateFormat(final String format) {
         try {
             LocalDate.now().format(DateTimeFormatter.ofPattern(format));
         } catch (Exception ignored) {

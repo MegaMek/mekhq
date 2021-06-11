@@ -27,7 +27,7 @@ import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import mekhq.Version;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
@@ -2784,8 +2784,8 @@ public class CampaignOptions implements Serializable {
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
      */
-    public int getAtBBattleChance(AtBLanceRole role) {
-        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
+    public int getAtBBattleChance(final AtBLanceRole role) {
+        return role.isUnassigned() ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**

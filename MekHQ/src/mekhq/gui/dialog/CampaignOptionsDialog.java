@@ -42,7 +42,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -628,10 +628,9 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
-            Faction f = Factions.getInstance().getFaction(sName);
-            if (f.validIn(date.getYear())) {
-                factionModel.addElement(f.getFullName(date.getYear()));
+        for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+            if (faction.validIn(date.getYear())) {
+                factionModel.addElement(faction.getFullName(date.getYear()));
             }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
@@ -5671,10 +5670,9 @@ public class CampaignOptionsDialog extends JDialog {
             date = dateSelectionDialog.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
-                Faction f = Factions.getInstance().getFaction(sname);
-                if (f.validIn(date.getYear())) {
-                    factionModel.addElement(f.getFullName(date.getYear()));
+            for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+                if (faction.validIn(date.getYear())) {
+                    factionModel.addElement(faction.getFullName(date.getYear()));
                 }
             }
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));

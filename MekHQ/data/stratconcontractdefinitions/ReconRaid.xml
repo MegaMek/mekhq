@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <alliedFacilityCount>0</alliedFacilityCount>
-    <briefing>Conduct reconaissance on designated units and locations.</briefing>
     <contractTypeName>Recon Raid</contractTypeName>
+    <alliedFacilityCount>0</alliedFacilityCount>
+    <briefing>Conduct reconnaissance on designated units and locations.</briefing>
     <hostileFacilityCount>-0.5</hostileFacilityCount>
 	<scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>

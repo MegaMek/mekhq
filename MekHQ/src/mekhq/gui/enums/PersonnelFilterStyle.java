@@ -38,7 +38,7 @@ public enum PersonnelFilterStyle {
     //endregion Variable Declarations
 
     //region Constructors
-    PersonnelFilterStyle(String name, String toolTipText) {
+    PersonnelFilterStyle(final String name, final String toolTipText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -50,7 +50,21 @@ public enum PersonnelFilterStyle {
     }
     //endregion Getters
 
-    public List<PersonnelFilter> getFilters(boolean standard) {
+    //region Boolean Comparison Methods
+    public boolean isStandard() {
+        return this == STANDARD;
+    }
+
+    public boolean isIndividualRole() {
+        return this == INDIVIDUAL_ROLE;
+    }
+
+    public boolean isAll() {
+        return this == ALL;
+    }
+    //endregion Boolean Comparison Methods
+
+    public List<PersonnelFilter> getFilters(final boolean standard) {
         switch (this) {
             case INDIVIDUAL_ROLE:
                 return standard ? PersonnelFilter.getIndividualRolesStandardPersonnelFilters()

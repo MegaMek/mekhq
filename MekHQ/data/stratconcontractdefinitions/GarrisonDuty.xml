@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
+    <contractTypeName>Garrison Duty</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Defend designated facilities.</briefing>
-    <contractTypeName>Garrison Duty</contractTypeName>
     <hostileFacilityCount>0</hostileFacilityCount>
 	<scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>

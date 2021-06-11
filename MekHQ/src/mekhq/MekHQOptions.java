@@ -546,6 +546,16 @@ public final class MekHQOptions {
     }
     //endregion File Paths
 
+    //region Nag Tab
+    public boolean getNagDialogIgnore(final String key) {
+        return userPreferences.node(MekHqConstants.NAG_NODE).getBoolean(key, false);
+    }
+
+    public void setNagDialogIgnore(final String key, final boolean value) {
+        userPreferences.node(MekHqConstants.NAG_NODE).putBoolean(key, value);
+    }
+    //endregion Nag Tab
+
     //region Miscellaneous Options
     public int getStartGameDelay() {
         return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);

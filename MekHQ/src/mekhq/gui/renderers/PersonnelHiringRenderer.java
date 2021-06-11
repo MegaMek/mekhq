@@ -20,8 +20,8 @@ package mekhq.gui.renderers;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
-import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
+import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
@@ -183,7 +183,7 @@ public class PersonnelHiringRenderer extends JPanel implements ListCellRenderer<
                 return;
             }
             AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(getFrame(), person.getPortrait());
-            if ((portraitDialog.showDialog() == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
+            if (portraitDialog.showDialog().isConfirmed() && (portraitDialog.getSelectedItem() != null)) {
                 person.setPortrait(portraitDialog.getSelectedItem());
                 getPersonnelHiringDetailPanel().updateValues();
             }

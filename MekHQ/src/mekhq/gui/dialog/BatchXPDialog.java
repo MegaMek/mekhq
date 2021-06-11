@@ -36,7 +36,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 import javax.swing.*;
@@ -108,7 +108,7 @@ public final class BatchXPDialog extends JDialog {
         personnelModel.refreshData();
         personnelSorter = new TableRowSorter<>(personnelModel);
         personnelSorter.setSortsOnUpdates(true);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(campaign));
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new PersonRankStringSorter(campaign));
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_XP, new FormattedNumberSorter());
         personnelSorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(1, SortOrder.ASCENDING)));
