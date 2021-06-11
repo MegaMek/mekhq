@@ -52,7 +52,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count", "Player/Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
-    public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "None", "Opposite Deployment Edge", "Random" };
+    public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "Nearest", "None", "Opposite Deployment Edge", "Random" };
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
 
     /**
@@ -71,8 +71,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public static final int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
 
-    public static final int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
-    public static final int DESTINATION_EDGE_RANDOM = 6;
+    public static final int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 6;
+    public static final int DESTINATION_EDGE_RANDOM = 7;
 
     // this is used to indicate that a "fixed" size unit should deploy as a lance
     public static final int FIXED_UNIT_SIZE_LANCE = -1;

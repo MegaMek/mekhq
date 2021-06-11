@@ -161,9 +161,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         destinationZoneMapping.put(1, CardinalEdge.EAST.getIndex());
         destinationZoneMapping.put(2, CardinalEdge.SOUTH.getIndex());
         destinationZoneMapping.put(3, CardinalEdge.WEST.getIndex());
-        destinationZoneMapping.put(4, CardinalEdge.NONE.getIndex());
-        destinationZoneMapping.put(5, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
-        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
+        destinationZoneMapping.put(4, CardinalEdge.NEAREST.getIndex());
+        destinationZoneMapping.put(5, CardinalEdge.NONE.getIndex());
+        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
+        destinationZoneMapping.put(7, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
     }
 
     /**
