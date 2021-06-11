@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.procreation;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
 import mekhq.Utilities;
@@ -65,7 +66,7 @@ public abstract class AbstractProcreation {
         return useRelationshiplessProcreation;
     }
 
-    public void setUseRelationshiplessProcreation(boolean useRelationshiplessProcreation) {
+    public void setUseRelationshiplessProcreation(final boolean useRelationshiplessProcreation) {
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
     //endregion Getters
@@ -82,11 +83,40 @@ public abstract class AbstractProcreation {
      * This is used to determine if a person can procreate
      * @param today the current date
      * @param person the person to determine for
-     * @return true if they can, otherwise false
+     * @param randomProcreation if this is for random procreation or manual procreation
+     * @return null if they can, otherwise the reason why they cannot
      */
-    public boolean canProcreate(final LocalDate today, final Person person) {
-        return person.getGender().isFemale() && person.isTryingToConceive() && !person.isPregnant() && !person.isDeployed()
-                && !person.isChild(today) && (person.getAge(today) < 51);
+    public @Nullable String canProcreate(final LocalDate today, final Person person,
+                                         final boolean randomProcreation) {
+        if (person.getGender().isMale()) {
+            return resources.getString("cannotProcreate.Gender.text");
+        } else if (!person.isTryingToConceive()) {
+            return resources.getString("cannotProcreate.NotTryingForABaby.text");
+        } else if (person.isPregnant()) {
+            return resources.getString("cannotProcreate.AlreadyPregnant.text");
+        } else if (person.isDeployed()) {
+            return resources.getString("cannotProcreate.Deployed.text");
+        } else if (person.isChild(today)) {
+            return resources.getString("cannotProcreate.Child.text");
+        } else if (person.getAge(today) >= 51) {
+            return resources.getString("cannotProcreate.TooOld.text");
+        } else if (randomProcreation) {
+            if (!person.getGenealogy().hasSpouse() && !isUseRelationshiplessProcreation()) {
+                return resources.getString("cannotProcreate.NoSpouse.text");
+            } else if (person.getGenealogy().hasSpouse()) {
+                if (person.getGenealogy().getSpouse().getGender().isFemale()) {
+                    return resources.getString("cannotProcreate.FemaleSpouse.text");
+                } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
+                    return resources.getString("cannotProcreate.MIASpouse.text");
+                } else if (person.getGenealogy().getSpouse().isDeployed()) {
+                    return resources.getString("cannotProcreate.DeployedSpouse.text");
+                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                    return resources.getString("cannotProcreate.ChildSpouse.text");
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -97,13 +127,12 @@ public abstract class AbstractProcreation {
      * @param mother the newly pregnant mother
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother) {
-        mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
-
         final int size = determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences());
         if (size <= 0) {
             return;
         }
+        mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
+        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
@@ -267,16 +296,10 @@ public abstract class AbstractProcreation {
      * @return true if they do, otherwise false
      */
     protected boolean randomlyProcreates(final LocalDate today, final Person person) {
-        if (!canProcreate(today, person)) {
+        if (canProcreate(today, person, true) != null) {
             return false;
         } else if (person.getGenealogy().hasSpouse()) {
-            final Person spouse = person.getGenealogy().getSpouse();
-            if (spouse.getGender().isMale() && !spouse.getStatus().isDeadOrMIA()
-                    && !spouse.isDeployed() && !spouse.isChild(today)) {
-                return relationshipProcreation(person);
-            } else {
-                return false;
-            }
+            return relationshipProcreation(person);
         } else if (isUseRelationshiplessProcreation()) {
             return relationshiplessProcreation(person);
         } else {

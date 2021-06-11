@@ -18,11 +18,6 @@
  */
 package mekhq.gui.utilities;
 
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.Vector;
-import java.util.stream.Stream;
-
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -372,7 +367,7 @@ public class StaticChecks {
      */
     public static boolean anyCanBePregnant(final LocalDate today, final AbstractProcreation procreation,
                                            final Person... people) {
-        return Stream.of(people).anyMatch(p -> procreation.canProcreate(today, p));
+        return Stream.of(people).anyMatch(p -> (procreation.canProcreate(today, p, false) != null));
     }
 
     /**
