@@ -223,7 +223,7 @@ public abstract class AbstractProcreation {
             }
 
             // Recruit the baby
-            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
+            campaign.recruitPerson(baby, prisonerStatus, true, true);
         }
 
         // Cleanup Data

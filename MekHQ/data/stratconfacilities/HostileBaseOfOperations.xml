@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>AlliedBaseOfOperations.xml</capturedDefinition>
 	<displayableName>Base of Operations</displayableName>
         <facilityType>BaseOfOperations</facilityType>
         <owner>Opposing</owner>

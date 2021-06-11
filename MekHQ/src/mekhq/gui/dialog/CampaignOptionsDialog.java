@@ -21,9 +21,9 @@ package mekhq.gui.dialog;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -42,7 +42,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarketDylan;
@@ -183,7 +184,7 @@ public class CampaignOptionsDialog extends JDialog {
     //planetary acquisitions
     private JCheckBox usePlanetaryAcquisitions;
     private JSpinner spnMaxJumpPlanetaryAcquisitions;
-    private JComboBox<String> comboPlanetaryAcquisitionsFactionLimits;
+    private JComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
     private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
     private JCheckBox usePlanetaryAcquisitionsVerbose;
     private JSpinner[] spnPlanetAcquireTechBonus;
@@ -577,7 +578,6 @@ public class CampaignOptionsDialog extends JDialog {
         usePlanetaryAcquisitions = new JCheckBox();
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
         disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
-        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<>();
         disallowClanPartsFromIS = new JCheckBox();
         useDamageMargin = new JCheckBox();
         useAeroSystemHitsBox = new JCheckBox();
@@ -629,10 +629,9 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
-            Faction f = Factions.getInstance().getFaction(sName);
-            if (f.validIn(date.getYear())) {
-                factionModel.addElement(f.getFullName(date.getYear()));
+        for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+            if (faction.validIn(date.getYear())) {
+                factionModel.addElement(faction.getFullName(date.getYear()));
             }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
@@ -1183,32 +1182,27 @@ public class CampaignOptionsDialog extends JDialog {
         spnMaxJumpPlanetaryAcquisitions = new JSpinner(new SpinnerNumberModel(2, 0, 5, 1));
         JPanel panMaxJump = new JPanel();
         panMaxJump.add(spnMaxJumpPlanetaryAcquisitions);
-        panMaxJump.add(new JLabel("Maximum number of jumps away to search for supplies"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        panMaxJump.add(new JLabel(resourceMap.getString("lblMaxJumpPlanetaryAcquisitions.text")));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panMaxJump, gridBagConstraints);
 
-        DefaultComboBoxModel<String> factionLimitComboBoxModel = new DefaultComboBoxModel<>();
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALL));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_NEUTRAL));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALLY));
-        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_SELF));
-        comboPlanetaryAcquisitionsFactionLimits.setModel(factionLimitComboBoxModel);
+        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<>(PlanetaryAcquisitionFactionLimit.values());
         JPanel panFactionLimit = new JPanel();
-        panFactionLimit.add(new JLabel("Faction supply limitations"));
+        panFactionLimit.add(new JLabel(resourceMap.getString("lblPlanetaryAcquisitionsFactionLimits.text")));
         panFactionLimit.add(comboPlanetaryAcquisitionsFactionLimits);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panFactionLimit, gridBagConstraints);
 
         disallowPlanetaryAcquisitionClanCrossover.setText(resourceMap.getString("disallowPlanetaryAcquisitionClanCrossover.text"));
@@ -4912,7 +4906,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
         spnMaxJumpPlanetaryAcquisitions.setValue(options.getMaxJumpsPlanetaryAcquisition());
-        comboPlanetaryAcquisitionsFactionLimits.setSelectedIndex(options.getPlanetAcquisitionFactionLimit());
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(options.getPlanetAcquisitionFactionLimit());
         disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
         disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
         spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFroIS());
@@ -5458,7 +5452,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
         options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
         options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
-        options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
+        options.setPlanetAcquisitionFactionLimit((PlanetaryAcquisitionFactionLimit) comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
+
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
             options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
             options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
@@ -5770,10 +5765,9 @@ public class CampaignOptionsDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
-                Faction f = Factions.getInstance().getFaction(sname);
-                if (f.validIn(date.getYear())) {
-                    factionModel.addElement(f.getFullName(date.getYear()));
+            for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
+                if (faction.validIn(date.getYear())) {
+                    factionModel.addElement(faction.getFullName(date.getYear()));
                 }
             }
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
@@ -5794,11 +5788,10 @@ public class CampaignOptionsDialog extends JDialog {
 
     private void btnCamoActionPerformed(ActionEvent evt) {
         CamoChooserDialog ccd = new CamoChooserDialog(frame, camouflage);
-        if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
-            return;
+        if (ccd.showDialog().isConfirmed()) {
+            camouflage = ccd.getSelectedItem();
+            btnCamo.setIcon(camouflage.getImageIcon());
         }
-        camouflage = ccd.getSelectedItem();
-        btnCamo.setIcon(camouflage.getImageIcon());
     }
 
     private Vector<String> getUnusedSPA() {

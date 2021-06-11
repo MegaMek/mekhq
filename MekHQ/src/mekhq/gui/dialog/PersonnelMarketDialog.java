@@ -45,6 +45,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
+import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -224,7 +225,7 @@ public class PersonnelMarketDialog extends JDialog {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
-            column.setCellRenderer(personnelModel.getRenderer(false));
+            column.setCellRenderer(personnelModel.getRenderer(PersonnelTabView.GENERAL));
 
             if (i != PersonnelTableModel.COL_GIVEN_NAME
                     && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)

@@ -29,6 +29,9 @@
 			LocalGarrisonTurrets.xml
 		</modifier>
 		<modifier>
+			LocalGarrisonBoats.xml
+		</modifier>
+		<modifier>
 			EnemyTurrets.xml
 		</modifier>
 		<modifier>
@@ -52,6 +55,9 @@
 		</modifier>
 		<modifier>
 			EnemyDropship.xml
+		</modifier>
+		<modifier>
+			GroundedEnemyDropship.xml
 		</modifier>
 		<modifier>
 			GoodIntel.xml

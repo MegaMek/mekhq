@@ -1,4 +1,5 @@
 <StratconFacility>
+	<capturedDefinition>HostileMekBase.xml</capturedDefinition>
 	<displayableName>Mech Base</displayableName>
         <facilityType>MekBase</facilityType>
         <localModifiers>AlliedMechGarrison.xml</localModifiers>

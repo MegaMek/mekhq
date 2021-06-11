@@ -41,7 +41,7 @@
                     <deploymentZone>9</deploymentZone>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -70,7 +70,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones/>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -109,8 +109,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-                <additionalDetail>Scans may be conducted by weapons fire, TAG, spotting or physical attacks.</additionalDetail>
-                <additionalDetail>If the scan action requires a roll, it must be possible.</additionalDetail>
+                <additionalDetail>Scans may be conducted by moving a unit within three hexes of the target and foregoing all attacks.</additionalDetail>
+                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
+                <additionalDetail>Note: This objective should be tracked manually outside of MegaMek.</additionalDetail>
             </additionalDetails>
             <description>Scan the following enemy unit(s) and force(s):</description>
             <destinationEdge>NONE</destinationEdge>

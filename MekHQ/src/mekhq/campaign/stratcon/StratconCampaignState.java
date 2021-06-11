@@ -53,10 +53,7 @@ public class StratconCampaignState {
     private double globalOpforBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
-    private int pendingStrategicObjectiveCount;
-    private int completedStrategicObjectiveCount;
-    private String briefingText; 
-    private boolean strategicObjectivesBehaveAsVPs;
+    private String briefingText;
     
     // these are applied to any scenario generated in the campaign; use sparingly
     private List<String> globalScenarioModifiers = new ArrayList<>(); 
@@ -135,14 +132,6 @@ public class StratconCampaignState {
         this.briefingText = briefingText;
     }
 
-    public boolean strategicObjectivesBehaveAsVPs() {
-        return strategicObjectivesBehaveAsVPs;
-    }
-
-    public void setStrategicObjectivesBehaveAsVPs(boolean strategicObjectivesBehaveAsVPs) {
-        this.strategicObjectivesBehaveAsVPs = strategicObjectivesBehaveAsVPs;
-    }
-
     public List<String> getGlobalScenarioModifiers() {
         return globalScenarioModifiers;
     }
@@ -151,42 +140,6 @@ public class StratconCampaignState {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }
 
-    public int getPendingStrategicObjectiveCount() {
-        return pendingStrategicObjectiveCount;
-    }
-
-    public void setPendingStrategicObjectiveCount(int pendingStrategicObjectiveCount) {
-        this.pendingStrategicObjectiveCount = pendingStrategicObjectiveCount;
-    }
-    
-    public void incrementPendingStrategicObjectiveCount(int increment) {
-        pendingStrategicObjectiveCount += increment;
-    }
-    
-    public void incrementPendingStrategicObjectiveCount() {
-        pendingStrategicObjectiveCount++;
-    }
-    
-    public int getStrategicObjectiveCompletedCount() {
-        return completedStrategicObjectiveCount;
-    }
-    
-    public void incrementStrategicObjectiveCompletedCount() {
-        completedStrategicObjectiveCount++;
-    }
-    
-    public void decrementStrategicObjectiveCompletedCount() {
-        completedStrategicObjectiveCount--;
-    }
-    
-    public void incrementStrategicObjectiveCompletedCount(int increment) {
-        completedStrategicObjectiveCount += increment;
-    }
-    
-    public void decrementStrategicObjectiveCompletedCount(int decrement) {
-        completedStrategicObjectiveCount -= decrement;
-    }
-    
     public void useSupportPoint() {
         supportPoints--;
     }
