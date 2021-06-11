@@ -38,7 +38,7 @@
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -69,7 +69,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>8</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -98,7 +98,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones/>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>12</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -128,7 +128,7 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones/>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
