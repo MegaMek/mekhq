@@ -27,6 +27,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * FactionDisplay is a display wrapper around a Faction, primarily to be used in ComboBoxes.
+ * This removes the need to track based on the index, thus simplifying the dev work.
+ */
 public class FactionDisplay {
     //region Variable Declarations
     private final Faction faction;

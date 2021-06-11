@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * I only exist because of
+ * I only exist because of our current Clan/Faction split, and need to be removed alongside Clan.
  */
 @Deprecated
 public class ClanDisplay {
