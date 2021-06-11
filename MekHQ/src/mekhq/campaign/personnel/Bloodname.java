@@ -87,6 +87,10 @@ public class Bloodname implements Serializable {
         return founder;
     }
 
+    public Clan getOriginClan() {
+        return origClan;
+    }
+
     public String getOrigClan() {
         return origClan.getCode();
     }
