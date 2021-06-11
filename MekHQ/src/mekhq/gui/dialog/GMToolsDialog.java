@@ -48,7 +48,6 @@ import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
@@ -673,6 +672,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JButton btnRollRAT = new MMButton("btnRollRAT", resources, "btnRollRAT.text",
                 "btnRollRAT.toolTipText", evt -> setLastRolledUnit(performRATRoll()));
         gbc.gridx = getGUI().getCampaign().isGM() ? maxGridX - 1 : maxGridX;
+        gbc.gridwidth = 1;
         panel.add(btnRollRAT, gbc);
 
         if (getGUI().getCampaign().isGM()) {
