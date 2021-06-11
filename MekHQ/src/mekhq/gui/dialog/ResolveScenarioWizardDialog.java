@@ -22,11 +22,10 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.MechViewPanel;
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -65,7 +64,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     //region Variable Declarations
@@ -1401,7 +1400,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
             }
         }
-        
+
         StratconRulesManager.processScenarioCompletion(tracker);
 
         this.setVisible(false);
@@ -1667,40 +1666,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             ustatus = tracker.getUnitsStatus().get(id);
         }
 
-        if (null == ustatus || null == ustatus.getEntity()) {
+        if ((ustatus == null) || (ustatus.getEntity() == null)) {
             return;
         }
-        Entity entity = ustatus.getEntity();
-        final JDialog dialog = new JDialog(frame, "Unit View", true);
-        MechViewPanel mvp = new MechViewPanel();
-        mvp.setMech(entity, true);
-        JButton btn = new JButton(Messages.getString("Okay"));
-        btn.addActionListener(e -> dialog.setVisible(false));
-
-        dialog.getContentPane().setLayout(new GridBagLayout());
-        GridBagConstraints c;
-
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        dialog.getContentPane().add(mvp, c);
-
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 1;
-        c.fill = GridBagConstraints.NONE;
-        c.anchor = GridBagConstraints.CENTER;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        dialog.getContentPane().add(btn, c);
-        dialog.setSize(mvp.getBestWidth(), mvp.getBestHeight() + 75);
-        dialog.validate();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        new EntityReadoutDialog(frame, true, ustatus.getEntity()).setVisible(true);
     }
 
     private void editUnit(UUID id, int idx, boolean salvage) {

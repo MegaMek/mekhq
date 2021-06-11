@@ -38,6 +38,9 @@ VERSION HISTORY:
 + PR #2677: Ignorable Nag Dialogs
 + Issues #2636 and #2658: AdvanceDaysDialog Rework: Advancement-based Modality, Expanded Buttons, Persistent Daily Report
 + PR #2634: AtB Enum (Morale, Contract Type, Lance Role) tooltips
++ PR #2691: ResolveScenarioWizardDialog Uses Standardized Entity Readout Dialog for Unit Views
++ Issues #2116 and #2589: Improving Rank and Title Sorting
++ PR #2694: Hangar Tab: Maintenance Colour No Longer Shows with Maintenance Disabled
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names

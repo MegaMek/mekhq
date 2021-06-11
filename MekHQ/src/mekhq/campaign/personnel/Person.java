@@ -2582,6 +2582,10 @@ public class Person implements Serializable {
         return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
     }
 
+    public String getHTMLTitle() {
+        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getFullTitle());
+    }
+
     public String getFullTitle() {
         String rank = getRankName();
 
@@ -2593,11 +2597,7 @@ public class Person implements Serializable {
     }
 
     public String makeHTMLRank() {
-        return String.format("<html>%s</html>", makeHTMLRankDiv());
-    }
-
-    public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s</div>", getId(), getRankName().trim());
+        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getRankName().trim());
     }
 
     public String getHyperlinkedFullTitle() {

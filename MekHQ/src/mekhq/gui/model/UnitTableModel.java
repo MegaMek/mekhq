@@ -231,14 +231,14 @@ public class UnitTableModel extends DataTableModel {
             case COL_QUALITY:
                 return u.getQualityName();
             case COL_PILOT:
-                return (u.getCommander() != null) ? u.getCommander().getFullTitle() : "-";
+                return (u.getCommander() != null) ? u.getCommander().getHTMLTitle() : "-";
             case COL_FORCE:
                 Force force = u.getCampaign().getForce(u.getForceId());
                 return (force != null) ? force.getFullName() : "-";
             case COL_CREW:
                 return u.getActiveCrew().size() + "/" + u.getFullCrewSize();
             case COL_TECH_CRW:
-                return (u.getTech() != null) ? u.getTech().getFullTitle() : "-";
+                return (u.getTech() != null) ? u.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN:
                 return u.getMaintenanceCost();
             case COL_BV:
@@ -296,7 +296,7 @@ public class UnitTableModel extends DataTableModel {
                 } else if (u.isMothballed()) {
                     setForeground(MekHQ.getMekHQOptions().getMothballedForeground());
                     setBackground(MekHQ.getMekHQOptions().getMothballedBackground());
-                } else if (u.isUnmaintained()) {
+                } else if (getCampaign().getCampaignOptions().checkMaintenance() && u.isUnmaintained()) {
                     setForeground(MekHQ.getMekHQOptions().getUnmaintainedForeground());
                     setBackground(MekHQ.getMekHQOptions().getUnmaintainedBackground());
                 } else if (!u.isRepairable()) {
