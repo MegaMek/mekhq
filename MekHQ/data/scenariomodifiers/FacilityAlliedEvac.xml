@@ -15,7 +15,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>6</destinationZone>
+                <destinationZone>7</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
