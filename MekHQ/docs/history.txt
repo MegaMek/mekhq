@@ -5,7 +5,7 @@ VERSION HISTORY:
 + Issue #2625: Properly Clear Tech Units on Person removal/retirement
 + PR #2617: Contract Command Rights Enum and Tool Tips
 + PR #2637: Personnel Names
-+ PR #2651, #2688: Various StratCon fixes:
++ PR #2651, #2688, #2698: Various StratCon fixes:
   - Updated arrival altitude for aerospace fighter reinforcement modifiers (they were showing up on the ground)
   - Standardized "recon" type scenarios to have the same criteria as Tukayyid scenarios
   - Various briefing text clarifications
@@ -16,6 +16,7 @@ VERSION HISTORY:
   - VTOLs no longer start on the ground in certain situations
   - Removed extraneous "recon turrets" modifier span for recon raid contracts
   - Tighten up strategic objective generation; correct objective coordinate display
+  - Removed extraneous references to contract score in some scenario modifiers; water-naval units may rarely make an appearance
 + PR #2656: Cleaning up a few erroneous Campaign GUI properties
 + PR #2655: Ensuring BotForce has a Valid Base Camouflage
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
