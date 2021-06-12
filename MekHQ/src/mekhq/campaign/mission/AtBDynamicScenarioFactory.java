@@ -96,7 +96,10 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, BombType.B_LG, BombType.B_TAG };
+    // bomb types assignable to aerospace units on ground maps
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, 
+            BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, 
+            BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
     private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
@@ -2311,6 +2314,15 @@ public class AtBDynamicScenarioFactory {
                     ((IAero) entity).land();
                 }
             }
+            
+            // hack - set helis and WIGEs to an explicit altitude of 1
+            // currently there is no support for setting elevation for "ground" units 
+            // in the scenario template editor, but it looks dumb to have choppers
+            // start out on the ground
+            if (entity.getMovementMode() == EntityMovementMode.VTOL ||
+                    entity.getMovementMode() == EntityMovementMode.WIGE) {
+                entity.setElevation(1);;
+            }
         }
     }
 
@@ -2366,9 +2378,21 @@ public class AtBDynamicScenarioFactory {
         }
         
         // pick out the index in the BombType array
-        int bombIndex = actualValidBombChoices.get(Compute.randomInt(actualValidBombChoices.size()));
+        int randomBombChoiceIndex = Compute.randomInt(actualValidBombChoices.size());
+        int bombIndex = actualValidBombChoices.get(randomBombChoiceIndex);
+        int weightModifier = 0;
+        
+        // hack: we only really need one "tag", so add it then pack on some more bombs
+        if (bombIndex == BombType.B_TAG) {
+            weightModifier = 5;
+            bombChoices[bombIndex] = 1;
+            actualValidBombChoices.remove(randomBombChoiceIndex);
+            bombIndex = Utilities.getRandomItem(actualValidBombChoices);
+        }
+        
         // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) (entity.getWeight() / (BombType.getBombCost(bombIndex) * 5));
+        int numBombs = (int) ((entity.getWeight() - weightModifier) / 
+                (BombType.getBombCost(bombIndex) * 5));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);
