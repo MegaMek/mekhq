@@ -1243,19 +1243,33 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Handles loading transported units onto their transports once a megamek scenario has actually started;
-     *
-     * @param scenario
      */
-    public static void loadTransports(AtBScenario scenario, Client client) {
+    public static void loadTransports(AtBScenario scenario, Client client, BotForce botForce) {
         Map<String, Integer> idMap = new HashMap<>();
+
+        // here we have to make sure that the server has loaded all the entities
+        // and sent the back to the client (which is the only way we know the former)
+        // before we attempt to load transports.
+        int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        while (entityCount != botForce.getEntityList().size()) {
+            try {
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+            } catch (Exception ignored) {
+                
+            }
+            
+            entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        }
+        
+        List<Entity> clientEntities = client.getEntitiesVector();
         // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
-        for (Entity entity : client.getEntitiesVector()) {
+        for (Entity entity : clientEntities) {
             if (entity.getOwnerId() == client.getLocalPlayerNumber()) {
                 idMap.put(entity.getExternalIdAsString(), entity.getId());
             }
         }
 
-        for (Entity potentialTransport : client.getEntitiesVector()) {
+        for (Entity potentialTransport : clientEntities) {
             if ((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) &&
                     scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
                 for (String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
@@ -2391,8 +2405,8 @@ public class AtBDynamicScenarioFactory {
         }
         
         // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) ((entity.getWeight() - weightModifier) / 
-                (BombType.getBombCost(bombIndex) * 5));
+        int numBombs = (int) Math.floor((entity.getWeight() - weightModifier) / 
+                (BombType.getBombCost(bombIndex) * 5.0));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);
