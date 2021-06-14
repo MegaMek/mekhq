@@ -51,8 +51,6 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     private JButton btnRedo;
     private JButton btnRestore;
     //endregion GUI Elements
-
-    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -76,7 +74,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         return originalForceIcon;
     }
 
-    public void setOriginalForceIcon(StandardForceIcon originalForceIcon) {
+    public void setOriginalForceIcon(final StandardForceIcon originalForceIcon) {
         this.originalForceIcon = originalForceIcon;
     }
 
@@ -84,27 +82,18 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         return forceIcon;
     }
 
-    public void setForceIcon(StandardForceIcon forceIcon) {
+    public void setForceIcon(final StandardForceIcon forceIcon) {
         this.forceIcon = forceIcon.clone();
     }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
-    protected void initialize() {
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(resources.getString("SimpleIcon.title"), new StandardForceIconChooser(getForceIcon()));
-        tabbedPane.addTab(resources.getString("LayeredIcon.title"), initializeLayeredForceIconPanel());
-
-        setLayout(new BorderLayout());
-        add(tabbedPane, BorderLayout.CENTER);
-        add(initializeButtons(), BorderLayout.PAGE_END);
-        pack();
-    }
-
-    @Override
     protected Container createCenterPane() {
-        return null;
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab(resources.getString("StandardIconTab.title"), new StandardForceIconChooser(getForceIcon()));
+        tabbedPane.addTab(resources.getString("LayeredIconTab.title"), initializeLayeredForceIconPanel());
+        return tabbedPane;
     }
 
     private JPanel initializeLayeredForceIconPanel() {
@@ -167,33 +156,29 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
 
     private JPanel initializeButtons() {
         //region Button Graphical Components
-        JButton btnSelect = new JButton(resources.getString("btnSelect.text"));
+        JButton btnSelect = new JButton(resources.getString("Select.text"));
         btnSelect.setName("btnSelect");
         btnSelect.addActionListener(evt -> setVisible(false));
 
-        btnUndo = new JButton(resources.getString("btnUndo.text"));
+        btnUndo = new JButton(resources.getString("Undo.text"));
         btnUndo.setName("btnUndo");
         btnUndo.setEnabled(false);
         btnUndo.addActionListener(evt -> undo());
 
-        btnRedo = new JButton(resources.getString("btnRedo.text"));
+        btnRedo = new JButton(resources.getString("Redo.text"));
         btnRedo.setName("btnRedo");
         btnRedo.setEnabled(false);
         btnRedo.addActionListener(evt -> redo());
 
-        btnRestore = new JButton(resources.getString("btnRestore.text"));
+        btnRestore = new JButton(resources.getString("Restore.text"));
         btnRestore.setName("btnRestore");
         btnRestore.setEnabled(false);
         btnRestore.addActionListener(evt -> setForceIcon(getOriginalForceIcon()));
 
-        JButton btnCancel = new JButton(resources.getString("btnCancel.text"));
+        JButton btnCancel = new JButton(resources.getString("Cancel.text"));
         btnCancel.setName("btnCancel");
-        btnCancel.addActionListener(evt -> {
-            setVisible(false);
-        });
-        //endregion Button Graphical Components
+        btnCancel.addActionListener(evt -> setVisible(false));
 
-        //region Layout
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -221,7 +206,6 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
                                 .addComponent(btnRestore)
                                 .addComponent(btnCancel))
         );
-        //endregion Layout
 
         return body;
     }
