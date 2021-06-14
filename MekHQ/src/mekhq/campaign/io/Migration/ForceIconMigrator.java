@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.io.Migration;
 
-import megamek.common.icons.AbstractIcon;
+import mekhq.MekHQ;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
@@ -34,13 +34,15 @@ import java.util.List;
  * This migration occurred in 0.49.3
  */
 public class ForceIconMigrator {
-    public static void migrateForceIcon(final AbstractIcon icon) {
+    public static void migrateForceIcon(final StandardForceIcon icon) {
         if (icon instanceof LayeredForceIcon) {
             migrateLayeredForceIcon((LayeredForceIcon) icon);
         } else if (icon instanceof UnitIcon) {
             migrateUnitIcon((UnitIcon) icon);
-        } else if (icon instanceof StandardForceIcon) {
-            migrateStandardForceIcon((StandardForceIcon) icon);
+        } else if (icon != null) {
+            migrateStandardForceIcon(icon);
+        } else {
+            MekHQ.getLogger().error("Attempted to migrate a null icon, when AbstractIcon is non-nullable by design");
         }
     }
 
@@ -50,7 +52,7 @@ public class ForceIconMigrator {
         icon.setFilename(StandardForceIcon.DEFAULT_ICON_FILENAME);
 
         // Now we handle the proper migration
-
+        // TODO : Windchild finish me
     }
 
     private static void migrateUnitIcon(final UnitIcon icon) {
@@ -60,7 +62,7 @@ public class ForceIconMigrator {
     }
 
     private static void migrateStandardForceIcon(final StandardForceIcon icon) {
-
+        // TODO : Windchild finish me
     }
 
     public static void migrateLegacyIconMapNodes(final LayeredForceIcon icon, final Node wn) {
