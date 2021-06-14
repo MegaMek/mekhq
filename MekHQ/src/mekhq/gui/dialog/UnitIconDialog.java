@@ -22,7 +22,6 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.enums.DialogResult;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.panels.UnitIconChooser;
 
@@ -49,6 +48,12 @@ public class UnitIconDialog extends StandardForceIconDialog {
         return (UnitIconChooser) super.getChooser();
     }
 
+    @Override
+    public @Nullable UnitIcon getSelectedItem() {
+        final AbstractIcon selected = getChooser().getSelectedItem();
+        return (selected instanceof UnitIcon) ? (UnitIcon) selected : null;
+    }
+
     public @Nullable AbstractIcon getOverride() {
         return override;
     }
@@ -70,8 +75,8 @@ public class UnitIconDialog extends StandardForceIconDialog {
                 "UnitIconDialog.btnNone.toolTipText", this::noneActionPerformed));
         panel.add(new MMButton("btnCancel", resources, "Cancel.text", "Cancel.toolTipText",
                 this::cancelActionPerformed));
-        panel.add(new MMButton("btnRefresh", resources, "refreshDirectory.text",
-                "refreshDirectory.toolTipText", evt -> getChooser().refreshDirectory()));
+        panel.add(new MMButton("btnRefresh", resources, "RefreshDirectory.text",
+                "RefreshDirectory.toolTipText", evt -> getChooser().refreshDirectory()));
 
         return panel;
     }

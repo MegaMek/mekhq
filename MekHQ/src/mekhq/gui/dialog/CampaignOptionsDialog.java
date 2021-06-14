@@ -43,6 +43,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
@@ -109,7 +110,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JFrame frame;
     private Camouflage camouflage;
     private PlayerColour colour;
-    private AbstractIcon unitIcon;
+    private StandardForceIcon unitIcon;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -703,11 +704,9 @@ public class CampaignOptionsDialog extends JDialog {
         btnIcon.setPreferredSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
         btnIcon.addActionListener(evt -> {
-            // TODO : Windchild : I need to be swapped over to a UnitIconDialog
-            final StandardForceIconDialog standardForceIconDialog = new StandardForceIconDialog(frame, unitIcon);
-            if (standardForceIconDialog.showDialog().isConfirmed()
-                    && (standardForceIconDialog.getSelectedItem() != null)) {
-                unitIcon = standardForceIconDialog.getSelectedItem();
+            final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
+            if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
+                unitIcon = unitIconDialog.getSelectedItem();
                 btnIcon.setIcon(unitIcon.getImageIcon(75));
             }
         });
