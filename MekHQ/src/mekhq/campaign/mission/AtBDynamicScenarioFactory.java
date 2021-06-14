@@ -34,7 +34,6 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 
-import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -50,6 +49,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.IAero;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -432,6 +432,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
+            correctNonAeroFlyerBehavior(generatedLance, scenario.getTerrainType());
 
             // if force contributes to map size, increment the generated "lance" count
             if (forceTemplate.getContributesToMapSize()) {
@@ -1241,52 +1242,6 @@ public class AtBDynamicScenarioFactory {
         return transportedUnits;
     }
 
-    /**
-     * Handles loading transported units onto their transports once a megamek scenario has actually started;
-     */
-    public static void loadTransports(AtBScenario scenario, Client client, BotForce botForce) {
-        Map<String, Integer> idMap = new HashMap<>();
-
-        // here we have to make sure that the server has loaded all the entities
-        // and sent the back to the client (which is the only way we know the former)
-        // before we attempt to load transports.
-        int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
-        while (entityCount != botForce.getEntityList().size()) {
-            try {
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
-            } catch (Exception ignored) {
-                
-            }
-            
-            entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
-        }
-        
-        List<Entity> clientEntities = client.getEntitiesVector();
-        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
-        for (Entity entity : clientEntities) {
-            if (entity.getOwnerId() == client.getLocalPlayerNumber()) {
-                idMap.put(entity.getExternalIdAsString(), entity.getId());
-            }
-        }
-
-        for (Entity potentialTransport : clientEntities) {
-            if ((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) &&
-                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
-                for (String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
-                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
-
-                    // if the game contains the potential cargo unit
-                    // and the potential transport can actually load it, send the load command to the server
-                    if ((cargo != null) &&
-                            idMap.containsKey(cargo.getExternalIdAsString()) &&
-                            potentialTransport.canLoad(cargo)) {
-                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()),
-                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
-                    }
-                }
-            }
-        }
-    }
     /**
      * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
      *
@@ -2328,14 +2283,35 @@ public class AtBDynamicScenarioFactory {
                     ((IAero) entity).land();
                 }
             }
+        }
+    }
+    
+    /**
+     * This method contains various hacks intended to put "special units"
+     * such as LAMs, VTOLs and WIGEs into a reasonable state that the bot can use
+     */
+    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int terrainType) {
+        for (Entity entity : entityList) {
+            boolean inSpace = terrainType == AtBScenario.TER_SPACE;
+            boolean inAtmo = terrainType == AtBScenario.TER_LOW_ATMO;
+            
+            // hack for land-air mechs
+            if (entity instanceof LandAirMech) {
+                if (inSpace || inAtmo) {
+                    ((LandAirMech) entity).setConversionMode(LandAirMech.CONV_MODE_FIGHTER);
+                } else {
+                    // for now, the bot does not know how to use WIGEs, so go as a mech
+                    ((LandAirMech) entity).setConversionMode(LandAirMech.CONV_MODE_MECH);
+                }
+            }
             
             // hack - set helis and WIGEs to an explicit altitude of 1
             // currently there is no support for setting elevation for "ground" units 
             // in the scenario template editor, but it looks dumb to have choppers
             // start out on the ground
-            if (entity.getMovementMode() == EntityMovementMode.VTOL ||
-                    entity.getMovementMode() == EntityMovementMode.WIGE) {
-                entity.setElevation(1);;
+            if ((entity.getMovementMode() == EntityMovementMode.VTOL) ||
+                    (entity.getMovementMode() == EntityMovementMode.WIGE)) {
+                entity.setElevation(1);
             }
         }
     }
