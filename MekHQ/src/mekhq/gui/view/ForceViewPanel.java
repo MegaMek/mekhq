@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -89,14 +89,14 @@ public class ForceViewPanel extends JScrollablePanel {
         setLayout(new java.awt.GridBagLayout());
 
 
-        lblIcon.setName("lblPortrait"); // NOI18N
-        setIcon(force, lblIcon, 150);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        lblIcon.setIcon(force.getForceIcon().getImageIcon(150));
+        lblIcon.setName("lblIcon");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(10, 10, 0, 0);
         add(lblIcon, gridBagConstraints);
 
         pnlStats.setName("pnlStats");
@@ -143,19 +143,6 @@ public class ForceViewPanel extends JScrollablePanel {
             add(txtDesc, gridBagConstraints);
         }
     }
-
-    private void setIcon(Force force, JLabel lbl, int scale) {
-        ImageIcon icon = null;
-        try {
-            icon = new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(scale, -1, Image.SCALE_SMOOTH));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-        lbl.setIcon(icon);
-    }
-
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl());
@@ -381,10 +368,9 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     private void fillSubUnits() {
+        GridBagConstraints gridBagConstraints;
 
-        java.awt.GridBagConstraints gridBagConstraints;
-
-        pnlSubUnits.setLayout(new java.awt.GridBagLayout());
+        pnlSubUnits.setLayout(new GridBagLayout());
 
         JLabel lblForce;
 
@@ -392,19 +378,20 @@ public class ForceViewPanel extends JScrollablePanel {
         for (Force subForce : force.getSubForces()) {
             lblForce = new JLabel();
             lblForce.setText(getSummaryFor(subForce));
-            setIcon(subForce, lblForce, 72);
+            lblForce.setIcon(subForce.getForceIcon().getImageIcon(72));
             nexty++;
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = nexty;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSubUnits.add(lblForce, gridBagConstraints);
         }
+
         JLabel lblPerson;
         JLabel lblUnit;
         ArrayList<Unit> units = new ArrayList<>();

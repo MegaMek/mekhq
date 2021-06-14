@@ -24,7 +24,6 @@ import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -43,7 +42,7 @@ import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
-import mekhq.gui.dialog.ImageChoiceDialog;
+import mekhq.gui.dialog.LayeredForceIconDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -54,7 +53,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -152,7 +150,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     //Other
     private static final String GOTO_PILOT = "GOTO_PILOT";
-
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
 
     // String tokens for dialog boxes used for transport loading
@@ -347,14 +344,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains(CHANGE_ICON)) {
             if (singleForce != null) {
-                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
-                        singleForce.getIconCategory(), singleForce.getIconFileName(),
-                        singleForce.getIconMap(), MHQStaticDirectoryManager.getForceIcons(), true);
-                pcd.setVisible(true);
-                if (pcd.isChanged()) {
-                    singleForce.setIconCategory(pcd.getCategory());
-                    singleForce.setIconFileName(pcd.getFileName());
-                    singleForce.setIconMap(pcd.getCategory().equals(Force.ROOT_LAYERED) ? pcd.getIconMap() : new LinkedHashMap<>());
+                final LayeredForceIconDialog layeredForceIconDialog = new LayeredForceIconDialog(
+                        gui.getFrame(), true, singleForce.getForceIcon());
+                if (layeredForceIconDialog.showDialog().isConfirmed()
+                        && (layeredForceIconDialog.getForceIcon() != null)) {
+                    singleForce.setForceIcon(layeredForceIconDialog.getForceIcon());
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
@@ -481,9 +475,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
-                                for (Unit cargo : unit.getTransportedUnits()) {
-                                    extraUnits.add(cargo);
-                                }
+                                extraUnits.addAll(unit.getTransportedUnits());
                             }
                         }
                         scenario.addUnit(unit.getId());

@@ -52,6 +52,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
@@ -650,21 +651,21 @@ public class CampaignXmlParser {
                         retVal.getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
                         retVal.getCamouflage().setFilename(retVal.getColour().name());
                     }
-                } else if (xn.equalsIgnoreCase("iconCategory")) {
+                } else if (xn.equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
+                    retVal.setUnitIcon(StandardForceIcon.parseFromXML(wn));
+                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
                     String val = wn.getTextContent().trim();
-
                     if (val.equals("null")) {
-                        retVal.setIconCategory(null);
+                        retVal.getUnitIcon().setCategory(null);
                     } else {
-                        retVal.setIconCategory(val);
+                        retVal.getUnitIcon().setCategory(val);
                     }
-                } else if (xn.equalsIgnoreCase("iconFileName")) {
+                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
                     String val = wn.getTextContent().trim();
-
                     if (val.equals("null")) {
-                        retVal.setIconFileName(null);
+                        retVal.getUnitIcon().setFilename(null);
                     } else {
-                        retVal.setIconFileName(val);
+                        retVal.getUnitIcon().setFilename(val);
                     }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;

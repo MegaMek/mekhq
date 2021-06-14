@@ -754,7 +754,7 @@ public class PersonnelTableModel extends DataTableModel {
 
             switch (actualCol) {
                 case COL_RANK:
-                    setPortrait(p);
+                    setImage(p.getPortrait().getImage(54));
                     setText(p.getFullDesc());
                     break;
                 case COL_ASSIGN:
@@ -801,7 +801,7 @@ public class PersonnelTableModel extends DataTableModel {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        Image forceImage = getImageFor(force);
+                        final Image forceImage = force.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

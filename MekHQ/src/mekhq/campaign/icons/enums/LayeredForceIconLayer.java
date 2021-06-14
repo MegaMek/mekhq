@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.handler;
+package mekhq.campaign.icons.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
@@ -53,7 +53,7 @@ public enum LayeredForceIconLayer {
     private final String tableName;
     private final int listSelectionModel;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

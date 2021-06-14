@@ -1,8 +1,8 @@
 /*
  * Force.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,33 +21,31 @@
  */
 package mekhq.campaign.force;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.icons.LayeredForceIcon;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.unit.Unit;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Camouflage;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.gui.enums.LayeredForceIcon;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
 
 /**
  * This is a hierarchical object to define forces for TO&E. Each Force
@@ -60,16 +58,14 @@ import mekhq.campaign.unit.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Force implements Serializable {
+    //region Variable Declarations
     private static final long serialVersionUID = -3018542172119419401L;
 
     // pathway to force icon
-    public static final String ROOT_LAYERED = "Layered";
     public static final int FORCE_NONE = -1;
-    private String iconCategory = ROOT_LAYERED;
-    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
+    private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
@@ -82,9 +78,12 @@ public class Force implements Serializable {
 
     //an ID so that forces can be tracked in Campaign hash
     private int id;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Force(String name) {
         setName(name);
+        setForceIcon(new LayeredForceIcon());
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
@@ -92,17 +91,8 @@ public class Force implements Serializable {
         this.subForces = new Vector<>();
         this.units = new Vector<>();
         this.scenarioId = -1;
-
-        // Initialize the Force Icon
-        Vector<String> frame = new Vector<>();
-        frame.add("Frame.png");
-        iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), frame);
     }
-
-    public Force(String n, int id, Force parent) {
-        this(n);
-        this.parentForce = parent;
-    }
+    //endregion Constructors
 
     public String getName() {
         return name;
@@ -360,11 +350,6 @@ public class Force implements Serializable {
         setScenarioId(-1);
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
     public int getId() {
         return id;
     }
@@ -388,73 +373,39 @@ public class Force implements Serializable {
         }
     }
 
-    public String getIconCategory() {
-        return iconCategory;
+    public StandardForceIcon getForceIcon() {
+        return forceIcon;
     }
 
-    public void setIconCategory(String s) {
-        this.iconCategory = s;
-    }
-
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public void setIconFileName(String s) {
-        this.iconFileName = s;
-    }
-
-    public LinkedHashMap<String, Vector<String>> getIconMap() {
-        return iconMap;
-    }
-
-    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
-        this.iconMap = iconMap;
+    public void setForceIcon(final StandardForceIcon forceIcon) {
+        this.forceIcon = forceIcon;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
+        getForceIcon().writeToXML(pw1, indent);
         getCamouflage().writeToXML(pw1, indent);
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", iconCategory);
-
-        if (iconCategory.equals(Force.ROOT_LAYERED)) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "iconHashMap");
-            for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
-                if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\">");
-                    for (String value : entry.getValue()) {
-                        pw1.println(MekHqXmlUtil.indentStr(indent + 2) +"<value name=\"" + MekHqXmlUtil.escape(value) + "\"/>");
-                    }
-                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "iconentry");
-                }
-            }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "iconHashMap");
-        }
-
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
-
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
-
         if (units.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "units");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "units");
             for (UUID uid : units) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) +"<unit id=\"" + uid + "\"/>");
+                pw1.println(MekHqXmlUtil.indentStr(indent) + "<unit id=\"" + uid + "\"/>");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "units");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "units");
         }
 
         if (subForces.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent + 1);
+                sub.writeToXml(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "subforces");
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "force");
     }
@@ -473,6 +424,10 @@ public class Force implements Serializable {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     retVal.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) { // Legacy - 0.49.3 removal
@@ -483,12 +438,14 @@ public class Force implements Serializable {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
-                    retVal.iconCategory = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
-                    processIconMapNodes(retVal, wn2, version);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
-                    retVal.iconFileName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
+                    retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.3 removal
+                    final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
+                    layeredForceIcon.processIconMapNodes(wn2);
+                    retVal.setForceIcon(layeredForceIcon);
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
+                    retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
@@ -505,8 +462,6 @@ public class Force implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
                             MekHQ.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
@@ -539,27 +494,6 @@ public class Force implements Serializable {
             Node classNameNode = attrs.getNamedItem("id");
             String idString = classNameNode.getTextContent();
             retVal.addUnit(UUID.fromString(idString));
-        }
-    }
-
-    private static void processIconMapNodes(Force retVal, Node wn, Version version) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("key");
-            String key = keyNode.getTextContent();
-            Vector<String> values = null;
-            if (wn2.hasChildNodes()) {
-                values = processIconMapSubNodes(wn2, version);
-            }
-            retVal.iconMap.put(key, values);
         }
     }
 
@@ -607,6 +541,11 @@ public class Force implements Serializable {
         children.addAll(units);
         children.addAll(unmannedUnits);
         return children;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     @Override
