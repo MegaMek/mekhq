@@ -23,7 +23,6 @@ import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.awt.*;
 import java.io.PrintWriter;
@@ -45,14 +44,6 @@ public class StandardForceIcon extends AbstractIcon {
     }
     //endregion Constructors
 
-    //region Getters/Setters
-    @Override
-    public void setFilename(final @Nullable String filename) {
-        // We allow filename to be null here as part of the UnitIcon Code
-        this.filename = filename;
-    }
-    //endregion Getters/Setters
-
     //region Boolean Methods
     @Override
     public boolean hasDefaultFilename() {
@@ -61,16 +52,7 @@ public class StandardForceIcon extends AbstractIcon {
     //endregion Boolean Methods
 
     @Override
-    public @Nullable Image getImage(final int width, final int height) {
-        if (getFilename() == null) {
-            return null;
-        }
-        final Image image = getBaseImage();
-        return (image == null) ? null : super.getImage(image, width, height);
-    }
-
-    @Override
-    public Image getBaseImage() {
+    public @Nullable Image getBaseImage() {
         // If we can't create the force icon directory, return null
         if (MHQStaticDirectoryManager.getForceIcons() == null) {
             return null;
@@ -109,19 +91,6 @@ public class StandardForceIcon extends AbstractIcon {
             return new StandardForceIcon();
         }
         return icon;
-    }
-
-    @Override
-    public void parseNodes(final NodeList nl) {
-        super.parseNodes(nl);
-
-        if ("null".equalsIgnoreCase(getCategory())) {
-            setCategory(ROOT_CATEGORY);
-        }
-
-        if ("null".equalsIgnoreCase(getFilename())) {
-            setFilename(null);
-        }
     }
     //endregion File I/O
 

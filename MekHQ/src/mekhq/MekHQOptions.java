@@ -511,6 +511,23 @@ public final class MekHQOptions {
     public void setIndividualRankSystemPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
+
+    /**
+     * @return the path of the folder to load when exporting a layered force icon
+     */
+    public String getLayeredForceIconPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, "userdata/data/images/force/");
+    }
+
+    /**
+     * This sets the path where one saves their layered force icon during export, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last layered force icon export
+     */
+    public void setLayeredForceIconPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
+    }
     //endregion File Paths
 
     //region Nag Tab

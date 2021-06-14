@@ -53,6 +53,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
@@ -651,8 +652,8 @@ public class CampaignXmlParser {
                         retVal.getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
                         retVal.getCamouflage().setFilename(retVal.getColour().name());
                     }
-                } else if (xn.equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
-                    retVal.setUnitIcon(StandardForceIcon.parseFromXML(wn));
+                } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
+                    retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
                     String val = wn.getTextContent().trim();
                     if (val.equals("null")) {

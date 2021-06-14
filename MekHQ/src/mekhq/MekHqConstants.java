@@ -107,6 +107,7 @@ public final class MekHqConstants {
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
     public static final String RANK_SYSTEMS_DIRECTORY_PATH = "rankSystemsDirectoryPath";
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
+    public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredForceIconDirectoryPath";
     //endregion File Paths
 
     //region Nag Tab

@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
+package mekhq.campaign.icons;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.awt.*;
+import java.io.PrintWriter;
+
+/**
+ * Unit Icon is pretty much identical to StandardForceIcon, but permits a null filename to display
+ * the absence of a unit icon
+ */
+public class UnitIcon extends StandardForceIcon {
+    //region Variable Declarations
+    private static final long serialVersionUID = -9134346451335731650L;
+    public static final String XML_TAG = "unitIcon";
+    //endregion Variable Declarations
+
+    //region Constructors
+    public UnitIcon() {
+        this(ROOT_CATEGORY, DEFAULT_FORCE_ICON_FILENAME);
+    }
+
+    public UnitIcon(final AbstractIcon icon) {
+        this(icon.getCategory(), icon.getFilename());
+    }
+
+    public UnitIcon(final @Nullable String category, final @Nullable String filename) {
+        super(category, filename);
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    @Override
+    public void setFilename(final @Nullable String filename) {
+        // We allow filename to be null here to indicate no icons
+        this.filename = filename;
+    }
+    //endregion Getters/Setters
+
+    @Override
+    public @Nullable Image getImage(final int width, final int height) {
+        if (getFilename() == null) {
+            return null;
+        }
+        final Image image = getBaseImage();
+        return (image == null) ? null : super.getImage(image, width, height);
+    }
+
+    //region File I/O
+    @Override
+    public void writeToXML(final PrintWriter pw, final int indent) {
+        writeToXML(pw, indent, XML_TAG);
+    }
+
+    public static UnitIcon parseFromXML(final Node wn) {
+        final UnitIcon icon = new UnitIcon();
+        try {
+            icon.parseNodes(wn.getChildNodes());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            return new UnitIcon();
+        }
+        return icon;
+    }
+
+    @Override
+    public void parseNodes(final NodeList nl) {
+        super.parseNodes(nl);
+
+        if ("null".equalsIgnoreCase(getCategory())) {
+            setCategory(ROOT_CATEGORY);
+        }
+
+        if ("null".equalsIgnoreCase(getFilename())) {
+            setFilename(null);
+        }
+    }
+    //endregion File I/O
+
+    @Override
+    public UnitIcon clone() {
+        return new UnitIcon(getCategory(), getFilename());
+    }
+}

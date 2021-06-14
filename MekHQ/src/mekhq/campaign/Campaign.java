@@ -39,6 +39,7 @@ import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
@@ -235,7 +236,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
-    private AbstractIcon unitIcon = new StandardForceIcon(null, null);
+    private AbstractIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 

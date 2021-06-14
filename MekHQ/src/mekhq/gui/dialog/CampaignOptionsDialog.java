@@ -34,20 +34,19 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -704,6 +703,7 @@ public class CampaignOptionsDialog extends JDialog {
         btnIcon.setPreferredSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
         btnIcon.addActionListener(evt -> {
+            // TODO : Windchild : I need to be swapped over to a UnitIconDialog
             final StandardForceIconDialog standardForceIconDialog = new StandardForceIconDialog(frame, unitIcon);
             if (standardForceIconDialog.showDialog().isConfirmed()
                     && (standardForceIconDialog.getSelectedItem() != null)) {

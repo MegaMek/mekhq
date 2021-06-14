@@ -87,7 +87,6 @@ public class FileDialogs {
     public static Optional<File> openRankSystems(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Rank Systems",
                 FileType.XML, MekHQ.getMekHQOptions().getRankSystemsPath());
-
         value.ifPresent(x -> MekHQ.getMekHQOptions().setRankSystemsPath(x.getParent()));
         return value;
     }
@@ -100,7 +99,6 @@ public class FileDialogs {
     public static Optional<File> saveRankSystems(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Rank Systems", FileType.XML,
                 MekHQ.getMekHQOptions().getRankSystemsPath(), "rankSystem.xml");
-
         value.ifPresent(x -> MekHQ.getMekHQOptions().setRankSystemsPath(x.getParent()));
         return value;
     }
@@ -113,7 +111,6 @@ public class FileDialogs {
     public static Optional<File> openIndividualRankSystem(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Individual Rank System",
                 FileType.XML, MekHQ.getMekHQOptions().getIndividualRankSystemPath());
-
         value.ifPresent(x -> MekHQ.getMekHQOptions().setIndividualRankSystemPath(x.getParent()));
         return value;
     }
@@ -127,8 +124,20 @@ public class FileDialogs {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Individual Rank System",
                 FileType.XML, MekHQ.getMekHQOptions().getIndividualRankSystemPath(),
                 "individualRankSystem.xml");
-
         value.ifPresent(x -> MekHQ.getMekHQOptions().setIndividualRankSystemPath(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> exportLayeredForceIcon(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Export Layered Force Icon",
+                FileType.PNG, MekHQ.getMekHQOptions().getLayeredForceIconPath(),
+                "layeredForceIcon.png");
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setLayeredForceIconPath(x.getParent()));
         return value;
     }
 

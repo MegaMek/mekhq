@@ -27,18 +27,26 @@ import javax.swing.*;
 
 public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Variable Declarations
-
+    private LayeredForceIcon forceIcon;
     //endregion Variable Declarations
 
     //region Constructors
-    protected LayeredForceIconCreationPane(final JFrame frame,
-                                           final @Nullable StandardForceIcon forceIcon) {
+    public LayeredForceIconCreationPane(final JFrame frame, final @Nullable StandardForceIcon forceIcon) {
         super(frame, "LayeredForceIconCreationPane");
-        setForceIcon((forceIcon instanceof LayeredForceIcon) ? forceIcon.clone() : new LayeredForceIcon());
+        setForceIcon((forceIcon instanceof LayeredForceIcon)
+                ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
+        initialize();
     }
     //endregion Constructors
 
     //region Getters/Setters
+    public LayeredForceIcon getForceIcon() {
+        return forceIcon;
+    }
+
+    public void setForceIcon(final LayeredForceIcon forceIcon) {
+        this.forceIcon = forceIcon;
+    }
     //endregion Getters/Setters
 
     //region Initialization
