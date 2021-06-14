@@ -345,7 +345,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(CHANGE_ICON)) {
             if (singleForce != null) {
                 final LayeredForceIconDialog layeredForceIconDialog = new LayeredForceIconDialog(
-                        gui.getFrame(), true, singleForce.getForceIcon());
+                        gui.getFrame(), singleForce.getForceIcon());
                 if (layeredForceIconDialog.showDialog().isConfirmed()
                         && (layeredForceIconDialog.getForceIcon() != null)) {
                     singleForce.setForceIcon(layeredForceIconDialog.getForceIcon());

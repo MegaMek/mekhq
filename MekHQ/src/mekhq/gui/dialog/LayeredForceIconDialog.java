@@ -23,9 +23,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.panels.StandardForceIconChooser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,8 +36,8 @@ import java.util.Set;
 
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private LayeredForceIcon originalForceIcon;
-    private LayeredForceIcon forceIcon;
+    private StandardForceIcon originalForceIcon;
+    private StandardForceIcon forceIcon;
 
     private boolean cancelled = false; // True when the user cancels the dialog
 
@@ -56,8 +56,8 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public LayeredForceIconDialog(JFrame parent, boolean modal, StandardForceIcon forceIcon) {
-        super(parent, modal);
+    public LayeredForceIconDialog(JFrame parent, StandardForceIcon forceIcon) {
+        super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
 
         if (MHQStaticDirectoryManager.getForceIcons() == null) {
             return;
@@ -72,33 +72,26 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //endregion Constructors
 
     //region Getters/Setters
-    public LayeredForceIcon getOriginalForceIcon() {
+    public StandardForceIcon getOriginalForceIcon() {
         return originalForceIcon;
     }
 
-    public void setOriginalForceIcon(LayeredForceIcon originalForceIcon) {
+    public void setOriginalForceIcon(StandardForceIcon originalForceIcon) {
         this.originalForceIcon = originalForceIcon;
     }
 
-    public LayeredForceIcon getForceIcon() {
+    public StandardForceIcon getForceIcon() {
         return forceIcon;
     }
 
-    public void setForceIcon(LayeredForceIcon forceIcon) {
+    public void setForceIcon(StandardForceIcon forceIcon) {
         this.forceIcon = forceIcon.clone();
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    public void setCancelled(Boolean cancelled) {
-        this.cancelled = cancelled;
     }
     //endregion Getters/Setters
 
     //region Initialization
-    private void initialize() {
+    @Override
+    protected void initialize() {
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(resources.getString("SimpleIcon.title"), new StandardForceIconChooser(getForceIcon()));
         tabbedPane.addTab(resources.getString("LayeredIcon.title"), initializeLayeredForceIconPanel());
@@ -107,6 +100,11 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         add(tabbedPane, BorderLayout.CENTER);
         add(initializeButtons(), BorderLayout.PAGE_END);
         pack();
+    }
+
+    @Override
+    protected Container createCenterPane() {
+        return null;
     }
 
     private JPanel initializeLayeredForceIconPanel() {
@@ -191,7 +189,6 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         JButton btnCancel = new JButton(resources.getString("btnCancel.text"));
         btnCancel.setName("btnCancel");
         btnCancel.addActionListener(evt -> {
-            setCancelled(true);
             setVisible(false);
         });
         //endregion Button Graphical Components

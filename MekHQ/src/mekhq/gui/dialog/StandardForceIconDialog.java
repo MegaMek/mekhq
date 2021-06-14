@@ -21,17 +21,15 @@ package mekhq.gui.dialog;
 import megamek.client.ui.dialogs.AbstractIconChooserDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import megamek.common.util.EncodeControl;
+import mekhq.gui.panels.StandardForceIconChooser;
 
 import javax.swing.*;
-import java.util.ResourceBundle;
 
 public class StandardForceIconDialog extends AbstractIconChooserDialog {
     private static final long serialVersionUID = 2690083417720266231L;
 
     public StandardForceIconDialog(final JFrame parent, final @Nullable AbstractIcon icon) {
-        super(parent, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl())
-                .getString("StandardForceIconChooserDialog.title"), new mekhq.gui.dialog.icons.StandardForceIconChooser(icon));
+        super(parent, "StandardForceIconDialog", "StandardForceIconDialog.title", new StandardForceIconChooser(icon), false);
     }
 
     //region Getters

@@ -20,8 +20,6 @@ package mekhq.campaign.icons;
 
 import megamek.MegaMek;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -44,7 +42,7 @@ public class LayeredForceIcon extends StandardForceIcon {
     public static final String LAYERED_CATEGORY = "Layered";
     public static final String XML_TAG = "layeredForceIcon";
 
-    private LinkedHashMap<String, List<String>> iconMap = new LinkedHashMap<>();
+    private Map<LayeredForceIconLayer, List<String>> iconMap = new LinkedHashMap<>();
     //endregion Variable Declarations
 
     //region Constructors
@@ -52,41 +50,33 @@ public class LayeredForceIcon extends StandardForceIcon {
         this(LAYERED_CATEGORY, DEFAULT_ICON_FILENAME);
     }
 
-    public LayeredForceIcon(AbstractIcon icon) {
-        this(icon.getCategory(), icon.getFilename());
+    public LayeredForceIcon(final @Nullable String category, final @Nullable String filename) {
+        this(category, filename, null);
     }
 
-    public LayeredForceIcon(String category, String filename) {
+    public LayeredForceIcon(final String category, final String filename,
+                            final @Nullable Map<LayeredForceIconLayer, List<String>> iconMap) {
         super(category, filename);
-        createDefaultIconMap();
-    }
 
-    public LayeredForceIcon(String category, String filename, LinkedHashMap<String, List<String>> iconMap) {
-        super(category, filename);
-        setIconMap(iconMap);
+        if (iconMap == null) {
+            final List<String> frame = new ArrayList<>();
+            frame.add("Frame.png");
+            getIconMap().put(LayeredForceIconLayer.FRAME, frame);
+        } else {
+            setIconMap(iconMap);
+        }
     }
     //endregion Constructors
 
     //region Getters/Setters
-    @Override
-    public void setFilename(@Nullable String filename) {
-        this.filename = (filename == null) ? DEFAULT_FORCE_ICON_FILENAME : filename;
-    }
-
-    public LinkedHashMap<String, List<String>> getIconMap() {
+    public Map<LayeredForceIconLayer, List<String>> getIconMap() {
         return iconMap;
     }
 
-    public void setIconMap(LinkedHashMap<String, List<String>> iconMap) {
+    public void setIconMap(final Map<LayeredForceIconLayer, List<String>> iconMap) {
         this.iconMap = iconMap;
     }
     //endregion Getters/Setters
-
-    private void createDefaultIconMap() {
-        List<String> frame = new ArrayList<>();
-        frame.add("Frame.png");
-        iconMap.put(LayeredForceIconLayer.FRAME.getLayerPath(), frame);
-    }
 
     @Override
     public Image getBaseImage() {
@@ -105,28 +95,34 @@ public class LayeredForceIcon extends StandardForceIcon {
         try {
             int width = 0;
             int height = 0;
+
             // Gather height/width
-            for (LayeredForceIconEnum layeredForceIcon : LayeredForceIconEnum.getInDrawOrder()) {
-                String layer = layeredForceIcon.getLayerPath();
+            for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
                 if (getIconMap().containsKey(layer)) {
                     for (String value : getIconMap().get(layer)) {
-                        // Load up the image piece
-                        BufferedImage img = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem(layer, value);
-                        width = Math.max(img.getWidth(), width);
-                        height = Math.max(img.getHeight(), height);
+                        final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
+                                .getForceIcons().getItem(layer.getLayerPath(), value);
+                        if (image != null) {
+                            width = Math.max(image.getWidth(), width);
+                            height = Math.max(image.getHeight(), height);
+                        }
                     }
                 }
             }
+
             base = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                     .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-            Graphics2D g2d = base.createGraphics();
-            for (LayeredForceIconEnum layeredForceIcon : LayeredForceIconEnum.getInDrawOrder()) {
-                String layer = layeredForceIcon.getLayerPath();
+
+            final Graphics2D g2d = base.createGraphics();
+            for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
                 if (getIconMap().containsKey(layer)) {
-                    for (String value : getIconMap().get(layer)) {
-                        BufferedImage img = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem(layer, value);
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(img, width - img.getWidth() + 1, height - img.getHeight() + 1, null);
+                    for (final String value : getIconMap().get(layer)) {
+                        final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
+                                .getForceIcons().getItem(layer.getLayerPath(), value);
+                        if (image != null) {
+                            // Draw the current buffered image onto the base, aligning bottom and right side
+                            g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
+                        }
                     }
                 }
             }
@@ -152,85 +148,79 @@ public class LayeredForceIcon extends StandardForceIcon {
         writeToXML(pw, indent, XML_TAG);
     }
 
+    @Override
+    protected void writeBodyToXML(final PrintWriter pw, int indent) {
+        super.writeBodyToXML(pw, indent);
+
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "map");
+        for (final Map.Entry<LayeredForceIconLayer, List<String>> entry : getIconMap().entrySet()) {
+            if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, entry.getKey().name());
+                for (final String value : entry.getValue()) {
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", value);
+                }
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, entry.getKey().name());
+            }
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "map");
+    }
+
     public static LayeredForceIcon parseFromXML(final Node wn) {
-        final Portrait icon = new Portrait();
+        final LayeredForceIcon icon = new LayeredForceIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
             MegaMek.getLogger().error(e);
-            return new Portrait();
+            return new LayeredForceIcon();
         }
         return icon;
     }
-    //endregion File I/O
 
-    //region FileIO
-    public void writeToXML(PrintWriter pw1, int indent) {
-        if (!hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", getCategory());
-
-            if (LayeredForceIcon.LAYERED_CATEGORY.equals(getCategory())) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "iconHashMap");
-                for (Map.Entry<String, List<String>> entry : getIconMap().entrySet()) {
-                    if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\">");
-                        for (String value : entry.getValue()) {
-                            pw1.println(MekHqXmlUtil.indentStr(indent) + "<value name=\"" + MekHqXmlUtil.escape(value) + "\"/>");
-                        }
-                        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "iconentry");
-                    }
+    @Override
+    protected void parseNode(final Node wn) {
+        super.parseNode(wn);
+        switch (wn.getNodeName()) {
+            case "map":
+                if (wn.hasChildNodes()) {
+                    processIconMapNodes(wn.getChildNodes());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "iconHashMap");
-            }
-        }
-
-        if (!hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", getFilename());
+                break;
+            default:
+                break;
         }
     }
 
-    public void processIconMapNodes(Node wn) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+    private void processIconMapNodes(final NodeList nl) {
+        for (int i = 0; i < nl.getLength(); i++) {
+            final Node wn = nl.item(i);
+            if ((wn.getNodeType() != Node.ELEMENT_NODE) || !wn.hasChildNodes()) {
                 continue;
             }
-
-            List<String> values = wn2.hasChildNodes() ? processIconMapSubNodes(wn2) : null;
-            getIconMap().put(wn2.getAttributes().getNamedItem("key").getTextContent(), values);
+            getIconMap().put(LayeredForceIconLayer.valueOf(wn.getNodeName()),
+                    processIconMapSubNodes(wn.getChildNodes()));
         }
     }
 
-    private List<String> processIconMapSubNodes(Node wn) {
-        List<String> values = new ArrayList<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+    private List<String> processIconMapSubNodes(final NodeList nl) {
+        final List<String> values = new ArrayList<>();
+        for (int i = 0; i < nl.getLength(); i++) {
+            final Node wn = nl.item(i);
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-
-            String key = wn2.getAttributes().getNamedItem("name").getTextContent();
-            if ((key != null) && !key.isEmpty()) {
-                values.add(key);
-            }
+            values.add(wn.getTextContent().trim());
         }
         return values;
     }
-    //endregion FileIO
+    //endregion File I/O
 
     @Override
     public LayeredForceIcon clone() {
-        LinkedHashMap<String, List<String>> iconMap = new LinkedHashMap<>();
-        for (Map.Entry<String, List<String>> entry : getIconMap().entrySet()) {
+        final Map<LayeredForceIconLayer, List<String>> iconMap = new LinkedHashMap<>();
+        for (final Map.Entry<LayeredForceIconLayer, List<String>> entry : getIconMap().entrySet()) {
             if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
                 iconMap.put(entry.getKey(), new ArrayList<>());
-                for (String value : entry.getValue()) {
+                for (final String value : entry.getValue()) {
                     iconMap.get(entry.getKey()).add(value);
                 }
             }

@@ -27,6 +27,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.unit.Unit;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -143,7 +144,7 @@ public class ForceStub implements Serializable {
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.3 removal
                     final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
-                    layeredForceIcon.processIconMapNodes(wn2);
+                    ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
                     retVal.setForceIcon(layeredForceIcon);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
                     retVal.getForceIcon().setFilename(wn2.getTextContent().trim());

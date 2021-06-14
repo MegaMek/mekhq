@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,11 +27,19 @@ import javax.swing.tree.DefaultTreeModel;
 import java.util.Iterator;
 
 public class StandardForceIconChooserTree extends AbstractIconChooserTree {
+    //region Variable Declarations
     private static final long serialVersionUID = -7213083882464527724L;
+    //endregion Variable Declarations
 
+    //region Constructors
     public StandardForceIconChooserTree() {
         super();
+    }
+    //endregion Constructors
 
+    //region Initialization
+    @Override
+    protected DefaultTreeModel createTreeModel() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY);
         if (MHQStaticDirectoryManager.getForceIcons() != null) {
             Iterator<String> catNames = MHQStaticDirectoryManager.getForceIcons().getCategoryNames();
@@ -43,6 +51,7 @@ public class StandardForceIconChooserTree extends AbstractIconChooserTree {
                 }
             }
         }
-        setModel(new DefaultTreeModel(root));
+        return new DefaultTreeModel(root);
     }
+    //endregion Initialization
 }
