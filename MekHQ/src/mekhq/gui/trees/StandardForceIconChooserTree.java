@@ -40,13 +40,13 @@ public class StandardForceIconChooserTree extends AbstractIconChooserTree {
     //region Initialization
     @Override
     protected DefaultTreeModel createTreeModel() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY);
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY);
         if (MHQStaticDirectoryManager.getForceIcons() != null) {
-            Iterator<String> catNames = MHQStaticDirectoryManager.getForceIcons().getCategoryNames();
+            final Iterator<String> catNames = MHQStaticDirectoryManager.getForceIcons().getCategoryNames();
             while (catNames.hasNext()) {
-                String catName = catNames.next();
-                if ((catName != null) && !catName.equals("")) {
-                    String[] names = catName.split("/");
+                final String catName = catNames.next();
+                if ((catName != null) && !catName.isBlank()) {
+                    final String[] names = catName.split("/");
                     addCategoryToTree(root, names);
                 }
             }

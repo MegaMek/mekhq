@@ -43,10 +43,6 @@ public class UnitIcon extends StandardForceIcon {
         this(ROOT_CATEGORY, DEFAULT_FORCE_ICON_FILENAME);
     }
 
-    public UnitIcon(final AbstractIcon icon) {
-        this(icon.getCategory(), icon.getFilename());
-    }
-
     public UnitIcon(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }

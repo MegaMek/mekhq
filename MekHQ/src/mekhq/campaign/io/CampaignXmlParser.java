@@ -655,18 +655,18 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
                     retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
-                    String val = wn.getTextContent().trim();
-                    if (val.equals("null")) {
+                    final String value = wn.getTextContent().trim();
+                    if (value.equals("null")) {
                         retVal.getUnitIcon().setCategory(null);
                     } else {
-                        retVal.getUnitIcon().setCategory(val);
+                        retVal.getUnitIcon().setCategory(value);
                     }
                 } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
-                    String val = wn.getTextContent().trim();
-                    if (val.equals("null")) {
+                    final String value = wn.getTextContent().trim();
+                    if (value.equals("null")) {
                         retVal.getUnitIcon().setFilename(null);
                     } else {
-                        retVal.getUnitIcon().setFilename(val);
+                        retVal.getUnitIcon().setFilename(value);
                     }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;

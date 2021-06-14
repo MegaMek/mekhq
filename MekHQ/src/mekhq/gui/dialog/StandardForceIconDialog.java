@@ -19,18 +19,32 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
+import megamek.common.util.EncodeControl;
 import mekhq.gui.panels.StandardForceIconChooser;
 
 import javax.swing.*;
+import java.util.ResourceBundle;
 
 public class StandardForceIconDialog extends AbstractIconChooserDialog {
+    //region Variable Declarations
     private static final long serialVersionUID = 2690083417720266231L;
+    //endregion Variable Declarations
 
+    //region Constructors
     public StandardForceIconDialog(final JFrame parent, final @Nullable AbstractIcon icon) {
-        super(parent, "StandardForceIconDialog", "StandardForceIconDialog.title", new StandardForceIconChooser(icon), false);
+        this(parent, "StandardForceIconDialog", "StandardForceIconDialog.title",
+                new StandardForceIconChooser(icon));
     }
+
+    public StandardForceIconDialog(final JFrame parent, final String name, final String title,
+                                   final AbstractIconChooser chooser) {
+        super(parent, true, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+                name, title, chooser, false);
+    }
+    //endregion Constructors
 
     //region Getters
     @Override

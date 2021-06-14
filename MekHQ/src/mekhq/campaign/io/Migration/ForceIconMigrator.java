@@ -36,12 +36,31 @@ import java.util.List;
 public class ForceIconMigrator {
     public static void migrateForceIcon(final AbstractIcon icon) {
         if (icon instanceof LayeredForceIcon) {
-            //migrateLayeredForceIcon((LayeredForceIcon) icon);
+            migrateLayeredForceIcon((LayeredForceIcon) icon);
         } else if (icon instanceof UnitIcon) {
-            //migrateUnitIcon((UnitIcon) icon);
+            migrateUnitIcon((UnitIcon) icon);
         } else if (icon instanceof StandardForceIcon) {
-            //migrateStandardForceIcon((StandardForceIcon) icon);
+            migrateStandardForceIcon((StandardForceIcon) icon);
         }
+    }
+
+    private static void migrateLayeredForceIcon(final LayeredForceIcon icon) {
+        // Just ensure these default properly
+        icon.setCategory(LayeredForceIcon.LAYERED_CATEGORY);
+        icon.setFilename(StandardForceIcon.DEFAULT_ICON_FILENAME);
+
+        // Now we handle the proper migration
+
+    }
+
+    private static void migrateUnitIcon(final UnitIcon icon) {
+        if (icon.getFilename() != null) {
+            migrateStandardForceIcon(icon);
+        }
+    }
+
+    private static void migrateStandardForceIcon(final StandardForceIcon icon) {
+
     }
 
     public static void migrateLegacyIconMapNodes(final LayeredForceIcon icon, final Node wn) {

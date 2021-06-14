@@ -236,7 +236,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
-    private AbstractIcon unitIcon = new UnitIcon(null, null);
+    private StandardForceIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 
@@ -3968,11 +3968,11 @@ public class Campaign implements Serializable, ITechManager {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public AbstractIcon getUnitIcon() {
+    public StandardForceIcon getUnitIcon() {
         return unitIcon;
     }
 
-    public void setUnitIcon(final AbstractIcon unitIcon) {
+    public void setUnitIcon(final StandardForceIcon unitIcon) {
         this.unitIcon = unitIcon;
     }
 

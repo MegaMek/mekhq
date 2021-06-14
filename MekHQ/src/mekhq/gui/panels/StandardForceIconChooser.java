@@ -19,6 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.panels.AbstractIconChooser;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.DirectoryItems;
 import mekhq.MHQStaticDirectoryManager;
@@ -31,11 +32,7 @@ import java.util.List;
 
 public class StandardForceIconChooser extends AbstractIconChooser {
     //region Constructors
-    public StandardForceIconChooser() {
-        this(null);
-    }
-
-    public StandardForceIconChooser(AbstractIcon icon) {
+    public StandardForceIconChooser(final @Nullable AbstractIcon icon) {
         super(new StandardForceIconChooserTree(), icon);
     }
     //endregion Constructors
@@ -46,20 +43,19 @@ public class StandardForceIconChooser extends AbstractIconChooser {
     }
 
     @Override
-    protected AbstractIcon createIcon(String category, String filename) {
+    protected StandardForceIcon createIcon(final @Nullable String category, final @Nullable String filename) {
         return new StandardForceIcon(category, filename);
     }
 
     @Override
-    protected List<AbstractIcon> getItems(String category) {
-        List<AbstractIcon> result = new ArrayList<>();
-
+    protected List<AbstractIcon> getItems(final String category) {
+        final List<AbstractIcon> result = new ArrayList<>();
         // The portraits of the selected category are presented.
         // When the includeSubDirs flag is true, all categories
         // below the selected one are also presented.
         if (includeSubDirs) {
-            for (Iterator<String> catNames = getDirectory().getCategoryNames(); catNames.hasNext(); ) {
-                String tcat = catNames.next();
+            for (final Iterator<String> catNames = getDirectory().getCategoryNames(); catNames.hasNext(); ) {
+                final String tcat = catNames.next();
                 if (tcat.startsWith(category)) {
                     addCategoryItems(tcat, result);
                 }
