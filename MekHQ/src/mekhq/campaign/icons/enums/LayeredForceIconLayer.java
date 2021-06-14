@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.enums;
+package mekhq.campaign.handler;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
@@ -26,23 +26,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public enum LayeredForceIcon {
+public enum LayeredForceIconLayer {
     //region Enum Declarations
-    TYPE("LayeredForceIcon.TYPE.text", "LayeredForceIcon.TYPE.toolTipText",
+    TYPE("LayeredForceIconLayer.TYPE.text", "LayeredForceIconLayer.TYPE.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.SINGLE_SELECTION),
-    FORMATION("LayeredForceIcon.FORMATION.text", "LayeredForceIcon.FORMATION.toolTipText",
+    FORMATION("LayeredForceIconLayer.FORMATION.text", "LayeredForceIconLayer.FORMATION.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
-    ADJUSTMENT("LayeredForceIcon.ADJUSTMENT.text", "LayeredForceIcon.ADJUSTMENT.toolTipText",
+    ADJUSTMENT("LayeredForceIconLayer.ADJUSTMENT.text", "LayeredForceIconLayer.ADJUSTMENT.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH, "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    ALPHANUMERIC("LayeredForceIcon.ALPHANUMERIC.text", "LayeredForceIcon.ALPHANUMERIC.toolTipText",
+    ALPHANUMERIC("LayeredForceIconLayer.ALPHANUMERIC.text", "LayeredForceIconLayer.ALPHANUMERIC.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH, "tableAlphanumerics", ListSelectionModel.SINGLE_SELECTION),
-    SPECIAL_MODIFIER("LayeredForceIcon.SPECIAL_MODIFIER.text", "LayeredForceIcon.SPECIAL_MODIFIER.toolTipText",
+    SPECIAL_MODIFIER("LayeredForceIconLayer.SPECIAL_MODIFIER.text", "LayeredForceIconLayer.SPECIAL_MODIFIER.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH, "tableSpecialModifiers", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    BACKGROUND("LayeredForceIcon.BACKGROUND.text", "LayeredForceIcon.BACKGROUND.toolTipText",
+    BACKGROUND("LayeredForceIconLayer.BACKGROUND.text", "LayeredForceIconLayer.BACKGROUND.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    FRAME("LayeredForceIcon.FRAME.text", "LayeredForceIcon.FRAME.toolTipText",
+    FRAME("LayeredForceIconLayer.FRAME.text", "LayeredForceIconLayer.FRAME.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
-    LOGO("LayeredForceIcon.LOGO.text", "LayeredForceIcon.LOGO.toolTipText",
+    LOGO("LayeredForceIconLayer.LOGO.text", "LayeredForceIconLayer.LOGO.toolTipText",
             MekHqConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
@@ -57,8 +57,8 @@ public enum LayeredForceIcon {
     //endregion Variable Declarations
 
     //region Constructors
-    LayeredForceIcon(final String name, final String toolTipText, final String layerPath,
-                     final String tableName, final int listSelectionModel) {
+    LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
+                          final String tableName, final int listSelectionModel) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;
@@ -122,8 +122,8 @@ public enum LayeredForceIcon {
     /**
      * @return the layered force icon enum values in the order they are drawn in
      */
-    public static List<LayeredForceIcon> getInDrawOrder() {
-        List<LayeredForceIcon> drawOrder = new ArrayList<>();
+    public static List<LayeredForceIconLayer> getInDrawOrder() {
+        List<LayeredForceIconLayer> drawOrder = new ArrayList<>();
         drawOrder.add(BACKGROUND);
         drawOrder.add(FRAME);
         drawOrder.add(TYPE);
