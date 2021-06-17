@@ -34,7 +34,6 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 
-import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -50,6 +49,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.IAero;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -96,7 +96,10 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, BombType.B_LG, BombType.B_TAG };
+    // bomb types assignable to aerospace units on ground maps
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, 
+            BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, 
+            BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
     private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
@@ -429,6 +432,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
+            correctNonAeroFlyerBehavior(generatedLance, scenario.getTerrainType());
 
             // if force contributes to map size, increment the generated "lance" count
             if (forceTemplate.getContributesToMapSize()) {
@@ -1238,38 +1242,6 @@ public class AtBDynamicScenarioFactory {
         return transportedUnits;
     }
 
-    /**
-     * Handles loading transported units onto their transports once a megamek scenario has actually started;
-     *
-     * @param scenario
-     */
-    public static void loadTransports(AtBScenario scenario, Client client) {
-        Map<String, Integer> idMap = new HashMap<>();
-        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
-        for (Entity entity : client.getEntitiesVector()) {
-            if (entity.getOwnerId() == client.getLocalPlayerNumber()) {
-                idMap.put(entity.getExternalIdAsString(), entity.getId());
-            }
-        }
-
-        for (Entity potentialTransport : client.getEntitiesVector()) {
-            if ((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) &&
-                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
-                for (String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
-                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
-
-                    // if the game contains the potential cargo unit
-                    // and the potential transport can actually load it, send the load command to the server
-                    if ((cargo != null) &&
-                            idMap.containsKey(cargo.getExternalIdAsString()) &&
-                            potentialTransport.canLoad(cargo)) {
-                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()),
-                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
-                    }
-                }
-            }
-        }
-    }
     /**
      * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
      *
@@ -2313,6 +2285,36 @@ public class AtBDynamicScenarioFactory {
             }
         }
     }
+    
+    /**
+     * This method contains various hacks intended to put "special units"
+     * such as LAMs, VTOLs and WIGEs into a reasonable state that the bot can use
+     */
+    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int terrainType) {
+        for (Entity entity : entityList) {
+            boolean inSpace = terrainType == AtBScenario.TER_SPACE;
+            boolean inAtmo = terrainType == AtBScenario.TER_LOW_ATMO;
+            
+            // hack for land-air mechs
+            if (entity instanceof LandAirMech) {
+                if (inSpace || inAtmo) {
+                    ((LandAirMech) entity).setConversionMode(LandAirMech.CONV_MODE_FIGHTER);
+                } else {
+                    // for now, the bot does not know how to use WIGEs, so go as a mech
+                    ((LandAirMech) entity).setConversionMode(LandAirMech.CONV_MODE_MECH);
+                }
+            }
+            
+            // hack - set helis and WIGEs to an explicit altitude of 1
+            // currently there is no support for setting elevation for "ground" units 
+            // in the scenario template editor, but it looks dumb to have choppers
+            // start out on the ground
+            if ((entity.getMovementMode() == EntityMovementMode.VTOL) ||
+                    (entity.getMovementMode() == EntityMovementMode.WIGE)) {
+                entity.setElevation(1);
+            }
+        }
+    }
 
     /**
      * Helper function that makes some of the units in the given list of entities
@@ -2366,9 +2368,21 @@ public class AtBDynamicScenarioFactory {
         }
         
         // pick out the index in the BombType array
-        int bombIndex = actualValidBombChoices.get(Compute.randomInt(actualValidBombChoices.size()));
+        int randomBombChoiceIndex = Compute.randomInt(actualValidBombChoices.size());
+        int bombIndex = actualValidBombChoices.get(randomBombChoiceIndex);
+        int weightModifier = 0;
+        
+        // hack: we only really need one "tag", so add it then pack on some more bombs
+        if (bombIndex == BombType.B_TAG) {
+            weightModifier = 5;
+            bombChoices[bombIndex] = 1;
+            actualValidBombChoices.remove(randomBombChoiceIndex);
+            bombIndex = Utilities.getRandomItem(actualValidBombChoices);
+        }
+        
         // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) (entity.getWeight() / (BombType.getBombCost(bombIndex) * 5));
+        int numBombs = (int) Math.floor((entity.getWeight() - weightModifier) / 
+                (BombType.getBombCost(bombIndex) * 5.0));
         bombChoices[bombIndex] = numBombs;
 
         ((IBomber) entity).setBombChoices(bombChoices);
