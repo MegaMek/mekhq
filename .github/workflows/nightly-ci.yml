@@ -18,8 +18,11 @@ on:
 #
 # Setup the Build Scan "VCS" link for all gradle invocations
 #
+# Disable maven pooling to deal with Azure SNAT resets
+# https://github.com/actions/virtual-environments/issues/1499#issuecomment-689467080
+#
 env:
-  GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
+  GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }} -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
 
 jobs:
   nightly_ci:
