@@ -168,7 +168,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
 
     private void setupTemplateList() {
         DefaultListModel<ScenarioForceTemplate> templateListModel = new DefaultListModel<>();
-        for (ScenarioForceTemplate forceTemplate : currentScenario.getTemplate().scenarioForces.values()) {
+        for (ScenarioForceTemplate forceTemplate : currentScenario.getTemplate().getAllScenarioForces()) {
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal() ||
                     forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
                 templateListModel.addElement(forceTemplate);

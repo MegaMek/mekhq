@@ -428,7 +428,7 @@ public class ScenarioObjective {
             for(String linkedForceName : forceTemplate.getObjectiveLinkedForces()) {
                 boolean objectiveContainsLinkedForce = getAssociatedForceNames().contains(linkedForceName);
                 if(objectiveContainsLinkedForce) {
-                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().scenarioForces.get(linkedForceName);
+                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces().get(linkedForceName);
                     return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
                 }
             }

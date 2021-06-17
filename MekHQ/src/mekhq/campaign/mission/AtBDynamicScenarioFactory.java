@@ -158,7 +158,7 @@ public class AtBDynamicScenarioFactory {
         setTerrain(scenario);
 
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
-        if (!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
+        if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
             
             // the default template should not allow the user to deploy ground units as 
@@ -171,7 +171,7 @@ public class AtBDynamicScenarioFactory {
             }
             
             
-            template.scenarioForces.put(defaultReinforcements.getForceName(), defaultReinforcements);
+            template.getScenarioForces().put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
         return scenario;
@@ -345,7 +345,8 @@ public class AtBDynamicScenarioFactory {
         int forceUnitBudget = 0;
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
-        } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
+        } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) ||
+                (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ?
                     lanceSize : forceTemplate.getFixedUnitCount();
         }
@@ -1768,7 +1769,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario to process
      */
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
-        for (ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
+        for (ScenarioForceTemplate forceTemplate : scenario.getTemplate().getAllScenarioForces()) {
             calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
         }
 
@@ -1796,16 +1797,16 @@ public class AtBDynamicScenarioFactory {
                 Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameEdge) {
-            calculatedEdge = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            calculatedEdge = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeEdge) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             calculatedEdge = getOppositeEdge(syncDeploymentZone);
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameArc) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             List<Integer> arc = getArc(syncDeploymentZone, true);
             calculatedEdge = arc.get(Compute.randomInt(arc.size()));
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeArc) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             List<Integer> arc = getArc(syncDeploymentZone, false);
             calculatedEdge = arc.get(Compute.randomInt(arc.size()));
         }
@@ -2462,5 +2463,38 @@ public class AtBDynamicScenarioFactory {
         }
         
         return contract.getSystem().getFactions(currentDate).contains(factionCode);
+    }
+    
+    /**
+     * Given a player unit ID and a template name, if the player unit type matches  
+     * the template's unit type and the template generation method is PlayerOrAllied,
+     * take the first unit that we find in the given scenario that's a part of that
+     * template and "put it away".
+     */
+    public static void benchAttachedAlly(UUID playerUnitID, String templateName, AtBDynamicScenario scenario) {
+        ScenarioForceTemplate destinationTemplate = null;
+        if (scenario.getTemplate().getScenarioForces().containsKey(templateName)) {
+            destinationTemplate = scenario.getTemplate().getScenarioForces().get(templateName);
+        }
+        
+        if ((destinationTemplate == null) || 
+                (destinationTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
+            return;
+        }
+        
+        List<UUID> candidateIDs = scenario.getBotTemplateUnits().get(destinationTemplate.getForceName());
+        if (candidateIDs.size() > 0) {
+            UUID unitID = candidateIDs.get(0);
+            
+            candidateIDs.remove(0);
+            scenario.getPlayerUnitSwaps().put(playerUnitID, unitID);
+            // remove entity from bot force or allied unit list
+            // add entity to temporary store (bigBattleAllies?)
+        }
+    }
+    
+    public static void unbenchAttachedAlly(UUID playerUnitID, AtBDynamicScenario scenario) {
+        // get entity from temporary store (big battle allies?), if it exists
+        // add it to to bot force being worked with or attached ally list
     }
 }

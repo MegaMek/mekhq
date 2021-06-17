@@ -67,7 +67,13 @@ public class AtBDynamicScenario extends AtBScenario {
     private Map<UUID, ScenarioForceTemplate> botUnitTemplates;
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
     private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
+    
+    // transient reverse lookup by bot force name to unit ID
+    private transient Map<String, List<UUID>> botTemplateUnits;
 
+    // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
+    private Map<UUID, UUID> playerUnitSwaps;
+    
     private List<AtBScenarioModifier> scenarioModifiers;
 
     private boolean finalized;
@@ -81,6 +87,8 @@ public class AtBDynamicScenario extends AtBScenario {
         playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
         externalIDLookup = new HashMap<>();
+        setBotTemplateUnits(new HashMap<>());
+        setPlayerUnitSwaps(new HashMap<>());
     }
 
     @Override
@@ -90,7 +98,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // loop through all player-supplied forces in the template, if there is one
         // assign the newly-added force to the first template we find
         if(template != null) {
-            for(ScenarioForceTemplate forceTemplate : template.scenarioForces.values()) {
+            for(ScenarioForceTemplate forceTemplate : template.getAllScenarioForces()) {
                 if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
                         !playerForceTemplates.containsValue(forceTemplate)) {
                     playerForceTemplates.put(forceID, forceTemplate);
@@ -116,13 +124,13 @@ public class AtBDynamicScenario extends AtBScenario {
 
         super.addForces(forceID);
 
-        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
         playerForceTemplates.put(forceID, forceTemplate);
     }
 
     public void addUnit(UUID unitID, String templateName) {
         super.addUnit(unitID);
-        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
         playerUnitTemplates.put(unitID, forceTemplate);
     }
 
@@ -185,10 +193,12 @@ public class AtBDynamicScenario extends AtBScenario {
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);
         botForceTemplates.put(botForce, forceTemplate);
+        botTemplateUnits.putIfAbsent(forceTemplate.getForceName(), new ArrayList<>());
 
         // put all bot units into the external ID lookup.
         for (Entity entity : botForce.getEntityList()) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
+            botTemplateUnits.get(forceTemplate.getForceName()).add(UUID.fromString(entity.getExternalIdAsString()));
         }
     }
 
@@ -201,7 +211,10 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((x >= 0) && (x < botForces.size())) {
             BotForce botToRemove = botForces.get(x);
 
-            botForceTemplates.remove(botToRemove);
+            if (botForceTemplates.containsKey(botToRemove)) {
+                botTemplateUnits.remove(botForceTemplates.get(botToRemove).getForceName());
+                botForceTemplates.remove(botToRemove);
+            }
         }
 
         super.removeBotForce(x);
@@ -245,6 +258,22 @@ public class AtBDynamicScenario extends AtBScenario {
 
     public Map<UUID, ScenarioForceTemplate> getBotUnitTemplates() {
         return botUnitTemplates;
+    }
+
+    public Map<UUID, UUID> getPlayerUnitSwaps() {
+        return playerUnitSwaps;
+    }
+
+    public void setPlayerUnitSwaps(Map<UUID, UUID> playerUnitSwaps) {
+        this.playerUnitSwaps = playerUnitSwaps;
+    }
+
+    public Map<String, List<UUID>> getBotTemplateUnits() {
+        return botTemplateUnits;
+    }
+
+    public void setBotTemplateUnits(Map<String, List<UUID>> botTemplateUnits) {
+        this.botTemplateUnits = botTemplateUnits;
     }
 
     public int getEffectiveOpforSkill() {
@@ -435,6 +464,7 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version);
+        restoreTransientData();
     }
 
     @Override
@@ -457,5 +487,26 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public String getBattlefieldControlDescription() {
         return "";
+    }
+    
+    /**
+     * Restores transient data that can be regenerated from already stored data
+     */
+    private void restoreTransientData() {
+        for (UUID unitID : botUnitTemplates.keySet()) {
+            String forceTemplateName = botUnitTemplates.get(unitID).getForceName();
+            botTemplateUnits.putIfAbsent(forceTemplateName, new ArrayList<>());
+            botTemplateUnits.get(forceTemplateName).add(unitID);
+        }
+        
+        for (BotForce botForce : botForceTemplates.keySet()) {
+            String forceTemplateName = botForceTemplates.get(botForce).getForceName();
+            
+            botTemplateUnits.putIfAbsent(forceTemplateName, new ArrayList<>());
+            
+            for (Entity entity : botForce.getEntityList()) {
+                botTemplateUnits.get(forceTemplateName).add(UUID.fromString(entity.getExternalIdAsString()));
+            }
+        }
     }
 }

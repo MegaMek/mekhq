@@ -48,7 +48,7 @@ public class ScenarioTemplate implements Cloneable {
     
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
-    public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
+    private Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
     @XmlElementWrapper(name="scenarioObjectives")
     @XmlElement(name="scenarioObjective")
@@ -90,6 +90,14 @@ public class ScenarioTemplate implements Cloneable {
     
     public List<ScenarioForceTemplate> getAllScenarioForces() {
         return scenarioForces.values().stream().collect(Collectors.toList());
+    }
+    
+    public Map<String, ScenarioForceTemplate> getScenarioForces() {
+        return scenarioForces;
+    }
+    
+    public void setScenarioForces(Map<String, ScenarioForceTemplate> forces) {
+        scenarioForces = forces;
     }
     
     public boolean isHostileFacility() {
