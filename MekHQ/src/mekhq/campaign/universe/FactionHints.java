@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,7 +20,6 @@ package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +27,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.MekHqConstants;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,12 +46,7 @@ import mekhq.MekHqXmlUtil;
  * @author Neoancient
  */
 public class FactionHints {
-
-    private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; //$NON-NLS-1$
-
-    private final Set<Faction> deepPeriphery;
     private final Set<Faction> neutralFactions;
-    private final Set<Faction> majorPowers;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
     private final Map<Faction, Map<Faction, List<FactionHint>>> alliances;
@@ -62,9 +58,7 @@ public class FactionHints {
      * Protected constructor that initializes empty data structures.
      */
     protected FactionHints() {
-        deepPeriphery = new HashSet<>();
         neutralFactions = new HashSet<>();
-        majorPowers = new HashSet<>();
         wars = new HashMap<>();
         alliances = new HashMap<>();
         rivals = new HashMap<>();
@@ -85,8 +79,8 @@ public class FactionHints {
     private void loadData() {
         try {
             loadFactionHints();
-        } catch (DOMException | ParseException e) {
-            MekHQ.getLogger().error(getClass(), "loadData()", e); //$NON-NLS-1$
+        } catch (DOMException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -98,26 +92,7 @@ public class FactionHints {
      * @return  Whether the faction is not a true faction
      */
     public static boolean isEmptyFaction(Faction f) {
-        return (f.getShortName().equals("ABN")
-                || f.getShortName().equals("UND")
-                || f.getShortName().equals("NONE"));
-    }
-
-    /**
-     * @param f The input faction
-     * @return  Whether the faction is considered a major Inner Sphere
-     *          power for purposes of contract generation
-     */
-    public boolean isISMajorPower(Faction f) {
-        return majorPowers.contains(f);
-    }
-
-    /**
-     * @param f The input faction
-     * @return  Whether the faction is located in the deep periphery
-     */
-    public boolean isDeepPeriphery(Faction f) {
-        return deepPeriphery.contains(f);
+        return Stream.of("ABN", "UND", "NONE").anyMatch(s -> f.getShortName().equals(s));
     }
 
     /**
@@ -371,26 +346,6 @@ public class FactionHints {
     }
 
     /**
-     * Adds faction to set of deep periphery powers
-     * @param f
-     */
-    protected void addDeepPeripheryFaction(Faction f) {
-        if (null != f) {
-            deepPeriphery.add(f);
-        }
-    }
-
-    /**
-     * Adds faction to set of major powers
-     * @param f
-     */
-    protected void addMajorPower(Faction f) {
-        if (null != f) {
-            majorPowers.add(f);
-        }
-    }
-
-    /**
      * Adds faction to list of non-combatants
      * @param f
      */
@@ -447,19 +402,16 @@ public class FactionHints {
         }
     }
 
-    private void loadFactionHints() throws DOMException, ParseException {
-        final String METHOD_NAME = "loadFactionHints()"; //$NON-NLS-1$
-
-        MekHQ.getLogger().info(getClass(), METHOD_NAME,
-                "Starting load of faction hint data from XML..."); //$NON-NLS-1$
+    private void loadFactionHints() throws DOMException {
+        MekHQ.getLogger().info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(FACTION_HINTS_FILE)) {
+        try (InputStream is = new FileInputStream(MekHqConstants.FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -478,33 +430,12 @@ public class FactionHints {
 
                 if (nodeName.equals("neutral")) {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
-                    Faction f = Faction.getFaction(fKey);
+                    Faction f = Factions.getInstance().getFaction(fKey);
                     if (null != f) {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
                     } else {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
-                    }
-                } else if (nodeName.equals("deepPeriphery")) {
-                    for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Faction.getFaction(fKey);
-                        if (null != f) {
-                            deepPeriphery.add(f);
-                        } else {
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
-                        }
-                    }
-                } else if (nodeName.equals("majorPowers")) {
-                    for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Faction.getFaction(fKey);
-                        if (null != f) {
-                            majorPowers.add(f);
-                        } else {
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
-                        }
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
                     }
                 } else if (nodeName.equals("rivals")) {
                     setFactionHint(rivals, wn);
@@ -528,15 +459,15 @@ public class FactionHints {
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                         Node wn2 = wn.getChildNodes().item(j);
                         if (wn2.getNodeName().equals("outer")) {
-                            outer = Faction.getFaction(wn2.getTextContent().trim());
+                            outer = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("inner")) {
-                            inner = Faction.getFaction(wn2.getTextContent().trim());
+                            inner = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("fraction")) {
                             fraction = Double.parseDouble(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("opponents")) {
                             opponents = new ArrayList<>();
                             for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                Faction f = Faction.getFaction(fKey);
+                                Faction f = Factions.getInstance().getFaction(fKey);
                                 if (null != f) {
                                     opponents.add(f);
                                 }
@@ -546,8 +477,7 @@ public class FactionHints {
                     if ((null != outer) && (null != inner)) {
                         addContainedFaction(outer, inner, start, end, fraction, opponents);
                     } else {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + outer + "/" + inner); //$NON-NLS-1$
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + outer + "/" + inner);
                     }
                 }
             }
@@ -584,7 +514,7 @@ public class FactionHints {
                 String[] factionKeys = wn.getTextContent().trim().split(",");
                 Faction[] parties = new Faction[factionKeys.length];
                 for (int i = 0; i < factionKeys.length; i++) {
-                    parties[i] = Faction.getFaction(factionKeys[i]);
+                    parties[i] = Factions.getInstance().getFaction(factionKeys[i]);
                     if (null == parties[i]) {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
@@ -617,7 +547,7 @@ public class FactionHints {
                 String[] parties = wn.getTextContent().trim().split(",");
 
                 for (String party : parties) {
-                    final Faction f = Faction.getFaction(party);
+                    final Faction f = Factions.getInstance().getFaction(party);
                     if (null == f) {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + party); //$NON-NLS-1$

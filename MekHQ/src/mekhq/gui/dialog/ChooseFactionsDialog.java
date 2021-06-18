@@ -41,11 +41,12 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
 public class ChooseFactionsDialog extends JDialog {
     private static final long serialVersionUID = 805616085217507489L;
@@ -160,7 +161,7 @@ public class ChooseFactionsDialog extends JDialog {
         private List<String> names;
 
         public FactionListModel(LocalDate date) {
-            for (Faction faction : Faction.getFactions()) {
+            for (Faction faction : Factions.getInstance().getFactions()) {
                 factionMap.put(faction.getFullName(date.getYear()), faction);
             }
             names = new ArrayList<>(factionMap.navigableKeySet());

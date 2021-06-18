@@ -63,11 +63,13 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -147,27 +149,6 @@ public class Utilities {
     }
 
     /**
-     * @param num   the number of dice to roll
-     * @param faces the number of faces on those dice
-     * @return an Integer list of every dice roll, with index 0 containing the summed result
-     */
-    public static List<Integer> individualDice(int num, int faces) {
-        List<Integer> individualRolls = new ArrayList<>();
-        int result = 0, roll;
-        individualRolls.add(result);
-
-        for (int i = 0; i < num; i++) {
-            roll = Compute.randomInt(faces) + 1;
-            individualRolls.add(roll);
-            result += roll;
-        }
-
-        individualRolls.set(0, result);
-
-        return individualRolls;
-    }
-
-    /**
      * Get a random element out of a collection, with equal probability.
      * <p>
      * This is the same as calling the following code, only plays nicely with
@@ -179,10 +160,9 @@ public class Utilities {
      *
      * @return <i>null</i> if the collection itself is null or empty;
      * can return <i>null</i> if the collection contains <i>null</i> items.
-     *
      */
-    public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if ((null == collection) || collection.isEmpty()) {
+    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
+        if ((collection == null) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
@@ -267,6 +247,19 @@ public class Utilities {
             ++ index;
         }
         return result;
+    }
+
+    public static <T> int compareNullable(final @Nullable T a, final @Nullable T b,
+                                          final Comparator<? super T> comparator) {
+        if (a == b) { // Strict comparison is desired, to handle both null too
+            return 0;
+        } else if (a == null) {
+            return 1;
+        } else if (b == null) {
+            return -1;
+        } else {
+            return comparator.compare(a, b);
+        }
     }
 
     public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
@@ -580,8 +573,8 @@ public class Utilities {
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -622,7 +615,7 @@ public class Utilities {
             //region Solo Pilot
             Person p;
             if (u.getEntity() instanceof LandAirMech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
@@ -631,38 +624,37 @@ public class Utilities {
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
                         - oldCrew.getGunnery(), 0);
-                p.setSecondaryRole(Person.T_AERO_PILOT);
             } else if (u.getEntity() instanceof Mech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof Aero) {
-                p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof ConvFighter) {
-                p = c.newPerson(Person.T_CONV_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget()
                         - oldCrew.getPiloting(), 0);
             } else if (u.getEntity() instanceof Protomech) {
-                p = c.newPerson(Person.T_PROTO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.PROTOMECH_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof VTOL) {
-                p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else {
                 //assume tanker if we got here
-                p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
@@ -678,13 +670,13 @@ public class Utilities {
                 for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
                     if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                                 - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
                                 - oldCrew.getGunnery(slot), 0);
                     } else if (u.getEntity() instanceof Aero) {
-                        p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
                                 - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
@@ -721,7 +713,7 @@ public class Utilities {
                 for (int slot = 0; slot < driversNeeded; slot++) {
                     Person p;
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        p = c.newPerson(Person.T_SPACE_PILOT, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.VESSEL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
@@ -729,7 +721,7 @@ public class Utilities {
                                 0);
                         totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                     } else if(u.getEntity() instanceof BattleArmor) {
-                        p = c.newPerson(Person.T_BA, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.BATTLE_ARMOUR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_GUN_BA).getTarget()
@@ -737,14 +729,14 @@ public class Utilities {
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
                     } else if(u.getEntity() instanceof Infantry) {
-                        p = c.newPerson(Person.T_INFANTRY, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.SOLDIER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
                     } else if(u.getEntity() instanceof VTOL) {
-                        p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(
                                 SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
@@ -753,7 +745,7 @@ public class Utilities {
                                 SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                                 0);
                     } else if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(
                                 SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
@@ -763,7 +755,7 @@ public class Utilities {
                                 0);
                     } else {
                         //assume tanker if we got here
-                        p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(
                                 SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
@@ -825,7 +817,7 @@ public class Utilities {
                     for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
                         Person p;
                         if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                            p = c.newPerson(Person.T_SPACE_GUNNER, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.VESSEL_GUNNER, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
                                     SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
@@ -833,7 +825,7 @@ public class Utilities {
                                     0);
                             totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
                         } else if (u.getEntity() instanceof Mech) {
-                            p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_PILOT_MECH,
                                     SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
@@ -846,7 +838,7 @@ public class Utilities {
                             totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
                         } else {
                             //assume tanker if we got here
-                            p = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.VEHICLE_GUNNER, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
                                     SkillType.getType(SkillType.S_GUN_VEE).getTarget()
@@ -890,22 +882,21 @@ public class Utilities {
 
             for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
                 Person p = c.newPerson(u.getEntity().isSupportVehicle()
-                                ? Person.T_VEHICLE_CREW
-                                : Person.T_SPACE_CREW,
-                        Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
+                                ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW,
+                        factionCode, oldCrew.getGender(numberPeopleGenerated));
 
                 migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(p);
             }
 
             if (u.canTakeNavigator()) {
-                navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
+                navigator = c.newPerson(PersonnelRole.VESSEL_NAVIGATOR, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
             if (u.canTakeTechOfficer()) {
-                consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_GUNNER, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
@@ -1069,8 +1060,8 @@ public class Utilities {
         return name;
     }
 
-    public static String printMoneyArray(Money[] array) {
-        StringJoiner joiner = new StringJoiner(","); //$NON-NLS-1$
+    public static String printMoneyArray(Money... array) {
+        StringJoiner joiner = new StringJoiner(",");
         for (Money value : array) {
             joiner.add(value.toXmlString());
         }
@@ -1154,10 +1145,14 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
+
+        Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
+
+        // Handle exact matches first
         List<Part> remaining = new ArrayList<>();
         for (Part part : unit.getParts()) {
             int eqnum = -1;
@@ -1169,64 +1164,107 @@ public class Utilities {
                 eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
                 etype = ((MissingEquipmentPart) part).getType();
             }
-            if (null != etype) {
+
+            if (etype != null) {
+                Mounted mounted = unit.getEntity().getEquipment(eqnum);
                 if (equipNums.contains(eqnum)
-                        && etype.equals(unit.getEntity().getEquipment(eqnum).getType())) {
+                        && (mounted != null)
+                        && etype.equals(mounted.getType())) {
                     equipNums.remove((Integer) eqnum);
+                    partMap.put(eqnum, part);
                 } else {
                     remaining.add(part);
                 }
             }
         }
+
+        // Handle approximate matches (AmmoBins with munition or bomb type changes)
+        List<Part> notFound = new ArrayList<>();
+        for (Part part : remaining) {
+            int eqnum = -1;
+            EquipmentType etype = null;
+            if (part instanceof EquipmentPart) {
+                eqnum = ((EquipmentPart) part).getEquipmentNum();
+                etype = ((EquipmentPart) part).getType();
+            } else if (part instanceof MissingEquipmentPart) {
+                eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
+                etype = ((MissingEquipmentPart) part).getType();
+            } else {
+                continue;
+            }
+
+            // Invalid equipment or already found
+            if ((etype == null) || partMap.containsKey(eqnum)) {
+                notFound.add(part);
+                continue;
+            }
+
+            Mounted mounted = unit.getEntity().getEquipment(eqnum);
+            if ((part instanceof AmmoBin)
+                    && (etype instanceof AmmoType)
+                    && (mounted != null)
+                    && (mounted.getType() instanceof AmmoType)) {
+                // Handle AmmoBins which had their AmmoType changed but did not get reloaded yet.
+                AmmoBin ammoBin = (AmmoBin) part;
+                AmmoType mountedType = (AmmoType) mounted.getType();
+                if (mountedType.equalsAmmoTypeOnly(ammoBin.getType())
+                        && (mountedType.getRackSize() == ammoBin.getType().getRackSize())) {
+                    equipNums.remove((Integer) eqnum);
+                    partMap.put(eqnum, part);
+                    continue;
+                }
+            }
+
+            notFound.add(part);
+        }
+
+        remaining = new ArrayList<>(notFound);
+        notFound.clear();
+
         // For ammo types we want to match the same munition type if possible to avoid
         // imposing unnecessary ammo swaps.
         // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
-        List<Part> notFound = new ArrayList<>();
         for (Part part : remaining) {
             boolean found = false;
             int i = -1;
 
             if (part instanceof EquipmentPart) {
-                EquipmentPart epart = (EquipmentPart)part;
+                EquipmentPart epart = (EquipmentPart) part;
                 for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof AmmoBin) {
-                        //If this is a refit, we want to update our ammo bin parts to match
-                        //the munitions specified in the refit, then reassign the equip number
+                        if (!(m.getType() instanceof AmmoType)) {
+                            continue;
+                        }
+
+                        AmmoBin ammoBin = (AmmoBin) part;
+                        AmmoType ammoType = (AmmoType) m.getType();
+
+                        // If this is a refit, we want to update our ammo bin parts to match
+                        // the munitions specified in the refit, then reassign the equip number
                         if (refit) {
-                            if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                                epart.setEquipmentNum(equipNum);
-                                AmmoBin bin = (AmmoBin) epart;
+                            if (ammoBin.getType().equalsAmmoTypeOnly(ammoType)
+                                    && (ammoType.getRackSize() == ammoBin.getType().getRackSize())
+                                    && !m.isDestroyed()) {
+                                ammoBin.setEquipmentNum(equipNum);
                                 // Ensure Entity is synch'd with part
-                                bin.updateConditionFromPart();
+                                ammoBin.updateConditionFromPart();
                                 // Unload bin before munition change
-                                bin.unload();
-                                bin.changeMunition((AmmoType) m.getType());
+                                ammoBin.unload();
+                                ammoBin.changeMunition(ammoType);
+                                partMap.put(equipNum, part);
                                 found = true;
                                 break;
                             }
-                        } else {
-                            //If this is not a refit, make sure the munitions match
-                            if (m.getType() instanceof AmmoType) {
-                                if (((AmmoType) epart.getType()).getMunitionType()
-                                        != ((AmmoType) m.getType()).getMunitionType()) {
-                                    continue;
-                                }
-                                if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                                    epart.setEquipmentNum(equipNum);
-                                    found = true;
-                                    break;
-                                }
-                            }
                         }
-                    } else {
-                        if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                            epart.setEquipmentNum(equipNum);
-                            found = true;
-                            break;
-                        }
+                    }
+                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
+                        found = true;
+                        break;
                     }
                 }
             } else if (part instanceof MissingEquipmentPart) {
@@ -1235,20 +1273,19 @@ public class Utilities {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof MissingAmmoBin
-                            && (!(m.getType() instanceof AmmoType)
-                            || (((AmmoType) epart.getType()).getMunitionType()
-                            != ((AmmoType) m.getType()).getMunitionType()))) {
+                            && !(m.getType() instanceof AmmoType)) {
                         continue;
                     }
                     if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
                         found = true;
                         break;
                     }
                 }
             }
 
-            if(found) {
+            if (found) {
                 equipNums.remove(i);
             } else {
                 notFound.add(part);
@@ -1279,16 +1316,29 @@ public class Utilities {
                 }
                 int equipNum;
                 if (p instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart)p;
+                    EquipmentPart ePart = (EquipmentPart) p;
                     equipNum = ePart.getEquipmentNum();
                 } else {
-                    MissingEquipmentPart mePart = (MissingEquipmentPart)p;
+                    MissingEquipmentPart mePart = (MissingEquipmentPart) p;
                     equipNum = mePart.getEquipmentNum();
                 }
                 boolean isMissing = remaining.contains(p);
                 String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
                 if (isMissing) {
                     eName = "<Incorrect>";
+
+                    // Break the incorrect equipment number linkage if there is already a valid part at the location.
+                    // This ensures only one part is mapped to each equipment number, avoiding crashes and other
+                    // problems when these parts get out of sync.
+                    if ((equipNum >= 0) && partMap.containsKey(equipNum)) {
+                        if (p instanceof EquipmentPart) {
+                            EquipmentPart ePart = (EquipmentPart) p;
+                            ePart.setEquipmentNum(-1);
+                        } else {
+                            MissingEquipmentPart mePart = (MissingEquipmentPart) p;
+                            mePart.setEquipmentNum(-1);
+                        }
+                    }
                 }
                 builder.append(String.format(" %d: %s %s %s %s\r\n", equipNum, p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
             }
@@ -1300,7 +1350,7 @@ public class Utilities {
                 boolean isAvailable = equipNums.contains(equipNum);
                 builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
             }
-            MekHQ.getLogger().warning(Utilities.class, builder.toString());
+            MekHQ.getLogger().warning(builder.toString());
         }
     }
 
@@ -1373,27 +1423,26 @@ public class Utilities {
      * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
+        TableModel model = table.getModel();
+        String[] columns = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            columns[i] = model.getColumnName(i);
+        }
 
+        String report;
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
+                    Object value = model.getValueAt(i, j);
                     // use regex to remove any HTML tags
-                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
+                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {

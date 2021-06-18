@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 import megamek.common.MechView;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  *
@@ -23,11 +23,11 @@ import mekhq.preferences.PreferencesNode;
 public class MekViewDialog extends javax.swing.JDialog {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 5894364756899721545L;
 	private MechView mview;
-    
+
     /** Creates new form MekViewDialog */
     public MekViewDialog(java.awt.Frame parent, boolean modal, MechView mv) {
         super(parent, modal);
@@ -41,7 +41,7 @@ public class MekViewDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
-        
+
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
@@ -62,7 +62,7 @@ public class MekViewDialog extends javax.swing.JDialog {
                 btnOkayActionPerformed(evt);
             }
         });
-        
+
         getContentPane().add(jScrollPane2, BorderLayout.CENTER);
         getContentPane().add(btnOkay, BorderLayout.PAGE_END);
 

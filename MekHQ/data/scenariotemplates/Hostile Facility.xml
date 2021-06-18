@@ -3,6 +3,7 @@
     <name>Hostile Facility</name>
     <shortBriefing>Hostile facility</shortBriefing>
     <detailedBriefing>A hostile-controlled facility has been located.</detailedBriefing>
+	<isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>
             <allowedTerrainType>3</allowedTerrainType>
@@ -32,7 +33,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -71,7 +72,7 @@
                     <deploymentZone>8</deploymentZone>
                     <deploymentZone>9</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -102,7 +103,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

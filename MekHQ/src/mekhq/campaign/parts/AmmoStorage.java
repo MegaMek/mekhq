@@ -22,13 +22,13 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
-import megamek.common.BombType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
@@ -36,6 +36,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -46,28 +47,23 @@ import mekhq.campaign.work.IAcquisitionWork;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
-	private static final long serialVersionUID = 2892728320891712304L;
+    private static final long serialVersionUID = 8555561045042023622L;
 
-	protected long munition;
-	protected int shots;
+    protected int shots;
 
     public AmmoStorage() {
-    	this(0, null, 0, null);
+        this(0, null, 0, null);
     }
 
     public AmmoStorage(int tonnage, @Nullable AmmoType et, int shots, @Nullable Campaign c) {
         super(tonnage, et, -1, 1.0, c);
         this.shots = shots;
-        if (et != null) {
-            this.munition = et.getMunitionType();
-        }
     }
 
     public AmmoStorage clone() {
-    	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
+        AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
-    	storage.munition = this.munition;
-    	return storage;
+        return storage;
     }
 
     @Override
@@ -77,10 +73,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-    	if (getType().getKgPerShot() > 0) {
-    		return getType().getKgPerShot() * shots/1000.0;
-    	}
-     	return ((double)shots / getType().getShots());
+        if (getType().getKgPerShot() > 0) {
+            return getType().getKgPerShot() * (shots / 1000.0);
+        }
+         return ((double) shots / getType().getShots());
     }
 
     @Override
@@ -109,139 +105,133 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             return Money.zero();
         }
 
-    	return getStickerPrice()
+        return getStickerPrice()
                 .multipliedBy(shots)
                 .dividedBy(getType().getShots());
     }
 
     public int getShots() {
-    	return shots;
+        return shots;
     }
 
     @Override
-    public boolean isSamePartType(Part part) {
-        if (part instanceof AmmoStorage) {
-            if (getType() instanceof BombType) {
-                return ((EquipmentPart)part).getType() instanceof BombType
-                        && ((BombType)getType()).getBombType() == ((BombType)((EquipmentPart)part).getType()).getBombType();
-            } else {
-                return getType().getMunitionType() == ((AmmoStorage) part).getType().getMunitionType()
-                        && getType().equals( (Object) ((EquipmentPart) part).getType());
-            }
+    public boolean isSamePartType(@Nullable Part part) {
+        return getClass().equals(part.getClass())
+                && Objects.equals(getType(), ((AmmoStorage) part).getType());
+    }
 
-        }
-        return false;
+    /**
+     * Gets a value indicating whether or an {@code AmmoType} is
+     * the same as this instance's ammo.
+     * @param otherAmmoType The other {@code AmmoType}.
+     */
+    public boolean isSameAmmoType(AmmoType otherAmmoType) {
+        return getType().equalsAmmoTypeOnly(otherAmmoType)
+            && (getType().getMunitionType() == otherAmmoType.getMunitionType())
+            && (getType().getRackSize() == otherAmmoType.getRackSize());
+    }
+
+    /**
+     * Gets a value indicating whether or not an {@code AmmoType}
+     * is compatible with this instance's ammo.
+     * @param otherAmmoType The other {@code AmmoType}.
+     */
+    public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
+        return getType().isCompatibleWith(otherAmmoType);
     }
 
     public void changeShots(int s) {
-    	shots = Math.max(0, shots + s);
+        shots = Math.max(0, shots + s);
     }
 
     public void setShots(int s) {
         shots = Math.max(0, s);
     }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<equipmentNum>"
-				+equipmentNum
-				+"</equipmentNum>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<typeName>"
-                +MekHqXmlUtil.escape(typeName)
-                +"</typeName>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<munition>"
-				+munition
-				+"</munition>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<shots>"
-				+shots
-				+"</shots>");
-		writeToXmlEnd(pw1, indent);
-	}
-
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-				equipmentNum = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-				typeName = wn2.getTextContent();
-			} else if (wn2.getNodeName().equalsIgnoreCase("munition")) {
-				munition = Long.parseLong(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
-				shots = Integer.parseInt(wn2.getTextContent());
-			}
-		}
-		restore();
-	}
-
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return getType().getTechAdvancement();
-	}
-
-	@Override
-	public void fix() {
-		//nothing to fix
-	}
-
-	@Override
-	public MissingPart getMissingPart() {
-		//nothing to do here
-		return null;
-	}
-
-	@Override
-    public IAcquisitionWork getAcquisitionWork() {
-        return (IAcquisitionWork)getNewPart();
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
+        writeToXmlEnd(pw1, indent);
     }
 
-	@Override
-	public TargetRoll getAllMods(Person tech) {
-		//nothing to do here
-		return null;
-	}
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		//nothing to do here
-	}
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+                typeName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
+                shots = Integer.parseInt(wn2.getTextContent());
+            }
+        }
 
-	@Override
-	public void updateConditionFromPart() {
-		//nothing to do here
-	}
+        restore();
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return false;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return getType().getTechAdvancement();
+    }
 
-	public String getDesc() {
-		String toReturn = "<html><font size='2'";
-		String scheduled = "";
-		if (getTech() != null) {
-			scheduled = " (scheduled) ";
-		}
+    @Override
+    public void fix() {
+        //nothing to fix
+    }
 
-		toReturn += ">";
-		toReturn += "<b>Reload " + getName() + "</b><br/>";
-		toReturn += getDetails() + "<br/>";
-		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-		toReturn += "</font></html>";
-		return toReturn;
-	}
+    @Override
+    public MissingEquipmentPart getMissingPart() {
+        //nothing to do here
+        return null;
+    }
+
+    @Override
+    public IAcquisitionWork getAcquisitionWork() {
+        return getNewPart();
+    }
+
+    @Override
+    public TargetRoll getAllMods(Person tech) {
+        //nothing to do here
+        return null;
+    }
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        //nothing to do here
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        //nothing to do here
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return false;
+    }
+
+    public String getDesc() {
+        String toReturn = "<html><font size='2'";
+        String scheduled = "";
+        if (getTech() != null) {
+            scheduled = " (scheduled) ";
+        }
+
+        toReturn += ">";
+        toReturn += "<b>Reload " + getName() + "</b><br/>";
+        toReturn += getDetails() + "<br/>";
+        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+        toReturn += "</font></html>";
+        return toReturn;
+    }
 
     @Override
     public String getDetails() {
-    	return getDetails(true);
+        return getDetails(true);
     }
 
     @Override
@@ -249,15 +239,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return shots + " shots";
     }
 
-	@Override
+    @Override
     public String checkFixable() {
         return null;
     }
 
-	@Override
+    @Override
     public String find(int transitDays) {
-	    Part newPart = getNewPart();
-	    newPart.setBrandNew(true);
+        AmmoStorage newPart = getNewPart();
+        newPart.setBrandNew(true);
         if(campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
@@ -265,40 +255,14 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
     }
 
-	@Override
-    public Object getNewEquipment() {
+    @Override
+    public AmmoStorage getNewEquipment() {
         return getNewPart();
     }
 
     @Override
     public String failToFind() {
         return "<font color='red'><b> part not found</b>.</font>";
-    }
-
-    /**
-     * Boolean function that determines if the given part is of the correct ammo.
-     * Useful as a predicate for campaign.findSparePart()
-     */
-    public static boolean IsRightAmmo(Part part, AmmoType curType) {
-        return part instanceof AmmoStorage
-                && part.isPresent()
-                && ((AmmoStorage) part).getType().equals(curType)
-                && curType.getMunitionType() == ((AmmoStorage) part).getType().getMunitionType();
-    }
-
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(part -> {
-            return IsRightAmmo(part, curType);
-        });
-
-        if (null != a) {
-            a.changeShots(amount);
-            if (a.getShots() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if(amount > 0) {
-            campaign.getQuartermaster().addPart(new AmmoStorage(1, curType, amount, campaign), 0);
-        }
     }
 
     @Override
@@ -317,20 +281,20 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDisplayName() {
-    	return getType().getDesc();
+        return getType().getDesc();
     }
 
-	@Override
-	public String getAcquisitionExtraDesc() {
-		return getType().getShots() + " shots (1 ton)";
-	}
+    @Override
+    public String getAcquisitionExtraDesc() {
+        return getType().getShots() + " shots (1 ton)";
+    }
 
     @Override
     public String getAcquisitionName() {
         return getType().getDesc();
     }
 
-	@Override
+    @Override
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
         if(getAllAcquisitionMods().getValue() > -1) {
@@ -340,10 +304,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return "(" + bonus + ")";
     }
 
-	@Override
-	public Part getAcquisitionPart() {
-		return getNewPart();
-	}
+    @Override
+    public AmmoStorage getAcquisitionPart() {
+        return getNewPart();
+    }
 
     @Override
     public TargetRoll getAllAcquisitionMods() {
@@ -362,7 +326,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return target;
     }
 
-    public Part getNewPart() {
+    public AmmoStorage getNewPart() {
         return new AmmoStorage(1, getType(), getType().getShots(), campaign);
     }
 
@@ -378,7 +342,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getArrivalReport() {
-        double totalShots = quantity * getShots();
+        int totalShots = quantity * getShots();
         String report = getQuantityName(quantity);
         if(totalShots == 1) {
             report += " has arrived";

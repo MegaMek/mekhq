@@ -35,13 +35,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
+    //region Variable Declarations
     private static final long serialVersionUID = -553191867660269247L;
+    //endregion Variable Declarations
 
-    private final MekHqColors colors = new MekHqColors();
-
+    //region Constructors
     public ForceRenderer() {
 
     }
+    //endregion Constructors
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
@@ -90,10 +92,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
-                    c3network += c3network += Messages.getString("ChatLounge.C3iNetwork")
+                    c3network += Messages.getString("ChatLounge.C3iNetwork")
                             + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
-                        c3network += Messages.getString("ChatLounge.C3Nodes",
+                        c3network += Messages.getString("ChatLounge.C3iNodes",
                                 entity.calculateFreeC3Nodes());
                     }
                 }
@@ -133,14 +135,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if (!sel && u.isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
             if (!sel && ((Force) value).isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else {

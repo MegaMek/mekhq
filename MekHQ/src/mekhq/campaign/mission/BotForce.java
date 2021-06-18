@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018, 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (C) 2018-2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -21,12 +21,15 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
+import mekhq.Version;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -37,6 +40,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.UnitNameTracker;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -44,74 +48,76 @@ import mekhq.MekHqXmlUtil;
 public class BotForce implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = 8259058549964342518L;
 
+    private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
     private List<Entity> entityList;
     private int team;
     private int start;
-    private String camoCategory;
-    private String camoFileName;
-    private int colorIndex;
+    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
+    private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
-        this.entityList = new ArrayList<>();
+        entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
+            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
         }
     }
 
     public BotForce(String name, int team, int start, List<Entity> entityList) {
-        this(name, team, start, start, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
+        this(name, team, start, start, entityList,
+                new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
+                PlayerColour.BLUE);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList) {
-        this(name, team, start, home, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
+        this(name, team, start, home, entityList,
+                new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
+                PlayerColour.BLUE);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList,
-                    String camoCategory, String camoFileName, int colorIndex) {
+                    Camouflage camouflage, PlayerColour colour) {
         this.name = name;
         this.team = team;
         this.start = start;
-        // Filter all nulls out of the parameter entityList
-        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
-        this.camoCategory = camoCategory;
-        this.camoFileName = camoFileName;
-        this.colorIndex = colorIndex;
+        setEntityList(entityList);
+        setCamouflage(camouflage);
+        setColour(colour);
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
+            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
         }
-        behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
-        behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
+        behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
+        behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
     }
 
     /* Convert from MM's Board to Princess's HomeEdge */
     public CardinalEdge findCardinalEdge(int start) {
         switch (start) {
-        case Board.START_N:
-            return CardinalEdge.NORTH;
-        case Board.START_S:
-            return CardinalEdge.SOUTH;
-        case Board.START_E:
-            return CardinalEdge.EAST;
-        case Board.START_W:
-            return CardinalEdge.WEST;
-        case Board.START_NW:
-            return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.WEST;
-        case Board.START_NE:
-            return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.EAST;
-        case Board.START_SW:
-            return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.WEST;
-        case Board.START_SE:
-            return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.EAST;
-        case Board.START_ANY:
-            return CardinalEdge.getCardinalEdge(Compute.randomInt(4));
-        default:
-            return CardinalEdge.NEAREST_OR_NONE;
+            case Board.START_N:
+                return CardinalEdge.NORTH;
+            case Board.START_S:
+                return CardinalEdge.SOUTH;
+            case Board.START_E:
+                return CardinalEdge.EAST;
+            case Board.START_W:
+                return CardinalEdge.WEST;
+            case Board.START_NW:
+                return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.WEST;
+            case Board.START_NE:
+                return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.EAST;
+            case Board.START_SW:
+                return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.WEST;
+            case Board.START_SE:
+                return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.EAST;
+            case Board.START_ANY:
+                return CardinalEdge.getCardinalEdge(Compute.randomInt(4));
+            default:
+                return CardinalEdge.NONE;
         }
     }
 
@@ -124,12 +130,34 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public List<Entity> getEntityList() {
-        return entityList;
+        return Collections.unmodifiableList(entityList);
+    }
+
+    public boolean removeEntity(int index) {
+        Entity e = null;
+        if ((index >= 0) && (index < entityList.size())) {
+            e = entityList.remove(index);
+            nameTracker.remove(e, updated -> {
+                updated.generateShortName();
+                updated.generateDisplayName();
+            });
+        }
+
+        return e != null;
     }
 
     public void setEntityList(List<Entity> entityList) {
-        // Filter all nulls out of the parameter entityList
-        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+        nameTracker.clear();
+
+        List<Entity> entities = new ArrayList<>();
+        for (Entity e : entityList) {
+            if (e != null) {
+                nameTracker.add(e);
+                entities.add(e);
+            }
+        }
+
+        this.entityList = entities;
     }
 
     public int getTeam() {
@@ -148,28 +176,19 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.start = start;
     }
 
-    public String getCamoCategory() {
-        return camoCategory;
+    public Camouflage getCamouflage() {
+        return camouflage;
     }
 
-    public void setCamoCategory(String camoCategory) {
-        this.camoCategory = camoCategory;
+    public void setCamouflage(Camouflage camouflage) {
+        this.camouflage = Objects.requireNonNull(camouflage);
+    }
+    public PlayerColour getColour() {
+        return colour;
     }
 
-    public String getCamoFileName() {
-        return camoFileName;
-    }
-
-    public void setCamoFileName(String camoFileName) {
-        this.camoFileName = camoFileName;
-    }
-
-    public int getColorIndex() {
-        return colorIndex;
-    }
-
-    public void setColorIndex(int index) {
-        colorIndex = index;
+    public void setColour(PlayerColour colour) {
+        this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
     public int getTotalBV() {
@@ -177,7 +196,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
         for (Entity entity : getEntityList()) {
             if (entity == null) {
-                MekHQ.getLogger().error(BotForce.class, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -204,38 +223,35 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoCategory", camoCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoFileName", camoFileName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "colorIndex", colorIndex);
-
-        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent++, "name", name);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "team", team);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "start", start);
+        getCamouflage().writeToXML(pw1, indent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
-                MekHQ.getLogger().error(BotForce.class, "Null entity when saving a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
+                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
             }
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
-
-        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "verbosity", behaviorSettings.getVerbosity().toString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "fallShameIndex", behaviorSettings.getFallShameIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "braveryIndex", behaviorSettings.getBraveryIndex());
-        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "verbosity", behaviorSettings.getVerbosity().toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "behaviorSettings");
     }
 
-    public void setFieldsFromXmlNode(Node wn) {
+    public void setFieldsFromXmlNode(final Node wn, final Version version) {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -245,12 +261,20 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 team = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                 start = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) {
-                camoCategory = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) {
-                camoFileName = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) {
-                colorIndex = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
+                setCamouflage(Camouflage.parseFromXML(wn2));
+            } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal
+                getCamouflage().setCategory(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) { // Legacy - 0.49.3 removal
+                getCamouflage().setFilename(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
+                setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
+                setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getCamouflage().getCategory())) {
+                    getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    getCamouflage().setFilename(getColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -260,7 +284,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             entityList.add(en);
@@ -294,6 +318,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 }
             }
+        }
+
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(getCamouflage());
         }
     }
 }

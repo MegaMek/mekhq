@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -33,11 +33,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
@@ -45,8 +45,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
 
@@ -91,7 +90,7 @@ public class ContractMarketDialog extends JDialog {
         campaign = c;
         contractMarket = c.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (c.getFactionCode().equals("MERC")) { //$NON-NLS-1$
+        if (c.getFactionCode().equals("MERC")) {
             countSuccessfulContracts();
         }
         initComponents();
@@ -104,16 +103,14 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (Mission m : campaign.getMissions()) {
-            if (m.isActive() || !(m instanceof AtBContract)
-                    || ((AtBContract) m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
-            AtBContract contract = (AtBContract) m;
             int num;
             num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),
-                    num + ((contract.getStatus() == Mission.S_SUCCESS) ? 1 : -1));
+                    num + (contract.getStatus().isSuccess() ? 1 : -1));
         }
         for (String key : successfulContracts.keySet()) {
             if (successfulContracts.get(key) >= 6) {
@@ -227,10 +224,11 @@ public class ContractMarketDialog extends JDialog {
         for (Contract c : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract) {
-                ((AtBContract) c).initContractDetails(campaign);
-                ((AtBContract) c).calculatePaymentMultiplier(campaign);
-                ((AtBContract) c).calculatePartsAvailabilityLevel(campaign);
-                ((AtBContract) c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+                final AtBContract atbContract = (AtBContract) c;
+                atbContract.initContractDetails(campaign);
+                atbContract.calculatePaymentMultiplier(campaign);
+                atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
+                atbContract.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
                         ? (Integer) spnSharePct.getValue() : 0);
             }
             c.setStartDate(null);
@@ -244,9 +242,9 @@ public class ContractMarketDialog extends JDialog {
                 row.add(((AtBContract) c).getEmployerName(campaign.getGameYear()));
                 row.add(((AtBContract) c).getEnemyName(campaign.getGameYear()));
                 if (((AtBContract) c).isSubcontract()) {
-                    row.add(((AtBContract) c).getMissionTypeName() + " (Subcontract)");
+                    row.add(((AtBContract) c).getContractType() + " (Subcontract)");
                 } else {
-                    row.add(((AtBContract) c).getMissionTypeName());
+                    row.add(((AtBContract) c).getContractType().toString());
                 }
             } else {
                 row.add(c.getEmployer());
@@ -304,7 +302,7 @@ public class ContractMarketDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
         if (null != campaign.getRetainerEmployerCode()) {
-            lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
+            lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
         }
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -348,7 +346,7 @@ public class ContractMarketDialog extends JDialog {
             lblCurrentRetainer.setVisible(true);
             lblRetainerEmployer.setVisible(true);
             btnEndRetainer.setVisible(true);
-            lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
+            lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
             //Remove the selected faction and add the previous one, if any
             countSuccessfulContracts();
             lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
@@ -374,7 +372,7 @@ public class ContractMarketDialog extends JDialog {
             }
 
             c.initContractDetails(campaign);
-            c.calculatePartsAvailabilityLevel(campaign);
+            c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
             c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
                     ? (Integer) spnSharePct.getValue() : 0);
             c.setStartDate(null);
@@ -386,7 +384,7 @@ public class ContractMarketDialog extends JDialog {
             Vector<String> row = new Vector<>();
             row.add(c.getEmployerName(campaign.getGameYear()));
             row.add(c.getEnemyName(campaign.getGameYear()));
-            row.add(c.getMissionTypeName());
+            row.add(c.getContractType().toString());
 
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
@@ -448,6 +446,8 @@ public class ContractMarketDialog extends JDialog {
             campaign.getFinances().credit(selectedContract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                     "Advance monies for " + selectedContract.getName(), campaign.getLocalDate());
             campaign.addMission(selectedContract);
+            // must be invoked after campaign.addMission to ensure presence of mission ID
+            selectedContract.acceptContract(campaign);
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts
                     .convertRowIndexToModel(tableContracts.getSelectedRow()));

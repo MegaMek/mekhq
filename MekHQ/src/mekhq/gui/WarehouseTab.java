@@ -41,7 +41,6 @@ import javax.swing.SortOrder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -60,6 +59,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
@@ -69,7 +69,6 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -78,12 +77,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged
@@ -100,12 +99,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final int SG_LOC = 4;
     private static final int SG_WEAP = 5;
     private static final int SG_AMMO = 6;
-    private static final int SG_AMMO_BIN = 7;
-    private static final int SG_MISC = 8;
-    private static final int SG_ENGINE = 9;
-    private static final int SG_GYRO = 10;
-    private static final int SG_ACT = 11;
-    private static final int SG_NUM = 12;
+    private static final int SG_MISC = 7;
+    private static final int SG_ENGINE = 8;
+    private static final int SG_GYRO = 9;
+    private static final int SG_ACT = 10;
+    private static final int SG_NUM = 11;
 
     // parts views
     private static final int SV_ALL = 0;
@@ -226,8 +224,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             filterTechs();
             updateTechTarget();
         });
-        partsTable.addMouseListener(new PartsTableMouseAdapter(getCampaignGui(),
-                partsTable, partsModel));
+        PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
         JScrollPane scrollPartsTable = new JScrollPane(partsTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -415,11 +412,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 } else if (nGroup == SG_WEAP) {
                     inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
                 } else if (nGroup == SG_AMMO) {
-                    inGroup = part instanceof EquipmentPart && !(part instanceof AmmoBin)
-                            && ((EquipmentPart) part).getType() instanceof AmmoType;
-                } else if (nGroup == SG_AMMO_BIN) {
-                    inGroup = part instanceof EquipmentPart && (part instanceof AmmoBin)
-                            && ((EquipmentPart) part).getType() instanceof AmmoType;
+                    inGroup = part instanceof AmmoStorage;
                 } else if (nGroup == SG_MISC) {
                     inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
                 } else if (nGroup == SG_ENGINE) {
@@ -464,8 +457,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return "Weapons";
         case SG_AMMO:
             return "Ammunition";
-        case SG_AMMO_BIN:
-            return "Ammunition Bins";
         case SG_MISC:
             return "Miscellaneous Equipment";
         case SG_ENGINE:
@@ -573,7 +564,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public void refreshTechsList() {
         // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
-        techsModel.setData(getCampaign().getTechs(true, null, true, false));
+        techsModel.setData(getCampaign().getTechs(true));
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";

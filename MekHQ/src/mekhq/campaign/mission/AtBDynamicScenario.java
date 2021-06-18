@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -9,10 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -23,13 +46,8 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
  * @author NickAragua
- *
  */
 public class AtBDynamicScenario extends AtBScenario {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 4671466413188687036L;
 
     // by convention, this is the ID specified in the template for the primary player force
@@ -52,6 +70,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
     private List<AtBScenarioModifier> scenarioModifiers;
 
+    private boolean finalized;
+
     public AtBDynamicScenario() {
         super();
 
@@ -60,6 +80,7 @@ public class AtBDynamicScenario extends AtBScenario {
         playerForceTemplates = new HashMap<>();
         playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
+        externalIDLookup = new HashMap<>();
     }
 
     @Override
@@ -117,6 +138,9 @@ public class AtBDynamicScenario extends AtBScenario {
         playerUnitTemplates.remove(unitID);
     }
 
+    /**
+     * The Board.START_X constant representing the starting zone for the player's primary force
+     */
     @Override
     public int getStart() {
         // If we've assigned at least one force
@@ -150,14 +174,22 @@ public class AtBDynamicScenario extends AtBScenario {
         return getMapSizeY();
     }
 
+    @Override
+    public void setMapSize() {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this);
+    }
+
     /**
-     * Adds a bot force to this dynamic scenario.
-     * @param botForce
-     * @param forceTemplate
+     * Adds a bot force to this scenario.
      */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);
         botForceTemplates.put(botForce, forceTemplate);
+
+        // put all bot units into the external ID lookup.
+        for (Entity entity : botForce.getEntityList()) {
+            getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
+        }
     }
 
     /**
@@ -166,7 +198,7 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeBotForce(int x) {
         // safety check, just in case
-        if((x >= 0) && (x < botForces.size())) {
+        if ((x >= 0) && (x < botForces.size())) {
             BotForce botToRemove = botForces.get(x);
 
             botForceTemplates.remove(botToRemove);
@@ -232,14 +264,32 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * A list of all the force IDs associated with pre-defined scenario templates
-     * @return
+     * This is used to indicate that player forces have been assigned to this scenario
+     * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
+     * generate opposing forces and their bots, apply any present scenario modifiers,
+     * set up deployment turns, calculate which units belong to which objectives, and many other things.
+     *
+     * Further "post-force-generation" modifiers can be applied to this scenario, but calling
+     * finalizeScenario() on it again will lead to "unsupported" behavior.
+     *
+     * Can be called as a short hand way of telling "is this scenario ready to play".
      */
-    public List<Integer> getPrimaryPlayerForceIDs() {
+    public boolean isFinalized() {
+        return finalized;
+    }
+
+    public void setFinalized(boolean finalized) {
+        this.finalized = finalized;
+    }
+
+    /**
+     * A list of all the force IDs associated with pre-defined scenario templates
+     */
+    public List<Integer> getPlayerTemplateForceIDs() {
         List<Integer> retval = new ArrayList<>();
 
-        for(int forceID : getForceIDs()) {
-            if(getPlayerForceTemplates().containsKey(forceID)) {
+        for (int forceID : getForceIDs()) {
+            if (getPlayerForceTemplates().containsKey(forceID)) {
                 retval.add(forceID);
             }
         }
@@ -252,13 +302,13 @@ public class AtBDynamicScenario extends AtBScenario {
      * @return
      */
     public Person getLanceCommander(Campaign campaign) {
-        if(getForceIDs().isEmpty()) {
+        if (getForceIDs().isEmpty()) {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
         Lance lance = campaign.getLances().get(getForceIDs().get(0));
 
-        if(lance != null) {
+        if (lance != null) {
             lance.refreshCommander(campaign);
             return lance.getCommander(campaign);
         } else {
@@ -277,7 +327,7 @@ public class AtBDynamicScenario extends AtBScenario {
         Person commander = getLanceCommander(campaign);
         int skillValue = SkillType.SKILL_NONE;
 
-        if((commander != null) &&
+        if ((commander != null) &&
                 commander.hasSkill(skillType)) {
             skillValue = commander.getSkill(skillType).getLevel();
         }
@@ -294,18 +344,62 @@ public class AtBDynamicScenario extends AtBScenario {
         return scenarioModifiers;
     }
 
-    public void addScenarioModifier(AtBScenarioModifier modifier) {
+    /**
+     * Adds a scenario modifier and any linked modifiers to this scenario,
+     * provided that the modifier exists and can be applied to the scenario (e.g. ground units on air map)
+     */
+    public void addScenarioModifier(@Nullable AtBScenarioModifier modifier) {
+        if (modifier == null) {
+            return;
+        }
+
+        // the default is that this modifier is allowed to apply to any map
+        if ((modifier.getAllowedMapLocations() != null) && !modifier.getAllowedMapLocations().isEmpty() &&
+                !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
+            return;
+        }
+
         scenarioModifiers.add(modifier);
+
+        for (String modifierKey : modifier.getLinkedModifiers().keySet()) {
+            AtBScenarioModifier subMod = AtBScenarioModifier.getScenarioModifier(modifierKey);
+
+            // if the modifier exists and has not already been added (to avoid infinite loops, as it's possible to define those in data)
+            if ((subMod != null) && !alreadyHasModifier(subMod)) {
+                // set the briefing text of the alternate modifier to the 'alternate' text supplied here
+                subMod.setAdditionalBriefingText(modifier.getLinkedModifiers().get(modifierKey));
+                addScenarioModifier(subMod);
+            }
+        }
+    }
+
+    /**
+     * Check if the modifier list already has a modifier with the given modifier's name.
+     */
+    public boolean alreadyHasModifier(AtBScenarioModifier modifier) {
+        for (AtBScenarioModifier existingModifier : scenarioModifiers) {
+            if (existingModifier.getModifierName().equals(modifier.getModifierName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public int getScenarioType() {
-        return 0;
+        return DYNAMIC;
+    }
+
+    @Override
+    public String getDesc() {
+        return getScenarioTypeDescription();
     }
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Dynamic Scenario";
+        return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
+                getTemplate().name : "Dynamic Scenario";
     }
 
     @Override
@@ -317,26 +411,30 @@ public class AtBDynamicScenario extends AtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
-        if(template != null && isCurrent()) {
+        if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
+            
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
         }
 
         super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 template = ScenarioTemplate.Deserialize(wn2);
+            } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
+                setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
             }
         }
 
-        super.loadFieldsFromXmlNode(wn);
+        super.loadFieldsFromXmlNode(wn, version);
     }
 
     @Override

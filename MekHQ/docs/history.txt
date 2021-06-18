@@ -1,7 +1,201 @@
 VERSION HISTORY:
 ----------------
-0.47.14-SNAPSHOT
+0.49.2-SNAPSHOT
++ Issue #2620: Adding Missing Leadership Column in Personnel Tab
++ Issue #2625: Properly Clear Tech Units on Person removal/retirement
++ PR #2617: Contract Command Rights Enum and Tool Tips
++ PR #2637: Personnel Names
++ PR #2651, #2688, #2698, #2701: Various StratCon fixes:
+  - Updated arrival altitude for aerospace fighter reinforcement modifiers (they were showing up on the ground)
+  - Standardized "recon" type scenarios to have the same criteria as Tukayyid scenarios
+  - Various briefing text clarifications
+  - Store artillery offboard status between campaign saves
+  - On Integrated command, don't immediately and incorrectly undeploy lances after generating scenarios
+  - Adjusted manual force deployment rules (unlimited stacking on allied facilities, one per hex otherwise, no manual deployment under integrated command)
+  - Tighten up reinforcement restrictions (can't deploy units that can't actually deploy; can't double deploy units; can now only deploy fight lances or have to use a support point/VP)
+  - VTOLs no longer start on the ground in certain situations, for real
+  - Removed extraneous "recon turrets" modifier span for recon raid contracts
+  - Tighten up strategic objective generation; correct objective coordinate display
+  - Removed extraneous references to contract score in some scenario modifiers; water-naval units may rarely make an appearance
+  - More robust transport loading code
+  - Bot now has access to Arrow IV external ordnance, won't load 20 TAG pods on a single fighter.
++ PR #2656: Cleaning up a few erroneous Campaign GUI properties
++ PR #2655: Ensuring BotForce has a Valid Base Camouflage
++ PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
++ PR #2653: Expanding File/Refresh Capabilities
++ PR #2652: Personnel Table Expanded Randomization Functionality
++ Issue #2659: Hangar Report: Adding IndustrialMech Section and Missing Combat Vehicle Super Heavy Nodes
++ Issue #2642: StratCon Tab: Force Table Background Doesn't Work Properly in Nimbus
++ Issue #2610: Adding Tech Officer migration from the reference class
++ Issue #2534: Fixing Missing Clan Check For Endo Steel Location Repairs
++ Issue #2382: Large Vessel Clan Repair and Maintenance modifier no longer applies to Clanners
++ PR #2667: Preventing NONE Primary Role Hiring
++ Issue #2485: Default Subcontract Name, Briefing Tab Mission Tracking
++ PR #2284: MHQ Options: Adding Colours Customizability
++ Issue #2491: Allow extra time for maintenance per StratOps/New CamOps repair/maintenance rules.
++ Issue #2661: Can no longer select the same unit across multiple selectors in StratCon scenario management UI.
++ Issue #2548: Making ROM Designation and Manei Domini Class and Rank part of the rank system data
++ Issue #2529: Fixing refit display so it no longer includes the pilot's BV
++ PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
++ PR #2540: Factions Data Customizability Expansion and Cleanup
++ PR #2677: Ignorable Nag Dialogs
++ Issues #2636 and #2658: AdvanceDaysDialog Rework: Advancement-based Modality, Expanded Buttons, Persistent Daily Report
++ PR #2634: AtB Enum (Morale, Contract Type, Lance Role) tooltips
++ PR #2691: ResolveScenarioWizardDialog Uses Standardized Entity Readout Dialog for Unit Views
++ Issues #2116 and #2589: Improving Rank and Title Sorting
++ PR #2694: Hangar Tab: Maintenance Colour No Longer Shows with Maintenance Disabled
++ PR #2693: GM Tools Dialog Rewrite
+
+0.49.1 (2021-05-23 1630 UTC)
++ Data: Fixing Aerospace Tech Portrait Folder Names
++ PR #2571: Fixing MechWarrior Salary
++ Issue #2569: Adding userdata to the build script
++ Issue #2574: Fixing Experience Tab Custom Skill Costs Formatting Type
++ PR #2584: MekHQ Options: New Day: Auto-hiring Pool Options
++ Issue #2568: Fixing StratCon Mission Completion NPEs
++ PR #2580: Campaign Options: Fixing doClick update issues
++ PR #2582: Fixing Astech and Medic pool salaries so they use the proper campaign options
++ PR #2587: Re-enable force deployment from TO&E
++ PR #2590: Take a breather after sending entities to MegaMek before trying to load transports
++ PR #2586: Fixing LAM Pilot Skill Level Calculation
++ PR #2599: Fixed multiple issues with deploying grounded dropships from MekHQ to MegaMek; 
+	Prevent putting scenario into error state when editing a non-resolved scenario in briefing room
++ Issue #2594: Allowing Scenario Date Nullable Comparison
++ Issue #2588: Fixing unmarketable check value for personnel table filter support check
++ PR #2602, #2611, #2615: StratCon Data Fixes
++ PR #2583: Dependent Swapover: Removing Parental and Spousal Abandonment, Fixing None Primary Role
++ Issue #2566: Ranks Warning Expansion and Change Tracking
++ Multiple StratCon stability and data fixes:
+	- scenario data updates
+	- phantom scenarios no longer display in briefing room; fixed objective scenarios remain on tracks until encountered
+	- logic update for force deployment right click menu
+	- map size rerolls no longer generate tiny maps
+	- descriptive text updates
+	- fixes for various issues when loading campaign saves
+	- improved objective generation and tracking
+	- prevent excessive spam of fixed contract modifiers for some contracts (notably, cadre duty and guerilla)
+	- temporarily prevent deployment of more than one force/hex (further re-work coming)
++ Issue #2607: Fixing Payment Overage Option Implementation
++ PR #2581: Modernizing Presets to 0.49.1 Standards
+
+0.49.0 (2021-05-01 2130 UTC)
++ Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
++ Issue #2418: Ensure context menu shortcut works on our tables
++ PR #2361: Use MML's CConfig.load instead of new CConfig()
++ Issue #2415: Implementing Unit Weapon SPA Generation and Fixing Tech Level Comparisons
++ PR #2260: Implementing Save and Quit in the MekHQ exit option pane
++ Issue #2446: Calculate the scrollable block increment correctly
++ Issue #2452: Ensure a Lance's Force assignment is still valid
++ Data: New Graphical Force Icon Type Pieces
++ PR #2379: Repair Bay: Adding part name to the report when GM repairing
++ PR #2337: Shopping List No Longer Writes to XML While Empty
++ Issue #2459: Only calculate weight if EquipmentPart has a type
++ PR #2465: Change source and target compatibility to Java 11
++ PR #2151: Improving Mission and Scenario Status Processing
++ PR #2440: Base Components: Creation and Expanding Preferences
++ Issue #2458: MRMS Astech Requirement Checks
++ PR #2473: Better GM unit restore
++ PR #2475: Use the correct resource string for free C3i Nodes on TOE
++ Issue #2456: Incorrect Financial Export Date, Two Force Icon NPEs, Unit Market NPE
++ Issue #2469: Fixing Award Log Edit NPEs
++ Issue MegaMek/megamek#2597: Use MM's new UnitNameTracker for name collisions
++ Issue #338: Base Refit Tech Selection Free Time Sort
++ PR #2468: Bulk Procurement Table Selection and GM-less Clear
++ Issue #3288: GM Tool Name Generation Expansion - Bulk Generation, Manual Editing
++ Issue #1936: AbstractIcon: Full Camouflage Implementation - Adding Force Camouflage
++ Issue #2489: Improving Award XML Load Null Proofing
++ PR #2356: Improving Genealogy Null Protections
++ PR #2417: Personnel Options Tab Rework
++ PR #2494: Base Components: Sorted Combo Box Model
++ PR #2331: Add MekLocation tests and fix location repair nits
++ PR #2532: ProtoMech Bay Rating
++ PR #2144: StratCon - Alpha
++ Issue #2487: When a garrison-type contract comes back from a "rout" break, you may find yourself facing different opposition
++ Issue #2460: Improving Default AtBContract Name and Briefing Tab Sort
++ PR #2352: Personnel Role Enum
++ PR #2545: Allow aerospace fighters with only 10 heat sinks to repair damaged heat sinks
++ Issue #2553: Fixing FactionComboBox NPE with null input code
++ Issue #2553: Fixing preferences issue in the Personnel Market
++ Issues #1483, #2196, #2201, #2202, #2205, #2449: Rank System and Profession Rework
++ Issue #271: ScenarioStatus Enum: Expanded Scenario Status Options
++ PR #2479: Fixing Escorpión Imperio starting planet
+
+0.48.0 (Stable) - (2021-03-05 1530 UTC)
++ Issue #2427: Exception during maintenance on a new day breaks MekHQ
++ Issue #2431: Fix exception exporting personnel to CSV
++ PR #2437: Hangar Report: Fixing Wrong Node Addition for Medium Wheeled
++ PR #2381: Repair Tab: Adding better information blockers for Null/Void Signature System and Chameleon Shield
++ Issue #2441: Adding Force Icon Pieces: numerous Alphanumerics and the Vehicle Assorted Type.
++ Issue #2429: Awards Documentation: Fixing Minimum Excel Version, Removing Duplicated Images, Double Spacing
++ Issue #2442: Fixing Multiple Ranks Issues
+
+0.47.17 (RC3) (2021-02-075 2015 UTC)
++ PR #2354: Don't skip ComStar as an origin faction
++ Issue #2348: Allow Clanner origins
++ Issue #2365: MissingEquipmentParts should only be replaced with parts of the correct Java type
++ Issue #2358: Add missing AtB lances on CPNX load
++ PR #2372: Infantry Motive Type File I/O Fixes
++ PR #2378: Acquisition Dialog: Fixing NPE, GM Acquire for In-Transit or On Order parts, Adding GM Acquire Message
++ Issue #2389: Fixing graphical NPE when not purchasing units in the unit selector dialog
++ PR #2390: Fixing Baby Prisoner Status Determination
++ Issue #2397: Adding Fall Back SPA check for current SPAs being edited
++ Issue #2396: Resolve Infantry part and other part type bugs
++ Issue #2387: Allow salvaging components on destroyed locations from repair bay
+
+0.47.16 (RC2) (2021-01-05 1700 UTC)
++ PR #2289: Drop support for migrating Campaigns older than v0.41.24 (2016-10-06 03:15 UTC)
++ Issue #2283: Ensure contracts are generated with the correct number of retries
++ Data: Adding Missing images.
++ Issues #2296 and #2299: Support older campaign dropship and jumpship ammo bin sizes in XML file
++ PR #2302: Fixing Log Display Spacing
++ Issue #2295: Expanding null protections for rank systems and adding defaults
++ PR #2303: Fixing Gender assignment on Generation
++ Issue #2270: Scenarios Respect Sort Order
++ Issue #2297: Ensure shots needed is converted properly between ammo types
++ Issue #2310: Avoid procurement popup exceptions due to race condition
++ Issue #2298: Do not display unknown armor types in the Parts In Use report
++ PR #2308: Add EquipmentPart unit tests and fix minor bugs
++ Issue #2266: For LAMs check Landing Gear and Avionics when considering repairable slots
++ Issue #2317: Ensure Person::idleMonths defaults to 0
++ PR #2324: Restrict removing, salvaging, or scrapping certain locations with avionics and landing gear on LAMs
++ Issues #2325 #2328: Do not throw NPE on missing equipment when unscrambling equipment numbers
++ PR #2330: Fix capitalization of MechWarrior portrait folder
++ Issue #2332: Delete refit file if unable to read it back when saving
++ PR #2294: Add contract market tests and add setters for static singletons (e.g. Systems and RandomFactionGenerator)
++ Issues #1727 and #2318: Colour Camouflage and Camouflage Selector Standardization
++ PR #2293: Upgrades built in campaigns to 0.47.15
++ Issue #2341: Equipment on incorrect mounts are not fixed
++ Issue #2342: Customs in CPNX with invalid file name chars do not save to disk
+
+0.47.15 (RC1) (2020-12-14 2330 UTC)
++ Issue #2166: NRE in Money::plus/Money::minus
++ PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
++ PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
++ Fixing Male Soldier and Female ProtoMech Pilot Portrait Paths so they properly generate
++ Issue #2236: Making Unmaintained hangar color take priority over Damaged/Inoperable
++ Issue #2248: Fix various ContractMarket exceptions when operating at the bounds of MekHQ data
++ PR #2250: Fixing Load Last Save for .cpnx.gz files
++ Issue #1880: Fixed briefing text error for breakthrough (defender) scenarios
++ Issue #2231: Don't give back free parts when fixing a missing part
++ Issue #2254: Ransomed Unit now properly adds to Total Value Salvaged
++ Issues #2255 and #2258: Fix Warehouse::removePart StackOverflowException with child parts and NRE with BayDoor/Cubicle parts
++ PR #2259: Adding Pregnancy Complications Personnel Status
++ PR #2261: Improved Awards Migration
++ PR #2271: Improve CPNX load perf with transport linkages in AtB scenarios
++ PR #2272: Ensure GM Acquire Instantly acquires the correct quantity
++ PR #2274: When loading Campaigns ensure more exceptions are caught and logged properly
++ Issue #2278: Ensure skill prefs are saved to the campaign on creation
++ Issues #1151, 1219, 1687, 1807, 2142, 2243, 2253, 2267, 2268, 2276: Refactor adding and removing ammo from the Campaign
++ Issue #2280: GM Restore skips parts
++ PR #2286: Don't reload unit data if nothing changed on disk when reading Campaigns
++ Issue #2287: Prisoner Filter Should Include Bondsmen
++ Issue #2141: Subcontracts don't reference parent contract after campaign load
++ Issue #1587: Basic Bulk Customization
++ Issue #2200: Moving Rank System Name to Data
+
+0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
++ Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
 
 0.47.13 (2020-11-09 1600 UTC) 
 + Issue #2213: Fix disastrous bug in AmmoStorage::ctor
@@ -19,7 +213,7 @@ VERSION HISTORY:
 + Issue #2118: Fixing MekHQ's use of MM password
 + Issue #2138: Fixing GM Mothballing
 + Issue #2139: Fixing Award Tracker Data Manipulation
-+ Issue #2130: Fixing TOE “Deployed” and “Undeployed” Background Colour Display
++ Issue #2130: Fixing TOE Deployed and Undeployed Background Colour Display
 + Issue #1723: Fixing Missing Personnel and Hangar Tab Selection Highlights
 + PR #2153: UnitRatingMethod: Add Disabled Case
 + Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
@@ -43,7 +237,6 @@ VERSION HISTORY:
 + Issue #572: Random Portrait Fails to Properly Compare File Paths
 + Issue #564: AbstractIcon: Fixing Basic Info Portrait Scaling
 + Data: Adding a CampaignAnon 3.5 AtB preset.
-
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
@@ -407,7 +600,7 @@ v0.47.0 (2019-08-21 0300 UTC)
 + PR #1227: Dropships can now load alternate munitions into artillery base if the game is configured for it
 + PR #1226: [Feature] Campaign Subset Export: export a subset of your current campaign into another, either new or existing, campaign file. Overwrites units and personnel with the same guid. Option to remove exported personnel from source campaign. Obviously make backups before using on an existing campaign.
 
-0.46.0 (2019-08-12 1900 UTC)
+0.46.0 (Stable) (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
 
 0.46.0-rc.2 (2019-08-12 0100 UTC)

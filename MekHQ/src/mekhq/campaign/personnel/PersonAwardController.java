@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,14 +10,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
@@ -100,11 +101,15 @@ public class PersonAwardController {
      * @param date is the date it was awarded
      */
     public void addAndLogAward(String setName, String awardName, LocalDate date) {
-        Award award;
+        final Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
+            if (award == null) {
+                MekHQ.getLogger().error("Cannot award a null award, returning.");
+                return;
+            }
             awards.add(award);
         }
         person.awardXP(award.getXPReward());
@@ -118,9 +123,13 @@ public class PersonAwardController {
 
     /**
      * Gives the award to this person
-     * @param award is the award it was awarded
+     * @param award is the award being loaded from XML
      */
-    public void addAwardFromXml(Award award) {
+    public void addAwardFromXml(final @Nullable Award award) {
+        if (award == null) {
+            return;
+        }
+
         if (hasAward(award)) {
             Award existingAward = getAward(award.getSet(), award.getName());
             existingAward.mergeDatesFrom(award);

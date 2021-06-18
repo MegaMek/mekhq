@@ -1,0 +1,9 @@
+<StratconFacility>
+	<capturedDefinition>HostileArtilleryBase.xml</capturedDefinition>
+	<displayableName>Artillery Base</displayableName>
+        <facilityType>ArtilleryBase</facilityType>
+        <localModifiers>AlliedArtyGarrison.xml</localModifiers>
+        <owner>Allied</owner>
+        <sharedModifiers>AlliedArtySupport.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>

@@ -1,8 +1,8 @@
 /*
  * Faction.java
  *
- * Copyright (C) 2009-2016 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,14 +22,12 @@
 package mekhq.campaign.universe;
 
 import java.awt.Color;
-import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,53 +35,42 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.ratgenerator.FactionRecord;
-import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Faction {
-    private static Map<String,Faction> factions;
-    private static Map<Integer,Faction> factionIdMap;
-    private static List<String> choosableFactionCodes = Collections.singletonList("MERC");
-
+    //region Variable Declarations
     private String shortName;
     private String fullName;
-    private NavigableMap<Integer,String> nameChanges = new TreeMap<>();
+    private NavigableMap<Integer, String> nameChanges = new TreeMap<>();
     private String[] altNames;
-    private Color color;
-    private String nameGenerator;
+    private String[] alternativeFactionCodes;
     private String startingPlanet;
-    private NavigableMap<LocalDate,String> planetChanges = new TreeMap<>();
+    private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
+    private String nameGenerator;
     private int[] eraMods;
-    private Integer id;
-    private Set<Tag> tags;
-    // Start and end years (inclusive)
-    private int start;
-    private int end;
+    private Color color;
     private String currencyCode = ""; // Currency of the faction, if any
+    private Set<Tag> tags;
+    private int start; // Start year (inclusive)
+    private int end; // End year (inclusive)
+    //endregion Variable Declarations
 
+    //region Constructors
     public Faction() {
         this("???", "Unknown");
     }
 
-    public Faction(String shortName, String fullName) {
+    public Faction(final String shortName, final String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;
         nameGenerator = "General";
@@ -94,16 +81,7 @@ public class Faction {
         start = 0;
         end = 9999;
     }
-
-    public static List<String> getChoosableFactionCodes() {
-        return choosableFactionCodes;
-    }
-
-    public static void setChoosableFactionCodes(String... choosableFactionCodes) {
-        if (choosableFactionCodes.length > 0) {
-            Faction.choosableFactionCodes = Arrays.asList(choosableFactionCodes);
-        }
-    }
+    //endregion Constructors
 
     public String getShortName() {
         return shortName;
@@ -118,33 +96,25 @@ public class Faction {
         }
     }
 
+    public @Nullable String[] getAlternativeFactionCodes() {
+        return alternativeFactionCodes;
+    }
+
+    public void setAlternativeFactionCodes(final String... alternativeFactionCodes) {
+        this.alternativeFactionCodes = alternativeFactionCodes;
+    }
+
     public Color getColor() {
         return color;
-    }
-
-    public boolean isClan() {
-        return is(Tag.CLAN);
-    }
-
-    public boolean isComStar() {
-        return "CS".equals(shortName);
-    }
-
-    public boolean isPeriphery() {
-        return is(Tag.PERIPHERY);
     }
 
     public String getNameGenerator() {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(LocalDate year) {
-        Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
-        if (null == change) {
-            return startingPlanet;
-        } else {
-            return change.getValue();
-        }
+    public String getStartingPlanet(final LocalDate year) {
+        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
+        return (change == null) ? startingPlanet : change.getValue();
     }
 
     public int getEraMod(int year) {
@@ -182,158 +152,115 @@ public class Faction {
         }
     }
 
-    public int getTechMod(Part part, Campaign campaign) {
-        int currentYear = campaign.getGameYear();
-
-        //TODO: This seems hacky - we shouldn't hardcode in universe details
-        //like this
-        int factionMod = 0;
-        if ((part.getTechBase() == Part.T_CLAN) && !isClan()) {
-            // Availability of clan tech for IS
-            if (currentYear < 3050) {
-                // Impossible to buy before clan invasion
-                factionMod = 12;
-            } else if (currentYear <= 3052) {
-                // Between begining of clan invasiuon and tukayyid, very very hard to buy
-                factionMod = 5;
-            } else if (currentYear <= 3060) {
-                // Between tukayyid and great refusal, very hard to buy
-                factionMod = 4;
-            } else {
-                // After great refusal, hard to buy
-                factionMod = 3;
-            }
-        } else if ((part.getTechBase() == Part.T_IS) && isPeriphery()) {
-            // Availability of high tech rating equipment in low tech areas (periphery)
-            switch (part.getTechRating()) {
-                case EquipmentType.RATING_E:
-                    factionMod += 1;
-                    break;
-                case EquipmentType.RATING_F:
-                    factionMod += 2;
-                    break;
-            }
-        }
-
-        return factionMod;
+    public boolean is(Tag tag) {
+        return tags.contains(tag);
     }
 
-    public boolean is(Faction.Tag tag) {
-        return tags.contains(tag);
+    public boolean validIn(final LocalDate today) {
+        return validIn(today.getYear());
     }
 
     public boolean validIn(int year) {
         return (year >= start) && (year <= end);
     }
 
-    public boolean validIn(LocalDate time) {
-        return validIn(time.getYear());
-    }
-
     public boolean validBetween(int startYear, int endYear) {
         return (startYear <= end) && (endYear >= start);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public int getStartYear() {
-        return this.start;
+        return start;
     }
 
     public int getEndYear() {
-        return this.end;
+        return end;
     }
 
     public String getCurrencyCode() {
-        return this.currencyCode;
+        return currencyCode;
     }
 
-    public boolean hasName(String name) {
-        if (name.equals(fullName)
-                || nameChanges.values().stream().anyMatch(n -> n.equals(name))) {
-            return true;
-        }
-        if ((altNames != null) && (altNames.length > 0)) {
-            for (String altName : altNames) {
-                if (name.equals(altName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    //region Checks
+    public boolean isPlayable() {
+        return is(Tag.PLAYABLE);
     }
 
-    public static Collection<Faction> getFactions() {
-        return factions.values();
+    public boolean isMercenary() {
+        return is(Tag.MERC);
     }
 
-    public static Collection<String> getFactionList() {
-        return new ArrayList<>(factions.keySet());
+    public boolean isPirate() {
+        return is(Tag.PIRATE);
     }
 
-    public static Faction getFaction(String sname) {
-        Faction defaultFaction = new Faction();
-        if (factions == null) {
-            return defaultFaction;
-        } else {
-            return factions.getOrDefault(sname, defaultFaction);
-        }
+    public boolean isRebel() {
+        return is(Tag.REBEL);
     }
 
-    public static Faction getFactionFromFullName(String fname, int year) {
-        return getFactionFromFullNameAndYear(fname, year);
+    public boolean isRebelOrPirate() {
+        return isRebel() || isPirate();
     }
 
-    public static Faction getFactionFromFullNameAndYear(String fname, int year) {
-        Faction faction = null;
-        for (Faction f : factions.values()) {
-            if (f.getFullName(year).equals(fname)) {
-                faction = f;
-                break;
-            }
-        }
-        return faction;
+    public boolean isComStar() {
+        return "CS".equals(getShortName());
     }
 
-    /**
-     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
-     * Useful for RAT generator activity.
-     * @param faction The faction whose MegaMek faction record to retrieve.
-     * @return Found faction record or null.
-     */
-    public static FactionRecord getFactionRecordOrFallback(String faction) {
-        FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
-        if (fRec == null) {
-            Faction f = Faction.getFaction(faction);
-            if (f != null) {
-                if (f.isPeriphery()) {
-                    fRec = RATGenerator.getInstance().getFaction("Periphery");
-                } else if (f.isClan()) {
-                    fRec = RATGenerator.getInstance().getFaction("CLAN");
-                } else {
-                    fRec = RATGenerator.getInstance().getFaction("IS");
-                }
-            }
-
-            if (fRec == null) {
-                MekHQ.getLogger().error(RATGenerator.class, "getFactionRecordOrFallback",
-                        "Could not locate faction record for " + faction);
-            }
-        }
-
-        return fRec;
+    public boolean isWoB() {
+        return "WOB".equals(getShortName());
     }
 
-    public static String getFactionCode(int faction) {
-        Faction f = factionIdMap.get(faction);
-        return (null != f) ? f.getShortName() : "IND";
+    public boolean isComStarOrWoB() {
+        return isComStar() || isWoB();
     }
+
+    public boolean isClan() {
+        return is(Tag.CLAN);
+    }
+
+    public boolean isInnerSphere() {
+        return is(Tag.IS);
+    }
+
+    public boolean isPeriphery() {
+        return is(Tag.PERIPHERY);
+    }
+
+    public boolean isDeepPeriphery() {
+        return is(Tag.DEEP_PERIPHERY);
+    }
+
+    public boolean isIndependent() {
+        return "IND".equals(getShortName()) || "PIND".equals(getShortName());
+    }
+
+    //region Power Checks
+    public boolean isSuperPower() {
+        return is(Tag.SUPER);
+    }
+
+    public boolean isMajorOrSuperPower() {
+        return isMajorPower() || isSuperPower();
+    }
+
+    public boolean isISMajorOrSuperPower() {
+        return isInnerSphere() && isMajorOrSuperPower();
+    }
+
+    public boolean isMajorPower() {
+        return is(Tag.MAJOR);
+    }
+
+    public boolean isMinorPower() {
+        return is(Tag.MINOR);
+    }
+
+    public boolean isSmall() {
+        return is(Tag.SMALL);
+    }
+    //endregion Power Checks
+    //endregion Checks
 
     public static Faction getFactionFromXML(Node wn) throws DOMException {
-        final String METHOD_NAME = "getFactionFromXML(Node)";
-
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
 
@@ -343,37 +270,27 @@ public class Faction {
                 retVal.shortName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
                 retVal.fullName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
-                retVal.nameGenerator = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.tags.add(Tag.CLAN);
-                } else {
-                    retVal.tags.remove(Tag.CLAN);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("periphery")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.tags.add(Tag.PERIPHERY);
-                } else {
-                    retVal.tags.remove(Tag.PERIPHERY);
-                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
+                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
+                retVal.nameChanges.put(year, wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
+                retVal.altNames = wn2.getTextContent().split(",", 0);
+            } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
+                retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
                 retVal.planetChanges.put(
                         MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                         wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
-                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
-                retVal.nameChanges.put(year, wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-                retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
                 retVal.eraMods = new int[] {0,0,0,0,0,0,0,0,0};
                 String[] values = wn2.getTextContent().split(",", -2);
                 for (int i = 0; i < values.length; i++) {
                     retVal.eraMods[i] = Integer.parseInt(values[i]);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
+                retVal.nameGenerator = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
                 String[] values = wn2.getTextContent().split(",");
                 if (values.length == 3) {
@@ -382,99 +299,23 @@ public class Faction {
                     int colorBlue = Integer.parseInt(values[2]);
                     retVal.color = new Color(colorRed, colorGreen, colorBlue);
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                retVal.id = Integer.valueOf(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                retVal.start = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                 retVal.currencyCode = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
-                retVal.end = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
                 Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
-                    .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
+                        .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
+            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
+                retVal.start = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
+                retVal.end = Integer.parseInt(wn2.getTextContent());
             }
         }
 
         if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            MekHQ.getLogger().warning(Faction.class, METHOD_NAME,
-                    retVal.fullName + " faction did not have a long enough eraMods vector");
+            MekHQ.getLogger().warning(retVal.fullName + " faction did not have a long enough eraMods vector");
         }
 
         return retVal;
-    }
-
-    public static void generateFactions() throws DOMException {
-        final String METHOD_NAME = "generateFactions()";
-
-        MekHQ.getLogger().info(Faction.class, METHOD_NAME, "Starting load of faction data from XML...");
-        // Initialize variables.
-        factions = new HashMap<>();
-        factionIdMap = new HashMap<>();
-
-        Document xmlDoc;
-
-        try (FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
-            return;
-        }
-
-        Element factionEle = xmlDoc.getDocumentElement();
-        NodeList nl = factionEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
-        factionEle.normalize();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-
-            if (!wn.getParentNode().equals(factionEle)) {
-                continue;
-            }
-
-            int xc = wn.getNodeType();
-
-            if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("faction")) {
-                    Faction f = getFactionFromXML(wn);
-                    if (!factions.containsKey(f.getShortName())) {
-                        factions.put(f.getShortName(), f);
-                        if (null != f.getId()) {
-                            if (!factionIdMap.containsKey(f.getId())) {
-                                factionIdMap.put(f.getId(), f);
-                            } else {
-                                MekHQ.getLogger().error(Faction.class, METHOD_NAME,
-                                        String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
-                                                f.getId(), factionIdMap.get(f.getId()).getFullName(0),
-                                                f.getFullName(0)));
-                            }
-                        }
-                    } else {
-                        MekHQ.getLogger().error(Faction.class, METHOD_NAME,
-                                String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                        f.getShortName(), factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
-                    }
-                } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
-                    setChoosableFactionCodes(wn.getTextContent().split(","));
-                }
-            }
-        }
-        MekHQ.getLogger().info(Faction.class, METHOD_NAME,
-                "Loaded a total of " + factions.size() + " factions");
     }
 
     /** @return Sorted list of faction names as one string */
@@ -509,7 +350,7 @@ public class Faction {
 
     public enum Tag {
         /** Inner sphere */
-        IS, PERIPHERY, CLAN,
+        IS, PERIPHERY, DEEP_PERIPHERY, CLAN,
         /** A bunch of dirty pirates */
         PIRATE,
         /** Major mercenary bands */
@@ -540,6 +381,8 @@ public class Faction {
         /** Faction is hidden from view */
         HIDDEN,
         /** Faction code is not intended to be for players */
-        SPECIAL
+        SPECIAL,
+        /** Faction is meant to be played */
+        PLAYABLE
     }
 }

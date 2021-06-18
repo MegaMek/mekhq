@@ -197,4 +197,9 @@ public class MedicalLogger {
         String message = logEntriesResourceMap.getString("diedOfOldAge.text");
         patient.addLogEntry(new MedicalLogEntry(date, message));
     }
+
+    public static void diedFromPregnancyComplications(Person patient, LocalDate date) {
+        String message = logEntriesResourceMap.getString("diedFromPregnancyComplications.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
 }

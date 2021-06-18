@@ -43,7 +43,7 @@ import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import megamek.common.options.PilotOptions;
@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -72,7 +73,7 @@ import mekhq.gui.utilities.WrapLayout;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends ScrollablePanel {
+public class PersonViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -85,6 +86,7 @@ public class PersonViewPanel extends ScrollablePanel {
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+        super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
@@ -656,11 +658,10 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free non-dependent, or if the
-        // person has tracked total earnings
+        // We show the following if track total earnings is on for a free person, or if the
+        // person has previously tracked total earnings
         if (campaign.getCampaignOptions().trackTotalEarnings()
-                && ((person.getPrisonerStatus().isFree() && !person.isDependent())
-                || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
+                && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
@@ -799,7 +800,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         int firsty = 0;
 
-        Person spouse = person.getGenealogy().getSpouse(campaign);
+        final Person spouse = person.getGenealogy().getSpouse();
         if (spouse != null) {
             JLabel lblSpouse1 = new JLabel(resourceMap.getString("lblSpouse1.text"));
             lblSpouse1.setName("lblSpouse1");
@@ -816,7 +817,7 @@ public class PersonViewPanel extends ScrollablePanel {
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    gui.getPersonnelTab().focusOnPerson(spouse.getId());
+                    gui.focusOnPerson(spouse);
                 }
             });
             gridBagConstraints.gridx = 1;
@@ -842,18 +843,18 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
             for (FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
-                Person ex = campaign.getPerson(formerSpouse.getFormerSpouseId());
+                Person ex = formerSpouse.getFormerSpouse();
                 gridBagConstraints.gridy = firsty;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
-                        ex.getFullName(), formerSpouse.getReasonString(),
+                        ex.getFullName(), formerSpouse.getReason(),
                         MekHQ.getMekHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        gui.getPersonnelTab().focusOnPerson(ex.getId());
+                        gui.focusOnPerson(ex);
                     }
                 });
                 pnlFamily.add(lblFormerSpouses2, gridBagConstraints);
@@ -862,7 +863,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
 
         if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayExtendedFamily()) {
-            List<UUID> children = person.getGenealogy().getChildren();
+            final List<Person> children = person.getGenealogy().getChildren();
             if (!children.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblChildren1.setName("lblChildren1");
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
@@ -877,9 +878,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-                for (UUID childId : children) {
-                    Person child = campaign.getPerson(childId);
-
+                for (Person child : children) {
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
@@ -888,7 +887,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(childId);
+                            gui.focusOnPerson(child);
                         }
                     });
                     pnlFamily.add(lblChildren2, gridBagConstraints);
@@ -896,7 +895,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> grandchildren = person.getGenealogy().getGrandchildren(campaign);
+            final List<Person> grandchildren = person.getGenealogy().getGrandchildren();
             if (!grandchildren.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
@@ -914,9 +913,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (UUID grandchildId : grandchildren) {
-                    Person grandchild = campaign.getPerson(grandchildId);
-
+                for (Person grandchild : grandchildren) {
                     gridBagConstraints.gridy = firsty;
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
@@ -925,7 +922,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(grandchildId);
+                            gui.focusOnPerson(grandchild);
                         }
                     });
                     pnlFamily.add(lblGrandchildren2, gridBagConstraints);
@@ -934,10 +931,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
-                List<UUID> parents = person.getGenealogy().getParents();
-                for (UUID parentId : parents) {
-                    Person parent = campaign.getPerson(parentId);
-
+                for (Person parent : person.getGenealogy().getParents()) {
                     JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
                             ? "lblFather1.text" : "lblMother1.text"));
                     labelParent.setName("lblParent");
@@ -954,7 +948,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     labelParentName.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(parentId);
+                            gui.focusOnPerson(parent);
                         }
                     });
                     gridBagConstraints.gridx = 1;
@@ -965,7 +959,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> siblings = person.getGenealogy().getSiblings(campaign);
+            final List<Person> siblings = person.getGenealogy().getSiblings();
             if (!siblings.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblSiblings1.setName("lblSiblings1");
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
@@ -983,9 +977,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (UUID siblingId : siblings) {
-                    Person sibling = campaign.getPerson(siblingId);
-
+                for (Person sibling : siblings) {
                     gridBagConstraints.gridy = firsty;
                     lblSiblings2 = new JLabel(String.format("<html>%s</html>", sibling.getHyperlinkedName()));
                     lblSiblings2.setName("lblSiblings2");
@@ -993,7 +985,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblSiblings2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(siblingId);
+                            gui.focusOnPerson(sibling);
                         }
                     });
                     pnlFamily.add(lblSiblings2, gridBagConstraints);
@@ -1001,7 +993,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> grandparents = person.getGenealogy().getGrandparents(campaign);
+            final List<Person> grandparents = person.getGenealogy().getGrandparents();
             if (!grandparents.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
@@ -1019,9 +1011,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (UUID grandparentId : grandparents) {
-                    Person grandparent = campaign.getPerson(grandparentId);
-
+                for (Person grandparent : grandparents) {
                     gridBagConstraints.gridy = firsty;
                     lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
                             grandparent.getHyperlinkedName()));
@@ -1030,7 +1020,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(grandparentId);
+                            gui.focusOnPerson(grandparent);
                         }
                     });
                     pnlFamily.add(lblGrandparents2, gridBagConstraints);
@@ -1038,7 +1028,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles(campaign);
+            final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
             if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
@@ -1056,9 +1046,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (UUID auntOrUncleId : auntsAndUncles) {
-                    Person auntOrUncle = campaign.getPerson(auntOrUncleId);
-
+                for (Person auntOrUncle : auntsAndUncles) {
                     gridBagConstraints.gridy = firsty;
                     lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
                             auntOrUncle.getHyperlinkedName()));
@@ -1067,7 +1055,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(auntOrUncleId);
+                            gui.focusOnPerson(auntOrUncle);
                         }
                     });
                     pnlFamily.add(lblAuntsOrUncles2, gridBagConstraints);
@@ -1075,7 +1063,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> cousins = person.getGenealogy().getCousins(campaign);
+            final List<Person> cousins = person.getGenealogy().getCousins();
             if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
@@ -1093,9 +1081,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (UUID cousinId : cousins) {
-                    Person cousin = campaign.getPerson(cousinId);
-
+                for (Person cousin : cousins) {
                     gridBagConstraints.gridy = firsty;
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
@@ -1104,7 +1090,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblCousins2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(cousinId);
+                            gui.focusOnPerson(cousin);
                         }
                     });
                     pnlFamily.add(lblCousins2, gridBagConstraints);
@@ -1117,7 +1103,6 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillSkills() {
-
         //skill panel
         JPanel pnlSkills = new JPanel(new GridBagLayout());
         pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
@@ -1250,7 +1235,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(false)) {
+            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(true)) {
                 //Add the Edge Available field for support personnel only
                 lblEdgeAvail1.setName("lblEdgeAvail1");
                 lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));

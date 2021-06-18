@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -50,8 +50,7 @@ public enum ROMDesignation {
 
     //region Variable Declarations
     private final String designation;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     ROMDesignation(String designation) {
@@ -63,42 +62,49 @@ public enum ROMDesignation {
 
         // Primary
         if (person.getPrimaryDesignator() != NONE) {
-            sb.append(person.getPrimaryDesignator().toString());
-        } else if (person.isTechPrimary()) {
-            sb.append(ZETA.toString());
-        } else if (person.isAdminPrimary()) {
-            sb.append(CHI.toString());
+            sb.append(person.getPrimaryDesignator());
+        } else if (person.getPrimaryRole().isTech()) {
+            sb.append(ZETA);
+        } else if (person.getPrimaryRole().isAdministrator()) {
+            sb.append(CHI);
         } else {
             sb.append(determineDesignationFromRole(person.getPrimaryRole(), person, campaign));
         }
 
         // Secondary
         if (person.getSecondaryDesignator() != NONE) {
-            sb.append(" ").append(person.getSecondaryDesignator().toString());
-        } else if (person.isTechSecondary()) {
-            sb.append(" ").append(ZETA.toString());
-        } else if (person.isAdminSecondary()) {
-            sb.append(" ").append(CHI.toString());
-        } else if (person.getSecondaryRole() != Person.T_NONE) {
+            sb.append(" ").append(person.getSecondaryDesignator());
+        } else if (person.getSecondaryRole().isTechSecondary()) {
+            sb.append(" ").append(ZETA);
+        } else if (person.getSecondaryRole().isAdministrator()) {
+            sb.append(" ").append(CHI);
+        } else if (!person.getSecondaryRole().isNone()) {
             sb.append(" ").append(determineDesignationFromRole(person.getSecondaryRole(), person, campaign));
         }
 
         return sb.toString();
     }
 
-    private static String determineDesignationFromRole(int role, Person person, Campaign campaign) {
+    private static String determineDesignationFromRole(PersonnelRole role, Person person, Campaign campaign) {
         switch (role) {
-            case Person.T_MECHWARRIOR:
+            case MECHWARRIOR:
                 return EPSILON.toString();
-            case Person.T_AERO_PILOT:
+            case GROUND_VEHICLE_DRIVER:
+            case NAVAL_VEHICLE_DRIVER:
+            case VTOL_PILOT:
+            case VEHICLE_GUNNER:
+            case VEHICLE_CREW:
+            case CONVENTIONAL_AIRCRAFT_PILOT:
+                return LAMBDA.toString();
+            case AEROSPACE_PILOT:
                 return PI.toString();
-            case Person.T_BA:
-            case Person.T_INFANTRY:
+            case BATTLE_ARMOUR:
+            case SOLDIER:
                 return IOTA.toString();
-            case Person.T_SPACE_CREW:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_SPACE_PILOT:
-            case Person.T_NAVIGATOR:
+            case VESSEL_PILOT:
+            case VESSEL_GUNNER:
+            case VESSEL_CREW:
+            case VESSEL_NAVIGATOR:
                 Unit u = person.getUnit();
                 if (u != null) {
                     Entity en = u.getEntity();
@@ -109,16 +115,9 @@ public enum ROMDesignation {
                     }
                 }
                 break;
-            case Person.T_DOCTOR:
-            case Person.T_MEDIC:
+            case DOCTOR:
+            case MEDIC:
                 return KAPPA.toString();
-            case Person.T_GVEE_DRIVER:
-            case Person.T_NVEE_DRIVER:
-            case Person.T_VTOL_PILOT:
-            case Person.T_VEE_GUNNER:
-            case Person.T_CONV_PILOT:
-            case Person.T_VEHICLE_CREW:
-                return LAMBDA.toString();
             default:
                 break;
         }
@@ -151,8 +150,7 @@ public enum ROMDesignation {
         }
 
         // Could not parse based on either method, so return NONE
-        MekHQ.getLogger().error(ROMDesignation.class, "parseFromString",
-                "Unable to parse " + information + " into a ROMDesignation. Returning NONE");
+        MekHQ.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
 
         return ROMDesignation.NONE;
     }

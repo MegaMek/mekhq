@@ -12,18 +12,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -35,7 +35,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekLegActuator extends Part {
@@ -72,7 +71,7 @@ public class ProtomekLegActuator extends Part {
     @Override
     public boolean isSamePartType (Part part) {
         return part instanceof ProtomekLegActuator
-                && getUnitTonnage() == ((ProtomekLegActuator)part).getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -84,7 +83,7 @@ public class ProtomekLegActuator extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
+        if (null != unit) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
         }
     }
@@ -106,13 +105,13 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             int h = Math.max(2, hits);
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -127,48 +126,42 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
-        	int priorHits = hits;
+        if (null != unit) {
+            int priorHits = hits;
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
-            if(checkForDestruction
-					&& hits > priorHits
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
+            if (checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
     }
 
     @Override
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 120;
-		}
-        if(hits <= 1) {
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return 120;
+        } else if (hits <= 1) {
             return 100;
-        }
-        else if(hits == 2) {
+        } else if (hits == 2) {
             return 150;
+        } else {
+            return 200;
         }
-        else {
-        	return 200;
-        }
-	}
+    }
 
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return 0;
-		}
-		if(hits <= 1) {
+    @Override
+    public int getDifficulty() {
+        if (isSalvaging()) {
             return 0;
-        }
-        else if(hits == 2) {
+        } else if (hits <= 1) {
+            return 0;
+        } else if (hits == 2) {
             return 1;
+        } else {
+            return 3;
         }
-        else {
-        	return 3;
-        }
-	}
+    }
 
     @Override
     public boolean needsFixing() {
@@ -182,7 +175,7 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null != unit) {
+        if (null != unit) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG);
         }
         return getUnitTonnage() + " tons";
@@ -190,8 +183,8 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(hits > 0) {
+        if (null != unit) {
+            if (hits > 0) {
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG, hits);
             } else {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
@@ -201,16 +194,16 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-    		return null;
-    	}
-        if(isSalvaging()) {
+        if (null == unit) {
             return null;
         }
-        if(unit.isLocationBreached(Protomech.LOC_LEG)) {
+        if (isSalvaging()) {
+            return null;
+        }
+        if (unit.isLocationBreached(Protomech.LOC_LEG)) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG) + " is breached.";
         }
-        if(isMountedOnDestroyedLocation()) {
+        if (isMountedOnDestroyedLocation()) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG) + " is destroyed.";
         }
         return null;
@@ -243,19 +236,18 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
-   	public String getLocationName() {
-   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
-   	}
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Protomech.LOC_LEG;
-	}
+    @Override
+    public int getLocation() {
+        return Protomech.LOC_LEG;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {
@@ -263,7 +255,7 @@ public class ProtomekLegActuator extends Part {
     }
 
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ACTUATOR;
     }
 }

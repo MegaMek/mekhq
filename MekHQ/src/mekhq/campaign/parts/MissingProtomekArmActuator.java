@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -33,7 +33,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekArmActuator extends MissingPart {
@@ -55,14 +54,14 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return 120;
-	}
+    public int getBaseTime() {
+        return 120;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
     public void setLocation(int loc) {
         this.location = loc;
@@ -94,7 +93,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("location")) {
@@ -105,20 +104,20 @@ public class MissingProtomekArmActuator extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
               unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, 1);
         }
     }
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-    		return null;
-    	}
-        if(unit.isLocationBreached(location)) {
+        if (null == unit) {
+            return null;
+        }
+        if (unit.isLocationBreached(location)) {
             return unit.getEntity().getLocationName(location) + " is breached.";
         }
-        if(unit.isLocationDestroyed(location)) {
+        if (unit.isLocationDestroyed(location)) {
             return unit.getEntity().getLocationName(location) + " is destroyed.";
         }
         return null;
@@ -127,7 +126,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -142,7 +141,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtomekArmActuator
-                && getUnitTonnage() == ((ProtomekArmActuator)part).getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -150,18 +149,18 @@ public class MissingProtomekArmActuator extends MissingPart {
         return new ProtomekArmActuator(getUnitTonnage(), location, campaign);
     }
 
-	@Override
-	public String getLocationName() {
-		return unit != null ? unit.getEntity().getLocationName(location) : null;
-	}
+    @Override
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
+    }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return ProtomekLocation.TECH_ADVANCEMENT;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return ProtomekLocation.TECH_ADVANCEMENT;
+    }
 
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    @Override
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ACTUATOR;
     }
 }

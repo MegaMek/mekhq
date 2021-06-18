@@ -40,7 +40,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -50,6 +49,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroSensor;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BattleArmorSuit;
@@ -84,11 +84,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa
@@ -469,8 +469,7 @@ public class PartsStoreDialog extends JDialog {
                     return (part instanceof EquipmentPart)
                             && (((EquipmentPart) part).getType() instanceof WeaponType);
                 } else if (nGroup == SG_AMMO) {
-                    return ((part instanceof EquipmentPart)
-                            && (((EquipmentPart) part).getType() instanceof AmmoType));
+                    return part instanceof AmmoStorage;
                 } else if (nGroup == SG_MISC) {
                     return ((part instanceof EquipmentPart)
                             && (((EquipmentPart) part).getType() instanceof MiscType)
