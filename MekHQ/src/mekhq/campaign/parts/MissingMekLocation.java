@@ -27,6 +27,7 @@ import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
+import megamek.common.MiscType;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -112,9 +113,13 @@ public class MissingMekLocation extends MissingPart {
                 }
                 break;
         }
-        if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
+
+        if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType, clan) + ")";
+        } else if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
             this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
+
         if (tsm) {
             this.name += " (TSM)";
         }
@@ -196,25 +201,20 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (loc == Mech.LOC_CT && !refit) {
+        if ((loc == Mech.LOC_CT) && !refit) {
             //you can't replace a center torso
             return false;
+        } else if (part instanceof MekLocation) {
+            MekLocation mekLoc = (MekLocation) part;
+            return (mekLoc.getLoc() == loc)
+                    && (mekLoc.getUnitTonnage() == getUnitTonnage())
+                    && (mekLoc.isTsm() == tsm)
+                    && (mekLoc.clan == clan)
+                    && (mekLoc.getStructureType() == structureType)
+                    && (!isArm() || (mekLoc.forQuad() == forQuad));
+        } else {
+            return false;
         }
-        if (part instanceof MekLocation) {
-            MekLocation mekLoc = (MekLocation)part;
-            /*if(mekLoc.getLoc() == Mech.LOC_HEAD && null != unit) {
-                //cockpit must either be none, or match
-                if(mekLoc.hasCockpit() && mekLoc.getCockpitType() != ((Mech)unit.getEntity()).getCockpitType()) {
-                    return false;
-                }
-            }*/
-            return mekLoc.getLoc() == loc
-                && mekLoc.getUnitTonnage() == getUnitTonnage()
-                && mekLoc.isTsm() == tsm
-                && mekLoc.getStructureType() == structureType
-                && (!isArm() || mekLoc.forQuad() == forQuad);
-        }
-        return false;
     }
 
     @Override
@@ -244,8 +244,8 @@ public class MissingMekLocation extends MissingPart {
             //certain other specific crits need to be left out (uggh, must be a better way to do this!)
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 // Skip Hip and Shoulder actuators
-                if ((slot.getIndex() == Mech.ACTUATOR_HIP
-                        || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+                if ((slot.getIndex() == Mech.ACTUATOR_HIP)
+                        || (slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
                     continue;
                 }
                 if (unit.getEntity() instanceof LandAirMech) {
@@ -254,20 +254,32 @@ public class MissingMekLocation extends MissingPart {
                         if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                             continue;
                         } else {
-                            return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                            return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
                         }
                     // Skip Avionics if already gone
                     } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
                         if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                             continue;
                         } else {
-                            return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                            return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
                         }
                     }
                 }
+            } else if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
+                if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
+                    EquipmentType equipmentType = slot.getMount().getType();
+                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                        return "Null-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                        return "Void-Signature System must be salvaged or scrapped first.";
+                    } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
+                        return "Chameleon shield must be salvaged or scrapped first.";
+                    }
+                }
             }
+
             if (slot.isRepairable()) {
-                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
             }
         }
         return null;

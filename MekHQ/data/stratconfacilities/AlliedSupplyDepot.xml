@@ -1,0 +1,7 @@
+<StratconFacility>
+	<capturedDefinition>HostileSupplyDepot.xml</capturedDefinition>
+	<displayableName>Supply Depot</displayableName>
+        <facilityType>SupplyDepot</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

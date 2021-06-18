@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,77 +21,42 @@ package mekhq.gui.utilities;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
+import java.util.stream.Stream;
 
-import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
     public static boolean areAllForcesUndeployed(Vector<Force> forces) {
-        for (Force force : forces) {
-            if (force.isDeployed()) {
-                return false;
-            }
-        }
-        return true;
+        return forces.stream().noneMatch(Force::isDeployed);
     }
 
     public static boolean areAllCombatForces(Vector<Force> forces) {
-        for (Force force : forces) {
-            if (!force.isCombatForce()) {
-                return false;
-            }
-        }
-        return true;
+        return forces.stream().allMatch(Force::isCombatForce);
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
-        for (Unit unit : units) {
-            if (!unit.isAvailable()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(Unit::isAvailable);
     }
 
     public static boolean areAllForcesDeployed(Vector<Force> forces) {
-        for (Force force : forces) {
-            if (!force.isDeployed()) {
-                return false;
-            }
-        }
-        return true;
+        return forces.stream().allMatch(Force::isDeployed);
     }
 
     public static boolean areAnyForcesDeployed(Vector<Force> forces) {
-        for (Force force : forces) {
-            if (force.isDeployed()) {
-                return true;
-            }
-        }
-        return false;
+        return forces.stream().anyMatch(Force::isDeployed);
     }
 
     public static boolean areAllUnitsDeployed(Vector<Unit> units) {
-        for (Unit unit : units) {
-            if (!unit.isDeployed()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(Unit::isDeployed);
     }
 
     public static boolean areAnyUnitsDeployed(Vector<Unit> units) {
-        for (Unit unit : units) {
-            if (unit.isDeployed()) {
-                return true;
-            }
-        }
-        return false;
+        return units.stream().anyMatch(Unit::isDeployed);
     }
 
     /**
@@ -101,12 +66,7 @@ public class StaticChecks {
      * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
      */
     public static boolean areAllUnitsTransported(Vector<Unit> units) {
-        for (Unit unit : units) {
-            if (!unit.hasTransportShipAssignment()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(Unit::hasTransportShipAssignment);
     }
 
     /**
@@ -215,64 +175,29 @@ public class StaticChecks {
 
     //region C3
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3i()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i());
     }
 
     public static boolean areAllUnitsNotC3iNetworked(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (e.hasC3i() && e.calculateFreeC3Nodes() < 5) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
+                && (u.getEntity().calculateFreeC3Nodes() < 5));
     }
 
     public static boolean areAllUnitsC3iNetworked(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3i() && !e.hasC3()) {
-                return false;
-            }
-            if (e.hasC3i() && e.calculateFreeC3Nodes() == 5) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
+                && (u.getEntity().calculateFreeC3Nodes() != 5));
     }
 
     public static boolean areAllUnitsOnSameC3iNetwork(Vector<Unit> units) {
-        String network = null;
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (null == e.getC3NetId()) {
-                return false;
-            }
-            if (null == network) {
-                network = e.getC3NetId();
-            } else if (!e.getC3NetId().equals(network)) {
-                return false;
-            }
+        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+            return false;
         }
-        return true;
+        final String network = units.get(0).getEntity().getC3NetId();
+        if (network == null) {
+            return false;
+        }
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
+                && network.equalsIgnoreCase(u.getEntity().getC3NetId()));
     }
 
     /**
@@ -281,16 +206,7 @@ public class StaticChecks {
      * @return false if any unit in the selection does not have a functioning NC3
      */
     public static boolean doAllUnitsHaveNC3(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasNavalC3()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && (u.getEntity().hasNavalC3()));
     }
 
     /**
@@ -299,16 +215,8 @@ public class StaticChecks {
      * @return false if any unit in the selection does not have a functioning NC3 or is already on an NC3 network
      */
     public static boolean areAllUnitsNotNC3Networked(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (e.hasNavalC3() && e.calculateFreeC3Nodes() < 5) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
+                && (u.getEntity().calculateFreeC3Nodes() == 5));
     }
 
     /**
@@ -317,19 +225,8 @@ public class StaticChecks {
      * @return false if any unit in the selection does not have a functioning NC3 or is not on an NC3 network with any other units
      */
     public static boolean areAllUnitsNC3Networked(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasNavalC3()) {
-                return false;
-            }
-            if (e.hasNavalC3() && e.calculateFreeC3Nodes() == 5) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
+                && (u.getEntity().calculateFreeC3Nodes() != 5));
     }
 
     /**
@@ -339,99 +236,34 @@ public class StaticChecks {
      *     or if any of the units is on a different NC3 network from the others.
      */
     public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
-        String network = null;
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            //Naval C3 recycles a lot of C3i code. C3i units will cause a false positive
-            //without this check
-            if (!e.hasNavalC3()) {
-                return false;
-            }
-            if (null == e.getC3NetId()) {
-                return false;
-            }
-            if (null == network) {
-                network = e.getC3NetId();
-            } else if (!e.getC3NetId().equals(network)) {
-                return false;
-            }
+        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+            return false;
         }
-        return true;
+        final String network = units.get(0).getEntity().getC3NetId();
+        if (network == null) {
+            return false;
+        }
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
+                && network.equals(u.getEntity().getC3NetId()));
     }
 
     public static boolean areAllUnitsC3Slaves(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3S()) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3S());
     }
 
     public static boolean areAllUnitsIndependentC3Masters(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3M()) {
-                return false;
-            }
-            /* Units with multiple masters need to be set to company command before other masters
-             * can connect to them.
-             */
-//            if (e.hasC3MM()) {
-//                return false;
-//            }
-            if (e.C3MasterIs(unit.getEntity())) {
-                return false;
-            }
-        }
-        return true;
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3M()
+                && !u.getEntity().C3MasterIs(u.getEntity()));
     }
 
     public static boolean areAllUnitsCompanyLevelMasters(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3M()) {
-                return false;
-            }
-            if (e.hasC3MM()) {
-                return false;
-            }
-            if (!e.C3MasterIs(unit.getEntity())) {
-                return false;
-            }
-        }
-        return true;
-
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3M()
+                && !u.getEntity().hasC3MM() && u.getEntity().C3MasterIs(u.getEntity()));
     }
 
     public static boolean doAllUnitsHaveC3Master(Vector<Unit> units) {
-        for (Unit unit : units) {
-            Entity e = unit.getEntity();
-            if (null == e) {
-                return false;
-            }
-            if (!e.hasC3()) {
-                return false;
-            }
-            if (null == e.getC3Master() || e.C3MasterIs(unit.getEntity())) {
-                return false;
-            }
-        }
-        return true;
-
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3()
+                && (u.getEntity().getC3Master() != null) && !u.getEntity().C3MasterIs(u.getEntity()));
     }
     //endregion C3
 
@@ -441,301 +273,123 @@ public class StaticChecks {
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
-        if (units.isEmpty()) {
+        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
             return false;
         }
-        // For our purposes, a selection of tanks isn't the same unless they're all the same weight class
-        // Set this based on the first unit in the selection
-        double firstUnitWeight = units.get(0).getEntity() != null ? units.get(0).getEntity().getWeight() : 0;
-        boolean light = firstUnitWeight > 0 && firstUnitWeight <= 50;
-        boolean heavy = firstUnitWeight > 50 && firstUnitWeight <= 100;
-        boolean superheavy = firstUnitWeight > 100 && firstUnitWeight <= 200;
-        for (Unit unit : units) {
-            if (unit.getEntity() == null) {
-                //No bueno.
-                continue;
-            }
-            if (unitType == UnitType.TANK || unitType == UnitType.VTOL || unitType == UnitType.NAVAL) {
-                if (light && unit.getEntity().getWeight() > 50) {
-                    return false;
-                }
-                if (heavy && (unit.getEntity().getWeight() <= 50 || unit.getEntity().getWeight() > 100)) {
-                    return false;
-                }
-                if (superheavy && (unit.getEntity().getWeight() <= 100 || unit.getEntity().getWeight() > 200)) {
-                    return false;
-                }
-
-            }
-            if (unit.getEntity().getUnitType() != unitType) {
-                return false;
-            }
-        }
-        return true;
+        final boolean isTank = (unitType == UnitType.TANK) || (unitType == UnitType.VTOL)
+                || (unitType == UnitType.NAVAL);
+        final int weightClass = units.get(0).getEntity().getWeightClass();
+        return units.stream().allMatch(u -> (u.getEntity() == null)
+                || ((u.getEntity() != null) && (u.getEntity().getUnitType() == unitType)
+                && (!isTank || (u.getEntity().getWeightClass() == weightClass))));
     }
 
-    public static boolean areAllInfantry(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_INFANTRY != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllSoldiers(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isSoldier());
     }
 
-    public static boolean areAllBattleArmor(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_BA != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllBattleArmor(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isBattleArmour());
     }
 
-    public static boolean areAllVeeGunners(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_VEE_GUNNER != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllVehicleGunners(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVehicleGunner());
     }
 
-    public static boolean areAllVesselGunners(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_SPACE_GUNNER != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllVesselGunners(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselGunner());
     }
 
-    public static boolean areAllVesselCrew(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_SPACE_CREW != person.getPrimaryRole()
-                    && Person.T_VEHICLE_CREW != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllVesselCrew(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselCrew()
+                || p.getPrimaryRole().isVehicleCrew());
     }
 
-    public static boolean areAllVesselPilots(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_SPACE_PILOT != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllVesselPilots(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselPilot());
     }
 
-    public static boolean areAllVesselNavigators(Person[] people) {
-        for (Person person : people) {
-            if (Person.T_NAVIGATOR != person.getPrimaryRole()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllVesselNavigators(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselNavigator());
     }
 
-    public static boolean areAllActive(Person[] people) {
-        for (Person person : people) {
-            if (!person.getStatus().isActive()) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllActive(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getStatus().isActive());
     }
 
-    public static boolean areAllClanEligible(Person[] people) {
-        for (Person p : people) {
-            if (!p.isClanner()) {
-                return false;
-            }
-        }
-        return areAllEligible(people);
+    public static boolean areAllClanEligible(Person... people) {
+        return Stream.of(people).allMatch(Person::isClanner) && areAllEligible(people);
     }
 
-    public static boolean areAllEligible(Person[] people) {
-        return areAllEligible(people, false);
+    public static boolean areAllEligible(Person... people) {
+        return areAllEligible(false, people);
     }
 
-    public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
-        int profession = people[0].getProfession();
-        for (Person person : people) {
-            if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                    || (person.getProfession() != profession)) {
-                return false;
-            }
-        }
-        int system = people[0].getRankSystem();
-        for (Person person : people) {
-            if (person.getRankSystem() != system) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean areAllEligible(final boolean ignorePrisonerStatus, final Person... people) {
+        final Profession profession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
+        return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
+                && (profession == Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
+                && people[0].getRankSystem().equals(p.getRankSystem()));
     }
+
     /**
      * Checks if there is at least one award in the selected group of people
      * @param people the selected group of people
      * @return true if at least one has one award
      */
-    public static boolean doAnyHaveAnAward(Person[] people) {
-        for (Person person : people) {
-            if (person.getAwardController().hasAwards()) {
-                return true;
-            }
-        }
-
-        return false;
+    public static boolean doAnyHaveAnAward(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getAwardController().hasAwards());
     }
 
-    public static boolean areAnyFree(Person[] people) {
-        for (Person person : people) {
-            if (person.getPrisonerStatus().isFree()) {
-                return true;
-            }
-        }
-
-        return false;
+    public static boolean areAnyFree(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isFree());
     }
 
-    public static boolean areAllPrisoners(Person[] people) {
-        for (Person person : people) {
-            if (!person.getPrisonerStatus().isPrisoner()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all dependents or all not dependents, otherwise false
-     */
-    public static boolean areEitherAllDependentsOrNot(Person[] people) {
-        if (people.length > 0) {
-            boolean isDependent = people[0].isDependent();
-            for (Person person : people) {
-                if (isDependent != person.isDependent()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public static boolean areAllPrisoners(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isPrisoner());
     }
 
     /**
      * @param people an array of people
      * @return true if all of the people are female, otherwise false
      */
-    public static boolean areAllFemale(Person[] people) {
-        for (Person person : people) {
-            if (person.getGender().isMale()) {
-               return false;
-            }
-        }
-        return true;
+    public static boolean areAllFemale(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getGender().isFemale());
     }
 
     /**
      * @param people an array of people
      * @return true if they are either all trying to conceive or all not, otherwise false
      */
-    public static boolean areEitherAllTryingToConceiveOrNot(Person[] people) {
-        if (people.length > 0) {
-            boolean tryingToConceive = people[0].isTryingToConceive();
-            for (Person person : people) {
-                if (tryingToConceive != person.isTryingToConceive()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public static boolean areEitherAllTryingToConceiveOrNot(Person... people) {
+        return Stream.of(people).allMatch(p -> p.isTryingToConceive() == people[0].isTryingToConceive());
     }
 
     /**
      * @param people an array of people
      * @return true if they are either all trying to marry or all not, otherwise false
      */
-    public static boolean areEitherAllTryingToMarryOrNot(Person[] people) {
-        if (people.length > 0) {
-            boolean tryingToMarry = people[0].isTryingToMarry();
-            for (Person person : people) {
-                if (tryingToMarry != person.isTryingToMarry()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public static boolean areEitherAllTryingToMarryOrNot(Person... people) {
+        return Stream.of(people).allMatch(p -> p.isTryingToMarry() == people[0].isTryingToMarry());
     }
 
     /**
      * @param people an array of people
      * @return true if they are either all founders or all not, otherwise false
      */
-    public static boolean areEitherAllFoundersOrNot(Person[] people) {
-        if (people.length > 0) {
-            boolean founder = people[0].isFounder();
-            for (Person person : people) {
-                if (founder != person.isFounder()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public static boolean areEitherAllFoundersOrNot(Person... people) {
+        return Stream.of(people).allMatch(p -> p.isFounder() == people[0].isFounder());
     }
 
-    public static boolean areAnyWillingToDefect(Person[] people) {
-        for (Person person : people) {
-            if (person.getPrisonerStatus().isWillingToDefect()) {
-                return true;
-            }
-        }
-
-        return false;
+    public static boolean areAnyWillingToDefect(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isWillingToDefect());
     }
 
-    public static boolean areAllWoB(Person[] people) {
-        for (Person p : people) {
-            if (p.getRankSystem() != Ranks.RS_WOB)
-                return false;
-        }
-        return true;
+    public static boolean areAllSameSite(Unit... units) {
+        return Stream.of(units).allMatch(u -> u.getSite() == units[0].getSite());
     }
 
-    public static boolean areAllWoBOrComstar(Person[] people) {
-        for (Person p : people) {
-            if (p.getRankSystem() != Ranks.RS_WOB
-                    && p.getRankSystem() != Ranks.RS_COM)
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean areAllSameSite(Unit[] units) {
-        int site = units[0].getSite();
-        for (Unit unit : units) {
-            if (unit.getSite() != site) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean allHaveSameUnit(Person[] people) {
-        if ((people == null) || (people.length == 0)) {
-            return false;
-        }
-
-        Unit unit = people[0].getUnit();
-        for (Person person : people) {
-            if (!Objects.equals(unit, person.getUnit())) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean allHaveSameUnit(Person... people) {
+        return Stream.of(people).allMatch(p -> Objects.equals(people[0].getUnit(), p.getUnit()));
     }
 }

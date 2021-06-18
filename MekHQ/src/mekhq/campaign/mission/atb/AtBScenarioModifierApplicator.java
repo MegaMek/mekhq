@@ -44,14 +44,13 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 
+/**
+ * Class that handles the application of scenario modifier actions to AtBDynamicScenarios
+ * @author NickAragua
+ */
 public class AtBScenarioModifierApplicator {
-
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
-     * @param eventTiming
      */
     public static void addForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply, EventTiming eventTiming) {
         preAddForce(campaign, scenario, forceToApply);
@@ -75,7 +74,7 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn());
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn(), scenario);
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
 
         // at this point, we have to re-translate the scenario objectives
@@ -85,9 +84,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Adds the given force to the scenario template prior to primary force generation.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
      */
     private static void preAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
         if (scenario.getTemplate() != null) {
@@ -97,10 +93,13 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that removes the number of units from the specified side.
-     * @param scenario
-     * @param campaign
      */
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient, int unitRemovalCount) {
+        // can't do this if we don't have bots
+        if (scenario.getNumBots() == 0) {
+            return;
+        }
+        
         int actualUnitsToRemove = unitRemovalCount;
 
         if (unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
@@ -118,9 +117,13 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+            
+            // only remove units from a bot force if it's on the affected team
+            // AND if it has any units to remove
+            if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
+                    && !bf.getEntityList().isEmpty()) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
-                bf.getEntityList().remove(unitIndexToRemove);
+                bf.removeEntity(unitIndexToRemove);
             }
         }
     }
@@ -128,8 +131,6 @@ public class AtBScenarioModifierApplicator {
     /**
      * Worker function that inflicts battle damage on all units belonging to the side specified in this modifier.
      * May theoretically result in a crippled or destroyed unit (?)
-     * @param scenario
-     * @param campaign
      */
     public static void inflictBattleDamage(AtBDynamicScenario scenario, Campaign campaign,
                                            ForceAlignment eventRecipient, int battleDamageIntensity) {
@@ -154,8 +155,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that expends ammo from all units belonging to the side specified in this modifier.
-     * @param scenario
-     * @param campaign
      */
     public static void expendAmmo(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int ammoExpenditureIntensity) {
@@ -176,8 +175,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Helper function that re-generates skill levels for all existing units in the scenario
-     * @param scenario
-     * @param campaign
      */
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
@@ -214,14 +211,10 @@ public class AtBScenarioModifierApplicator {
      * Worker function that adjusts the scenario's unit quality by the indicated amount,
      * capped between 0 and 5. Only effective for units generated after the adjustment has taken place.
      * Only capable of being applied to opfor.
-     * @param scenario Scenario to modify.
-     * @param c Working campaign
-     * @param eventRecipient Whose
-     * @param qualityAdjustment
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
         if (eventRecipient != ForceAlignment.Opposing) {
-            MekHQ.getLogger().warning(AtBScenarioModifierApplicator.class, "adjustQuality", "Cannot only adjust opfor unit quality");
+            MekHQ.getLogger().warning( "Can only adjust opfor unit quality");
             return;
         }
 
@@ -239,9 +232,6 @@ public class AtBScenarioModifierApplicator {
      * that will be on the battlefield at the start of the scenario
      *
      * Also marks any such forces as able to deploy "anywhere".
-     * @param scenario
-     * @param campaign
-     * @param eventRecipient
      */
     public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
         if (eventRecipient == ForceAlignment.Player) {
@@ -343,5 +333,13 @@ public class AtBScenarioModifierApplicator {
             ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
             scenario.getScenarioObjectives().add(actualObjective);
         }
+    }
+    
+    /**
+     * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
+     */
+    public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
+        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(), 
+                (Boolean) goodEvent));
     }
 }

@@ -1,6 +1,14 @@
 <AtBScenarioModifier>
+	<additionalBriefingText>Extract assets from designated locations at this facility.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Extract</modifierName>
+<linkedModifiers>
+		<entry>
+            		<key>FacilityHostileCapture.xml</key>
+            		<value>If captured, our forces can extract what they need at will.</value>
+		</entry>
+	</linkedModifiers>
 	<objectives>
         <objective>
             <associatedForceNames>
@@ -24,6 +32,7 @@
             <additionalDetails>
 		<additionalDetail>Extraction can be carried out by a unit with at least one free hand actuator, infantry or battle armor.</additionalDetail>
 		<additionalDetail>Extraction cannot be performed from destroyed buildings.</additionalDetail>
+		<additionalDetail>The extracting units may flee the battlefield; alternately, the objective is automatically completed when routing the opposing force.</additionalDetail>
             </additionalDetails>
             <description>Extract assets from 75% of the buildings designated by turrets.</description>
             <destinationEdge>NONE</destinationEdge>
@@ -31,7 +40,7 @@
             <percentage>75</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </objective>
         </objectives>
 </AtBScenarioModifier>

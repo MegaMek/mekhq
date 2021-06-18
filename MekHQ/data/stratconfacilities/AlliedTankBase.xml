@@ -1,0 +1,9 @@
+<StratconFacility>
+	<capturedDefinition>HostileTankBase.xml</capturedDefinition>
+	<displayableName>Tank Base</displayableName>
+        <facilityType>TankBase</facilityType>
+        <localModifiers>AlliedTankGarrison.xml</localModifiers>
+        <owner>Allied</owner>
+        <sharedModifiers>AlliedTankReinforcements.xml</sharedModifiers>
+        <visible>true</visible>
+</StratconFacility>

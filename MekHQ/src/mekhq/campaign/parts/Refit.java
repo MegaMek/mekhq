@@ -599,7 +599,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_F);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech)newUnit.getEntity()).hasTSM() != ((Mech)oldUnit.getEntity()).hasTSM()) {
+                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
                     updateRefitClass(CLASS_E);
                 } else {
                     updateRefitClass(CLASS_F);
@@ -971,9 +971,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //infantry take zero time to re-organize
         //also check for squad size and number changes
-        if (oldUnit.getEntity() instanceof Infantry && !(oldUnit.getEntity() instanceof BattleArmor)) {
-            if (((Infantry)oldUnit.getEntity()).getSquadN() != ((Infantry)newEntity).getSquadN()
-                    ||((Infantry)oldUnit.getEntity()).getSquadSize() != ((Infantry)newEntity).getSquadSize()) {
+        if (oldUnit.isConventionalInfantry()) {
+            if (((Infantry) oldUnit.getEntity()).getSquadN() != ((Infantry) newEntity).getSquadN()
+                    ||((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
                 updateRefitClass(CLASS_A);
             }
             time = 0;
@@ -1014,6 +1014,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
             cost = oldUnit.getBuyCost().multipliedBy(0.1);
+        }
+        if (oldUnit.hasPrototypeTSM() || newUnit.hasPrototypeTSM()) {
+            time *= 2;
         }
     }
 
@@ -1489,7 +1492,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 ((AmmoBin) p).loadBin();
             }
         }
-        
+
         if (null != newArmorSupplies) {
             getCampaign().getWarehouse().removePart(newArmorSupplies);
         }
@@ -1602,7 +1605,7 @@ public class Refit extends Part implements IAcquisitionWork {
             MekHQ.getLogger().info(String.format("Saved %s %s to %s",
                     newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s", 
+            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s",
                     newEntity.getChassis(), newEntity.getModel()), e);
 
             if (fileNameCampaign != null) {
@@ -2268,8 +2271,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public void suggestNewName() {
-        if (newEntity instanceof Infantry && !(newEntity instanceof BattleArmor)) {
-            Infantry infantry = (Infantry)newEntity;
+        if (newEntity.isConventionalInfantry()) {
+            Infantry infantry = (Infantry) newEntity;
             String chassis;
             switch (infantry.getMovementMode()) {
             case INF_UMU:

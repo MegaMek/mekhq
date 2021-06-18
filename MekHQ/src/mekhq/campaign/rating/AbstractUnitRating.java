@@ -32,6 +32,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.Dropship;
+import megamek.common.ProtomechBay;
 import megamek.common.SpaceStation;
 import megamek.common.Entity;
 import megamek.common.HeavyVehicleBay;
@@ -146,24 +147,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setSuccessCount(0);
         setFailCount(0);
         setBreachCount(0);
-        for (Mission m : getCampaign().getMissions()) {
-
-            //Skip ongoing missions.
-            if (m.isActive()) {
-                continue;
-            }
-
-            if (m.getStatus() == Mission.S_SUCCESS) {
-                setSuccessCount(getSuccessCount() + 1);
-            } else if (m.getStatus() == Mission.S_FAILED) {
-                setFailCount(getFailCount() + 1);
-            } else if (m.getStatus() == Mission.S_BREACH) {
-                setBreachCount(getBreachCount() + 1);
+        for (Mission m : getCampaign().getCompletedMissions()) {
+            switch (m.getStatus()) {
+                case SUCCESS:
+                    setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case FAILED:
+                    setFailCount(getFailCount() + 1);
+                    break;
+                case BREACH:
+                    setBreachCount(getBreachCount() + 1);
+                    break;
+                default:
+                    break;
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) -
-               (getBreachCount() * 25);
+        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
@@ -387,16 +387,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfantry(u) &&
-            (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
-    }
-
-    boolean isConventionalInfantry(Unit u) {
-        return (u.getEntity() instanceof Infantry) &&
-               !(u.getEntity() instanceof BattleArmor);
     }
 
     /**
@@ -445,7 +439,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * and this method will immediately exit.
      */
     protected void initValues() {
-        MekHQ.getLogger().methodBegin(getClass(), "initValues()");
         setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -469,10 +462,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setFighterBayCount(0);
         setSmallCraftBayCount(0);
         setProtoBayCount(0);
-        setBaBayCount(0);
-        setLightVeeBayCount(0);
-        setHeavyVeeBayCount(0);
         setSuperHeavyVeeBayCount(0);
+        setHeavyVeeBayCount(0);
+        setLightVeeBayCount(0);
+        setBaBayCount(0);
         setInfantryBayCount(0);
         setDockingCollarCount(0);
 
@@ -488,7 +481,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
         clearSkillRatingCounts();
-        MekHQ.getLogger().methodEnd(getClass(), "initValues()");
     }
 
     /**
@@ -500,21 +492,24 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
             for (Bay bay : e.getTransportBays()) {
                 if (bay instanceof MechBay) {
-                    setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
-                } else if (bay instanceof BattleArmorBay) {
-                    setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
-                } else if (bay instanceof InfantryBay) {
-                    setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
-                } else if (bay instanceof LightVehicleBay) {
-                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof HeavyVehicleBay) {
-                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof SuperHeavyVehicleBay) {
-                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                    setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof ASFBay) {
                     setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof SmallCraftBay) {
                     setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof ProtomechBay) {
+                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof SuperHeavyVehicleBay) {
+                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof HeavyVehicleBay) {
+                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof LightVehicleBay) {
+                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
+                }  else if (bay instanceof BattleArmorBay) {
+                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof InfantryBay) {
+                    setInfantryBayCount(getInfantryBayCount() + (int)
+                            Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }

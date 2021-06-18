@@ -1,4 +1,8 @@
 <AtBScenarioModifier>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<additionalBriefingText>Minor detention facility reported here. Rescue targets from designated buildings.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
@@ -14,7 +18,7 @@
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
 		</deploymentZones>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>0</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
@@ -28,26 +32,30 @@
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 	</forceDefinition>
-	<scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Designated Facilities</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
-                    <effectScaling>Linear</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects/>
-            <additionalDetails/>
-            <description>Extract from or do not destroy units from the following force(s) for additional support points:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <fixedAmount>1</fixedAmount>
-            <objectiveCriterion>Capture</objectiveCriterion>
-            <percentage>1</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
+	<objectives>
+		<objective>
+			<associatedForceNames>
+				<associatedForceName>Designated Facilities</associatedForceName>
+			</associatedForceNames>
+			<successEffects>
+				<successEffect>
+					<effectType>SupportPointUpdate</effectType>
+					<effectScaling>Linear</effectScaling>
+					<howMuch>1</howMuch>
+				</successEffect>
+			</successEffects>
+			<description>Extract from, or, leave intact while maintaining battlefield control, units from the following force(s) for additional support points:</description>
+			<additionalDetails>
+				<additionalDetail>Extraction can be carried out by a unit with at least one free hand actuator, infantry or battle armor.</additionalDetail>
+				<additionalDetail>Extraction cannot be performed from destroyed buildings.</additionalDetail>
+				<additionalDetail>The extracting units may flee the battlefield; alternately, the objective is automatically completed when routing the opposing force and one support point will be awarded per intact turret remaining.</additionalDetail>
+			</additionalDetails>
+			<destinationEdge>NONE</destinationEdge>
+			<fixedAmount>1</fixedAmount>
+			<objectiveCriterion>Capture</objectiveCriterion>
+			<percentage>1</percentage>
+			<timeLimitAtMost>true</timeLimitAtMost>
+			<timeLimitType>None</timeLimitType>
+		</objective>
+        </objectives>
 </AtBScenarioModifier>

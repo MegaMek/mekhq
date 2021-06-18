@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MekHQ Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MekHQ Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,12 +20,16 @@ package mekhq;
 
 import mekhq.gui.enums.PersonnelFilterStyle;
 
+import javax.swing.*;
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions {
+    //region Variable Declarations
     private static final Preferences userPreferences = Preferences.userRoot();
+    //endregion Variable Declarations
 
     //region Display
     public String getDisplayDateFormat() {
@@ -64,6 +68,7 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
 
+    //region Expanded MekHQ Display Options
     //region Command Center Display
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
@@ -100,6 +105,255 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
     //endregion Personnel Tab Display Options
+    //endregion Expanded MekHQ Display Options
+
+    //region Colours
+    public Color getDeployedForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setDeployedForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.DEPLOYED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getDeployedBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.DEPLOYED_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
+    }
+
+    public void setDeployedBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.DEPLOYED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getBelowContractMinimumForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, Color.RED.getRGB()));
+    }
+
+    public void setBelowContractMinimumForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, value.getRGB());
+    }
+
+    public Color getBelowContractMinimumBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND, UIManager.getColor("Table.background").getRGB()));
+    }
+
+    public void setBelowContractMinimumBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND, value.getRGB());
+    }
+
+    public Color getInTransitForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.IN_TRANSIT_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setInTransitForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.IN_TRANSIT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getInTransitBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.IN_TRANSIT_BACKGROUND, Color.MAGENTA.getRGB()));
+    }
+
+    public void setInTransitBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.IN_TRANSIT_BACKGROUND, value.getRGB());
+    }
+
+    public Color getRefittingForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.REFITTING_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setRefittingForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.REFITTING_FOREGROUND, value.getRGB());
+    }
+
+    public Color getRefittingBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.REFITTING_BACKGROUND, Color.CYAN.getRGB()));
+    }
+
+    public void setRefittingBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.REFITTING_BACKGROUND, value.getRGB());
+    }
+
+    public Color getMothballingForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.MOTHBALLING_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setMothballingForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.MOTHBALLING_FOREGROUND, value.getRGB());
+    }
+
+    public Color getMothballingBackground() {
+        // new Color(153, 153, 255)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.MOTHBALLING_BACKGROUND, 0xFF9999FF));
+    }
+
+    public void setMothballingBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.MOTHBALLING_BACKGROUND, value.getRGB());
+    }
+
+    public Color getMothballedForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.MOTHBALLED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setMothballedForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.MOTHBALLED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getMothballedBackground() {
+        // new Color(204, 204, 255)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.MOTHBALLED_BACKGROUND, 0xFFCCCCFF));
+    }
+
+    public void setMothballedBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.MOTHBALLED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getNotRepairableForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NOT_REPAIRABLE_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setNotRepairableForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NOT_REPAIRABLE_FOREGROUND, value.getRGB());
+    }
+
+    public Color getNotRepairableBackground() {
+        // new Color(190, 150, 55)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NOT_REPAIRABLE_BACKGROUND, 0xFFBE9637));
+    }
+
+    public void setNotRepairableBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NOT_REPAIRABLE_BACKGROUND, value.getRGB());
+    }
+
+    public Color getNonFunctionalForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NON_FUNCTIONAL_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setNonFunctionalForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NON_FUNCTIONAL_FOREGROUND, value.getRGB());
+    }
+
+    public Color getNonFunctionalBackground() {
+        // new Color(205, 92, 92)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NON_FUNCTIONAL_BACKGROUND, 0xFFCD5C5C));
+    }
+
+    public void setNonFunctionalBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NON_FUNCTIONAL_BACKGROUND, value.getRGB());
+    }
+
+    public Color getNeedsPartsFixedForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NEEDS_PARTS_FIXED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setNeedsPartsFixedForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NEEDS_PARTS_FIXED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getNeedsPartsFixedBackground() {
+        // new Color(238, 238, 0)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.NEEDS_PARTS_FIXED_BACKGROUND, 0xFFEEEE00));
+    }
+
+    public void setNeedsPartsFixedBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.NEEDS_PARTS_FIXED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getUnmaintainedForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.UNMAINTAINED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setUnmaintainedForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.UNMAINTAINED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getUnmaintainedBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.UNMAINTAINED_BACKGROUND, Color.ORANGE.getRGB()));
+    }
+
+    public void setUnmaintainedBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.UNMAINTAINED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getUncrewedForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.UNCREWED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setUncrewedForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.UNCREWED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getUncrewedBackground() {
+        // new Color(218, 130, 255)
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.UNCREWED_BACKGROUND, 0xFFDA82FF));
+    }
+
+    public void setUncrewedBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.UNCREWED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getLoanOverdueForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.LOAN_OVERDUE_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setLoanOverdueForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.LOAN_OVERDUE_FOREGROUND, value.getRGB());
+    }
+
+    public Color getLoanOverdueBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.LOAN_OVERDUE_BACKGROUND, Color.RED.getRGB()));
+    }
+
+    public void setLoanOverdueBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.LOAN_OVERDUE_BACKGROUND, value.getRGB());
+    }
+
+    public Color getInjuredForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.INJURED_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setInjuredForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.INJURED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getInjuredBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.INJURED_BACKGROUND, Color.RED.getRGB()));
+    }
+
+    public void setInjuredBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.INJURED_BACKGROUND, value.getRGB());
+    }
+
+    public Color getHealedInjuriesForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.HEALED_INJURIES_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setHealedInjuriesForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.HEALED_INJURIES_FOREGROUND, value.getRGB());
+    }
+
+    public Color getHealedInjuriesBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.HEALED_INJURIES_BACKGROUND, 0xEE9A00));
+    }
+
+    public void setHealedInjuriesBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.HEALED_INJURIES_BACKGROUND, value.getRGB());
+    }
+
+    public Color getPaidRetirementForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PAID_RETIREMENT_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setPaidRetirementForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PAID_RETIREMENT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getPaidRetirementBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PAID_RETIREMENT_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
+    }
+
+    public void setPaidRetirementBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
+    }
+    //endregion Colours
     //endregion Display
 
     //region Autosave
@@ -162,6 +416,22 @@ public final class MekHQOptions {
     //endregion Autosave
 
     //region New Day
+    public boolean getNewDayAstechPoolFill() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_ASTECH_POOL_FILL, true);
+    }
+
+    public void setNewDayAstechPoolFill(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_ASTECH_POOL_FILL, value);
+    }
+
+    public boolean getNewDayMedicPoolFill() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MEDIC_POOL_FILL, true);
+    }
+
+    public void setNewDayMedicPoolFill(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MEDIC_POOL_FILL, value);
+    }
+
     public boolean getNewDayMRMS() {
         return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
     }
@@ -208,14 +478,50 @@ public final class MekHQOptions {
     //endregion Campaign XML Save Options
 
     //region File Paths
-    public String getAwardsDirectoryPath() {
-        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.AWARDS_DIRECTORY_PATH, "data/universe/awards/");
+    /**
+     * @return the path of the folder to load when loading or saving rank systems
+     */
+    public String getRankSystemsPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, "userdata/data/universe/");
     }
 
-    public void setAwardsDirectoryPath(String value) {
-        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
+    /**
+     * This sets the path where one saves or loads their rank systems from, as this is not required
+     * for any data but improves UX.
+     *
+     * @param value the path where the person saved their last individual rank system.
+     */
+    public void setRankSystemsPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, value);
+    }
+
+    /**
+     * @return the path of the folder to load when loading or saving an individual rank system
+     */
+    public String getIndividualRankSystemPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, "userdata/data/universe/");
+    }
+
+    /**
+     * This sets the path where one saves or loads their individual rank system, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last individual rank system.
+     */
+    public void setIndividualRankSystemPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
     //endregion File Paths
+
+    //region Nag Tab
+    public boolean getNagDialogIgnore(final String key) {
+        return userPreferences.node(MekHqConstants.NAG_NODE).getBoolean(key, false);
+    }
+
+    public void setNagDialogIgnore(final String key, final boolean value) {
+        userPreferences.node(MekHqConstants.NAG_NODE).putBoolean(key, value);
+    }
+    //endregion Nag Tab
 
     //region Miscellaneous Options
     public int getStartGameDelay() {

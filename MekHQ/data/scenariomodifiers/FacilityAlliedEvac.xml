@@ -15,7 +15,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>6</destinationZone>
+                <destinationZone>7</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -29,6 +29,7 @@
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
 	</forceDefinition>
+	<modifierName>Evacuate</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>
@@ -41,10 +42,20 @@
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
+		<successEffect>
+                    <effectType>FacilityRemoved</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>

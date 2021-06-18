@@ -25,8 +25,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,12 +41,12 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
+import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
@@ -76,6 +78,8 @@ public class AtBGameThread extends GameThread {
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
     private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+    
+    public static final int CLIENT_RETRY_COUNT = 1000;
 
 
     @Override
@@ -107,7 +111,7 @@ public class AtBGameThread extends GameThread {
 
             // if game is running, shouldn't do the following, so detect the
             // phase
-            for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            for (int i = 0; (i < CLIENT_RETRY_COUNT) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
                 MekHQ.getLogger().error("Thread in unknown stage");
             }
@@ -115,8 +119,7 @@ public class AtBGameThread extends GameThread {
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
                 MekHQ.getLogger().info("Thread in lounge");
 
-                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
 
                 if (started) {
@@ -164,12 +167,19 @@ public class AtBGameThread extends GameThread {
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
 
+                //minefields
+                client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
+                client.getLocalPlayer().setNbrMFCommand(scenario.getNumPlayerMinefields(Minefield.TYPE_COMMAND_DETONATED));
+                client.getLocalPlayer().setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
+                client.getLocalPlayer().setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
+                client.getLocalPlayer().setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
+
                 /* If the player is making a combat drop (either required by scenario
                  * or player chose to deploy a DropShip), do not use deployment
                  * delay for slower scout units.
                  */
                 boolean useDropship = false;
-                if (scenario.getLanceRole() == AtBLanceRole.SCOUTING) {
+                if (scenario.getLanceRole().isScouting()) {
                     for (Entity en : scenario.getAlliesPlayer()) {
                         if (en.getUnitType() == UnitType.DROPSHIP) {
                             useDropship = true;
@@ -186,6 +196,7 @@ public class AtBGameThread extends GameThread {
                     }
                 }
 
+                var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
@@ -205,7 +216,7 @@ public class AtBGameThread extends GameThread {
                     }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
-                    if(!(scenario instanceof AtBDynamicScenario)) {
+                    if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
                         if (entity.getJumpMP() > 0) {
                             if (entity instanceof megamek.common.Infantry) {
@@ -217,19 +228,21 @@ public class AtBGameThread extends GameThread {
                         // Set scenario type-specific delay
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                        if ((scenario.getLanceRole() == AtBLanceRole.SCOUTING)
-                                && (scenario.getLance(campaign) != null)
+                        if (scenario.getLanceRole().isScouting() && (scenario.getLance(campaign) != null)
                                 && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
                                 && !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    // Add Mek to game
-                    client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Force force = campaign.getForceFor(unit);
+                    if (force != null) {
+                        entity.setForceString(force.getFullMMName());
+                    }
+                    entities.add(entity);
                 }
+                client.sendAddEntity(entities);
+
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
                 for (Unit unit : units) {
@@ -252,6 +265,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 /* Add player-controlled ally units */
+                entities.clear();
                 for (Entity entity : scenario.getAlliesPlayer()) {
                     if (null == entity) {
                         continue;
@@ -269,18 +283,16 @@ public class AtBGameThread extends GameThread {
                             }
                         }
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                        if ((scenario.getLanceRole() == AtBLanceRole.SCOUTING)
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
-                                && !useDropship) {
+                        if (!useDropship && scenario.getLanceRole().isScouting()
+                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
 
                     entity.setDeployRound(deploymentRound);
-                    client.sendAddEntity(entity);
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    entities.add(entity);
                 }
-
+                client.sendAddEntity(entities);
                 client.sendPlayerInfo();
 
                 /* Add bots */
@@ -303,12 +315,15 @@ public class AtBGameThread extends GameThread {
                     }
                     swingGui.getBots().put(name, botClient);
 
+                    // chill out while bot is created and connects to megamek
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                     configureBot(botClient, bf);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                     if (scenario != null) {
-                        AtBDynamicScenarioFactory.loadTransports(scenario, botClient);
+                        loadTransports(scenario, botClient, bf);
                     }
                 }
 
@@ -360,8 +375,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-        }
-        finally {
+        } finally {
             client.die();
             client = null;
             swingGui = null;
@@ -392,23 +406,75 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-                botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+                botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
 
+                String forceName = botClient.getLocalPlayer().getName() + "|1";
+                var entities = new ArrayList<Entity>();
                 for (Entity entity : botForce.getEntityList()) {
                     if (null == entity) {
                         continue;
                     }
                     entity.setOwner(botClient.getLocalPlayer());
-                    botClient.sendAddEntity(entity);
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    entity.setForceString(forceName);
+                    entities.add(entity);
                 }
+                botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+        }
+    }
+    
+    /**
+     * Handles loading transported units onto their transports once a megamek scenario has actually started;
+     */
+    private void loadTransports(AtBScenario scenario, Client client, BotForce botForce) {
+        Map<String, Integer> idMap = new HashMap<>();
+
+        // here we have to make sure that the server has loaded all the entities
+        // and sent the back to the client (which is the only way we know the former)
+        // before we attempt to load transports.
+        int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        int retryCount = 0;
+        while ((entityCount != botForce.getEntityList().size()) &&
+                (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
+            try {
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+            } catch (Exception ignored) {
+                
+            }
+            
+            retryCount++;
+            entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        }
+        
+        List<Entity> clientEntities = client.getEntitiesVector();
+        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
+        for (Entity entity : clientEntities) {
+            if (entity.getOwnerId() == client.getLocalPlayerNumber()) {
+                idMap.put(entity.getExternalIdAsString(), entity.getId());
+            }
+        }
+
+        for (Entity potentialTransport : clientEntities) {
+            if ((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) &&
+                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                for (String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+
+                    // if the game contains the potential cargo unit
+                    // and the potential transport can actually load it, send the load command to the server
+                    if ((cargo != null) &&
+                            idMap.containsKey(cargo.getExternalIdAsString()) &&
+                            potentialTransport.canLoad(cargo, false)) {
+                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()),
+                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
+                    }
+                }
+            }
         }
     }
 }

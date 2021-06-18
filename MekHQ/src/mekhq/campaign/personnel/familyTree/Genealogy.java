@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,89 +21,76 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.io.idReferenceClasses.PersonIdReference;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
  * It is also used to determine familial relationships between people
  */
-public class Genealogy implements Serializable, MekHqXmlSerializable {
+public class Genealogy implements Serializable {
     //region Variables
     private static final long serialVersionUID = -6350146649504329173L;
-    private UUID origin;
-    private UUID spouse;
+    private Person origin;
+    private Person spouse;
     private List<FormerSpouse> formerSpouses;
-    private Map<FamilialRelationshipType, List<UUID>> family;
+    private Map<FamilialRelationshipType, List<Person>> family;
     //endregion Variables
 
     //region Constructors
     /**
-     * This creates an empty Genealogy object
-     * This case should only be used for reading from XML
-     */
-    public Genealogy() {
-        this(null);
-    }
-
-    /**
      * This is the standard constructor, and follow the below warning
-     * @param origin the person's UUID. This must ONLY be null when reading from XML
+     * @param origin the origin person
      */
-    public Genealogy(@Nullable UUID origin) {
-        this.origin = origin; // null only when reading from XML
-        this.spouse = null;
-        this.formerSpouses = new ArrayList<>();
-        this.family = new HashMap<>();
+    public Genealogy(final Person origin) {
+        setOrigin(origin);
+        setSpouse(null);
+        formerSpouses = new ArrayList<>();
+        setFamily(new HashMap<>());
     }
     //endregion Constructors
 
     //region Getters/Setters
     /**
-     * @return the person's UUID
+     * @return the origin person
      */
-    public UUID getOrigin() {
+    public Person getOrigin() {
         return origin;
     }
 
     /**
-     * @param origin the person's UUID
+     * @param origin the origin person
      */
-    public void setOrigin(UUID origin) {
-        this.origin = origin;
+    public void setOrigin(Person origin) {
+        this.origin = Objects.requireNonNull(origin);
     }
 
     /**
-     * @param campaign the campaign the person is in
-     * @return the person's spouse, or null if they don't have a spouse
+     * @return the current person's spouse
      */
-    @Nullable
-    public Person getSpouse(Campaign campaign) {
-        return campaign.getPerson(getSpouseId());
-    }
-
-    /**
-     * @return the current person's spouse's id
-     */
-    @Nullable
-    public UUID getSpouseId() {
+    public @Nullable Person getSpouse() {
         return spouse;
     }
 
     /**
-     * @param spouse the new spouse id for the current person
+     * @param spouse the new spouse for the current person
      */
-    public void setSpouse(@Nullable UUID spouse) {
+    public void setSpouse(@Nullable Person spouse) {
         this.spouse = spouse;
     }
 
@@ -118,60 +105,64 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param formerSpouse a former spouse to add the the current person's list
      */
     public void addFormerSpouse(FormerSpouse formerSpouse) {
-        getFormerSpouses().add(formerSpouse);
+        getFormerSpouses().add(Objects.requireNonNull(formerSpouse));
     }
 
     /**
-     * This is implemented for future use, as it will be required for the family tree implementation
-     * @param formerSpouseId the former spouse's id to remove from the current person's list
+     * @param formerSpouse the former spouse to remove from the current person's list
      */
-    public void removeFormerSpouse(UUID formerSpouseId) {
-        getFormerSpouses().removeIf(formerSpouse -> formerSpouse.getFormerSpouseId().equals(formerSpouseId));
+    public void removeFormerSpouse(Person formerSpouse) {
+        getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
     }
 
     /**
      * @return the family map for this person
      */
-    public Map<FamilialRelationshipType, List<UUID>> getFamily() {
+    public Map<FamilialRelationshipType, List<Person>> getFamily() {
         return family;
+    }
+
+    /**
+     * @param family the new family map for this person
+     */
+    public void setFamily(Map<FamilialRelationshipType, List<Person>> family) {
+        this.family = family;
     }
 
     /**
      * This is used to add a new family member
      * @param relationshipType the relationship type between the two people
-     * @param id the id of the person to add
+     * @param person the person to add
      */
-    public void addFamilyMember(FamilialRelationshipType relationshipType, UUID id) {
-        if (id != null) {
+    public void addFamilyMember(FamilialRelationshipType relationshipType, @Nullable Person person) {
+        if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
-            getFamily().get(relationshipType).add(id);
+            getFamily().get(relationshipType).add(person);
         }
     }
 
     /**
-     * This is implemented for future use, as it will be required for the family tree implementation
      * @param relationshipType the FamilialRelationshipType of the person to remove
-     * @param id the id of the person to remove
+     * @param person the person to remove
      */
-    public void removeFamilyMember(FamilialRelationshipType relationshipType, UUID id) {
+    public void removeFamilyMember(@Nullable FamilialRelationshipType relationshipType, Person person) {
         if (relationshipType == null) {
             for (FamilialRelationshipType type : FamilialRelationshipType.values()) {
-                List<UUID> ids = getFamily().get(type);
-                if ((ids != null) && ids.contains(id)) {
-                    ids.remove(id);
-                    if (ids.isEmpty()) {
+                List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
+                if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
+                    familyMembers.remove(person);
+                    if (familyMembers.isEmpty()) {
                         getFamily().remove(type);
                     }
                     break;
                 }
             }
         } else if (getFamily().get(relationshipType) == null) {
-            MekHQ.getLogger().error(getClass(), "removeFamilyMember",
-                    "Could not remove unknown family member of relationship "
-                            + relationshipType.name() + " and UUID " + id.toString() + ".");
+            MekHQ.getLogger().error("Could not remove unknown family member of relationship "
+                    + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId() + ".");
         } else {
-            List<UUID> familyTypeMembers = getFamily().get(relationshipType);
-            familyTypeMembers.remove(id);
+            List<Person> familyTypeMembers = getFamily().get(relationshipType);
+            familyTypeMembers.remove(person);
             if (familyTypeMembers.isEmpty()) {
                 getFamily().remove(relationshipType);
             }
@@ -192,7 +183,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a spouse, false otherwise
      */
     public boolean hasSpouse() {
-        return (getSpouseId() != null);
+        return (getSpouse() != null);
     }
 
     /**
@@ -206,14 +197,14 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return true if the person has at least one kid, false otherwise
      */
     public boolean hasChildren() {
-        return (getFamily().get(FamilialRelationshipType.CHILD) != null);
+        return getFamily().get(FamilialRelationshipType.CHILD) != null;
     }
 
     /**
      * @return true if the Person has any parents, otherwise false
      */
     public boolean hasParents() {
-        return (getFamily().get(FamilialRelationshipType.PARENT) != null);
+        return getFamily().get(FamilialRelationshipType.PARENT) != null;
     }
 
     /**
@@ -223,7 +214,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return true if they have mutual ancestors, otherwise false
      */
     public boolean checkMutualAncestors(Person person, Campaign campaign) {
-        if (getOrigin().equals(person.getId())) {
+        if (getOrigin().equals(person)) {
             // Same person will always return true, to prevent any weirdness
             return true;
         }
@@ -234,11 +225,11 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
             return false;
         }
 
-        Set<UUID> originAncestors = getAncestors(depth, campaign);
-        Set<UUID> checkAncestors = person.getGenealogy().getAncestors(depth, campaign);
+        Set<Person> originAncestors = getAncestors(depth);
+        Set<Person> checkAncestors = person.getGenealogy().getAncestors(depth);
 
-        for (UUID id : checkAncestors) {
-            if (originAncestors.contains(id)) {
+        for (Person ancestor : checkAncestors) {
+            if (originAncestors.contains(ancestor)) {
                 return true;
             }
         }
@@ -248,13 +239,12 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     /**
      * @param depth the depth of ancestors to get
-     * @param campaign the campaign the person is part of
      * @return a set of all unique ancestors of a person back depth generations
      * @note this is a recursive search to ensure it goes to a specified depth of relation
      */
-    public Set<UUID> getAncestors(int depth, Campaign campaign) {
+    private Set<Person> getAncestors(int depth) {
         // Create the return value
-        Set<UUID> ancestors = new HashSet<>();
+        Set<Person> ancestors = new HashSet<>();
 
         // Add this person to the return set
         ancestors.add(getOrigin());
@@ -264,9 +254,9 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
             // If so, decrease remaining search depth
             depth--;
             // Then parse through the parents
-            for (UUID parent : getParents()) {
+            for (Person parent : getParents()) {
                 // And add all of their returned ancestors to the list
-                ancestors.addAll(campaign.getPerson(parent).getGenealogy().getAncestors(depth, campaign));
+                ancestors.addAll(parent.getGenealogy().getAncestors(depth));
             }
         }
 
@@ -277,44 +267,38 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Basic Family Getters
     /**
-     * @param campaign the campaign they are part of
-     * @return a list of the current person's grandparent(s) id(s)
+     * @return a list of the current person's grandparent(s)
      */
-    public List<UUID> getGrandparents(Campaign campaign) {
-        List<UUID> grandparents = new ArrayList<>();
-        List<UUID> tempGrandparents;
+    public List<Person> getGrandparents() {
+        List<Person> grandparents = new ArrayList<>();
+        List<Person> tempGrandparents;
 
-        for (UUID parentId : getParents()) {
-            Person parent = campaign.getPerson(parentId);
-            if (parent != null) {
-                tempGrandparents = parent.getGenealogy().getParents();
-                // prevents duplicates, if anyone uses a small number of depth for their ancestry
-                grandparents.removeAll(tempGrandparents);
-                grandparents.addAll(tempGrandparents);
-            }
+        for (Person parent : getParents()) {
+            tempGrandparents = parent.getGenealogy().getParents();
+            // prevents duplicates, if anyone uses a small number of depth for their ancestry
+            grandparents.removeAll(tempGrandparents);
+            grandparents.addAll(tempGrandparents);
         }
 
         return grandparents;
     }
 
     /**
-     * @return the id(s) of the person's parent(s)
+     * @return the person's parent(s)
      */
-    public List<UUID> getParents() {
+    public List<Person> getParents() {
         return getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>());
     }
 
     /**
-     * @param campaign the campaign they are part of
      * @param gender the gender of the parent(s) to get
-     * @return a list of UUIDs of the person's parent(s) of the specified gender
+     * @return a list of the person's parent(s) of the specified gender
      */
-    public List<UUID> getParentsByGender(Campaign campaign, Gender gender) {
-        List<UUID> parents = new ArrayList<>();
-        for (UUID parentId : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
-            Person parent = campaign.getPerson(parentId);
-            if ((parent != null) && (parent.getGender() == gender)) {
-                parents.add(parentId);
+    public List<Person> getParentsByGender(Gender gender) {
+        List<Person> parents = new ArrayList<>();
+        for (Person parent : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
+            if (parent.getGender() == gender) {
+                parents.add(parent);
             }
         }
 
@@ -322,29 +306,27 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * @param campaign the campaign they are part of
-     * @return the person's father(s) id(s)
+     * @return the person's father(s)
      */
-    public List<UUID> getFathers(Campaign campaign) {
-        return getParentsByGender(campaign, Gender.MALE);
+    public List<Person> getFathers() {
+        return getParentsByGender(Gender.MALE);
     }
 
     /**
-     * @param campaign the campaign they are part of
-     * @return the person's mother(s) id(s)
+     * @return the person's mother(s)
      */
-    public List<UUID> getMothers(Campaign campaign) {
-        return getParentsByGender(campaign, Gender.FEMALE);
+    public List<Person> getMothers() {
+        return getParentsByGender(Gender.FEMALE);
     }
 
     /**
      * Siblings are defined as sharing either parent. Inlaws are not counted.
      * @return the siblings of the current person
      */
-    public List<UUID> getSiblings(Campaign campaign) {
-        List<UUID> siblings = new ArrayList<>();
-        for (UUID parentId : getParents()) {
-            for (UUID sibling : campaign.getPerson(parentId).getGenealogy().getChildren()) {
+    public List<Person> getSiblings() {
+        List<Person> siblings = new ArrayList<>();
+        for (Person parent : getParents()) {
+            for (Person sibling : parent.getGenealogy().getChildren()) {
                 if (!getOrigin().equals(sibling)) {
                     siblings.remove(sibling);
                     siblings.add(sibling);
@@ -356,17 +338,16 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * @param campaign the campaign they are part of
      * @return a list of the person's siblings with spouses (if any)
      */
-    public List<UUID> getSiblingsAndSpouses(Campaign campaign) {
-        List<UUID> siblingsAndSpouses = new ArrayList<>();
-        for (UUID parent : getParents()) {
-            for (UUID sibling : campaign.getPerson(parent).getGenealogy().getChildren()) {
+    public List<Person> getSiblingsAndSpouses() {
+        List<Person> siblingsAndSpouses = new ArrayList<>();
+        for (Person parent : getParents()) {
+            for (Person sibling : parent.getGenealogy().getChildren()) {
                 if (!getOrigin().equals(sibling)) {
                     siblingsAndSpouses.remove(sibling);
                     siblingsAndSpouses.add(sibling);
-                    UUID spouse = campaign.getPerson(sibling).getGenealogy().getSpouseId();
+                    Person spouse = sibling.getGenealogy().getSpouse();
                     if (spouse != null) {
                         siblingsAndSpouses.remove(spouse);
                         siblingsAndSpouses.add(spouse);
@@ -379,22 +360,21 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * @return a list of UUIDs of the current person's children
+     * @return a list of the current person's children
      */
-    public List<UUID> getChildren() {
+    public List<Person> getChildren() {
         return getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>());
     }
 
     /**
-     * @param campaign the campaign they are part of
-     * @return a list of UUIDs of the person's grandchildren
+     * @return a list of the person's grandchildren
      */
-    public List<UUID> getGrandchildren(Campaign campaign) {
-        List<UUID> grandchildren = new ArrayList<>();
-        List<UUID> tempGrandchildren;
-        for (UUID childId : getChildren()) {
+    public List<Person> getGrandchildren() {
+        List<Person> grandchildren = new ArrayList<>();
+        List<Person> tempGrandchildren;
+        for (Person child : getChildren()) {
             // We want to get the children of any children, without duplicates
-            tempGrandchildren = campaign.getPerson(childId).getGenealogy().getChildren();
+            tempGrandchildren = child.getGenealogy().getChildren();
             grandchildren.removeAll(tempGrandchildren);
             grandchildren.addAll(tempGrandchildren);
         }
@@ -403,39 +383,31 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * @param campaign the campaign they are part of
      * @return a list of the person's Aunts and Uncles
      */
-    public List<UUID> getsAuntsAndUncles(Campaign campaign) {
-        List<UUID> auntsAndUncles = new ArrayList<>();
-        List<UUID> tempAuntsAndUncles;
-        for (UUID parentId : getParents()) {
-            Person parent = campaign.getPerson(parentId);
-            if (parent != null) {
-                tempAuntsAndUncles = parent.getGenealogy().getSiblingsAndSpouses(campaign);
-                auntsAndUncles.removeAll(tempAuntsAndUncles);
-                auntsAndUncles.addAll(tempAuntsAndUncles);
-            }
+    public List<Person> getsAuntsAndUncles() {
+        List<Person> auntsAndUncles = new ArrayList<>();
+        List<Person> tempAuntsAndUncles;
+        for (Person parent : getParents()) {
+            tempAuntsAndUncles = parent.getGenealogy().getSiblingsAndSpouses();
+            auntsAndUncles.removeAll(tempAuntsAndUncles);
+            auntsAndUncles.addAll(tempAuntsAndUncles);
         }
 
         return auntsAndUncles;
     }
 
     /**
-     * @param campaign the campaign they are part of
      * @return a list of the person's cousins
      */
-    public List<UUID> getCousins(Campaign campaign) {
-        List<UUID> cousins = new ArrayList<>();
-        List<UUID> tempCousins;
+    public List<Person> getCousins() {
+        List<Person> cousins = new ArrayList<>();
+        List<Person> tempCousins;
 
-        for (UUID auntOrUncleId : getsAuntsAndUncles(campaign)) {
-            Person auntOrUncle = campaign.getPerson(auntOrUncleId);
-            if (auntOrUncle != null) {
-                tempCousins = auntOrUncle.getGenealogy().getChildren();
-                cousins.removeAll(tempCousins);
-                cousins.addAll(tempCousins);
-            }
+        for (Person auntOrUncle : getsAuntsAndUncles()) {
+            tempCousins = auntOrUncle.getGenealogy().getChildren();
+            cousins.removeAll(tempCousins);
+            cousins.addAll(tempCousins);
         }
 
         return cousins;
@@ -444,117 +416,110 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Read/Write to XML
     /**
-     * @param pw1 the PrintWriter to write to
+     * @param pw the PrintWriter to write to
      * @param indent the indent for the base line (i.e. the line containing genealogy)
      */
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "genealogy");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "origin", getOrigin().toString());
-        if (getSpouseId() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", getSpouseId().toString());
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "genealogy");
+        if (getSpouse() != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "spouse", getSpouse().getId());
         }
+
         if (!getFormerSpouses().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouses");
             for (FormerSpouse ex : getFormerSpouses()) {
-                ex.writeToXml(pw1, indent + 2);
+                ex.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouses");
         }
+
         if (!familyIsEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "family");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "family");
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 2, "relationship");
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", relationshipType.name());
-                for (UUID id : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "personId", id.toString());
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "relationship");
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", relationshipType.name());
+                for (Person person : getFamily().get(relationshipType)) {
+                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "personId", person.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 2, "relationship");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "relationship");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "family");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "family");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "genealogy");
     }
 
     /**
      * @param nl the NodeList containing the saved Genealogy
-     * @return the Genealogy generated from the provided NodeList
      */
-    public static Genealogy generateInstanceFromXML(NodeList nl) {
-        Genealogy retVal = new Genealogy();
-
-        try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn1 = nl.item(x);
-
-                if (wn1.getNodeName().equalsIgnoreCase("origin")) {
-                    retVal.setOrigin(UUID.fromString(wn1.getTextContent()));
-                } else if (wn1.getNodeName().equalsIgnoreCase("spouse")) {
-                    retVal.setSpouse(UUID.fromString(wn1.getTextContent()));
-                } else if (wn1.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    loadFormerSpouses(retVal, wn1.getChildNodes());
-                } else if (wn1.getNodeName().equalsIgnoreCase("family")) {
-                    loadFamily(retVal, wn1.getChildNodes());
+    public void fillFromXML(final NodeList nl) {
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn = nl.item(x);
+            try {
+                if (wn.getNodeName().equalsIgnoreCase("spouse")) {
+                    setSpouse(new PersonIdReference(wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("formerSpouses")) {
+                    if (wn.hasChildNodes()) {
+                        loadFormerSpouses(wn.getChildNodes());
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("family")) {
+                    if (wn.hasChildNodes()) {
+                        loadFamily(wn.getChildNodes());
+                    }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId());
             }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(Genealogy.class, "generateInstanceFromXML", "");
         }
-
-        return retVal;
     }
 
     /**
      * This loads the FormerSpouses from their saved nodes
-     * @param retVal the Genealogy to load the FormerSpouse nodes into
-     * @param nl2 the NodeList containing the saved former spouses
+     * @param nl the NodeList containing the saved former spouses
      * @note This must be public for migration reasons
      */
-    public static void loadFormerSpouses(Genealogy retVal, NodeList nl2) {
-        for (int y = 0; y < nl2.getLength(); y++) {
-            Node wn2 = nl2.item(y);
+    public void loadFormerSpouses(final NodeList nl) {
+        for (int y = 0; y < nl.getLength(); y++) {
+            final Node wn = nl.item(y);
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                MekHQ.getLogger().error(Genealogy.class, "generateInstanceFromXML",
-                        "Unknown node type not loaded in formerSpouses nodes: " + wn2.getNodeName());
+            if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
+                MekHQ.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
+                        + wn.getNodeName());
                 continue;
             }
-            retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn2));
+            getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
         }
     }
 
     /**
      * This loads the familial relationships from their saved nodes
-     * @param retVal the Genealogy to load the family nodes into
-     * @param nl2 the NodeList containing the saved Genealogy familial relationships
+     * @param nl the NodeList containing the saved Genealogy familial relationships
      */
-    private static void loadFamily(Genealogy retVal, NodeList nl2) {
-        for (int y = 0; y < nl2.getLength(); y++) {
-            Node wn2 = nl2.item(y);
+    private void loadFamily(final NodeList nl) {
+        for (int y = 0; y < nl.getLength(); y++) {
+            final Node wn = nl.item(y);
 
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (wn2.getNodeName().equalsIgnoreCase("relationship")) {
-                NodeList nl3 = wn2.getChildNodes();
+            if (wn.getNodeName().equalsIgnoreCase("relationship")) {
+                final NodeList nl2 = wn.getChildNodes();
                 // The default value should never be used, but it is useful to have a default
                 FamilialRelationshipType type = FamilialRelationshipType.PARENT;
-                List<UUID> ids = new ArrayList<>();
-                for (int i = 0; i < nl3.getLength(); i++) {
-                    Node wn3 = nl3.item(i);
-                    if (wn3.getNodeName().equalsIgnoreCase("type")) {
-                        type = FamilialRelationshipType.valueOf(wn3.getTextContent());
-                    } else if (wn3.getNodeName().equalsIgnoreCase("personId")) {
-                        ids.add(UUID.fromString(wn3.getTextContent().trim()));
+                final List<Person> people = new ArrayList<>();
+                for (int i = 0; i < nl2.getLength(); i++) {
+                    Node wn2 = nl2.item(i);
+                    if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                        type = FamilialRelationshipType.valueOf(wn2.getTextContent().trim());
+                    } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                        people.add(new PersonIdReference(wn2.getTextContent().trim()));
                     }
                 }
-
-                retVal.getFamily().put(type, ids);
+                getFamily().put(type, people);
             }
         }
     }
@@ -563,11 +528,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return whether the Genealogy object is empty or not
      */
     public boolean isEmpty() {
-        if ((getSpouseId() != null) || !getFormerSpouses().isEmpty()) {
-            return false;
-        }
-
-        return familyIsEmpty();
+        return (getSpouse() == null) && getFormerSpouses().isEmpty() && familyIsEmpty();
     }
 
     /**
@@ -575,7 +536,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * (i.e. spouse and formerSpouses are not included, just family)
      */
     public boolean familyIsEmpty() {
-        for (List<UUID> list : getFamily().values()) {
+        for (List<Person> list : getFamily().values()) {
             if ((list != null) && !list.isEmpty()) {
                 return false;
             }
@@ -587,22 +548,18 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Clear Genealogy
     /**
-     * This is used to remove Genealogy for a person
-     * @param campaign the campaign they are part of
+     * This is used to remove Genealogy links to a person
      */
-    public void clearGenealogy(Campaign campaign) {
-        // Clear Spouse Id
-        if (getSpouseId() != null) {
-            Person person = getSpouse(campaign);
-            if (person != null) {
-                person.getGenealogy().setSpouse(null);
-            }
+    public void clearGenealogy() {
+        // Clear Spouse
+        if (getSpouse() != null) {
+            getSpouse().getGenealogy().setSpouse(null);
         }
 
         // Clear Former Spouses
         if (!getFormerSpouses().isEmpty()) {
             for (FormerSpouse formerSpouse : getFormerSpouses()) {
-                Person person = campaign.getPerson(formerSpouse.getFormerSpouseId());
+                Person person = formerSpouse.getFormerSpouse();
                 if (person != null) {
                     person.getGenealogy().removeFormerSpouse(getOrigin());
                 }
@@ -611,12 +568,9 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
         // Clear Family
         if (!familyIsEmpty()) {
-            for (List<UUID> list : getFamily().values()) {
-                for (UUID id : list) {
-                    Person person  = campaign.getPerson(id);
-                    if (person != null) {
-                        person.getGenealogy().removeFamilyMember(null, this.origin);
-                    }
+            for (List<Person> list : getFamily().values()) {
+                for (Person person : list) {
+                    person.getGenealogy().removeFamilyMember(null, getOrigin());
                 }
             }
         }

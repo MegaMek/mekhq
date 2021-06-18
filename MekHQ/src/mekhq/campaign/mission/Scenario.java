@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,28 +52,22 @@ import mekhq.campaign.unit.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Scenario implements Serializable {
+    //region Variable Declarations
     private static final long serialVersionUID = -2193761569359938090L;
-
-    public static final int S_CURRENT  = 0;
-    public static final int S_VICTORY  = 1;
-    public static final int S_MVICTORY = 2;
-    public static final int S_DEFEAT   = 3;
-    public static final int S_MDEFEAT  = 4;
-    public static final int S_DRAW     = 5;
-    public static final int S_NUM      = 6;
 
     public static final int S_DEFAULT_ID = -1;
 
     private String name;
     private String desc;
     private String report;
-    private int status;
+    private ScenarioStatus status;
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
     private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
+    private boolean cloaked;
 
     //allow multiple loot objects for meeting different mission objectives
     private List<Loot> loots;
@@ -80,7 +75,8 @@ public class Scenario implements Serializable {
     private List<ScenarioObjective> scenarioObjectives;
 
     //Stores combinations of units and the transports they are assigned to
-    private Map<UUID, ArrayList<UUID>> playerTransportLinkages;
+    private Map<UUID, List<UUID>> playerTransportLinkages;
+    //endregion Variable Declarations
 
     public Scenario() {
         this(null);
@@ -90,7 +86,7 @@ public class Scenario implements Serializable {
         this.name = n;
         this.desc = "";
         this.report = "";
-        this.status = S_CURRENT;
+        setStatus(ScenarioStatus.CURRENT);
         this.date = null;
         this.subForceIds = new ArrayList<>();
         this.unitIds = new ArrayList<>();
@@ -99,28 +95,10 @@ public class Scenario implements Serializable {
         this.playerTransportLinkages = new HashMap<>();
     }
 
-    public static String getStatusName(int s) {
-        switch(s) {
-            case S_CURRENT:
-                return "Pending";
-            case S_VICTORY:
-                return "Victory";
-            case S_MVICTORY:
-                return "Marginal Victory";
-            case S_DEFEAT:
-                return "Defeat";
-            case S_MDEFEAT:
-                return "Marginal Defeat";
-            case S_DRAW:
-                return "Draw";
-            default:
-                return "?";
-        }
-    }
-
     public String getName() {
         return name;
     }
+
     public void setName(String n) {
         this.name = n;
     }
@@ -141,16 +119,12 @@ public class Scenario implements Serializable {
         this.report = r;
     }
 
-    public int getStatus() {
+    public ScenarioStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int s) {
-        this.status = s;
-    }
-
-    public String getStatusName() {
-        return getStatusName(getStatus());
+    public void setStatus(final ScenarioStatus status) {
+        this.status = status;
     }
 
     public void setDate(LocalDate d) {
@@ -174,7 +148,18 @@ public class Scenario implements Serializable {
         this.scenarioObjectives = scenarioObjectives;
     }
 
-    public Map<UUID,ArrayList<UUID>> getPlayerTransportLinkages() {
+    /**
+     * This indicates that the scenario should not be displayed in the briefing tab.
+     */
+    public boolean isCloaked() {
+        return cloaked;
+    }
+
+    public void setCloaked(boolean cloaked) {
+        this.cloaked = cloaked;
+    }
+
+    public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
         return playerTransportLinkages;
     }
 
@@ -263,10 +248,6 @@ public class Scenario implements Serializable {
         subForceIds.removeAll(toRemove);
     }
 
-    public boolean isCurrent() {
-        return status == S_CURRENT;
-    }
-
     public void clearAllForcesAndPersonnel(Campaign campaign) {
         for (int fid : subForceIds) {
             Force f = campaign.getForce(fid);
@@ -284,6 +265,15 @@ public class Scenario implements Serializable {
         }
         subForceIds = new ArrayList<>();
         unitIds = new ArrayList<>();
+    }
+
+    /**
+     * Converts this scenario to a stub
+     */
+    public void convertToStub(final Campaign campaign, final ScenarioStatus status) {
+        setStatus(status);
+        clearAllForcesAndPersonnel(campaign);
+        generateStub(campaign);
     }
 
     public void generateStub(Campaign c) {
@@ -326,10 +316,7 @@ public class Scenario implements Serializable {
                 +"<report>"
                 +MekHqXmlUtil.escape(report)
                 +"</report>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<status>"
-                +status
-                +"</status>");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "status", getStatus().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<id>"
                 +id
@@ -344,7 +331,7 @@ public class Scenario implements Serializable {
                 }
             }
         }
-        if ((loots.size() > 0) && (status == S_CURRENT)) {
+        if ((loots.size() > 0) && getStatus().isCurrent()) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<loots>");
             for (Loot l : loots) {
                 l.writeToXml(pw1, indent+2);
@@ -354,13 +341,15 @@ public class Scenario implements Serializable {
         if (null != date) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         }
+        
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "cloaked", isCloaked());
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
     }
 
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         //do nothing
     }
 
@@ -389,14 +378,14 @@ public class Scenario implements Serializable {
                 }
 
                 if (battleType == -1) {
-                    MekHQ.getLogger().error(Scenario.class, "Unable to load an old AtBScenario because we could not determine the battle type");
+                    MekHQ.getLogger().error("Unable to load an old AtBScenario because we could not determine the battle type");
                     return null;
                 }
 
                 List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
 
                 if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
-                    MekHQ.getLogger().error(Scenario.class, "Unable to load an old AtBScenario of battle type " + battleType);
+                    MekHQ.getLogger().error("Unable to load an old AtBScenario of battle type " + battleType);
                     return null;
                 }
 
@@ -405,7 +394,7 @@ public class Scenario implements Serializable {
                 retVal = (Scenario) Class.forName(className).newInstance();
             }
 
-            retVal.loadFieldsFromXmlNode(wn);
+            retVal.loadFieldsFromXmlNode(wn, version);
             retVal.scenarioObjectives = new ArrayList<>();
 
             // Okay, now load Part-specific fields!
@@ -417,7 +406,7 @@ public class Scenario implements Serializable {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = Integer.parseInt(wn2.getTextContent());
+                    retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
@@ -428,6 +417,8 @@ public class Scenario implements Serializable {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {
+                    retVal.cloaked = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -439,7 +430,7 @@ public class Scenario implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error(Scenario.class, "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
@@ -450,10 +441,7 @@ public class Scenario implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Scenario.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

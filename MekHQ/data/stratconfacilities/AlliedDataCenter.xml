@@ -1,0 +1,7 @@
+<StratconFacility>
+	<capturedDefinition>HostileDataCenter.xml</capturedDefinition>
+	<displayableName>Data Center</displayableName>
+        <facilityType>DataCenter</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

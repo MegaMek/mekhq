@@ -20,20 +20,24 @@
  */
 package mekhq.campaign.universe;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import megamek.common.util.WeightedMap;
-
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OptionsChangedEvent;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * @author Neoancient
@@ -101,9 +105,9 @@ public class RandomFactionGenerator {
         borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
         MekHQ.registerHandler(borderTracker);
         MekHQ.registerHandler(this);
-        for (Faction f : Factions.getInstance().getFactions()) {
-            if (factionHints.isDeepPeriphery(f)) {
-                borderTracker.setBorderSize(f, BORDER_RANGE_DEEP_PERIPHERY);
+        for (final Faction faction : Factions.getInstance().getFactions()) {
+            if (faction.isDeepPeriphery()) {
+                borderTracker.setBorderSize(faction, BORDER_RANGE_DEEP_PERIPHERY);
             }
         }
     }
@@ -173,8 +177,8 @@ public class RandomFactionGenerator {
      *
      * @return Map used to select employer
      */
-    protected WeightedMap<Faction> buildEmployerMap() {
-        WeightedMap<Faction> retVal = new WeightedMap<>();
+    protected WeightedIntMap<Faction> buildEmployerMap() {
+        WeightedIntMap<Faction> retVal = new WeightedIntMap<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
             if (f.isClan() || FactionHints.isEmptyFaction(f)) {
@@ -208,7 +212,7 @@ public class RandomFactionGenerator {
      * @return A faction to use as the employer for a contract.
      */
     public String getEmployer() {
-        WeightedMap<Faction> employers = buildEmployerMap();
+        WeightedIntMap<Faction> employers = buildEmployerMap();
         Faction f = employers.randomItem();
         if (null != f) {
             return f.getShortName();
@@ -237,6 +241,13 @@ public class RandomFactionGenerator {
     }
 
     /**
+     * Pick an enemy faction, possibly rebels, given an employer.
+     */
+    public String getEnemy(Faction employer, boolean useRebels) {
+        return getEnemy(employer, useRebels, false);
+    }
+
+    /**
      * Selects an enemy faction for the given employer, weighted by length of shared border and
      * diplomatic relations. Factions at war or designated as rivals are twice as likely (cumulative)
      * to be chosen as opponents. Allied factions are ignored except for Clans, which halves
@@ -244,9 +255,11 @@ public class RandomFactionGenerator {
      *
      * @param employer  The faction offering the contract
      * @param useRebels Whether to include rebels as a possible opponent
+     * @param useMercs  Whether to include MERC as a possible opponent. Note, don't do this when
+     * first generating contract, as contract generation relies on the opfor having planets
      * @return          The faction to use as the opfor.
      */
-    public String getEnemy(Faction employer, boolean useRebels) {
+    public String getEnemy(Faction employer, boolean useRebels, boolean useMercs) {
         String employerName = employer != null ? employer.getShortName() : "no employer supplied or faction does not exist";
 
         /* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
@@ -260,17 +273,34 @@ public class RandomFactionGenerator {
         }
         if (null != employer) {
             employerName = employer.getShortName();
-            WeightedMap<Faction> enemyMap = buildEnemyMap(employer);
+            WeightedIntMap<Faction> enemyMap = buildEnemyMap(employer);
+
+            if (useMercs) {
+                appendMercsToEnemyMap(enemyMap);
+            }
+
             enemy = enemyMap.randomItem();
         }
         if (null != enemy) {
             return enemy.getShortName();
         }
-        
-        MekHQ.getLogger().error("Could not find enemy for " + employerName); //$NON-NLS-1$
-        
+
+        MekHQ.getLogger().error("Could not find enemy for " + employerName);
+
         // Fallback; there are always pirates.
         return "PIR";
+    }
+
+    /**
+     * Appends MERC faction to the given enemy map, with approximately a 10% probability
+     */
+    protected void appendMercsToEnemyMap(WeightedIntMap<Faction> enemyMap) {
+        int mercWeight = 0;
+        for (int key : enemyMap.keySet()) {
+            mercWeight += key;
+        }
+
+        enemyMap.add(Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction("MERC"));
     }
 
     /**
@@ -279,8 +309,8 @@ public class RandomFactionGenerator {
      * @param employer The employer faction
      * @return         The weight map of potential enemies
      */
-    protected WeightedMap<Faction> buildEnemyMap(Faction employer) {
-        WeightedMap<Faction> enemyMap = new WeightedMap<>();
+    protected WeightedIntMap<Faction> buildEnemyMap(Faction employer) {
+        WeightedIntMap<Faction> enemyMap = new WeightedIntMap<>();
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
             if (FactionHints.isEmptyFaction(enemy)
                     || enemy.getShortName().equals("CLAN")) {

@@ -40,21 +40,6 @@ public class LogEntryController {
     private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
     private static final Map<String, Pattern> patternCache = new HashMap<>();
 
-    /**
-     * Generates a string with the rank of the person
-     * @param person whose rank we want to generate the string
-     * @return string with the rank
-     */
-    public static String generateRankEntryString(Person person) {
-        String rankEntry = "";
-        if (person.getRankNumeric() > 0) {
-            String message = logEntriesResourceMap.getString("asA.text");
-            rankEntry = MessageFormat.format(message, person.getRankName());
-        }
-
-        return rankEntry;
-    }
-
     private static Pattern compilePattern(String key, Supplier<String> regex) {
         Pattern pattern = patternCache.get(key);
         if (pattern == null) {

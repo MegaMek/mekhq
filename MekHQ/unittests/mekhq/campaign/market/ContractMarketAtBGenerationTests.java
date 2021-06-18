@@ -69,7 +69,7 @@ public class ContractMarketAtBGenerationTests {
     @Parameters(name = "Run {index}: gameYear={0}, unitRating={1}, isClanEnemy={2}")
     public static Iterable<Object[]> data() throws Throwable {
         List<Integer> gameYears = Arrays.asList(new Integer[] { 2750, 3025, 3055, 3067, 3120 });
-        
+
         List<Object[]> parameters = new ArrayList<>();
         for (int gameYear : gameYears) {
             for (int rating = IUnitRating.DRAGOON_F; rating <= IUnitRating.DRAGOON_ASTAR; ++rating) {
@@ -158,8 +158,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -254,8 +254,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(false).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -350,8 +350,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -446,8 +446,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         doReturn(true).when(hints).isAtWarWith(eq(employerFaction), eq(enemyFaction), any());
@@ -510,7 +510,7 @@ public class ContractMarketAtBGenerationTests {
         when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
-        
+
         Faction pirates = mock(Faction.class);
         doReturn(pirates).when(factions).getFaction(eq("PIR"));
 
@@ -544,8 +544,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -631,7 +631,7 @@ public class ContractMarketAtBGenerationTests {
         when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
-        
+
         Faction pirates = mock(Faction.class);
         doReturn(pirates).when(factions).getFaction(eq("PIR"));
 
@@ -665,8 +665,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(null).doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -728,7 +728,7 @@ public class ContractMarketAtBGenerationTests {
         when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
-        
+
         Faction pirates = mock(Faction.class);
         doReturn(pirates).when(factions).getFaction(eq("PIR"));
 
@@ -762,8 +762,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(null).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -773,7 +773,7 @@ public class ContractMarketAtBGenerationTests {
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
     }
-    
+
     @Test
     public void mercJumpPathRetries() {
         Campaign campaign = mock(Campaign.class);
@@ -819,7 +819,7 @@ public class ContractMarketAtBGenerationTests {
         when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
-        
+
         Faction pirates = mock(Faction.class);
         doReturn(pirates).when(factions).getFaction(eq("PIR"));
 
@@ -852,8 +852,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -870,7 +870,7 @@ public class ContractMarketAtBGenerationTests {
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
     }
-    
+
     @Test
     public void mercJumpPathFails() {
         Campaign campaign = mock(Campaign.class);
@@ -916,7 +916,7 @@ public class ContractMarketAtBGenerationTests {
         when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
-        
+
         Faction pirates = mock(Faction.class);
         doReturn(pirates).when(factions).getFaction(eq("PIR"));
 
@@ -949,8 +949,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1042,8 +1042,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1138,8 +1138,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(false).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1234,8 +1234,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1329,8 +1329,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         doReturn(true).when(hints).isAtWarWith(eq(employerFaction), eq(enemyFaction), any());
@@ -1426,8 +1426,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1522,8 +1522,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(false).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1618,8 +1618,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
@@ -1713,8 +1713,8 @@ public class ContractMarketAtBGenerationTests {
         doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
 
         FactionHints hints = mock(FactionHints.class);
-        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
-        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
+        when(enemyFaction.isISMajorOrSuperPower()).thenReturn(true);
         doReturn(true).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         doReturn(true).when(hints).isAtWarWith(eq(employerFaction), eq(enemyFaction), any());

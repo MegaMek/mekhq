@@ -75,8 +75,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -157,13 +157,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     static {
         destinationZoneMapping = new HashMap<>();
-        destinationZoneMapping.put(0, CardinalEdge.NORTH.ordinal());
-        destinationZoneMapping.put(1, CardinalEdge.EAST.ordinal());
-        destinationZoneMapping.put(2, CardinalEdge.SOUTH.ordinal());
-        destinationZoneMapping.put(3, CardinalEdge.WEST.ordinal());
-        destinationZoneMapping.put(4, CardinalEdge.NEAREST_OR_NONE.ordinal());
-        destinationZoneMapping.put(5, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
-        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
+        destinationZoneMapping.put(0, CardinalEdge.NORTH.getIndex());
+        destinationZoneMapping.put(1, CardinalEdge.EAST.getIndex());
+        destinationZoneMapping.put(2, CardinalEdge.SOUTH.getIndex());
+        destinationZoneMapping.put(3, CardinalEdge.WEST.getIndex());
+        destinationZoneMapping.put(4, CardinalEdge.NEAREST.getIndex());
+        destinationZoneMapping.put(5, CardinalEdge.NONE.getIndex());
+        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
+        destinationZoneMapping.put(7, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
     }
 
     /**
@@ -416,7 +417,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblDestinationZones, gbc);
 
         cboDestinationZone = new JComboBox<String>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
-        cboDestinationZone.setSelectedIndex(CardinalEdge.NEAREST_OR_NONE.ordinal());
+        cboDestinationZone.setSelectedIndex(CardinalEdge.NONE.getIndex());
         gbc.gridx = 1;
         forcedPanel.add(cboDestinationZone, gbc);
 
@@ -1253,8 +1254,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Force needs to be synced or have explicit deployment zones");
         }
 
-        if(txtForceName.getText().trim().isEmpty()) {
-            if(valBuilder.length() > 0) {
+        if (txtForceName.getText().isBlank()) {
+            if (valBuilder.length() > 0) {
                 valBuilder.append("\n");
             }
 

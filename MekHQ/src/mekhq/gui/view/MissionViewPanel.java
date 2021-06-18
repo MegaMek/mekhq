@@ -33,13 +33,14 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissionViewPanel extends ScrollablePanel {
+public class MissionViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Mission mission;
@@ -95,6 +96,7 @@ public class MissionViewPanel extends ScrollablePanel {
 
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
+        super();
         this.mission = m;
         this.scenarioTable = scenarioTable;
         this.gui = gui;
@@ -157,8 +159,9 @@ public class MissionViewPanel extends ScrollablePanel {
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + mission.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + mission.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(mission.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -260,13 +263,14 @@ public class MissionViewPanel extends ScrollablePanel {
         txtCommand = new JLabel();
         lblBLC = new JLabel();
         txtBLC = new JLabel();
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + contract.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -423,8 +427,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCommand, gridBagConstraints);
 
-        txtCommand.setName("txtCommand"); // NOI18N
-        txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand.setName("txtCommand");
+        txtCommand.setText(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -597,8 +602,9 @@ public class MissionViewPanel extends ScrollablePanel {
 
         int y = 0;
 
-        lblStatus.setName("lblOwner"); // NOI18N
-        lblStatus.setText("<html><b>" + contract.getStatusName() + "</b></html>");
+        lblStatus.setName("lblOwner");
+        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
+        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -681,8 +687,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtEnemy, gridBagConstraints);
 
-        lblType.setName("lblType"); // NOI18N
+        lblType.setName("lblType");
         lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -690,8 +697,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
-        txtType.setName("txtType"); // NOI18N
+        txtType.setName("txtType");
         txtType.setText(contract.getType());
+        txtType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -812,8 +820,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCommand, gridBagConstraints);
 
-        txtCommand.setName("txtCommand"); // NOI18N
-        txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand.setName("txtCommand");
+        txtCommand.setText(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -919,8 +928,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvagePct, gridBagConstraints);
 
-        lblMorale.setName("lblMorale"); // NOI18N
+        lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
+        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -928,8 +938,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblMorale, gridBagConstraints);
 
-        txtMorale.setName("txtMorale"); // NOI18N
-        txtMorale.setText(contract.getMoraleLevelName());
+        txtMorale.setName("txtMorale");
+        txtMorale.setText(contract.getMoraleLevel().toString());
+        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
