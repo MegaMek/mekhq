@@ -45,6 +45,7 @@ VERSION HISTORY:
 + Issues #2116 and #2589: Improving Rank and Title Sorting
 + PR #2694: Hangar Tab: Maintenance Colour No Longer Shows with Maintenance Disabled
 + PR #2693: GM Tools Dialog Rewrite
++ PR #2422: Improve simple accessibility faults
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
