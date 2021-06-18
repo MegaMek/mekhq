@@ -102,7 +102,7 @@ jobs:
     # to figure out.
     - name: Build with Gradle
       working-directory: mekhq
-      run: ./gradlew -I .github/build-scan-init.gradle build --continue --stacktrace --scan
+      run: ./gradlew -I .github/build-scan-init.gradle build -x test --continue --stacktrace --scan
 
     - name: Upload Test Logs on Failure
       uses: actions/upload-artifact@v2-preview
