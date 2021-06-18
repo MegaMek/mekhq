@@ -121,6 +121,8 @@ public class StartUpGUI extends JPanel {
         setLayout(new BorderLayout(1, 1));
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.getAccessibleContext().setAccessibleName("Loader Actions");
+        buttonPanel.getAccessibleContext().setAccessibleDescription("Contains buttons to perform top-level actions, such as starting a new campaign or loading an old campaign.");
         buttonPanel.setOpaque(false);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnNewGame);

@@ -76,6 +76,7 @@ public final class TOETab extends CampaignGuiTab {
 
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
+        orgTree.getAccessibleContext().setAccessibleName("Table of Organization and Equipment (TOE)");
         TOEMouseAdapter.connect(getCampaignGui(), orgTree);
         orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
@@ -86,6 +87,7 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
         panForceView = new JPanel();
+        panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
         panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
         panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
@@ -130,6 +132,7 @@ public final class TOETab extends CampaignGuiTab {
             int crewSize = u.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
+                crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
                 final JScrollPane scrollPerson = new JScrollPane();
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
