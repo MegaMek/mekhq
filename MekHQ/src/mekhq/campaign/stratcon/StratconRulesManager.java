@@ -951,15 +951,41 @@ public class StratconRulesManager {
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements || (reinforcements
                     && (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.None));
-            if (!force.isDeployed() && (force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
+            if ((force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
                     && !forcesInTracks.contains(force.getId())
                     && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
-                    && noReinforcementRestriction) {
+                    && noReinforcementRestriction
+                    && !subElementsDeployed(force, campaign)) {
                 retVal.add(force.getId());
             }
         }
 
         return retVal;
+    }
+    
+    /**
+     * Returns true if any sub-element (unit or sub-force) of this force is deployed.
+     */
+    private static boolean subElementsDeployed(Force force, Campaign campaign) {
+        if (force.isDeployed()) {
+            return true;
+        }
+        
+        for (UUID unitID : force.getUnits()) {
+            Unit unit = campaign.getUnit(unitID);
+            
+            if (unit.isDeployed()) {
+                return true;
+            }
+        }
+        
+        for (Force child : force.getSubForces()) {
+            if (subElementsDeployed(child, campaign)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**
