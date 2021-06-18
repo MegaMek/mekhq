@@ -1482,6 +1482,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         for (Part p : newParts) {
+            // CAW: after a refit some parts ended up NOT having a Campaign attached,
+            // see https://github.com/MegaMek/mekhq/issues/2703
+            p.setCampaign(getCampaign());
+
             if (p instanceof AmmoBin) {
                 //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
                 //Consider all LC ammobins empty and load them back up.
