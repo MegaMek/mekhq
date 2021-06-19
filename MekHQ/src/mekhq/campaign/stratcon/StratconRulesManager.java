@@ -980,7 +980,7 @@ public class StratconRulesManager {
         }
         
         for (Force child : force.getSubForces()) {
-            if (subElementsDeployed(child, campaign)) {
+            if (subElementsOrSelfDeployed(child, campaign)) {
                 return true;
             }
         }
