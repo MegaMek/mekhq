@@ -955,7 +955,7 @@ public class StratconRulesManager {
                     && !forcesInTracks.contains(force.getId())
                     && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
                     && noReinforcementRestriction
-                    && !subElementsDeployed(force, campaign)) {
+                    && !subElementsOrSelfDeployed(force, campaign)) {
                 retVal.add(force.getId());
             }
         }
@@ -966,7 +966,7 @@ public class StratconRulesManager {
     /**
      * Returns true if any sub-element (unit or sub-force) of this force is deployed.
      */
-    private static boolean subElementsDeployed(Force force, Campaign campaign) {
+    private static boolean subElementsOrSelfDeployed(Force force, Campaign campaign) {
         if (force.isDeployed()) {
             return true;
         }
