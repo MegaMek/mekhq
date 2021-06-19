@@ -92,6 +92,7 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().setContentType("text/html");
         getTxtLog().setEditable(false);
         ((DefaultCaret) getTxtLog().getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        getTxtLog().getAccessibleContext().setAccessibleName("Daily Log");
         getTxtLog().addHyperlinkListener(gui.getReportHLL());
 
         final JScrollPane logPanel = new JScrollPane(getTxtLog());

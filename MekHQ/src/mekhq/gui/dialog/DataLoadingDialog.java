@@ -330,5 +330,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             default:
                 break;
         }
+
+        getAccessibleContext().setAccessibleDescription(
+                String.format(resourceMap.getString("accessibleDescription.format"), progressBar.getString()));
     }
 }
