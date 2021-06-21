@@ -42,7 +42,6 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.MMPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
