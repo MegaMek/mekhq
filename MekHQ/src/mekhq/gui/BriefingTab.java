@@ -40,6 +40,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.event.Subscribe;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
@@ -567,7 +568,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (null != scenario) {
-            getCampaignGui().getApplication().startHost(scenario, true, null);
+            getCampaignGui().getApplication().startHost(scenario, true, new ArrayList<>());
         }
     }
 
@@ -648,9 +649,9 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
-        if (chosen.size() > 0) {
+        if (!chosen.isEmpty()) {
             // Ensure that the MegaMek year GameOption matches the campaign year
-            getCampaign().getGameOptions().getOption("year").setValue(getCampaign().getGameYear());
+            getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication().startHost(scenario, false, chosen);
         }
     }
@@ -669,8 +670,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        List<Unit> chosen = new ArrayList<>();
         StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
@@ -700,7 +700,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (chosen.size() > 0) {
+        if (!chosen.isEmpty()) {
             getCampaignGui().getApplication().joinGame(scenario, chosen);
         }
     }

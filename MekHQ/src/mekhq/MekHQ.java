@@ -652,7 +652,7 @@ public class MekHQ implements GameListener {
 
     /**
      * Helper function that calculates the maximum screen width available locally.
-     * 
+     *
      * @return Maximum screen width.
      */
     public double calculateMaxScreenWidth() {
