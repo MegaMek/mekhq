@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 0.49.3-SNAPSHOT
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
++ Issue #2709: Two Scenario Date NPEs
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
