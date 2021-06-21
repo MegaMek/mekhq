@@ -134,7 +134,7 @@ public final class MekHqConstants {
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String RATINFO_DIR = "data/universe/ratdata";
-    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Type/";
+    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Types/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
     public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_PATH = "Pieces/Alphanumerics/";
