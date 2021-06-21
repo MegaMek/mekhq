@@ -3169,8 +3169,8 @@ public class Person implements Serializable {
     }
 
     public boolean isTaskOvertime(IPartWork partWork) {
-        return partWork.getTimeLeft() > getMinutesLeft()
-               && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
+        return (partWork.getTimeLeft() > getMinutesLeft())
+               && (getOvertimeLeft() > 0);
     }
 
     public Skill getSkillForWorkingOn(IPartWork part) {
