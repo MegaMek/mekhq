@@ -133,6 +133,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return Collections.unmodifiableList(entityList);
     }
 
+    public void addEntity(Entity entity) {
+        entityList.add(entity);
+    }
+    
     public boolean removeEntity(int index) {
         Entity e = null;
         if ((index >= 0) && (index < entityList.size())) {

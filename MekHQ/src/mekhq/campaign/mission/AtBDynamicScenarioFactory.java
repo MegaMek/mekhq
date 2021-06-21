@@ -64,6 +64,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
@@ -2471,7 +2472,7 @@ public class AtBDynamicScenarioFactory {
      * take the first unit that we find in the given scenario that's a part of that
      * template and "put it away".
      */
-    public static void benchAttachedAlly(UUID playerUnitID, String templateName, AtBDynamicScenario scenario) {
+    public static void benchAllyUnit(UUID playerUnitID, String templateName, AtBDynamicScenario scenario) {
         ScenarioForceTemplate destinationTemplate = null;
         if (scenario.getTemplate().getScenarioForces().containsKey(templateName)) {
             destinationTemplate = scenario.getTemplate().getScenarioForces().get(templateName);
@@ -2482,19 +2483,75 @@ public class AtBDynamicScenarioFactory {
             return;
         }
         
-        List<UUID> candidateIDs = scenario.getBotTemplateUnits().get(destinationTemplate.getForceName());
-        if (candidateIDs.size() > 0) {
-            UUID unitID = candidateIDs.get(0);
+        // two possible situations here:
+        // 1 - the unit is an "attached" unit. This requires a mapping between template name and 
+        //      individual attached units. At this point, we remove the first unit matching the template
+        //      from the attached units list. The benched unit should have the player unit's ID
+        //      stored so that if the player unit is detached, the benched unit comes back.
+        // 2 - the unit is part of a bot force. In this case, we need a mapping between template names
+        //      and bot forces. 
+
+        if (destinationTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) {
+            List<UUID> candidateIDs = scenario.getBotTemplateUnits().get(destinationTemplate.getForceName());
             
-            candidateIDs.remove(0);
-            scenario.getPlayerUnitSwaps().put(playerUnitID, unitID);
-            // remove entity from bot force or allied unit list
-            // add entity to temporary store (bigBattleAllies?)
+            if ((candidateIDs != null) && (candidateIDs.isEmpty())) {
+                return;
+            }
+            
+            UUID unitID = candidateIDs.get(0);                
+            candidateIDs.remove(0);                
+            
+            Entity swapTarget = scenario.getAlliesPlayer().stream().filter(item -> item.getExternalIdAsString() == unitID.toString()).findFirst().get();
+            BenchedEntityData benchedEntity = new BenchedEntityData();
+            benchedEntity.entity = swapTarget;
+            benchedEntity.templateName = "";
+            
+            scenario.getAlliesPlayer().remove(swapTarget);
+            scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+        } else {
+            BotForce botForce = null;
+            
+            // slightly inefficient to loop through all bot forces looking for our template
+            // but it is also difficult to create a reverse lookup, so we avoid that problem for now
+            for (BotForce candidateForce : scenario.getBotForceTemplates().keySet()) {
+                if (scenario.getBotForceTemplates().get(candidateForce).getForceName().
+                        equals(destinationTemplate.getForceName())) {
+                    botForce = candidateForce;
+                    break;
+                }
+            }
+            
+            if ((botForce != null) && !botForce.getEntityList().isEmpty()) {
+                Entity swapTarget = botForce.getEntityList().get(0);
+                BenchedEntityData benchedEntity = new BenchedEntityData();
+                benchedEntity.entity = swapTarget;
+                benchedEntity.templateName = destinationTemplate.getForceName();
+                
+                botForce.removeEntity(0);
+                scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+            }
         }
     }
     
+    /**
+     * Given a player unit ID and a scenario, return a benched allied unit, if one exists
+     * that was benched in favor of the player's unit.
+     */
     public static void unbenchAttachedAlly(UUID playerUnitID, AtBDynamicScenario scenario) {
         // get entity from temporary store (big battle allies?), if it exists
         // add it to to bot force being worked with or attached ally list
+        if (scenario.getPlayerUnitSwaps().containsKey(playerUnitID)) {
+            BenchedEntityData benchedEntityData = scenario.getPlayerUnitSwaps().get(playerUnitID);
+            
+            if (benchedEntityData.templateName.isEmpty()) {
+                scenario.getAlliesPlayer().add(benchedEntityData.entity);
+            } else {
+                for (BotForce botForce : scenario.getBotForceTemplates().keySet()) {
+                    if (scenario.getBotForceTemplates().get(botForce).getForceName().equals(benchedEntityData.templateName)) {
+                        botForce.addEntity(benchedEntityData.entity);
+                    }
+                }
+            }
+        }
     }
 }

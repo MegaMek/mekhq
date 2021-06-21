@@ -48,6 +48,14 @@ import mekhq.campaign.personnel.SkillType;
  * @author NickAragua
  */
 public class AtBDynamicScenario extends AtBScenario {
+    /**
+     * Data relevant to an entity that was swapped out in a "player or fixed unit count" force.
+     */
+    public static class BenchedEntityData {
+        public Entity entity;
+        public String templateName;
+    }
+    
     private static final long serialVersionUID = 4671466413188687036L;
 
     // by convention, this is the ID specified in the template for the primary player force
@@ -72,7 +80,7 @@ public class AtBDynamicScenario extends AtBScenario {
     private transient Map<String, List<UUID>> botTemplateUnits;
 
     // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
-    private Map<UUID, UUID> playerUnitSwaps;
+    private Map<UUID, BenchedEntityData> playerUnitSwaps;
     
     private List<AtBScenarioModifier> scenarioModifiers;
 
@@ -132,6 +140,7 @@ public class AtBDynamicScenario extends AtBScenario {
         super.addUnit(unitID);
         ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
         playerUnitTemplates.put(unitID, forceTemplate);
+        AtBDynamicScenarioFactory.benchAllyUnit(unitID, templateName, this);
     }
 
     @Override
@@ -143,6 +152,7 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeUnit(UUID unitID) {
         super.removeUnit(unitID);
+        AtBDynamicScenarioFactory.unbenchAttachedAlly(unitID, this);
         playerUnitTemplates.remove(unitID);
     }
 
@@ -260,11 +270,11 @@ public class AtBDynamicScenario extends AtBScenario {
         return botUnitTemplates;
     }
 
-    public Map<UUID, UUID> getPlayerUnitSwaps() {
+    public Map<UUID, BenchedEntityData> getPlayerUnitSwaps() {
         return playerUnitSwaps;
     }
 
-    public void setPlayerUnitSwaps(Map<UUID, UUID> playerUnitSwaps) {
+    public void setPlayerUnitSwaps(Map<UUID, BenchedEntityData> playerUnitSwaps) {
         this.playerUnitSwaps = playerUnitSwaps;
     }
 
