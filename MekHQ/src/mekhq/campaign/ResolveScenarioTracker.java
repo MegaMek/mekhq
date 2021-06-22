@@ -20,15 +20,30 @@
  */
 package mekhq.campaign;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import megamek.client.Client;
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.Compute;
+import megamek.common.Crew;
+import megamek.common.CriticalSlot;
+import megamek.common.EjectedCrew;
+import megamek.common.Entity;
+import megamek.common.IAero;
+import megamek.common.IArmorState;
+import megamek.common.IEntityRemovalConditions;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.MULParser;
+import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.MechWarrior;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.Protomech;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
@@ -55,6 +70,24 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -145,11 +178,7 @@ public class ResolveScenarioTracker {
 
     public void processMulFiles() {
         if (unitList.isPresent()) {
-            try {
-                loadUnitsAndPilots(unitList.get());
-            } catch (IOException e) {
-                MekHQ.getLogger().error(this, e);
-            }
+            loadUnitsAndPilots(unitList.get());
         } else {
             initUnitsAndPilotsWithoutBattle();
         }
@@ -1043,24 +1072,16 @@ public class ResolveScenarioTracker {
         }
     }
 
-    private void loadUnitsAndPilots(File unitFile) throws IOException {
+    private void loadUnitsAndPilots(final File unitFile) {
         if (unitFile != null) {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
             // Create an empty parser.
-            MULParser parser = new MULParser();
-
-            // Open up the file.
-            try (InputStream listStream = new FileInputStream(unitFile)) {
-                // Read a Vector from the file.
-                parser.parse(listStream);
-            } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
-            }
+            MULParser parser = new MULParser(unitFile, campaign.getGameOptions());
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(this, parser.getWarningMessage());
+                MekHQ.getLogger().warning(parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();

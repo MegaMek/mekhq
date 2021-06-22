@@ -33,6 +33,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import megamek.common.options.GameOptions;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -56,7 +57,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     /**
      * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from
      * XML entity expansion attacks.
-     * 
+     *
      * @return A DocumentBuilder less safe to use to read untrusted XML.
      */
     public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
@@ -110,7 +111,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     /**
      * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
-     * 
+     *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
      * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
      * MM and then re-factored out of EntityListFile.
@@ -456,7 +457,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         /*
          * crew are handled as a Person object in MekHq... if (e.isDriverHit()) { critVal =
          * critVal.concat(" driver=\""); critVal = critVal.concat("hit"); critVal = critVal.concat("\""); }
-         * 
+         *
          * if (e.isCommanderHit()) { critVal = critVal.concat(" commander=\""); critVal =
          * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
@@ -473,17 +474,17 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     }
 
-    /** @deprecated use {@link #parseSingleEntityMul(Element)} instead */
+    /** @deprecated use {@link #parseSingleEntityMul(Element, GameOptions)} instead */
     @Deprecated
-    public static Entity getEntityFromXmlString(Node xml) {
-        return parseSingleEntityMul((Element) xml);
+    public static Entity getEntityFromXmlString(Node xml, GameOptions options) {
+        return parseSingleEntityMul((Element) xml, options);
     }
 
     /**
      * Parses the given node as if it was a .mul file and returns the first entity it contains.
-     * <p>
-     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the input
-     * can't be parsed; if it can be parsed and contains more than one entity, an
+     *
+     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the
+     * input can't be parsed; if it can be parsed and contains more than one entity, an
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
@@ -493,11 +494,9 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
-    public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
-
+    public static Entity parseSingleEntityMul(final Element element, final GameOptions options) throws IllegalArgumentException {
         MULParser prs = new MULParser();
-        prs.parse(element);
+        prs.parse(element, options);
         List<Entity> entities = prs.getEntities();
 
         switch (entities.size()) {

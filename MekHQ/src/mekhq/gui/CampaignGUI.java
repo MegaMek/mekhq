@@ -1953,14 +1953,7 @@ public class CampaignGUI extends JPanel {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
             // Create an empty parser.
-            MULParser parser = new MULParser();
-
-            // Open up the file.
-            try (InputStream is = new FileInputStream(unitFile)) {
-                parser.parse(is);
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
+            MULParser parser = new MULParser(unitFile, getCampaign().getGameOptions());
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
@@ -1971,14 +1964,6 @@ public class CampaignGUI extends JPanel {
             for (Entity entity : parser.getEntities()) {
                 getCampaign().addNewUnit(entity, allowNewPilots, 0);
             }
-
-            // TODO : re-add any ejected pilots
-            //for (Crew pilot : parser.getPilots()) {
-            //    if (pilot.isEjected()) {
-            //         getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
-            //         false);
-            //    }
-            //}
         }
     }
 
