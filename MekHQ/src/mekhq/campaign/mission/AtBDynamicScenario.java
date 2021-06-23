@@ -60,6 +60,12 @@ public class AtBDynamicScenario extends AtBScenario {
 
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    
+    private static final String PLAYER_UNIT_SWAPS_ELEMENT = "PlayerUnitSwaps";
+    private static final String PLAYER_UNIT_SWAP_ELEMENT = "PlayerUnitSwap";
+    private static final String PLAYER_UNIT_SWAP_ID_ELEMENT = "UnitID";
+    private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
+    private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "Entity";
 
     // derived fields used for various calculations
     private int effectivePlayerUnitCount;
@@ -201,6 +207,7 @@ public class AtBDynamicScenario extends AtBScenario {
      * Adds a bot force to this scenario.
      */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
+        botForce.setTemplateName(forceTemplate.getForceName());
         super.addBotForce(botForce);
         botForceTemplates.put(botForce, forceTemplate);
         botTemplateUnits.putIfAbsent(forceTemplate.getForceName(), new ArrayList<>());
@@ -454,6 +461,24 @@ public class AtBDynamicScenario extends AtBScenario {
             template.Serialize(pw1);
             
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
+            
+            if (!playerUnitSwaps.isEmpty()) {
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                
+                // note: if you update the order in which data is stored here or anything else about it
+                // double check loadFieldsFromXmlNode
+                for (UUID unitID : playerUnitSwaps.keySet()) {
+                    MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    
+                    BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent + 2, Collections.emptyList()));
+                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
+                }
+                
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+            }
         }
 
         super.writeToXmlEnd(pw1, indent);
@@ -470,6 +495,21 @@ public class AtBDynamicScenario extends AtBScenario {
                 template = ScenarioTemplate.Deserialize(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
+                // 
+                for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
+                    Node swapNode = wn2.getChildNodes().item(snsIndex);
+                    
+                    if (swapNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ELEMENT)) {
+                        BenchedEntityData benchedEntityData = new BenchedEntityData();
+                        
+                        UUID playerUnitID = UUID.fromString(swapNode.getChildNodes().item(1).getTextContent());
+                        benchedEntityData.templateName = swapNode.getChildNodes().item(3).getTextContent();
+                        benchedEntityData.entity = MekHqXmlUtil.getEntityFromXmlString(swapNode.getChildNodes().item(5));
+                        
+                        playerUnitSwaps.put(playerUnitID, benchedEntityData);
+                    }
+                }
             }
         }
 

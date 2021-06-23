@@ -2508,15 +2508,16 @@ public class AtBDynamicScenarioFactory {
             
             scenario.getAlliesPlayer().remove(swapTarget);
             scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+            swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), "", scenario);
         } else {
             BotForce botForce = null;
             
             // slightly inefficient to loop through all bot forces looking for our template
             // but it is also difficult to create a reverse lookup, so we avoid that problem for now
-            for (BotForce candidateForce : scenario.getBotForceTemplates().keySet()) {
-                if (scenario.getBotForceTemplates().get(candidateForce).getForceName().
-                        equals(destinationTemplate.getForceName())) {
-                    botForce = candidateForce;
+            for (int x = 0; x < scenario.getNumBots(); x++) {
+                BotForce candidateForce = scenario.getBotForce(x);
+                if (candidateForce.getTemplateName().equals(destinationTemplate.getForceName())) {
+                    botForce = candidateForce; // found a matching force, end the loop and move on.
                     break;
                 }
             }
@@ -2529,6 +2530,33 @@ public class AtBDynamicScenarioFactory {
                 
                 botForce.removeEntity(0);
                 scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+                swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), botForce.getName(), scenario);
+            }
+        }
+    }
+    
+    /**
+     * Given a scenario and a pair of unit IDs (and a force), swap the first one for the second one.
+     * Or, add the unit to all objectives containing the given force.
+     */
+    private static void swapUnitInObjectives(String subIn, String subOut, String subOutForceName, AtBDynamicScenario scenario) {
+        for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            // if the sub-out unit is explicitly referenced, do a direct substitution
+            if (objective.getAssociatedUnitIDs().contains(subOut)) {
+                objective.removeUnit(subOut);
+                
+                // don't want to add an empty unit to the objective
+                if (!subIn.isEmpty()) {
+                    objective.addUnit(subIn);
+                }
+                
+                continue;
+            }
+            
+            // if the sub-out unit is replacing a unit that's part of a force, 
+            // just add it individually
+            if (objective.getAssociatedForceNames().contains(subOutForceName)) {
+                objective.addUnit(subIn);
             }
         }
     }
@@ -2545,13 +2573,20 @@ public class AtBDynamicScenarioFactory {
             
             if (benchedEntityData.templateName.isEmpty()) {
                 scenario.getAlliesPlayer().add(benchedEntityData.entity);
+                swapUnitInObjectives(benchedEntityData.entity.toString(), playerUnitID.toString(), "", scenario);
             } else {
-                for (BotForce botForce : scenario.getBotForceTemplates().keySet()) {
-                    if (scenario.getBotForceTemplates().get(botForce).getForceName().equals(benchedEntityData.templateName)) {
+                for (int x = 0; x < scenario.getNumBots(); x++) {
+                    BotForce botForce = scenario.getBotForce(x);
+                    if (botForce.getTemplateName().equals(benchedEntityData.templateName)) {
                         botForce.addEntity(benchedEntityData.entity);
+                        // in this situation, the entity is being added back to a force, 
+                        // so we just want to clear out the player unit. 
+                        swapUnitInObjectives("", playerUnitID.toString(), "", scenario);
+                        break;
                     }
                 }
             }
+            
         }
     }
 }

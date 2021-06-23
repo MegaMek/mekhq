@@ -47,6 +47,7 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
@@ -240,6 +241,16 @@ public class AtBGameThread extends GameThread {
                         entity.setForceString(force.getFullMMName());
                     }
                     entities.add(entity);
+                    
+                    // if we've swapped this entity in for a bot-controlled unit, copy the bot controlled unit's
+                    // deployment parameters to this entity.
+                    if (scenario instanceof AtBDynamicScenario &&
+                            ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
+                                containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
+                        Entity benchedEntity = ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
+                                get(UUID.fromString(entity.getExternalIdAsString())).entity;
+                        copyDeploymentParameters(benchedEntity, entity);
+                    }
                 }
                 client.sendAddEntity(entities);
 
@@ -476,5 +487,15 @@ public class AtBGameThread extends GameThread {
                 }
             }
         }
+    }
+    
+    /**
+     * Utility function to copy some deployment parameters between source and destination entities
+     */
+    private void copyDeploymentParameters(Entity source, Entity destination) {
+        destination.setDeployRound(source.getDeployRound());
+        destination.setStartingPos(source.getStartingPos(false));
+        destination.setAltitude(source.getAltitude());
+        destination.setElevation(source.getElevation());
     }
 }
