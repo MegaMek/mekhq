@@ -113,7 +113,7 @@ public class StratconRulesManager {
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && true) { //(Compute.randomInt(100) <= targetNum)) {
+            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) <= targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -215,11 +215,7 @@ public class StratconRulesManager {
                 }
                 
                 // find units in player's campaign (not just forces!)
-                for(Unit unit : campaign.getHangar().getUnits()) {
-                    if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                        int alpha = 1;
-                    }
-                    
+                for(Unit unit : campaign.getHangar().getUnits()) {                    
                     // if it's the right type of unit and is around
                     if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(), sft.getAllowedUnitType(), false) && 
                             unit.isAvailable() && unit.isFunctional()) {
