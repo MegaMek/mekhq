@@ -18,28 +18,6 @@
  */
 package mekhq;
 
-import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.GameOptions;
-import megamek.utils.MegaMekXmlUtil;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import megamek.common.Aero;
 import megamek.common.BombType;
 import megamek.common.CommonConstants;
@@ -51,6 +29,18 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
+import megamek.common.annotations.Nullable;
+import megamek.common.options.GameOptions;
+import megamek.utils.MegaMekXmlUtil;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.Iterator;
+import java.util.List;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -462,12 +452,6 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
         return retVal;
 
-    }
-
-    /** @deprecated use {@link #parseSingleEntityMul(Element, GameOptions)} instead */
-    @Deprecated
-    public static Entity getEntityFrofmXmlString(Node xml, GameOptions options) {
-        return parseSingleEntityMul((Element) xml, options);
     }
 
     /**
