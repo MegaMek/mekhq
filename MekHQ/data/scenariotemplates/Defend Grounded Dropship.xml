@@ -36,7 +36,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
+                <additionalDetail>If the DropShip cannot be deployed, this objective may be ignored.</additionalDetail>
             </additionalDetails>
             <description>Protect the following units:</description>
             <destinationEdge>NONE</destinationEdge>
