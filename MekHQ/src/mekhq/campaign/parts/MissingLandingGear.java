@@ -32,6 +32,8 @@ import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
+import java.util.StringJoiner;
+
 import org.w3c.dom.Node;
 
 /**
