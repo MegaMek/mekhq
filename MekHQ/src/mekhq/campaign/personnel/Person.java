@@ -2583,7 +2583,7 @@ public class Person implements Serializable {
     }
 
     public String getHTMLTitle() {
-        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getFullTitle());
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
     }
 
     public String getFullTitle() {
