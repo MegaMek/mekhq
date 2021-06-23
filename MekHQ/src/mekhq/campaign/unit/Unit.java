@@ -43,6 +43,7 @@ import mekhq.campaign.parts.*;
 
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1876,7 +1877,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unit");
     }
 
-    public static Unit generateInstanceFromXML(Node wn, Version version) {
+    public static Unit generateInstanceFromXML(final Node wn, final Version version,
+                                               final Campaign campaign) {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1971,9 +1973,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
-                    retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
+                    retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {
                     retVal.history = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {

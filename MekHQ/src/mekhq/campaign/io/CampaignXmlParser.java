@@ -32,6 +32,7 @@ import megamek.common.Mounted;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
@@ -1166,7 +1167,7 @@ public class CampaignXmlParser {
         MekHQ.getLogger().info("Load Mission Nodes Complete!");
     }
 
-    private static String checkUnits(Node wn) {
+    private static @Nullable String checkUnits(final Node wn) {
         MekHQ.getLogger().info("Checking for missing entities...");
 
         List<String> unitList = new ArrayList<>();
@@ -1191,15 +1192,15 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        if (null == MekHqXmlUtil.getEntityFromXmlString(wn3)) {
+                        final Entity entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, null);
+                        if (entity == null) {
                             String name = MekHqXmlUtil.getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
                             }
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(CampaignXmlParser.class, "Could not read entity from XML");
-                        MekHQ.getLogger().error(CampaignXmlParser.class, e);
+                        MekHQ.getLogger().error("Could not read entity from XML", e);
                     }
                 }
             }
@@ -1233,14 +1234,11 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("unit")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
                 MekHQ.getLogger().error("Unknown node type not loaded in Unit nodes: " + wn2.getNodeName());
-
                 continue;
             }
 
-            Unit u = Unit.generateInstanceFromXML(wn2, version);
+            Unit u = Unit.generateInstanceFromXML(wn2, version, retVal);
 
             if (u != null) {
                 retVal.importUnit(u);

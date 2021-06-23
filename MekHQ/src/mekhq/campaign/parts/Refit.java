@@ -39,6 +39,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.finances.Money;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1978,14 +1979,15 @@ public class Refit extends Part implements IAcquisitionWork {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
     }
 
-    public static Refit generateInstanceFromXML(Node wn, Unit u, Version version) {
+    public static Refit generateInstanceFromXML(final Node wn, final Version version,
+                                                final Campaign campaign, final Unit unit) {
         Refit retVal = new Refit();
-        retVal.oldUnit = Objects.requireNonNull(u);
+        retVal.oldUnit = Objects.requireNonNull(unit);
 
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("time")) {
@@ -2017,10 +2019,10 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
                     retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.newEntity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.oldUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
@@ -2028,7 +2030,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.newUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));

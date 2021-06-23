@@ -29,7 +29,9 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -251,7 +253,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "behaviorSettings");
     }
 
-    public void setFieldsFromXmlNode(final Node wn, final Version version) {
+    public void setFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign) {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -282,7 +284,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                         Entity en = null;
                         try {
-                            en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                            en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                         } catch (Exception e) {
                             MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }

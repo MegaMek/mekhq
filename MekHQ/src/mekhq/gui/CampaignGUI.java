@@ -1946,23 +1946,15 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    protected void loadListFile(boolean allowNewPilots) {
-        File unitFile = FileDialogs.openUnits(frame).orElse(null);
-
+    protected void loadListFile(final boolean allowNewPilots) {
+        final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
         if (unitFile != null) {
-            // I need to get the parser myself, because I want to pull both
-            // entities and pilots from it
-            // Create an empty parser.
-            MULParser parser = new MULParser(unitFile, getCampaign().getGameOptions());
-
-            // Was there any error in parsing?
-            if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(parser.getWarningMessage());
-            }
-
-            // Add the units from the file.
-            for (Entity entity : parser.getEntities()) {
-                getCampaign().addNewUnit(entity, allowNewPilots, 0);
+            try {
+                for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

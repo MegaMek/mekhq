@@ -61,7 +61,7 @@ public class AtBDynamicScenario extends AtBScenario {
     private int effectiveOpforQuality;
 
     // convenient pointers that let us keep data around that would otherwise need reloading
-    private ScenarioTemplate template;      // the template that is being used to generate this scenario
+    private ScenarioTemplate template; // the template that is being used to generate this scenario
 
     private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
     private Map<UUID, ScenarioForceTemplate> botUnitTemplates;
@@ -413,7 +413,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // in its current state
         if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
-            
+
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
         }
 
@@ -421,7 +421,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+            throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -434,7 +435,7 @@ public class AtBDynamicScenario extends AtBScenario {
             }
         }
 
-        super.loadFieldsFromXmlNode(wn, version);
+        super.loadFieldsFromXmlNode(wn, version, campaign);
     }
 
     @Override

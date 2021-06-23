@@ -33,6 +33,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
@@ -96,17 +97,6 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
         return dbf.newDocumentBuilder();
-    }
-
-    public static String xmlToString(Node node) throws TransformerException {
-        Source source = new DOMSource(node);
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        transformer.transform(source, result);
-
-        return stringWriter.getBuffer().toString();
     }
 
     /**
@@ -476,7 +466,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     /** @deprecated use {@link #parseSingleEntityMul(Element, GameOptions)} instead */
     @Deprecated
-    public static Entity getEntityFromXmlString(Node xml, GameOptions options) {
+    public static Entity getEntityFrofmXmlString(Node xml, GameOptions options) {
         return parseSingleEntityMul((Element) xml, options);
     }
 
@@ -488,28 +478,28 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
+     * @param options the Game Options to parse using
      *
      * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
      *         the input
      *
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
-    public static Entity parseSingleEntityMul(final Element element, final GameOptions options) throws IllegalArgumentException {
-        MULParser prs = new MULParser();
-        prs.parse(element, options);
-        List<Entity> entities = prs.getEntities();
+    public static @Nullable Entity parseSingleEntityMul(final Element element,
+                                                        final @Nullable GameOptions options)
+            throws IllegalArgumentException {
+        final List<Entity> entities = new MULParser(element, options).getEntities();
 
         switch (entities.size()) {
-        case 0:
-            return null;
-        case 1:
-            Entity entity = entities.get(0);
-            MekHQ.getLogger().trace(MekHqXmlUtil.class,
-                    "Returning " + entity + " from getEntityFromXmlString(String)...");
-            return entity;
-        default:
-            throw new IllegalArgumentException(
-                    "More than one entity contained in XML string!  Expecting a single entity.");
+            case 0:
+                return null;
+            case 1:
+                Entity entity = entities.get(0);
+                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                return entity;
+            default:
+                throw new IllegalArgumentException(
+                        "More than one entity contained in XML string!  Expecting a single entity.");
         }
     }
 

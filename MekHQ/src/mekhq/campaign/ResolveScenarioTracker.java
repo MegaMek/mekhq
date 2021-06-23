@@ -1077,11 +1077,12 @@ public class ResolveScenarioTracker {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
             // Create an empty parser.
-            MULParser parser = new MULParser(unitFile, campaign.getGameOptions());
-
-            // Was there any error in parsing?
-            if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(parser.getWarningMessage());
+            final MULParser parser;
+            try {
+                parser = new MULParser(unitFile, campaign.getGameOptions());
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+                return;
             }
 
             killCredits = parser.getKills();
