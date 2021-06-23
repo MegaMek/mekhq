@@ -45,7 +45,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Allied Dropship</associatedForceName>
+                <associatedForceName>Allied DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>

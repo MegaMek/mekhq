@@ -18,7 +18,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Escorted Dropship</associatedForceName>
+                <associatedForceName>Escorted DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>

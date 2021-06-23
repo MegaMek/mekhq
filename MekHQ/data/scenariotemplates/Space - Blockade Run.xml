@@ -18,7 +18,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Enemy Dropships</associatedForceName>
+                <associatedForceName>Enemy DropShips</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
