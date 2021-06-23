@@ -15,6 +15,7 @@ import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
@@ -62,7 +63,7 @@ class GameThread extends Thread implements CloseClientListener {
         this.password = password;
         this.client = c;
         this.app = app;
-        this.units = units;
+        this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
     }
@@ -130,7 +131,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendPlayerInfo();
             }
 
-            while(!stop) {
+            while (!stop) {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
