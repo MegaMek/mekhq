@@ -32,8 +32,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -111,7 +113,7 @@ public class StratconRulesManager {
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) <= targetNum)) {
+            if (!availableForceIDs.isEmpty() && true) { //(Compute.randomInt(100) <= targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -165,6 +167,7 @@ public class StratconRulesManager {
         // if not auto-assigning lances, we then back out the lance assignments.
         for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
 
             if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
                 for (int forceID : scenario.getPlayerTemplateForceIDs()) {
@@ -178,6 +181,59 @@ public class StratconRulesManager {
                 // if we're auto-assigning lances, deploy all assigned forces to the track as well
                 for (int forceID : scenario.getPrimaryForceIDs()) {
                     processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Worker function that looks through the scenario's templates and swaps in
+     * player units for "player or allied force" templates.
+     */
+    private static void swapInPlayerUnits(StratconScenario scenario, Campaign campaign, int explicitForceID) { 
+        for (ScenarioForceTemplate sft : scenario.getScenarioTemplate().getAllScenarioForces()) {
+            if (sft.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
+                int unitCount = 0;
+
+                // get all the units that have been generated for this template
+                for (UUID unitID : scenario.getBackingScenario().getBotUnitTemplates().keySet()) {
+                    if (scenario.getBackingScenario().getBotUnitTemplates().get(unitID).getForceName().equals(sft.getForceName())) {
+                        unitCount++;
+                    }
+                }
+                
+                // or the units embedded in bot forces
+                for (BotForce botForce : scenario.getBackingScenario().getBotForceTemplates().keySet()) {
+                    if (scenario.getBackingScenario().getBotForceTemplates().get(botForce).getForceName().equals(sft.getForceName())) {
+                        unitCount += botForce.getEntityList().size();
+                    }
+                }
+                
+                // now we have a unit count. Don't bother with the next step if we don't have any substitutions to make
+                if (unitCount == 0) {
+                    continue;
+                }
+                
+                // find units in player's campaign (not just forces!)
+                for(Unit unit : campaign.getHangar().getUnits()) {
+                    if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                        int alpha = 1;
+                    }
+                    
+                    // if it's the right type of unit and is around
+                    if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(), sft.getAllowedUnitType(), false) && 
+                            unit.isAvailable() && unit.isFunctional()) {
+                        
+                        // add the unit to the scenario and bench the appropriate bot unit if one is present
+                        scenario.addUnit(unit, sft.getForceName(), false);
+                        AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(), sft.getForceName(), scenario.getBackingScenario());
+                        unitCount--;
+                        
+                        // once we've supplied enough units, end the process
+                        if (unitCount == 0) {
+                            break;
+                        }
+                    }
                 }
             }
         }
