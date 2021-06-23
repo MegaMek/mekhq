@@ -2492,16 +2492,23 @@ public class AtBDynamicScenarioFactory {
         //      and bot forces. 
 
         if (destinationTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) {
-            List<UUID> candidateIDs = scenario.getBotTemplateUnits().get(destinationTemplate.getForceName());
+            Entity swapTarget = null;
             
-            if ((candidateIDs != null) && (candidateIDs.isEmpty())) {
+            // look through the "allies" player to see a unit that was put there
+            // under a matching template
+            for (Entity entity : scenario.getAlliesPlayer()) {
+                UUID unitID = UUID.fromString(entity.getExternalIdAsString());
+                
+                if (scenario.getBotUnitTemplates().get(unitID).getForceName().equals(templateName)) {
+                    swapTarget = entity;
+                    break;
+                }
+            }
+            
+            if (swapTarget == null) {
                 return;
             }
             
-            UUID unitID = candidateIDs.get(0);                
-            candidateIDs.remove(0);                
-            
-            Entity swapTarget = scenario.getAlliesPlayer().stream().filter(item -> item.getExternalIdAsString() == unitID.toString()).findFirst().get();
             BenchedEntityData benchedEntity = new BenchedEntityData();
             benchedEntity.entity = swapTarget;
             benchedEntity.templateName = "";
@@ -2516,7 +2523,7 @@ public class AtBDynamicScenarioFactory {
             // but it is also difficult to create a reverse lookup, so we avoid that problem for now
             for (int x = 0; x < scenario.getNumBots(); x++) {
                 BotForce candidateForce = scenario.getBotForce(x);
-                if (candidateForce.getTemplateName().equals(destinationTemplate.getForceName())) {
+                if (candidateForce.getTemplateName().equals(templateName)) {
                     botForce = candidateForce; // found a matching force, end the loop and move on.
                     break;
                 }
@@ -2573,7 +2580,7 @@ public class AtBDynamicScenarioFactory {
             
             if (benchedEntityData.templateName.isEmpty()) {
                 scenario.getAlliesPlayer().add(benchedEntityData.entity);
-                swapUnitInObjectives(benchedEntityData.entity.toString(), playerUnitID.toString(), "", scenario);
+                swapUnitInObjectives(benchedEntityData.entity.getExternalIdAsString(), playerUnitID.toString(), "", scenario);
             } else {
                 for (int x = 0; x < scenario.getNumBots(); x++) {
                     BotForce botForce = scenario.getBotForce(x);
@@ -2587,6 +2594,7 @@ public class AtBDynamicScenarioFactory {
                 }
             }
             
+            scenario.getPlayerUnitSwaps().remove(playerUnitID);
         }
     }
 }

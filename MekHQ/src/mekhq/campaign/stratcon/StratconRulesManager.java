@@ -197,16 +197,16 @@ public class StratconRulesManager {
                 int unitCount = 0;
 
                 // get all the units that have been generated for this template
-                for (UUID unitID : scenario.getBackingScenario().getBotUnitTemplates().keySet()) {
-                    if (scenario.getBackingScenario().getBotUnitTemplates().get(unitID).getForceName().equals(sft.getForceName())) {
+                for (ScenarioForceTemplate template : scenario.getBackingScenario().getBotUnitTemplates().values()) {
+                    if (template.getForceName().equals(sft.getForceName())) {
                         unitCount++;
                     }
                 }
                 
                 // or the units embedded in bot forces
-                for (BotForce botForce : scenario.getBackingScenario().getBotForceTemplates().keySet()) {
-                    if (scenario.getBackingScenario().getBotForceTemplates().get(botForce).getForceName().equals(sft.getForceName())) {
-                        unitCount += botForce.getEntityList().size();
+                for (var tuple : scenario.getBackingScenario().getBotForceTemplates().entrySet()) {
+                    if (tuple.getValue().getForceName().equals(sft.getForceName())) {
+                        unitCount += tuple.getKey().getEntityList().size();
                     }
                 }
                 
