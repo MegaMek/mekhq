@@ -49,6 +49,7 @@ import mekhq.campaign.unit.Unit;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -214,8 +215,26 @@ public class StratconRulesManager {
                     continue;
                 }
                 
+                Collection<Unit> potentialUnits = new HashSet<>();
+                
                 // find units in player's campaign (not just forces!)
-                for(Unit unit : campaign.getHangar().getUnits()) {                    
+                // by default, all units are eligible
+                if (explicitForceID == Force.FORCE_NONE) {
+                    potentialUnits = campaign.getHangar().getUnits();
+                // if we're using a seed force, then units transporting this force
+                // are eligible
+                } else {
+                    Force force = campaign.getForce(explicitForceID);
+                    for (UUID unitID : force.getUnits()) {
+                        Unit unit = campaign.getUnit(unitID);
+                        if (unit.getTransportShipAssignment() != null) {
+                            potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                        }
+                    }
+                }
+                    
+                    
+                for (Unit unit : potentialUnits) {                    
                     // if it's the right type of unit and is around
                     if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(), sft.getAllowedUnitType(), false) && 
                             unit.isAvailable() && unit.isFunctional()) {
@@ -298,6 +317,13 @@ public class StratconRulesManager {
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            
+            // if we wound up with a field scenario, we may sub in dropships carrying
+            // units of the force in question
+            if (spawnScenario && !isNonAlliedFacility) {
+                swapInPlayerUnits(scenario, campaign, forceID);
+            }
+            
             commitPrimaryForces(campaign, scenario, track);
         }
     }
@@ -674,7 +700,7 @@ public class StratconRulesManager {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
-        // StratconScenarioFactory.getSpecificScenario("Hostile Facility.xml");
+        //template = StratconScenarioFactory.getSpecificScenario("Defend Grounded Dropship.xml");
 
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
