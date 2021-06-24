@@ -25,28 +25,28 @@ import mekhq.MekHqConstants;
 import javax.swing.*;
 import java.util.ResourceBundle;
 
-public class AbstractMenu extends JMenu {
+public class JScrollableMenu extends JMenu {
     //region Variable Declarations
     protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    public AbstractMenu(final String name) {
+    public JScrollableMenu(final String name) {
         super();
         setName(name);
     }
 
-    public AbstractMenu(final String name, final String text) {
+    public JScrollableMenu(final String name, final String text) {
         super(text);
         setName(name);
     }
 
-    public AbstractMenu(final String name, final Action action) {
+    public JScrollableMenu(final String name, final Action action) {
         super(action);
         setName(name);
     }
 
-    public AbstractMenu(final String name, final String text, final boolean b) {
+    public JScrollableMenu(final String name, final String text, final boolean b) {
         super(text, b);
         setName(name);
     }
