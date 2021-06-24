@@ -19,11 +19,12 @@
 package mekhq.campaign.io.Migration;
 
 import megamek.common.icons.Camouflage;
+import mekhq.MekHQ;
 import mekhq.Version;
 
 /**
  * This migrates Camouflage from SeaBee's Pack to Deadborder's Pack.
- * This migration occurred in 0.49.3.
+ * This migration occurred in 0.49.2 to 0.49.3.
  */
 public class CamouflageMigrator {
     public static void migrateCamouflage(final Version version, final Camouflage camouflage) {
@@ -32,15 +33,22 @@ public class CamouflageMigrator {
             camouflage.setFilename(migrateFilename(camouflage.getCategory(), camouflage.getFilename()));
             finalizeMigration(camouflage);
         } else {
-            if ("Capellan Confederation/Liao Cháng-Chéng/".equalsIgnoreCase(camouflage.getCategory())) {
-                camouflage.setCategory("Capellan Confederation/Liao Chang-Cheng/");
-            } else if ("Magistracy of Canopus/Chasseurs á Cheval/".equalsIgnoreCase(camouflage.getCategory())) {
-                camouflage.setCategory("Capellan Confederation/Chasseurs a Cheval/");
-            } else if ("Pirates/".equalsIgnoreCase(camouflage.getCategory())) {
-                if ("Shen-sè Tian.jpg".equalsIgnoreCase(camouflage.getFilename())) {
-                    camouflage.setFilename("Shen-se Tian.jpg");
-                }
+            switch (camouflage.getCategory()) {
+                case "Capellan Confederation/Liao Ch\u00e1ng-Ch\u00e9ng/":
+                    camouflage.setCategory("Capellan Confederation/Liao Chang-Cheng/");
+                    break;
+                case "Magistracy of Canopus/Chasseurs \u00e1 Cheval/":
+                    camouflage.setCategory("Magistracy of Canopus/Chasseurs a Cheval/");
+                    break;
+                case "Pirates/":
+                    if ("Shen-s\u00e8 Tian.jpg".equalsIgnoreCase(camouflage.getFilename())) {
+                        camouflage.setFilename("Shen-se Tian.jpg");
+                    }
+                    break;
+                default:
+                    break;
             }
+            MekHQ.getLogger().warning("Migrated to " + camouflage.toString());
         }
     }
 
