@@ -321,7 +321,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         }
 
         if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(getCamouflage());
+            CamouflageMigrator.migrateCamouflage(version, getCamouflage());
         }
     }
 }

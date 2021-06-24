@@ -19,16 +19,29 @@
 package mekhq.campaign.io.Migration;
 
 import megamek.common.icons.Camouflage;
+import mekhq.Version;
 
 /**
  * This migrates Camouflage from SeaBee's Pack to Deadborder's Pack.
  * This migration occurred in 0.49.3.
  */
 public class CamouflageMigrator {
-    public static void migrateCamouflage(final Camouflage camouflage) {
-        camouflage.setCategory(migrateCategory(camouflage.getCategory()));
-        camouflage.setFilename(migrateFilename(camouflage.getCategory(), camouflage.getFilename()));
-        finalizeMigration(camouflage);
+    public static void migrateCamouflage(final Version version, final Camouflage camouflage) {
+        if (version.isLowerThan("0.49.2")) {
+            camouflage.setCategory(migrateCategory(camouflage.getCategory()));
+            camouflage.setFilename(migrateFilename(camouflage.getCategory(), camouflage.getFilename()));
+            finalizeMigration(camouflage);
+        } else {
+            if ("Capellan Confederation/Liao Cháng-Chéng/".equalsIgnoreCase(camouflage.getCategory())) {
+                camouflage.setCategory("Capellan Confederation/Liao Chang-Cheng/");
+            } else if ("Magistracy of Canopus/Chasseurs á Cheval/".equalsIgnoreCase(camouflage.getCategory())) {
+                camouflage.setCategory("Capellan Confederation/Chasseurs a Cheval/");
+            } else if ("Pirates/".equalsIgnoreCase(camouflage.getCategory())) {
+                if ("Shen-sè Tian.jpg".equalsIgnoreCase(camouflage.getFilename())) {
+                    camouflage.setFilename("Shen-se Tian.jpg");
+                }
+            }
+        }
     }
 
     private static String migrateCategory(String text) {
@@ -109,7 +122,7 @@ public class CamouflageMigrator {
         } else if (text.startsWith("Capellan Confederation/Citizens Honored/")) {
             text = text.replaceFirst("Citizens Honored", "Citizen's Honored");
         } else if (text.startsWith("Capellan Confederation/Liao Chang-Cheng (Liao Reserves)/")) {
-            text = text.replaceFirst("Liao Chang-Cheng (Liao Reserves)", "Liao Cháng-Chéng");
+            text = text.replaceFirst("Liao Chang-Cheng (Liao Reserves)", "Liao Chang-Cheng");
         } else if (text.startsWith("Capellan Confederation/Victoria Commonality Regulars/")) {
             text = text.replaceFirst("Victoria Commonality Regulars", "Victoria Rangers");
         } else if (text.startsWith("Capellan Confederation/McCarrons Armored Cavalry/")) {
@@ -117,7 +130,7 @@ public class CamouflageMigrator {
         } else if (text.startsWith("Capellan Confederation/Reserve Cavalry/")) {
             text = text.replaceFirst("Reserve Cavalry", "Capellan Reserve Cavalry");
         } else if (text.startsWith("Magistracy of Canopus/Chasseurs a Cheval/")) {
-            text = text.replaceFirst("Chasseurs a Cheval", "Chasseurs á Cheval");
+            text = text.replaceFirst("Chasseurs a Cheval", "Chasseurs a Cheval");
         } else if (text.startsWith("Lyran Commonwealth/Bolan Guard/")) {
             text = text.replaceFirst("Bolan Guard", "Commonwealth Guards");
         } else if (text.startsWith("Lyran Commonwealth/Buena Guard/")) {
@@ -165,7 +178,7 @@ public class CamouflageMigrator {
                 return migrateCitizensHonored(text);
             case "Capellan Confederation/Free Capella/":
                 return text.equalsIgnoreCase("Borodins Vindicators.jpg") ? "Borodin's Vindicators.jpg" : text;
-            case "Capellan Confederation/Liao Cháng-Chéng/":
+            case "Capellan Confederation/Liao Chang-Cheng/":
                 return migrateLiaoChangCheng(text);
             case "Capellan Confederation/McCarron's Armored Cavalry/":
                 return migrateMcCarronsArmoredCavalry(text);
@@ -709,7 +722,7 @@ public class CamouflageMigrator {
             case "Morrisons Extractors.jpg":
                 return "Morrison's Extractors.jpg";
             case "Shen se Tian.jpg":
-                return "Shen-sè Tian.jpg";
+                return "Shen-se Tian.jpg";
             default:
                 return text;
         }

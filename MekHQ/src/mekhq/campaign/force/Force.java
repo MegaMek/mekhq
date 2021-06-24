@@ -522,7 +522,7 @@ public class Force implements Serializable {
         }
 
         if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(retVal.getCamouflage());
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         return retVal;
