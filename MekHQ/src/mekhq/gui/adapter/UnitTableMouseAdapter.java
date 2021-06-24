@@ -42,6 +42,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -96,7 +97,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl());
 
     //region Commands
     //region Standard Commands
@@ -154,6 +154,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
     //endregion GM Commands
     //endregion Commands
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     protected UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
@@ -322,14 +324,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             if (toRemove.size() > 0) {
-                String title = String.format(resourceMap.getString("deleteUnitsCount.text"), toRemove.size());
+                String title = String.format(resources.getString("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
                     title = toRemove.get(0).getName();
                 }
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        String.format(resourceMap.getString("confirmRemove.format"), title),
-                        resourceMap.getString("removeQ.text"),
+                        String.format(resources.getString("confirmRemove.text"), title),
+                        resources.getString("removeQ.title"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Unit unit : toRemove) {
                         gui.getCampaign().removeUnit(unit.getId());
@@ -793,9 +795,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             if (oneSelected) {
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), unit));
-            }
-
-            if (allRequireSameTechType) {
+            } else if (allRequireSameTechType) { // Tech assignment is otherwise in the above menu
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToTechMenu(gui.getCampaign(),
                         skill, maintenanceTime, units));
             }
@@ -901,7 +901,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             // fill with personnel
             if (oneAvailableUnitBelowMaxCrew) {
-                menuItem = new JMenuItem(resourceMap.getString("hireMinimumComplement.text"));
+                menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
                 menuItem.setActionCommand(COMMAND_HIRE_FULL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1018,7 +1018,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem(resourceMap.getString("addMinimumComplement.text"));
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplement.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
@@ -1057,12 +1057,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void addCustomUnitTag(Unit... units) {
-        String sCustomsDir = "data/mechfiles/customs/";
-        String sCustomsDirCampaign = sCustomsDir + gui.getCampaign().getName() + "/";
-        File customsDir = new File(sCustomsDir);
+        String sCustomsDirCampaign = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
+                + gui.getCampaign().getName() + "/";
+        File customsDir = new File(MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Unable to create directory " + sCustomsDir
+                MekHQ.getLogger().error("Unable to create directory "
+                        + MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
                         + " to hold custom units, cannot assign custom unit tag");
                 return;
             }
@@ -1080,7 +1081,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (unit.getEntity() instanceof Mech) {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
+                String fileOutName = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                        + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     JOptionPane.showMessageDialog(null,
@@ -1098,7 +1100,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
+                String fileOutName = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                        + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     JOptionPane.showMessageDialog(null,

@@ -133,6 +133,7 @@ public final class MekHqConstants {
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
+    public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";

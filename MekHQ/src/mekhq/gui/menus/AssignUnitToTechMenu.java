@@ -19,23 +19,17 @@
 package mekhq.gui.menus;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.utilities.JMenuHelpers;
+import mekhq.gui.baseComponents.JScrollableMenu;
 
 import javax.swing.*;
-import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-public class AssignUnitToTechMenu extends JMenu {
-    //region Variable Declarations
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
-    //endregion Variable Declarations
-
+public class AssignUnitToTechMenu extends JScrollableMenu {
     //region Constructors
     public AssignUnitToTechMenu(final Campaign campaign, final Unit unit) {
         this("AssignPersonToUnitMenu.Tech.title", campaign,
@@ -50,17 +44,17 @@ public class AssignUnitToTechMenu extends JMenu {
     public AssignUnitToTechMenu(final String title, final Campaign campaign,
                                 final @Nullable String skillName, final int maintenanceTime,
                                 final Unit... units) {
-        super();
+        super("AssignUnitToTechMenu");
         initialize(title, campaign, skillName, maintenanceTime, units);
     }
     //endregion Constructors
 
+    //region Initialization
     private void initialize(final String title, final Campaign campaign,
                             final @Nullable String skillName, final int maintenanceTime,
                             final Unit... units) {
         // Initialize Menu
         setText(resources.getString(title));
-        setName("AssignUnitToTechMenu");
 
         // Default Return for Illegal Assignments - Null/Empty Skill Name or Self-Crewed Units
         // don't need techs, and if the total maintenance time is longer than the maximum for a
@@ -72,11 +66,11 @@ public class AssignUnitToTechMenu extends JMenu {
         }
 
         // Person Assignment Menus
-        final JMenu eliteMenu = new JMenu(SkillType.ELITE_NM);
-        final JMenu veteranMenu = new JMenu(SkillType.VETERAN_NM);
-        final JMenu regularMenu = new JMenu(SkillType.REGULAR_NM);
-        final JMenu greenMenu = new JMenu(SkillType.GREEN_NM);
-        final JMenu ultraGreenMenu = new JMenu(SkillType.ULTRA_GREEN_NM);
+        final JMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
+        final JMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
+        final JMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
+        final JMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
+        final JMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
 
         for (final Person tech : campaign.getTechs()) {
             final boolean selected = Stream.of(units).allMatch(unit -> tech.equals(unit.getTech()));
@@ -133,11 +127,11 @@ public class AssignUnitToTechMenu extends JMenu {
             }
         }
 
-        JMenuHelpers.addMenuIfNonEmpty(this, eliteMenu);
-        JMenuHelpers.addMenuIfNonEmpty(this, veteranMenu);
-        JMenuHelpers.addMenuIfNonEmpty(this, regularMenu);
-        JMenuHelpers.addMenuIfNonEmpty(this, greenMenu);
-        JMenuHelpers.addMenuIfNonEmpty(this, ultraGreenMenu);
+        add(eliteMenu);
+        add(veteranMenu);
+        add(regularMenu);
+        add(greenMenu);
+        add(ultraGreenMenu);
 
         // And finally add the ability to simply unassign
         final JMenuItem miUnassignTech = new JMenuItem(resources.getString("None.text"));
@@ -149,4 +143,5 @@ public class AssignUnitToTechMenu extends JMenu {
         });
         add(miUnassignTech);
     }
+    //endregion Initialization
 }

@@ -528,16 +528,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Run a diagnostic on this unit
-     * TODO: This is being called in the PersonnelTableModel after changes to the personnel
-     * attached to a unit, but I am not sure it needs to be. I don't think any parts check
-     * attached personnel. I think it could b removed, but I am going to leave it for the
-     * moment because I have made so many other changes in this version.
      */
     public void runDiagnostic(boolean checkForDestruction) {
         //need to set up an array of part ids to avoid concurrent modification
         //problems because some updateCondition methods will remove the part and put
         //in a new one
-        ArrayList<Part> tempParts = new ArrayList<>();
+        List<Part> tempParts = new ArrayList<>();
         tempParts.addAll(parts);
 
         for (Part part : tempParts) {

@@ -18,26 +18,20 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
-import mekhq.gui.utilities.JMenuHelpers;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class AssignUnitToPersonMenu extends JMenu {
-    //region Variable Declarations
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
-    //endregion Variable Declarations
-
+public class AssignUnitToPersonMenu extends JScrollableMenu {
     //region Constructors
     public AssignUnitToPersonMenu(final Campaign campaign, final Unit unit) {
-        super();
+        super("AssignUnitToPersonMenu");
         initialize(campaign, unit);
     }
     //endregion Constructors
@@ -46,25 +40,16 @@ public class AssignUnitToPersonMenu extends JMenu {
     private void initialize(final Campaign campaign, final Unit unit) {
         // Initialize Menu
         setText(resources.getString("AssignUnitToPersonMenu.title"));
-        setName("AssignUnitToPersonMenu");
 
         // Person Assignment Menus
-        final JMenu pilotMenu = new JMenu(resources.getString("pilotMenu.text"));
-        pilotMenu.setName("pilotMenu");
-        final JMenu driverMenu = new JMenu(resources.getString("driverMenu.text"));
-        driverMenu.setName("driverMenu");
-        final JMenu gunnerMenu = new JMenu(resources.getString("gunnerMenu.text"));
-        gunnerMenu.setName("gunnerMenu");
-        final JMenu crewmemberMenu = new JMenu(resources.getString("crewmemberMenu.text"));
-        crewmemberMenu.setName("crewmemberMenu");
-        final JMenu techOfficerMenu = new JMenu(resources.getString("techOfficerMenu.text"));
-        techOfficerMenu.setName("techOfficerMenu");
-        final JMenu consoleCommanderMenu = new JMenu(resources.getString("consoleCommanderMenu.text"));
-        consoleCommanderMenu.setName("consoleCommanderMenu");
-        final JMenu soldierMenu = new JMenu(resources.getString("soldierMenu.text"));
-        soldierMenu.setName("soldierMenu");
-        final JMenu navigatorMenu = new JMenu(resources.getString("navigatorMenu.text"));
-        navigatorMenu.setName("navigatorMenu");
+        final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
+        final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
+        final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
+        final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
+        final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
+        final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
+        final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
+        final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
 
         final List<Person> personnel = new ArrayList<>(campaign.getPersonnel());
         personnel.sort(new PersonTitleSorter());
@@ -88,6 +73,7 @@ public class AssignUnitToPersonMenu extends JMenu {
                 continue;
             }
 
+            // TODO : Finish me
             if (unit.usesSoloPilot()) {
 
             } else if (unit.usesSoldiers()) {
@@ -98,7 +84,15 @@ public class AssignUnitToPersonMenu extends JMenu {
         }
 
         // Assign Tech to Unit Menu
-        JMenuHelpers.addMenuIfNonEmpty(this, new AssignUnitToTechMenu(campaign, unit));
+        add(new AssignUnitToTechMenu(campaign, unit));
+
+        // And finally add the ability to simply unassign
+        final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
+        miUnassignPerson.setName("miUnassignPerson");
+        miUnassignPerson.addActionListener(evt -> {
+            // TODO : Finish me
+        });
+        add(miUnassignPerson);
     }
     //endregion Initialization
 }
