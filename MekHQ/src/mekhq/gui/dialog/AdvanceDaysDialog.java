@@ -287,19 +287,24 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         boolean firstDay = true;
         final List<String> reports = new ArrayList<>();
         for (; days > 0; days--) {
-            if (!getGUI().getCampaign().newDay()) {
+            try {
+                if (!getGUI().getCampaign().newDay()) {
+                    break;
+                }
+
+                final String report = getGUI().getCampaign().getCurrentReportHTML();
+                if (firstDay) {
+                    getDailyLogPanel().refreshLog(report);
+                    firstDay = false;
+                } else {
+                    reports.add(resources.getString("HR.text"));
+                    reports.add(report);
+                }
+                getGUI().getCampaign().fetchAndClearNewReports();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
                 break;
             }
-
-            final String report = getGUI().getCampaign().getCurrentReportHTML();
-            if (firstDay) {
-                getDailyLogPanel().refreshLog(report);
-                firstDay = false;
-            } else {
-                reports.add(resources.getString("HR.text"));
-                reports.add(report);
-            }
-            getGUI().getCampaign().fetchAndClearNewReports();
         }
 
         setRunning(false);
