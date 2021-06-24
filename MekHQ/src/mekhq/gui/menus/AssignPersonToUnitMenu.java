@@ -57,7 +57,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Person Assignment Menus
 
         // and we always include the None checkbox
-        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text"));
+        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("None.text"));
         cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);

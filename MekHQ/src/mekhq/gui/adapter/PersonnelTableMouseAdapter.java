@@ -194,7 +194,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl());
     //endregion Variable Declarations
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
@@ -391,7 +391,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (null == spa) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                                 selectedPerson.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES,
-                                        "edge", selectedPerson.getEdge() + 1);
+                                        OptionsConstants.EDGE, selectedPerson.getEdge() + 1);
                                 gui.getCampaign().addReport(String.format(resources.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName()));
                             }
                         } else {
@@ -416,7 +416,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "weapon_specialist", selected);
+                        OptionsConstants.GUNNERY_WEAPON_SPECIALIST, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
@@ -426,7 +426,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "specialist", selected);
+                        OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
@@ -436,7 +436,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "range_master", selected);
+                        OptionsConstants.GUNNERY_RANGE_MASTER, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
@@ -446,7 +446,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "human_tro", selected);
+                        OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
