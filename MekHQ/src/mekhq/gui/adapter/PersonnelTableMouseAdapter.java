@@ -365,19 +365,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PILOT: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                Unit oldUnit = selectedPerson.getUnit();
-                boolean useTransfers = false;
-                boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                if (null != oldUnit) {
-                    oldUnit.remove(selectedPerson, transferLog);
-                    useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
+                final Unit oldUnit = selectedPerson.getUnit();
+                if (oldUnit != null) {
+                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
                 }
-                if (null != u) {
-                    u.addPilotOrSoldier(selectedPerson, useTransfers);
-                    u.resetPilotAndEntity();
-                    u.runDiagnostic(false);
+
+                if (unit != null) {
+                    unit.addPilotOrSoldier(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
+                    unit.resetPilotAndEntity();
+                    unit.runDiagnostic(false);
                 }
                 break;
             }
@@ -404,19 +401,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_DRIVER: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                Unit oldUnit = selectedPerson.getUnit();
-                boolean useTransfers = false;
-                boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                if (null != oldUnit) {
-                    oldUnit.remove(selectedPerson, transferLog);
-                    useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
+                final Unit oldUnit = selectedPerson.getUnit();
+                if (oldUnit != null) {
+                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
                 }
-                if (null != u) {
-                    u.addDriver(selectedPerson, useTransfers);
-                    u.resetPilotAndEntity();
-                    u.runDiagnostic(false);
+
+                if (unit != null) {
+                    unit.addDriver(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
+                    unit.resetPilotAndEntity();
+                    unit.runDiagnostic(false);
                 }
                 break;
             }
@@ -1591,6 +1585,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             }
                         }
                     }
+
                     if (unit.canTakeTech() && person.canTech(unit.getEntity())
                             && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
                         cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"),

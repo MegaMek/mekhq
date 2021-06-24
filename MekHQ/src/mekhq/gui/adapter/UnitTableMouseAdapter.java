@@ -51,7 +51,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
@@ -71,6 +70,8 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.menus.AssignUnitToPersonMenu;
+import mekhq.gui.menus.AssignUnitToTechMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -115,8 +116,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_MOTHBALL = "MOTHBALL";
     public static final String COMMAND_ACTIVATE = "ACTIVATE";
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
-    // Assign Tech Commands
-    public static final String COMMAND_ASSIGN_TECH = "ASSIGN";
     // Unit History Commands
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
     // Remove All Personnel Commands
@@ -221,17 +220,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.showMaintenanceReport(selectedUnit.getId());
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             gui.showUnitCostReport(selectedUnit.getId());
-        } else if (command.contains(COMMAND_ASSIGN_TECH)) {
-            Person tech = gui.getCampaign().getPerson(UUID.fromString(command.split(":")[1]));
-            if (tech != null) {
-                // remove any existing techs
-                for (Unit u : units) {
-                    if (u.getTech() != null) {
-                        u.remove(u.getTech(), true);
-                    }
-                    u.setTech(tech);
-                }
-            }
         } else if (command.equals(COMMAND_SET_QUALITY)) {
             int q;
             Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this probably shouldn't be inline
@@ -654,7 +642,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     oneHasIndividualCamo = true;
                 }
 
-                if (u.getCrew().size() > 0) {
+                if (!u.getCrew().isEmpty()) {
                     oneHasCrew = true;
                 }
 
@@ -677,12 +665,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 if (!StringUtil.isNullOrEmpty(skill)) {
                     if (!skill.equals(u.determineUnitTechSkillType())) {
                         allRequireSameTechType = false;
-                        skill = ""; //little performance saving hack
+                        skill = ""; // little performance saving hack
                         continue;
                     }
                     maintenanceTime += u.getMaintenanceTime();
                     if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
-                        skill = ""; //little performance saving hack
+                        skill = ""; // little performance saving hack
                     }
                 }
 
@@ -803,76 +791,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (allRequireSameTechType && !StringUtil.isNullOrEmpty(skill)) {
-                menu = new JMenu("Assign Tech");
-                JMenu menuElite = new JMenu(SkillType.ELITE_NM);
-                JMenu menuVeteran = new JMenu(SkillType.VETERAN_NM);
-                JMenu menuRegular = new JMenu(SkillType.REGULAR_NM);
-                JMenu menuGreen = new JMenu(SkillType.GREEN_NM);
-                JMenu menuUltraGreen = new JMenu(SkillType.ULTRA_GREEN_NM);
+            if (oneSelected) {
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), unit));
+            }
 
-                int techsFound = 0;
-                for (Person tech : gui.getCampaign().getTechs()) {
-                    if (tech.hasSkill(skill)
-                            && (tech.getMaintenanceTimeUsing() + maintenanceTime)
-                                    <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
-
-                        String skillLvl = "Unknown";
-                        if (tech.getSkillForWorkingOn(unit) != null) {
-                            skillLvl = SkillType.getExperienceLevelName(
-                                    tech.getSkillForWorkingOn(unit).getExperienceLevel());
-                        }
-
-                        JMenu subMenu;
-                        switch (skillLvl) {
-                            case SkillType.ELITE_NM:
-                                subMenu = menuElite;
-                                break;
-                            case SkillType.VETERAN_NM:
-                                subMenu = menuVeteran;
-                                break;
-                            case SkillType.REGULAR_NM:
-                                subMenu = menuRegular;
-                                break;
-                            case SkillType.GREEN_NM:
-                                subMenu = menuGreen;
-                                break;
-                            case SkillType.ULTRA_GREEN_NM:
-                                subMenu = menuUltraGreen;
-                                break;
-                            default:
-                                subMenu = null;
-                                break;
-                        }
-
-                        if (subMenu != null) {
-                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle()
-                                    + " (" + tech.getMaintenanceTimeUsing() + "m)");
-                            cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
-
-                            if (tech.equals(unit.getTech())) {
-                                cbMenuItem.setSelected(true);
-                            } else {
-                                cbMenuItem.addActionListener(this);
-                            }
-
-                            subMenu.add(cbMenuItem);
-                            if (cbMenuItem.isSelected()) {
-                                subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
-                            }
-                            techsFound++;
-                        }
-                    }
-                }
-
-                if (techsFound > 0) {
-                    JMenuHelpers.addMenuIfNonEmpty(menu, menuElite);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, menuVeteran);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, menuRegular);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, menuGreen);
-                    JMenuHelpers.addMenuIfNonEmpty(menu, menuUltraGreen);
-                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-                }
+            if (allRequireSameTechType) {
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToTechMenu(gui.getCampaign(),
+                        skill, maintenanceTime, units));
             }
 
             // if we're using maintenance and have selected something that requires maintenance
