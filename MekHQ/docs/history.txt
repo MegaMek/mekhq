@@ -8,6 +8,8 @@ VERSION HISTORY:
 + Issue #2707: Preventing text wrap in the person title JTable usages
 + PR #2718: Fixing Bulk Refit Complete/Cancel
 + Issue #2717: Advance Days Dialog no longer based on modality
++ PR #2716: StratCon - player dropships will now be pulled into dropship defense scenarios;
+	more abstractly: capability to substitute player units for bot units in designated scenario force templates
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
