@@ -57,7 +57,7 @@ public class CampaignManagementDialog extends JDialog {
         
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
-            lblTrackScenarioOdds.setText(String.format("Scenario Odds: %d%%", currentTrack.getScenarioOdds()));
+            lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%", currentTrack.getScenarioOdds()));
         }
     }
     
