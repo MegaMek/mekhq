@@ -13,8 +13,10 @@
 */
 package mekhq.gui;
 
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -23,6 +25,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,6 +42,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.stratcon.CampaignManagementDialog;
 
 /**
  * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
@@ -56,6 +60,8 @@ public class StratconTab extends CampaignGuiTab {
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = true;
 
+    CampaignManagementDialog cmd;
+    
     /**
      * Creates an instance of the StratconTab.
      */
@@ -77,7 +83,7 @@ public class StratconTab extends CampaignGuiTab {
         campaignStatusText = new JLabel();
         campaignStatusText.setHorizontalAlignment(SwingConstants.LEFT);
         campaignStatusText.setVerticalAlignment(SwingConstants.TOP);
-
+        
         objectiveStatusText = new JLabel();
         objectiveStatusText.setHorizontalAlignment(SwingConstants.LEFT);
         objectiveStatusText.setVerticalAlignment(SwingConstants.TOP);
@@ -102,6 +108,8 @@ public class StratconTab extends CampaignGuiTab {
 
         initializeInfoPanel();
         this.add(infoPanel);
+        
+        cmd = new CampaignManagementDialog(this);
 
         MekHQ.registerHandler(this);
     }
@@ -115,6 +123,13 @@ public class StratconTab extends CampaignGuiTab {
 
         infoPanel.add(new JLabel("Current Campaign Status:"));
         infoPanel.add(campaignStatusText);
+        
+        JButton btnManageCampaignState = new JButton();
+        btnManageCampaignState.setHorizontalAlignment(SwingConstants.LEFT);
+        btnManageCampaignState.setVerticalAlignment(SwingConstants.TOP);
+        btnManageCampaignState.setText("Manage SP/VP");
+        btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
+        infoPanel.add(btnManageCampaignState);
 
         expandedObjectivePanel = new JScrollPane(objectiveStatusText);
         expandedObjectivePanel.setMaximumSize(new Dimension(400, 300));
@@ -177,7 +192,7 @@ public class StratconTab extends CampaignGuiTab {
      * Worker function that updates the campaign state section of the info panel
      * with such info as current objective status, VP/SP totals, etc.
      */
-    private void updateCampaignState() {
+    public void updateCampaignState() {
         if ((cboCurrentTrack == null) || (campaignStatusText == null)) {
             return;
         }
@@ -393,6 +408,13 @@ public class StratconTab extends CampaignGuiTab {
             infoPanelText.setText("No active campaign tracks");
             stratconPanel.setVisible(false);
         }
+    }
+    
+    private void showCampaignStateManagement(ActionEvent e) {
+        TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        cmd.display(selectedTrack.contract.getStratconCampaignState(), selectedTrack.track, getCampaign().isGM());
+        cmd.setModalityType(ModalityType.APPLICATION_MODAL);
+        cmd.setVisible(true);
     }
 
     @Subscribe
