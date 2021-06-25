@@ -64,6 +64,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
@@ -158,7 +159,7 @@ public class AtBDynamicScenarioFactory {
         setTerrain(scenario);
 
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
-        if (!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
+        if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
             
             // the default template should not allow the user to deploy ground units as 
@@ -171,7 +172,7 @@ public class AtBDynamicScenarioFactory {
             }
             
             
-            template.scenarioForces.put(defaultReinforcements.getForceName(), defaultReinforcements);
+            template.getScenarioForces().put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
         return scenario;
@@ -345,7 +346,8 @@ public class AtBDynamicScenarioFactory {
         int forceUnitBudget = 0;
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
-        } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
+        } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) ||
+                (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ?
                     lanceSize : forceTemplate.getFixedUnitCount();
         }
@@ -1768,7 +1770,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario to process
      */
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
-        for (ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
+        for (ScenarioForceTemplate forceTemplate : scenario.getTemplate().getAllScenarioForces()) {
             calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
         }
 
@@ -1796,16 +1798,16 @@ public class AtBDynamicScenarioFactory {
                 Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameEdge) {
-            calculatedEdge = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            calculatedEdge = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeEdge) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             calculatedEdge = getOppositeEdge(syncDeploymentZone);
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameArc) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             List<Integer> arc = getArc(syncDeploymentZone, true);
             calculatedEdge = arc.get(Compute.randomInt(arc.size()));
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeArc) {
-            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().getScenarioForces().get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
             List<Integer> arc = getArc(syncDeploymentZone, false);
             calculatedEdge = arc.get(Compute.randomInt(arc.size()));
         }
@@ -2462,5 +2464,137 @@ public class AtBDynamicScenarioFactory {
         }
         
         return contract.getSystem().getFactions(currentDate).contains(factionCode);
+    }
+    
+    /**
+     * Given a player unit ID and a template name, if the player unit type matches  
+     * the template's unit type and the template generation method is PlayerOrAllied,
+     * take the first unit that we find in the given scenario that's a part of that
+     * template and "put it away".
+     */
+    public static void benchAllyUnit(UUID playerUnitID, String templateName, AtBDynamicScenario scenario) {
+        ScenarioForceTemplate destinationTemplate = null;
+        if (scenario.getTemplate().getScenarioForces().containsKey(templateName)) {
+            destinationTemplate = scenario.getTemplate().getScenarioForces().get(templateName);
+        }
+        
+        if ((destinationTemplate == null) || 
+                (destinationTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
+            return;
+        }
+        
+        // two possible situations here:
+        // 1 - the unit is an "attached" unit. This requires a mapping between template name and 
+        //      individual attached units. At this point, we remove the first unit matching the template
+        //      from the attached units list. The benched unit should have the player unit's ID
+        //      stored so that if the player unit is detached, the benched unit comes back.
+        // 2 - the unit is part of a bot force. In this case, we need a mapping between template names
+        //      and bot forces. 
+
+        if (destinationTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) {
+            Entity swapTarget = null;
+            
+            // look through the "allies" player to see a unit that was put there
+            // under a matching template
+            for (Entity entity : scenario.getAlliesPlayer()) {
+                UUID unitID = UUID.fromString(entity.getExternalIdAsString());
+                
+                if (scenario.getBotUnitTemplates().get(unitID).getForceName().equals(templateName)) {
+                    swapTarget = entity;
+                    break;
+                }
+            }
+            
+            if (swapTarget == null) {
+                return;
+            }
+            
+            BenchedEntityData benchedEntity = new BenchedEntityData();
+            benchedEntity.entity = swapTarget;
+            benchedEntity.templateName = "";
+            
+            scenario.getAlliesPlayer().remove(swapTarget);
+            scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+            swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), "", scenario);
+        } else {
+            BotForce botForce = null;
+            
+            // slightly inefficient to loop through all bot forces looking for our template
+            // but it is also difficult to create a reverse lookup, so we avoid that problem for now
+            for (int x = 0; x < scenario.getNumBots(); x++) {
+                BotForce candidateForce = scenario.getBotForce(x);
+                if (candidateForce.getTemplateName().equals(templateName)) {
+                    botForce = candidateForce; // found a matching force, end the loop and move on.
+                    break;
+                }
+            }
+            
+            if ((botForce != null) && !botForce.getEntityList().isEmpty()) {
+                Entity swapTarget = botForce.getEntityList().get(0);
+                BenchedEntityData benchedEntity = new BenchedEntityData();
+                benchedEntity.entity = swapTarget;
+                benchedEntity.templateName = destinationTemplate.getForceName();
+                
+                botForce.removeEntity(0);
+                scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
+                swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), botForce.getName(), scenario);
+            }
+        }
+    }
+    
+    /**
+     * Given a scenario and a pair of unit IDs (and a force), swap the first one for the second one.
+     * Or, add the unit to all objectives containing the given force.
+     */
+    private static void swapUnitInObjectives(String subIn, String subOut, String subOutForceName, AtBDynamicScenario scenario) {
+        for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            // if the sub-out unit is explicitly referenced, do a direct substitution
+            if (objective.getAssociatedUnitIDs().contains(subOut)) {
+                objective.removeUnit(subOut);
+                
+                // don't want to add an empty unit to the objective
+                if (!subIn.isEmpty()) {
+                    objective.addUnit(subIn);
+                }
+                
+                continue;
+            }
+            
+            // if the sub-out unit is replacing a unit that's part of a force, 
+            // just add it individually
+            if (objective.getAssociatedForceNames().contains(subOutForceName)) {
+                objective.addUnit(subIn);
+            }
+        }
+    }
+    
+    /**
+     * Given a player unit ID and a scenario, return a benched allied unit, if one exists
+     * that was benched in favor of the player's unit.
+     */
+    public static void unbenchAttachedAlly(UUID playerUnitID, AtBDynamicScenario scenario) {
+        // get entity from temporary store (big battle allies?), if it exists
+        // add it to to bot force being worked with or attached ally list
+        if (scenario.getPlayerUnitSwaps().containsKey(playerUnitID)) {
+            BenchedEntityData benchedEntityData = scenario.getPlayerUnitSwaps().get(playerUnitID);
+            
+            if (benchedEntityData.templateName.isEmpty()) {
+                scenario.getAlliesPlayer().add(benchedEntityData.entity);
+                swapUnitInObjectives(benchedEntityData.entity.getExternalIdAsString(), playerUnitID.toString(), "", scenario);
+            } else {
+                for (int x = 0; x < scenario.getNumBots(); x++) {
+                    BotForce botForce = scenario.getBotForce(x);
+                    if (botForce.getTemplateName().equals(benchedEntityData.templateName)) {
+                        botForce.addEntity(benchedEntityData.entity);
+                        // in this situation, the entity is being added back to a force, 
+                        // so we just want to clear out the player unit. 
+                        swapUnitInObjectives("", playerUnitID.toString(), "", scenario);
+                        break;
+                    }
+                }
+            }
+            
+            scenario.getPlayerUnitSwaps().remove(playerUnitID);
+        }
     }
 }
