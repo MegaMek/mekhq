@@ -40,16 +40,18 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // Default Return for Illegal Assignments - Null/Empty Skill Name or Self-Crewed Units
         // don't need techs, and if the total maintenance time is longer than the maximum for a
         // person we can just skip too
+        // TODO :Finish me
 
 
         // Person Assignment Menus
+        // TODO :Finish me
 
 
         // And finally add the ability to simply unassign
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
         miUnassignPerson.setName("miUnassignTech");
         miUnassignPerson.addActionListener(evt -> {
-
+            // TODO :Finish me
         });
         add(miUnassignPerson);
     }
