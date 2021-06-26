@@ -1995,7 +1995,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(retVal.getCamouflage());
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         if (retVal.id == null) {
