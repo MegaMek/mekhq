@@ -37,6 +37,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
 
@@ -303,8 +304,11 @@ public class StratconTab extends CampaignGuiTab {
                 boolean displayCoordinateData = objective.getObjectiveCoords() != null;
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
 
-                if (objectiveCompleted) {
-                    sb.append("<span color='green'>");
+                if((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
+                        !campaignState.allowEarlyVictory()) {
+                    sb.append("<span>");
+                } else if (objectiveCompleted) {
+                    sb.append("<span color='green'>");                    
                 } else {
                     sb.append("<span color='red'>");
                 }
@@ -325,6 +329,10 @@ public class StratconTab extends CampaignGuiTab {
                     case AlliedFacilityControl:
                         sb.append(coordsRevealed ? "M" : "m")
                             .append("aintain control of designated facility");
+                        
+                        if (!campaignState.allowEarlyVictory()) {
+                            sb.append(" until " + campaignState.getContract().getEndingDate());
+                        }
                         break;
                     case AnyScenarioVictory:
                         sb.append("Engage and defeat hostile forces in ")

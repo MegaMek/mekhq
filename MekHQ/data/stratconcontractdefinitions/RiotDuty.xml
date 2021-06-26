@@ -3,6 +3,7 @@
     <contractTypeName>Riot Duty</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Defend designated facilities.</briefing>
+	<allowEarlyVictory>false</allowEarlyVictory>
     <hostileFacilityCount>0</hostileFacilityCount>
 	<scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>

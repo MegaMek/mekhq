@@ -1006,5 +1006,14 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
+        
+        // for StratCon, contract score is irrelevant and only leads to confusion, so we
+        // do not display it in that situation
+        boolean showContractScore = 
+                !gui.getCampaign().getCampaignOptions().getUseStratCon() &&
+                (mission instanceof AtBContract) && (((AtBContract) mission).getStratconCampaignState() != null);
+        
+        lblScore.setVisible(showContractScore);
+        txtScore.setVisible(showContractScore);
     }
 }
