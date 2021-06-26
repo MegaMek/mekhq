@@ -25,6 +25,11 @@ import mekhq.MekHqConstants;
 import javax.swing.*;
 import java.util.ResourceBundle;
 
+/**
+ * JScrollablePopupMenu is an extension of JPopupMenu that expands the add functionality so that it
+ * adds child menus only if they are not empty, and then adds a scroller to them if they are of the
+ * specified size or larger.
+ */
 public class JScrollablePopupMenu extends JPopupMenu {
     //region Variable Declarations
     protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());

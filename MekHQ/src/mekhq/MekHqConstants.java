@@ -28,7 +28,7 @@ public final class MekHqConstants {
     //region GUI Constants
     public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
     public static final int BASE_SCROLLER_THRESHOLD = 20;
-    //endregion Constants
+    //endregion GUI Constants
 
     //region MekHQ Options
     //region Display

@@ -665,13 +665,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (!StringUtil.isNullOrEmpty(skill)) {
-                    if (!skill.equals(u.determineUnitTechSkillType())) {
+                    if (skill.equals(u.determineUnitTechSkillType())) {
+                        maintenanceTime += u.getMaintenanceTime();
+                        if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                            skill = ""; // little performance saving hack
+                        }
+                    } else {
                         allRequireSameTechType = false;
-                        skill = ""; // little performance saving hack
-                        continue;
-                    }
-                    maintenanceTime += u.getMaintenanceTime();
-                    if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
                         skill = ""; // little performance saving hack
                     }
                 }

@@ -36,6 +36,10 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * This is a standard menu that takes either a person or multiple people, and allows the user to
+ * assign them to a unit or remove them from their unit(s), including tech assignments.
+ */
 public class AssignPersonToUnitMenu extends JScrollableMenu {
     //region Constructors
     public AssignPersonToUnitMenu(final Campaign campaign, final Person... people) {
@@ -55,17 +59,20 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
 
         // Person Assignment Menus
+        final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
+        final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
+        final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
+        final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
+        final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
+        final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
+        final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
+        final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
 
         // and we always include the None checkbox
         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("None.text"));
         cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
-
-        if ((menu.getItemCount() > 1) || (person.getUnit() != null)
-                || !person.getTechUnits().isEmpty()) {
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-        }
 
         // And finally add the ability to simply unassign
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));

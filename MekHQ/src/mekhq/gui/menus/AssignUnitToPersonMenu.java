@@ -28,6 +28,10 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is a standard menu that takes either a unit or multiple units that require the same tech
+ * type, and allows the user to assign or remove a tech from them.
+ */
 public class AssignUnitToPersonMenu extends JScrollableMenu {
     //region Constructors
     public AssignUnitToPersonMenu(final Campaign campaign, final Unit unit) {

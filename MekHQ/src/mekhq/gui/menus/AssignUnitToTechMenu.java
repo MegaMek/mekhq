@@ -29,21 +29,40 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import javax.swing.*;
 import java.util.stream.Stream;
 
+/**
+ * This is a standard menu that takes either a unit or multiple units, all with the same tech type,
+ * and allows the user to assign or remove a tech from them.
+ */
 public class AssignUnitToTechMenu extends JScrollableMenu {
     //region Constructors
+    /**
+     * This is used to assign a single unit a tech, normally as part of the wider person assignment
+     * menu.
+     *
+     * @param campaign the campaign the unit is a part of
+     * @param unit the unit in question
+     */
     public AssignUnitToTechMenu(final Campaign campaign, final Unit unit) {
         this("AssignPersonToUnitMenu.Tech.title", campaign,
                 unit.determineUnitTechSkillType(), unit.getMaintenanceTime(), unit);
     }
 
+    /**
+     * This is used to assign a group of units the same tech
+     *
+     * @param campaign the campaign the unit is a part of
+     * @param skillName the skill name, which will force an immediate return if it is null or empty
+     * @param maintenanceTime the maintenance time required for the provided units
+     * @param units the units in question
+     */
     public AssignUnitToTechMenu(final Campaign campaign, final @Nullable String skillName,
                                 final int maintenanceTime, final Unit... units) {
         this("AssignPersonToUnitMenu.AssignTech.title", campaign, skillName, maintenanceTime, units);
     }
 
-    public AssignUnitToTechMenu(final String title, final Campaign campaign,
-                                final @Nullable String skillName, final int maintenanceTime,
-                                final Unit... units) {
+    private AssignUnitToTechMenu(final String title, final Campaign campaign,
+                                 final @Nullable String skillName, final int maintenanceTime,
+                                 final Unit... units) {
         super("AssignUnitToTechMenu");
         initialize(title, campaign, skillName, maintenanceTime, units);
     }
@@ -56,9 +75,11 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         // Initialize Menu
         setText(resources.getString(title));
 
-        // Default Return for Illegal Assignments - Null/Empty Skill Name or Self-Crewed Units
-        // don't need techs, and if the total maintenance time is longer than the maximum for a
-        // person we can just skip too
+        // Default Return for Illegal or Impossible Assignments
+        // 1) Null/Empty Skill Name or Self-Crewed Units
+        // 2) No units to be assigned
+        // 3) Self-Crewed units can't be assigned a tech
+        // 4) More maintenance time required than the person can supply
         if (StringUtil.isNullOrEmpty(skillName) || (units.length == 0)
                 || Stream.of(units).anyMatch(Unit::isSelfCrewed)
                 || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)) {
@@ -77,7 +98,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             if (tech.hasSkill(skillName)
                     && (((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)
                     || selected)) {
-                final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? "Unknown"
+                final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
                         : SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(units[0]).getExperienceLevel());
 
                 final JMenu subMenu;
@@ -104,8 +125,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
                 if (subMenu != null) {
                     final JMenuItem miAssignTech = new JCheckBoxMenuItem(String.format(
-                            resources.getString("miAssignTech.text"), tech.getFullTitle(),
-                            tech.getMaintenanceTimeUsing()));
+                            resources.getString("miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
                     miAssignTech.setName("miAssignTech");
                     miAssignTech.setSelected(selected);
                     miAssignTech.addActionListener(evt -> {

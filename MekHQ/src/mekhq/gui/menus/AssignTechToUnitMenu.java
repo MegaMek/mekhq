@@ -18,12 +18,22 @@
  */
 package mekhq.gui.menus;
 
+import megamek.common.EntityWeightClass;
+import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.HangarSorter;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * This is a standard menu that takes a person and lets the user assign a unit for them to tech
+ */
 public class AssignTechToUnitMenu extends JScrollableMenu {
     //region Constructors
     public AssignTechToUnitMenu(final Campaign campaign, final Person person) {
@@ -37,21 +47,83 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // Initialize Menu
         setText(resources.getString("AssignTechToUnitMenu.title"));
 
-        // Default Return for Illegal Assignments - Null/Empty Skill Name or Self-Crewed Units
-        // don't need techs, and if the total maintenance time is longer than the maximum for a
-        // person we can just skip too
-        // TODO :Finish me
-
+        // Default Return for Illegal Assignments
+        // 1) Person must be active
+        // 2) Person must be free
+        // 3) Person cannot be deployed
+        // 4) Person must be a tech
+        // 5) Person must have free maintenance time
+        if (!person.getStatus().isActive() || !person.getPrisonerStatus().isFree()
+                || person.isDeployed() || person.isTech()
+                || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+            return;
+        }
 
         // Person Assignment Menus
-        // TODO :Finish me
+        // Parsing variables
+        JMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu"); // ensures no empty additions
+        JMenu entityWeightClassMenu = new JMenu();
+        int unitType = -1;
+        int weightClass = -1;
 
+        // Get all units that are:
+        // 1) Available
+        // 2) Potentially maintained by the person
+        // 3) One of:
+        //      a) Currently maintained by the person
+        //      b) The unit can take a tech and the person can afford the time to maintain the unit
+        final List<Unit> units = HangarSorter.defaultSorting()
+                .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable)
+                        .filter(unit -> person.canTech(unit.getEntity()))
+                        .filter(unit -> person.equals(unit.getTech()) || (unit.canTakeTech()
+                                && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME))))
+                .collect(Collectors.toList());
+        for (final Unit unit : units) {
+            if (unit.getEntity().getUnitType() != unitType) {
+                // Add the current menus, first the Entity Weight Class menu to the Unit Type menu,
+                // then the Unit Type menu to this menu
+                unitTypeMenu.add(entityWeightClassMenu);
+                add(unitTypeMenu);
 
-        // And finally add the ability to simply unassign
+                // Update parsing variables
+                unitType = unit.getEntity().getUnitType();
+                weightClass = unit.getEntity().getWeightClass();
+
+                // And create the new menus
+                unitTypeMenu = new JScrollableMenu("unitTypeMenu", UnitType.getTypeDisplayableName(unitType));
+                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu", EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+            } else if (unit.getEntity().getWeightClass() != weightClass) {
+                // Add the current Entity Weight Class menu to the Unit Type menu
+                unitTypeMenu.add(entityWeightClassMenu);
+
+                // Update parsing variable
+                weightClass = unit.getEntity().getWeightClass();
+
+                // And create the new Entity Weight Class menu
+                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu", EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+            }
+
+            final JMenuItem cbUnit = new JCheckBoxMenuItem(unit.getName());
+            cbUnit.setName("cbUnit");
+            cbUnit.setSelected(person.equals(unit.getTech()));
+            cbUnit.addActionListener(evt -> {
+                if (person.equals(unit.getTech())) {
+                    unit.remove(person, true);
+                } else {
+                    unit.setTech(person);
+                }
+            });
+            entityWeightClassMenu.add(cbUnit);
+        }
+
+        // And finally add the ability to simply unassign from all tech assignments
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
         miUnassignPerson.setName("miUnassignTech");
         miUnassignPerson.addActionListener(evt -> {
-            // TODO :Finish me
+            for (final Unit unit : new ArrayList<>(person.getTechUnits())) {
+                unit.remove(person, true);
+                unit.resetEngineer();
+            }
         });
         add(miUnassignPerson);
     }
