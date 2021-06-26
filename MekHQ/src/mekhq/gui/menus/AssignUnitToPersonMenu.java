@@ -45,6 +45,12 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Initialize Menu
         setText(resources.getString("AssignUnitToPersonMenu.title"));
 
+        // Default Return for Illegal or Impossible Assignments
+        // 1) No people to be assigned
+        // 2) All people must be active non-prisoners (bondsmen should be assignable to units)
+        // 3) All people must not be primary civilians
+        // 4) All people must share one of their non-civilian professions
+
         // Person Assignment Menus
         final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
         final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));

@@ -18,23 +18,20 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Mech;
-import megamek.common.Tank;
+import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import mekhq.gui.utilities.JMenuHelpers;
-import mekhq.gui.utilities.StaticChecks;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This is a standard menu that takes either a person or multiple people, and allows the user to
@@ -53,562 +50,181 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Initialize Menu
         setText(resources.getString("AssignPersonToUnitMenu.title"));
 
-        // Default Return for Illegal Assignments - Null/Empty Skill Name or Self-Crewed Units
-        // don't need techs, and if the total maintenance time is longer than the maximum for a
-        // person we can just skip too
-
+        // Default Return for Illegal or Impossible Assignments
+        // 1) No people to be assigned
+        // 2) All people must be active
+        // 3) All people must be non-prisoners (bondsmen should be assignable to units)
+        // 4) All people cannot be currently deployed
+        // 5) All people must not be primary civilians
+        // 6) All people must share one of their non-civilian professions
+        if ((people.length == 0) || Stream.of(people).allMatch(person -> person.getStatus().isActive()
+                && !person.getPrisonerStatus().isPrisoner() && !person.isDeployed()
+                && !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
+            return;
+        }
+        final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
+        final Profession baseSecondaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
+        for (final Person person : people) {
+            final Profession primaryProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+            if ((primaryProfession == basePrimaryProfession) || (primaryProfession == baseSecondaryProfession)) {
+                continue;
+            }
+            final Profession secondaryProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+            if (secondaryProfession.isCivilian()
+                    || ((secondaryProfession != basePrimaryProfession) && (secondaryProfession != baseSecondaryProfession))) {
+                return;
+            }
+        }
 
         // Person Assignment Menus
-        final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
-        final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
-        final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
-        final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
-        final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
-        final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
-        final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
-        final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
+        // Parsing variables
+        final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("asPilotMenu.text"));
+        JMenu pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu");
+        JMenu pilotEntityWeightMenu = new JMenu();
+        final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("asDriverMenu.text"));
+        JMenu driverUnitTypeMenu = new JScrollableMenu("driverUnitTypeMenu");
+        JMenu driverEntityWeightMenu = new JMenu();
+        final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("asGunnerMenu.text"));
+        JMenu gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu");
+        JMenu gunnerEntityWeightMenu = new JMenu();
+        final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("asCrewmemberMenu.text"));
+        JMenu crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu");
+        JMenu crewmemberEntityWeightMenu = new JMenu();
+        final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("asTechOfficerMenu.text"));
+        JMenu techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu");
+        JMenu techOfficerEntityWeightMenu = new JMenu();
+        final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("asConsoleCommanderMenu.text"));
+        JMenu consoleCommanderUnitTypeMenu = new JScrollableMenu("consoleCommanderUnitTypeMenu");
+        JMenu consoleCommanderEntityWeightMenu = new JMenu();
+        final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("asSoldierMenu.text"));
+        JMenu soldierUnitTypeMenu = new JScrollableMenu("soldierUnitTypeMenu");
+        JMenu soldierEntityWeightMenu = new JMenu();
+        final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("asNavigatorMenu.text"));
+        JMenu navigatorUnitTypeMenu = new JScrollableMenu("navigatorUnitTypeMenu");
+        JMenu navigatorEntityWeightMenu = new JMenu();
+        int unitType = -1;
+        int weightClass = -1;
 
-        // and we always include the None checkbox
-        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("None.text"));
-        cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
-        cbMenuItem.addActionListener(this);
-        menu.add(cbMenuItem);
+        final List<Unit> units = HangarSorter.defaultSorting()
+                .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable))
+                .collect(Collectors.toList());
+        for (final Unit unit : units) {
+            if (unit.getEntity().getUnitType() != unitType) {
+                // Add the current menus, first the Entity Weight Class menu to the related Unit
+                // Type menu, then the Unit Type menu to the grouping menu
+                pilotUnitTypeMenu.add(pilotEntityWeightMenu);
+                pilotMenu.add(pilotUnitTypeMenu);
+                driverUnitTypeMenu.add(driverEntityWeightMenu);
+                driverMenu.add(driverUnitTypeMenu);
+                gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
+                gunnerMenu.add(gunnerUnitTypeMenu);
+                crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
+                crewmemberMenu.add(crewmemberUnitTypeMenu);
+                techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
+                techOfficerMenu.add(techOfficerUnitTypeMenu);
+                consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
+                consoleCommanderMenu.add(consoleCommanderUnitTypeMenu);
+                soldierUnitTypeMenu.add(soldierEntityWeightMenu);
+                soldierMenu.add(soldierUnitTypeMenu);
+                navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
+                navigatorMenu.add(navigatorUnitTypeMenu);
+
+                // Update parsing variables
+                unitType = unit.getEntity().getUnitType();
+                weightClass = unit.getEntity().getWeightClass();
+
+                // And create the new menus
+                final String unitTypeName = UnitType.getTypeDisplayableName(unitType);
+                final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, unit.getEntity());
+                pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
+                pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
+                driverUnitTypeMenu = new JScrollableMenu("driverUnitTypeMenu", unitTypeName);
+                driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
+                gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu", unitTypeName);
+                gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
+                crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu", unitTypeName);
+                crewmemberEntityWeightMenu = new JScrollableMenu("crewmemberEntityWeightMenu", entityWeightClassName);
+                pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
+                pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
+                consoleCommanderUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
+                consoleCommanderEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
+                soldierUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
+                soldierEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
+                navigatorUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
+                navigatorEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
+            } else if (unit.getEntity().getWeightClass() != weightClass) {
+                // Add the current Entity Weight Class menu to the Unit Type menu
+                unitTypeMenu.add(entityWeightClassMenu);
+
+                // Update parsing variable
+                weightClass = unit.getEntity().getWeightClass();
+
+                // And create the new Entity Weight Class menu
+                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu", EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+            }
+
+            final JMenuItem cbUnit = new JCheckBoxMenuItem(unit.getName());
+            cbUnit.setName("cbUnit");
+            cbUnit.setSelected(person.equals(unit.getTech()));
+            cbUnit.addActionListener(evt -> {
+                if (person.equals(unit.getTech())) {
+                    unit.remove(person, true);
+                } else {
+                    unit.setTech(person);
+                }
+            });
+            entityWeightClassMenu.add(cbUnit);
+        }
+
+        // Add the created menus to this
+        pilotUnitTypeMenu.add(pilotEntityWeightMenu);
+        pilotMenu.add(pilotUnitTypeMenu);
+        add(pilotMenu);
+        driverUnitTypeMenu.add(driverEntityWeightMenu);
+        driverMenu.add(driverUnitTypeMenu);
+        add(driverMenu);
+        gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
+        gunnerMenu.add(gunnerUnitTypeMenu);
+        add(gunnerMenu);
+        crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
+        crewmemberMenu.add(crewmemberUnitTypeMenu);
+        add(crewmemberMenu);
+        techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
+        techOfficerMenu.add(techOfficerUnitTypeMenu);
+        add(techOfficerMenu);
+        consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
+        consoleCommanderMenu.add(consoleCommanderUnitTypeMenu);
+        add(consoleCommanderMenu);
+        soldierUnitTypeMenu.add(soldierEntityWeightMenu);
+        soldierMenu.add(soldierUnitTypeMenu);
+        add(soldierMenu);
+        navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
+        navigatorMenu.add(navigatorUnitTypeMenu);
+        add(navigatorMenu);
+
+        // Add the tech menu if there is only a single person to assign
+        if (people.length == 1) {
+            add(new AssignTechToUnitMenu(campaign, people[0]));
+        }
 
         // And finally add the ability to simply unassign
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
         miUnassignPerson.setName("miUnassignPerson");
         miUnassignPerson.addActionListener(evt -> {
+            for (final Person person : people) {
+                if (person.getUnit() != null) {
+                    person.getUnit().remove(person, true);
+                }
 
+                if (!person.getTechUnits().isEmpty()) {
+                    for (final Unit unit : new ArrayList<>(person.getTechUnits())) {
+                        unit.remove(person, true);
+                    }
+                    person.clearTechUnits();
+                }
+            }
         });
         add(miUnassignPerson);
     }
     //endregion Initialization
-
-
-
-    private void old() {
-        if (!person.isDeployed()) {
-            // Assign pilot to unit/none
-            menu = new JMenu(resourceMap.getString("assignToUnit.text"));
-            JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text"));
-            JMenu pilotUnitTypeMenu = new JMenu();
-            JMenu pilotEntityWeightMenu = new JMenu();
-            JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text"));
-            JMenu driverUnitTypeMenu = new JMenu();
-            JMenu driverEntityWeightMenu = new JMenu();
-            JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text"));
-            JMenu crewUnitTypeMenu = new JMenu();
-            JMenu crewEntityWeightMenu = new JMenu();
-            JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text"));
-            JMenu gunnerUnitTypeMenu = new JMenu();
-            JMenu gunnerEntityWeightMenu = new JMenu();
-            JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text"));
-            JMenu navUnitTypeMenu = new JMenu();
-            JMenu navEntityWeightMenu = new JMenu();
-            JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text"));
-            JMenu soldierUnitTypeMenu = new JMenu();
-            JMenu soldierEntityWeightMenu = new JMenu();
-            JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text"));
-            JMenu techOfficerUnitTypeMenu = new JMenu();
-            JMenu techOfficerEntityWeightMenu = new JMenu();
-            JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text"));
-            JMenu consoleCmdrUnitTypeMenu = new JMenu();
-            JMenu consoleCmdrEntityWeightMenu = new JMenu();
-
-            int unitType = -1;
-            int weightClass = -1;
-
-            if (oneSelected && person.getStatus().isActive() && person.getPrisonerStatus().isFree()) {
-                for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
-                    if (!unit.isAvailable()) {
-                        continue;
-                    } else if (unit.getEntity().getUnitType() != unitType) {
-                        unitType = unit.getEntity().getUnitType();
-                        String unitTypeName = UnitType.getTypeName(unitType);
-                        weightClass = unit.getEntity().getWeightClass();
-                        String weightClassName = unit.getEntity().getWeightClassName();
-
-                        // Add Weight Menus to Unit Type Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
-
-                        // Then add the Unit Type Menus to the Role Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu);
-
-                        // Create new UnitType and EntityWeight Menus
-                        pilotUnitTypeMenu = new JMenu(unitTypeName);
-                        pilotEntityWeightMenu = new JMenu(weightClassName);
-                        driverUnitTypeMenu = new JMenu(unitTypeName);
-                        driverEntityWeightMenu = new JMenu(weightClassName);
-                        crewUnitTypeMenu = new JMenu(unitTypeName);
-                        crewEntityWeightMenu = new JMenu(weightClassName);
-                        gunnerUnitTypeMenu = new JMenu(unitTypeName);
-                        gunnerEntityWeightMenu = new JMenu(weightClassName);
-                        navUnitTypeMenu = new JMenu(unitTypeName);
-                        navEntityWeightMenu = new JMenu(weightClassName);
-                        soldierUnitTypeMenu = new JMenu(unitTypeName);
-                        soldierEntityWeightMenu = new JMenu(weightClassName);
-                        techOfficerUnitTypeMenu = new JMenu(unitTypeName);
-                        techOfficerEntityWeightMenu = new JMenu(weightClassName);
-                        consoleCmdrUnitTypeMenu = new JMenu(unitTypeName);
-                        consoleCmdrEntityWeightMenu = new JMenu(weightClassName);
-                    } else if (unit.getEntity().getWeightClass() != weightClass) {
-                        weightClass = unit.getEntity().getWeightClass();
-                        String weightClassName = unit.getEntity().getWeightClassName();
-
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
-
-                        pilotEntityWeightMenu = new JMenu(weightClassName);
-                        driverEntityWeightMenu = new JMenu(weightClassName);
-                        crewEntityWeightMenu = new JMenu(weightClassName);
-                        gunnerEntityWeightMenu = new JMenu(weightClassName);
-                        navEntityWeightMenu = new JMenu(weightClassName);
-                        soldierEntityWeightMenu = new JMenu(weightClassName);
-                        techOfficerEntityWeightMenu = new JMenu(weightClassName);
-                        consoleCmdrEntityWeightMenu = new JMenu(weightClassName);
-                    }
-
-                    if (unit.usesSoloPilot()) {
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())
-                                && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_PILOT, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            pilotEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (unit.usesSoldiers()) {
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else {
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
-                                pilotEntityWeightMenu.add(cbMenuItem);
-                            } else {
-                                driverEntityWeightMenu.add(cbMenuItem);
-                            }
-                        }
-
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerEntityWeightMenu.add(cbMenuItem);
-                        }
-
-                        if (unit.canTakeMoreVesselCrew()
-                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            crewEntityWeightMenu.add(cbMenuItem);
-                        }
-
-                        if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            navEntityWeightMenu.add(cbMenuItem);
-                        }
-
-                        if (unit.canTakeTechOfficer()) {
-                            //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
-                            if (unit.getEntity() instanceof Tank) {
-                                if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
-                                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
-                                    cbMenuItem.addActionListener(this);
-                                    consoleCmdrEntityWeightMenu.add(cbMenuItem);
-                                }
-                            } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
-                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
-                                cbMenuItem.addActionListener(this);
-                                techOfficerEntityWeightMenu.add(cbMenuItem);
-                            }
-                        }
-                    }
-                }
-            } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
-                for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
-                    if (!unit.isAvailable()) {
-                        continue;
-                    } else if (unit.getEntity().getUnitType() != unitType) {
-                        unitType = unit.getEntity().getUnitType();
-                        String unitTypeName = UnitType.getTypeName(unitType);
-                        weightClass = unit.getEntity().getWeightClass();
-                        String weightClassName = unit.getEntity().getWeightClassName();
-
-                        // Add Weight Menus to Unit Type Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
-
-                        // Then add the Unit Type Menus to the Role Menus
-                        JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
-
-                        // Create new UnitType and EntityWeight Menus
-                        pilotUnitTypeMenu = new JMenu(unitTypeName);
-                        pilotEntityWeightMenu = new JMenu(weightClassName);
-                        driverUnitTypeMenu = new JMenu(unitTypeName);
-                        driverEntityWeightMenu = new JMenu(weightClassName);
-                        crewUnitTypeMenu = new JMenu(unitTypeName);
-                        crewEntityWeightMenu = new JMenu(weightClassName);
-                        gunnerUnitTypeMenu = new JMenu(unitTypeName);
-                        gunnerEntityWeightMenu = new JMenu(weightClassName);
-                        navUnitTypeMenu = new JMenu(unitTypeName);
-                        navEntityWeightMenu = new JMenu(weightClassName);
-                        soldierUnitTypeMenu = new JMenu(unitTypeName);
-                        soldierEntityWeightMenu = new JMenu(weightClassName);
-                    } else if (unit.getEntity().getWeightClass() != weightClass) {
-                        weightClass = unit.getEntity().getWeightClass();
-                        String weightClassName = unit.getEntity().getWeightClassName();
-
-                        JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
-                        JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
-
-                        pilotEntityWeightMenu = new JMenu(weightClassName);
-                        driverEntityWeightMenu = new JMenu(weightClassName);
-                        crewEntityWeightMenu = new JMenu(weightClassName);
-                        gunnerEntityWeightMenu = new JMenu(weightClassName);
-                        navEntityWeightMenu = new JMenu(weightClassName);
-                        soldierEntityWeightMenu = new JMenu(weightClassName);
-                    }
-
-                    if (StaticChecks.areAllSoldiers(selected)) {
-                        if (!unit.isConventionalInfantry()) {
-                            continue;
-                        }
-
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllBattleArmor(selected)) {
-                        if (!(unit.getEntity() instanceof BattleArmor)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVehicleGunners(selected)) {
-                        if (!(unit.getEntity() instanceof Tank)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselGunners(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselCrew(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreVesselCrew()
-                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            crewEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselPilots(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            pilotEntityWeightMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselNavigators(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            navEntityWeightMenu.add(cbMenuItem);
-                        }
-                    }
-                }
-            }
-
-            // Add the last grouping of entity weight menus to the last grouping of entity menus
-            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu);
-            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu);
-
-            // then add the last grouping of entity menus to the primary menus
-            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu);
-            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu);
-
-            // and finally add any non-empty menus to the primary menu
-            JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, gunnerMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, navMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, soldierMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, techOfficerMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu);
-        }
-    }
-
-    private void oldNote() {
-        switch (old) {
-            case CMD_REMOVE_UNIT: {
-                for (Person person : people) {
-                    Unit u = person.getUnit();
-                    if (null != u) {
-                        u.remove(person, true);
-                    }
-                    // check for tech unit assignments
-                    if (!person.getTechUnits().isEmpty()) {
-                        for (Unit unitWeTech : new ArrayList<>(person.getTechUnits())) {
-                            unitWeTech.remove(person, true);
-                        }
-
-                        // Incase there's still some assignments for this tech,
-                        // clear them out. This can happen if the target unit
-                        // above is null. The tech will still have the pointer
-                        // but to a null unit and it will never go away
-                        // otherwise
-                        person.clearTechUnits();
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_PILOT: {
-                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
-                final Unit oldUnit = selectedPerson.getUnit();
-                if (oldUnit != null) {
-                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
-                }
-
-                if (unit != null) {
-                    unit.addPilotOrSoldier(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
-                }
-                break;
-            }
-            case CMD_ADD_SOLDIER: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeMoreGunners()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.addPilotOrSoldier(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_DRIVER: {
-                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
-                final Unit oldUnit = selectedPerson.getUnit();
-                if (oldUnit != null) {
-                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
-                }
-
-                if (unit != null) {
-                    unit.addDriver(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
-                }
-                break;
-            }
-            case CMD_ADD_VESSEL_PILOT: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeMoreDrivers()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.addDriver(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_GUNNER: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeMoreGunners()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.addGunner(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_CREW: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeMoreVesselCrew()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.addVesselCrew(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_NAVIGATOR: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeNavigator()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.setNavigator(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_TECH_OFFICER: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeTechOfficer()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.setTechOfficer(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-            case CMD_ADD_TECH: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit unit = gui.getCampaign().getUnit(selected);
-                if (unit != null) {
-                    if (unit.canTakeTech()) {
-                        unit.setTech(selectedPerson);
-                    }
-                }
-                break;
-            }
-        }
-    }
 }

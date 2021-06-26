@@ -18,13 +18,19 @@
  */
 package mekhq.gui.menus;
 
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.EntityWeightClass;
+import megamek.common.Mech;
+import megamek.common.Tank;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.gui.utilities.StaticChecks;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -54,7 +60,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 4) Person must be a tech
         // 5) Person must have free maintenance time
         if (!person.getStatus().isActive() || !person.getPrisonerStatus().isFree()
-                || person.isDeployed() || person.isTech()
+                || person.isDeployed() || !person.isTech()
                 || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
             return;
         }
@@ -128,4 +134,311 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         add(miUnassignPerson);
     }
     //endregion Initialization
+
+
+    private void old() {
+        if (!person.isDeployed()) {
+            if (unit.usesSoloPilot()) {
+                if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())
+                        && person.canGun(unit.getEntity())) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_PILOT, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    pilotEntityWeightMenu.add(cbMenuItem);
+                }
+            } else if (unit.usesSoldiers()) {
+                if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    soldierEntityWeightMenu.add(cbMenuItem);
+                }
+            } else {
+                if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
+                        pilotEntityWeightMenu.add(cbMenuItem);
+                    } else {
+                        driverEntityWeightMenu.add(cbMenuItem);
+                    }
+                }
+
+                if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    gunnerEntityWeightMenu.add(cbMenuItem);
+                }
+
+                if (unit.canTakeMoreVesselCrew()
+                        && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                        || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    crewEntityWeightMenu.add(cbMenuItem);
+                }
+
+                if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
+                    cbMenuItem.addActionListener(this);
+                    navEntityWeightMenu.add(cbMenuItem);
+                }
+
+                if (unit.canTakeTechOfficer()) {
+                    //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
+                    if (unit.getEntity() instanceof Tank) {
+                        if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
+                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                            cbMenuItem.addActionListener(this);
+                            consoleCmdrEntityWeightMenu.add(cbMenuItem);
+                        }
+                    } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        techOfficerEntityWeightMenu.add(cbMenuItem);
+                    }
+                }
+            }
+        } else if (StaticChecks.areAllActive(selected)&&StaticChecks.areAllEligible(selected)) {
+            for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
+                if (StaticChecks.areAllSoldiers(selected)) {
+                    if (!unit.isConventionalInfantry()) {
+                        continue;
+                    }
+
+                    if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        soldierEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllBattleArmor(selected)) {
+                    if (!(unit.getEntity() instanceof BattleArmor)) {
+                        continue;
+                    }
+                    if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        soldierEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllVehicleGunners(selected)) {
+                    if (!(unit.getEntity() instanceof Tank)) {
+                        continue;
+                    }
+                    if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        gunnerEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllVesselGunners(selected)) {
+                    if (!(unit.getEntity() instanceof Aero)) {
+                        continue;
+                    }
+                    if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        gunnerEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllVesselCrew(selected)) {
+                    if (!(unit.getEntity() instanceof Aero)) {
+                        continue;
+                    }
+                    if (unit.canTakeMoreVesselCrew()
+                            && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                            || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        crewEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllVesselPilots(selected)) {
+                    if (!(unit.getEntity() instanceof Aero)) {
+                        continue;
+                    }
+                    if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        pilotEntityWeightMenu.add(cbMenuItem);
+                    }
+                } else if (StaticChecks.areAllVesselNavigators(selected)) {
+                    if (!(unit.getEntity() instanceof Aero)) {
+                        continue;
+                    }
+                    if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
+                        cbMenuItem.addActionListener(this);
+                        navEntityWeightMenu.add(cbMenuItem);
+                    }
+                }
+            }
+        }
+    }
+
+    private void oldNote() {
+        switch (old) {
+            case CMD_ADD_PILOT: {
+                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
+                final Unit oldUnit = selectedPerson.getUnit();
+                if (oldUnit != null) {
+                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
+                }
+
+                if (unit != null) {
+                    unit.addPilotOrSoldier(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
+                }
+                break;
+            }
+            case CMD_ADD_SOLDIER: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeMoreGunners()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.addPilotOrSoldier(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+            case CMD_ADD_DRIVER: {
+                final Unit unit = gui.getCampaign().getUnit(UUID.fromString(data[1]));
+                final Unit oldUnit = selectedPerson.getUnit();
+                if (oldUnit != null) {
+                    oldUnit.remove(selectedPerson, !gui.getCampaign().getCampaignOptions().useTransfers());
+                }
+
+                if (unit != null) {
+                    unit.addDriver(selectedPerson, gui.getCampaign().getCampaignOptions().useTransfers());
+                }
+                break;
+            }
+            case CMD_ADD_VESSEL_PILOT: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeMoreDrivers()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.addDriver(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+            case CMD_ADD_GUNNER: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeMoreGunners()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.addGunner(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+            case CMD_ADD_CREW: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeMoreVesselCrew()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.addVesselCrew(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+            case CMD_ADD_NAVIGATOR: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeNavigator()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.setNavigator(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+            case CMD_ADD_TECH_OFFICER: {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeTechOfficer()) {
+                            Unit oldUnit = p.getUnit();
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.setTechOfficer(p, useTransfers);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
 }
