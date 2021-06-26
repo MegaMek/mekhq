@@ -120,17 +120,29 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * This method is how a person becomes pregnant. They have their due date set and the size and
-     * parentage of the pregnancy determined.
+     * This method is how a person becomes pregnant.
      * @param campaign the campaign the person is a part of
      * @param today the current date
      * @param mother the newly pregnant mother
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother) {
-        final int size = determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences());
-        if (size <= 0) {
+        addPregnancy(campaign, today, mother, determineNumberOfBabies(
+                campaign.getCampaignOptions().getMultiplePregnancyOccurrences()));
+    }
+
+    /**
+     * This method is how a person becomes pregnant with the specified number of children. They have
+     * their due date set and the parentage of the pregnancy determined.
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     * @param mother the newly pregnant mother
+     * @param size the number of children the mother is having
+     */
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size) {
+        if (size < 1) {
             return;
         }
+
         mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
         mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);

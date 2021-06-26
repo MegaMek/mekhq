@@ -29,6 +29,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTextFieldPreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -75,12 +76,14 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JTabbedPane tabbedPane;
 
     //region General Tab
+    // Dice Panel
     private JSpinner spnDiceCount;
     private JSpinner spnDiceNumber;
     private JSpinner spnDiceSides;
     private JLabel lblTotalDiceResult;
     private JTextPane txtIndividualDiceResults;
 
+    // RAT Panel
     private MMComboBox<FactionDisplay> comboRATFaction;
     private JTextField txtYear;
     private MMComboBox<String> comboQuality;
@@ -91,6 +94,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion General Tab
 
     //region Name Tab
+    // Name Panel
     private MMComboBox<String> comboEthnicCode;
     private MMComboBox<Gender> comboGender;
     private MMComboBox<FactionDisplay> comboNameGeneratorFaction;
@@ -100,11 +104,13 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JTextArea txtNamesGenerated;
     private String[] lastGeneratedName;
 
+    // Callsign Panel
     private JSpinner spnCallsignNumber;
     private JLabel lblCurrentCallsign;
     private JTextArea txtCallsignsGenerated;
     private String lastGeneratedCallsign;
 
+    // Bloodname Panel
     private MMComboBox<ClanDisplay> comboOriginClan;
     private MMComboBox<Integer> comboBloodnameEra;
     private MMComboBox<Phenotype> comboPhenotype;
@@ -118,6 +124,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private Phenotype selectedPhenotype;
     private String lastGeneratedBloodname;
     //endregion Name Tab
+
+    //region Personnel Module Tab
+    // Procreation Panel
+    private JCheckBox chkProcreationEligibilityType;
+    private JSpinner spnPregnancySize;
+    //endregion Personnel Module Tab
     //endregion GUI Variables
 
     //region Constants
@@ -245,7 +257,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblUnitPicked = lblUnitPicked;
     }
 
-    public @Nullable Entity getLastRolledUnit() {
+    public @Nullable
+    Entity getLastRolledUnit() {
         return lastRolledUnit;
     }
 
@@ -311,7 +324,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtNamesGenerated = txtNamesGenerated;
     }
 
-    public @Nullable String[] getLastGeneratedName() {
+    public @Nullable
+    String[] getLastGeneratedName() {
         return lastGeneratedName;
     }
 
@@ -343,7 +357,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtCallsignsGenerated = txtCallsignsGenerated;
     }
 
-    public @Nullable String getLastGeneratedCallsign() {
+    public @Nullable
+    String getLastGeneratedCallsign() {
         return lastGeneratedCallsign;
     }
 
@@ -415,7 +430,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblBloodnameWarning = lblBloodnameWarning;
     }
 
-    public @Nullable Clan getOriginClan() {
+    public @Nullable
+    Clan getOriginClan() {
         return originClan;
     }
 
@@ -431,7 +447,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.bloodnameYear = bloodnameYear;
     }
 
-    public @Nullable Phenotype getSelectedPhenotype() {
+    public @Nullable
+    Phenotype getSelectedPhenotype() {
         return selectedPhenotype;
     }
 
@@ -439,7 +456,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.selectedPhenotype = selectedPhenotype;
     }
 
-    public @Nullable String getLastGeneratedBloodname() {
+    public @Nullable
+    String getLastGeneratedBloodname() {
         return lastGeneratedBloodname;
     }
 
@@ -447,6 +465,24 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lastGeneratedBloodname = lastGeneratedBloodname;
     }
     //endregion Name Tab
+
+    //region Personnel Module Tab
+    public JCheckBox getChkProcreationEligibilityType() {
+        return chkProcreationEligibilityType;
+    }
+
+    public void setChkProcreationEligibilityType(final JCheckBox chkProcreationEligibilityType) {
+        this.chkProcreationEligibilityType = chkProcreationEligibilityType;
+    }
+
+    public JSpinner getSpnPregnancySize() {
+        return spnPregnancySize;
+    }
+
+    public void setSpnPregnancySize(final JSpinner spnPregnancySize) {
+        this.spnPregnancySize = spnPregnancySize;
+    }
+    //endregion Personnel Module Tab
     //endregion GUI Variables
     //endregion Getters and Setters
 
@@ -457,7 +493,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getTabbedPane().setName("GMToolsTabbedPane");
         getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
         getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
-        //getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
+        getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
         return getTabbedPane();
     }
 
@@ -832,7 +868,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             panel.add(btnGenerateNames, gbc);
         } else {
             final JButton btnAssignName = new MMButton("btnAssignName", resources,
-                    "btnAssignName.text", "btnAssignName.toolTipText", evt-> assignName());
+                    "btnAssignName.text", "btnAssignName.toolTipText", evt -> assignName());
             gbc.gridx = maxGridX - 1;
             gbc.gridy++;
             panel.add(btnAssignName, gbc);
@@ -1077,6 +1113,83 @@ public class GMToolsDialog extends AbstractMHQDialog {
     }
     //endregion Names Tab
 
+    //region Personnel Module Tab
+    private JScrollPane createPersonnelModuleTab() {
+        // Create Panel Components
+        final JPanel procreationPanel = createProcreationPanel();
+
+        // Layout the Panel
+        final JPanel panel = new JScrollablePanel();
+        panel.setName("personnelModuleTab");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(procreationPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(procreationPanel)
+        );
+
+        return new JScrollPane(panel);
+    }
+
+    private JPanel createProcreationPanel() {
+        // Create the Panel
+        final JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("procreationPanel.title")));
+        panel.setName("procreationPanel");
+
+        // Create the Constraints
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 3, 0, 3);
+
+        final int maxGridX;
+
+        // Create the Components and Layout
+        if (getPerson() != null) {
+            final JLabel lblEligible = new JLabel(resources.getString("Eligible.text"));
+            lblEligible.setName("lblEligible");
+            panel.add(lblEligible, gbc);
+
+            final JLabel lblEligibility = new JLabel(resources.getString("True.text"));
+            lblEligibility.setName("lblEligibility");
+            gbc.gridx++;
+            panel.add(lblEligibility, gbc);
+
+            setChkProcreationEligibilityType(new JCheckBox(resources.getString("chkProcreationEligibilityType.text")));
+            getChkProcreationEligibilityType().setToolTipText(resources.getString("chkProcreationEligibilityType.toolTipText"));
+            getChkProcreationEligibilityType().setName("chkProcreationEligibilityType");
+            getChkProcreationEligibilityType().addActionListener(evt -> {
+                final String reason = getGUI().getCampaign().getProcreation().canProcreate(
+                        getGUI().getCampaign().getLocalDate(), getPerson(),
+                        getChkProcreationEligibilityType().isSelected());
+                lblEligibility.setText(resources.getString((reason == null) ? "True.text" : "False.text"));
+                lblEligibility.setToolTipText(reason);
+            });
+            gbc.gridx++;
+            panel.add(getChkProcreationEligibilityType(), gbc);
+
+            // Male Personnel are invalid after this point
+            if (getPerson().getGender().isMale()) {
+                return panel;
+            }
+        }
+
+        return panel;
+    }
+    //endregion Personnel Module Tab
+
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
@@ -1098,6 +1211,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         if (getSpnCallsignNumber() != null) {
             preferences.manage(new JIntNumberSpinnerPreference(getSpnCallsignNumber()));
         }
+
+        if (getChkProcreationEligibilityType() != null) {
+            preferences.manage(new JToggleButtonPreference(getChkProcreationEligibilityType()));
+        }
+
+        preferences.manage(new JIntNumberSpinnerPreference(getSpnPregnancySize()));
     }
 
     private void setValuesFromPerson() {
@@ -1143,7 +1262,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
         for (int i = BLOODNAME_ERAS.length - 1; i >= 0; i--) {
             if (BLOODNAME_ERAS[i] <= year) {
                 getComboBloodnameEra().setSelectedIndex(i);
-                year = BLOODNAME_ERAS[i];
                 break;
             }
         }
@@ -1155,6 +1273,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         getComboPhenotype().setSelectedItem(getPerson().getPhenotype());
+
+        getChkProcreationEligibilityType().setSelected(!getChkProcreationEligibilityType().isSelected());
+        getChkProcreationEligibilityType().doClick();
     }
 
     /**
