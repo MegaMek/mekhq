@@ -304,7 +304,7 @@ public class StratconTab extends CampaignGuiTab {
                 boolean displayCoordinateData = objective.getObjectiveCoords() != null;
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
 
-                if((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
+                if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
                         !campaignState.allowEarlyVictory()) {
                     sb.append("<span>");
                 } else if (objectiveCompleted) {
