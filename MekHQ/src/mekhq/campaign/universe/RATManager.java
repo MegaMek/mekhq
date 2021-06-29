@@ -1,7 +1,8 @@
 /*
  * RATManager.java
  *
- * Copyright (c) 2016 Carl Spain. All rights reserved.
+ * Copyright (c) 2016 - Carl Spain. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,13 +64,13 @@ import mekhq.campaign.event.OptionsChangedEvent;
  *
  * @author Neoancient
  */
-public class RATManager extends AbstractUnitGenerator implements IUnitGenerator {
+public class RATManager extends AbstractUnitGenerator {
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
-    private Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
-    private ArrayList<String> selectedCollections;
+    private final Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
+    private final ArrayList<String> selectedCollections;
 
     private static Map<String, List<Integer>> allCollections = null;
-    private static Map<String, String> fileNames = new HashMap<>();
+    private static final Map<String, String> fileNames = new HashMap<>();
 
     private boolean canIgnoreEra = false;
 
@@ -465,7 +466,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                MekHQ.getLogger().error(RATManager.class, "name attribute missing");
+                MekHQ.getLogger().error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();

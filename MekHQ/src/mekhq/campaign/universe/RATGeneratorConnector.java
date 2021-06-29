@@ -34,10 +34,10 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 
 /**
- * Provides access to RATGenerator through IUnitGenerator interface.
+ * Provides access to RATGenerator through the AbstractUnitGenerator and thus the IUnitGenerator interface.
  * @author Neoancient
  */
-public class RATGeneratorConnector extends AbstractUnitGenerator implements IUnitGenerator {
+public class RATGeneratorConnector extends AbstractUnitGenerator {
     /**
      * Initialize RATGenerator and load the data for the current game year
      */
