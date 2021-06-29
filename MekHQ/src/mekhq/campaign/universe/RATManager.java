@@ -37,6 +37,8 @@ import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -379,11 +381,13 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
 
     @Override
     public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes, Predicate<MechSummary> filter) {
+        return generate(faction, unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
+    }
+
+    @Override
+    public @Nullable MechSummary generate(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes, Collection<MissionRole> missionRoles, Predicate<MechSummary> filter) {
         List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
-        if (list.size() > 0) {
-            return list.get(0);
-        }
-        return null;
+        return list.isEmpty() ? null : list.get(0);
     }
 
     /* (non-Javadoc)
@@ -423,11 +427,16 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     public List<MechSummary> generate(int count, String faction, int unitType,
             int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes,
             Predicate<MechSummary> filter) {
+        return generate(count, faction, unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
+    }
+
+    @Override
+    public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes, Collection<MissionRole> missionRoles, Predicate<MechSummary> filter) {
         RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (!movementModes.isEmpty()) {
                 Predicate<MechSummary> moveFilter = ms ->
-                    movementModes.contains(EntityMovementMode.getMode(ms.getUnitSubType()));
+                        movementModes.contains(EntityMovementMode.getMode(ms.getUnitSubType()));
                 if (filter == null) {
                     filter = moveFilter;
                 } else {
@@ -436,7 +445,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
     }
 
     /**
@@ -459,7 +468,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      * @return Generated units. Null if none generated.
      */
     @Override
-    public MechSummary generate(UnitGeneratorParameters parameters) {
+    public @Nullable MechSummary generate(UnitGeneratorParameters parameters) {
         return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
                 parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }

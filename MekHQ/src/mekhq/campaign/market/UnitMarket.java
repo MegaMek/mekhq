@@ -23,19 +23,16 @@ package mekhq.campaign.market;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import megamek.common.*;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -46,7 +43,6 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
  * Generates units available for sale.
@@ -164,26 +160,18 @@ public class UnitMarket implements Serializable {
             market = UnitMarketType.EMPLOYER;
         }
 
-        UnitGeneratorParameters params = new UnitGeneratorParameters();
-        params.setFaction(faction);
-        params.setYear(campaign.getGameYear());
-        params.setUnitType(unitType);
-        params.setQuality(quality);
-
         for (int i = 0; i < num; i++) {
-            params.setWeightClass(getRandomWeight(unitType, faction,
-                    campaign.getCampaignOptions().getRegionalMechVariations()));
-            params.clearMissionRoles();
+            final Collection<EntityMovementMode> movementModes = new ArrayList<>();
+            final Collection<MissionRole> missionRoles = new ArrayList<>();
 
-            MechSummary ms;
             if (unitType == UnitType.TANK) {
-                params.setMovementModes(IUnitGenerator.MIXED_TANK_VTOL);
-                params.addMissionRole(MissionRole.MIXED_ARTILLERY);
-
-            } else {
-                params.clearMovementModes();
+                movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+                missionRoles.add(MissionRole.MIXED_ARTILLERY);
             }
-            ms = campaign.getUnitGenerator().generate(params);
+
+            MechSummary ms = campaign.getUnitGenerator().generate(faction, campaign.getGameYear(), unitType,
+                    getRandomWeight(unitType, faction, campaign.getCampaignOptions().getRegionalMechVariations()),
+                    quality, movementModes, missionRoles, null);
             if (ms != null) {
                 if (campaign.getCampaignOptions().limitByYear()
                         && (campaign.getGameYear() < ms.getYear())) {
