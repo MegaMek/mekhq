@@ -194,7 +194,7 @@ public class AtBEventProcessor {
         }
         final String faction = getRecruitFaction(campaign);
         MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
-                IUnitRating.DRAGOON_F, movementModes, missionRoles, null);
+                IUnitRating.DRAGOON_F, movementModes, missionRoles);
         Entity en;
         if (null != ms) {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {

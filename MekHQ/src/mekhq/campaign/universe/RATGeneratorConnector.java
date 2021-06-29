@@ -23,7 +23,6 @@ package mekhq.campaign.universe;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -94,67 +93,14 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         return (unitType != UnitType.GUN_EMPLACEMENT) && (unitType != UnitType.SPACE_STATION);
     }
 
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int)
-     */
-    @Override
-    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
-                                          final int year, final int quality) {
-        return generate(faction, unitType, weightClass, year, quality, null);
-    }
-
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
-     */
-    @Override
-    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
-                                          final int year, final int quality,
-                                          final @Nullable Predicate<MechSummary> filter) {
-        return generate(faction, unitType, weightClass, year, quality, EnumSet.noneOf(EntityMovementMode.class), filter);
-    }
-
-    @Override
-    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
-                                          final int year, final int quality,
-                                          final Collection<EntityMovementMode> movementModes,
-                                          final @Nullable Predicate<MechSummary> filter) {
-        return generate(faction,unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
-    }
-
     @Override
     public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
                                           final int year, final int quality,
                                           final Collection<EntityMovementMode> movementModes,
                                           final Collection<MissionRole> missionRoles,
-                                          final @Nullable Predicate<MechSummary> filter) {
+                                          @Nullable Predicate<MechSummary> filter) {
         final UnitTable table = findTable(faction, unitType, weightClass, year, quality, movementModes, missionRoles);
         return (table == null) ? null : table.generateUnit((filter == null) ? null : filter::test);
-    }
-
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int)
-     */
-    @Override
-    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                      final int year, final int quality) {
-        return generate(count, faction, unitType, weightClass, year, quality, null);
-    }
-
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int, java.util.function.Predicate)
-     */
-    @Override
-    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                      final int year, final int quality, final @Nullable Predicate<MechSummary> filter) {
-        return generate(count, faction, unitType, weightClass, year, quality, EnumSet.noneOf(EntityMovementMode.class), filter);
-    }
-
-    @Override
-    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                      final int year, final int quality,
-                                      final Collection<EntityMovementMode> movementModes,
-                                      final @Nullable Predicate<MechSummary> filter) {
-        return generate(count, faction, unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
     }
 
     @Override
@@ -162,7 +108,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
                                       final int year, final int quality,
                                       final Collection<EntityMovementMode> movementModes,
                                       final Collection<MissionRole> missionRoles,
-                                      final @Nullable Predicate<MechSummary> filter) {
+                                      @Nullable Predicate<MechSummary> filter) {
         final UnitTable table = findTable(faction, unitType, weightClass, year, quality, movementModes, missionRoles);
         return (table == null) ? new ArrayList<>() : table.generateUnits(count, (filter == null) ? null : filter::test);
     }

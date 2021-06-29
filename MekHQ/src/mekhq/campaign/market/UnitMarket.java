@@ -171,7 +171,7 @@ public class UnitMarket implements Serializable {
 
             MechSummary ms = campaign.getUnitGenerator().generate(faction, campaign.getGameYear(), unitType,
                     getRandomWeight(unitType, faction, campaign.getCampaignOptions().getRegionalMechVariations()),
-                    quality, movementModes, missionRoles, null);
+                    quality, movementModes, missionRoles);
             if (ms != null) {
                 if (campaign.getCampaignOptions().limitByYear()
                         && (campaign.getGameYear() < ms.getYear())) {
