@@ -18,6 +18,7 @@
  */
 package mekhq.gui.menus;
 
+import megamek.MegaMek;
 import megamek.common.Aero;
 import megamek.common.ConvFighter;
 import megamek.common.EntityWeightClass;
@@ -45,8 +46,6 @@ import java.util.stream.Stream;
 /**
  * This is a standard menu that takes either a person or multiple people, and allows the user to
  * assign them to a unit or remove them from their unit(s), including tech assignments.
- *
- * Special assignments are isolated to those with the
  */
 public class AssignPersonToUnitMenu extends JScrollableMenu {
     //region Constructors
