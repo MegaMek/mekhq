@@ -23,7 +23,9 @@ package mekhq.campaign.universe;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import megamek.client.ratgenerator.*;
@@ -142,7 +144,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
      * This finds a unit table for OpFor generation. It falls back using the parent faction to try to ensure there are
      * units in the unit table, so an OpFor is generated.
      * @param unitParameters the base parameters to find the table using.
-     * @return the unit table to generate using
+     * @return the unit table to use in generating OpFor mech summaries
      */
     private UnitTable findOpForTable(final UnitGeneratorParameters unitParameters) {
         final UnitTable.Parameters parameters = unitParameters.getRATGeneratorParameters();
@@ -151,7 +153,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
             // Do Parent Factions Fallbacks to try to ensure units can be generated, at a maximum of 10
             List<String> factions = parameters.getFaction().getParentFactions();
             for (int i = 0; (i < 10) && !factions.isEmpty(); i++) {
-                final List<String> parentFactions = new ArrayList<>();
+                final Set<String> parentFactions = new HashSet<>();
                 for (final String factionCode : factions) {
                     // Use the current Parent Faction
                     parameters.setFaction(RATGenerator.getInstance().getFaction(factionCode));
