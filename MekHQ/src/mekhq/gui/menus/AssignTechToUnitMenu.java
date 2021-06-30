@@ -18,18 +18,13 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.Aero;
 import megamek.common.EntityWeightClass;
-import megamek.common.Mech;
-import megamek.common.Tank;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import mekhq.gui.utilities.StaticChecks;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -133,60 +128,4 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         add(miUnassignPerson);
     }
     //endregion Initialization
-
-
-    private void old() {
-        if (!person.isDeployed()) {
-            if (unit.canTakeMoreVesselCrew()
-                    && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                    || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                cbMenuItem.addActionListener(this);
-                crewEntityWeightMenu.add(cbMenuItem);
-            }
-        } else if (StaticChecks.areAllActive(selected)&&StaticChecks.areAllEligible(selected)) {
-            for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
-                if (StaticChecks.areAllVesselCrew(selected)) {
-                    if (!(unit.getEntity() instanceof Aero)) {
-                        continue;
-                    }
-                    if (unit.canTakeMoreVesselCrew()
-                            && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                            || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                        cbMenuItem.addActionListener(this);
-                        crewEntityWeightMenu.add(cbMenuItem);
-                    }
-                }
-            }
-        }
-    }
-
-    private void oldNote() {
-        switch (old) {
-            case CMD_ADD_CREW: {
-                UUID selected = UUID.fromString(data[1]);
-                Unit u = gui.getCampaign().getUnit(selected);
-                if (null != u) {
-                    for (Person p : people) {
-                        if (u.canTakeMoreVesselCrew()) {
-                            Unit oldUnit = p.getUnit();
-                            boolean useTransfers = false;
-                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
-                            if (null != oldUnit) {
-                                oldUnit.remove(p, transferLog);
-                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
-                            }
-                            u.addVesselCrew(p, useTransfers);
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
 }
