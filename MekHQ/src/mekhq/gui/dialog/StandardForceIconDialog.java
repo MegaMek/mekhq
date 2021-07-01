@@ -24,7 +24,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.panels.StandardForceIconChooser;
 
 import javax.swing.*;
@@ -56,8 +55,7 @@ public class StandardForceIconDialog extends AbstractIconChooserDialog {
 
     @Override
     public @Nullable StandardForceIcon getSelectedItem() {
-        final AbstractIcon selected = getChooser().getSelectedItem();
-        return (selected instanceof StandardForceIcon) ? (UnitIcon) selected : null;
+        return getChooser().getSelectedItem();
     }
     //endregion Getters
 }

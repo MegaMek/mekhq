@@ -347,8 +347,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 final LayeredForceIconDialog layeredForceIconDialog = new LayeredForceIconDialog(
                         gui.getFrame(), singleForce.getForceIcon());
                 if (layeredForceIconDialog.showDialog().isConfirmed()
-                        && (layeredForceIconDialog.getForceIcon() != null)) {
-                    singleForce.setForceIcon(layeredForceIconDialog.getForceIcon());
+                        && (layeredForceIconDialog.getSelectedItem() != null)) {
+                    singleForce.setForceIcon(layeredForceIconDialog.getSelectedItem());
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }

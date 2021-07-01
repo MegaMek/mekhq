@@ -27,18 +27,20 @@ import mekhq.gui.panels.UnitIconChooser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Enumeration;
 
 public class UnitIconDialog extends StandardForceIconDialog {
     //region Variable Declarations
-    private AbstractIcon override;
+    private UnitIcon override;
     //endregion Variable Declarations
 
     //region Constructors
     public UnitIconDialog(final JFrame parent, final @Nullable AbstractIcon icon) {
         super(parent, "UnitIconDialog", "UnitIconDialog.title", new UnitIconChooser(icon));
-        setOverride(null);
     }
     //endregion Constructors
 
@@ -50,15 +52,14 @@ public class UnitIconDialog extends StandardForceIconDialog {
 
     @Override
     public @Nullable UnitIcon getSelectedItem() {
-        final AbstractIcon selected = getChooser().getSelectedItem();
-        return (selected instanceof UnitIcon) ? (UnitIcon) selected : null;
+        return (getOverride() == null) ? getChooser().getSelectedItem() : getOverride();
     }
 
-    public @Nullable AbstractIcon getOverride() {
+    public @Nullable UnitIcon getOverride() {
         return override;
     }
 
-    public void setOverride(final @Nullable AbstractIcon override) {
+    public void setOverride(final @Nullable UnitIcon override) {
         this.override = override;
     }
     //endregion Getters
@@ -79,6 +80,26 @@ public class UnitIconDialog extends StandardForceIconDialog {
                 "RefreshDirectory.toolTipText", evt -> getChooser().refreshDirectory()));
 
         return panel;
+    }
+
+    @Override
+    protected void finalizeInitialization() {
+        super.finalizeInitialization();
+        setOverride(null);
+
+        // Default to the Units folder when no icon is selected
+        if ((getChooser().getTreeCategories() != null) && ((getChooser().getOriginalIcon() == null)
+                || (getChooser().getOriginalIcon().getFilename() == null))) {
+            final DefaultMutableTreeNode root = (DefaultMutableTreeNode) getChooser().getTreeCategories()
+                    .getModel().getRoot();
+            for (final Enumeration<?> children = root.children(); children.hasMoreElements(); ) {
+                final DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+                if ("Units".equals(child.getUserObject())) {
+                    getChooser().getTreeCategories().setSelectionPath(new TreePath(child.getPath()));
+                    break;
+                }
+            }
+        }
     }
     //endregion Initialization
 

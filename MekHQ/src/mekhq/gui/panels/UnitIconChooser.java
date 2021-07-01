@@ -20,10 +20,8 @@ package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.gui.trees.StandardForceIconChooserTree;
 
 public class UnitIconChooser extends StandardForceIconChooser {
     //region Constructors
@@ -35,5 +33,11 @@ public class UnitIconChooser extends StandardForceIconChooser {
     @Override
     protected UnitIcon createIcon(final @Nullable String category, final @Nullable String filename) {
         return new UnitIcon(category, filename);
+    }
+
+    @Override
+    public @Nullable UnitIcon getSelectedItem() {
+        final AbstractIcon icon = super.getSelectedItem();
+        return (icon instanceof UnitIcon) ? (UnitIcon) icon : null;
     }
 }

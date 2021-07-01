@@ -67,6 +67,12 @@ public class StandardForceIconChooser extends AbstractIconChooser {
     }
 
     @Override
+    public @Nullable StandardForceIcon getSelectedItem() {
+        final AbstractIcon icon = super.getSelectedItem();
+        return (icon instanceof StandardForceIcon) ? (StandardForceIcon) icon : null;
+    }
+
+    @Override
     public void refreshDirectory() {
         MHQStaticDirectoryManager.refreshForceIcons();
         refreshDirectory(new StandardForceIconChooserTree());

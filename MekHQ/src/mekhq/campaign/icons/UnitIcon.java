@@ -19,8 +19,6 @@
 package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,6 +47,11 @@ public class UnitIcon extends StandardForceIcon {
     //endregion Constructors
 
     //region Getters/Setters
+    @Override
+    public @Nullable String getFilename() {
+        return super.getFilename();
+    }
+
     @Override
     public void setFilename(final @Nullable String filename) {
         // We allow filename to be null here to indicate no icons
