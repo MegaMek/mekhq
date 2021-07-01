@@ -2583,7 +2583,7 @@ public class Person implements Serializable {
     }
 
     public String getHTMLTitle() {
-        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getFullTitle());
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
     }
 
     public String getFullTitle() {
@@ -3169,8 +3169,8 @@ public class Person implements Serializable {
     }
 
     public boolean isTaskOvertime(IPartWork partWork) {
-        return partWork.getTimeLeft() > getMinutesLeft()
-               && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
+        return (partWork.getTimeLeft() > getMinutesLeft())
+               && (getOvertimeLeft() > 0);
     }
 
     public Skill getSkillForWorkingOn(IPartWork part) {

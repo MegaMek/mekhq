@@ -65,7 +65,10 @@ public class MissingMekLocationTest {
         }).when(unit).findPart(any());
 
         // We cannot repair this torso
-        assertNotNull(missing.checkFixable());
+        String message = missing.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains("Avionics"));
+        assertTrue(message.contains("Landing Gear"));
 
         // Only missing landing gear, avionics are still good
         doAnswer(inv -> {
@@ -75,7 +78,9 @@ public class MissingMekLocationTest {
         }).when(unit).findPart(any());
 
         // We cannot repair this torso
-        assertNotNull(missing.checkFixable());
+        message = missing.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains("Avionics"));
 
         // Only missing avionics, landing gear is still good
         doAnswer(inv -> {
@@ -85,7 +90,9 @@ public class MissingMekLocationTest {
         }).when(unit).findPart(any());
 
         // We cannot repair this torso
-        assertNotNull(missing.checkFixable());
+        message = missing.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains("Landing Gear"));
 
         // Missing both Landing Gear and Avionics
         doAnswer(inv -> {
@@ -130,7 +137,9 @@ public class MissingMekLocationTest {
         }).when(unit).findPart(any());
 
         // We cannot repair this head
-        assertNotNull(missing.checkFixable());
+        String message = missing.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains("Avionics"));
 
         // Missing avionics
         doAnswer(inv -> {

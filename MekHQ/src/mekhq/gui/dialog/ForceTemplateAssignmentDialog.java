@@ -42,6 +42,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
@@ -168,7 +169,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
 
     private void setupTemplateList() {
         DefaultListModel<ScenarioForceTemplate> templateListModel = new DefaultListModel<>();
-        for (ScenarioForceTemplate forceTemplate : currentScenario.getTemplate().scenarioForces.values()) {
+        for (ScenarioForceTemplate forceTemplate : currentScenario.getTemplate().getAllScenarioForces()) {
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal() ||
                     forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
                 templateListModel.addElement(forceTemplate);

@@ -480,7 +480,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 //its a new part
                 //dont actually add the part iself but rather its missing equivalent
                 //except in the case of armor, ammobins and the spacecraft cooling system
-                if (part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem) {
+                if (part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem
+                        || part instanceof TransportBayPart) {
                     newPartList.add(part);
                 } else {
                     Part mPart = part.getMissingPart();
@@ -1482,6 +1483,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         for (Part p : newParts) {
+            // CAW: after a refit some parts ended up NOT having a Campaign attached,
+            // see https://github.com/MegaMek/mekhq/issues/2703
+            p.setCampaign(getCampaign());
+
             if (p instanceof AmmoBin) {
                 //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
                 //Consider all LC ammobins empty and load them back up.

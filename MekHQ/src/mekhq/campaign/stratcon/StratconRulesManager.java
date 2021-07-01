@@ -32,8 +32,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -47,6 +49,7 @@ import mekhq.campaign.unit.Unit;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,6 +168,7 @@ public class StratconRulesManager {
         // if not auto-assigning lances, we then back out the lance assignments.
         for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
 
             if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
                 for (int forceID : scenario.getPlayerTemplateForceIDs()) {
@@ -178,6 +182,73 @@ public class StratconRulesManager {
                 // if we're auto-assigning lances, deploy all assigned forces to the track as well
                 for (int forceID : scenario.getPrimaryForceIDs()) {
                     processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Worker function that looks through the scenario's templates and swaps in
+     * player units for "player or allied force" templates.
+     */
+    private static void swapInPlayerUnits(StratconScenario scenario, Campaign campaign, int explicitForceID) { 
+        for (ScenarioForceTemplate sft : scenario.getScenarioTemplate().getAllScenarioForces()) {
+            if (sft.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
+                int unitCount = 0;
+
+                // get all the units that have been generated for this template
+                for (ScenarioForceTemplate template : scenario.getBackingScenario().getBotUnitTemplates().values()) {
+                    if (template.getForceName().equals(sft.getForceName())) {
+                        unitCount++;
+                    }
+                }
+                
+                // or the units embedded in bot forces
+                for (var tuple : scenario.getBackingScenario().getBotForceTemplates().entrySet()) {
+                    if (tuple.getValue().getForceName().equals(sft.getForceName())) {
+                        unitCount += tuple.getKey().getEntityList().size();
+                    }
+                }
+                
+                // now we have a unit count. Don't bother with the next step if we don't have any substitutions to make
+                if (unitCount == 0) {
+                    continue;
+                }
+                
+                Collection<Unit> potentialUnits = new HashSet<>();
+                
+                // find units in player's campaign (not just forces!)
+                // by default, all units are eligible
+                if (explicitForceID == Force.FORCE_NONE) {
+                    potentialUnits = campaign.getHangar().getUnits();
+                // if we're using a seed force, then units transporting this force
+                // are eligible
+                } else {
+                    Force force = campaign.getForce(explicitForceID);
+                    for (UUID unitID : force.getUnits()) {
+                        Unit unit = campaign.getUnit(unitID);
+                        if (unit.getTransportShipAssignment() != null) {
+                            potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                        }
+                    }
+                }
+                    
+                    
+                for (Unit unit : potentialUnits) {                    
+                    // if it's the right type of unit and is around
+                    if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(), sft.getAllowedUnitType(), false) && 
+                            unit.isAvailable() && unit.isFunctional()) {
+                        
+                        // add the unit to the scenario and bench the appropriate bot unit if one is present
+                        scenario.addUnit(unit, sft.getForceName(), false);
+                        AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(), sft.getForceName(), scenario.getBackingScenario());
+                        unitCount--;
+                        
+                        // once we've supplied enough units, end the process
+                        if (unitCount == 0) {
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -246,6 +317,13 @@ public class StratconRulesManager {
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            
+            // if we wound up with a field scenario, we may sub in dropships carrying
+            // units of the force in question
+            if (spawnScenario && !isNonAlliedFacility) {
+                swapInPlayerUnits(scenario, campaign, forceID);
+            }
+            
             commitPrimaryForces(campaign, scenario, track);
         }
     }
@@ -622,7 +700,7 @@ public class StratconRulesManager {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
-        // StratconScenarioFactory.getSpecificScenario("Hostile Facility.xml");
+        //template = StratconScenarioFactory.getSpecificScenario("Defend Grounded Dropship.xml");
 
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
@@ -951,15 +1029,41 @@ public class StratconRulesManager {
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements || (reinforcements
                     && (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.None));
-            if (!force.isDeployed() && (force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
+            if ((force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
                     && !forcesInTracks.contains(force.getId())
                     && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
-                    && noReinforcementRestriction) {
+                    && noReinforcementRestriction
+                    && !subElementsOrSelfDeployed(force, campaign)) {
                 retVal.add(force.getId());
             }
         }
 
         return retVal;
+    }
+    
+    /**
+     * Returns true if any sub-element (unit or sub-force) of this force is deployed.
+     */
+    private static boolean subElementsOrSelfDeployed(Force force, Campaign campaign) {
+        if (force.isDeployed()) {
+            return true;
+        }
+        
+        for (UUID unitID : force.getUnits()) {
+            Unit unit = campaign.getUnit(unitID);
+            
+            if (unit.isDeployed()) {
+                return true;
+            }
+        }
+        
+        for (Force child : force.getSubForces()) {
+            if (subElementsOrSelfDeployed(child, campaign)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**

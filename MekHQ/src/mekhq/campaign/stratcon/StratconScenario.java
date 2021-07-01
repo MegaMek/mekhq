@@ -20,16 +20,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.unit.Unit;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -93,16 +96,31 @@ public class StratconScenario implements IStratconDisplayable {
     
     /**
      * Add a force to the backing scenario, trying to associate it with the given template.
+     * Does some scenario and force house-keeping, fires a deployment changed event.
      */
-    public void addForce(int forceID, String templateID) {
-        backingScenario.addForce(forceID, templateID);
+    public void addForce(Force force, String templateID) {
+        if (!getBackingScenario().getForceIDs().contains(force.getId())) {
+            backingScenario.addForce(force.getId(), templateID);
+            force.setScenarioId(getBackingScenarioID());
+            MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
+        }
     }
     
     /**
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
+     * Performs house keeping on the unit and scenario and invokes a deployment changed event.
      */
-    public void addUnit(UUID unitID, String templateID) {
-        backingScenario.addUnit(unitID, templateID);
+    public void addUnit(Unit unit, String templateID, boolean useLeadershipPoint) {
+        if (!backingScenario.containsPlayerUnit(unit.getId())) {
+            backingScenario.addUnit(unit.getId(), templateID);
+            unit.setScenarioId(getBackingScenarioID());
+            
+            if (useLeadershipPoint) {
+                useLeadershipPoint();
+            }
+            
+            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
+        }
     }
 
     public List<Integer> getAssignedForces() {

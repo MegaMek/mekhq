@@ -1,11 +1,22 @@
 VERSION HISTORY:
 ----------------
-0.49.2-SNAPSHOT
+0.49.3-SNAPSHOT
++ Issue #2679: Correctly show and apply overtime mod to multi-day rolls
++ Issue #2709: Two Scenario Date NPEs
++ Issue #2685: Preventing NPE when loading scenario save games
++ Issue #2609: Show which parts are blocking repairs
++ Issue #2707: Preventing text wrap in the person title JTable usages
++ PR #2718: Fixing Bulk Refit Complete/Cancel
++ Issue #2717: Advance Days Dialog no longer based on modality
++ PR #2716: StratCon - player dropships will now be pulled into dropship defense scenarios;
+	more abstractly: capability to substitute player units for bot units in designated scenario force templates
+
+0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
 + Issue #2625: Properly Clear Tech Units on Person removal/retirement
 + PR #2617: Contract Command Rights Enum and Tool Tips
 + PR #2637: Personnel Names
-+ PR #2651, #2688, #2698: Various StratCon fixes:
++ PR #2651, #2688, #2698, #2701, #2702: Various StratCon fixes:
   - Updated arrival altitude for aerospace fighter reinforcement modifiers (they were showing up on the ground)
   - Standardized "recon" type scenarios to have the same criteria as Tukayyid scenarios
   - Various briefing text clarifications
@@ -13,10 +24,13 @@ VERSION HISTORY:
   - On Integrated command, don't immediately and incorrectly undeploy lances after generating scenarios
   - Adjusted manual force deployment rules (unlimited stacking on allied facilities, one per hex otherwise, no manual deployment under integrated command)
   - Tighten up reinforcement restrictions (can't deploy units that can't actually deploy; can't double deploy units; can now only deploy fight lances or have to use a support point/VP)
-  - VTOLs no longer start on the ground in certain situations
+  - VTOLs no longer start on the ground in certain situations, for real
   - Removed extraneous "recon turrets" modifier span for recon raid contracts
   - Tighten up strategic objective generation; correct objective coordinate display
   - Removed extraneous references to contract score in some scenario modifiers; water-naval units may rarely make an appearance
+  - More robust transport loading code
+  - Bot now has access to Arrow IV external ordnance, won't load 20 TAG pods on a single fighter.
+  - Prevent double deployment of units and forces to individual scenarios
 + PR #2656: Cleaning up a few erroneous Campaign GUI properties
 + PR #2655: Ensuring BotForce has a Valid Base Camouflage
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
@@ -43,6 +57,9 @@ VERSION HISTORY:
 + Issues #2116 and #2589: Improving Rank and Title Sorting
 + PR #2694: Hangar Tab: Maintenance Colour No Longer Shows with Maintenance Disabled
 + PR #2693: GM Tools Dialog Rewrite
++ PR #2422: Improve simple accessibility faults
++ Issue #2703: Defend against parts without campaigns after Refit
++ Issue #2687: Fix error refitting dropship transport bays
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
