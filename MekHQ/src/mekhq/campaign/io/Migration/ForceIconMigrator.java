@@ -39,7 +39,7 @@ public class ForceIconMigrator {
         if (icon instanceof LayeredForceIcon) {
             return migrateLayeredForceIcon((LayeredForceIcon) icon);
         } else if (icon instanceof UnitIcon) {
-            return migrateUnitIcon((UnitIcon) icon);
+            return icon; // Assume they properly set this value
         } else if (icon != null) {
             return migrateStandardForceIcon(icon);
         } else {
@@ -60,6 +60,981 @@ public class ForceIconMigrator {
         migrateSpecialModifiers(icon, layered);
         migrateTypes(icon, layered);
         return icon;
+    }
+
+    private static void migrateAdjustments(final LayeredForceIcon original, final LayeredForceIcon migrated) {
+        for (final String path : original.getIconMap().getOrDefault(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>())) {
+            switch (path) {
+                case "Air assault.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Air Mobile.png");
+                    break;
+                case "Artillery_Missile.png":
+                case "Artillery_Missile_small.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Artillery (Missile).png");
+                    break;
+                case "Artillery_Missile_Multiple.png":
+                case "Artillery_Missile_Multiple_small.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Artillery (Multiple Missile).png");
+                    break;
+                case "Artillery_tube.png":
+                case "Artillery_tube_small.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Artillery.png");
+                    break;
+                case "Command and Control.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Command and Control.png");
+                    break;
+                case "Drone Carrier.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone Carrier.png");
+                    break;
+                case "Infantry_Motorized.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Motorized.png");
+                    break;
+                case "Battle Armor Transport.png":
+                case "Mechanized.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Mechanized.png");
+                    break;
+                case "Mountaineers.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Mountaineer.png");
+                    break;
+                case "Paratrooper.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Paratrooper.png");
+                    break;
+                case "Recon.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Recon.png");
+                    break;
+                case "Scuba.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Scuba.png");
+                    break;
+                case "Supply.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Supply.png");
+                    break;
+                case "Infantry_Jumppng":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("StratOps/Jump Infantry (Large).png");
+                    break;
+                case "Infantry_SpaceMarine.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("StratOps/Space.png");
+                    break;
+                case "Omni.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("StratOps/Omni.png");
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    private static void migrateAlphanumerics(final LayeredForceIcon original, final LayeredForceIcon migrated) {
+        for (final String path : original.getIconMap().getOrDefault(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>())) {
+            switch (path) {
+                case "A I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "A II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "A III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "A IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "A V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "B I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "B II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "B III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "B IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "B V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "C I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "C II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "C III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "C IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "C V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "D I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "D II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "D III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "D IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "D V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "E I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "E II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "E III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "E IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "E V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "F I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "F II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "F III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "F IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "F V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "G I Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(01) Roman I.png");
+                    break;
+                case "G II Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "G III Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "G IV Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "G V Low.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(05) Roman V.png");
+                    break;
+                case "A Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/A.png");
+                    break;
+                case "A Low.png":
+                case "A.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/A.png");
+                    break;
+                case "AP.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/AP.png");
+                    break;
+                case "B Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/B.png");
+                    break;
+                case "B Low.png":
+                case "B.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/B.png");
+                    break;
+                case "BB.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/BB.png");
+                    break;
+                case "BT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/BT.png");
+                    break;
+                case "C Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/C.png");
+                    break;
+                case "C Low.png":
+                case "C.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/C.png");
+                    break;
+                case "CA.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CA.png");
+                    break;
+                case "CB.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CB.png");
+                    break;
+                case "CH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CH.png");
+                    break;
+                case "CP.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CP.png");
+                    break;
+                case "CT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CT.png");
+                    break;
+                case "CV.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/CV.png");
+                    break;
+                case "D Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/D.png");
+                    break;
+                case "D Low.png":
+                case "D.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/D.png");
+                    break;
+                case "DCV.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/DCV.png");
+                    break;
+                case "DD.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/DD.png");
+                    break;
+                case "DH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/DH.png");
+                    break;
+                case "DS.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/DS.png");
+                    break;
+                case "E Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/E.png");
+                    break;
+                case "E Low.png":
+                case "E.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/E.png");
+                    break;
+                case "EP.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/EP.png");
+                    break;
+                case "F Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/F.png");
+                    break;
+                case "F Low.png":
+                case "F.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/F.png");
+                    break;
+                case "FR.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/FR.png");
+                    break;
+                case "G Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/G.png");
+                    break;
+                case "G Low.png":
+                case "G.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/G.png");
+                    break;
+                case "H Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/H.png");
+                    break;
+                case "H Low.png":
+                case "H.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/H.png");
+                    break;
+                case "I Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/I.png");
+                    break;
+                case "I Low.png":
+                case "I.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/I.png");
+                    break;
+                case "II Low.png":
+                case "II.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(02) Roman II.png");
+                    break;
+                case "III Low.png":
+                case "III.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(03) Roman III.png");
+                    break;
+                case "IV Low.png":
+                case "IV.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(04) Roman IV.png");
+                    break;
+                case "IX Low.png":
+                case "IX.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(09) Roman IX.png");
+                    break;
+                case "J Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/J.png");
+                    break;
+                case "J Low.png":
+                case "J.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/J.png");
+                    break;
+                case "K Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/K.png");
+                    break;
+                case "K Low.png":
+                case "K.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/K.png");
+                    break;
+                case "L Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/L.png");
+                    break;
+                case "L Low.png":
+                case "L.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/L.png");
+                    break;
+                case "LB.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LB.png");
+                    break;
+                case "LC.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LC.png");
+                    break;
+                case "LG.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LG.png");
+                    break;
+                case "LH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LH.png");
+                    break;
+                case "LM.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LM.png");
+                    break;
+                case "LP.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LP.png");
+                    break;
+                case "LT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/LT.png");
+                    break;
+                case "M Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/M.png");
+                    break;
+                case "M Low.png":
+                case "M.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/M.png");
+                    break;
+                case "MY.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/MY.png");
+                    break;
+                case "N Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/N.png");
+                    break;
+                case "N Low.png":
+                case "N.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/N.png");
+                    break;
+                case "NF.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/NF.png");
+                    break;
+                case "NX.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/NX.png");
+                    break;
+                case "O Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/O.png");
+                    break;
+                case "O Low.png":
+                case "O.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/O.png");
+                    break;
+                case "P Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/P.png");
+                    break;
+                case "P Low.png":
+                case "P.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/P.png");
+                    break;
+                case "PC.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/PC.png");
+                    break;
+                case "PS.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/PS.png");
+                    break;
+                case "PT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/PT.png");
+                    break;
+                case "Q Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/Q.png");
+                    break;
+                case "Q Low.png":
+                case "Q.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/Q.png");
+                    break;
+                case "R Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/R.png");
+                    break;
+                case "R Low.png":
+                case "R.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/R.png");
+                    break;
+                case "S Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/S.png");
+                    break;
+                case "S Low.png":
+                case "S.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/S.png");
+                    break;
+                case "SB.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/SB.png");
+                    break;
+                case "SL.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/SL.png");
+                    break;
+                case "SS.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/SS.png");
+                    break;
+                case "ST.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/ST.png");
+                    break;
+                case "T Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/T.png");
+                    break;
+                case "T Low.png":
+                case "T.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/T.png");
+                    break;
+                case "U Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/U.png");
+                    break;
+                case "U Low.png":
+                case "U.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/U.png");
+                    break;
+                case "V Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/V.png");
+                    break;
+                case "V Low.png":
+                case "V.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/V.png");
+                    break;
+                case "VI Low.png":
+                case "VI.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(06) Roman VI.png");
+                    break;
+                case "VII Low.png":
+                case "VII.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(07) Roman VII.png");
+                    break;
+                case "VIII Low.png":
+                case "VIII.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/Roman Numerals/(08) Roman VIII.png");
+                    break;
+                case "W Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/W.png");
+                    break;
+                case "W Low.png":
+                case "W.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/W.png");
+                    break;
+                case "X Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/X.png");
+                    break;
+                case "X Low.png":
+                case "X.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/X.png");
+                    break;
+                case "Y Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/Y.png");
+                    break;
+                case "Y Low.png":
+                case "Y.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/Y.png");
+                    break;
+                case "YC.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YC.png");
+                    break;
+                case "YH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YH.png");
+                    break;
+                case "YLG.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YLG.png");
+                    break;
+                case "YLH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YLH.png");
+                    break;
+                case "YLT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YLT.png");
+                    break;
+                case "YMY.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YMY.png");
+                    break;
+                case "YNX.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YNX.png");
+                    break;
+                case "YP.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YP.png");
+                    break;
+                case "YR.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YR.png");
+                    break;
+                case "YT.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YT.png");
+                    break;
+                case "YX.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/YX.png");
+                    break;
+                case "Z Low Left.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Left/English Letters/Z.png");
+                    break;
+                case "Z Low.png":
+                case "Z.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top Right/English Letters/Z.png");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private static void migrateBackgrounds(final LayeredForceIcon original, final LayeredForceIcon migrated) {
+        for (final String path : original.getIconMap().getOrDefault(LayeredForceIconLayer.BACKGROUND, new ArrayList<>())) {
+            switch (path) {
+                case "CDS.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Diamond Shark.png");
+                    break;
+                case "CGB.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Ghost Bear.png");
+                    break;
+                case "CHH.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Hell's Horses.png");
+                    break;
+                case "CJF.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Jade Falcon.png");
+                    break;
+                case "CNC Alternate.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Nova Cat (Alternate).png");
+                    break;
+                case "CNC.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Nova Cat.png");
+                    break;
+                case "CSR Alternate.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Snow Raven (Alternate).png");
+                    break;
+                case "CSR.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Snow Raven.png");
+                    break;
+                case "CW.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Clan/Clan Wolf.png");
+                    break;
+                case "Capellan Confederation.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Capellan Confederation.png");
+                    break;
+                case "Comstar background.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/ComStar.png");
+                    break;
+                case "Draconis Combine.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Draconis Combine.png");
+                    break;
+                case "Federated Suns.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Federated Suns.png");
+                    break;
+                case "Free Rasalhague Republic.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Free Rasalhague Republic.png");
+                    break;
+                case "Free Worlds League.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Free Worlds League.png");
+                    break;
+                case "Lyran Commonwealth.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Lyran Commonwealth.png");
+                    break;
+                case "Republic of the sphere.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Inner Sphere/Republic of the Sphere.png");
+                    break;
+                case "Magistracy of Canopus alternate.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Magistracy of Canopus (Alternate).png");
+                    break;
+                case "Magistracy of Canopus.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Magistracy of Canopus.png");
+                    break;
+                case "Marian Hegemony.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Marian Hegemony.png");
+                    break;
+                case "Outworlds alliance alternate.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Outworlds Alliance (Alternate).png");
+                    break;
+                case "Outworlds alliance.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Outworlds Alliance.png");
+                    break;
+                case "Rim worlds Republic.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Rim Worlds Republic.png");
+                    break;
+                case "Tarurian Concordat .png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Tarurian Concordat.png");
+                    break;
+                case "Tarurian Concordat alternate.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Periphery/Tarurian Concordat (Alternate).png");
+                    break;
+                case "Merc.png":
+                    migrated.getIconMap().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.BACKGROUND).add("Mercenary.png");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private static void migrateFormations(final LayeredForceIcon original, final LayeredForceIcon migrated) {
+        for (final String path : original.getIconMap().getOrDefault(LayeredForceIconLayer.FORMATION, new ArrayList<>())) {
+            switch (path) {
+                case "00 Installation.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(00) Installation.png");
+                    break;
+                case "01 Fire Team.png":
+                case "01 FireTeam.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(01) Fire Team.png");
+                    break;
+                case "02 Individual.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(02) Individual.png");
+                    break;
+                case "03 Team.png":
+                case "03Team.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(03) Team.png");
+                    break;
+                case "04 Lance.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(05) Lance.png");
+                    break;
+                case "05 Lance Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(06) Augmented Lance.png");
+                    break;
+                case "06 Company.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(07) Company.png");
+                    break;
+                case "07 Company Task Force.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(08) Company Task Force.png");
+                    break;
+                case "08 Battalion.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(09) Battalion.png");
+                    break;
+                case "09 Battlegroup.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(10) Battlegroup.png");
+                    break;
+                case "10 Regiment.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(11) Regiment.png");
+                    break;
+                case "11 Brigade.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(13) Brigade.png");
+                    break;
+                case "12 Division.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(15) Division.png");
+                    break;
+                case "13 Corps.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(17) Corps.png");
+                    break;
+                case "14 Field Army.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(19) Field Army.png");
+                    break;
+                case "15 Army Group.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(21) Army Group.png");
+                    break;
+                case "Brigade Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(14) Augmented Brigade.png");
+                    break;
+                case "Corps Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(18) Augmented Corps.png");
+                    break;
+                case "Division Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(16) Augmented Division.png");
+                    break;
+                case "Field Army Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(20) Augmented Field Army.png");
+                    break;
+                case "Regiment Augmented.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Inner Sphere/(12) Augmented Regiment.png");
+                    break;
+                case "16 Level I.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(01) Level I.png");
+                    break;
+                case "17 Level II.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(02) Level II.png");
+                    break;
+                case "18 Choir.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(03) Choir.png");
+                    break;
+                case "19 Level III.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(04) Level III.png");
+                    break;
+                case "20 Level IV.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(05) Level IV.png");
+                    break;
+                case "21 Level V.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(06) Level V.png");
+                    break;
+                case "22 Level VI.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("ComStar/(07) Level VI.png");
+                    break;
+                case "23 Point.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(01) Point.png");
+                    break;
+                case "24 Star.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(02) Star.png");
+                    break;
+                case "25 Binary.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(04) Binary.png");
+                    break;
+                case "26 Nova.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(03) Nova.png");
+                    break;
+                case "27 Trinary.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(06) Trinary.png");
+                    break;
+                case "28 SuperNova Binary.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(05) SuperNova Binary.png");
+                    break;
+                case "29 SuperNova Trinary.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(07) SuperNova Trinary.png");
+                    break;
+                case "30 Cluster.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(08) Cluster.png");
+                    break;
+                case "31 Galaxy.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.FORMATION).add("Clan/(09) Galaxy.png");
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private static void migrateFrames(final LayeredForceIcon original, final LayeredForceIcon migrated) {
@@ -253,24 +1228,345 @@ public class ForceIconMigrator {
             }
         }
     }
+
+    private static void migrateTypes(final LayeredForceIcon original, final LayeredForceIcon migrated) {
+        for (final String path : original.getIconMap().getOrDefault(LayeredForceIconLayer.TYPE, new ArrayList<>())) {
+            switch (path) {
+                case "Aerospace Heavy.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Aerospace (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Heavy.png");
+                    break;
+                case "Aerospace Light.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Aerospace (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Light.png");
+                    break;
+                case "Aerospace Medium.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Aerospace (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Medium.png");
+                    break;
+                case "Aerospace.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Aerospace.png");
+                    break;
+                case "Air Defense Artillery.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Air Defense.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Artillery.png");
+                    break;
+                case "Air Defense Capital Weaponry.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Air Defense.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("StratOps/Space.png");
+                    break;
+                case "Air Defense.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Air Defense.png");
+                    break;
+                case "Airship.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Airship.png");
+                    break;
+                case "Armoured_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Main Battle Tank.png");
+                    break;
+                case "Artillery_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Artillery.png");
+                    break;
+                case "Aviation VTOL.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Aviation, Rotary Wing (Civilian).png");
+                    break;
+                case "Battle Armor.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Battle Armor (Extended).png");
+                    break;
+                case "BattleMech Assault.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Assault.png");
+                    break;
+                case "BattleMech Heavy.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Heavy.png");
+                    break;
+                case "BattleMech Light.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Light.png");
+                    break;
+                case "BattleMech Medium.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Medium.png");
+                    break;
+                case "BattleMech Superheavy.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Superheavy.png");
+                    break;
+                case "BattleMech.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Center).png");
+                    break;
+                case "Drone Hover Converted.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Hover).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Converted).png");
+                    break;
+                case "Drone Hover.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Hover).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Military).png");
+                    break;
+                case "Drone Tracked Converted.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Tracked).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Converted).png");
+                    break;
+                case "Drone Tracked.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Tracked).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Military).png");
+                    break;
+                case "Drone Wheeled Converted.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Wheeled).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Converted).png");
+                    break;
+                case "Drone Wheeled.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Wheeled).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Drone (Military).png");
+                    break;
+                case "Dropship.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/DropShip.png");
+                    break;
+                case "Engineer.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Engineer.png");
+                    break;
+                case "Fixed Wing.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Aviation, Fixed Wing (Civilian).png");
+                    break;
+                case "Headquarters.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Alphanumeric/Type/HQ (Headquarters).png");
+                    break;
+                case "Industrial Mechs.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Industrial.png");
+                    break;
+                case "Infantry Hover.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Hover).png");
+                    break;
+                case "Infantry Jump.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Jump Infantry (Large).png");
+                    break;
+                case "Infantry Mechanized VTOL.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Aviation, Rotary Wing (Military).png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Mechanized.png");
+                    break;
+                case "Infantry Mechanized.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Mechanized.png");
+                    break;
+                case "Infantry Space Marine.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("StratOps/Space.png");
+                    break;
+                case "Infantry Tracked.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Tracked).png");
+                    break;
+                case "Infantry Wheeled.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Wheeled).png");
+                    break;
+                case "Infantry.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    break;
+                case "Infantry_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Infantry.png");
+                    break;
+                case "Jumpship.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/JumpShip.png");
+                    break;
+                case "LAM.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Aerospace (Right).png");
+                    break;
+                case "Maintenance Alt.png":
+                case "Maintenance Small.png":
+                case "Maintenance.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Maintenance.png");
+                    break;
+                case "medical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Medical.png");
+                    break;
+                case "Naval.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Naval.png");
+                    break;
+                case "Naval_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Naval (Destroyer).png");
+                    break;
+                case "Protomech.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/BattleMech (Left).png");
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/ProtoMech.png");
+                    break;
+                case "Rail Pressurized.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Rail (Pressurized).png");
+                    break;
+                case "Rail Unpressurized.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Rail (Unpressurized).png");
+                    break;
+                case "Satellite.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Satellite.png");
+                    break;
+                case "Scuba.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Infantry.png");
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.ADJUSTMENT).add("NATO/Scuba (Bottom).png");
+                    break;
+                case "Space Station.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Space Station.png");
+                    break;
+                case "Transport Medium.png":
+                case "Transport Small.png":
+                case "Transport.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Transport.png");
+                    break;
+                case "Transport_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Transport.png");
+                    break;
+                case "Turret_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/Turret (AA).png");
+                    break;
+                case "UAV.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/UAV.png");
+                    break;
+                case "Vehicle Assorted.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Vehicle (Hover Wheeled Armoured).png");
+                    break;
+                case "Vehicle Hover Alt.png":
+                case "Vehicle Hover Small.png":
+                case "Vehicle Hover.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Hover).png");
+                    break;
+                case "Vehicle Tracked Alt.png":
+                case "Vehicle Tracked Small Artillery.png":
+                case "Vehicle Tracked Small.png":
+                case "Vehicle Tracked.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Tracked).png");
+                    break;
+                case "Vehicle Wheeled Alt.png":
+                case "Vehicle Wheeled Small.png":
+                case "Vehicle Wheeled.png":
+                case "Vehicle_Wheeled.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Vehicle (Wheeled).png");
+                    break;
+                case "VTOL_Graphical.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("Graphical/VTOL.png");
+                    break;
+                case "Warship.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/WarShip.png");
+                    break;
+                case "WIGE.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("NATO/Aviation, WiGE (Military).png");
+                    break;
+                case "Xenoplanetary.png":
+                    migrated.getIconMap().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    migrated.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Infantry (Xenoplanetary).png");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     //endregion Layered Force Icon
 
     //region Standard Force Icon
-    private static StandardForceIcon migrateUnitIcon(final UnitIcon icon) {
-        final StandardForceIcon migrated = (icon.getFilename() == null) ? icon
-                : migrateStandardForceIcon(icon);
-        return new UnitIcon(migrated.getCategory(), migrated.getFilename());
-    }
-
     private static StandardForceIcon migrateStandardForceIcon(final StandardForceIcon icon) {
         if (icon.hasDefaultCategory()) {
             if ("Book.png".equalsIgnoreCase(icon.getFilename())) {
                 return new StandardForceIcon(StandardForceIcon.ROOT_CATEGORY,
                         StandardForceIcon.DEFAULT_FORCE_ICON_FILENAME);
             } else {
-                return (icon instanceof LayeredForceIcon)
-                        ? new StandardForceIcon(icon.getCategory(), icon.getFilename()) : icon;
+                return (icon instanceof LayeredForceIcon) ? new StandardForceIcon() : icon;
             }
+        } else if (icon.getCategory().toLowerCase(Locale.ENGLISH).startsWith("pieces")) {
+            LayeredForceIconLayer layer = null;
+            for (final LayeredForceIconLayer iconLayer : LayeredForceIconLayer.values()) {
+                if (icon.getCategory().equalsIgnoreCase(iconLayer.getLayerPath())) {
+                    layer = iconLayer;
+                    break;
+                }
+            }
+
+            if (layer == null) {
+                return new StandardForceIcon();
+            }
+
+            final LayeredForceIcon parser = new LayeredForceIcon();
+            parser.getIconMap().putIfAbsent(layer, new ArrayList<>());
+            final LayeredForceIcon parsed = new LayeredForceIcon();
+            migrateLogos(parser, parsed);
+            return parsed;
         }
 
         switch (icon.getCategory().toLowerCase(Locale.ENGLISH)) {
@@ -304,8 +1600,6 @@ public class ForceIconMigrator {
                 return migrateStandardNames(icon);
             case "naval":
                 return migrateStandardNaval(icon);
-            case "pieces":
-                return migrateStandardPieces(icon);
             case "units":
                 return migrateStandardUnits(icon);
             case "vehicles":
@@ -530,8 +1824,18 @@ public class ForceIconMigrator {
     }
 
     private static StandardForceIcon migrateStandardFormationsClan(final StandardForceIcon icon) {
-        // TODO : Finish me
-        return icon;
+        // TODO : Complete me
+        final LayeredForceIcon layered = new LayeredForceIcon();
+        switch (icon.getFilename()) {
+            case "battlearmor.png":
+                layered.getIconMap().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getIconMap().get(LayeredForceIconLayer.TYPE).add("StratOps/Battle Armor (Extended).png");
+                layered.getIconMap().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                layered.getIconMap().get(LayeredForceIconLayer.ALPHANUMERIC).add("Top/MVO.png");
+                return layered;
+            default:
+                return icon;
+        }
     }
 
     private static StandardForceIcon migrateStandardFormationsGreekLetters(final StandardForceIcon icon) {
@@ -1539,15 +2843,6 @@ public class ForceIconMigrator {
             default:
                 return icon;
         }
-    }
-
-    private static StandardForceIcon migrateStandardPieces(final StandardForceIcon icon) {
-        // TODO : Finish me
-        final LayeredForceIcon layered = new LayeredForceIcon();
-        if ("Pieces/Type".equalsIgnoreCase(icon.getCategory())) {
-
-        }
-        return icon;
     }
 
     private static StandardForceIcon migrateStandardUnits(final StandardForceIcon icon) {
