@@ -18,6 +18,8 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.preferences.JTabbedPanePreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -64,6 +66,12 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     protected void initialize() {
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("piecesTabbedPane");
+    }
+
+    @Override
+    protected void setCustomPreferences(PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JTabbedPanePreference(getTabbedPane()));
     }
     //endregion Initialization
 

@@ -26,7 +26,6 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.panels.UnitIconChooser;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -67,8 +66,8 @@ public class UnitIconDialog extends StandardForceIconDialog {
     //region Initialization
     @Override
     protected JPanel createButtonPanel() {
-        final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 2));
-        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        final JPanel panel = new JPanel(new GridLayout(1, 4));
+        panel.setName("buttonPanel");
 
         panel.add(new MMButton("btnOk", resources, "Ok.text", "Ok.toolTipText",
                 this::okButtonActionPerformed));

@@ -18,6 +18,9 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.preferences.JSplitPanePreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -28,6 +31,7 @@ import mekhq.gui.panes.LayeredForceIconCreationPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
@@ -108,5 +112,31 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         getTabbedPane().addTab(resources.getString("LayeredIconTab.title"), getLayeredForceIconCreationPane());
         return getTabbedPane();
     }
+
+    @Override
+    protected JPanel createButtonPanel() {
+        final JPanel panel = new JPanel(new GridLayout(1, 3));
+        panel.setName("buttonPanel");
+
+        panel.add(new MMButton("btnOk", resources, "Ok.text", "Ok.toolTipText",
+                this::okButtonActionPerformed));
+        panel.add(new MMButton("btnCancel", resources, "Cancel.text", "Cancel.toolTipText",
+                this::cancelActionPerformed));
+        panel.add(new MMButton("btnRefresh", resources, "RefreshDirectory.text",
+                "RefreshDirectory.toolTipText", this::refreshDirectory));
+
+        return panel;
+    }
+
+    @Override
+    protected void setCustomPreferences(final PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JSplitPanePreference(getStandardForceIconChooser().getSplitPane()));
+    }
     //endregion Initialization
+
+    public void refreshDirectory(final ActionEvent evt) {
+        getStandardForceIconChooser().refreshDirectory();
+        // TODO : Layered Force Icon refresh
+    }
 }
