@@ -28,6 +28,8 @@ import javax.swing.*;
 public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
+
+    private JTabbedPane tabbedPane;
     //endregion Variable Declarations
 
     //region Constructors
@@ -47,12 +49,21 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     public void setForceIcon(final LayeredForceIcon forceIcon) {
         this.forceIcon = forceIcon;
     }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public void setTabbedPane(final JTabbedPane tabbedPane) {
+        this.tabbedPane = tabbedPane;
+    }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected void initialize() {
-
+        setTabbedPane(new JTabbedPane());
+        getTabbedPane().setName("piecesTabbedPane");
     }
     //endregion Initialization
 
