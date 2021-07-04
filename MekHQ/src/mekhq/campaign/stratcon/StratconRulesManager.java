@@ -32,7 +32,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -1483,7 +1482,7 @@ public class StratconRulesManager {
             
             if ((track.getAssignedForceReturnDates().get(forceID).equals(date)
                     || track.getAssignedForceReturnDates().get(forceID).isBefore(date))
-                    && (force != null) && !force.isDeployed()
+                    && (force != null) && !track.getBackingScenariosMap().containsKey(force.getScenarioId())
                     && !track.getStickyForces().contains(forceID)) {
                 forcesToUndeploy.add(forceID);
             }
