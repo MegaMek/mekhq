@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
 import megamek.common.event.Subscribe;
@@ -102,7 +103,8 @@ public class StratconTab extends CampaignGuiTab {
         // TODO: lance role assignment UI here?
 
         initializeInfoPanel();
-        this.add(infoPanel);
+        JScrollPane infoScrollPane = new JScrollPane(infoPanel);
+        this.add(infoScrollPane);
 
         MekHQ.registerHandler(this);
     }
