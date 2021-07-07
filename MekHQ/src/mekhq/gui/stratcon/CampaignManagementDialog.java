@@ -32,11 +32,11 @@ import mekhq.gui.StratconTab;
 public class CampaignManagementDialog extends JDialog {
     private StratconCampaignState currentCampaignState;
     private StratconTab parent;
-    JButton btnConvertVPToSP;
-    JButton btnConvertSPtoBonusPart;
-    JButton btnGMAddVP;
-    JButton btnGMAddSP;
-    JLabel lblTrackScenarioOdds;
+    private JButton btnConvertVPToSP;
+    private JButton btnConvertSPtoBonusPart;
+    private JButton btnGMAddVP;
+    private JButton btnGMAddSP;
+    private JLabel lblTrackScenarioOdds;
     
     public CampaignManagementDialog(StratconTab parent) {
         this.parent = parent;
