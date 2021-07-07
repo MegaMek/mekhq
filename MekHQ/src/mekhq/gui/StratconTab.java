@@ -124,10 +124,9 @@ public class StratconTab extends CampaignGuiTab {
         infoPanel.add(new JLabel("Current Campaign Status:"));
         infoPanel.add(campaignStatusText);
         
-        JButton btnManageCampaignState = new JButton();
+        JButton btnManageCampaignState = new JButton("Manage SP/VP");
         btnManageCampaignState.setHorizontalAlignment(SwingConstants.LEFT);
         btnManageCampaignState.setVerticalAlignment(SwingConstants.TOP);
-        btnManageCampaignState.setText("Manage SP/VP");
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
         infoPanel.add(btnManageCampaignState);
 
