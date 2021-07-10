@@ -94,10 +94,8 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         final JMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
 
         for (final Person tech : campaign.getTechs()) {
-            final boolean selected = Stream.of(units).allMatch(unit -> tech.equals(unit.getTech()));
             if (tech.hasSkill(skillName)
-                    && (((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)
-                    || selected)) {
+                    && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
                 final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
                         : SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(units[0]).getExperienceLevel());
 
@@ -127,19 +125,14 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                     final JMenuItem miAssignTech = new JCheckBoxMenuItem(String.format(
                             resources.getString("miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
                     miAssignTech.setName("miAssignTech");
-                    miAssignTech.setSelected(selected);
                     miAssignTech.addActionListener(evt -> {
                         for (final Unit unit : units) {
                             if (tech.equals(unit.getTech())) {
-                                if (selected) {
-                                    unit.remove(unit.getTech(), true);
-                                }
-                            } else {
-                                if (unit.getTech() != null) {
-                                    unit.remove(unit.getTech(), true);
-                                }
-                                unit.setTech(tech);
+                                continue;
+                            } else if (unit.getTech() != null) {
+                                unit.remove(unit.getTech(), true);
                             }
+                            unit.setTech(tech);
                         }
                     });
                     subMenu.add(miAssignTech);

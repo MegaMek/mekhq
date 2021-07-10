@@ -112,8 +112,6 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         JMenu navigatorEntityWeightMenu = new JMenu();
 
         // Parsing Booleans
-        final boolean selected = (people[0].getUnit() != null)
-                && Stream.of(people).allMatch(person -> people[0].getUnit().equals(person.getUnit()));
         final boolean singlePerson = people.length == 1;
         final boolean areAllBattleMechPilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping());
         final boolean areAllProtoMechPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT));
@@ -208,10 +206,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             }
 
             // Pilot Menu
-            if (unit.canTakeMoreDrivers() || selected) {
+            if (unit.canTakeMoreDrivers()) {
                 // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                if (singlePerson
-                        && (selected || unit.usesSoloPilot() || (unit.getEntity() instanceof VTOL))) {
+                if (singlePerson && (unit.usesSoloPilot() || (unit.getEntity() instanceof VTOL))) {
                     final boolean valid;
                     if (unit.getEntity() instanceof Mech) {
                         valid = areAllBattleMechPilots;
@@ -230,19 +227,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     if (valid) {
                         final JMenuItem cbPilot = new JCheckBoxMenuItem(unit.getName());
                         cbPilot.setName("cbPilot");
-                        cbPilot.setSelected(selected);
                         cbPilot.addActionListener(evt -> {
-                            if (selected) {
-                                unit.remove(people[0], true);
-                            } else {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
-                                }
-                                unit.addPilotOrSoldier(people[0], useTransfers);
+                            final Unit oldUnit = people[0].getUnit();
+                            boolean useTransfers = false;
+                            if (oldUnit != null) {
+                                oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
+                                useTransfers = campaign.getCampaignOptions().useTransfers();
                             }
+                            unit.addPilotOrSoldier(people[0], useTransfers);
                         });
                         pilotEntityWeightMenu.add(cbPilot);
                     }
@@ -253,12 +245,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         && areAllVesselPilots) {
                     final JMenuItem cbVesselPilot = new JCheckBoxMenuItem(unit.getName());
                     cbVesselPilot.setName("cbVesselPilot");
-                    cbVesselPilot.setSelected(selected);
                     cbVesselPilot.addActionListener(evt -> {
                         for (final Person person : people) {
-                            if (selected) {
-                                unit.remove(person, true);
-                            } else if (!unit.canTakeMoreDrivers()) {
+                            if (!unit.canTakeMoreDrivers()) {
                                 return;
                             } else if (!unit.equals(person.getUnit())) {
                                 final Unit oldUnit = person.getUnit();
@@ -295,19 +284,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     if (valid) {
                         final JMenuItem cbDriver = new JCheckBoxMenuItem(unit.getName());
                         cbDriver.setName("cbDriver");
-                        cbDriver.setSelected(selected);
                         cbDriver.addActionListener(evt -> {
-                            if (selected) {
-                                unit.remove(people[0], true);
-                            } else {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
-                                }
-                                unit.addDriver(people[0], useTransfers);
+                            final Unit oldUnit = people[0].getUnit();
+                            boolean useTransfers = false;
+                            if (oldUnit != null) {
+                                oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
+                                useTransfers = campaign.getCampaignOptions().useTransfers();
                             }
+                            unit.addDriver(people[0], useTransfers);
                         });
                         driverEntityWeightMenu.add(cbDriver);
                     }
@@ -315,7 +299,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             }
 
             // Gunnery Menu
-            if (unit.canTakeMoreGunners() || selected) {
+            if (unit.canTakeMoreGunners()) {
                 final boolean valid;
                 if (unit.getEntity() instanceof Tank) {
                     valid = areAllVehicleGunners;
@@ -328,12 +312,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 if (valid) {
                     final JMenuItem cbGunner = new JCheckBoxMenuItem(unit.getName());
                     cbGunner.setName("cbGunner");
-                    cbGunner.setSelected(selected);
                     cbGunner.addActionListener(evt -> {
                         for (final Person person : people) {
-                            if (selected) {
-                                unit.remove(person, true);
-                            } else if (!unit.canTakeMoreGunners()) {
+                            if (!unit.canTakeMoreGunners()) {
                                 return;
                             } else if (!unit.equals(person.getUnit())) {
                                 final Unit oldUnit = person.getUnit();
@@ -353,7 +334,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             // Crewmember Menu
             // TODO : Rename the method to canTakeMoreCrewmembers, and update the variable names to
             // TODO : also be based on crewmembers
-            if (unit.canTakeMoreVesselCrew() || selected) {
+            if (unit.canTakeMoreVesselCrew()) {
                 final boolean valid;
                 if (unit.getEntity() instanceof Aero) {
                     valid = areAllVesselCrew;
@@ -367,12 +348,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 if (valid) {
                     final JMenuItem cbCrewmember = new JCheckBoxMenuItem(unit.getName());
                     cbCrewmember.setName("cbCrewmember");
-                    cbCrewmember.setSelected(selected);
                     cbCrewmember.addActionListener(evt -> {
                         for (final Person person : people) {
-                            if (selected) {
-                                unit.remove(person, true);
-                            } else if (!unit.canTakeMoreVesselCrew()) {
+                            if (!unit.canTakeMoreVesselCrew()) {
                                 return;
                             } else if (!unit.equals(person.getUnit())) {
                                 final Unit oldUnit = person.getUnit();
@@ -394,37 +372,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             // TODO : I find that really terrible. We should be able to separate out tech officers
             // TODO : and Console Commanders properly. Because of this, I'm leaving the base code
             // TODO : here as the older style for now.
-            if (singlePerson && (unit.canTakeTechOfficer() || selected)) {
+            if (singlePerson && unit.canTakeTechOfficer()) {
                 // For a vehicle command console we will require the commander to be a driver
                 // or a gunner, but not necessarily both
                 if (unit.getEntity() instanceof Tank) {
                     if (people[0].canDrive(unit.getEntity()) || people[0].canGun(unit.getEntity())) {
                         final JMenuItem cbConsoleCommander = new JCheckBoxMenuItem(unit.getName());
                         cbConsoleCommander.setName("cbConsoleCommander");
-                        cbConsoleCommander.setSelected(selected);
                         cbConsoleCommander.addActionListener(evt -> {
-                            if (selected) {
-                                unit.remove(people[0], true);
-                            } else {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
-                                }
-                                unit.setTechOfficer(people[0], useTransfers);
-                            }
-                        });
-                        consoleCommanderEntityWeightMenu.add(cbConsoleCommander);
-                    }
-                } else if (people[0].canDrive(unit.getEntity()) && people[0].canGun(unit.getEntity())) {
-                    final JMenuItem cbTechOfficer = new JCheckBoxMenuItem(unit.getName());
-                    cbTechOfficer.setName("cbTechOfficer");
-                    cbTechOfficer.setSelected(selected);
-                    cbTechOfficer.addActionListener(evt -> {
-                        if (selected) {
-                            unit.remove(people[0], true);
-                        } else {
                             final Unit oldUnit = people[0].getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
@@ -432,14 +387,27 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().useTransfers();
                             }
                             unit.setTechOfficer(people[0], useTransfers);
+                        });
+                        consoleCommanderEntityWeightMenu.add(cbConsoleCommander);
+                    }
+                } else if (people[0].canDrive(unit.getEntity()) && people[0].canGun(unit.getEntity())) {
+                    final JMenuItem cbTechOfficer = new JCheckBoxMenuItem(unit.getName());
+                    cbTechOfficer.setName("cbTechOfficer");
+                    cbTechOfficer.addActionListener(evt -> {
+                        final Unit oldUnit = people[0].getUnit();
+                        boolean useTransfers = false;
+                        if (oldUnit != null) {
+                            oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
+                            useTransfers = campaign.getCampaignOptions().useTransfers();
                         }
+                        unit.setTechOfficer(people[0], useTransfers);
                     });
                     techOfficerEntityWeightMenu.add(cbTechOfficer);
                 }
             }
 
             // Soldier Menu
-            if (unit.usesSoldiers() && (unit.canTakeMoreGunners() || selected)) {
+            if (unit.usesSoldiers() && unit.canTakeMoreGunners()) {
                 final boolean valid;
                 if (unit.isConventionalInfantry()) {
                     valid = areAllSoldiers;
@@ -450,12 +418,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 if (valid) {
                     final JMenuItem cbSoldier = new JCheckBoxMenuItem(unit.getName());
                     cbSoldier.setName("cbSoldier");
-                    cbSoldier.setSelected(selected);
                     cbSoldier.addActionListener(evt -> {
                         for (final Person person : people) {
-                            if (selected) {
-                                unit.remove(person, true);
-                            } else if (!unit.canTakeMoreGunners()) {
+                            if (!unit.canTakeMoreGunners()) {
                                 return;
                             } else if (!unit.equals(person.getUnit())) {
                                 final Unit oldUnit = person.getUnit();
@@ -473,25 +438,17 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             }
 
             // Navigator Menu
-            // Show if one person with the navigator role is selected, and they are either the
-            // unit's current navigator or the unit can take a navigator
-            if (singlePerson && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)
-                    && ((selected && people[0].equals(unit.getNavigator())) || unit.canTakeNavigator())) {
+            if (singlePerson && unit.canTakeNavigator() && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)) {
                 final JMenuItem cbNavigator = new JCheckBoxMenuItem(unit.getName());
                 cbNavigator.setName("cbNavigator");
-                cbNavigator.setSelected(selected);
                 cbNavigator.addActionListener(evt -> {
-                    if (selected) {
-                        unit.remove(people[0], true);
-                    } else {
-                        final Unit oldUnit = people[0].getUnit();
-                        boolean useTransfers = false;
-                        if (oldUnit != null) {
-                            oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                        }
-                        unit.setNavigator(people[0], useTransfers);
+                    final Unit oldUnit = people[0].getUnit();
+                    boolean useTransfers = false;
+                    if (oldUnit != null) {
+                        oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
+                        useTransfers = campaign.getCampaignOptions().useTransfers();
                     }
+                    unit.setNavigator(people[0], useTransfers);
                 });
                 navigatorEntityWeightMenu.add(cbNavigator);
             }

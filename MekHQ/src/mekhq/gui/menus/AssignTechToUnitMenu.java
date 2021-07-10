@@ -69,14 +69,12 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // Get all units that are:
         // 1) Available
         // 2) Potentially maintained by the person
-        // 3) One of:
-        //      a) Currently maintained by the person
-        //      b) The unit can take a tech and the person can afford the time to maintain the unit
+        // 3) The unit can take a tech and the person can afford the time to maintain the unit
         final List<Unit> units = HangarSorter.defaultSorting()
                 .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable)
                         .filter(unit -> person.canTech(unit.getEntity()))
-                        .filter(unit -> person.equals(unit.getTech()) || (unit.canTakeTech()
-                                && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME))))
+                        .filter(unit -> unit.canTakeTech()
+                                && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME)))
                 .collect(Collectors.toList());
         for (final Unit unit : units) {
             if (unit.getEntity().getUnitType() != unitType) {
@@ -105,14 +103,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
             final JMenuItem cbUnit = new JCheckBoxMenuItem(unit.getName());
             cbUnit.setName("cbUnit");
-            cbUnit.setSelected(person.equals(unit.getTech()));
-            cbUnit.addActionListener(evt -> {
-                if (person.equals(unit.getTech())) {
-                    unit.remove(person, true);
-                } else {
-                    unit.setTech(person);
-                }
-            });
+            cbUnit.addActionListener(evt -> unit.setTech(person));
             entityWeightClassMenu.add(cbUnit);
         }
 

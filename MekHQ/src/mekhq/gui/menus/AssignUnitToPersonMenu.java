@@ -18,6 +18,7 @@
  */
 package mekhq.gui.menus;
 
+import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -60,6 +61,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
         final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
         final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
+
+        // Parsing Booleans
+        final boolean usesSoloPilot = unit.usesSoloPilot();
+        final boolean isVTOL = unit.getEntity() instanceof VTOL;
+        final boolean usesSoldiers = unit.usesSoldiers();
 
         final List<Person> personnel = new ArrayList<>(campaign.getPersonnel());
         personnel.sort(new PersonTitleSorter());
