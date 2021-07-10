@@ -19,19 +19,13 @@
 package mekhq.campaign.personnel.generator;
 
 import megamek.common.Compute;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RandomPortraitGenerator {
     private RandomPortraitGenerator() {
