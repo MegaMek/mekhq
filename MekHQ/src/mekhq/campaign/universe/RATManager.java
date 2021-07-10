@@ -333,7 +333,7 @@ public class RATManager extends AbstractUnitGenerator {
 
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction.getAlternativeFactionCodes() != null) {
-            final List<String> alternativeFactionCodes = Arrays.asList(faction.getAlternativeFactionCodes());
+            final List<String> alternativeFactionCodes = new ArrayList<>(Arrays.asList(faction.getAlternativeFactionCodes()));
             while (!alternativeFactionCodes.isEmpty()) {
                 factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
