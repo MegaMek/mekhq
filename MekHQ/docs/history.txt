@@ -17,6 +17,7 @@ VERSION HISTORY:
     	added scroll pane to info panel in case it has more data than can be displayed (important on smaller resolutions)
     	do not un-deploy force from track if it's assigned to a scenario on the track until the scenario is resolved one way or another
 + Issue #251: Force Generator Unit Generation Empty Unit Table Parent Faction Fallback
++ Issue #2736: Fixing Alternative Faction Code Generation by using correct ArrayList type
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
