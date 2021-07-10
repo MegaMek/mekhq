@@ -100,10 +100,10 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 }
             }
-
-            // Assign Tech to Unit Menu
-            add(new AssignUnitToTechMenu(campaign, units[0]));
         }
+
+        // Assign Tech to Unit Menu
+        add(new AssignUnitToTechMenu(campaign, units[0]));
 
         // Always add the ability to simply unassign
         final JMenuItem miUnassignCrew = new JMenuItem(resources.getString("miUnassignCrew.text"));
