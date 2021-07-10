@@ -60,9 +60,10 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         }
 
         // Person Assignment Menus
-        // Parsing variables
         JMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu"); // ensures no empty additions
         JMenu entityWeightClassMenu = new JMenu();
+
+        // Parsing variables
         int unitType = -1;
         int weightClass = -1;
 

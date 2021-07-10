@@ -79,7 +79,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         // 1) Null/Empty Skill Name or Self-Crewed Units
         // 2) No units to be assigned
         // 3) Self-Crewed units can't be assigned a tech
-        // 4) More maintenance time required than the person can supply
+        // 4) More maintenance time required than a person can supply
         if (StringUtil.isNullOrEmpty(skillName) || (units.length == 0)
                 || Stream.of(units).anyMatch(Unit::isSelfCrewed)
                 || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)) {
@@ -93,7 +93,15 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         final JMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
         final JMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
 
+        // Boolean Parsing Values
+        final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
+                ? (unit.getTech() == null) : units[0].getTech().equals(unit.getTech()));
+
         for (final Person tech : campaign.getTechs()) {
+            if (allShareTech && tech.equals(units[0].getTech())) {
+                continue;
+            }
+
             if (tech.hasSkill(skillName)
                     && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
                 final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
