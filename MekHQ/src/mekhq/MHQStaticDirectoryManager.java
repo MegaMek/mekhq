@@ -21,6 +21,7 @@ package mekhq;
 import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
+import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.io.AwardFileFactory;
@@ -29,8 +30,8 @@ import java.io.File;
 
 public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Variable Declarations
-    private static DirectoryItems forceIconDirectory;
-    private static DirectoryItems awardIconDirectory;
+    private static AbstractDirectory forceIconDirectory;
+    private static AbstractDirectory awardIconDirectory;
 
     // Re-parsing Prevention Variables: The are True at startup and when the specified directory
     // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's an error.
@@ -95,23 +96,23 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
 
     //region Getters
     /**
-     * Returns a DirectoryItems object containing all force icon filenames
+     * Returns an AbstractDirectory object containing all force icon filenames
      * found in MekHQ's force icon folder.
-     * @return a DirectoryItems object with the force icon folders and filenames.
+     * @return an AbstractDirectory object with the force icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable DirectoryItems getForceIcons() {
+    public static @Nullable AbstractDirectory getForceIcons() {
         initializeForceIcons();
         return forceIconDirectory;
     }
 
     /**
-     * Returns a DirectoryItems object containing all award icon filenames
+     * Returns an AbstractDirectory object containing all award icon filenames
      * found in MekHQ's award icon folder.
-     * @return a DirectoryItems object with the award icon folders and filenames.
+     * @return an AbstractDirectory object with the award icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable DirectoryItems getAwardIcons() {
+    public static @Nullable AbstractDirectory getAwardIcons() {
         initializeAwardIcons();
         return awardIconDirectory;
     }
@@ -121,26 +122,26 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Refreshers
     /**
      * Re-reads MekHQ's force icon folder and returns the updated
-     * DirectoryItems object. This will update the DirectoryItems object
+     * AbstractDirectory object. This will update the AbstractDirectory object
      * with changes to the force icons (like added image files and folders)
      * while MekHQ is running.
      *
      * @see #getForceIcons()
      */
-    public static DirectoryItems refreshForceIcons() {
+    public static AbstractDirectory refreshForceIcons() {
         parseForceIconDirectory = true;
         return getForceIcons();
     }
 
     /**
      * Re-reads MekHQ's award icon folder and returns the updated
-     * DirectoryItems object. This will update the DirectoryItems object
+     * AbstractDirectory object. This will update the AbstractDirectory object
      * with changes to the award icons (like added image files and folders)
      * while MekHQ is running.
      *
      * @see #getAwardIcons()
      */
-    public static DirectoryItems refreshAwardIcons() {
+    public static AbstractDirectory refreshAwardIcons() {
         parseAwardIconDirectory = true;
         return getAwardIcons();
     }

@@ -23,15 +23,20 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
+import mekhq.gui.panels.ForcePieceIconChooser;
 
 import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
 
     private JTabbedPane tabbedPane;
+    private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
     //endregion Variable Declarations
 
     //region Constructors
@@ -59,6 +64,14 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     public void setTabbedPane(final JTabbedPane tabbedPane) {
         this.tabbedPane = tabbedPane;
     }
+
+    public Map<LayeredForceIconLayer, ForcePieceIconChooser> getChoosers() {
+        return choosers;
+    }
+
+    public void setChoosers(final Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers) {
+        this.choosers = choosers;
+    }
     //endregion Getters/Setters
 
     //region Initialization
@@ -66,10 +79,17 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     protected void initialize() {
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("piecesTabbedPane");
+        add(getTabbedPane());
+
+        setChoosers(new HashMap<>());
+        for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
+            getChoosers().put(layer, new ForcePieceIconChooser(layer, getForceIcon()));
+            getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
+        }
     }
 
     @Override
-    protected void setCustomPreferences(PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
     }

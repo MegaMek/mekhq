@@ -22,23 +22,40 @@ import megamek.client.ui.trees.AbstractIconChooserTree;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import mekhq.MHQStaticDirectoryManager;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.Iterator;
 
-public class StandardForceIconChooserTree extends AbstractIconChooserTree {
+public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
+    //region Variable Declarations
+    private LayeredForceIconLayer layer;
+    //endregion Variable Declarations
+
     //region Constructors
-    public StandardForceIconChooserTree() {
-        super();
+    public ForcePieceIconChooserTree(final LayeredForceIconLayer layer) {
+        super(layer.getListSelectionModel(), false);
+        setLayer(layer);
+        setModel(createTreeModel());
     }
     //endregion Constructors
+
+    //region Getters/Setters
+    public LayeredForceIconLayer getLayer() {
+        return layer;
+    }
+
+    public void setLayer(final LayeredForceIconLayer layer) {
+        this.layer = layer;
+    }
+    //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected DefaultTreeModel createTreeModel() {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY);
-        final AbstractDirectory directory = MHQStaticDirectoryManager.getForceIcons();
+        final AbstractDirectory directory = MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath());
         if (directory != null) {
             final Iterator<String> catNames = directory.getCategoryNames();
             while (catNames.hasNext()) {

@@ -21,11 +21,12 @@ package mekhq.gui.panels;
 import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import megamek.common.util.fileUtils.DirectoryItems;
+import megamek.common.util.fileUtils.AbstractDirectory;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.gui.trees.StandardForceIconChooserTree;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,10 +36,15 @@ public class StandardForceIconChooser extends AbstractIconChooser {
     public StandardForceIconChooser(final @Nullable AbstractIcon icon) {
         super(new StandardForceIconChooserTree(), icon);
     }
+
+    protected StandardForceIconChooser(final JTree tree, final @Nullable AbstractIcon icon,
+                                       final boolean initialize) {
+        super(tree, icon, initialize);
+    }
     //endregion Constructors
 
     @Override
-    protected DirectoryItems getDirectory() {
+    protected @Nullable AbstractDirectory getDirectory() {
         return MHQStaticDirectoryManager.getForceIcons();
     }
 
