@@ -45,13 +45,13 @@ public class RandomPortraitGenerator {
      * @param p the {@link Person} to generate a unique portrait for
      * @return the generated portrait
      */
-    public static AbstractIcon generate(Collection<Person> personnel, Person p) {
+    public static Portrait generate(Collection<Person> personnel, Person p) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates
         Set<String> existingPortraits = new HashSet<>();
         for (Person existingPerson : personnel) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
+            existingPortraits.add(existingPerson.getPortrait().getCategory() + ":"
+                    + existingPerson.getPortrait().getFilename());
         }
 
         List<String> possiblePortraits;
