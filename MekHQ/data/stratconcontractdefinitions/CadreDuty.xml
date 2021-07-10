@@ -3,6 +3,7 @@
     <contractTypeName>Cadre Duty</contractTypeName>
     <alliedFacilityCount>-0.3</alliedFacilityCount>
     <briefing>Protect attached trainees.</briefing>
+	<allowEarlyVictory>false</allowEarlyVictory>
     <hostileFacilityCount>0</hostileFacilityCount>
 	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
 	<scenarioOdds>

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collections;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -220,7 +221,7 @@ public class ScenarioObjective {
     }
     
     public Set<String> getAssociatedUnitIDs() {
-        return new HashSet<String>(associatedUnitIDs);
+        return Collections.unmodifiableSet(associatedUnitIDs);
     }
     
     public void clearAssociatedUnits() {
@@ -428,7 +429,7 @@ public class ScenarioObjective {
             for(String linkedForceName : forceTemplate.getObjectiveLinkedForces()) {
                 boolean objectiveContainsLinkedForce = getAssociatedForceNames().contains(linkedForceName);
                 if(objectiveContainsLinkedForce) {
-                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().scenarioForces.get(linkedForceName);
+                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces().get(linkedForceName);
                     return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
                 }
             }

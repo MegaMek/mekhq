@@ -188,7 +188,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean hasPendingScenarios() {
-        return getScenarios().stream().anyMatch(scenario -> scenario.getStatus().isCurrent());
+        // scenarios that are pending, but have not been revealed don't count
+        return getScenarios().stream().anyMatch(scenario -> 
+            (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
     //endregion Scenarios
 
