@@ -18,7 +18,6 @@
  */
 package mekhq.gui.menus;
 
-import megamek.MegaMek;
 import megamek.common.Aero;
 import megamek.common.ConvFighter;
 import megamek.common.EntityWeightClass;
@@ -67,9 +66,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // 4) All people cannot be currently deployed
         // 5) All people must not be primary civilians
         // 6) All people must share one of their non-civilian professions
-        if ((people.length == 0) || Stream.of(people).allMatch(person -> person.getStatus().isActive()
-                && !person.getPrisonerStatus().isPrisoner() && !person.isDeployed()
-                && !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
+        if ((people.length == 0) || Stream.of(people).anyMatch(person -> !person.getStatus().isActive()
+                || person.getPrisonerStatus().isPrisoner() || person.isDeployed()
+                || Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
             return;
         }
         final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
@@ -87,7 +86,6 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         }
 
         // Person Assignment Menus
-        // Parsing variables
         final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("asPilotMenu.text"));
         JMenu pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu");
         JMenu pilotEntityWeightMenu = new JMenu();
@@ -112,11 +110,29 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("asNavigatorMenu.text"));
         JMenu navigatorUnitTypeMenu = new JScrollableMenu("navigatorUnitTypeMenu");
         JMenu navigatorEntityWeightMenu = new JMenu();
-        int unitType = -1;
-        int weightClass = -1;
 
+        // Parsing Booleans
         final boolean selected = (people[0].getUnit() != null)
                 && Stream.of(people).allMatch(person -> people[0].getUnit().equals(person.getUnit()));
+        final boolean singlePerson = people.length == 1;
+        final boolean areAllBattleMechPilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping());
+        final boolean areAllProtoMechPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT));
+        final boolean areAllConventionalAerospacePilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isConventionalAirGrouping() || person.getSecondaryRole().isConventionalAirGrouping());
+        final boolean areAllAerospacePilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isAerospaceGrouping() || person.getSecondaryRole().isAerospaceGrouping());
+        final boolean areAllVTOLPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VTOL_PILOT));
+        final boolean areAllVesselPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_PILOT));
+        final boolean areAllNavalVehicleDrivers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.NAVAL_VEHICLE_DRIVER));
+        final boolean areAllGroundVehicleDrivers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
+        final boolean areAllVehicleGunners = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_GUNNER));
+        final boolean areAllVesselGunners = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_GUNNER));
+        final boolean areAllVesselCrew = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_CREW));
+        final boolean areAllVehicleCrew = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW));
+        final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
+        final boolean areAllBattleArmourPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
+
+        // Parsing Variables
+        int unitType = -1;
+        int weightClass = -1;
 
         final List<Unit> units = HangarSorter.defaultSorting()
                 .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable))
@@ -194,22 +210,19 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             // Pilot Menu
             if (unit.canTakeMoreDrivers() || selected) {
                 // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                if ((people.length == 1)
+                if (singlePerson
                         && (selected || unit.usesSoloPilot() || (unit.getEntity() instanceof VTOL))) {
                     final boolean valid;
                     if (unit.getEntity() instanceof Mech) {
-                        valid = Stream.of(people).allMatch(person -> person.getPrimaryRole().isMechWarriorGrouping()
-                                || person.getSecondaryRole().isMechWarriorGrouping());
+                        valid = areAllBattleMechPilots;
                     } else if (unit.getEntity() instanceof Protomech) {
-                        valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT));
+                        valid = areAllProtoMechPilots;
                     } else if (unit.getEntity() instanceof ConvFighter) {
-                        valid = Stream.of(people).allMatch(person -> person.getPrimaryRole().isConventionalAirGrouping()
-                                || person.getSecondaryRole().isConventionalAirGrouping());
+                        valid = areAllConventionalAerospacePilots;
                     } else if (unit.getEntity() instanceof Aero) {
-                        valid = Stream.of(people).allMatch(person -> person.getPrimaryRole().isAerospaceGrouping()
-                                || person.getSecondaryRole().isAerospaceGrouping());
+                        valid = areAllAerospacePilots;
                     } else if (unit.getEntity() instanceof VTOL) {
-                        valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VTOL_PILOT));
+                        valid = areAllVTOLPilots;
                     } else {
                         valid = false;
                     }
@@ -237,7 +250,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
                 // Pilot Menu - Small Craft and JumpShip Vessel Pilot Assignment
                 if (((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))
-                        && Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_PILOT))) {
+                        && areAllVesselPilots) {
                     final JMenuItem cbVesselPilot = new JCheckBoxMenuItem(unit.getName());
                     cbVesselPilot.setName("cbVesselPilot");
                     cbVesselPilot.setSelected(selected);
@@ -262,7 +275,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 }
 
                 // Driver Menu - Non-VTOL Tank Driver Assignments
-                if ((people.length == 1) && (unit.getEntity() instanceof Tank)) {
+                if (singlePerson && (unit.getEntity() instanceof Tank)) {
                     final boolean valid;
                     if (unit.getEntity() instanceof VTOL) {
                         valid = false;
@@ -271,12 +284,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             case NAVAL:
                             case HYDROFOIL:
                             case SUBMARINE:
-                                valid = Stream.of(people).allMatch(person ->
-                                        person.hasRole(PersonnelRole.NAVAL_VEHICLE_DRIVER));
+                                valid = areAllNavalVehicleDrivers;
                                 break;
                             default:
-                                valid = Stream.of(people).allMatch(person ->
-                                        person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
+                                valid = areAllGroundVehicleDrivers;
                                 break;
                         }
                     }
@@ -307,9 +318,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             if (unit.canTakeMoreGunners() || selected) {
                 final boolean valid;
                 if (unit.getEntity() instanceof Tank) {
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_GUNNER));
+                    valid = areAllVehicleGunners;
                 } else if ((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship)) {
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_GUNNER));
+                    valid = areAllVesselGunners;
                 } else {
                     valid = false;
                 }
@@ -345,10 +356,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             if (unit.canTakeMoreVesselCrew() || selected) {
                 final boolean valid;
                 if (unit.getEntity() instanceof Aero) {
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VESSEL_CREW));
+                    valid = areAllVesselCrew;
                 } else if (unit.getEntity().isSupportVehicle()) {
                     // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW));
+                    valid = areAllVehicleCrew;
                 } else {
                     valid = false;
                 }
@@ -383,7 +394,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             // TODO : I find that really terrible. We should be able to separate out tech officers
             // TODO : and Console Commanders properly. Because of this, I'm leaving the base code
             // TODO : here as the older style for now.
-            if ((people.length == 1) && (unit.canTakeTechOfficer() || selected)) {
+            if (singlePerson && (unit.canTakeTechOfficer() || selected)) {
                 // For a vehicle command console we will require the commander to be a driver
                 // or a gunner, but not necessarily both
                 if (unit.getEntity() instanceof Tank) {
@@ -431,9 +442,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             if (unit.usesSoldiers() && (unit.canTakeMoreGunners() || selected)) {
                 final boolean valid;
                 if (unit.isConventionalInfantry()) {
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
+                    valid = areAllSoldiers;
                 } else {
-                    valid = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
+                    valid = areAllBattleArmourPilots;
                 }
 
                 if (valid) {
@@ -462,8 +473,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             }
 
             // Navigator Menu
-            if ((people.length == 1) && (unit.canTakeNavigator() || selected)
-                    && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)) {
+            // Show if one person with the navigator role is selected, and they are either the
+            // unit's current navigator or the unit can take a navigator
+            if (singlePerson && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)
+                    && ((selected && people[0].equals(unit.getNavigator())) || unit.canTakeNavigator())) {
                 final JMenuItem cbNavigator = new JCheckBoxMenuItem(unit.getName());
                 cbNavigator.setName("cbNavigator");
                 cbNavigator.setSelected(selected);
@@ -511,7 +524,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         add(navigatorMenu);
 
         // Add the tech menu if there is only a single person to assign
-        if (people.length == 1) {
+        if (singlePerson) {
             add(new AssignTechToUnitMenu(campaign, people[0]));
         }
 
