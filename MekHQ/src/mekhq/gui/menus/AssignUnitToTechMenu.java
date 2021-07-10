@@ -72,19 +72,19 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
     private void initialize(final String title, final Campaign campaign,
                             final @Nullable String skillName, final int maintenanceTime,
                             final Unit... units) {
-        // Initialize Menu
-        setText(resources.getString(title));
-
         // Default Return for Illegal or Impossible Assignments
-        // 1) Null/Empty Skill Name or Self-Crewed Units
-        // 2) No units to be assigned
+        // 1) No units to be assigned
+        // 2) Null/Empty Skill Name
         // 3) Self-Crewed units can't be assigned a tech
         // 4) More maintenance time required than a person can supply
-        if (StringUtil.isNullOrEmpty(skillName) || (units.length == 0)
+        if ((units.length == 0) || StringUtil.isNullOrEmpty(skillName)
                 || Stream.of(units).anyMatch(Unit::isSelfCrewed)
                 || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)) {
             return;
         }
+
+        // Initialize Menu
+        setText(resources.getString(title));
 
         // Person Assignment Menus
         final JMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
@@ -155,7 +155,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         add(ultraGreenMenu);
 
         // And finally add the ability to simply unassign
-        final JMenuItem miUnassignTech = new JMenuItem(resources.getString("None.text"));
+        final JMenuItem miUnassignTech = new JMenuItem(resources.getString("miUnassignTech.text"));
         miUnassignTech.setName("miUnassignTech");
         miUnassignTech.addActionListener(evt -> {
             for (final Unit unit : units) {

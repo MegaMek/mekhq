@@ -118,8 +118,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     // Unit History Commands
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
-    // Remove All Personnel Commands
-    public static final String COMMAND_REMOVE_ALL_PERSONNEL = "REMOVE_ALL_PERSONNEL";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_DISBAND = "DISBAND";
@@ -200,25 +198,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         }
         Unit selectedUnit = units[0];
 
-        if (command.equals(COMMAND_REMOVE_ALL_PERSONNEL)) {
-            for (Unit unit : units) {
-                if (unit.isDeployed()) {
-                    continue;
-                }
-
-                for (Person p : unit.getCrew()) {
-                    unit.remove(p, true);
-                }
-
-                unit.removeTech();
-
-                Person engineer = unit.getEngineer();
-
-                if (null != engineer) {
-                    unit.remove(engineer, true);
-                }
-            }
-        } else if (command.equals(COMMAND_MAINTENANCE_REPORT)) { // Single Unit only
+        if (command.equals(COMMAND_MAINTENANCE_REPORT)) { // Single Unit only
             gui.showMaintenanceReport(selectedUnit.getId());
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             gui.showUnitCostReport(selectedUnit.getId());
@@ -940,15 +920,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (oneSelected) {
                 menuItem = new JMenuItem("Edit Unit History...");
                 menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-            }
-
-            // remove all personnel
-            if (oneHasCrew) {
-                popup.addSeparator();
-                menuItem = new JMenuItem("Remove all personnel");
-                menuItem.setActionCommand(COMMAND_REMOVE_ALL_PERSONNEL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }

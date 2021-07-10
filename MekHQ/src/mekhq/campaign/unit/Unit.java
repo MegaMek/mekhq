@@ -4288,6 +4288,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             resetPilotAndEntity();
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
         }
+
         if (log) {
             ServiceLogger.removedFrom(p, getCampaign().getLocalDate(), getName());
         }
@@ -4313,27 +4314,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.scenarioId = i;
     }
 
-    public ArrayList<Person> getCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
-        for (Person p : drivers) {
-            crew.add(p);
-        }
+    public List<Person> getCrew() {
+        final List<Person> crew = new ArrayList<>(drivers);
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (Person p : gunners) {
-                crew.add(p);
-            }
+            crew.addAll(gunners);
         }
-        for (Person p : vesselCrew) {
-            crew.add(p);
-        }
+        crew.addAll(vesselCrew);
         if (navigator != null) {
             crew.add(navigator);
         }
+
         if (techOfficer != null) {
             crew.add(techOfficer);
         }
         return crew;
     }
+
+    public void clearCrew() {
+        if (isDeployed()) {
+            return;
+        }
+
+        for (final Person person : getCrew()) {
+            remove(person, true);
+        }
+
+        removeTech();
+
+        if (getEngineer() != null) {
+            remove(getEngineer(), true);
+        }
+    }
+
 
     public List<Person> getDrivers() {
         return Collections.unmodifiableList(drivers);

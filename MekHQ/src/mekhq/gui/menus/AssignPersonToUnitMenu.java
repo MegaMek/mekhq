@@ -56,22 +56,24 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
     //region Initialization
     private void initialize(final Campaign campaign, final Person... people) {
+        // Immediate Return for Illegal Assignment
+        if (people.length == 0) {
+            return;
+        }
+
         // Initialize Menu
         setText(resources.getString("AssignPersonToUnitMenu.title"));
 
         // Initial Parsing Booleans
         boolean assign = true;
-        final boolean singlePerson = people.length == 1;
 
-
-        // Default Return for Illegal or Impossible Assignments
-        // 1) No people to be assigned
-        // 2) All people must be active
-        // 3) All people must be non-prisoners (bondsmen should be assignable to units)
-        // 4) All people cannot be currently deployed
-        // 5) All people must not be primary civilians
-        // 6) All people must share one of their non-civilian professions
-        if ((people.length == 0) || Stream.of(people).anyMatch(person -> !person.getStatus().isActive()
+        // Impossible Assignments:
+        // 1) All people must be active
+        // 2) All people must be non-prisoners (bondsmen should be assignable to units)
+        // 3) All people cannot be currently deployed
+        // 4) All people must not be primary civilians
+        // 5) All people must share one of their non-civilian professions
+        if (Stream.of(people).anyMatch(person -> !person.getStatus().isActive()
                 || person.getPrisonerStatus().isPrisoner() || person.isDeployed()
                 || Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
             assign = false;
@@ -122,6 +124,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             JMenu navigatorEntityWeightMenu = new JMenu();
 
             // Parsing Booleans
+            final boolean singlePerson = people.length == 1;
             final boolean areAllBattleMechPilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping());
             final boolean areAllProtoMechPilots = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT));
             final boolean areAllConventionalAerospacePilots = Stream.of(people).allMatch(person -> person.getPrimaryRole().isConventionalAirGrouping() || person.getSecondaryRole().isConventionalAirGrouping());
@@ -488,14 +491,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
             navigatorMenu.add(navigatorUnitTypeMenu);
             add(navigatorMenu);
+
+            // Add the tech menu if there is only a single person to assign
+            if (singlePerson) {
+                add(new AssignTechToUnitMenu(campaign, people[0]));
+            }
         }
 
-        // Add the tech menu if there is only a single person to assign
-        if (singlePerson) {
-            add(new AssignTechToUnitMenu(campaign, people[0]));
-        }
-
-        // And finally add the ability to simply unassign
+        // Always add the ability to simply unassign
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
         miUnassignPerson.setName("miUnassignPerson");
         miUnassignPerson.addActionListener(evt -> {

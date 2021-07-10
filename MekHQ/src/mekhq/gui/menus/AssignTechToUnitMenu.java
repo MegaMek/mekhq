@@ -44,9 +44,6 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
     //region Initialization
     private void initialize(final Campaign campaign, final Person person) {
-        // Initialize Menu
-        setText(resources.getString("AssignTechToUnitMenu.title"));
-
         // Default Return for Illegal Assignments
         // 1) Person must be active
         // 2) Person must be free
@@ -58,6 +55,9 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                 || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
             return;
         }
+
+        // Initialize Menu
+        setText(resources.getString("AssignTechToUnitMenu.title"));
 
         // Person Assignment Menus
         JMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu"); // ensures no empty additions

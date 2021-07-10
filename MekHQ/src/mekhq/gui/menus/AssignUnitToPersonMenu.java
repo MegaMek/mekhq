@@ -35,80 +35,85 @@ import java.util.List;
  */
 public class AssignUnitToPersonMenu extends JScrollableMenu {
     //region Constructors
-    public AssignUnitToPersonMenu(final Campaign campaign, final Unit unit) {
+    public AssignUnitToPersonMenu(final Campaign campaign, final Unit... units) {
         super("AssignUnitToPersonMenu");
-        initialize(campaign, unit);
+        initialize(campaign, units);
     }
     //endregion Constructors
 
     //region Initialization
-    private void initialize(final Campaign campaign, final Unit unit) {
+    private void initialize(final Campaign campaign, final Unit... units) {
+        // Immediate Return for Illegal Assignment
+        if (units.length == 0) {
+            return;
+        }
+
         // Initialize Menu
         setText(resources.getString("AssignUnitToPersonMenu.title"));
 
-        // Default Return for Illegal or Impossible Assignments
-        // 1) No people to be assigned
-        // 2) All people must be active non-prisoners (bondsmen should be assignable to units)
-        // 3) All people must not be primary civilians
-        // 4) All people must share one of their non-civilian professions
+        // Only assign non-tech personnel if the following is met:
 
-        // Person Assignment Menus
-        final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
-        final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
-        final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
-        final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
-        final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
-        final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
-        final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
-        final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
+        if (units.length == 1) {
+            // Person Assignment Menus
+            final JMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
+            final JMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
+            final JMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
+            final JMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
+            final JMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
+            final JMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
+            final JMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
+            final JMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
 
-        // Parsing Booleans
-        final boolean usesSoloPilot = unit.usesSoloPilot();
-        final boolean isVTOL = unit.getEntity() instanceof VTOL;
-        final boolean usesSoldiers = unit.usesSoldiers();
+            // Parsing Booleans
+            final boolean usesSoloPilot = units[0].usesSoloPilot();
+            final boolean isVTOL = units[0].getEntity() instanceof VTOL;
+            final boolean usesSoldiers = units[0].usesSoldiers();
 
-        final List<Person> personnel = new ArrayList<>(campaign.getPersonnel());
-        personnel.sort(new PersonTitleSorter());
-        for (final Person person : personnel) {
-            // Skip People if they are:
-            // 1) Astech Primary role with the Medical, Administrator, or None Secondary Roles
-            // 2) Medical Primary role with the Astech, Administrator, or None Secondary Roles
-            // 3) Administrator Primary Role with Astech, Medical, Administrator, or None Secondary Roles
-            // 4) Dependent Primary Role
-            if (person.getPrimaryRole().isAstech() && (person.getSecondaryRole().isMedicalStaff()
-                    || person.getSecondaryRole().isAdministrator() || person.getSecondaryRole().isNone())) {
-                continue;
-            } else if (person.getPrimaryRole().isMedicalStaff() && (person.getSecondaryRole().isAstech()
-                    || person.getSecondaryRole().isAdministrator() || person.getSecondaryRole().isNone())) {
-                continue;
-            } else if (person.getPrimaryRole().isAdministrator() && (person.getSecondaryRole().isAstech()
-                    || person.getSecondaryRole().isMedicalStaff() || person.getSecondaryRole().isAdministrator()
-                    || person.getSecondaryRole().isNone())) {
-                continue;
-            } else if (person.getPrimaryRole().isDependent()) {
-                continue;
+            final List<Person> personnel = new ArrayList<>(campaign.getPersonnel());
+            personnel.sort(new PersonTitleSorter());
+            for (final Person person : personnel) {
+                // Skip People if they are:
+                // 1) Astech Primary role with the Medical, Administrator, or None Secondary Roles
+                // 2) Medical Primary role with the Astech, Administrator, or None Secondary Roles
+                // 3) Administrator Primary Role with Astech, Medical, Administrator, or None Secondary Roles
+                // 4) Dependent Primary Role
+                if (person.getPrimaryRole().isAstech() && (person.getSecondaryRole().isMedicalStaff()
+                        || person.getSecondaryRole().isAdministrator() || person.getSecondaryRole().isNone())) {
+                    continue;
+                } else if (person.getPrimaryRole().isMedicalStaff() && (person.getSecondaryRole().isAstech()
+                        || person.getSecondaryRole().isAdministrator() || person.getSecondaryRole().isNone())) {
+                    continue;
+                } else if (person.getPrimaryRole().isAdministrator() && (person.getSecondaryRole().isAstech()
+                        || person.getSecondaryRole().isMedicalStaff() || person.getSecondaryRole().isAdministrator()
+                        || person.getSecondaryRole().isNone())) {
+                    continue;
+                } else if (person.getPrimaryRole().isDependent()) {
+                    continue;
+                }
+
+                // TODO : Finish me
+                if (units[0].usesSoloPilot()) {
+
+                } else if (units[0].usesSoldiers()) {
+
+                } else {
+
+                }
             }
 
-            // TODO : Finish me
-            if (unit.usesSoloPilot()) {
-
-            } else if (unit.usesSoldiers()) {
-
-            } else {
-
-            }
+            // Assign Tech to Unit Menu
+            add(new AssignUnitToTechMenu(campaign, units[0]));
         }
 
-        // Assign Tech to Unit Menu
-        add(new AssignUnitToTechMenu(campaign, unit));
-
-        // And finally add the ability to simply unassign
-        final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
-        miUnassignPerson.setName("miUnassignPerson");
-        miUnassignPerson.addActionListener(evt -> {
-            // TODO : Finish me
+        // Always add the ability to simply unassign
+        final JMenuItem miUnassignCrew = new JMenuItem(resources.getString("miUnassignCrew.text"));
+        miUnassignCrew.setName("miUnassignCrew");
+        miUnassignCrew.addActionListener(evt -> {
+            for (final Unit unit : units) {
+                unit.clearCrew();
+            }
         });
-        add(miUnassignPerson);
+        add(miUnassignCrew);
     }
     //endregion Initialization
 }
