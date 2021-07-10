@@ -18,8 +18,6 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -30,61 +28,32 @@ import javax.swing.*;
 import java.util.stream.Stream;
 
 /**
- * This is a standard menu that takes either a unit or multiple units, all with the same tech type,
- * and allows the user to assign or remove a tech from them.
+ * This is a standard menu that takes either a unit or multiple units, and allows the user to
+ * assign or remove a tech from them.
  */
 public class AssignUnitToTechMenu extends JScrollableMenu {
     //region Constructors
     /**
-     * This is used to assign a single unit a tech, normally as part of the wider person assignment
-     * menu.
-     *
      * @param campaign the campaign the unit is a part of
-     * @param unit the unit in question
-     */
-    public AssignUnitToTechMenu(final Campaign campaign, final Unit unit) {
-        this("AssignPersonToUnitMenu.Tech.title", campaign,
-                unit.determineUnitTechSkillType(), unit.getMaintenanceTime(), unit);
-    }
-
-    /**
-     * This is used to assign a group of units the same tech
-     *
-     * @param campaign the campaign the unit is a part of
-     * @param skillName the skill name, which will force an immediate return if it is null or empty
-     * @param maintenanceTime the maintenance time required for the provided units
      * @param units the units in question
      */
-    public AssignUnitToTechMenu(final Campaign campaign, final @Nullable String skillName,
-                                final int maintenanceTime, final Unit... units) {
-        this("AssignPersonToUnitMenu.AssignTech.title", campaign, skillName, maintenanceTime, units);
-    }
-
-    private AssignUnitToTechMenu(final String title, final Campaign campaign,
-                                 final @Nullable String skillName, final int maintenanceTime,
-                                 final Unit... units) {
+    public AssignUnitToTechMenu(final Campaign campaign, final Unit... units) {
         super("AssignUnitToTechMenu");
-        initialize(title, campaign, skillName, maintenanceTime, units);
+        initialize(campaign, units);
     }
     //endregion Constructors
 
     //region Initialization
-    private void initialize(final String title, final Campaign campaign,
-                            final @Nullable String skillName, final int maintenanceTime,
-                            final Unit... units) {
+    private void initialize(final Campaign campaign, final Unit... units) {
         // Default Return for Illegal or Impossible Assignments
         // 1) No units to be assigned
-        // 2) Null/Empty Skill Name
-        // 3) Self-Crewed units can't be assigned a tech
-        // 4) More maintenance time required than a person can supply
-        if ((units.length == 0) || StringUtil.isNullOrEmpty(skillName)
-                || Stream.of(units).anyMatch(Unit::isSelfCrewed)
-                || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+        // 2) Self-Crewed units can't be assigned a tech
+        if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isSelfCrewed)) {
             return;
         }
 
         // Initialize Menu
-        setText(resources.getString(title));
+        setText(resources.getString("AssignPersonToUnitMenu.title"));
 
         // Person Assignment Menus
         final JMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
@@ -96,6 +65,26 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         // Boolean Parsing Values
         final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
                 ? (unit.getTech() == null) : units[0].getTech().equals(unit.getTech()));
+
+        // 2) Null/Empty Skill Name
+        // 4) More maintenance time required than a person can supply
+        // StringUtil.isNullOrEmpty(skillName) || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)
+
+/*
+        String skill = unit.determineUnitTechSkillType();
+        int maintenanceTime = 0;
+        if (!StringUtil.isNullOrEmpty(skill)) {
+            if (skill.equals(u.determineUnitTechSkillType())) {
+                maintenanceTime += u.getMaintenanceTime();
+                if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                    skill = ""; // little performance saving hack
+                }
+            } else {
+                allRequireSameTechType = false;
+                skill = ""; // little performance saving hack
+            }
+        }
+ */
 
         for (final Person tech : campaign.getTechs()) {
             if (allShareTech && tech.equals(units[0].getTech())) {

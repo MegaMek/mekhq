@@ -21,25 +21,12 @@ package mekhq.gui.adapter;
 import megamek.client.ui.dialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.GunEmplacement;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Protomech;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -53,26 +40,13 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.actions.ActivateUnitAction;
-import mekhq.campaign.unit.actions.CancelMothballUnitAction;
-import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
-import mekhq.campaign.unit.actions.IUnitAction;
-import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.campaign.unit.actions.RestoreUnitAction;
-import mekhq.campaign.unit.actions.StripUnitAction;
-import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
+import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
-import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.QuirksDialog;
-import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
-import mekhq.gui.menus.AssignUnitToTechMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -84,12 +58,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
@@ -575,22 +544,21 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             boolean oneAvailableUnitBelowMaxCrew = false; // If one unit isn't fully crewed, enable bulk hiring
             boolean oneNotPresent = false; // If a unit isn't present, enable instant arrival for GMs
             boolean oneHasIndividualCamo = false; // If a unit has a unique camo, allow it to be removed
-            boolean oneHasCrew = false; // If a unit has crew, enable removing it
             boolean allUnitsAreRepairable = true;  // If all units can be repaired, allow the repair flag to be selected
             boolean areAllConventionalInfantry = true; // Conventional infantry can be disbanded, but no others
             boolean noConventionalInfantry = true; // Conventional infantry can't be repaired/salvaged
             boolean areAllRepairFlagged = true; // If everyone has the repair flag, then we show the repair flag box as selected
             boolean areAllSalvageFlagged = true;  // Same as above, but with the salvage flag
-            boolean allRequireSameTechType = true; // If everyone requires the same tech type, we can allow bulk tech assignment
             boolean allSameModel = true; // If everyone is the exact same unit and model of that unit
             boolean oneRefitting = false; // If any one selected unit is refitting
             boolean allAvailable = true; // If everyone is available
             boolean allAvailableIgnoreRefit = true; // If everyone is available
-
             final String model = unit.getEntity().getShortNameRaw();
-            String skill = unit.determineUnitTechSkillType();
             int maintenanceTime = 0;
+
             for (Unit u : units) {
+                maintenanceTime += u.getMaintenanceTime();
+
                 if (u.isMothballed()) {
                     oneMothballed = true;
                 } else if (u.isMothballing()) {
@@ -624,10 +592,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     oneHasIndividualCamo = true;
                 }
 
-                if (!u.getCrew().isEmpty()) {
-                    oneHasCrew = true;
-                }
-
                 if (!u.isRepairable()) {
                     allUnitsAreRepairable = false;
                 }
@@ -642,18 +606,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     noConventionalInfantry = false;
                 } else {
                     areAllConventionalInfantry = false;
-                }
-
-                if (!StringUtil.isNullOrEmpty(skill)) {
-                    if (skill.equals(u.determineUnitTechSkillType())) {
-                        maintenanceTime += u.getMaintenanceTime();
-                        if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
-                            skill = ""; // little performance saving hack
-                        }
-                    } else {
-                        allRequireSameTechType = false;
-                        skill = ""; // little performance saving hack
-                    }
                 }
 
                 if (!model.equals(u.getEntity().getShortNameRaw())) {
@@ -773,16 +725,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected) {
-                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), unit));
-            } else if (allRequireSameTechType) { // Tech assignment is otherwise in the above menu
-                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToTechMenu(gui.getCampaign(),
-                        skill, maintenanceTime, units));
-            }
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
 
             // if we're using maintenance and have selected something that requires maintenance
-            if (gui.getCampaign().getCampaignOptions().checkMaintenance() &&
-                    (maintenanceTime > 0)) {
+            if (gui.getCampaign().getCampaignOptions().checkMaintenance() && (maintenanceTime > 0)) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
 
                 for (int x = 1; x <= 4; x++) {
