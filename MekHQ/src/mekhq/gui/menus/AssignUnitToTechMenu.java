@@ -18,6 +18,7 @@
  */
 package mekhq.gui.menus;
 
+import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -45,113 +46,100 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
     //region Initialization
     private void initialize(final Campaign campaign, final Unit... units) {
-        // Default Return for Illegal or Impossible Assignments
-        // 1) No units to be assigned
-        // 2) Self-Crewed units can't be assigned a tech
-        if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isSelfCrewed)) {
+        // Default Return for Illegal Assignment
+        if (units.length == 0) {
             return;
         }
 
+
         // Initialize Menu
-        setText(resources.getString("AssignPersonToUnitMenu.title"));
+        setText(resources.getString("AssignUnitToTechMenu.title"));
 
-        // Person Assignment Menus
-        final JMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-        final JMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-        final JMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-        final JMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-        final JMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+        // Initial Parsing Values
+        final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
+        final String skillName = units[0].determineUnitTechSkillType();
+        final boolean assign = Stream.of(units).noneMatch(Unit::isSelfCrewed)
+                && (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
+                && !StringUtil.isNullOrEmpty(skillName)
+                && Stream.of(units).allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
-        // Boolean Parsing Values
-        final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
-                ? (unit.getTech() == null) : units[0].getTech().equals(unit.getTech()));
+        if (assign) {
+            // Person Assignment Menus
+            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
+            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
+            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
+            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
+            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
 
-        // 2) Null/Empty Skill Name
-        // 4) More maintenance time required than a person can supply
-        // StringUtil.isNullOrEmpty(skillName) || (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME)
+            // Boolean Parsing Values
+            final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
+                    ? (unit.getTech() == null) : units[0].getTech().equals(unit.getTech()));
 
-/*
-        String skill = unit.determineUnitTechSkillType();
-        int maintenanceTime = 0;
-        if (!StringUtil.isNullOrEmpty(skill)) {
-            if (skill.equals(u.determineUnitTechSkillType())) {
-                maintenanceTime += u.getMaintenanceTime();
-                if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
-                    skill = ""; // little performance saving hack
-                }
-            } else {
-                allRequireSameTechType = false;
-                skill = ""; // little performance saving hack
-            }
-        }
- */
-
-        for (final Person tech : campaign.getTechs()) {
-            if (allShareTech && tech.equals(units[0].getTech())) {
-                continue;
-            }
-
-            if (tech.hasSkill(skillName)
-                    && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
-                final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
-                        : SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(units[0]).getExperienceLevel());
-
-                final JMenu subMenu;
-                switch (skillLevel) {
-                    case SkillType.ELITE_NM:
-                        subMenu = eliteMenu;
-                        break;
-                    case SkillType.VETERAN_NM:
-                        subMenu = veteranMenu;
-                        break;
-                    case SkillType.REGULAR_NM:
-                        subMenu = regularMenu;
-                        break;
-                    case SkillType.GREEN_NM:
-                        subMenu = greenMenu;
-                        break;
-                    case SkillType.ULTRA_GREEN_NM:
-                        subMenu = ultraGreenMenu;
-                        break;
-                    default:
-                        subMenu = null;
-                        break;
+            for (final Person tech : campaign.getTechs()) {
+                if (allShareTech && tech.equals(units[0].getTech())) {
+                    continue;
                 }
 
-                if (subMenu != null) {
-                    final JMenuItem miAssignTech = new JCheckBoxMenuItem(String.format(
-                            resources.getString("miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
-                    miAssignTech.setName("miAssignTech");
-                    miAssignTech.addActionListener(evt -> {
-                        for (final Unit unit : units) {
-                            if (tech.equals(unit.getTech())) {
-                                continue;
-                            } else if (unit.getTech() != null) {
-                                unit.remove(unit.getTech(), true);
+                if (tech.hasSkill(skillName)
+                        && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                    final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
+                            : SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(units[0]).getExperienceLevel());
+
+                    final JScrollableMenu subMenu;
+                    switch (skillLevel) {
+                        case SkillType.ELITE_NM:
+                            subMenu = eliteMenu;
+                            break;
+                        case SkillType.VETERAN_NM:
+                            subMenu = veteranMenu;
+                            break;
+                        case SkillType.REGULAR_NM:
+                            subMenu = regularMenu;
+                            break;
+                        case SkillType.GREEN_NM:
+                            subMenu = greenMenu;
+                            break;
+                        case SkillType.ULTRA_GREEN_NM:
+                            subMenu = ultraGreenMenu;
+                            break;
+                        default:
+                            subMenu = null;
+                            break;
+                    }
+
+                    if (subMenu != null) {
+                        final JMenuItem miAssignTech = new JMenuItem(String.format(
+                                resources.getString("miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
+                        miAssignTech.setName("miAssignTech");
+                        miAssignTech.addActionListener(evt -> {
+                            for (final Unit unit : units) {
+                                if (tech.equals(unit.getTech())) {
+                                    continue;
+                                } else if (unit.getTech() != null) {
+                                    unit.remove(unit.getTech(), true);
+                                }
+                                unit.setTech(tech);
                             }
-                            unit.setTech(tech);
-                        }
-                    });
-                    subMenu.add(miAssignTech);
+                        });
+                        subMenu.add(miAssignTech);
+                    }
                 }
             }
+
+            add(eliteMenu);
+            add(veteranMenu);
+            add(regularMenu);
+            add(greenMenu);
+            add(ultraGreenMenu);
         }
 
-        add(eliteMenu);
-        add(veteranMenu);
-        add(regularMenu);
-        add(greenMenu);
-        add(ultraGreenMenu);
-
-        // And finally add the ability to simply unassign
-        final JMenuItem miUnassignTech = new JMenuItem(resources.getString("miUnassignTech.text"));
-        miUnassignTech.setName("miUnassignTech");
-        miUnassignTech.addActionListener(evt -> {
-            for (final Unit unit : units) {
-                unit.remove(unit.getTech(), true);
-            }
-        });
-        add(miUnassignTech);
+        // And finally add the ability to simply unassign, provided at least one unit has a tech
+        if (Stream.of(units).anyMatch(unit -> unit.getTech() != null)) {
+            final JMenuItem miUnassignTech = new JMenuItem(resources.getString("miUnassignTech.text"));
+            miUnassignTech.setName("miUnassignTech");
+            miUnassignTech.addActionListener(evt -> Stream.of(units).forEach(unit -> unit.remove(unit.getTech(), true)));
+            add(miUnassignTech);
+        }
     }
     //endregion Initialization
 }

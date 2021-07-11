@@ -2014,7 +2014,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * quirks are enabled for this unit
      * @return
      */
-    public String getQuirksList() {
+    public @Nullable String getQuirksList() {
         String quirkString = "";
         boolean first = true;
         if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
@@ -2033,10 +2033,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
-        if (quirkString.equals("")) {
-            return null;
-        }
-        return "<html>" + quirkString + "</html>";
+        return quirkString.isBlank() ? null : "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {
@@ -4265,32 +4262,40 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
-    public void remove(Person p, boolean log) {
-        Objects.requireNonNull(p);
+    /**
+     * @param person the person to remove. If this is null we return immediately without parsing.
+     * @param log whether to log the removal
+     */
+    public void remove(final @Nullable Person person, final boolean log) {
+        if (person == null) {
+            return;
+        }
 
-        ensurePersonIsRegistered(p);
-        if (p.equals(tech)) {
+        ensurePersonIsRegistered(person);
+        if (person.equals(tech)) {
             removeTech();
         } else {
-            p.setUnit(null);
-            drivers.remove(p);
-            gunners.remove(p);
-            vesselCrew.remove(p);
-            if (p.equals(navigator)) {
+            person.setUnit(null);
+            drivers.remove(person);
+            gunners.remove(person);
+            vesselCrew.remove(person);
+            if (person.equals(navigator)) {
                 navigator = null;
             }
-            if (p.equals(techOfficer)) {
+
+            if (person.equals(techOfficer)) {
                 techOfficer = null;
             }
-            if (p.equals(engineer)) {
+
+            if (person.equals(engineer)) {
                 engineer = null;
             }
             resetPilotAndEntity();
-            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
         }
 
         if (log) {
-            ServiceLogger.removedFrom(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
         }
     }
 
@@ -4671,11 +4676,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (!getFluffName().equals("")) {
-            return entity.getShortName() + " - " + getFluffName();
-        } else {
-            return entity.getShortName();
-        }
+        return getFluffName().isBlank() ? getEntity().getShortName()
+                : getEntity().getShortName() + " - " + getFluffName();
     }
 
     public String getHyperlinkedName() {

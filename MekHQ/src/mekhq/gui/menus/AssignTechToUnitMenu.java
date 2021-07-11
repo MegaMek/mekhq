@@ -60,8 +60,8 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         setText(resources.getString("AssignTechToUnitMenu.title"));
 
         // Person Assignment Menus
-        JMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu"); // ensures no empty additions
-        JMenu entityWeightClassMenu = new JMenu();
+        JScrollableMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu");
+        JScrollableMenu entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu");
 
         // Parsing variables
         int unitType = -1;
@@ -89,8 +89,10 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                 weightClass = unit.getEntity().getWeightClass();
 
                 // And create the new menus
-                unitTypeMenu = new JScrollableMenu("unitTypeMenu", UnitType.getTypeDisplayableName(unitType));
-                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu", EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+                unitTypeMenu = new JScrollableMenu("unitTypeMenu",
+                        UnitType.getTypeDisplayableName(unitType));
+                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu",
+                        EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             } else if (unit.getEntity().getWeightClass() != weightClass) {
                 // Add the current Entity Weight Class menu to the Unit Type menu
                 unitTypeMenu.add(entityWeightClassMenu);
@@ -99,14 +101,18 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                 weightClass = unit.getEntity().getWeightClass();
 
                 // And create the new Entity Weight Class menu
-                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu", EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+                entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu",
+                        EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             }
 
-            final JMenuItem cbUnit = new JCheckBoxMenuItem(unit.getName());
-            cbUnit.setName("cbUnit");
-            cbUnit.addActionListener(evt -> unit.setTech(person));
-            entityWeightClassMenu.add(cbUnit);
+            final JMenuItem miUnit = new JMenuItem(unit.getName());
+            miUnit.setName("miUnit");
+            miUnit.addActionListener(evt -> unit.setTech(person));
+            entityWeightClassMenu.add(miUnit);
         }
+
+        unitTypeMenu.add(entityWeightClassMenu);
+        add(unitTypeMenu);
 
         // And finally add the ability to simply unassign from all tech assignments
         final JMenuItem miUnassignPerson = new JMenuItem(resources.getString("None.text"));
