@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.gui.sorter.PersonTitleSorter;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -57,7 +58,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
     //region Initialization
     private void initialize(final Campaign campaign, final Person... people) {
         // Immediate Return for Illegal Assignment
-        if (people.length == 0) {
+        // 1) No people to assign
+        // 2) Any of the people you are trying to assign are currently deployed
+        if ((people.length == 0) || Stream.of(people).anyMatch(Person::isDeployed)) {
             return;
         }
 
@@ -70,11 +73,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Impossible Assignments:
         // 1) All people must be active
         // 2) All people must be non-prisoners (bondsmen should be assignable to units)
-        // 3) All people cannot be currently deployed
-        // 4) All people must not be primary civilians
-        // 5) All people must share one of their non-civilian professions
+        // 3) All people must not be primary civilians
+        // 4) All people must share one of their non-civilian professions
         if (Stream.of(people).anyMatch(person -> !person.getStatus().isActive()
-                || person.getPrisonerStatus().isPrisoner() || person.isDeployed()
+                || person.getPrisonerStatus().isPrisoner()
                 || Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
             assign = false;
         }

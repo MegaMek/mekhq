@@ -47,7 +47,9 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
     //region Initialization
     private void initialize(final Campaign campaign, final Unit... units) {
         // Default Return for Illegal Assignment
-        if (units.length == 0) {
+        // 1) No Units to assign
+        // 2) Any self crewed units
+        if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isSelfCrewed)) {
             return;
         }
 
@@ -58,8 +60,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         // Initial Parsing Values
         final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
         final String skillName = units[0].determineUnitTechSkillType();
-        final boolean assign = Stream.of(units).noneMatch(Unit::isSelfCrewed)
-                && (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
+        final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
                 && !StringUtil.isNullOrEmpty(skillName)
                 && Stream.of(units).allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
