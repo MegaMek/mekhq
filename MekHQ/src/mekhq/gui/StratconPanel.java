@@ -269,20 +269,20 @@ public class StratconPanel extends JPanel implements ActionListener {
             
             // since we have the possibility of scrolling, we need to convert the on-screen clicked coordinates
             // to on-board coordinates. Thankfully, SwingUtilities provides the main computational ability for that
-            Point actualPanelPoint = SwingUtilities.convertPoint(this, translatedClickedPoint, this.getParent());
-            translatedClickedPoint.translate((int) -(actualPanelPoint.getX() - translatedClickedPoint.getX()), 
-                                                (int) -(actualPanelPoint.getY() - translatedClickedPoint.getY()));
+            translatedClickedPoint = SwingUtilities.convertPoint(this, translatedClickedPoint, this.getParent());
+            translatedClickedPoint.translate((int) getVisibleRect().getX(), (int) getVisibleRect().getY());
+            translatedClickedPoint.translate(0, -HEX_Y_RADIUS);
             
-            // now we translate to the starting point of where we're drawing and then go down a hex
-            translatedClickedPoint.translate((int) g2D.getTransform().getTranslateX(), (int) g2D.getTransform().getTranslateY());
-            translatedClickedPoint.translate(0, HEX_Y_RADIUS * -2);
+            // useful for graphics coords debugging
+            //g2D.setColor(Color.ORANGE);
+            //g2D.drawString(translatedClickedPoint.getX() + ", " + translatedClickedPoint.getY(), (int) clickedPoint.getX(), (int) clickedPoint.getY());
         }
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(new Color(0, 0, 0));
-                    g2D.drawPolygon(graphHex);                    
+                    g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
                     
                     if (currentTrack.coordsRevealed(x, y) || currentTrack.isGmRevealed()) {
@@ -291,6 +291,11 @@ public class StratconPanel extends JPanel implements ActionListener {
                         g2D.setColor(Color.DARK_GRAY);
                     }
                     g2D.fillPolygon(graphHex);
+                    
+                    // useful for graphics coords debugging
+                    //g2D.setColor(Color.pink);
+                    //g2D.drawString(graphHex.getBounds().getX() + ", " + graphHex.getBounds().getY(), (int) graphHex.getBounds().getX(), (int) graphHex.getBounds().getY());
+                    //g2D.setColor(Color.DARK_GRAY);
                     
                     if ((translatedClickedPoint != null) && graphHex.contains(translatedClickedPoint)) {
                         g2D.setColor(Color.WHITE);

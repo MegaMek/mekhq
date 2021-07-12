@@ -1404,7 +1404,7 @@ public class StratconRulesManager {
                         switchFacilityOwner(facility);
                     }
 
-                    processTrackForceReturnDates(track, rst.getCampaign().getLocalDate());
+                    processTrackForceReturnDates(track, rst.getCampaign());
 
                     track.removeScenario(scenario);
                     break;
@@ -1470,14 +1470,19 @@ public class StratconRulesManager {
      * Worker function that goes through a track and undeploys any forces where the
      * return date is on or before the given date.
      */
-    public static void processTrackForceReturnDates(StratconTrackState track, LocalDate date) {
+    public static void processTrackForceReturnDates(StratconTrackState track, Campaign campaign) {
         List<Integer> forcesToUndeploy = new ArrayList<>();
+        LocalDate date = campaign.getLocalDate();
 
         // for each force on the track, if the return date is today or in the past,
+        // and the scenario has not yet occurred, undeploy it.
         // "return to base", unless it's been told to stay in the field
         for (int forceID : track.getAssignedForceReturnDates().keySet()) {
+            Force force = campaign.getForce(forceID);
+            
             if ((track.getAssignedForceReturnDates().get(forceID).equals(date)
                     || track.getAssignedForceReturnDates().get(forceID).isBefore(date))
+                    && (force != null) && !track.getBackingScenariosMap().containsKey(force.getScenarioId())
                     && !track.getStickyForces().contains(forceID)) {
                 forcesToUndeploy.add(forceID);
             }
@@ -1598,7 +1603,7 @@ public class StratconRulesManager {
                     // please do this before generating scenarios for track
                     // to avoid unintentionally cleaning out integrated force deployments on
                     // 0-deployment-length tracks
-                    processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
+                    processTrackForceReturnDates(track, ev.getCampaign());
 
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences

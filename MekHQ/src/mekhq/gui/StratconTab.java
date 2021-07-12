@@ -108,9 +108,10 @@ public class StratconTab extends CampaignGuiTab {
         // TODO: lance role assignment UI here?
 
         initializeInfoPanel();
-        this.add(infoPanel);
-        
-        cmd = new CampaignManagementDialog(this);
+	cmd = new CampaignManagementDialog(this);
+
+        JScrollPane infoScrollPane = new JScrollPane(infoPanel);
+        this.add(infoScrollPane);
 
         MekHQ.registerHandler(this);
     }
