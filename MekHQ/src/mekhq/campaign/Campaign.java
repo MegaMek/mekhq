@@ -1911,7 +1911,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean eliteFirst) {
+    public List<Person> getTechs(final boolean noZeroMinute, final @Nullable UUID firstTechId,
+                                 final boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
 
         // Get the first tech.
@@ -1922,7 +1923,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (final Person person : getActivePersonnel()) {
-            if (person.isTech() && (!person.equals(firstTech)) && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
+            if (person.isTech() && !person.equals(firstTech)
+                    && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
                 techs.add(person);
             }
         }
@@ -1948,7 +1950,7 @@ public class Campaign implements Serializable, ITechManager {
 
         techSorter = techSorter.thenComparing(new PersonTitleSorter());
 
-        if (firstTechId != null) {
+        if (firstTechId == null) {
             techs.sort(techSorter);
         } else if (techs.size() > 1) {
             techs.subList(1, techs.size()).sort(techSorter);
