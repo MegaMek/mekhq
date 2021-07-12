@@ -29,6 +29,11 @@ import java.util.ResourceBundle;
  * JScrollablePopupMenu is an extension of JPopupMenu that expands the add functionality so that it
  * adds child menus only if they are not empty, and then adds a scroller to them if they are of the
  * specified size or larger.
+ *
+ * WARNING: When using this menu always have it be strictly declared to the max abstraction of this
+ * WARNING: class, or the menu addition will be assumed to be using the base JMenu add
+ * WARNING: e.g. use JScrollablePopupMenu menu = new JScrollablePopupMenu("menu"),
+ * WARNING: never JPopupMenu menu = new JScrollablePopupMenu("menu")
  */
 public class JScrollablePopupMenu extends JPopupMenu {
     //region Variable Declarations

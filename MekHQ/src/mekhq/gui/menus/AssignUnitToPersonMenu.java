@@ -169,360 +169,103 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 .filter(person -> person.getPrimaryRole().isMechWarriorGrouping()
                                         || person.getSecondaryRole().isMechWarriorGrouping())
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isMechWarriorGrouping())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else if (isProtoMech) {
                         filteredPersonnel = personnel.stream()
                                 .filter(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT))
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isProtoMechPilot())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else if (isSmallCraftOrJumpShip) {
                         filteredPersonnel = personnel.stream()
                                 .filter(person -> person.hasRole(PersonnelRole.VESSEL_PILOT))
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isVesselPilot())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else if (isConventionalAircraft) {
                         filteredPersonnel = personnel.stream()
                                 .filter(person -> person.getPrimaryRole().isConventionalAirGrouping()
                                         || person.getSecondaryRole().isConventionalAirGrouping())
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isConventionalAirGrouping())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else if (isAero) {
                         filteredPersonnel = personnel.stream()
                                 .filter(person -> person.getPrimaryRole().isAerospaceGrouping()
                                         || person.getSecondaryRole().isAerospaceGrouping())
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isAerospaceGrouping())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else if (isVTOL) {
                         filteredPersonnel = personnel.stream()
                                 .filter(person -> person.hasRole(PersonnelRole.VTOL_PILOT))
                                 .collect(Collectors.toList());
-
-                        if (!filteredPersonnel.isEmpty()) {
-                            // Create the SkillType Submenus
-                            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
-
-                            // Add the person to the proper menu
-                            for (final Person person : filteredPersonnel) {
-                                final JScrollableMenu subMenu;
-                                switch (person.getExperienceLevel(!person.getPrimaryRole().isVTOLPilot())) {
-                                    case SkillType.EXP_ELITE:
-                                        subMenu = eliteMenu;
-                                        break;
-                                    case SkillType.EXP_VETERAN:
-                                        subMenu = veteranMenu;
-                                        break;
-                                    case SkillType.EXP_REGULAR:
-                                        subMenu = regularMenu;
-                                        break;
-                                    case SkillType.EXP_GREEN:
-                                        subMenu = greenMenu;
-                                        break;
-                                    case SkillType.EXP_ULTRA_GREEN:
-                                        subMenu = ultraGreenMenu;
-                                        break;
-                                    default:
-                                        subMenu = null;
-                                        break;
-                                }
-
-                                if (subMenu != null) {
-                                    final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
-                                    miPilot.setName("miPilot");
-                                    miPilot.addActionListener(evt -> {
-                                        final Unit oldUnit = person.getUnit();
-                                        boolean useTransfers = false;
-                                        if (oldUnit != null) {
-                                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                            useTransfers = campaign.getCampaignOptions().useTransfers();
-                                        }
-                                        units[0].addPilotOrSoldier(person, useTransfers);
-                                    });
-                                    subMenu.add(miPilot);
-                                }
-                            }
-
-                            pilotMenu.add(eliteMenu);
-                            pilotMenu.add(veteranMenu);
-                            pilotMenu.add(regularMenu);
-                            pilotMenu.add(greenMenu);
-                            pilotMenu.add(ultraGreenMenu);
-                        }
                     } else {
                         MekHQ.getLogger().warning("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
+                        filteredPersonnel = new ArrayList<>();
+                    }
+
+
+                    if (!filteredPersonnel.isEmpty()) {
+                        // Create the SkillType Submenus
+                        final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
+                        final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
+                        final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
+                        final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
+                        final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+
+                        // Add the person to the proper menu
+                        for (final Person person : filteredPersonnel) {
+                            final JScrollableMenu subMenu;
+                            final int experienceLevel;
+                            if (isMech) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isMechWarriorGrouping());
+                            } else if (isProtoMech) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isProtoMechPilot());
+                            } else if (isSmallCraftOrJumpShip) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isVesselPilot());
+                            } else if (isConventionalAircraft) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isConventionalAirGrouping());
+                            } else if (isAero) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isAerospaceGrouping());
+                            } else if (isVTOL) {
+                                experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isVTOLPilot());
+                            } else { // won't happen
+                                experienceLevel = -1;
+                            }
+                            switch (experienceLevel) {
+                                case SkillType.EXP_ELITE:
+                                    subMenu = eliteMenu;
+                                    break;
+                                case SkillType.EXP_VETERAN:
+                                    subMenu = veteranMenu;
+                                    break;
+                                case SkillType.EXP_REGULAR:
+                                    subMenu = regularMenu;
+                                    break;
+                                case SkillType.EXP_GREEN:
+                                    subMenu = greenMenu;
+                                    break;
+                                case SkillType.EXP_ULTRA_GREEN:
+                                    subMenu = ultraGreenMenu;
+                                    break;
+                                default:
+                                    subMenu = null;
+                                    break;
+                            }
+
+                            if (subMenu != null) {
+                                final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
+                                miPilot.setName("miPilot");
+                                miPilot.addActionListener(evt -> {
+                                    final Unit oldUnit = person.getUnit();
+                                    boolean useTransfers = false;
+                                    if (oldUnit != null) {
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
+                                        useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    }
+                                    units[0].addPilotOrSoldier(person, useTransfers);
+                                });
+                                subMenu.add(miPilot);
+                            }
+                        }
+
+                        pilotMenu.add(eliteMenu);
+                        pilotMenu.add(veteranMenu);
+                        pilotMenu.add(regularMenu);
+                        pilotMenu.add(greenMenu);
+                        pilotMenu.add(ultraGreenMenu);
                     }
                 }
 
