@@ -29,7 +29,6 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
