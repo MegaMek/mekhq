@@ -25,6 +25,11 @@ public final class MekHqConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
     public static final int MAXIMUM_D6_VALUE = 6;
 
+    //region GUI Constants
+    public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
+    public static final int BASE_SCROLLER_THRESHOLD = 20;
+    //endregion GUI Constants
+
     //region MekHQ Options
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
@@ -128,6 +133,7 @@ public final class MekHqConstants {
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
+    public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";

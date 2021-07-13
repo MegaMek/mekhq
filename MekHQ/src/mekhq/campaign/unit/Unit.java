@@ -528,16 +528,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Run a diagnostic on this unit
-     * TODO: This is being called in the PersonnelTableModel after changes to the personnel
-     * attached to a unit, but I am not sure it needs to be. I don't think any parts check
-     * attached personnel. I think it could b removed, but I am going to leave it for the
-     * moment because I have made so many other changes in this version.
      */
     public void runDiagnostic(boolean checkForDestruction) {
         //need to set up an array of part ids to avoid concurrent modification
         //problems because some updateCondition methods will remove the part and put
         //in a new one
-        ArrayList<Part> tempParts = new ArrayList<>();
+        List<Part> tempParts = new ArrayList<>();
         tempParts.addAll(parts);
 
         for (Part part : tempParts) {
@@ -2018,7 +2014,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * quirks are enabled for this unit
      * @return
      */
-    public String getQuirksList() {
+    public @Nullable String getQuirksList() {
         String quirkString = "";
         boolean first = true;
         if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
@@ -2037,10 +2033,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
-        if (quirkString.equals("")) {
-            return null;
-        }
-        return "<html>" + quirkString + "</html>";
+        return quirkString.isBlank() ? null : "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {
@@ -4269,31 +4262,40 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
-    public void remove(Person p, boolean log) {
-        Objects.requireNonNull(p);
+    /**
+     * @param person the person to remove. If this is null we return immediately without parsing.
+     * @param log whether to log the removal
+     */
+    public void remove(final @Nullable Person person, final boolean log) {
+        if (person == null) {
+            return;
+        }
 
-        ensurePersonIsRegistered(p);
-        if (p.equals(tech)) {
+        ensurePersonIsRegistered(person);
+        if (person.equals(tech)) {
             removeTech();
         } else {
-            p.setUnit(null);
-            drivers.remove(p);
-            gunners.remove(p);
-            vesselCrew.remove(p);
-            if (p.equals(navigator)) {
+            person.setUnit(null);
+            drivers.remove(person);
+            gunners.remove(person);
+            vesselCrew.remove(person);
+            if (person.equals(navigator)) {
                 navigator = null;
             }
-            if (p.equals(techOfficer)) {
+
+            if (person.equals(techOfficer)) {
                 techOfficer = null;
             }
-            if (p.equals(engineer)) {
+
+            if (person.equals(engineer)) {
                 engineer = null;
             }
             resetPilotAndEntity();
-            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
         }
+
         if (log) {
-            ServiceLogger.removedFrom(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
         }
     }
 
@@ -4317,27 +4319,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.scenarioId = i;
     }
 
-    public ArrayList<Person> getCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
-        for (Person p : drivers) {
-            crew.add(p);
-        }
+    public List<Person> getCrew() {
+        final List<Person> crew = new ArrayList<>(drivers);
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (Person p : gunners) {
-                crew.add(p);
-            }
+            crew.addAll(gunners);
         }
-        for (Person p : vesselCrew) {
-            crew.add(p);
-        }
+        crew.addAll(vesselCrew);
         if (navigator != null) {
             crew.add(navigator);
         }
+
         if (techOfficer != null) {
             crew.add(techOfficer);
         }
         return crew;
     }
+
+    public void clearCrew() {
+        if (isDeployed()) {
+            return;
+        }
+
+        for (final Person person : getCrew()) {
+            remove(person, true);
+        }
+
+        removeTech();
+
+        if (getEngineer() != null) {
+            remove(getEngineer(), true);
+        }
+    }
+
 
     public List<Person> getDrivers() {
         return Collections.unmodifiableList(drivers);
@@ -4663,11 +4676,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (!getFluffName().equals("")) {
-            return entity.getShortName() + " - " + getFluffName();
-        } else {
-            return entity.getShortName();
-        }
+        return getFluffName().isBlank() ? getEntity().getShortName()
+                : getEntity().getShortName() + " - " + getFluffName();
     }
 
     public String getHyperlinkedName() {

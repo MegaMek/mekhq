@@ -19,20 +19,20 @@
 package mekhq.gui.utilities;
 
 import megamek.client.ui.swing.util.MenuScroller;
+import mekhq.MekHqConstants;
 
 import javax.swing.*;
 
 public class JMenuHelpers {
-    private static final int DEFAULT_SCROLLER_THRESHOLD = 20;
-
     /**
      * This is used to add a JMenu to another JMenu, provided it isn't empty, and then add a scroller
      * to it if it is above the default minimum threshold
      * @param menu the JMenu to add the child to
      * @param child the JMenu to add
      */
+    @Deprecated // Replaced by JScrollableMenu
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child) {
-        addMenuIfNonEmpty(menu, child, DEFAULT_SCROLLER_THRESHOLD);
+        addMenuIfNonEmpty(menu, child, MekHqConstants.BASE_SCROLLER_THRESHOLD);
     }
 
     /**
@@ -42,6 +42,7 @@ public class JMenuHelpers {
      * @param child the JMenu to add
      * @param scrollerThreshold the threshold for adding a scroller
      */
+    @Deprecated // Replaced by JScrollableMenu
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child, int scrollerThreshold) {
         if (child.getItemCount() > 0) {
             menu.add(child);
@@ -57,17 +58,20 @@ public class JMenuHelpers {
      * @param menu the JPopupMenu to add the child to
      * @param child the JMenu to add
      */
+    @Deprecated // Replaced by JScrollablePopupMenu
     public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child) {
-        addMenuIfNonEmpty(menu, child, DEFAULT_SCROLLER_THRESHOLD);
+        addMenuIfNonEmpty(menu, child, MekHqConstants.BASE_SCROLLER_THRESHOLD);
     }
 
     /**
      * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and then add a scroller
      * to it if it is above the minimum threshold
+     *
      * @param menu the JPopupMenu to add the child to
      * @param child the JMenu to add
      * @param scrollerThreshold the threshold for adding a scroller
      */
+    @Deprecated // Replaced by JScrollablePopupMenu
     public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child, int scrollerThreshold) {
         if (child.getItemCount() > 0) {
             menu.add(child);
