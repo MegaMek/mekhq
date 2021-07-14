@@ -416,7 +416,7 @@ public class RATManager extends AbstractUnitGenerator {
         if (rat != null) {
             if (!movementModes.isEmpty()) {
                 final Predicate<MechSummary> moveFilter = ms ->
-                        movementModes.contains(EntityMovementMode.getMode(ms.getUnitSubType()));
+                        movementModes.contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
                 filter = (filter == null) ? moveFilter : filter.and(moveFilter);
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
