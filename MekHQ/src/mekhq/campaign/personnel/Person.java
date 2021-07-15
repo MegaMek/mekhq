@@ -41,7 +41,6 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -185,7 +184,7 @@ public class Person implements Serializable {
     //endregion Name
 
     private Gender gender;
-    private AbstractIcon portrait;
+    private Portrait portrait;
 
     private PersonnelRole primaryRole;
     private PersonnelRole secondaryRole;
@@ -769,22 +768,13 @@ public class Person implements Serializable {
     }
     //endregion Names
 
-    //region Portrait
-    public AbstractIcon getPortrait() {
+    public Portrait getPortrait() {
         return portrait;
     }
 
-    public void setPortrait(AbstractIcon portrait) {
-        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+    public void setPortrait(final Portrait portrait) {
+        assert (portrait != null) : "Illegal assignment: cannot have a null Portrait for a Portrait";
         this.portrait = Objects.requireNonNull(portrait);
-    }
-
-    public String getPortraitCategory() {
-        return getPortrait().getCategory();
-    }
-
-    public String getPortraitFileName() {
-        return getPortrait().getFilename();
     }
 
     //region Personnel Roles
