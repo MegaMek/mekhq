@@ -18,7 +18,9 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
+import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
@@ -29,13 +31,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.UnitGeneratorParameters;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -114,23 +116,54 @@ public abstract class AbstractUnitMarket implements Serializable {
     public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
                                           final int unitType, final Faction faction,
                                           final int quality, final int percent) {
-        final UnitGeneratorParameters parameters = createUnitGeneratorParameters(campaign, unitType, faction, quality);
-        parameters.setWeightClass(generateWeight(campaign, unitType, faction));
-        return addSingleUnit(campaign, market, unitType, parameters, percent);
+        return addSingleUnit(campaign, market, unitType, faction, quality, new ArrayList<>(),
+                new ArrayList<>(), percent);
     }
 
     /**
      * @param campaign the campaign to use to generate the unit offer
      * @param market the market type the unit is being offered in
      * @param unitType the unit type to generate the unit with
-     * @param parameters the parameters with which to generate the unit
+     * @param faction the faction to generate the unit from
+     * @param quality the quality to generate the unit at
+     * @param movementModes the movement modes to generate for
+     * @param missionRoles the mission roles to generate for
+     * @param percent the percentage of the original unit cost the unit will be offered at
+     * @return the name of the unit that has been added to the market, or null if none were added
+     */
+    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
+                                          final int unitType, final Faction faction,
+                                          final int quality,
+                                          final Collection<EntityMovementMode> movementModes,
+                                          final Collection<MissionRole> missionRoles,
+                                          final int percent) {
+        return addSingleUnit(campaign, market, unitType, faction,
+                generateWeight(campaign, unitType, faction), quality, movementModes, missionRoles, percent);
+    }
+
+    /**
+     * @param campaign the campaign to use to generate the unit offer
+     * @param market the market type the unit is being offered in
+     * @param unitType the unit type to generate the unit with
+     * @param faction the faction to generate the unit from
+     * @param weight the weight class to generate the unit at
+     * @param quality the quality to generate the unit at
+     * @param movementModes the movement modes to generate for
+     * @param missionRoles the mission roles to generate for
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market, or null if none were added
      */
     protected @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-                                             final int unitType, final UnitGeneratorParameters parameters,
+                                             final int unitType, final Faction faction,
+                                             final int weight, final int quality,
+                                             final Collection<EntityMovementMode> movementModes,
+                                             final Collection<MissionRole> missionRoles,
                                              final int percent) {
-        final MechSummary mechSummary = campaign.getUnitGenerator().generate(parameters);
+        final MechSummary mechSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
+                unitType, weight, campaign.getGameYear(), quality, movementModes, missionRoles,
+                ms -> (!campaign.getCampaignOptions().limitByYear() || (campaign.getGameYear() > ms.getYear()))
+                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
+                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases()));
         return (mechSummary == null) ? null : addSingleUnit(campaign, market, unitType, mechSummary, percent);
     }
 
@@ -148,29 +181,6 @@ public abstract class AbstractUnitMarket implements Serializable {
         getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent,
                 generateTransitDuration(campaign)));
         return mechSummary.getName();
-    }
-
-    /**
-     * @param campaign the campaign to create the parameters based on
-     * @param unitType the unit type to generate
-     * @param faction the faction to generate for
-     * @param quality the quality of the unit to generate
-     * @return the created parameters to use in generating the unit
-     */
-    protected UnitGeneratorParameters createUnitGeneratorParameters(final Campaign campaign,
-                                                                    final int unitType,
-                                                                    final Faction faction,
-                                                                    final int quality) {
-        UnitGeneratorParameters parameters = new UnitGeneratorParameters();
-        parameters.setFaction(faction.getShortName());
-        parameters.setYear(campaign.getGameYear());
-        parameters.setUnitType(unitType);
-        parameters.setQuality(quality);
-        parameters.setFilter(ms ->
-                (!campaign.getCampaignOptions().limitByYear() || (campaign.getGameYear() > ms.getYear()))
-                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases()));
-        return parameters;
     }
 
     /**

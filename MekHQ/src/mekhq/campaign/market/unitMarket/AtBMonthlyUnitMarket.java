@@ -20,6 +20,7 @@ package mekhq.campaign.market.unitMarket;
 
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
+import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
@@ -33,8 +34,9 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitGeneratorParameters;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
@@ -137,18 +139,15 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             market = UnitMarketType.EMPLOYER;
         }
 
-        final UnitGeneratorParameters parameters = createUnitGeneratorParameters(campaign, unitType, faction, quality);
         for (int i = 0; i < num; i++) {
-            parameters.setWeightClass(generateWeight(campaign, unitType, faction));
-            parameters.clearMissionRoles();
+            final Collection<EntityMovementMode> movementModes = new ArrayList<>();
+            final Collection<MissionRole> missionRoles = new ArrayList<>();
             if (unitType == UnitType.TANK) {
-                parameters.setMovementModes(IUnitGenerator.MIXED_TANK_VTOL);
-                parameters.addMissionRole(MissionRole.MIXED_ARTILLERY);
-            } else {
-                parameters.clearMovementModes();
+                movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+                missionRoles.add(MissionRole.MIXED_ARTILLERY);
             }
             final int percent = 100 - (Compute.d6(2) - priceTarget) * 5;
-            addSingleUnit(campaign, market, unitType, parameters, percent);
+            addSingleUnit(campaign, market, unitType, faction, quality, movementModes, missionRoles, percent);
         }
     }
 
