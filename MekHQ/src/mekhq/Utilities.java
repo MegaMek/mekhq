@@ -21,109 +21,49 @@
  */
 package mekhq;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
+import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.util.StringUtil;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import megamek.client.Client;
-import megamek.common.ASFBay;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.Bay;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Crew;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.HeavyVehicleBay;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.LightVehicleBay;
-import megamek.common.Mech;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.SmallCraftBay;
-import megamek.common.SuperHeavyVehicleBay;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
-import megamek.common.UnitType;
-import megamek.common.VTOL;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.Node;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Utilities {
     private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
-    private static int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
+    private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
 
     public static int roll3d6() {
         Vector<Integer> rolls = new Vector<>();
@@ -971,8 +911,8 @@ public class Utilities {
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortrait(oldCrew.getPortrait(crewIndex));
+            if (!oldCrew.getPortrait(crewIndex).isDefault()) {
+                p.setPortrait(oldCrew.getPortrait(crewIndex).clone());
             }
         }
     }

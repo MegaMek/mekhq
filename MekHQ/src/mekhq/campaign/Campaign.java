@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
@@ -2796,6 +2797,7 @@ public class Campaign implements Serializable, ITechManager {
             if (isOvertimeAllowed() && minutes <= tech.getOvertimeLeft()) {
                 // we are working overtime
                 usedOvertime = true;
+                partWork.setWorkedOvertime(true);
                 tech.setMinutesLeft(0);
                 tech.setOvertimeLeft(tech.getOvertimeLeft() - minutes);
             } else {
@@ -5564,12 +5566,12 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Assigns a random portrait to a {@link Person}.
-     * @param p The {@link Person} who should receive a randomized portrait.
+     * @param person The {@link Person} who should receive a randomized portrait.
      */
-    public void assignRandomPortraitFor(Person p) {
-        AbstractIcon portrait = RandomPortraitGenerator.generate(getPersonnel(), p);
+    public void assignRandomPortraitFor(final Person person) {
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person);
         if (!portrait.isDefault()) {
-            p.setPortrait(portrait);
+            person.setPortrait(portrait);
         }
     }
 

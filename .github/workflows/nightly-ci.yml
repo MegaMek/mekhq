@@ -102,7 +102,7 @@ jobs:
     # to figure out.
     - name: Build with Gradle
       working-directory: mekhq
-      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
+      run: ./gradlew -I .github/build-scan-init.gradle build -x test --continue --stacktrace --scan
 
     - name: Upload Test Logs on Failure
       uses: actions/upload-artifact@v2-preview
@@ -119,7 +119,7 @@ jobs:
     #
     - name: Upload Nix/Mac Releases
       uses: actions/upload-artifact@v2
-      if: matrix.os == 'ubuntu-latest'
+      if: always() && matrix.os == 'ubuntu-latest'
       with:
         name: release-nix-mac-java${{ matrix.java }}
         path: mekhq/MekHQ/build/distributions/*.tar
@@ -132,7 +132,7 @@ jobs:
     #
     - name: Upload Windows Release
       uses: actions/upload-artifact@v2
-      if: matrix.os == 'windows-latest'
+      if: always() && matrix.os == 'windows-latest'
       with:
         name: release-win-java${{ matrix.java }}
         path: mekhq/MekHQ/build/distributions/*.zip

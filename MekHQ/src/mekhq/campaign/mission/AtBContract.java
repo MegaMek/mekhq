@@ -302,7 +302,7 @@ public class AtBContract extends Contract implements Serializable {
         LocalDate lastMonth = today.minusMonths(1);
 
         for (Scenario s : getScenarios()) {
-            if (lastMonth.isAfter(s.getDate())) {
+            if ((s.getDate() != null) && lastMonth.isAfter(s.getDate())) {
                 continue;
             }
 

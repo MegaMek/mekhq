@@ -361,10 +361,7 @@ public class BattleArmorSuit extends Part {
                 +"<weightClass>"
                 +weightClass
                 +"</weightClass>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<jumpType>"
-                +MekHqXmlUtil.escape(EntityMovementMode.token(jumpType))
-                +"</jumpType>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpType", jumpType.name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<alternateCost>"
                 +alternateCost.toXmlString()
@@ -380,7 +377,7 @@ public class BattleArmorSuit extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
                 trooper = Integer.parseInt(wn2.getTextContent());
@@ -399,7 +396,7 @@ public class BattleArmorSuit extends Part {
             } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
                 model = MekHqXmlUtil.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
-                jumpType = EntityMovementMode.type(MekHqXmlUtil.unEscape(wn2.getTextContent()));
+                jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
                 alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {

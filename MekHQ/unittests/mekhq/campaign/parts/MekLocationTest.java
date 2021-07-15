@@ -53,6 +53,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -939,9 +940,64 @@ public class MekLocationTest {
 
         when(repairable.isRepairable()).thenReturn(true);
 
-        // A repairable systems remains
-        assertNotNull(mekLocation.checkSalvagable());
-        assertNotNull(mekLocation.checkFixable());
+        // A repairable system remains
+        String message;
+        message = mekLocation.checkSalvagable();
+        assertNotNull(message);
+        assertTrue(message.contains("Repairable Part"));
+
+        message = mekLocation.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains("Repairable Part"));
+    }
+
+    @Test
+    public void checkSalvagableRepairableNamedSystemsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        doReturn(1).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot repairable = mock(CriticalSlot.class);
+        when(repairable.isEverHittable()).thenReturn(true);
+        when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
+        doReturn(repairable).when(entity).getCritical(eq(location), eq(0));
+        Mounted mounted = mock(Mounted.class);
+        when(repairable.getMount()).thenReturn(mounted);
+        when(mounted.getType()).thenReturn(mock(EquipmentType.class));
+        doReturn(1).when(entity).getEquipmentNum(mounted);
+        String partName = "Test Part";
+        EquipmentPart part = mock(EquipmentPart.class);
+        when(part.getName()).thenReturn(partName);
+        when(part.getEquipmentNum()).thenReturn(1);
+        doAnswer(inv -> {
+            Predicate<Part> predicate = inv.getArgument(0);
+            return predicate.test(part) ? part : null;
+        }).when(unit).findPart(any());
+
+        // No repairable systems
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+
+        when(repairable.isRepairable()).thenReturn(true);
+
+        // A repairable system remains
+        String message;
+        message = mekLocation.checkSalvagable();
+        assertNotNull(message);
+        assertTrue(message.contains(partName));
+
+        message = mekLocation.checkFixable();
+        assertNotNull(message);
+        assertTrue(message.contains(partName));
     }
     
     @Test

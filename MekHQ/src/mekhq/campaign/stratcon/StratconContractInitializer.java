@@ -49,7 +49,8 @@ public class StratconContractInitializer {
     public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
-
+        campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
+        
         // dependency: this is required here in order for scenario initialization to work properly
         contract.setStratconCampaignState(campaignState);
 
