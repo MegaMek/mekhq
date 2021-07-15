@@ -33,20 +33,20 @@ import org.xml.sax.SAXException;
 
 public class FactionsIntegrationTest {
     @Test
-    public void loadDefaultTest() 
+    public void loadDefaultTest()
             throws DOMException, SAXException, IOException, ParserConfigurationException {
         Factions factions = Factions.loadDefault();
 
         assertNotNull(factions);
 
-        List<String> choosableFactionCodes = factions.getChoosableFactionCodes();
-        assertNotNull(choosableFactionCodes);
-        assertTrue(choosableFactionCodes.contains("MERC"));
-        assertTrue(choosableFactionCodes.contains("FS"));
+        List<Faction> choosableFactions = factions.getChoosableFactions();
+        assertNotNull(choosableFactions);
+        assertTrue(choosableFactions.contains(factions.getFaction("MERC")));
+        assertTrue(choosableFactions.contains(factions.getFaction("FS")));
 
-        for (String factionCode : choosableFactionCodes) {
-            assertNotNull(String.format("Missing faction %s in choosable faction list", factionCode),
-                    factions.getFaction(factionCode));
+        for (final Faction faction : choosableFactions) {
+            assertNotNull(String.format("Missing faction %s in choosable faction list", faction.getShortName()),
+                    faction);
         }
 
         Faction capellans = factions.getFaction("CC");

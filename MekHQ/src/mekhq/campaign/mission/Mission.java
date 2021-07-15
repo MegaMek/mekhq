@@ -152,9 +152,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     public List<Scenario> getScenarios() {
         return scenarios;
     }
-    
+
     public List<Scenario> getVisibleScenarios() {
-        return getScenarios().stream().filter(scenario -> !scenario.isCloaked()).collect(Collectors.toList()); 
+        return getScenarios().stream().filter(scenario -> !scenario.isCloaked()).collect(Collectors.toList());
     }
 
     public List<Scenario> getCurrentScenarios() {
@@ -188,7 +188,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean hasPendingScenarios() {
-        return getScenarios().stream().anyMatch(scenario -> scenario.getStatus().isCurrent());
+        // scenarios that are pending, but have not been revealed don't count
+        return getScenarios().stream().anyMatch(scenario -> 
+            (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
     //endregion Scenarios
 
@@ -303,4 +305,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         return retVal;
     }
     //endregion File I/O
+
+    @Override
+    public String toString() {
+        return getStatus().isCompleted() ? name + " (Complete)" : name;
+    }
 }

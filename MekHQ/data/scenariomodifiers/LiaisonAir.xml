@@ -13,7 +13,7 @@
 		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>0</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
@@ -46,11 +46,6 @@
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
-                </failureEffect>
-		<failureEffect>
-                    <effectType>ContractScoreUpdate</effectType>
-                    <effectScaling>Inverted</effectScaling>
-                    <howMuch>-1</howMuch>
                 </failureEffect>
             </failureEffects>
             <description>Preserve 100% of the following force(s) and unit(s):</description>

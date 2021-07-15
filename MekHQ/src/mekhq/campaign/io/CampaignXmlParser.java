@@ -52,6 +52,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -105,7 +106,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -331,6 +331,11 @@ public class CampaignXmlParser {
 
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
+        // Apply Migration
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
+        }
+
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References
         PersonIdReference.fixPersonIdReferences(retVal);
@@ -603,14 +608,10 @@ public class CampaignXmlParser {
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
-     * @throws ParseException
      * @throws DOMException
      */
-    private static void processInfoNode(Campaign retVal, Node wni, Version version) throws DOMException, CampaignXmlParseException {
+    private static void processInfoNode(Campaign retVal, Node wni, Version version) throws DOMException {
         NodeList nl = wni.getChildNodes();
-
-        String rankNames = null;
-        int officerCut = 0;
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
@@ -627,6 +628,8 @@ public class CampaignXmlParser {
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
                     retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
+                    retVal.setCamouflage(Camouflage.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
 

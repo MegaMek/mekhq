@@ -34,11 +34,12 @@ import javax.swing.JOptionPane;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
@@ -414,6 +415,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public Force getForces() {
         return forces;
+    }
+
+    public List<Force> getAllForces() {
+        return new ArrayList<>(forceIds.values());
     }
 
     public void importLance(Lance l) {
@@ -988,7 +993,7 @@ public class Campaign implements Serializable, ITechManager {
     public void addScenario(Scenario s, Mission m) {
         addScenario(s, m, false);
     }
-    
+
     /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
      * that it is a new scenario. It then adds the scenario to the scenarioId hash.
@@ -2805,6 +2810,7 @@ public class Campaign implements Serializable, ITechManager {
             if (isOvertimeAllowed() && minutes <= tech.getOvertimeLeft()) {
                 // we are working overtime
                 usedOvertime = true;
+                partWork.setWorkedOvertime(true);
                 tech.setMinutesLeft(0);
                 tech.setOvertimeLeft(tech.getOvertimeLeft() - minutes);
             } else {
@@ -2971,11 +2977,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * TODO : I should be part of AtBContract, not Campaign
      * @param contract an active AtBContract
      * @return the current deployment deficit for the contract
      */
     public int getDeploymentDeficit(AtBContract contract) {
-        if (contract.isActiveOn(getLocalDate())) {
+        if (!contract.isActiveOn(getLocalDate()) || contract.getStartDate().isEqual(getLocalDate())) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet
@@ -2985,10 +2992,11 @@ public class Campaign implements Serializable, ITechManager {
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
+        final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (Lance l : lances.values()) {
-            if ((l.getMissionId() == contract.getId()) && (l.getRole() != AtBLanceRole.UNASSIGNED)) {
+            if (!l.getRole().isUnassigned() && (l.getMissionId() == contract.getId())) {
                 total++;
-                if (l.getRole() == contract.getRequiredLanceType()) {
+                if (l.getRole() == requiredLanceRole) {
                     role++;
                 }
             }
@@ -3106,31 +3114,11 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (AtBContract contract : getActiveAtBContracts()) {
-            switch (contract.getMissionType()) {
-                case AtBContract.MT_GARRISONDUTY:
-                case AtBContract.MT_SECURITYDUTY:
-                case AtBContract.MT_CADREDUTY:
-                    fatigueLevel -= 1;
-                    break;
-                case AtBContract.MT_RIOTDUTY:
-                case AtBContract.MT_GUERRILLAWARFARE:
-                case AtBContract.MT_PIRATEHUNTING:
-                    fatigueLevel += 1;
-                    break;
-                case AtBContract.MT_RELIEFDUTY:
-                case AtBContract.MT_PLANETARYASSAULT:
-                    fatigueLevel += 2;
-                    break;
-                case AtBContract.MT_DIVERSIONARYRAID:
-                case AtBContract.MT_EXTRACTIONRAID:
-                case AtBContract.MT_RECONRAID:
-                case AtBContract.MT_OBJECTIVERAID:
-                    fatigueLevel += 3;
-                    break;
-            }
+        for (final AtBContract contract : getActiveAtBContracts()) {
+            fatigueLevel += contract.getContractType().getFatigue();
             inContract = true;
         }
+
         if (!inContract && location.isOnPlanet()) {
             fatigueLevel -= 2;
         }
@@ -3197,7 +3185,7 @@ public class Campaign implements Serializable, ITechManager {
 
             for (AtBContract contract : getActiveAtBContracts()) {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
-                addReport("Enemy morale is now " + contract.getMoraleLevelName()
+                addReport("Enemy morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
 
@@ -3547,7 +3535,7 @@ public class Campaign implements Serializable, ITechManager {
             u.remove(person, true);
         }
         removeAllPatientsFor(person);
-        removeAllTechJobsFor(person);
+        person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
 
@@ -3633,30 +3621,6 @@ public class Campaign implements Serializable, ITechManager {
                     && p.getDoctorId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
                         .getNaturalHealingWaitingPeriod());
-            }
-        }
-    }
-
-    public void removeAllTechJobsFor(Person tech) {
-        if (tech == null || tech.getId() == null) {
-            return;
-        }
-        getHangar().forEachUnit(u -> {
-            if (tech.equals(u.getTech())) {
-                u.removeTech();
-            }
-            if ((u.getRefit() != null) && tech.equals(u.getRefit().getTech())) {
-                u.getRefit().setTech(null);
-            }
-        });
-        for (Part p : getParts()) {
-            if (tech.equals(p.getTech())) {
-                p.setTech(null);
-            }
-        }
-        for (Force f : forceIds.values()) {
-            if (tech.getId().equals(f.getTechID())) {
-                f.setTechID(null);
             }
         }
     }
@@ -4087,12 +4051,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "astechPoolOvertime",
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
-        if (!getCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoCategory", getCamouflage().getCategory());
-        }
-        if (!getCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", getCamouflage().getFilename());
-        }
+        getCamouflage().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
@@ -4383,10 +4342,6 @@ public class Campaign implements Serializable, ITechManager {
         this.rankSystem = rankSystem;
     }
     //endregion Ranks
-
-    public ArrayList<Force> getAllForces() {
-        return new ArrayList<>(forceIds.values());
-    }
 
     public void setFinances(Finances f) {
         finances = f;
@@ -4993,6 +4948,12 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
+            }
+
+            // like repairs, per CamOps page 208 extra time gives a
+            // reduction to the TN based on x2, x3, x4
+            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
             }
         }
 
@@ -5603,12 +5564,12 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Assigns a random portrait to a {@link Person}.
-     * @param p The {@link Person} who should receive a randomized portrait.
+     * @param person The {@link Person} who should receive a randomized portrait.
      */
-    public void assignRandomPortraitFor(Person p) {
-        AbstractIcon portrait = RandomPortraitGenerator.generate(getPersonnel(), p);
+    public void assignRandomPortraitFor(final Person person) {
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person);
         if (!portrait.isDefault()) {
-            p.setPortrait(portrait);
+            person.setPortrait(portrait);
         }
     }
 

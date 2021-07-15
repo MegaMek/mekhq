@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,10 +48,24 @@ import mekhq.campaign.personnel.SkillType;
  * @author NickAragua
  */
 public class AtBDynamicScenario extends AtBScenario {
+    /**
+     * Data relevant to an entity that was swapped out in a "player or fixed unit count" force.
+     */
+    public static class BenchedEntityData {
+        public Entity entity;
+        public String templateName;
+    }
+    
     private static final long serialVersionUID = 4671466413188687036L;
 
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    
+    private static final String PLAYER_UNIT_SWAPS_ELEMENT = "PlayerUnitSwaps";
+    private static final String PLAYER_UNIT_SWAP_ELEMENT = "PlayerUnitSwap";
+    private static final String PLAYER_UNIT_SWAP_ID_ELEMENT = "UnitID";
+    private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
+    private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
 
     // derived fields used for various calculations
     private int effectivePlayerUnitCount;
@@ -67,6 +82,9 @@ public class AtBDynamicScenario extends AtBScenario {
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
     private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
 
+    // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
+    private Map<UUID, BenchedEntityData> playerUnitSwaps;
+    
     private List<AtBScenarioModifier> scenarioModifiers;
 
     private boolean finalized;
@@ -80,6 +98,7 @@ public class AtBDynamicScenario extends AtBScenario {
         playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
         externalIDLookup = new HashMap<>();
+        setPlayerUnitSwaps(new HashMap<>());
     }
 
     @Override
@@ -88,9 +107,9 @@ public class AtBDynamicScenario extends AtBScenario {
 
         // loop through all player-supplied forces in the template, if there is one
         // assign the newly-added force to the first template we find
-        if(template != null) {
-            for(ScenarioForceTemplate forceTemplate : template.scenarioForces.values()) {
-                if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
+        if (template != null) {
+            for (ScenarioForceTemplate forceTemplate : template.getAllScenarioForces()) {
+                if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
                         !playerForceTemplates.containsValue(forceTemplate)) {
                     playerForceTemplates.put(forceID, forceTemplate);
                     return;
@@ -115,14 +134,15 @@ public class AtBDynamicScenario extends AtBScenario {
 
         super.addForces(forceID);
 
-        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
         playerForceTemplates.put(forceID, forceTemplate);
     }
 
     public void addUnit(UUID unitID, String templateName) {
         super.addUnit(unitID);
-        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
         playerUnitTemplates.put(unitID, forceTemplate);
+        AtBDynamicScenarioFactory.benchAllyUnit(unitID, templateName, this);
     }
 
     @Override
@@ -134,6 +154,7 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeUnit(UUID unitID) {
         super.removeUnit(unitID);
+        AtBDynamicScenarioFactory.unbenchAttachedAlly(unitID, this);
         playerUnitTemplates.remove(unitID);
     }
 
@@ -172,7 +193,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public int getMapY() {
         return getMapSizeY();
     }
-    
+
     @Override
     public void setMapSize() {
         AtBDynamicScenarioFactory.setScenarioMapSize(this);
@@ -182,6 +203,7 @@ public class AtBDynamicScenario extends AtBScenario {
      * Adds a bot force to this scenario.
      */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
+        botForce.setTemplateName(forceTemplate.getForceName());
         super.addBotForce(botForce);
         botForceTemplates.put(botForce, forceTemplate);
 
@@ -200,7 +222,9 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((x >= 0) && (x < botForces.size())) {
             BotForce botToRemove = botForces.get(x);
 
-            botForceTemplates.remove(botToRemove);
+            if (botForceTemplates.containsKey(botToRemove)) {
+                botForceTemplates.remove(botToRemove);
+            }
         }
 
         super.removeBotForce(x);
@@ -244,6 +268,14 @@ public class AtBDynamicScenario extends AtBScenario {
 
     public Map<UUID, ScenarioForceTemplate> getBotUnitTemplates() {
         return botUnitTemplates;
+    }
+
+    public Map<UUID, BenchedEntityData> getPlayerUnitSwaps() {
+        return playerUnitSwaps;
+    }
+
+    public void setPlayerUnitSwaps(Map<UUID, BenchedEntityData> playerUnitSwaps) {
+        this.playerUnitSwaps = playerUnitSwaps;
     }
 
     public int getEffectiveOpforSkill() {
@@ -414,26 +446,67 @@ public class AtBDynamicScenario extends AtBScenario {
             template.Serialize(pw1);
             
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
+            
+            if (!playerUnitSwaps.isEmpty()) {
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                
+                // note: if you update the order in which data is stored here or anything else about it
+                // double check loadFieldsFromXmlNode
+                for (UUID unitID : playerUnitSwaps.keySet()) {
+                    MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    
+                    BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent + 2, Collections.emptyList()));
+                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
+                }
+                
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+            }
         }
 
         super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 template = ScenarioTemplate.Deserialize(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
+                for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
+                    Node swapNode = wn2.getChildNodes().item(snsIndex);
+                    
+                    if (swapNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ELEMENT)) {
+                        BenchedEntityData benchedEntityData = new BenchedEntityData();
+                        UUID playerUnitID = null;
+                        
+                        for (int swapIndex = 0; swapIndex < swapNode.getChildNodes().getLength(); swapIndex++) {
+                            Node dataNode = swapNode.getChildNodes().item(swapIndex);                           
+                            
+                            if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ID_ELEMENT)) {
+                                playerUnitID = UUID.fromString(dataNode.getTextContent());
+                            } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
+                                benchedEntityData.templateName = dataNode.getTextContent();
+                            } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
+                                benchedEntityData.entity = MekHqXmlUtil.getEntityFromXmlString(dataNode);
+                            }
+                        }
+                        
+                        playerUnitSwaps.put(playerUnitID, benchedEntityData);
+                    }
+                }
             }
         }
 
-        super.loadFieldsFromXmlNode(wn);
+        super.loadFieldsFromXmlNode(wn, version);
     }
 
     @Override

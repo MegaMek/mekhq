@@ -44,13 +44,13 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.MekHqColors;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -67,7 +67,6 @@ public class LanceAssignmentView extends JPanel {
     private static final long serialVersionUID = 7280552346074838142L;
 
     private final Campaign campaign;
-    private final MekHqColors colors = new MekHqColors();
 
     private JTable tblRequiredLances;
     private JTable tblAssignments;
@@ -92,6 +91,19 @@ public class LanceAssignmentView extends JPanel {
         });
 
         cbRole = new JComboBox<>(AtBLanceRole.values());
+        cbRole.setName("cbRole");
+        cbRole.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBLanceRole) {
+                    list.setToolTipText(((AtBLanceRole) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -114,7 +126,7 @@ public class LanceAssignmentView extends JPanel {
                             getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String) value).indexOf('/') >= 0) {
-                            colors.getBelowContractMinimum().getAlternateColor().ifPresent(this::setForeground);
+                            setForeground(MekHQ.getMekHQOptions().getBelowContractMinimumForeground());
                         }
                     }
                     return this;
@@ -355,11 +367,11 @@ class RequiredLancesTableModel extends DataTableModel {
                     return t + "/" + contract.getRequiredLances();
                 }
                 return Integer.toString(contract.getRequiredLances());
-            } else if (contract.getRequiredLanceType().ordinal() == column - 2) {
+            } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
                     if (data.get(row).equals(l.getContract(campaign))
-                            && (l.getRole() == l.getContract(campaign).getRequiredLanceType())
+                            && (l.getRole() == l.getContract(campaign).getContractType().getRequiredLanceRole())
                             && l.isEligible(campaign)) {
                         t++;
                     }

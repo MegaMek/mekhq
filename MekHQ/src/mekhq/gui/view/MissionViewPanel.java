@@ -427,8 +427,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCommand, gridBagConstraints);
 
-        txtCommand.setName("txtCommand"); // NOI18N
-        txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand.setName("txtCommand");
+        txtCommand.setText(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -686,8 +687,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtEnemy, gridBagConstraints);
 
-        lblType.setName("lblType"); // NOI18N
+        lblType.setName("lblType");
         lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -695,8 +697,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
-        txtType.setName("txtType"); // NOI18N
+        txtType.setName("txtType");
         txtType.setText(contract.getType());
+        txtType.setToolTipText(contract.getContractType().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -817,8 +820,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCommand, gridBagConstraints);
 
-        txtCommand.setName("txtCommand"); // NOI18N
-        txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand.setName("txtCommand");
+        txtCommand.setText(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -924,8 +928,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvagePct, gridBagConstraints);
 
-        lblMorale.setName("lblMorale"); // NOI18N
+        lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
+        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -933,8 +938,9 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblMorale, gridBagConstraints);
 
-        txtMorale.setName("txtMorale"); // NOI18N
-        txtMorale.setText(contract.getMoraleLevelName());
+        txtMorale.setName("txtMorale");
+        txtMorale.setText(contract.getMoraleLevel().toString());
+        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -966,25 +972,33 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtSharePct, gridBagConstraints);
         }
 
-        lblScore.setName("lblScore");
-        lblScore.setText(resourceMap.getString("lblScore.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblScore, gridBagConstraints);
+        // for StratCon, contract score is irrelevant and only leads to confusion, so we
+        // do not display it in that situation
+        boolean showContractScore = 
+                !gui.getCampaign().getCampaignOptions().getUseStratCon() &&
+                (mission instanceof AtBContract) && (((AtBContract) mission).getStratconCampaignState() != null);
+        
+        if (showContractScore) {
+            lblScore.setName("lblScore");
+            lblScore.setText(resourceMap.getString("lblScore.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblScore, gridBagConstraints);
 
-        txtScore.setName("txtScore");
-        txtScore.setText(Integer.toString(contract.getScore()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtScore, gridBagConstraints);
+            txtScore.setName("txtScore");
+            txtScore.setText(Integer.toString(contract.getScore()));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtScore, gridBagConstraints);
+        }
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

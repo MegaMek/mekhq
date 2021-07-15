@@ -26,11 +26,11 @@
 			<deploymentZone>8</deploymentZone>
 			<deploymentZone>9</deploymentZone>
 		</deploymentZones>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Ground Reinforcements</forceName>
+		<forceName>Additional Opfor Ground Units</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>

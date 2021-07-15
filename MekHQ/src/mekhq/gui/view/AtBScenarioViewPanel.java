@@ -1,7 +1,7 @@
 /*
  * AtBScenarioViewPanel.java
  *
- * Copyright (C) 2014-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -425,15 +425,15 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 objectiveBuilder.append("\n");
             }
 
+            objectiveBuilder.append("\t");
+            objectiveBuilder.append(objective.getTimeLimitString());
+            objectiveBuilder.append("\n");
+
             for (String detail : objective.getDetails()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(detail);
                 objectiveBuilder.append("\n");
             }
-
-            objectiveBuilder.append("\t");
-            objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
 
             objectiveBuilder.append("\n");
         }
@@ -1004,7 +1004,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }
             } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
-                if (tree.getSelectionCount() > 0) {
+                if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
@@ -1025,9 +1025,13 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
+            final JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
-                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                if (path == null) {
+                    return;
+                }
+
                 JMenuItem menuItem;
                 if (path.getPathCount() > 1) {
                     menuItem = new JMenuItem("Edit Unit...");
@@ -1042,6 +1046,5 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
-    };
-
+    }
 }

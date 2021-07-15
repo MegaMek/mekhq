@@ -20,8 +20,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -30,10 +29,13 @@ import java.util.Set;
 
 import javax.swing.*;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -58,7 +60,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected JCheckBox chkShowAllFactions;
     protected JComboBox<String> cbPlanets;
     protected JCheckBox chkShowAllPlanets;
-    protected JComboBox<String> cbMissionType;
+    protected MMComboBox<AtBContractType> comboContractType;
     protected JComboBox<String> cbAllySkill;
     protected JComboBox<String> cbAllyQuality;
     protected JComboBox<String> cbEnemySkill;
@@ -134,7 +136,6 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbPlanets = new JComboBox<>();
         cbPlanets.setModel(new SortedComboBoxModel<>());
         chkShowAllPlanets = new JCheckBox();
-        cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
@@ -281,8 +282,20 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
 
-        cbMissionType.setSelectedItem(contract.getMissionTypeName());
-        cbMissionType.setName("cbMissionType"); // NOI18N
+        comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
+        comboContractType.setSelectedItem(contract.getContractType());
+        comboContractType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBContractType) {
+                    list.setToolTipText(((AtBContractType) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -290,7 +303,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-        descPanel.add(cbMissionType, gbc);
+        descPanel.add(comboContractType, gbc);
 
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text")); // NOI18N
         lblEnemy.setName("lblAllyRating"); // NOI18N
@@ -384,7 +397,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     private void addAllListeners() {
         cbPlanets.addActionListener(contractUpdateActionListener);
-        cbMissionType.addActionListener(contractUpdateActionListener);
+        comboContractType.addActionListener(contractUpdateActionListener);
         cbEmployer.addActionListener(contractUpdateActionListener);
         cbEnemy.addActionListener(contractUpdateActionListener);
         cbAllySkill.addActionListener(contractUpdateActionListener);
@@ -397,7 +410,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     private void removeAllListeners() {
         cbPlanets.removeActionListener(contractUpdateActionListener);
-        cbMissionType.removeActionListener(contractUpdateActionListener);
+        comboContractType.removeActionListener(contractUpdateActionListener);
         cbEmployer.removeActionListener(contractUpdateActionListener);
         cbEnemy.removeActionListener(contractUpdateActionListener);
         cbAllySkill.removeActionListener(contractUpdateActionListener);
@@ -468,22 +481,22 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
         AtBContract contract = (AtBContract) this.contract;
         HashSet<String> systems = new HashSet<>();
-        if (contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
-                getCurrentEnemyCode().equals("REB") ||
-                getCurrentEnemyCode().equals("PIR")) {
+        if (!contract.getContractType().isGarrisonType()
+                || getCurrentEnemyCode().equals("REB") || getCurrentEnemyCode().equals("PIR")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
-        if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
-                contract.getMissionType() == AtBContract.MT_RELIEFDUTY) &&
-                !contract.getEnemyCode().equals("REB")) {
+
+        if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty())
+                && !contract.getEnemyCode().equals("REB")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
+
         cbPlanets.removeAllItems();
         for (String system : systems) {
             cbPlanets.addItem(system);
@@ -514,9 +527,9 @@ public class NewAtBContractDialog extends NewContractDialog {
                     campaign.getLocalDate())).getId());
         }
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-        contract.setMissionType(cbMissionType.getSelectedIndex());
+        contract.setContractType(comboContractType.getSelectedItem());
         contract.setDesc(txtDesc.getText());
-        contract.setCommandRights(choiceCommand.getSelectedIndex());
+        contract.setCommandRights(choiceCommand.getSelectedItem());
 
         contract.setEnemyCode(getCurrentEnemyCode());
         contract.setAllySkill(cbAllySkill.getSelectedIndex());
@@ -527,19 +540,19 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
         contract.setSharesPct((Integer)spnShares.getValue());
 
-        contract.calculatePartsAvailabilityLevel(campaign);
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());
         campaign.addMission(contract);
-        
+
         // note that the contract must be initialized after the mission is added to the campaign
         // to ensure presence of mission ID
         if (campaign.getCampaignOptions().getUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
-                    StratconContractDefinition.getContractDefinition(contract.getMissionType()));
+                    StratconContractDefinition.getContractDefinition(contract.getContractType()));
         }
-        
+
         setVisible(false);
     }
 
@@ -571,8 +584,8 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setEnemyCode(getCurrentEnemyCode());
             updatePlanets();
             needUpdatePayment = true;
-        } else if (source.equals(cbMissionType)) {
-            contract.setMissionType(cbMissionType.getSelectedIndex());
+        } else if (source.equals(comboContractType)) {
+            contract.setContractType(comboContractType.getSelectedItem());
             contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
             spnLength.setValue(contract.getLength());
             updatePlanets();

@@ -47,6 +47,7 @@ import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
+import mekhq.gui.sorter.PersonTitleSorter;
 
 /**
  * Shows injured and medical personnel
@@ -317,9 +318,11 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     public void refreshDoctorsList() {
-        int selected = docTable.getSelectedRow();
-        doctorsModel.setData(getCampaign().getDoctors());
-        if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
+        final int selected = docTable.getSelectedRow();
+        final List<Person> doctors = getCampaign().getDoctors();
+        doctors.sort(new PersonTitleSorter().reversed());
+        doctorsModel.setData(doctors);
+        if ((selected > -1) && (selected < doctors.size())) {
             docTable.setRowSelectionInterval(selected, selected);
         }
     }

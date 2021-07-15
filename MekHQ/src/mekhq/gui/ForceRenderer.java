@@ -35,13 +35,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
+    //region Variable Declarations
     private static final long serialVersionUID = -553191867660269247L;
+    //endregion Variable Declarations
 
-    private final MekHqColors colors = new MekHqColors();
-
+    //region Constructors
     public ForceRenderer() {
 
     }
+    //endregion Constructors
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
@@ -131,16 +133,20 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported by: ")
                         .append(u.getTransportShipAssignment().getTransportShip().getName());
             }
-            setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
+            String text = name + ", " + uname + c3network + transport;
+            setText("<html>" + text + "</html>");
+            getAccessibleContext().setAccessibleName((u.isDeployed() ? "Deployed Unit: " : "Unit: ") + text);
             if (!sel && u.isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
-            if (!sel && ((Force) value).isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+            Force force = (Force) value;
+            getAccessibleContext().setAccessibleName((force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
+            if (!sel && force.isDeployed()) {
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else {
