@@ -1,7 +1,7 @@
 /*
  * MassMothballDialog.java
  *
- * Copyright (c) 2018 Megamek Team. All rights reserved.
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -265,15 +265,19 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL) &&
-                !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
+        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL)
+                && !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
             return;
         }
 
         boolean isMothballing = e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL);
 
         for (int unitType : unitsByType.keySet()) {
-            List<Person> selectedTechs = techListsByUnitType.get(unitType).getSelectedValuesList();
+            final List<Person> selectedTechs = techListsByUnitType.get(unitType).getSelectedValuesList();
+            if (selectedTechs.isEmpty()) {
+                continue;
+            }
+
             int techIndex = 0;
 
             // this is a "naive" approach, where we assign each of the selected techs

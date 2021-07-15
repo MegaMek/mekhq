@@ -58,6 +58,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
+    private String templateName;
 
     public BotForce() {
         entityList = new ArrayList<>();
@@ -135,6 +136,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return Collections.unmodifiableList(entityList);
     }
 
+    public void addEntity(Entity entity) {
+        entityList.add(entity);
+    }
+    
     public boolean removeEntity(int index) {
         Entity e = null;
         if ((index >= 0) && (index < entityList.size())) {
@@ -176,6 +181,14 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public void setStart(int start) {
         this.start = start;
+    }
+    
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
     }
 
     public Camouflage getCamouflage() {
@@ -230,6 +243,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "start", start);
         getCamouflage().writeToXML(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "templateName", templateName);        
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
@@ -277,6 +291,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
                     getCamouflage().setFilename(getColour().name());
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
+                setTemplateName(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -323,7 +339,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         }
 
         if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(getCamouflage());
+            CamouflageMigrator.migrateCamouflage(version, getCamouflage());
         }
     }
 }

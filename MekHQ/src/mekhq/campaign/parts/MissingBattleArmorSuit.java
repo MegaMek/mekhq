@@ -188,10 +188,7 @@ public class MissingBattleArmorSuit extends MissingPart {
                 +"<weightClass>"
                 +weightClass
                 +"</weightClass>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<jumpType>"
-                +MekHqXmlUtil.escape(EntityMovementMode.token(jumpType))
-                +"</jumpType>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpType", jumpType.name());
         writeToXmlEnd(pw1, indent);
     }
 
@@ -218,7 +215,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
                 model = MekHqXmlUtil.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
-                jumpType = EntityMovementMode.type(MekHqXmlUtil.unEscape(wn2.getTextContent()));
+                jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
             }
         }
     }
