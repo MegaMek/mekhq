@@ -23,6 +23,7 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -372,12 +373,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, c.getGameOptions());
                 }
             }
-        } catch (Exception ex) {
-            // Doh!
-            MekHQ.getLogger().error(UnitOrder.class, ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
         }
 
         retVal.initializeParts(false);

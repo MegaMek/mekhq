@@ -18,26 +18,6 @@
  */
 package mekhq;
 
-import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import megamek.utils.MegaMekXmlUtil;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import megamek.common.Aero;
 import megamek.common.BombType;
 import megamek.common.CommonConstants;
@@ -49,6 +29,18 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
+import megamek.common.annotations.Nullable;
+import megamek.common.options.GameOptions;
+import megamek.utils.MegaMekXmlUtil;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.Iterator;
+import java.util.List;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -56,7 +48,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     /**
      * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from
      * XML entity expansion attacks.
-     * 
+     *
      * @return A DocumentBuilder less safe to use to read untrusted XML.
      */
     public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
@@ -97,20 +89,9 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         return dbf.newDocumentBuilder();
     }
 
-    public static String xmlToString(Node node) throws TransformerException {
-        Source source = new DOMSource(node);
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        transformer.transform(source, result);
-
-        return stringWriter.getBuffer().toString();
-    }
-
     /**
      * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
-     * 
+     *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
      * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
      * MM and then re-factored out of EntityListFile.
@@ -456,7 +437,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         /*
          * crew are handled as a Person object in MekHq... if (e.isDriverHit()) { critVal =
          * critVal.concat(" driver=\""); critVal = critVal.concat("hit"); critVal = critVal.concat("\""); }
-         * 
+         *
          * if (e.isCommanderHit()) { critVal = critVal.concat(" commander=\""); critVal =
          * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
@@ -473,44 +454,36 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     }
 
-    /** @deprecated use {@link #parseSingleEntityMul(Element)} instead */
-    @Deprecated
-    public static Entity getEntityFromXmlString(Node xml) {
-        return parseSingleEntityMul((Element) xml);
-    }
-
     /**
      * Parses the given node as if it was a .mul file and returns the first entity it contains.
-     * <p>
-     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the input
-     * can't be parsed; if it can be parsed and contains more than one entity, an
+     *
+     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the
+     * input can't be parsed; if it can be parsed and contains more than one entity, an
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
+     * @param options the Game Options to parse using
      *
      * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
      *         the input
      *
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
-    public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
-
-        MULParser prs = new MULParser();
-        prs.parse(element);
-        List<Entity> entities = prs.getEntities();
+    public static @Nullable Entity parseSingleEntityMul(final Element element,
+                                                        final @Nullable GameOptions options)
+            throws IllegalArgumentException {
+        final List<Entity> entities = new MULParser(element, options).getEntities();
 
         switch (entities.size()) {
-        case 0:
-            return null;
-        case 1:
-            Entity entity = entities.get(0);
-            MekHQ.getLogger().trace(MekHqXmlUtil.class,
-                    "Returning " + entity + " from getEntityFromXmlString(String)...");
-            return entity;
-        default:
-            throw new IllegalArgumentException(
-                    "More than one entity contained in XML string!  Expecting a single entity.");
+            case 0:
+                return null;
+            case 1:
+                Entity entity = entities.get(0);
+                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                return entity;
+            default:
+                throw new IllegalArgumentException(
+                        "More than one entity contained in XML string!  Expecting a single entity.");
         }
     }
 
