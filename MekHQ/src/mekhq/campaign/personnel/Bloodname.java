@@ -492,11 +492,6 @@ public class Bloodname implements Serializable {
         }
 
         @Override
-        public Object clone() {
-            return new Fraction(this);
-        }
-
-        @Override
         public String toString() {
             return numerator + "/" + denominator;
         }
@@ -510,6 +505,16 @@ public class Bloodname implements Serializable {
             } else {
                 return value() == ((Fraction) object).value();
             }
+        }
+
+        @Override
+        public int hashCode() {
+            return Double.valueOf(value()).hashCode();
+        }
+
+        @Override
+        public Object clone() {
+            return new Fraction(this);
         }
 
         public double value() {
