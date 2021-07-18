@@ -343,9 +343,21 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
+                    case ASTECH:
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_ASTECH));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        break;
                     case DOCTOR:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_DOCTOR));
+                        preparedStatement.setInt(2, role.ordinal());
+                        preparedStatement.executeUpdate();
+                        break;
+                    case MEDIC:
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_MEDTECH));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
@@ -358,8 +370,6 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
-                    case ASTECH:
-                    case MEDIC:
                     case DEPENDENT:
                     case NONE:
                     default:
