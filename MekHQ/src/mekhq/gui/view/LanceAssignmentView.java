@@ -294,13 +294,12 @@ class RequiredLancesTableModel extends DataTableModel {
     public static final int COL_TRAINING = 5;
     public static final int COL_NUM = 6;
 
-    protected String[] columnNames = {"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
-
     private Campaign campaign;
 
-    public RequiredLancesTableModel(Campaign campaign) {
+    public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
+        columnNames = new String[]{"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
     }
 
     @Override
@@ -396,12 +395,12 @@ class LanceAssignmentTableModel extends DataTableModel {
     public static final int COL_ROLE = 3;
     public static final int COL_NUM = 4;
 
-    protected String[] columnNames = {"Force", "Wt", "Mission", "Role"};
     private Campaign campaign;
 
     public LanceAssignmentTableModel(Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<>();
+        columnNames = new String[]{"Force", "Wt", "Mission", "Role"};
     }
 
     @Override
