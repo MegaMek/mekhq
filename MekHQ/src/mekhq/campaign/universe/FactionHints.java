@@ -459,26 +459,30 @@ public class FactionHints {
                         end = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                     }
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
-                        Node wn2 = wn.getChildNodes().item(j);
-                        switch (wn2.getNodeName()) {
-                            case "outer":
-                                outerCode = wn2.getTextContent().trim();
-                                break;
-                            case "inner":
-                                innerCode = wn2.getTextContent().trim();
-                                break;
-                            case "fraction":
-                                fraction = Double.parseDouble(wn2.getTextContent().trim());
-                                break;
-                            case "opponents":
-                                opponents = new ArrayList<>();
-                                for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                    Faction f = Factions.getInstance().getFaction(fKey);
-                                    if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                                        opponents.add(f);
+                        try {
+                            Node wn2 = wn.getChildNodes().item(j);
+                            switch (wn2.getNodeName()) {
+                                case "outer":
+                                    outerCode = wn2.getTextContent().trim();
+                                    break;
+                                case "inner":
+                                    innerCode = wn2.getTextContent().trim();
+                                    break;
+                                case "fraction":
+                                    fraction = Double.parseDouble(wn2.getTextContent().trim());
+                                    break;
+                                case "opponents":
+                                    opponents = new ArrayList<>();
+                                    for (String fKey : wn2.getTextContent().trim().split(",")) {
+                                        Faction f = Factions.getInstance().getFaction(fKey);
+                                        if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                                            opponents.add(f);
+                                        }
                                     }
-                                }
-                                break;
+                                    break;
+                            }
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
                         }
                     }
 

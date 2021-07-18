@@ -137,13 +137,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         name = name.trim();
         MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if(null == summary) {
-            MekHQ.getLogger().error(this, "Could not find a mech summary for " + name);
+            MekHQ.getLogger().error("Could not find a mech summary for " + name);
             return null;
         }
         try {
             return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(this, "Could not load " + summary.getEntryName());
+            MekHQ.getLogger().error("Could not load " + summary.getEntryName());
             return null;
         }
     }
@@ -376,8 +376,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 }
             }
         } catch (Exception ex) {
-            // Doh!
-            MekHQ.getLogger().error(UnitOrder.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         retVal.initializeParts(false);

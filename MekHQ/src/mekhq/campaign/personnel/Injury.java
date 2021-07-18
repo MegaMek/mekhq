@@ -67,7 +67,7 @@ public class Injury {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.getLogger().error(Injury.class, "<init>", e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -80,7 +80,7 @@ public class Injury {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Injury.class, "generateInstanceFromXML(Node)", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(ex); //$NON-NLS-1$
         }
         return null;
     }
@@ -292,8 +292,8 @@ public class Injury {
     public void writeToXml(PrintWriter pw1, int indent) {
         try {
             marshaller.marshal(this, pw1);
-        } catch(JAXBException ex) {
-            MekHQ.getLogger().error(getClass(), "writeToXml(PrintWriter,int)", ex); //$NON-NLS-1$
+        } catch (JAXBException ex) {
+            MekHQ.getLogger().error(ex);
         }
     }
 

@@ -32,9 +32,9 @@ public class Connection extends Thread {
         try {
             socket.close();
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "run", e);
+            MekHQ.getLogger().error(e);
         }
-        MekHQ.getLogger().error(getClass(), "run", "closing socket");
+        MekHQ.getLogger().error("closing socket");
     }
 
 
@@ -56,7 +56,7 @@ public class Connection extends Thread {
             try {
                 wait();
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "setMessage", e);
+                MekHQ.getLogger().error(e);
             }
         }
         message = s;

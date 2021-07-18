@@ -415,12 +415,12 @@ public class Bloodname implements Serializable {
         Clan.loadClanData();
         bloodnames = new ArrayList<>();
 
-        File f = new File("data/names/bloodnames/bloodnames.xml");
+        File f = new File("data/names/bloodnames/bloodnames.xml"); // TODO : Remove inline file path
         FileInputStream fis;
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Bloodname.class, "Cannot find file bloodnames.xml");
+            MekHQ.getLogger().error("Cannot find file bloodnames.xml");
             return;
         }
 
@@ -431,8 +431,7 @@ public class Bloodname implements Serializable {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, "Could not parse bloodnames.xml");
-            MekHQ.getLogger().error(Bloodname.class, ex);
+            MekHQ.getLogger().error("Could not parse bloodnames.xml", ex);
             return;
         }
 
@@ -448,7 +447,7 @@ public class Bloodname implements Serializable {
                 }
             }
         }
-        MekHQ.getLogger().info(Bloodname.class, "Loaded " + bloodnames.size() + " Bloodname records.");
+        MekHQ.getLogger().info("Loaded " + bloodnames.size() + " Bloodname records.");
     }
 
     private static class NameAcquired {

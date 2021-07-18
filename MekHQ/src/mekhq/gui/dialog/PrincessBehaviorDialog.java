@@ -92,7 +92,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
     private void handleError(String method, Throwable t) {
         JOptionPane.showMessageDialog(this, t.getMessage(),
                                       "ERROR", JOptionPane.ERROR_MESSAGE);
-        MekHQ.getLogger().error(getClass(), method, t);
+        MekHQ.getLogger().error(t);
     }
 
     @Override
