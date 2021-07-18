@@ -4781,6 +4781,7 @@ public class Campaign implements Serializable, ITechManager {
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
+
         if ((partWork.getUnit() != null) && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
@@ -4841,11 +4842,13 @@ public class Campaign implements Serializable, ITechManager {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
-        boolean isOvertime = false;
+        final boolean isOvertime;
         if (isOvertimeAllowed()
                 && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
             isOvertime = true;
+        } else {
+            isOvertime = false;
         }
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
@@ -4857,9 +4860,9 @@ public class Campaign implements Serializable, ITechManager {
         int helpMod;
         if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {
             helpMod = getShorthandedModForCrews((partWork.getUnit().getEntity().getCrew() == null)
-                    ? 6 : partWork.getUnit().getEntity().getCrew().getHits());
+                    ? MekHqConstants.ASTECH_TEAM_SIZE : partWork.getUnit().getEntity().getCrew().getHits());
         } else {
-            int helpers = getAvailableAstechs(minutes, isOvertime);
+            final int helpers = getAvailableAstechs(minutes, isOvertime);
             helpMod = getShorthandedMod(helpers, false);
             // we may have just gone overtime with our helpers
             if (!isOvertime && (astechPoolMinutes < (minutes * helpers))) {
@@ -4874,7 +4877,6 @@ public class Campaign implements Serializable, ITechManager {
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
-
         return target;
     }
 
@@ -5284,35 +5286,32 @@ public class Campaign implements Serializable, ITechManager {
         return astechs;
     }
 
-    public int getAvailableAstechs(int minutes, boolean alreadyOvertime) {
+    public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
         if (minutes == 0) {
             MekHQ.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
             return 0;
         }
 
         int availableHelp = (int) Math.floor(((double) astechPoolMinutes) / minutes);
-        if (isOvertimeAllowed() && (availableHelp < 6)) {
+        if (isOvertimeAllowed() && (availableHelp < MekHqConstants.ASTECH_TEAM_SIZE)) {
             // if we are less than fully staffed, then determine whether
             // we should dip into overtime or just continue as short-staffed
-            int shortMod = getShorthandedMod(availableHelp, false);
-            int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
-            int extraHelp = (remainingMinutes + astechPoolOvertime) / minutes;
-            int helpNeeded = 6 - availableHelp;
+            final int shortMod = getShorthandedMod(availableHelp, false);
+            final int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
+            final int extraHelp = (remainingMinutes + astechPoolOvertime) / minutes;
+            final int helpNeeded = MekHqConstants.ASTECH_TEAM_SIZE - availableHelp;
             if (alreadyOvertime && (shortMod > 0)) {
                 // then add whatever we can
                 availableHelp += extraHelp;
             } else if (shortMod > 3) {
                 // only dip in if we can bring ourselves up to full
                 if (extraHelp >= helpNeeded) {
-                    availableHelp = 6;
+                    availableHelp = MekHqConstants.ASTECH_TEAM_SIZE;
                 }
             }
         }
 
-        if (availableHelp > 6) {
-            availableHelp = 6;
-        }
-        return Math.min(availableHelp, getNumberAstechs());
+        return Math.min(Math.min(availableHelp, MekHqConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
     public int getShorthandedMod(int availableHelp, boolean medicalStaff) {
