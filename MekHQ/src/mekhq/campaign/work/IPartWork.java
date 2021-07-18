@@ -93,7 +93,7 @@ public interface IPartWork extends IWork {
 
     boolean isSalvaging();
 
-    String checkFixable();
+    @Nullable String checkFixable();
 
     void reservePart();
 

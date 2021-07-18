@@ -4778,35 +4778,25 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
-    public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
-        Skill skill = tech.getSkillForWorkingOn(partWork);
+    public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
+        final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
-        if (null != partWork.getUnit() && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "This unit is not currently available!");
-        }
-        if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Already being worked on by another team");
-        }
-        if (null == skill) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Assigned tech does not have the right skills");
-        }
-        if (!getCampaignOptions().isDestroyByMargin()
-                && partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Task is beyond this tech's skill level");
-        }
-        if (partWork.getSkillMin() > SkillType.EXP_ELITE) {
+        if ((partWork.getUnit() != null) && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
+        } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
+        } else if (skill == null) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
+        } else if (!getCampaignOptions().isDestroyByMargin()
+                && (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty))) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
+        } else if (partWork.getSkillMin() > SkillType.EXP_ELITE) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
-        }
-        if (!partWork.needsFixing() && !partWork.isSalvaging()) {
+        } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-        }
-        if (partWork instanceof MissingPart
-                && null == ((MissingPart) partWork).findReplacement(false)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
+        } else if ((partWork instanceof MissingPart)
+                && (((MissingPart) partWork).findReplacement(false) == null)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
         }
 
         final int techTime = isOvertimeAllowed() ? tech.getMinutesLeft() + tech.getOvertimeLeft()
@@ -4814,8 +4804,9 @@ public class Campaign implements Serializable, ITechManager {
         if (!(partWork instanceof Refit) && (techTime <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
-        String notFixable = partWork.checkFixable();
-        if (null != notFixable) {
+
+        final String notFixable = partWork.checkFixable();
+        if (notFixable != null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
 
@@ -4825,8 +4816,8 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
-        //if we are using the MoF rule, then we will ignore mode penalty here
-        //and instead assign it as a straight penalty
+        // If we are using the MoF rule, then we will ignore mode penalty here
+        // and instead assign it as a straight penalty
         if (getCampaignOptions().isDestroyByMargin()) {
             modePenalty = 0;
         }
@@ -4838,7 +4829,7 @@ public class Campaign implements Serializable, ITechManager {
                 && (SkillType.EXP_GREEN == (skill.getExperienceLevel() - modePenalty))) {
             value++;
         }
-        TargetRoll target = new TargetRoll(value,
+        final TargetRoll target = new TargetRoll(value,
                 SkillType.getExperienceLevelName(skill.getExperienceLevel() - modePenalty));
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
@@ -4860,7 +4851,7 @@ public class Campaign implements Serializable, ITechManager {
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
         if (minutes <= 0) {
             MekHQ.getLogger().error("Attempting to get the target number for a part with zero time left.");
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no time remaining to repair the part");
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
         }
 
         int helpMod;
