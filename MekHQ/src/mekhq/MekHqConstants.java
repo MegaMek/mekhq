@@ -21,9 +21,12 @@
 package mekhq;
 
 public final class MekHqConstants {
+    //region General Constants
     // This is used in creating the name of save files, e.g. the MekHQ campaign file
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
     public static final int MAXIMUM_D6_VALUE = 6;
+    public static final int PREGNANCY_STANDARD_DURATION = 280; //standard duration of a pregnancy in days (40 weeks)
+    // endregion General Constants
 
     //region MekHQ Options
     //region Display
