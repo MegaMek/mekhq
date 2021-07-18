@@ -501,8 +501,15 @@ public class Bloodname implements Serializable {
             return numerator + "/" + denominator;
         }
 
-        public boolean equals(Fraction f) {
-            return value() == f.value();
+        @Override
+        public boolean equals(final @Nullable Object object) {
+            if (this == object) {
+                return true;
+            } else if (!(object instanceof Fraction)) {
+                return false;
+            } else {
+                return value() == ((Fraction) object).value();
+            }
         }
 
         public double value() {
