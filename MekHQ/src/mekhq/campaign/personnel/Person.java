@@ -2317,7 +2317,7 @@ public class Person implements Serializable {
         }
 
         if (getRankSystem().isUseROMDesignation()) {
-            rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
+            rankName += ROMDesignation.getComStarBranchDesignation(this);
         }
 
         // Rank Level Modifications

@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author: Dylan Myers <ralgith@gmail.com>
  */
@@ -49,7 +49,7 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.mod.am.InjuryTypes;
 
 // Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
-@XmlRootElement(name="injury")
+@XmlRootElement(name = "injury")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
@@ -66,7 +66,7 @@ public class Injury {
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
-        } catch(JAXBException e) {
+        } catch (JAXBException e) {
             MekHQ.getLogger().error(e);
         }
     }
@@ -79,8 +79,8 @@ public class Injury {
     public static Injury generateInstanceFromXML(Node wn) {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex); //$NON-NLS-1$
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
         }
         return null;
     }
@@ -99,11 +99,11 @@ public class Injury {
     private boolean workedOn;
     private boolean extended;
     private InjuryHiding hidingState = InjuryHiding.DEFAULT;
-    @XmlElement(name="InjuryUUID")
+    @XmlElement(name = "InjuryUUID")
     private UUID id;
     /** Generic extra data, for use with plugins and mods */
     private ExtraData extraData = new ExtraData();
-    @XmlAttribute(name="v")
+    @XmlAttribute(name = "v")
     private int version;
 
     /**

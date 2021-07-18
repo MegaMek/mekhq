@@ -190,7 +190,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                         retVal.getShoppingList().add((IAcquisitionWork) p);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
-                    UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c, version);
+                    UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c);
                     u.setCampaign(c);
                     if (u.getEntity() != null) {
                         retVal.getShoppingList().add(u);
