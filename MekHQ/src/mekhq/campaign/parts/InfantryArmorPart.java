@@ -93,24 +93,28 @@ public class InfantryArmorPart extends Part {
         if (isEncumbering()) {
             details += "encumbering";
         }
+
         if (isSneakCamo()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "camo";
         }
+
         if (isSneakECM()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "ECM";
         }
+
         if (isSneakIR()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "IR";
         }
+
         return details;
     }
 

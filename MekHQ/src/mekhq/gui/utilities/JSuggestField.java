@@ -68,7 +68,7 @@ public class JSuggestField extends JTextField {
 
 	/** Needed for the new narrowing search, so we know when to reset the list */
 	private String lastWord = "";
-	
+
 	/**
 	 * The last chosen variable which exists. Needed if user
 	 * continued to type but didn't press the enter key
@@ -146,12 +146,13 @@ public class JSuggestField extends JTextField {
 			@Override
 			public void focusLost(FocusEvent e) {
 				d.setVisible(false);
-				
-				if (getText().equals("") && e.getOppositeComponent() != null && e.getOppositeComponent().getName() != null) {
+
+				if (getText().isBlank() && (e.getOppositeComponent() != null)
+                        && (e.getOppositeComponent().getName() != null)) {
 					if (!e.getOppositeComponent().getName().equals("suggestFieldDropdownButton")) {
 						setText("Type a variable name here...");
 					}
-				} else if (getText().equals("")) {
+				} else if (getText().isBlank()) {
 					setText("Type a variable name here...");
 				}
 			}
@@ -161,7 +162,7 @@ public class JSuggestField extends JTextField {
 				if (getText().equals("Type a variable name here...")) {
 					setText("");
 				}
-				
+
 				//showSuggest();
 			}
 		});
@@ -442,11 +443,11 @@ public class JSuggestField extends JTextField {
 			listener.actionPerformed(event);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns the selected value in the drop down list
-	 * 
+	 *
 	 * @return selected value from the user or null if the entered value does not exist
 	 */
 	public String getLastChosenExistingVariable() {
