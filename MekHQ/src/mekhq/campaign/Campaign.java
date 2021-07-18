@@ -4104,9 +4104,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "kills");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "skillTypes");
-        for (String name : SkillType.skillList) {
-            SkillType type = SkillType.getType(name);
-            if (null != type) {
+        for (final String skillName : SkillType.skillList) {
+            final SkillType type = SkillType.getType(skillName);
+            if (type != null) {
                 type.writeToXml(pw1, indent + 1);
             }
         }
