@@ -148,7 +148,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -180,7 +180,7 @@ public class ResolveScenarioTracker {
 
         for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -263,7 +263,7 @@ public class ResolveScenarioTracker {
         // Utterly destroyed entities
         for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -296,7 +296,7 @@ public class ResolveScenarioTracker {
         //add retreated units
         for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -329,7 +329,7 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = victoryEvent.getGraveyardEntities();
         while (wrecks.hasMoreElements()) {
             Entity e = wrecks.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -480,7 +480,7 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            MekHQ.getLogger().error(this,
+                            MekHQ.getLogger().error(
                                     "A null person status was found for person id " + p.getId().toString()
                                     + " when trying to assign kills");
                             continue;
@@ -690,7 +690,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    MekHQ.getLogger().error(this, "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    MekHQ.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
                     continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
@@ -1055,12 +1055,12 @@ public class ResolveScenarioTracker {
                 // Read a Vector from the file.
                 parser.parse(listStream);
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(this, parser.getWarningMessage());
+                MekHQ.getLogger().warning(parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();
@@ -1918,7 +1918,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
         }

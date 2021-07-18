@@ -1,7 +1,8 @@
 /*
  * RATManager.java
  *
- * Copyright (c) 2016 Carl Spain. All rights reserved.
+ * Copyright (c) 2016 - Carl Spain. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +38,8 @@ import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,13 +64,13 @@ import mekhq.campaign.event.OptionsChangedEvent;
  *
  * @author Neoancient
  */
-public class RATManager extends AbstractUnitGenerator implements IUnitGenerator {
+public class RATManager extends AbstractUnitGenerator {
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
-    private Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
-    private ArrayList<String> selectedCollections;
+    private final Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
+    private final ArrayList<String> selectedCollections;
 
     private static Map<String, List<Integer>> allCollections = null;
-    private static Map<String, String> fileNames = new HashMap<>();
+    private static final Map<String, String> fileNames = new HashMap<>();
 
     private boolean canIgnoreEra = false;
 
@@ -330,7 +333,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
 
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction.getAlternativeFactionCodes() != null) {
-            final List<String> alternativeFactionCodes = Arrays.asList(faction.getAlternativeFactionCodes());
+            final List<String> alternativeFactionCodes = new ArrayList<>(Arrays.asList(faction.getAlternativeFactionCodes()));
             while (!alternativeFactionCodes.isEmpty()) {
                 factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
@@ -347,64 +350,48 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
      */
     @Override
-    public boolean isSupportedUnitType(int unitType) {
-        return unitType == UnitType.MEK
-                || unitType == UnitType.TANK
-                || unitType == UnitType.AERO
-                || unitType == UnitType.DROPSHIP
-                || unitType == UnitType.INFANTRY
-                || unitType == UnitType.BATTLE_ARMOR
-                || unitType == UnitType.PROTOMEK;
-    }
-
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int)
-     */
-    @Override
-    public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality) {
-        return generate(faction, unitType, weightClass, year, quality, null);
+    public boolean isSupportedUnitType(final int unitType) {
+        return (unitType == UnitType.MEK)
+                || (unitType == UnitType.TANK)
+                || (unitType == UnitType.AERO)
+                || (unitType == UnitType.DROPSHIP)
+                || (unitType == UnitType.INFANTRY)
+                || (unitType == UnitType.BATTLE_ARMOR)
+                || (unitType == UnitType.PROTOMEK);
     }
 
     /* (non-Javadoc)
      * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
      */
     @Override
-    public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality, Predicate<MechSummary> filter) {
-        List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality, filter);
-        if (list.size() > 0) {
-            return list.get(0);
-        }
-        return null;
+    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+                                          final int year, final int quality, @Nullable Predicate<MechSummary> filter) {
+        final List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality, filter);
+        return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
-    public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes, Predicate<MechSummary> filter) {
-        List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
-        if (list.size() > 0) {
-            return list.get(0);
-        }
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int)
-     */
-    @Override
-    public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality) {
-        return generate(count, faction, unitType, weightClass, year, quality, null);
+    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+                                          final int year, final int quality,
+                                          final Collection<EntityMovementMode> movementModes,
+                                          final Collection<MissionRole> missionRoles,
+                                          @Nullable Predicate<MechSummary> filter) {
+        final List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
+        return list.isEmpty() ? null : list.get(0);
     }
 
     /* (non-Javadoc)
      * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int, java.util.function.Predicate)
      */
     @Override
-    public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality, Predicate<MechSummary> filter) {
-        RAT rat = findRAT(faction, unitType, weightClass, year, quality);
+    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+                                      final int year, final int quality, @Nullable Predicate<MechSummary> filter) {
+        final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (unitType == UnitType.TANK) {
-                filter = filter != null ? filter.and(RATManager::isTank) : RATManager::isTank;
+                filter = (filter != null) ? filter.and(RATManager::isTank) : RATManager::isTank;
             } else if (unitType == UnitType.VTOL) {
-                filter = filter != null ? filter.and(RATManager::isVTOL) : RATManager::isVTOL;
+                filter = (filter != null) ? filter.and(RATManager::isVTOL) : RATManager::isVTOL;
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
@@ -420,23 +407,33 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     }
 
     @Override
-    public List<MechSummary> generate(int count, String faction, int unitType,
-            int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes,
-            Predicate<MechSummary> filter) {
-        RAT rat = findRAT(faction, unitType, weightClass, year, quality);
+    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+                                      final int year, final int quality,
+                                      final Collection<EntityMovementMode> movementModes,
+                                      final Collection<MissionRole> missionRoles,
+                                      @Nullable Predicate<MechSummary> filter) {
+        final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (!movementModes.isEmpty()) {
-                Predicate<MechSummary> moveFilter = ms ->
-                    movementModes.contains(EntityMovementMode.getMode(ms.getUnitSubType()));
-                if (filter == null) {
-                    filter = moveFilter;
-                } else {
-                    filter = filter.and(moveFilter);
-                }
+                final Predicate<MechSummary> moveFilter = ms ->
+                        movementModes.contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
+                filter = (filter == null) ? moveFilter : filter.and(moveFilter);
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
+    }
+
+    /**
+     * Generates a single unit, for the given faction, using the given set of parameters.
+     * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
+     * @param parameters data structure containing unit generation parameters
+     * @return Generated units. Null if none generated.
+     */
+    @Override
+    public @Nullable MechSummary generate(final UnitGeneratorParameters parameters) {
+        return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
+                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
     /**
@@ -447,20 +444,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      * @param parameters RATGenerator parameters (some are ignored)
      */
     @Override
-    public List<MechSummary> generate(int count, UnitGeneratorParameters parameters) {
+    public List<MechSummary> generate(final int count, final UnitGeneratorParameters parameters) {
         return generate(count, parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
-                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
-    }
-
-    /**
-     * Generates a single unit, for the given faction, using the given set of parameters.
-     * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
-     * @param parameters data structure containing unit generation parameters
-     * @return Generated units. Null if none generated.
-     */
-    @Override
-    public MechSummary generate(UnitGeneratorParameters parameters) {
-        return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
                 parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
@@ -481,7 +466,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                MekHQ.getLogger().error(RATManager.class, "name attribute missing");
+                MekHQ.getLogger().error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();

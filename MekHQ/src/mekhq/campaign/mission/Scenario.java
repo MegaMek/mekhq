@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -127,12 +128,12 @@ public class Scenario implements Serializable {
         this.status = status;
     }
 
-    public void setDate(LocalDate d) {
-        this.date = d;
+    public @Nullable LocalDate getDate() {
+        return date;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public void setDate(final @Nullable LocalDate date) {
+        this.date = date;
     }
 
     public boolean hasObjectives() {
@@ -341,7 +342,7 @@ public class Scenario implements Serializable {
         if (null != date) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         }
-        
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "cloaked", isCloaked());
     }
 

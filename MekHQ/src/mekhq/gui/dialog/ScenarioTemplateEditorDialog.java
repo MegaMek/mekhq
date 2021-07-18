@@ -976,7 +976,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         panForceList.removeAll();
 
         if(forceScrollPane != null) {
-            forceScrollPane.setVisible(!scenarioTemplate.scenarioForces.isEmpty());
+            forceScrollPane.setVisible(!scenarioTemplate.getScenarioForces().isEmpty());
         }
 
         gbc.gridy++;
@@ -1059,7 +1059,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 0;
 
-        List<ScenarioForceTemplate> forceTemplateList = new ArrayList<>(scenarioTemplate.scenarioForces.values());
+        List<ScenarioForceTemplate> forceTemplateList = new ArrayList<>(scenarioTemplate.getAllScenarioForces());
         Collections.sort(forceTemplateList);
 
         for(ScenarioForceTemplate sft : forceTemplateList) {
@@ -1232,7 +1232,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             sft.setDeploymentZones(deploymentZones);
         }
 
-        scenarioTemplate.scenarioForces.put(txtForceName.getText(), sft);
+        scenarioTemplate.getScenarioForces().put(txtForceName.getText(), sft);
 
         updateForceSyncList();
         syncDeploymentChangeHandler();
@@ -1304,7 +1304,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void deleteForceButtonHandler(String command) {
         String forceIndex = command.substring(REMOVE_FORCE_COMMAND.length());
-        scenarioTemplate.scenarioForces.remove(forceIndex);
+        scenarioTemplate.getScenarioForces().remove(forceIndex);
 
         updateForceSyncList();
         renderForceList();
@@ -1318,7 +1318,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void editForceButtonHandler(String command) {
         String forceIndex = command.substring(EDIT_FORCE_COMMAND.length());
-        loadForce(scenarioTemplate.scenarioForces.get(forceIndex));
+        loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
     }
 
     /**
@@ -1327,7 +1327,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void updateForceSyncList() {
         cboSyncForceName.removeAllItems();
-        for(String forceID : scenarioTemplate.scenarioForces.keySet()) {
+        for(String forceID : scenarioTemplate.getScenarioForces().keySet()) {
             cboSyncForceName.addItem(forceID);
         }
 
@@ -1522,7 +1522,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void toggleForcePanelVisibility() {
         forcedPanel.setVisible(!forcedPanel.isVisible());
-        forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.scenarioForces.isEmpty());
+        forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.getScenarioForces().isEmpty());
     }
 
     private void removeObjective() {

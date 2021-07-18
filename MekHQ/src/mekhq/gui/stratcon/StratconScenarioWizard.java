@@ -22,7 +22,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -473,31 +472,22 @@ public class StratconScenarioWizard extends JDialog {
                     }
                 }
 
-                currentScenario.addForce(force.getId(), templateID);
-                force.setScenarioId(currentScenario.getBackingScenarioID());
-                MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario.getBackingScenario()));
+                currentScenario.addForce(force, templateID);
             }
         }
 
         for (String templateID : availableUnitLists.keySet()) {
             for (Unit unit : availableUnitLists.get(templateID).getSelectedValuesList()) {
-                currentScenario.addUnit(unit.getId(), templateID);
-                unit.setScenarioId(currentScenario.getBackingScenarioID());
-                MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
+                currentScenario.addUnit(unit, templateID, false);
             }
         }
 
         for (Unit unit : availableInfantryUnits.getSelectedValuesList()) {
-            currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
-            unit.setScenarioId(currentScenario.getBackingScenarioID());
-            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
+            currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, false);
         }
 
         for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
-            currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
-            unit.setScenarioId(currentScenario.getBackingScenarioID());
-            currentScenario.useLeadershipPoint();
-            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
+            currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, true);
         }
 
         // every force that's been deployed to this scenario gets assigned to the track

@@ -335,7 +335,7 @@ public class CampaignXmlParser {
 
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(retVal.getCamouflage());
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         // We need to do a post-process pass to restore a number of references.

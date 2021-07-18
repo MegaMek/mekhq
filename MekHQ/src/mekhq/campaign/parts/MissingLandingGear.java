@@ -32,6 +32,8 @@ import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
+import java.util.StringJoiner;
+
 import org.w3c.dom.Node;
 
 /**
@@ -79,19 +81,24 @@ public class MissingLandingGear extends MissingPart {
         if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
             // Landing Gear is installed in the CT and both Side Torsos,
             // make sure they're not missing.
+            StringJoiner missingLocs = new StringJoiner(", ");
             for (Part part : unit.getParts()) {
                 if (part instanceof MissingMekLocation) {
                     // The CT cannot be scrapped, so that check is elided.
                     switch (part.getLocation()) {
                         case Mech.LOC_LT:
-                            return "Cannot reinstall landing gear with a missing Left Torso.";
                         case Mech.LOC_RT:
-                            return "Cannot reinstall landing gear with a missing Right Torso.";
+                            missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
+                            break;
                         default:
                             break;
                     }
                 }
             }
+    
+            return missingLocs.length() == 0 
+                    ? null 
+                    : "Cannot reinstall landing gear when missing: " + missingLocs;
         }
         return null;
     }
