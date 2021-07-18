@@ -75,7 +75,7 @@ public class JSuggestField extends JTextField {
 	 * */
 	private String lastChosenExistingVariable;
 
-	/** Listeners, fire event when a selection as occured */
+	/** Listeners, fire event when a selection as occurred */
 	private LinkedList<ActionListener> listeners;
 
 	/**
@@ -86,9 +86,9 @@ public class JSuggestField extends JTextField {
 	 */
 	public JSuggestField(Window owner) {
 		super();
-		data = new Vector<String>();
-		suggestions = new Vector<String>();
-		listeners = new LinkedList<ActionListener>();
+		data = new Vector<>();
+		suggestions = new Vector<>();
+		listeners = new LinkedList<>();
 		owner.addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -170,7 +170,7 @@ public class JSuggestField extends JTextField {
 		d.setUndecorated(true);
 		d.setFocusableWindowState(false);
 		d.setFocusable(false);
-		list = new JList<String>();
+		list = new JList<>();
 		list.addMouseListener(new MouseListener() {
 			private int selected;
 
@@ -182,8 +182,8 @@ public class JSuggestField extends JTextField {
 			public void mouseReleased(MouseEvent e) {
 				if (selected == list.getSelectedIndex()) {
 					// provide double-click for selecting a suggestion
-					setText((String) list.getSelectedValue());
-					lastChosenExistingVariable = list.getSelectedValue().toString();
+					setText(list.getSelectedValue());
+					lastChosenExistingVariable = list.getSelectedValue();
 					fireActionEvent();
 					d.setVisible(false);
 				}
@@ -232,10 +232,10 @@ public class JSuggestField extends JTextField {
 					list.setSelectedIndex(list.getSelectedIndex() - 1);
 					list.ensureIndexIsVisible(list.getSelectedIndex() - 1);
 					return;
-				} else if (e.getKeyCode() == KeyEvent.VK_ENTER
-						&& list.getSelectedIndex() != -1 && suggestions.size() > 0) {
-					setText((String) list.getSelectedValue());
-					lastChosenExistingVariable = list.getSelectedValue().toString();
+				} else if ((e.getKeyCode() == KeyEvent.VK_ENTER)
+						&& (list.getSelectedIndex() != -1) && !suggestions.isEmpty()) {
+					setText(list.getSelectedValue());
+					lastChosenExistingVariable = list.getSelectedValue();
 					fireActionEvent();
 					d.setVisible(false);
 					return;
@@ -282,7 +282,7 @@ public class JSuggestField extends JTextField {
 	 *
 	 * @return Vector containing Strings
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings(value = "unchecked")
 	public Vector<String> getSuggestData() {
 		return (Vector<String>) data.clone();
 	}
@@ -361,8 +361,8 @@ public class JSuggestField extends JTextField {
 			location = getLocationOnScreen();
 			location.y += getHeight();
 			d.setLocation(location);
-		} catch (IllegalComponentStateException e) {
-			return; // might happen on window creation
+		} catch (IllegalComponentStateException ignored) {
+
 		}
 	}
 
@@ -397,24 +397,23 @@ public class JSuggestField extends JTextField {
 					}
 				}
 				setFont(regular);
-				if (suggestions.size() > 0) {
+				if (suggestions.isEmpty()) {
+                    d.setVisible(false);
+                } else {
 					list.setListData(suggestions);
 					list.setSelectedIndex(0);
 					list.ensureIndexIsVisible(0);
 					d.setVisible(true);
-				} else {
-					d.setVisible(false);
 				}
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 				// Despite all precautions, external changes have occurred.
 				// Let the new thread handle it...
-				return;
 			}
 		}
 	}
 
 	/**
-	 * Adds a listener that notifies when a selection has occured
+	 * Adds a listener that notifies when a selection has occurred
 	 * @param listener
 	 * 			ActionListener to use
 	 */
