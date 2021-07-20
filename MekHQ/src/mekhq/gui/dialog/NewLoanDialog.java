@@ -542,7 +542,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void refreshValues() {
-        final String METHOD_NAME = "refreshValues";
         try {
             txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
             lblAPR.setText(loan.getInterestRate() + "%");
@@ -556,7 +555,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            MekHQ.getLogger().error(NewLoanDialog.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 

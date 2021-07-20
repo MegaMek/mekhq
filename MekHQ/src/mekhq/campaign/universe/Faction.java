@@ -49,6 +49,8 @@ import mekhq.Utilities;
  */
 public class Faction {
     //region Variable Declarations
+    public static final String DEFAULT_CODE = "???";
+
     private String shortName;
     private String fullName;
     private NavigableMap<Integer, String> nameChanges = new TreeMap<>();
@@ -67,7 +69,7 @@ public class Faction {
 
     //region Constructors
     public Faction() {
-        this("???", "Unknown");
+        this(DEFAULT_CODE, "Unknown");
     }
 
     public Faction(final String shortName, final String fullName) {

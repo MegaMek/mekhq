@@ -265,7 +265,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         }
-                        if (!cantTech.equals("")) {
+
+                        if (!cantTech.isBlank()) {
                             cantTech += "You will need to assign a tech manually.";
                             JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                         }

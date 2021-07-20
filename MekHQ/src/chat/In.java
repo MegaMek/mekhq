@@ -58,7 +58,7 @@ public final class In {
             scanner = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "In", "Could not open " + socket);
+            MekHQ.getLogger().error("Could not open " + socket);
         }
     }
 
@@ -72,7 +72,7 @@ public final class In {
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "In", "Could not open " + url);
+            MekHQ.getLogger().error("Could not open " + url);
         }
     }
 
@@ -84,7 +84,7 @@ public final class In {
             scanner = new Scanner(file, charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "In", "Could not open " + file);
+            MekHQ.getLogger().error("Could not open " + file);
         }
     }
 
@@ -114,7 +114,7 @@ public final class In {
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "In", "Could not open " + s);
+            MekHQ.getLogger().error("Could not open " + s);
         }
     }
 

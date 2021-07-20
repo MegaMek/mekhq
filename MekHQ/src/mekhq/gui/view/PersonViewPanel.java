@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -300,7 +300,7 @@ public class PersonViewPanel extends JScrollablePanel {
         Collections.reverse(awards);
 
         int i = 0;
-        Box rowRibbonsBox = null;
+        Box rowRibbonsBox = Box.createHorizontalBox();
         ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
 
         for (Award award : awards) {
@@ -1010,7 +1010,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.getAccessibleContext().getAccessibleRelationSet().add(
                         new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
-                    
+
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1085,7 +1085,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.getAccessibleContext().getAccessibleRelationSet().add(
                         new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
-                    
+
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
                         @Override

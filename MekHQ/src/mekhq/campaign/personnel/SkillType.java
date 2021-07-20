@@ -399,7 +399,7 @@ public class SkillType implements Serializable {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
@@ -425,21 +425,16 @@ public class SkillType implements Serializable {
 
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             MekHQ.getLogger().error(ex);
         }
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
-        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SkillType>)";
-
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
@@ -465,10 +460,7 @@ public class SkillType implements Serializable {
 
             hash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
