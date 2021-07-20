@@ -224,8 +224,7 @@ public class CampaignExportWizard extends JDialog {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error(getClass(), "display",
-                                    "Failed to export campaign to new campaign file");
+                            MekHQ.getLogger().error("Failed to export campaign to new campaign file");
                         }
                         setVisible(false);
                     }
@@ -238,8 +237,7 @@ public class CampaignExportWizard extends JDialog {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error(getClass(), "display",
-                                    "Failed to export campaign to existing campaign file");
+                            MekHQ.getLogger().error("Failed to export campaign to existing campaign file");
                         }
                         setVisible(false);
                     }
@@ -468,16 +466,13 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.cleanUp();
                 fis.close();
             } catch (NullEntityException ex) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
+                MekHQ.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "The campaign file could not be loaded.\nPlease check the log file for details.");
+                MekHQ.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");
                 return false;
             } catch (OutOfMemoryError e) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
+                MekHQ.getLogger().error("MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
                 return false;
             }
         }

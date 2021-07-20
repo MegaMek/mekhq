@@ -24,13 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
@@ -47,7 +41,6 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
@@ -61,7 +54,7 @@ import mekhq.campaign.unit.Unit;
  */
 public class AtBGameThread extends GameThread {
 
-    AtBScenario scenario;
+    private final AtBScenario scenario;
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario) {
@@ -71,7 +64,7 @@ public class AtBGameThread extends GameThread {
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario, boolean started) {
         super(name, password, c, app, units, started);
-        this.scenario = scenario;
+        this.scenario = Objects.requireNonNull(scenario);
     }
 
     // String tokens for dialog boxes used for transport loading
@@ -79,7 +72,7 @@ public class AtBGameThread extends GameThread {
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
     private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
-    
+
     public static final int CLIENT_RETRY_COUNT = 1000;
 
 
@@ -132,8 +125,7 @@ public class AtBGameThread extends GameThread {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if ((scenario != null) &&
-                        scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
@@ -240,7 +232,7 @@ public class AtBGameThread extends GameThread {
                         entity.setForceString(force.getFullMMName());
                     }
                     entities.add(entity);
-                    
+
                     // if we've swapped this entity in for a bot-controlled unit, copy the bot controlled unit's
                     // deployment parameters to this entity.
                     if ((scenario instanceof AtBDynamicScenario) &&
@@ -332,9 +324,7 @@ public class AtBGameThread extends GameThread {
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
-                    if (scenario != null) {
-                        loadTransports(scenario, botClient, bf);
-                    }
+                    loadTransports(scenario, botClient, bf);
                 }
 
                 // All player and bot units have been added to the lobby
@@ -437,7 +427,7 @@ public class AtBGameThread extends GameThread {
             MekHQ.getLogger().error(e);
         }
     }
-    
+
     /**
      * Handles loading transported units onto their transports once a megamek scenario has actually started;
      */
@@ -454,13 +444,13 @@ public class AtBGameThread extends GameThread {
             try {
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
             } catch (Exception ignored) {
-                
+
             }
-            
+
             retryCount++;
             entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         }
-        
+
         List<Entity> clientEntities = client.getEntitiesVector();
         // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
         for (Entity entity : clientEntities) {
@@ -487,7 +477,7 @@ public class AtBGameThread extends GameThread {
             }
         }
     }
-    
+
     /**
      * Utility function to copy some deployment parameters between source and destination entities
      */

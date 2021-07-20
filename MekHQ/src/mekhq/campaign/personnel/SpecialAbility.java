@@ -399,21 +399,17 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
-        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
-
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
@@ -453,29 +449,25 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
     public static void initializeSPA() {
-        final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
         specialAbilities = new Hashtable<>();
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
+        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 

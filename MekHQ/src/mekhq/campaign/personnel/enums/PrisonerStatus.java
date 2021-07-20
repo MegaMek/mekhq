@@ -115,8 +115,7 @@ public enum PrisonerStatus {
 
         }
 
-        MekHQ.getLogger().error(PrisonerStatus.class, "parseFromString",
-                    "Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+        MekHQ.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
 
         return FREE;
     }

@@ -2564,7 +2564,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void mothball(Unit u) {
         if (u.isMothballed()) {
-            MekHQ.getLogger().warning(Campaign.class, "mothball(Unit)", "Unit is already mothballed, cannot mothball.");
+            MekHQ.getLogger().warning("Unit is already mothballed, cannot mothball.");
             return;
         }
 
@@ -2611,7 +2611,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void activate(Unit u) {
         if (!u.isMothballed()) {
-            MekHQ.getLogger().warning(Campaign.class, "activate(Unit)", "Unit is already activated, cannot activate.");
+            MekHQ.getLogger().warning("Unit is already activated, cannot activate.");
             return;
         }
 
@@ -4104,9 +4104,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "kills");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "skillTypes");
-        for (String name : SkillType.skillList) {
-            SkillType type = SkillType.getType(name);
-            if (null != type) {
+        for (final String skillName : SkillType.skillList) {
+            final SkillType type = SkillType.getType(skillName);
+            if (type != null) {
                 type.writeToXml(pw1, indent + 1);
             }
         }
