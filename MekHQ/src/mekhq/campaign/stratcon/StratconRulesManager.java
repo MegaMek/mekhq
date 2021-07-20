@@ -1422,9 +1422,14 @@ public class StratconRulesManager {
 
         // first, we check if this scenario is associated with any specific scenario objectives
         StratconStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
-        if (victory && (specificObjective != null) &&
+        if ((specificObjective != null) &&
                 (specificObjective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory)) {
-            specificObjective.incrementCurrentObjectiveCount();
+            
+            if (victory) {
+                specificObjective.incrementCurrentObjectiveCount();
+            } else {
+                specificObjective.setCurrentObjectiveCount(StratconStrategicObjective.OBJECTIVE_FAILED);
+            }
         }
 
         // "any scenario victory" is not linked to any specific coordinates, so we have to
@@ -1542,6 +1547,12 @@ public class StratconRulesManager {
                     if (closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords()
                                 .translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
+                        
+                        boolean objectiveMoved = track.moveObjective(scenario.getCoords(), newCoords);
+                        if (!objectiveMoved) {
+                            track.failObjective(scenario.getCoords());
+                        }
+                        
                         scenario.setCoords(newCoords);
 
                         int daysForward = Math.max(1, track.getDeploymentTime());
@@ -1563,6 +1574,7 @@ public class StratconRulesManager {
                         scenario.setCurrentState(ScenarioState.UNRESOLVED);
                         return false;
                     } else {
+                        track.failObjective(scenario.getCoords());
                         // TODO: if there's no allied facilities here, add its forces to track
                         // reinforcement pool
                         return true;

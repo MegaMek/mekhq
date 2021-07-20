@@ -377,6 +377,34 @@ public class StratconTrackState {
     }
     
     /**
+     * Moves a strategic objectives from the source to the destination coordinates.
+     * @return True if the operation succeeded, false if it failed
+     */
+    public boolean moveObjective(StratconCoords source, StratconCoords destination) {
+        // safety: don't move it if it's not there; logic prevents two objectives in the same coords
+        if (getObjectivesByCoords().containsKey(source) &&
+                !getObjectivesByCoords().containsKey(destination)) {
+            StratconStrategicObjective objective = getObjectivesByCoords().get(source);
+            // gotta get the cache
+            getObjectivesByCoords().remove(source);
+            getObjectivesByCoords().put(destination, objective);
+            objective.setObjectiveCoords(destination);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Convenience method to fail an objective at the given coordinates.
+     */
+    public void failObjective(StratconCoords coords) {
+        if (getObjectivesByCoords().containsKey(coords)) {
+            getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratconStrategicObjective.OBJECTIVE_FAILED);
+        }
+    }
+    
+    /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
     public boolean isForceDeployed(int forceID) {

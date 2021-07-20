@@ -917,9 +917,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 for (final Mission mission : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
-                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                        if (scenario.isCloaked()
+                                || (gui.getCampaign().getCampaignOptions().getUseAtB()
                                 && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign())) {
+                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign()))) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());

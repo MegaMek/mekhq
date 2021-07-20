@@ -304,14 +304,17 @@ public class StratconTab extends CampaignGuiTab {
                 boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
                 boolean displayCoordinateData = objective.getObjectiveCoords() != null;
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
+                boolean objectiveFailed = objective.isObjectiveFailed(track);
 
                 if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
                         !campaignState.allowEarlyVictory()) {
-                    sb.append("<span>");
+                    sb.append("<span>o");
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='green'>");                    
+                    sb.append("<span color='green'>&#10003; ");                    
+                } else if (objectiveFailed) {
+                    sb.append("<span color='red'>x ");
                 } else {
-                    sb.append("<span color='red'>");
+                    sb.append("<span color='orange'>o ");
                 }
 
                 if (!coordsRevealed && displayCoordinateData) {
