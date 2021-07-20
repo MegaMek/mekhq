@@ -21,6 +21,7 @@ VERSION HISTORY:
 + PR #2744: Mass Mothball Dialog: Fixing IndexOutOfBoundsException with no techs for a unit type
 + PR #2745: Fixing Two AtB Scenario View Panel NPEs
 + PR #2725: StratCon campaign state management: GM Tool to add VP/SP; Ability to convert VP to SP manually; Ability to convert SP to bonus parts; GM mode viewing of current track's "scenario spawn odds".
++ PR #2751: Fixing Astech Divide By Zero Errors
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
