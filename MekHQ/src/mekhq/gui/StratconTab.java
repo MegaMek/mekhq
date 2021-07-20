@@ -48,6 +48,10 @@ import mekhq.campaign.stratcon.StratconTrackState;
 public class StratconTab extends CampaignGuiTab {
     private static final long serialVersionUID = 8179754409939346465L;
 
+    private static final String OBJECTIVE_FAILED = "x";
+    private static final String OBJECTIVE_COMPLETED = "&#10003;";
+    private static final String OBJECTIVE_IN_PROGRESS = "o";
+    
     private StratconPanel stratconPanel;
     private JPanel infoPanel;
     private JComboBox<TrackDropdownItem> cboCurrentTrack;
@@ -291,6 +295,8 @@ public class StratconTab extends CampaignGuiTab {
     private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
 
+        boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
+        
         // loop through all tracks
         // for each track, loop through all objectives
         // for each objective, grab the coordinates
@@ -306,16 +312,19 @@ public class StratconTab extends CampaignGuiTab {
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
                 boolean objectiveFailed = objective.isObjectiveFailed(track);
 
+                // special case: allied facilities can get lost at any point in time
                 if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
                         !campaignState.allowEarlyVictory()) {
-                    sb.append("<span>o");
+                    sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='green'>&#10003; ");                    
+                    sb.append("<span color='green'>").append(OBJECTIVE_COMPLETED);                    
                 } else if (objectiveFailed) {
-                    sb.append("<span color='red'>x ");
+                    sb.append("<span color='red'>").append(OBJECTIVE_FAILED);
                 } else {
-                    sb.append("<span color='orange'>o ");
+                    sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
                 }
+                
+                sb.append(" ");
 
                 if (!coordsRevealed && displayCoordinateData) {
                     sb.append("Locate and ");
@@ -357,14 +366,16 @@ public class StratconTab extends CampaignGuiTab {
         }
 
         // special case text reminding player to complete required scenarios
-        if (!campaignState.getContract().getCommandRights().isIndependent()) {
-            if (campaignState.getVictoryPoints() > 0) {
-                sb.append("<span color='green'>");
+        if (!campaignState.getContract().getCommandRights().isIndependent()) {            
+            if (contractIsActive) {
+                sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
+            } else if (campaignState.getVictoryPoints() > 0) {
+                sb.append("<span color='green'>").append(OBJECTIVE_COMPLETED);
             } else {
-                sb.append("<span color='red'>");
+                sb.append("<span color='red'>").append(OBJECTIVE_FAILED);
             }
 
-            sb.append("Maintain victory point count above 0 by completing required scenarios")
+            sb.append(" Maintain victory point count above 0 by completing required scenarios")
                 .append("</span><br/>");
         }
 
