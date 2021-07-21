@@ -4238,6 +4238,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        addPilotOrSoldier(p, useTransfers, null);
+    }
+
+    public void addPilotOrSoldier(Person p, boolean useTransfers, Unit oldUnit) {
         Objects.requireNonNull(p);
 
         ensurePersonIsRegistered(p);
@@ -4250,8 +4254,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(oldUnit), getCampaign().getForceFor(this));
         } else {
             ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.addedToTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4279,8 +4287,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             resetPilotAndEntity();
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
         }
+
         if (log) {
             ServiceLogger.removedFrom(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFromTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
     }
 
@@ -4304,19 +4315,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.scenarioId = i;
     }
 
-    public ArrayList<Person> getCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
-        for (Person p : drivers) {
-            crew.add(p);
-        }
+    public List<Person> getCrew() {
+        List<Person> crew = new ArrayList<>(drivers);
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (Person p : gunners) {
-                crew.add(p);
-            }
+            crew.addAll(gunners);
         }
-        for (Person p : vesselCrew) {
-            crew.add(p);
-        }
+        crew.addAll(vesselCrew);
         if (navigator != null) {
             crew.add(navigator);
         }
@@ -4556,17 +4560,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     //endregion Mothballing/Activation
 
-    public ArrayList<Person> getActiveCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
+    public List<Person> getActiveCrew() {
+        List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
-            if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
+            if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                 continue;
             }
             crew.add(p);
         }
+
         if (!usesSoloPilot() && !usesSoldiers()) {
             for (Person p : gunners) {
-                if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
+                if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                     continue;
                 }
                 crew.add(p);

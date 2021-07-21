@@ -217,6 +217,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseExtendedTOEForceName;
 
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
@@ -3671,6 +3672,10 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
 
+        chkUseExtendedTOEForceName = new JCheckBox(resources.getString("chkUseExtendedTOEForceName.text"));
+        chkUseExtendedTOEForceName.setToolTipText(resources.getString("chkUseExtendedTOEForceName.toolTipText"));
+        chkUseExtendedTOEForceName.setName("chkUseExtendedTOEForceName ");
+
         // Layout the Panel
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -3693,6 +3698,7 @@ public class CampaignOptionsDialog extends JDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
         );
 
         layout.setHorizontalGroup(
@@ -3707,6 +3713,7 @@ public class CampaignOptionsDialog extends JDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
         );
 
         return panel;
@@ -4835,6 +4842,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseImplants.setSelected(options.useImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
+        chkUseExtendedTOEForceName.setSelected(options.isUseExtendedTOEForceName());
 
         // Expanded Personnel Information
         if (chkUseTimeInService.isSelected() != options.getUseTimeInService()) {
@@ -5423,6 +5431,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setUseExtendedTOEForceName(chkUseExtendedTOEForceName.isSelected());
 
         // Expanded Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());

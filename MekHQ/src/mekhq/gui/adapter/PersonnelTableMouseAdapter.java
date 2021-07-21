@@ -333,7 +333,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                 }
                 if (null != u) {
-                    u.addPilotOrSoldier(selectedPerson, useTransfers);
+                    u.addPilotOrSoldier(selectedPerson, useTransfers, oldUnit);
                     u.resetPilotAndEntity();
                     u.runDiagnostic(false);
                 }
@@ -352,7 +352,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 oldUnit.remove(p, transferLog);
                                 useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                             }
-                            u.addPilotOrSoldier(p, useTransfers);
+                            u.addPilotOrSoldier(p, useTransfers, oldUnit);
                         }
                     }
 

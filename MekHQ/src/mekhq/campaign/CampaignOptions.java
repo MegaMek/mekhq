@@ -180,6 +180,7 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useTransfers;
+    private boolean useExtendedTOEForceName;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -524,6 +525,7 @@ public class CampaignOptions implements Serializable {
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseTransfers(true);
+        setUseExtendedTOEForceName(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -980,6 +982,14 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
+    }
+
+    public boolean isUseExtendedTOEForceName() {
+        return useExtendedTOEForceName;
+    }
+
+    public void setUseExtendedTOEForceName(final boolean useExtendedTOEForceName) {
+        this.useExtendedTOEForceName = useExtendedTOEForceName;
     }
     //endregion General Personnel
 
@@ -3128,6 +3138,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -3581,6 +3592,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                     retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedTOEForceName")) {
+                    retVal.setUseExtendedTOEForceName(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
