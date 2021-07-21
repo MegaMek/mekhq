@@ -390,9 +390,9 @@ public class StratconTrackState {
             getObjectivesByCoords().put(destination, objective);
             objective.setObjectiveCoords(destination);
             return true;
+        } else {        
+            return false;
         }
-        
-        return false;
     }
     
     /**

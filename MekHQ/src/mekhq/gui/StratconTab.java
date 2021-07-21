@@ -295,8 +295,6 @@ public class StratconTab extends CampaignGuiTab {
     private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
 
-        boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
-        
         // loop through all tracks
         // for each track, loop through all objectives
         // for each objective, grab the coordinates
@@ -366,7 +364,9 @@ public class StratconTab extends CampaignGuiTab {
         }
 
         // special case text reminding player to complete required scenarios
-        if (!campaignState.getContract().getCommandRights().isIndependent()) {            
+        if (!campaignState.getContract().getCommandRights().isIndependent()) {
+            boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
+            
             if (contractIsActive) {
                 sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
             } else if (campaignState.getVictoryPoints() > 0) {

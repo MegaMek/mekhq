@@ -72,25 +72,25 @@ public class StratconStrategicObjective {
 
     public boolean isObjectiveFailed(StratconTrackState trackState) {
         switch (getObjectiveType()) {
-        case AnyScenarioVictory:
-        case SpecificScenarioVictory:
-            // you can fail this if the scenario goes away somehow
-            return getCurrentObjectiveCount() == OBJECTIVE_FAILED;
-        case AlliedFacilityControl:
-            // you can fail this by having the facility destroyed
-            StratconFacility alliedFacility = trackState.getFacility(getObjectiveCoords());
-            return alliedFacility == null;
-        case HostileFacilityControl:
-            // you can fail this by having the facility destroyed
-            StratconFacility hostileFacility = trackState.getFacility(getObjectiveCoords());
-            return hostileFacility == null;
-        case FacilityDestruction:
-            // you can't really permanently fail this
-            return false;
-        default:
-            // we shouldn't be here, but just in case
-            return false;
-    }
+            case AnyScenarioVictory:
+            case SpecificScenarioVictory:
+                // you can fail this if the scenario goes away somehow
+                return getCurrentObjectiveCount() == OBJECTIVE_FAILED;
+            case AlliedFacilityControl:
+                // you can fail this by having the facility destroyed
+                StratconFacility alliedFacility = trackState.getFacility(getObjectiveCoords());
+                return alliedFacility == null;
+            case HostileFacilityControl:
+                // you can fail this by having the facility destroyed
+                StratconFacility hostileFacility = trackState.getFacility(getObjectiveCoords());
+                return hostileFacility == null;
+            case FacilityDestruction:
+                // you can't really permanently fail this
+                return false;
+            default:
+                // we shouldn't be here, but just in case
+                return false;
+        }
     }
     
     /**
