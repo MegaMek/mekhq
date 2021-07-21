@@ -66,6 +66,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -855,7 +856,7 @@ public class CampaignGUI extends JPanel {
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
@@ -1315,8 +1316,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
-        umd.setVisible(true);
+        if (getCampaign().getUnitMarket().getMethod().isNone()) {
+            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+        } else {
+            new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
+        }
     }
 
     public void showShipSearch() {
@@ -1436,7 +1440,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuOptionsActionPerformed(final ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
@@ -1475,6 +1479,13 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
+        if (getCampaign().getCampaignOptions().getUnitMarketMethod() != unitMarket.getMethod()) {
+            getCampaign().setUnitMarket(getCampaign().getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+            getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
+            miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        }
+
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB(false);
@@ -1482,7 +1493,6 @@ public class CampaignGUI extends JPanel {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
             miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
@@ -2627,7 +2637,7 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(OptionsChangedEvent ev) {
+    public void handle(final OptionsChangedEvent evt) {
         if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
             removeStandardTab(GuiTabType.STRATCON);
         } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
@@ -2637,6 +2647,7 @@ public class CampaignGUI extends JPanel {
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
+        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
     @Subscribe

@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -42,6 +42,7 @@ import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
 import mekhq.Version;
+import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -54,7 +55,6 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
@@ -798,13 +798,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 for (int i = 0; i < Compute.d6() - 3; i++) {
                     addLance(enemyEntities, getContract(campaign).getEnemyCode(),
                             getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                            UnitMarket.getRandomWeight(UnitType.MEK, getContract(campaign).getEnemyCode(),
-                                campaign.getCampaignOptions().getRegionalMechVariations()),
+                            AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, getContract(campaign).getEnemy()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
             } else if (getLanceRole().isScouting()) {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
-                 * but only if not deploying by dropship.
+                 * but only if not deploying by DropShip.
                  */
                 alliesPlayer.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();

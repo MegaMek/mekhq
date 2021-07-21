@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,25 +19,52 @@
 package mekhq.campaign.market.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
+import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
 
 import java.util.ResourceBundle;
 
 public enum UnitMarketMethod {
     //region Enum Declarations
-    ATB_MONTHLY("UnitMarketMethod.ATB_MONTHLY.text");
+    NONE("UnitMarketMethod.NONE.text", "UnitMarketMethod.NONE.toolTipText"),
+    ATB_MONTHLY("UnitMarketMethod.ATB_MONTHLY.text", "UnitMarketMethod.ATB_MONTHLY.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            new EncodeControl());
+    private final String toolTipText;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    UnitMarketMethod(String name) {
+    UnitMarketMethod(final String name, final String toolTipText) {
         this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
+
+    //region Boolean Comparisons
+    public boolean isNone() {
+        return this == NONE;
+    }
+    //endregion Boolean Comparisons
+
+    public AbstractUnitMarket getUnitMarket() {
+        switch (this) {
+            case ATB_MONTHLY:
+                return new AtBMonthlyUnitMarket();
+            case NONE:
+            default:
+                return new EmptyUnitMarket();
+        }
+    }
 
     @Override
     public String toString() {

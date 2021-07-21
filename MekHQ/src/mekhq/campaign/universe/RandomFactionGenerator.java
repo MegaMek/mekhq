@@ -206,11 +206,16 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Selects a faction from those with a presence in the region weighted by number of systems controlled.
-     * Excludes Clan factions and non-faction place holders (unknown, abandoned, none).
+     * Selects a Faction from those with a presence in the region weighted by number of systems controlled.
+     * Excludes Clan Factions and non-faction place holders (unknown, abandoned, none).
      *
-     * @return A faction to use as the employer for a contract.
+     * @return A Faction to use as the employer for a contract.
      */
+    public @Nullable Faction getEmployerFaction() {
+        return buildEmployerMap().randomItem();
+    }
+
+    @Deprecated // TODO : Replace with the above method
     public String getEmployer() {
         WeightedIntMap<Faction> employers = buildEmployerMap();
         Faction f = employers.randomItem();
