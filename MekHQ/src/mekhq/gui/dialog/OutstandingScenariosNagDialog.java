@@ -41,7 +41,7 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
         return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
                 && campaign.getActiveAtBContracts(true).stream()
                         .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
-                                .anyMatch(scenario -> (scenario.getDate() != null)
+                                .anyMatch(scenario -> (scenario != null) && (scenario.getDate() != null)
                                         && scenario.getDate().isEqual(campaign.getLocalDate())));
     }
 }
