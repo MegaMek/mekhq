@@ -22,6 +22,11 @@ VERSION HISTORY:
 + PR #2745: Fixing Two AtB Scenario View Panel NPEs
 + PR #2725: StratCon campaign state management: GM Tool to add VP/SP; Ability to convert VP to SP manually; Ability to convert SP to bonus parts; GM mode viewing of current track's "scenario spawn odds".
 + PR #2751: Fixing Astech Divide By Zero Errors
++ PR #2756: StratCon
+	- Fix incorrect bot configuration in pursuit scenario that would cause it to bee-line for the opposite edge
+	- When objective scenarios move, they will take their objectives with them
+	- Strategic objective display improvement - colorcoding and symbols to indicate in-progress/complete/failed.
+	- Prevent phantom scenarios from showing up in TO&E deploy menu
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
