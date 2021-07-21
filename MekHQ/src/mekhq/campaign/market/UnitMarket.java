@@ -169,9 +169,9 @@ public class UnitMarket implements Serializable {
                 missionRoles.add(MissionRole.MIXED_ARTILLERY);
             }
 
-            MechSummary ms = campaign.getUnitGenerator().generate(faction, campaign.getGameYear(), unitType,
+            MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType,
                     getRandomWeight(unitType, faction, campaign.getCampaignOptions().getRegionalMechVariations()),
-                    quality, movementModes, missionRoles);
+                    campaign.getGameYear(), quality, movementModes, missionRoles);
             if (ms != null) {
                 if (campaign.getCampaignOptions().limitByYear()
                         && (campaign.getGameYear() < ms.getYear())) {

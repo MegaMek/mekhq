@@ -413,8 +413,7 @@ public class Finances implements Serializable {
                  * payment that has just been made.
                  */
                 campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                MekHQ.getLogger().error(getClass(), "payoutShares",
-                        "Attempted to payout share amount larger than the payment of the contract");
+                MekHQ.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
     }
@@ -515,7 +514,7 @@ public class Finances implements Serializable {
 
             report = transactions.size() + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
-            MekHQ.getLogger().info(this, "Error exporting finances to " + format);
+            MekHQ.getLogger().info("Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
 

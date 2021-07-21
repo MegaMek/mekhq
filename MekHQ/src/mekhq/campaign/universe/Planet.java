@@ -749,8 +749,7 @@ public class Planet implements Serializable {
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if (null == parentSystem) {
-        	MekHQ.getLogger().error(Planet.class, "getDistanceToJumpPoint",
-        			"reference to planet with no parent system");
+        	MekHQ.getLogger().error("reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
