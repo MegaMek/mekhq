@@ -879,17 +879,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        MekHQ.getLogger().debug(this, "Adding " + u.getName() + " to unit counts.");
+        MekHQ.getLogger().debug("Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            MekHQ.getLogger().debug(this, "Unit " + u.getName() + " is not an Entity.  Skipping.");
+            MekHQ.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = e.getUnitType();
-        MekHQ.getLogger().debug(this, "Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
-        //todo: Add Airship when Megamek supports it.
+        MekHQ.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
                 incrementMechCount();
@@ -900,7 +900,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                MekHQ.getLogger().debug(this, "Unit " + u.getName() + " weight is " + e.getWeight());
+                MekHQ.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {

@@ -1032,7 +1032,7 @@ public class CampaignXmlParser {
             }
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Game Option Nodes Complete!");
+        MekHQ.getLogger().info("Load Game Option Nodes Complete!");
     }
 
     /**
@@ -1044,7 +1044,7 @@ public class CampaignXmlParser {
      */
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" + File.separator + "mechfiles"
-                + File.separator + "customs";
+                + File.separator + "customs";  // TODO : Remove inline file path
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
@@ -1198,8 +1198,7 @@ public class CampaignXmlParser {
                             }
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(CampaignXmlParser.class, "Could not read entity from XML");
-                        MekHQ.getLogger().error(CampaignXmlParser.class, e);
+                        MekHQ.getLogger().error("Could not read entity from XML", e);
                     }
                 }
             }
@@ -1233,10 +1232,7 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("unit")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
                 MekHQ.getLogger().error("Unknown node type not loaded in Unit nodes: " + wn2.getNodeName());
-
                 continue;
             }
 
@@ -1266,10 +1262,7 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
                 MekHQ.getLogger().error("Unknown node type not loaded in Part nodes: " + wn2.getNodeName());
-
                 continue;
             }
 

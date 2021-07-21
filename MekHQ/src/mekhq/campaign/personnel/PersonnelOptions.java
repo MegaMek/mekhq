@@ -70,18 +70,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find L3Advantage group");
+            MekHQ.getLogger().warning("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find edge group");
+            MekHQ.getLogger().warning("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find augmentation (MD) group");
+            MekHQ.getLogger().warning("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 

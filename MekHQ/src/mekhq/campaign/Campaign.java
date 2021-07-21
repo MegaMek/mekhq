@@ -2557,7 +2557,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void mothball(Unit u) {
         if (u.isMothballed()) {
-            MekHQ.getLogger().warning(Campaign.class, "mothball(Unit)", "Unit is already mothballed, cannot mothball.");
+            MekHQ.getLogger().warning("Unit is already mothballed, cannot mothball.");
             return;
         }
 
@@ -2604,7 +2604,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void activate(Unit u) {
         if (!u.isMothballed()) {
-            MekHQ.getLogger().warning(Campaign.class, "activate(Unit)", "Unit is already activated, cannot activate.");
+            MekHQ.getLogger().warning("Unit is already activated, cannot activate.");
             return;
         }
 
@@ -4104,9 +4104,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "kills");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "skillTypes");
-        for (String name : SkillType.skillList) {
-            SkillType type = SkillType.getType(name);
-            if (null != type) {
+        for (final String skillName : SkillType.skillList) {
+            final SkillType type = SkillType.getType(skillName);
+            if (type != null) {
                 type.writeToXml(pw1, indent + 1);
             }
         }
@@ -4786,52 +4786,47 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
-    public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
-        Skill skill = tech.getSkillForWorkingOn(partWork);
+    public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
+        final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
-        if (null != partWork.getUnit() && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "This unit is not currently available!");
-        }
-        if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Already being worked on by another team");
-        }
-        if (null == skill) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Assigned tech does not have the right skills");
-        }
-        if (!getCampaignOptions().isDestroyByMargin()
-                && partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "Task is beyond this tech's skill level");
-        }
-        if (partWork.getSkillMin() > SkillType.EXP_ELITE) {
+
+        if ((partWork.getUnit() != null) && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
+        } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
+        } else if (skill == null) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
+        } else if (!getCampaignOptions().isDestroyByMargin()
+                && (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty))) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
+        } else if (partWork.getSkillMin() > SkillType.EXP_ELITE) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
-        }
-        if (!partWork.needsFixing() && !partWork.isSalvaging()) {
+        } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
+        } else if ((partWork instanceof MissingPart)
+                && (((MissingPart) partWork).findReplacement(false) == null)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
         }
-        if (partWork instanceof MissingPart
-                && null == ((MissingPart) partWork).findReplacement(false)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
+
+        final int techTime = isOvertimeAllowed() ? tech.getMinutesLeft() + tech.getOvertimeLeft()
+                : tech.getMinutesLeft();
+        if (!(partWork instanceof Refit) && (techTime <= 0)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
-        if (!(partWork instanceof Refit) && tech.getMinutesLeft() <= 0
-                && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
-        }
-        String notFixable = partWork.checkFixable();
-        if (null != notFixable) {
+
+        final String notFixable = partWork.checkFixable();
+        if (notFixable != null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
+
         // if this is an infantry refit, then automatic success
         if ((partWork instanceof Refit) && (partWork.getUnit() != null)
                 && partWork.getUnit().isConventionalInfantry()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
-        //if we are using the MoF rule, then we will ignore mode penalty here
-        //and instead assign it as a straight penalty
+        // If we are using the MoF rule, then we will ignore mode penalty here
+        // and instead assign it as a straight penalty
         if (getCampaignOptions().isDestroyByMargin()) {
             modePenalty = 0;
         }
@@ -4839,11 +4834,11 @@ public class Campaign implements Serializable, ITechManager {
         // this is ugly, if the mode penalty drops you to green, you drop two
         // levels instead of two
         int value = skill.getFinalSkillValue() + modePenalty;
-        if (modePenalty > 0
-                && SkillType.EXP_GREEN == (skill.getExperienceLevel() - modePenalty)) {
+        if ((modePenalty > 0)
+                && (SkillType.EXP_GREEN == (skill.getExperienceLevel() - modePenalty))) {
             value++;
         }
-        TargetRoll target = new TargetRoll(value,
+        final TargetRoll target = new TargetRoll(value,
                 SkillType.getExperienceLevelName(skill.getExperienceLevel() - modePenalty));
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
@@ -4855,37 +4850,38 @@ public class Campaign implements Serializable, ITechManager {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
-        boolean isOvertime = false;
+        final boolean isOvertime;
         if (isOvertimeAllowed()
                 && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
             isOvertime = true;
+        } else {
+            isOvertime = false;
         }
 
-        int minutes = Math.min(partWork.getTimeLeft(), tech.getMinutesLeft());
-        if (isOvertimeAllowed()) {
-            minutes = Math.min(minutes, tech.getMinutesLeft() + tech.getOvertimeLeft());
+        final int minutes = Math.min(partWork.getTimeLeft(), techTime);
+        if (minutes <= 0) {
+            MekHQ.getLogger().error("Attempting to get the target number for a part with zero time left.");
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
         }
+
         int helpMod;
-        if (null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
-            int hits;
-            if (null != partWork.getUnit().getEntity().getCrew()) {
-                hits = partWork.getUnit().getEntity().getCrew().getHits();
-            } else {
-                hits = 6;
-            }
-            helpMod = getShorthandedModForCrews(hits);
+        if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {
+            helpMod = getShorthandedModForCrews((partWork.getUnit().getEntity().getCrew() == null)
+                    ? MekHqConstants.ASTECH_TEAM_SIZE : partWork.getUnit().getEntity().getCrew().getHits());
         } else {
-            int helpers = getAvailableAstechs(minutes, isOvertime);
+            final int helpers = getAvailableAstechs(minutes, isOvertime);
             helpMod = getShorthandedMod(helpers, false);
             // we may have just gone overtime with our helpers
-            if (!isOvertime && astechPoolMinutes < (minutes * helpers)) {
+            if (!isOvertime && (astechPoolMinutes < (minutes * helpers))) {
                 target.addModifier(3, "overtime astechs");
             }
         }
+
         if (partWork.getShorthandedMod() > helpMod) {
             helpMod = partWork.getShorthandedMod();
         }
+
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
@@ -5298,30 +5294,32 @@ public class Campaign implements Serializable, ITechManager {
         return astechs;
     }
 
-    public int getAvailableAstechs(int minutes, boolean alreadyOvertime) {
-        int availableHelp = (int) Math.floor(((double) astechPoolMinutes)
-                / minutes);
-        if (isOvertimeAllowed() && availableHelp < 6) {
+    public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
+        if (minutes == 0) {
+            MekHQ.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
+            return 0;
+        }
+
+        int availableHelp = (int) Math.floor(((double) astechPoolMinutes) / minutes);
+        if (isOvertimeAllowed() && (availableHelp < MekHqConstants.ASTECH_TEAM_SIZE)) {
             // if we are less than fully staffed, then determine whether
             // we should dip into overtime or just continue as short-staffed
-            int shortMod = getShorthandedMod(availableHelp, false);
-            int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
-            int extraHelp = (remainingMinutes + astechPoolOvertime) / minutes;
-            int helpNeeded = 6 - availableHelp;
-            if (alreadyOvertime && shortMod > 0) {
+            final int shortMod = getShorthandedMod(availableHelp, false);
+            final int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
+            final int extraHelp = (remainingMinutes + astechPoolOvertime) / minutes;
+            final int helpNeeded = MekHqConstants.ASTECH_TEAM_SIZE - availableHelp;
+            if (alreadyOvertime && (shortMod > 0)) {
                 // then add whatever we can
                 availableHelp += extraHelp;
             } else if (shortMod > 3) {
                 // only dip in if we can bring ourselves up to full
                 if (extraHelp >= helpNeeded) {
-                    availableHelp = 6;
+                    availableHelp = MekHqConstants.ASTECH_TEAM_SIZE;
                 }
             }
         }
-        if (availableHelp > 6) {
-            availableHelp = 6;
-        }
-        return Math.min(availableHelp, getNumberAstechs());
+
+        return Math.min(Math.min(availableHelp, MekHqConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
     public int getShorthandedMod(int availableHelp, boolean medicalStaff) {

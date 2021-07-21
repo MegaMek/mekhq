@@ -129,7 +129,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf);
             }
         } catch (PrincessException e) {
-            MekHQ.getLogger().error(getClass(), "setExtraMissionForces", e);
+            MekHQ.getLogger().error(e);
         }
     }
 

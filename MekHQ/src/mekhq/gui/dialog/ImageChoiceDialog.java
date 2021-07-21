@@ -43,6 +43,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.icons.AbstractIcon;
+import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
@@ -140,7 +141,7 @@ public class ImageChoiceDialog extends JDialog {
                 ? imageItems.getCategoryNames() : Collections.emptyIterator();
         while (names.hasNext()) {
             String name = names.next();
-            if (!"".equals(name)) {
+            if (!StringUtil.isNullOrEmpty(name)) {
                 categoryModel.addElement(name);
                 if (category.equals(name)) {
                     match = name;
