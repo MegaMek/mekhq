@@ -57,11 +57,10 @@ public class ForceIconMigrator {
         migrateAlphanumerics(icon, layered);
         migrateBackgrounds(icon, layered);
         migrateFormations(icon, layered);
-        migrateFrames(icon, layered);
         migrateLogos(icon, layered);
         migrateSpecialModifiers(icon, layered);
         migrateTypes(icon, layered);
-        return icon;
+        return layered;
     }
 
     private static void migrateAdjustments(final LayeredForceIcon original, final LayeredForceIcon migrated) {
@@ -1283,21 +1282,6 @@ public class ForceIconMigrator {
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Clan/", "(09) Galaxy.png"));
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private static void migrateFrames(final LayeredForceIcon original, final LayeredForceIcon migrated) {
-        for (final ForcePieceIcon piece : original.getPieces().getOrDefault(LayeredForceIconLayer.FRAME, new ArrayList<>())) {
-            switch (piece.getFilename()) {
-                case "Extended Frame.png":
-                case "Frame.png":
-                    migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FRAME, new ArrayList<>());
-                    migrated.getPieces().get(LayeredForceIconLayer.FRAME)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FRAME, "", "Frame.png"));
                     break;
                 default:
                     break;

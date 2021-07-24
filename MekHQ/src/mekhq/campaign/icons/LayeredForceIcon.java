@@ -95,8 +95,9 @@ public class LayeredForceIcon extends StandardForceIcon {
             for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
                 if (getPieces().containsKey(layer)) {
                     for (final ForcePieceIcon value : getPieces().get(layer)) {
+                        final String categoryPath = value.getCategoryPath();
                         final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                                .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
+                                .getForceIcons().getItem(categoryPath, value.getFilename());
                         if (image != null) {
                             width = Math.max(image.getWidth(), width);
                             height = Math.max(image.getHeight(), height);
@@ -105,18 +106,20 @@ public class LayeredForceIcon extends StandardForceIcon {
                 }
             }
 
-            base = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                    .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            if ((width > 0) && (height > 0)) {
+                base = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                        .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
-            final Graphics2D g2d = base.createGraphics();
-            for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
-                if (getPieces().containsKey(layer)) {
-                    for (final ForcePieceIcon value : getPieces().get(layer)) {
-                        final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                                .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
-                        if (image != null) {
-                            // Draw the current buffered image onto the base, aligning bottom and right side
-                            g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
+                final Graphics2D g2d = base.createGraphics();
+                for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
+                    if (getPieces().containsKey(layer)) {
+                        for (final ForcePieceIcon value : getPieces().get(layer)) {
+                            final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
+                                    .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
+                            if (image != null) {
+                                // Draw the current buffered image onto the base, aligning bottom and right side
+                                g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
+                            }
                         }
                     }
                 }
@@ -174,14 +177,10 @@ public class LayeredForceIcon extends StandardForceIcon {
     @Override
     protected void parseNode(final Node wn) {
         super.parseNode(wn);
-        switch (wn.getNodeName()) {
-            case "map":
-                if (wn.hasChildNodes()) {
-                    processIconMapNodes(wn.getChildNodes());
-                }
-                break;
-            default:
-                break;
+        if ("map".equals(wn.getNodeName())) {
+            if (wn.hasChildNodes()) {
+                processIconMapNodes(wn.getChildNodes());
+            }
         }
     }
 

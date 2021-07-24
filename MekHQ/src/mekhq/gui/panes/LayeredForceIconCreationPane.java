@@ -28,6 +28,7 @@ import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.panels.ForcePieceIconChooser;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,15 +78,21 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Initialization
     @Override
     protected void initialize() {
+        final JPanel panel = new JPanel();
+        panel.setName("piecesPanel");
+        panel.setLayout(new BorderLayout());
+
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("piecesTabbedPane");
-        add(getTabbedPane());
+        panel.add(getTabbedPane(), BorderLayout.PAGE_START);
 
         setChoosers(new HashMap<>());
         for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
             getChoosers().put(layer, new ForcePieceIconChooser(layer, getForceIcon()));
             getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
         }
+
+        setViewportView(panel);
     }
 
     @Override

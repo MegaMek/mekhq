@@ -28,10 +28,7 @@ import mekhq.gui.trees.ForcePieceIconChooserTree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class ForcePieceIconChooser extends StandardForceIconChooser {
@@ -65,27 +62,9 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
     }
 
     @Override
-    protected ForcePieceIcon createIcon(final @Nullable String category, final @Nullable String filename) {
+    protected ForcePieceIcon createIcon(String category, final String filename) {
+        category = category.replace(getLayer().getLayerPath(), "");
         return new ForcePieceIcon(getLayer(), category, filename);
-    }
-
-    @Override
-    protected List<AbstractIcon> getItems(final String category) {
-        final List<AbstractIcon> result = new ArrayList<>();
-        // The portraits of the selected category are presented.
-        // When the includeSubDirs flag is true, all categories
-        // below the selected one are also presented.
-        if (includeSubDirs) {
-            for (final Iterator<String> catNames = getDirectory().getCategoryNames(); catNames.hasNext(); ) {
-                final String tcat = catNames.next();
-                if (tcat.startsWith(category)) {
-                    addCategoryItems(tcat, result);
-                }
-            }
-        } else {
-            addCategoryItems(category, result);
-        }
-        return result;
     }
 
     @Override
@@ -106,7 +85,7 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
             return;
         }
 
-        // TODO : Fixme
+        // TODO : Change this to handle multiselect and more from here
 
         // This cumbersome code takes the category name and transforms it into
         // a TreePath so it can be selected in the dialog

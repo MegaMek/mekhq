@@ -24,6 +24,7 @@ package mekhq.campaign.force;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -126,7 +127,7 @@ public class ForceStub implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "forceStub");
     }
 
-    public static ForceStub generateInstanceFromXML(final Node wn) {
+    public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {
         final ForceStub retVal = new ForceStub();
 
         try {
@@ -172,12 +173,16 @@ public class ForceStub implements Serializable {
                             continue;
                         }
 
-                        retVal.subForces.add(generateInstanceFromXML(wn3));
+                        retVal.subForces.add(generateInstanceFromXML(wn3, version));
                     }
                 }
             }
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
+        }
+
+        if (version.isLowerThan("0.49.4")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon(retVal.getForceIcon()));
         }
 
         return retVal;

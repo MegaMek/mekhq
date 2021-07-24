@@ -22,39 +22,21 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
+import megamek.common.*;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.MhqFileUtil;
-import mekhq.NullEntityException;
-import mekhq.Utilities;
-import mekhq.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.Warehouse;
+import mekhq.*;
+import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -63,23 +45,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingMekLocation;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
@@ -95,26 +62,11 @@ import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
 
 public class CampaignXmlParser {
     private InputStream is;
@@ -336,6 +288,10 @@ public class CampaignXmlParser {
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
+        }
+
+        if (version.isLowerThan("0.49.4")) {
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon(retVal.getUnitIcon()));
         }
 
         // We need to do a post-process pass to restore a number of references.
@@ -656,14 +612,10 @@ public class CampaignXmlParser {
                     retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
                     final String value = wn.getTextContent().trim();
-                    if (value.equals("null")) {
-                        retVal.getUnitIcon().setCategory(null);
-                    } else {
-                        retVal.getUnitIcon().setCategory(value);
-                    }
+                    retVal.getUnitIcon().setCategory(value.equals("null") ? null : value);
                 } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
                     final String value = wn.getTextContent().trim();
-                    if (value.equals("null")) {
+                    if (value.equals("null") || value.equals(AbstractIcon.DEFAULT_ICON_FILENAME)) {
                         retVal.getUnitIcon().setFilename(null);
                     } else {
                         retVal.getUnitIcon().setFilename(value);

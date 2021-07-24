@@ -104,12 +104,9 @@ public class ForcePieceIcon extends StandardForceIcon {
     @Override
     protected void parseNode(final Node wn) {
         super.parseNode(wn);
-        switch (wn.getNodeName()) {
-            case "layer":
-                setLayer(LayeredForceIconLayer.valueOf(wn.getTextContent().trim()));
-                break;
-            default:
-                break;
+
+        if ("layer".equals(wn.getNodeName())) {
+            setLayer(LayeredForceIconLayer.valueOf(wn.getTextContent().trim()));
         }
     }
     //endregion File I/O

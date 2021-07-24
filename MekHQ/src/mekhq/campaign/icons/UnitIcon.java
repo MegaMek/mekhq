@@ -59,6 +59,14 @@ public class UnitIcon extends StandardForceIcon {
     }
     //endregion Getters/Setters
 
+    //region Boolean Methods
+    @Override
+    public boolean hasDefaultFilename() {
+        return DEFAULT_ICON_FILENAME.equals(getFilename())
+                || ((getFilename() != null) && getFilename().isBlank());
+    }
+    //endregion Boolean Methods
+
     @Override
     public @Nullable Image getImage(final int width, final int height) {
         if (getFilename() == null) {
@@ -90,7 +98,7 @@ public class UnitIcon extends StandardForceIcon {
         super.parseNodes(nl);
 
         if ("null".equalsIgnoreCase(getCategory())) {
-            setCategory(ROOT_CATEGORY);
+            setCategory(null);
         }
 
         if ("null".equalsIgnoreCase(getFilename())) {

@@ -66,8 +66,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
             parseForceIconDirectory = false;
             try {
-                forceIconDirectory = new DirectoryItems(new File("data/images/force"),
-                        "", new ImageFileFactory());
+                forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : Remove inline file path
+                        new ImageFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the force icon directory!", e);
             }
@@ -85,8 +85,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseAwardIconDirectory to false to avoid parsing repeatedly when something fails
             parseAwardIconDirectory = false;
             try {
-                awardIconDirectory = new DirectoryItems(new File("data/images/awards"),
-                        "", new AwardFileFactory());
+                awardIconDirectory = new DirectoryItems(new File("data/images/awards"), // TODO : Remove inline file path
+                        new AwardFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the award icon directory!", e);
             }

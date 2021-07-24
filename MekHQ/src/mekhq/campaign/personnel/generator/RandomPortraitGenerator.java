@@ -107,19 +107,21 @@ public class RandomPortraitGenerator {
      * based on the supplied subdirectory
      *
      * @param existingPortraits the list of existing portraits that have already been assigned
-     * @param subDir the subdirectory to search
+     * @param subdirectory the subdirectory to search
      * @return a list of all possible unassigned random portraits
      */
-    private static List<String> getPossibleRandomPortraits(Set<String> existingPortraits, File subDir) {
-        List<String> possiblePortraits = new ArrayList<>();
-        Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (new File(category).compareTo(subDir) == 0) {
+    private static List<String> getPossibleRandomPortraits(final Set<String> existingPortraits,
+                                                           final File subdirectory) {
+        if (MHQStaticDirectoryManager.getPortraits() == null) {
+            return new ArrayList<>();
+        }
+
+        final List<String> possiblePortraits = new ArrayList<>();
+        for (final String category : MHQStaticDirectoryManager.getPortraits().getCategories().keySet()) {
+            if (new File(category).compareTo(subdirectory) == 0) {
                 Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
                 while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
+                    final String location = category + ":" + names.next();
                     if (existingPortraits.contains(location)) {
                         continue;
                     }

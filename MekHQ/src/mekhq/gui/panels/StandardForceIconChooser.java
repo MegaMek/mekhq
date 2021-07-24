@@ -27,9 +27,6 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.gui.trees.StandardForceIconChooserTree;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class StandardForceIconChooser extends AbstractIconChooser {
     //region Constructors
@@ -49,27 +46,8 @@ public class StandardForceIconChooser extends AbstractIconChooser {
     }
 
     @Override
-    protected StandardForceIcon createIcon(final @Nullable String category, final @Nullable String filename) {
+    protected StandardForceIcon createIcon(String category, final String filename) {
         return new StandardForceIcon(category, filename);
-    }
-
-    @Override
-    protected List<AbstractIcon> getItems(final String category) {
-        final List<AbstractIcon> result = new ArrayList<>();
-        // The portraits of the selected category are presented.
-        // When the includeSubDirs flag is true, all categories
-        // below the selected one are also presented.
-        if (includeSubDirs) {
-            for (final Iterator<String> catNames = getDirectory().getCategoryNames(); catNames.hasNext(); ) {
-                final String tcat = catNames.next();
-                if (tcat.startsWith(category)) {
-                    addCategoryItems(tcat, result);
-                }
-            }
-        } else {
-            addCategoryItems(category, result);
-        }
-        return result;
     }
 
     @Override

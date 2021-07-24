@@ -20,7 +20,6 @@ package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 
 public class UnitIconChooser extends StandardForceIconChooser {
@@ -31,7 +30,7 @@ public class UnitIconChooser extends StandardForceIconChooser {
     //endregion Constructors
 
     @Override
-    protected UnitIcon createIcon(final @Nullable String category, final @Nullable String filename) {
+    protected UnitIcon createIcon(String category, final String filename) {
         return new UnitIcon(category, filename);
     }
 

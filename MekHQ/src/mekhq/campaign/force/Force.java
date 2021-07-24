@@ -481,6 +481,10 @@ public class Force implements Serializable {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
+        if (version.isLowerThan("0.49.4")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon(retVal.getForceIcon()));
+        }
+
         return retVal;
     }
 
@@ -496,27 +500,6 @@ public class Force implements Serializable {
             String idString = classNameNode.getTextContent();
             retVal.addUnit(UUID.fromString(idString));
         }
-    }
-
-    private static Vector<String> processIconMapSubNodes(Node wn, Version version) {
-        Vector<String> values = new Vector<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("name");
-            String key = keyNode.getTextContent();
-            if ((null != key) && !key.isEmpty()) {
-                values.add(key);
-            }
-        }
-        return values;
     }
 
     public Vector<Object> getAllChildren(Campaign campaign) {
