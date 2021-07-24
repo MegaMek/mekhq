@@ -134,14 +134,14 @@ public class FactionHints {
         if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
             for (FactionHint fh : wars.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
-                    return fh.name;
+                    return fh.toString();
                 }
             }
         }
         if (wars.get(f2) != null && wars.get(f2).get(f1) != null) {
             for (FactionHint fh : wars.get(f2).get(f1)) {
                 if (fh.isInDateRange(date)) {
-                    return fh.name;
+                    return fh.toString();
                 }
             }
         }
@@ -251,7 +251,7 @@ public class FactionHints {
         if (containedFactions.get(host) != null && containedFactions.get(host).get(contained) != null) {
             for (AltLocation l : containedFactions.get(host).get(contained)) {
                 if (l.isInDateRange(date)) {
-                    return l.fraction;
+                    return l.getFraction();
                 }
             }
         }
@@ -277,10 +277,11 @@ public class FactionHints {
         if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
             for (AltLocation l : containedFactions.get(outer).get(inner)) {
                 if (l.isInDateRange(date)) {
-                    if (l.opponents == null) {
+                    if (l.getOpponents().isEmpty()) {
                         return !inner.equals(opponent) || hintApplies(wars, inner, inner, date);
                     }
-                    for (Faction f : l.opponents) {
+
+                    for (Faction f : l.getOpponents()) {
                         if (f.equals(opponent)) {
                             return true;
                         }
@@ -410,8 +411,8 @@ public class FactionHints {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
             return;
         }
 
@@ -422,8 +423,9 @@ public class FactionHints {
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
 
-            if (wn.getParentNode() != rootElement)
+            if (wn.getParentNode() != rootElement) {
                 continue;
+            }
 
             if (wn.getNodeType() == Node.ELEMENT_NODE) {
                 String nodeName = wn.getNodeName();
@@ -431,11 +433,11 @@ public class FactionHints {
                 if (nodeName.equals("neutral")) {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
                     Faction f = Factions.getInstance().getFaction(fKey);
-                    if (null != f) {
+                    if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
+                    } else {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
-                    } else {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
                     }
                 } else if (nodeName.equals("rivals")) {
                     setFactionHint(rivals, wn);
@@ -447,8 +449,8 @@ public class FactionHints {
                     LocalDate start = null;
                     LocalDate end = null;
                     double fraction = 0.0;
-                    Faction outer = null;
-                    Faction inner = null;
+                    String outerCode = "";
+                    String innerCode = "";
                     List<Faction> opponents = null;
                     if (wn.getAttributes().getNamedItem("start") != null) {
                         start = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
@@ -457,27 +459,41 @@ public class FactionHints {
                         end = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                     }
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
-                        Node wn2 = wn.getChildNodes().item(j);
-                        if (wn2.getNodeName().equals("outer")) {
-                            outer = Factions.getInstance().getFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equals("inner")) {
-                            inner = Factions.getInstance().getFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equals("fraction")) {
-                            fraction = Double.parseDouble(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equals("opponents")) {
-                            opponents = new ArrayList<>();
-                            for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                Faction f = Factions.getInstance().getFaction(fKey);
-                                if (null != f) {
-                                    opponents.add(f);
-                                }
+                        try {
+                            Node wn2 = wn.getChildNodes().item(j);
+                            switch (wn2.getNodeName()) {
+                                case "outer":
+                                    outerCode = wn2.getTextContent().trim();
+                                    break;
+                                case "inner":
+                                    innerCode = wn2.getTextContent().trim();
+                                    break;
+                                case "fraction":
+                                    fraction = Double.parseDouble(wn2.getTextContent().trim());
+                                    break;
+                                case "opponents":
+                                    opponents = new ArrayList<>();
+                                    for (String fKey : wn2.getTextContent().trim().split(",")) {
+                                        Faction f = Factions.getInstance().getFaction(fKey);
+                                        if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                                            opponents.add(f);
+                                        }
+                                    }
+                                    break;
                             }
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
                         }
                     }
-                    if ((null != outer) && (null != inner)) {
-                        addContainedFaction(outer, inner, start, end, fraction, opponents);
+
+                    final Faction outer = Factions.getInstance().getFaction(outerCode);
+                    final Faction inner = Factions.getInstance().getFaction(innerCode);
+                    if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
+                            || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: "
+                                + outerCode + "/" + innerCode);
                     } else {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + outer + "/" + inner);
+                        addContainedFaction(outer, inner, start, end, fraction, opponents);
                     }
                 }
             }
@@ -485,8 +501,6 @@ public class FactionHints {
     }
 
     private void setFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hint, Node node) throws DOMException {
-        final String METHOD_NAME = "setFactionHint(Map<Faction,Map<Faction,List<FactionHint>>>,Node"; //$NON-NLS-1$
-
         String name = "";
         LocalDate start = null;
         LocalDate end = null;
@@ -514,11 +528,12 @@ public class FactionHints {
                 String[] factionKeys = wn.getTextContent().trim().split(",");
                 Faction[] parties = new Faction[factionKeys.length];
                 for (int i = 0; i < factionKeys.length; i++) {
-                    parties[i] = Factions.getInstance().getFaction(factionKeys[i]);
-                    if (null == parties[i]) {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
+                    final Faction faction = Factions.getInstance().getFaction(factionKeys[i]);
+                    if (faction.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
+                        continue;
                     }
+                    parties[i] = faction;
                 }
                 addFactionHint(hint, name, localStart, localEnd, parties);
             }
@@ -526,12 +541,11 @@ public class FactionHints {
     }
 
     private void addNeutralExceptions(Faction faction, Node node) throws DOMException {
-        final String METHOD_NAME = "addNeutralExceptions(Faction,Node)"; //$NON-NLS-1$
-
         LocalDate end = null;
         if (node.getAttributes().getNamedItem("end") != null) {
             end = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
         }
+
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
             if (wn.getNodeName().equals("exceptions")) {
@@ -540,6 +554,7 @@ public class FactionHints {
                 if (wn.getAttributes().getNamedItem("start") != null) {
                     localStart = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
+
                 if (wn.getAttributes().getNamedItem("end") != null) {
                     localEnd = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                 }
@@ -548,9 +563,8 @@ public class FactionHints {
 
                 for (String party : parties) {
                     final Faction f = Factions.getInstance().getFaction(party);
-                    if (null == f) {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + party); //$NON-NLS-1$
+                    if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + party);
                         continue;
                     }
                     addNeutralExceptions("", localStart, localEnd, faction, f);
@@ -559,36 +573,48 @@ public class FactionHints {
         }
     }
 
+    /**
+     * Each participant in a war or an alliance has one instance
+     * of this class for each of the other factions involved.
+     */
     static class FactionHint {
-        /**
-         * Each participant in a war or an alliance has one instance
-         * of this class for each of the other factions involved.
-         */
-        public String name;
-        public LocalDate start;
-        public LocalDate end;
+        private final String name;
+        private final LocalDate start;
+        private final LocalDate end;
 
-        public FactionHint (String n, LocalDate s, LocalDate e) {
-            name = n;
-            start = s;
-            end = e;
+        public FactionHint (final String name, final @Nullable LocalDate start, final @Nullable LocalDate end) {
+            this.name = name;
+            this.start = start;
+            this.end = end;
         }
 
-        public boolean isInDateRange(LocalDate date) {
+        public boolean isInDateRange(final LocalDate date) {
             return ((start == null) || date.isAfter(start)) && ((end == null) || date.isBefore(end));
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 
     static class AltLocation extends FactionHint {
-        public double fraction;
-        public List<Faction> opponents;
+        private final double fraction;
+        private final List<Faction> opponents;
 
-        public AltLocation (LocalDate s, LocalDate e, double f, List<Faction> opponents) {
-            super(null, s, e);
-            fraction = f;
-            if (null != opponents) {
-                this.opponents = new ArrayList<>(opponents);
-            }
+        public AltLocation (final @Nullable LocalDate start, final @Nullable LocalDate end,
+                            final double fraction, final @Nullable List<Faction> opponents) {
+            super("", start, end);
+            this.fraction = fraction;
+            this.opponents = (opponents == null) ? new ArrayList<>() : new ArrayList<>(opponents);
+        }
+
+        public double getFraction() {
+            return fraction;
+        }
+
+        public List<Faction> getOpponents() {
+            return opponents;
         }
     }
 }

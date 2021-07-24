@@ -57,7 +57,7 @@ public enum ROMDesignation {
         this.designation = resources.getString(designation);
     }
 
-    public static String getComStarBranchDesignation(Person person, Campaign campaign) {
+    public static String getComStarBranchDesignation(Person person) {
         StringBuilder sb = new StringBuilder(" ");
 
         // Primary
@@ -68,7 +68,7 @@ public enum ROMDesignation {
         } else if (person.getPrimaryRole().isAdministrator()) {
             sb.append(CHI);
         } else {
-            sb.append(determineDesignationFromRole(person.getPrimaryRole(), person, campaign));
+            sb.append(determineDesignationFromRole(person.getPrimaryRole(), person));
         }
 
         // Secondary
@@ -79,13 +79,13 @@ public enum ROMDesignation {
         } else if (person.getSecondaryRole().isAdministrator()) {
             sb.append(" ").append(CHI);
         } else if (!person.getSecondaryRole().isNone()) {
-            sb.append(" ").append(determineDesignationFromRole(person.getSecondaryRole(), person, campaign));
+            sb.append(" ").append(determineDesignationFromRole(person.getSecondaryRole(), person));
         }
 
         return sb.toString();
     }
 
-    private static String determineDesignationFromRole(PersonnelRole role, Person person, Campaign campaign) {
+    private static String determineDesignationFromRole(PersonnelRole role, Person person) {
         switch (role) {
             case MECHWARRIOR:
                 return EPSILON.toString();

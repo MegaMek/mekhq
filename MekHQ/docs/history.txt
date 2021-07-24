@@ -8,8 +8,25 @@ VERSION HISTORY:
 + Issue #2707: Preventing text wrap in the person title JTable usages
 + PR #2718: Fixing Bulk Refit Complete/Cancel
 + Issue #2717: Advance Days Dialog no longer based on modality
-+ PR #2716: StratCon - player dropships will now be pulled into dropship defense scenarios;
++ PR #2716, 2727: StratCon - player dropships will now be pulled into dropship defense scenarios;
 	more abstractly: capability to substitute player units for bot units in designated scenario force templates
+	prevent "regenerate bot forces" button from displaying when editing completed scenarios
+	allow contract completion for scenarios with remaining "fixed" objectives (useful for when the enemy morale goes to rout or you win a base of operations attack)
+	explicitly show that objectives in defensive contracts must be held until contract completion	
+    	fix clicked hex detection on StratCon map when viewing anything other than top left corner when map doesn't fit on single screen (smaller resolutions/bigger maps)
+    	added scroll pane to info panel in case it has more data than can be displayed (important on smaller resolutions)
+    	do not un-deploy force from track if it's assigned to a scenario on the track until the scenario is resolved one way or another
++ Issue #251: Force Generator Unit Generation Empty Unit Table Parent Faction Fallback
++ Issue #2736: Fixing Alternative Faction Code Generation by using correct ArrayList type
++ PR #2744: Mass Mothball Dialog: Fixing IndexOutOfBoundsException with no techs for a unit type
++ PR #2745: Fixing Two AtB Scenario View Panel NPEs
++ PR #2725: StratCon campaign state management: GM Tool to add VP/SP; Ability to convert VP to SP manually; Ability to convert SP to bonus parts; GM mode viewing of current track's "scenario spawn odds".
++ PR #2751: Fixing Astech Divide By Zero Errors
++ PR #2756: StratCon
+	- Fix incorrect bot configuration in pursuit scenario that would cause it to bee-line for the opposite edge
+	- When objective scenarios move, they will take their objectives with them
+	- Strategic objective display improvement - colorcoding and symbols to indicate in-progress/complete/failed.
+	- Prevent phantom scenarios from showing up in TO&E deploy menu
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab

@@ -20,15 +20,8 @@ package mekhq.gui.adapter;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.dialogs.AbstractIconChooserDialog;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Crew;
-import megamek.common.Mech;
-import megamek.common.Mounted;
-import megamek.common.Tank;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -42,22 +35,8 @@ import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.AwardsFactory;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.enums.Divorce;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -69,19 +48,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
-import mekhq.gui.dialog.AddOrEditKillEntryDialog;
-import mekhq.gui.dialog.AddOrEditMissionEntryDialog;
-import mekhq.gui.dialog.AddOrEditPersonnelEntryDialog;
-import mekhq.gui.dialog.CustomizePersonDialog;
-import mekhq.gui.dialog.EditKillLogDialog;
-import mekhq.gui.dialog.EditMissionLogDialog;
-import mekhq.gui.dialog.EditPersonnelHitsDialog;
-import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
-import mekhq.gui.dialog.EditPersonnelLogDialog;
-import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
@@ -93,17 +60,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -854,8 +812,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
-                AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
-                        selectedPerson.getPortrait());
+                final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(
+                        gui.getFrame(), selectedPerson.getPortrait());
                 if (portraitDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
                         if (!person.getPortrait().equals(portraitDialog.getSelectedItem())) {

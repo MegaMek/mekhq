@@ -150,6 +150,8 @@ public class StratconContractDefinition {
      */
     private double hostileFacilityCount;
 
+    private boolean allowEarlyVictory;
+    
     /**
      * List of scenario IDs (file names) that are allowed for this contract type
      */
@@ -201,6 +203,14 @@ public class StratconContractDefinition {
      */
     public void setBriefing(String briefing) {
         this.briefing = briefing;
+    }
+
+    public boolean isAllowEarlyVictory() {
+        return allowEarlyVictory;
+    }
+
+    public void setAllowEarlyVictory(boolean allowEarlyVictory) {
+        this.allowEarlyVictory = allowEarlyVictory;
     }
 
     /**

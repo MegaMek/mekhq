@@ -56,7 +56,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     /**
      * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from
      * XML entity expansion attacks.
-     * 
+     *
      * @return A DocumentBuilder less safe to use to read untrusted XML.
      */
     public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
@@ -110,7 +110,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     /**
      * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
-     * 
+     *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
      * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
      * MM and then re-factored out of EntityListFile.
@@ -365,7 +365,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             critVal = critVal.concat(" gear=\"none\"");
         }
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -456,12 +456,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         /*
          * crew are handled as a Person object in MekHq... if (e.isDriverHit()) { critVal =
          * critVal.concat(" driver=\""); critVal = critVal.concat("hit"); critVal = critVal.concat("\""); }
-         * 
+         *
          * if (e.isCommanderHit()) { critVal = critVal.concat(" commander=\""); critVal =
          * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -494,7 +494,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
+        MekHQ.getLogger().trace("Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -505,8 +505,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             return null;
         case 1:
             Entity entity = entities.get(0);
-            MekHQ.getLogger().trace(MekHqXmlUtil.class,
-                    "Returning " + entity + " from getEntityFromXmlString(String)...");
+            MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
             return entity;
         default:
             throw new IllegalArgumentException(

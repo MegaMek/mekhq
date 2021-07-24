@@ -18,10 +18,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class ChatClient extends JPanel implements ActionListener {
-
-    /**
-	 *
-	 */
 	private static final long serialVersionUID = -7447573101863923187L;
 
 	private String screenName;
@@ -45,7 +41,7 @@ public class ChatClient extends JPanel implements ActionListener {
             out    = new Out(socket);
             in     = new In(socket);
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "ChatClient", e);
+            MekHQ.getLogger().error(e);
         }
         this.screenName = screenName;
 
@@ -82,6 +78,7 @@ public class ChatClient extends JPanel implements ActionListener {
     }
 
     // process TextField after user hits Enter
+    @Override
     public void actionPerformed(ActionEvent e) {
         out.println("[" + screenName + "]: " + typedText.getText());
         typedText.setText("");
@@ -100,8 +97,8 @@ public class ChatClient extends JPanel implements ActionListener {
         try {
             socket.close();
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "listen", e);
+            MekHQ.getLogger().error(e);
         }
-        MekHQ.getLogger().error(getClass(), "listen", "Closed client socket");
+        MekHQ.getLogger().error("Closed client socket");
     }
 }

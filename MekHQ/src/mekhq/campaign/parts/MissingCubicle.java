@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -35,10 +35,6 @@ import mekhq.campaign.Campaign;
  *
  */
 public class MissingCubicle extends MissingPart {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -5418633125937755683L;
 
     private BayType bayType;
@@ -71,7 +67,6 @@ public class MissingCubicle extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -92,7 +87,7 @@ public class MissingCubicle extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -130,7 +125,7 @@ public class MissingCubicle extends MissingPart {
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
                 bayType = BayType.parse(wn2.getTextContent());
                 if (null == bayType) {
-                    MekHQ.getLogger().error(MissingCubicle.class, "Could not parse bay type " + wn2.getTextContent());
+                    MekHQ.getLogger().error("Could not parse bay type " + wn2.getTextContent());
                     bayType = BayType.MECH;
                 }
                 name = bayType.getDisplayName() + " Cubicle";

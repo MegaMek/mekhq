@@ -154,7 +154,7 @@ public class ForceStub implements Serializable {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
-                        } else  if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
+                        } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
