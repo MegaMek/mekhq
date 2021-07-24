@@ -18,33 +18,43 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.panels.ForcePieceIconChooser;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
+    private final boolean includeExportButton;
 
     private JTabbedPane tabbedPane;
     private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
     //endregion Variable Declarations
 
     //region Constructors
-    public LayeredForceIconCreationPane(final JFrame frame, final @Nullable StandardForceIcon forceIcon) {
+    public LayeredForceIconCreationPane(final JFrame frame,
+                                        final @Nullable StandardForceIcon forceIcon,
+                                        final boolean includeExportButton) {
         super(frame, "LayeredForceIconCreationPane");
         setForceIcon((forceIcon instanceof LayeredForceIcon)
                 ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
+        this.includeExportButton = includeExportButton;
         initialize();
     }
     //endregion Constructors
@@ -56,6 +66,10 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
 
     public void setForceIcon(final LayeredForceIcon forceIcon) {
         this.forceIcon = forceIcon;
+    }
+
+    public boolean isIncludeExportButton() {
+        return includeExportButton;
     }
 
     public JTabbedPane getTabbedPane() {
@@ -92,6 +106,11 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
             getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
         }
 
+        if (isIncludeExportButton()) {
+            panel.add(new MMButton("btnExport", resources, "Export.text",
+                    "LayeredForceIconCreationPane.btnExport.toolTipText", evt -> exportAction()));
+        }
+
         setViewportView(panel);
     }
 
@@ -103,5 +122,23 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //endregion Initialization
 
     //region Button Actions
+    private void exportAction() {
+        File file = FileDialogs.exportLayeredForceIcon(getFrame()).orElse(null);
+        if (file == null) {
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".png")) {
+            path += ".png";
+            file = new File(path);
+        }
+
+        try {
+            final BufferedImage image = (BufferedImage) getForceIcon().getImage();
+            ImageIO.write(image, "png", file);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
     //endregion Button Actions
 }

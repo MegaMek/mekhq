@@ -206,6 +206,8 @@ public class LayeredForceIcon extends StandardForceIcon {
     }
     //endregion File I/O
 
+    // TODO : Equals and HashCode overrides
+
     @Override
     public LayeredForceIcon clone() {
         final Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new LinkedHashMap<>();

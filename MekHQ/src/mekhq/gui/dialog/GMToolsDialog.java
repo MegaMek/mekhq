@@ -1081,7 +1081,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     //region Layered Force Icon Tab
     private JScrollPane createLayeredForceIconTab() {
-        return new LayeredForceIconCreationPane(getFrame(), null);
+        return new LayeredForceIconCreationPane(getFrame(), null, true);
     }
     //endregion Layered Force Icon Tab
 
