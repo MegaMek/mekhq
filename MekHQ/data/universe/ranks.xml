@@ -3150,7 +3150,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E1 -->
 		<rank>
-			<rankNames>Volunteer,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Volunteer,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E2 -->
@@ -3160,7 +3160,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>First Ranker,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>First Ranker,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -3200,7 +3200,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E11 -->
 		<rank>
-			<rankNames>Lance Corporal,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Lance Corporal,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E12 -->
@@ -3210,7 +3210,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E13 -->
 		<rank>
-			<rankNames>Star Corporal,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Star Corporal,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E14 -->
@@ -3220,7 +3220,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E15 -->
 		<rank>
-			<rankNames>Command Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Command Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E16 -->
@@ -3240,7 +3240,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E19 -->
 		<rank>
-			<rankNames>Banner Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Banner Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E20 -->
@@ -3305,22 +3305,22 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Ensign,-,-,Comcapt,-,-,-,-,-</rankNames>
+			<rankNames>Ensign,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Commander,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Commander,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
 		<rank>
-			<rankNames>Major,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Major,-,-,Comcapt,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O5 -->
 		<rank>
-			<rankNames>-,-,-,Rearad,-,-,-,-,-</rankNames>
+			<rankNames>-,-,-,-,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O6 -->
@@ -3330,7 +3330,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->
 		<rank>
-			<rankNames>Colonel,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Colonel,-,-,Rearad,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O8 -->
@@ -3340,7 +3340,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O9 -->
 		<rank>
-			<rankNames>-,-,-,Admiral,-,-,-,-,-</rankNames>
+			<rankNames>-,-,-,-,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O10 -->
@@ -3350,7 +3350,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O11 -->
 		<rank>
-			<rankNames>General,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>General,-,-,Admiral,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O12 -->
@@ -3410,7 +3410,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E1 -->
 		<rank>
-			<rankNames>Recruit,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Recruit,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E2 -->
@@ -3420,7 +3420,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Corporal,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Corporal,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -3440,7 +3440,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E7 -->
 		<rank>
-			<rankNames>Section Leader,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Section Leader,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E8 -->
@@ -3460,7 +3460,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E11 -->
 		<rank>
-			<rankNames>Force Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Force Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E12 -->
@@ -3470,7 +3470,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E13 -->
 		<rank>
-			<rankNames>Lance Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Lance Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E14 -->
@@ -4450,7 +4450,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E1 -->
 		<rank>
-			<rankNames>Recruit,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Recruit,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E2 -->
@@ -4460,7 +4460,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Corporal,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Corporal,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -4480,7 +4480,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E7 -->
 		<rank>
-			<rankNames>Section Leader,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Section Leader,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E8 -->
@@ -4500,7 +4500,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E11 -->
 		<rank>
-			<rankNames>Force Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Force Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E12 -->
@@ -4510,7 +4510,7 @@ Rank:
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E13 -->
 		<rank>
-			<rankNames>Lance Sergeant,-,-,-,-,-,-,-,-</rankNames>
+			<rankNames>Lance Sergeant,-,-,--MW,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E14 -->
