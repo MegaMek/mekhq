@@ -103,6 +103,23 @@ public class Force implements Serializable {
         this.name = n;
     }
 
+    public StandardForceIcon getForceIcon() {
+        return forceIcon;
+    }
+
+    public void setForceIcon(final StandardForceIcon forceIcon) {
+        setForceIcon(forceIcon, false);
+    }
+
+    public void setForceIcon(final StandardForceIcon forceIcon, final boolean setForSubForces) {
+        this.forceIcon = forceIcon;
+        if (setForSubForces) {
+            for (final Force force : subForces) {
+                force.setForceIcon(forceIcon.clone(), true);
+            }
+        }
+    }
+
     public Camouflage getCamouflage() {
         return camouflage;
     }
@@ -372,14 +389,6 @@ public class Force implements Serializable {
         if (found) {
             subForces.remove(idx);
         }
-    }
-
-    public StandardForceIcon getForceIcon() {
-        return forceIcon;
-    }
-
-    public void setForceIcon(final StandardForceIcon forceIcon) {
-        this.forceIcon = forceIcon;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
