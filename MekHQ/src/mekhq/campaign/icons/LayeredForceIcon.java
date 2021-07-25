@@ -30,10 +30,8 @@ import org.w3c.dom.NodeList;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class LayeredForceIcon extends StandardForceIcon {
     //region Variable Declarations
@@ -86,22 +84,24 @@ public class LayeredForceIcon extends StandardForceIcon {
 
         // Try to get the player's force icon file.
         BufferedImage base = null;
+        final List<BufferedImage> images = new ArrayList<>();
+        int width = 0;
+        int height = 0;
 
         try {
-            int width = 0;
-            int height = 0;
-
             // Gather height/width
             for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
-                if (getPieces().containsKey(layer)) {
-                    for (final ForcePieceIcon value : getPieces().get(layer)) {
-                        final String categoryPath = value.getCategoryPath();
-                        final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                                .getForceIcons().getItem(categoryPath, value.getFilename());
-                        if (image != null) {
-                            width = Math.max(image.getWidth(), width);
-                            height = Math.max(image.getHeight(), height);
-                        }
+                if (!getPieces().containsKey(layer)) {
+                    continue;
+                }
+
+                for (final ForcePieceIcon value : getPieces().get(layer)) {
+                    final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
+                            .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
+                    if (image != null) {
+                        width = Math.max(image.getWidth(), width);
+                        height = Math.max(image.getHeight(), height);
+                        images.add(image);
                     }
                 }
             }
@@ -111,17 +111,9 @@ public class LayeredForceIcon extends StandardForceIcon {
                         .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
                 final Graphics2D g2d = base.createGraphics();
-                for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
-                    if (getPieces().containsKey(layer)) {
-                        for (final ForcePieceIcon value : getPieces().get(layer)) {
-                            final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                                    .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
-                            if (image != null) {
-                                // Draw the current buffered image onto the base, aligning bottom and right side
-                                g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
-                            }
-                        }
-                    }
+                for (final BufferedImage image : images) {
+                    // Draw the current buffered image onto the base, aligning bottom and right side
+                    g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
                 }
             }
         } catch (Exception e) {

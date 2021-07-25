@@ -137,6 +137,6 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
 
     public void refreshDirectory(final @Nullable ActionEvent evt) {
         getStandardForceIconChooser().refreshDirectory();
-        // TODO : Layered Force Icon refresh
+        getLayeredForceIconCreationPane().refreshDirectory();
     }
 }

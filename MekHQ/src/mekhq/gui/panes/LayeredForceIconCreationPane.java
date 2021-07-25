@@ -28,6 +28,7 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.panels.ForcePieceIconChooser;
 
 import javax.imageio.ImageIO;
@@ -41,20 +42,21 @@ import java.util.Map;
 public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
-    private final boolean includeExportButton;
+    private final boolean includeButtons;
 
     private JTabbedPane tabbedPane;
     private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
+    private JLabel lblIcon;
     //endregion Variable Declarations
 
     //region Constructors
     public LayeredForceIconCreationPane(final JFrame frame,
                                         final @Nullable StandardForceIcon forceIcon,
-                                        final boolean includeExportButton) {
+                                        final boolean includeButtons) {
         super(frame, "LayeredForceIconCreationPane");
         setForceIcon((forceIcon instanceof LayeredForceIcon)
                 ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
-        this.includeExportButton = includeExportButton;
+        this.includeButtons = includeButtons;
         initialize();
     }
     //endregion Constructors
@@ -68,8 +70,8 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
         this.forceIcon = forceIcon;
     }
 
-    public boolean isIncludeExportButton() {
-        return includeExportButton;
+    public boolean isIncludeButtons() {
+        return includeButtons;
     }
 
     public JTabbedPane getTabbedPane() {
@@ -87,28 +89,55 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     public void setChoosers(final Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers) {
         this.choosers = choosers;
     }
+
+    public JLabel getLblIcon() {
+        return lblIcon;
+    }
+
+    public void setLblIcon(final JLabel lblIcon) {
+        this.lblIcon = lblIcon;
+    }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected void initialize() {
-        final JPanel panel = new JPanel();
+        final JPanel panel = new JScrollablePanel(new GridBagLayout());
         panel.setName("piecesPanel");
-        panel.setLayout(new BorderLayout());
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
 
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("piecesTabbedPane");
-        panel.add(getTabbedPane(), BorderLayout.PAGE_START);
-
         setChoosers(new HashMap<>());
         for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
             getChoosers().put(layer, new ForcePieceIconChooser(layer, getForceIcon()));
             getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
         }
+        panel.add(getTabbedPane(), gbc);
 
-        if (isIncludeExportButton()) {
+        setLblIcon(new JLabel(getForceIcon().getImageIcon()));
+        getLblIcon().setToolTipText(resources.getString("lblIcon.toolTipText"));
+        getLblIcon().setName("lblIcon");
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        panel.add(getLblIcon(), gbc);
+
+        if (isIncludeButtons()) {
+            gbc.gridy++;
+            gbc.gridwidth = 1;
             panel.add(new MMButton("btnExport", resources, "Export.text",
-                    "LayeredForceIconCreationPane.btnExport.toolTipText", evt -> exportAction()));
+                    "LayeredForceIconCreationPane.btnExport.toolTipText", evt -> exportAction()), gbc);
+
+            gbc.gridx++;
+            panel.add(new MMButton("btnRefreshDirectory", resources, "RefreshDirectory.text",
+                    "RefreshDirectory.toolTipText", evt -> refreshDirectory()), gbc);
         }
 
         setViewportView(panel);
@@ -139,6 +168,10 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
         }
+    }
+
+    public void refreshDirectory() {
+        // TODO : Implement me
     }
     //endregion Button Actions
 }
