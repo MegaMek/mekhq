@@ -22,6 +22,7 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
@@ -94,16 +95,20 @@ public class Asset implements MekHqXmlSerializable {
         Asset retVal = new Asset();
 
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                retVal.name = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                retVal.value = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                retVal.income = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
-                retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("name")) {
+                    retVal.name = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
+                    retVal.value = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
+                    retVal.income = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
+                    retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         return retVal;

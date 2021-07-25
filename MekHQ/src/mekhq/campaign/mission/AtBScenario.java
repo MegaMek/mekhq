@@ -43,6 +43,7 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHqConstants;
 import mekhq.Version;
 import mekhq.campaign.mission.enums.AtBLanceRole;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1726,146 +1727,150 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("attacker")) {
-                setAttacker(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
-                lanceForceId = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
-                lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
-                terrainType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
-                light = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
-                weather = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
-                wind = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
-                fog = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
-                atmosphere = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
-                gravity = Float.parseFloat(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                start = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
-                deploymentDelay = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
-                String []xy = wn2.getTextContent().split(",");
-                mapSizeX = Integer.parseInt(xy[0]);
-                mapSizeY = Integer.parseInt(xy[1]);
-            } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
-                map = wn2.getTextContent().trim();
-            } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
-                lanceCount = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
-                rerollsRemaining = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayer")) {
-                NodeList nl2 = wn2.getChildNodes();
-                for (int i = 0; i < nl2.getLength(); i++) {
-                    Node wn3 = nl2.item(i);
-                    if (wn3.getNodeName().equalsIgnoreCase("entity")) {
-                        Entity en = null;
-                        try {
-                            en = MekHqXmlUtil.getEntityFromXmlString(wn3);
-                        } catch (Exception e) {
-                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
-                        }
-                        if (en != null) {
-                            alliesPlayer.add(en);
-                            entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
-                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
-                        }
-                    }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("bigBattleAllies")) {
-                bigBattleAllies = new ArrayList<>();
-                NodeList nl2 = wn2.getChildNodes();
-                for (int i = 0; i < nl2.getLength(); i++) {
-                    Node wn3 = nl2.item(i);
-                    if (wn3.getNodeName().equalsIgnoreCase("entity")) {
-                        Entity en = null;
-                        try {
-                            en = MekHqXmlUtil.getEntityFromXmlString(wn3);
-                        } catch (Exception e) {
-                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
-                        }
-                        if (en != null) {
-                            bigBattleAllies.add(en);
-                            entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
-                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("attacker")) {
+                    setAttacker(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
+                    lanceForceId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
+                    lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
+                    terrainType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
+                    light = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
+                    weather = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
+                    wind = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
+                    fog = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
+                    atmosphere = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
+                    gravity = Float.parseFloat(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
+                    start = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
+                    deploymentDelay = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
+                    String[] xy = wn2.getTextContent().split(",");
+                    mapSizeX = Integer.parseInt(xy[0]);
+                    mapSizeY = Integer.parseInt(xy[1]);
+                } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
+                    map = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
+                    lanceCount = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
+                    rerollsRemaining = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayer")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        Node wn3 = nl2.item(i);
+                        if (wn3.getNodeName().equalsIgnoreCase("entity")) {
+                            Entity en = null;
+                            try {
+                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3);
+                            } catch (Exception e) {
+                                MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                            }
+                            if (en != null) {
+                                alliesPlayer.add(en);
+                                entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                                getExternalIDLookup().put(en.getExternalIdAsString(), en);
+                            }
                         }
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies")) {
-                specMissionEnemies = new ArrayList<>();
-                for (int i = 0; i < 4; i++) {
-                    specMissionEnemies.add(new ArrayList<>());
-                }
-                NodeList nl2 = wn2.getChildNodes();
-                for (int i = 0; i < nl2.getLength(); i++) {
-                    Node wn3 = nl2.item(i);
-                    if (wn3.getNodeName().equalsIgnoreCase("playerWeight")) {
-                        int weightClass = Integer.parseInt(wn3.getAttributes().getNamedItem("class").getTextContent());
-                        NodeList nl3 = wn3.getChildNodes();
-                        for (int j = 0; j < nl3.getLength(); j++) {
-                            Node wn4 = nl3.item(j);
-                            if (wn4.getNodeName().equalsIgnoreCase("entity")) {
-                                Entity en = null;
-                                try {
-                                    en = MekHqXmlUtil.getEntityFromXmlString(wn4);
-                                } catch (Exception e) {
-                                    MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
-                                }
-                                if (null != en) {
-                                    specMissionEnemies.get(weightClass).add(en);
-                                    entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
-                                    getExternalIDLookup().put(en.getExternalIdAsString(), en);
+                } else if (wn2.getNodeName().equalsIgnoreCase("bigBattleAllies")) {
+                    bigBattleAllies = new ArrayList<>();
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        Node wn3 = nl2.item(i);
+                        if (wn3.getNodeName().equalsIgnoreCase("entity")) {
+                            Entity en = null;
+                            try {
+                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3);
+                            } catch (Exception e) {
+                                MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                            }
+                            if (en != null) {
+                                bigBattleAllies.add(en);
+                                entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                                getExternalIDLookup().put(en.getExternalIdAsString(), en);
+                            }
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies")) {
+                    specMissionEnemies = new ArrayList<>();
+                    for (int i = 0; i < 4; i++) {
+                        specMissionEnemies.add(new ArrayList<>());
+                    }
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        Node wn3 = nl2.item(i);
+                        if (wn3.getNodeName().equalsIgnoreCase("playerWeight")) {
+                            int weightClass = Integer.parseInt(wn3.getAttributes().getNamedItem("class").getTextContent());
+                            NodeList nl3 = wn3.getChildNodes();
+                            for (int j = 0; j < nl3.getLength(); j++) {
+                                Node wn4 = nl3.item(j);
+                                if (wn4.getNodeName().equalsIgnoreCase("entity")) {
+                                    Entity en = null;
+                                    try {
+                                        en = MekHqXmlUtil.parseSingleEntityMul((Element) wn4);
+                                    } catch (Exception e) {
+                                        MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
+                                    }
+                                    if (null != en) {
+                                        specMissionEnemies.get(weightClass).add(en);
+                                        entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                                        getExternalIDLookup().put(en.getExternalIdAsString(), en);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
-                BotForce bf = new BotForce();
-                try {
-                    bf.setFieldsFromXmlNode(wn2, version);
-                } catch (Exception e) {
-                    MekHQ.getLogger().error("Error loading bot force in scenario", e);
-                    bf = null;
-                }
+                } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
+                    BotForce bf = new BotForce();
+                    try {
+                        bf.setFieldsFromXmlNode(wn2, version);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error("Error loading bot force in scenario", e);
+                        bf = null;
+                    }
 
-                if (bf != null) {
-                    addBotForce(bf);
+                    if (bf != null) {
+                        addBotForce(bf);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {
+                    alliesPlayerStub = getEntityStub(wn2);
+                } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
+                    String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
+                    List<String> stub = getEntityStub(wn2);
+                    botForceStubs.add(new BotForceStub(name, stub));
+                } else if (wn2.getNodeName().equalsIgnoreCase("attachedUnits")) {
+                    String[] ids = wn2.getTextContent().split(",");
+                    for (String s : ids) {
+                        attachedUnitIds.add(UUID.fromString(s));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("survivalBonus")) {
+                    String[] ids = wn2.getTextContent().split(",");
+                    for (String s : ids) {
+                        survivalBonus.add(UUID.fromString(s));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportLinkages")) {
+                    try {
+                        transportLinkages = loadTransportLinkages(wn2);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefields")) {
+                    try {
+                        loadMinefieldCounts(wn2);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error("Error loading minefield counts in scenario", e);
+                    }
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {
-                alliesPlayerStub = getEntityStub(wn2);
-            } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
-                String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
-                List<String> stub = getEntityStub(wn2);
-                botForceStubs.add(new BotForceStub(name, stub));
-            } else if (wn2.getNodeName().equalsIgnoreCase("attachedUnits")) {
-                String[] ids = wn2.getTextContent().split(",");
-                for (String s : ids) {
-                    attachedUnitIds.add(UUID.fromString(s));
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("survivalBonus")) {
-                String[] ids = wn2.getTextContent().split(",");
-                for (String s : ids) {
-                    survivalBonus.add(UUID.fromString(s));
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("transportLinkages")) {
-                try {
-                    transportLinkages = loadTransportLinkages(wn2);
-                } catch (Exception e) {
-                    MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefields")) {
-                try {
-                    loadMinefieldCounts(wn2);
-                } catch (Exception e) {
-                    MekHQ.getLogger().error("Error loading minefield counts in scenario", e);
-                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         /* In the event a discrepancy occurs between a RAT entry and the unit lookup name,

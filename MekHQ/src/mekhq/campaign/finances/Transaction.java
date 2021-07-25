@@ -229,14 +229,18 @@ public class Transaction implements Serializable {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("amount")) {
-                retVal.amount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("category")) {
-                retVal.category = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
-                retVal.description = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+                    retVal.amount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("category")) {
+                    retVal.category = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
+                    retVal.description = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
+                    retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         return retVal;

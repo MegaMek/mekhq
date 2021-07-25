@@ -4018,7 +4018,12 @@ public class CampaignOptions implements Serializable {
         int[] weights = new int[values.length];
 
         for (int i = 0; i < weights.length; i++) {
-            weights[i] = Integer.parseInt(values[i]);
+            try {
+                weights[i] = Integer.parseInt(values[i]);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+                weights[i] = 0;
+            }
         }
 
         // Now we need to test to figure out the weights have changed. If not, we will keep the
