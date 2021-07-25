@@ -33,15 +33,14 @@ import java.util.Locale;
 
 /**
  * This migrates Force icons from varied sources to Kailan's Pack
- * This migration occurred in 0.49.3
+ * This migration occurred in 0.49.4
  */
 public class ForceIconMigrator {
     public static StandardForceIcon migrateForceIcon(final StandardForceIcon icon) {
         if (icon instanceof LayeredForceIcon) {
             return migrateLayeredForceIcon((LayeredForceIcon) icon);
         } else if (icon instanceof UnitIcon) {
-            // TODO : Migration Units to logos
-            return icon; // Assume they properly set this value
+            return migrateUnitIcon((UnitIcon) icon);
         } else if (icon != null) {
             return migrateStandardForceIcon(icon);
         } else {
@@ -1908,6 +1907,169 @@ public class ForceIconMigrator {
     }
     //endregion Layered Force Icon
 
+    //region Unit Icon
+    private static UnitIcon migrateUnitIcon(final UnitIcon icon) {
+        if (icon.hasDefaultFilename() || (icon.getFilename() == null)) {
+            return new UnitIcon(null, null);
+        }
+
+        switch (icon.getCategory().toLowerCase(Locale.ENGLISH)) {
+            case "units":
+                return migrateUnitIconUnits(icon);
+            case "pieces/logos":
+                return migrateUnitIconLogos(icon);
+            default:
+                // Apply a hard reset, as they can reselect and it's almost certain this originates
+                // from user error
+                return new UnitIcon(null, null);
+        }
+    }
+
+    private static UnitIcon migrateUnitIconUnits(final UnitIcon icon) {
+        switch (icon.getFilename()) {
+            case "Arturanguards25th.jpg":
+                return new UnitIcon(icon.getCategory(), "25th Arcturan Guards.jpg");
+            case "Black_Widow_Company.jpg":
+                return new UnitIcon(icon.getCategory(), "Black Widow Company.jpg");
+            case "CapellanConfederation.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Capellan Confederation.png");
+            case "CircinusFederation.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Circinus Federation.png");
+            case "ClanCloudCobra.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Cloud Cobra.png");
+            case "ClanCoyote.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Coyote.png");
+            case "ClanDiamondShark.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Diamond Shark.png");
+            case "ClanGhostBear.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Ghost Bear.png");
+            case "ClanSteelViper.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Steel Viper.png");
+            case "ClanWolverine.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Wolverine.png");
+            case "Comstar.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "ComStar.png");
+            case "DraconisCombine.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Draconis Combine.png");
+            case "FederatedCommonwealth.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Federated Commonwealth.png");
+            case "FederatedSuns.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Federated Suns.png");
+            case "foxsteeth.png":
+                return new UnitIcon(icon.getCategory(), "Fox's Teeth.png");
+            case "FreeRasalhagueRepublic.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Free Rasalhague Republic.png");
+            case "FreeWorldsLeague.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Free Worlds League.png");
+            case "JadeFalconDelta.gif":
+                return new UnitIcon(icon.getCategory(), "Jade Falcon Delta Galaxy.gif");
+            case "LyranAlliance.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Lyran Alliance.png");
+            case "MagistryOfCanopus.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Magistracy of Canopus.png");
+            case "MarianHegemony.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Marian Hegemony.png");
+            case "Opacus_Venatori.jpg":
+                return new UnitIcon(icon.getCategory(), "Opacus Venatori.jpg");
+            case "OutworldsAlliance.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Outworlds Alliance.png");
+            case "RepublicOfTheSphere.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Republic of the Sphere.png");
+            case "SorensonSabres.jpg":
+                return new UnitIcon(icon.getCategory(), "Sorenson's Sabres.jpg");
+            case "StarLeague.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Star League.png");
+            case "TaurianConcordat.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Taurian Concordat.png");
+            case "WordOfBlake.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Word of Blake.png");
+            default:
+                return icon;
+        }
+    }
+
+    private static UnitIcon migrateUnitIconLogos(final UnitIcon icon) {
+        switch (icon.getFilename()) {
+            case "Capellan Confederation.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Capellan Confederation.png");
+            case "ComStar.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "ComStar.png");
+            case "Draconis Combine.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Draconis Combine.png");
+            case "Federated Commonwealth.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Federated Commonwealth.png");
+            case "Federated Suns.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Federated Suns.png");
+            case "Free Rasalhague Republic.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Free Rasalhague Republic.png");
+            case "Free Worlds League.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Free Worlds League.png");
+            case "Lyran Alliance.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Lyran Alliance.png");
+            case "Lyran Commonwealth.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Lyran Commonwealth.png");
+            case "Rim Worlds Republic.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Rim Worlds Republic.png");
+            case "Star League.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Star League.png");
+            case "Word of Blake.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Word of Blake.png");
+            case "Clan Blood Spirit.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Blood Spirit.png");
+            case "Clan Cloud Cobra.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Cloud Cobra.png");
+            case "Clan Coyote.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Coyote.png");
+            case "Clan Diamond Shark.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Diamond Shark.png");
+            case "Clan Fire Mandril.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Fire Mandril.png");
+            case "Clan Ghost Bear.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Ghost Bear.png");
+            case "Clan Goliath Scorpion.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Goliath Scorpion.png");
+            case "Clan Hells Horses.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Hells Horses.png");
+            case "Clan Ice Hellion.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Ice Hellion.png");
+            case "Clan Jade Falcon.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Jade Falcon.png");
+            case "Clan Mongoose.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Mongoose.png");
+            case "Clan Nova Cat.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Nova Cat.png");
+            case "Clan Smoke Jaguar.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Smoke Jaguar.png");
+            case "Clan Snow Raven.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Snow Raven.png");
+            case "Clan Star Adder.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Star Adder.png");
+            case "Clan Steel Viper.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Steel Viper.png");
+            case "Clan Widowmaker.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Widowmaker.png");
+            case "Clan Wolf in Exile.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Wolf-in-Exile.png");
+            case "Clan Wolf.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Wolf.png");
+            case "Clan Wolverine.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Wolverine.png");
+            case "Circinus Federation.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Circinus Federation.png");
+            case "Magistracy of Canopus.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Magistracy of Canopus.png");
+            case "Marian Hegemony.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Marian Hegemony.png");
+            case "Outworlds Alliance.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Outworlds Alliance.png");
+            case "Taurian Concordat.png":
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Taurian Concordat.png");
+            default:
+                return icon;
+        }
+    }
+    //endregion Unit Icon
+
     //region Standard Force Icon
     private static StandardForceIcon migrateStandardForceIcon(final StandardForceIcon icon) {
         if (icon.hasDefaultCategory()) {
@@ -1928,12 +2090,39 @@ public class ForceIconMigrator {
 
             if (layer == null) {
                 return new StandardForceIcon();
+            } else if (layer.isFrame()) {
+                return new LayeredForceIcon();
             }
 
-            final LayeredForceIcon parser = new LayeredForceIcon();
-            parser.getPieces().putIfAbsent(layer, new ArrayList<>());
+            final LayeredForceIcon parser = new LayeredForceIcon(LayeredForceIcon.LAYERED_CATEGORY,
+                    icon.getFilename());
             final LayeredForceIcon parsed = new LayeredForceIcon();
-            migrateLogos(parser, parsed);
+            switch (layer) {
+                case ADJUSTMENT:
+                    migrateAdjustments(parser, parsed);
+                    break;
+                case ALPHANUMERIC:
+                    migrateAlphanumerics(parser, parsed);
+                    break;
+                case BACKGROUND:
+                    migrateBackgrounds(parser, parsed);
+                    break;
+                case FORMATION:
+                    migrateFormations(parser, parsed);
+                    break;
+                case FRAME:
+                    break;
+                case LOGO:
+                    migrateLogos(parser, parsed);
+                    break;
+                case SPECIAL_MODIFIER:
+                    migrateSpecialModifiers(parser, parsed);
+                    break;
+                case TYPE:
+                    migrateTypes(parser, parsed);
+                    break;
+            }
+
             return parsed;
         }
 
@@ -2074,17 +2263,16 @@ public class ForceIconMigrator {
 
     private static StandardForceIcon migrateStandardBattleArmor(final StandardForceIcon icon) {
         final LayeredForceIcon layered = new LayeredForceIcon();
-        switch (icon.getFilename()) {
-            case "battlearmor.png":
-                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
-                layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Battle Armor (Extended).png"));
-                layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
-                layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "MVO.png"));
-                return layered;
-            default:
-                return icon;
+        if ("battlearmor.png".equals(icon.getFilename())) {
+            layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+            layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Battle Armor (Extended).png"));
+            layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+            layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "MVO.png"));
+            return layered;
+        } else {
+            return icon;
         }
     }
 
@@ -2245,7 +2433,7 @@ public class ForceIconMigrator {
     }
 
     private static StandardForceIcon migrateStandardFormationsClan(final StandardForceIcon icon) {
-        // TODO : Complete me
+        // TODO : Windchild : Complete me
         final LayeredForceIcon layered = new LayeredForceIcon();
         switch (icon.getFilename()) {
             case "battlearmor.png":
