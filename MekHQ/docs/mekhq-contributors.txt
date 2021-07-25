@@ -46,7 +46,12 @@ Data
 		at http://iscs.teamspam.net/
 
 	Force Images
-		Jennifer "Kailan" Imbrie
+		Jennifer "Kailan" Imbrie - Kailan Pack
+		Dylan Myers <https://github.com/Dylan-M> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		Peter Farland <pfarland@live.com> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		CarnageINC - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		krazzyharry - MekHQ 0.48 Pack - Now part of the MekHQ Extras
 
 	Against the Bot Guide
 		CampaignAnon
