@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.panes;
+package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JTabbedPanePreference;
@@ -27,9 +27,7 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQScrollPane;
-import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.panels.ForcePieceIconChooser;
+import mekhq.gui.baseComponents.AbstractMHQPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -39,7 +37,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
+public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
     private final boolean includeButtons;
@@ -50,10 +48,10 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //endregion Variable Declarations
 
     //region Constructors
-    public LayeredForceIconCreationPane(final JFrame frame,
-                                        final @Nullable StandardForceIcon forceIcon,
-                                        final boolean includeButtons) {
-        super(frame, "LayeredForceIconCreationPane");
+    public LayeredForceIconCreationPanel(final JFrame frame,
+                                         final @Nullable StandardForceIcon forceIcon,
+                                         final boolean includeButtons) {
+        super(frame, "LayeredForceIconCreationPanel", new GridBagLayout());
         setForceIcon((forceIcon instanceof LayeredForceIcon)
                 ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
         this.includeButtons = includeButtons;
@@ -102,45 +100,46 @@ public class LayeredForceIconCreationPane extends AbstractMHQScrollPane {
     //region Initialization
     @Override
     protected void initialize() {
-        final JPanel panel = new JScrollablePanel(new GridBagLayout());
-        panel.setName("piecesPanel");
-
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("piecesTabbedPane");
+        getTabbedPane().setPreferredSize(new Dimension(700, 1100));
         setChoosers(new HashMap<>());
         for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
             getChoosers().put(layer, new ForcePieceIconChooser(layer, getForceIcon()));
             getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
         }
-        panel.add(getTabbedPane(), gbc);
+        add(getTabbedPane(), gbc);
 
         setLblIcon(new JLabel(getForceIcon().getImageIcon()));
         getLblIcon().setToolTipText(resources.getString("lblIcon.toolTipText"));
         getLblIcon().setName("lblIcon");
         gbc.gridy++;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.SOUTH;
-        panel.add(getLblIcon(), gbc);
+        add(getLblIcon(), gbc);
 
         if (isIncludeButtons()) {
             gbc.gridy++;
             gbc.gridwidth = 1;
-            panel.add(new MMButton("btnExport", resources, "Export.text",
-                    "LayeredForceIconCreationPane.btnExport.toolTipText", evt -> exportAction()), gbc);
+            add(new MMButton("btnExport", resources, "Export.text",
+                    "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
 
             gbc.gridx++;
-            panel.add(new MMButton("btnRefreshDirectory", resources, "RefreshDirectory.text",
+            add(new MMButton("btnRefreshDirectory", resources, "RefreshDirectory.text",
                     "RefreshDirectory.toolTipText", evt -> refreshDirectory()), gbc);
         }
 
-        setViewportView(panel);
+        setPreferences();
     }
 
     @Override

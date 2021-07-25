@@ -54,7 +54,7 @@ import mekhq.gui.baseComponents.AbstractMHQDialog;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import mekhq.gui.panes.LayeredForceIconCreationPane;
+import mekhq.gui.panels.LayeredForceIconCreationPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -1080,8 +1080,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Names Tab
 
     //region Layered Force Icon Tab
-    private JScrollPane createLayeredForceIconTab() {
-        return new LayeredForceIconCreationPane(getFrame(), null, true);
+    private JPanel createLayeredForceIconTab() {
+        return new LayeredForceIconCreationPanel(getFrame(), null, true);
     }
     //endregion Layered Force Icon Tab
 

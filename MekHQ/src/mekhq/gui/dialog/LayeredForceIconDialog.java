@@ -23,11 +23,12 @@ import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panels.StandardForceIconChooser;
-import mekhq.gui.panes.LayeredForceIconCreationPane;
+import mekhq.gui.panels.LayeredForceIconCreationPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,7 +40,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
 
     private JTabbedPane tabbedPane;
     private StandardForceIconChooser standardForceIconChooser;
-    private LayeredForceIconCreationPane layeredForceIconCreationPane;
+    private LayeredForceIconCreationPanel layeredForceIconCreationPanel;
     //endregion Variable Declarations
 
     //region Constructors
@@ -80,12 +81,12 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         this.standardForceIconChooser = standardForceIconChooser;
     }
 
-    public LayeredForceIconCreationPane getLayeredForceIconCreationPane() {
-        return layeredForceIconCreationPane;
+    public LayeredForceIconCreationPanel getLayeredForceIconCreationPanel() {
+        return layeredForceIconCreationPanel;
     }
 
-    public void setLayeredForceIconCreationPane(final LayeredForceIconCreationPane layeredForceIconCreationPane) {
-        this.layeredForceIconCreationPane = layeredForceIconCreationPane;
+    public void setLayeredForceIconCreationPanel(final LayeredForceIconCreationPanel layeredForceIconCreationPanel) {
+        this.layeredForceIconCreationPanel = layeredForceIconCreationPanel;
     }
 
     public @Nullable StandardForceIcon getSelectedItem() {
@@ -94,7 +95,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         } else if (getStandardForceIconChooser().equals(getTabbedPane().getSelectedComponent())) {
             return getStandardForceIconChooser().getSelectedItem();
         } else {
-            return getLayeredForceIconCreationPane().getForceIcon();
+            return getLayeredForceIconCreationPanel().getForceIcon();
         }
     }
     //endregion Getters/Setters
@@ -108,8 +109,8 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         setStandardForceIconChooser(new StandardForceIconChooser(getOriginalForceIcon()));
         getTabbedPane().addTab(resources.getString("StandardIconTab.title"), getStandardForceIconChooser());
 
-        setLayeredForceIconCreationPane(new LayeredForceIconCreationPane(getFrame(), getOriginalForceIcon(), false));
-        getTabbedPane().addTab(resources.getString("LayeredIconTab.title"), getLayeredForceIconCreationPane());
+        setLayeredForceIconCreationPanel(new LayeredForceIconCreationPanel(getFrame(), getOriginalForceIcon(), false));
+        getTabbedPane().addTab(resources.getString("LayeredIconTab.title"), getLayeredForceIconCreationPanel());
         return getTabbedPane();
     }
 
@@ -129,6 +130,15 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     }
 
     @Override
+    protected void finalizeInitialization() {
+        super.finalizeInitialization();
+
+        if (getOriginalForceIcon() instanceof LayeredForceIcon) {
+            getTabbedPane().setSelectedComponent(getLayeredForceIconCreationPanel());
+        }
+    }
+
+    @Override
     protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
         preferences.manage(new JSplitPanePreference(getStandardForceIconChooser().getSplitPane()));
@@ -137,6 +147,6 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
 
     public void refreshDirectory(final @Nullable ActionEvent evt) {
         getStandardForceIconChooser().refreshDirectory();
-        getLayeredForceIconCreationPane().refreshDirectory();
+        getLayeredForceIconCreationPanel().refreshDirectory();
     }
 }
