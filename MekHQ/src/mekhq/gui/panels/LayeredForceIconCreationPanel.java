@@ -170,7 +170,11 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     }
 
     public void refreshDirectory() {
-        // TODO : Implement me
+        for (final ForcePieceIconChooser chooser : getChoosers().values()) {
+            chooser.refreshDirectory();
+        }
+
+        // TODO : Windchild : Refresh the LayeredForceIcon based on the refreshed choosers
     }
     //endregion Button Actions
 }

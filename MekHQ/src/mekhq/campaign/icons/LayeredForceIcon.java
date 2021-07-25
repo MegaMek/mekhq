@@ -40,7 +40,7 @@ public class LayeredForceIcon extends StandardForceIcon {
     public static final String LAYERED_CATEGORY = "Layered";
     public static final String XML_TAG = "layeredForceIcon";
 
-    private Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new LinkedHashMap<>();
+    private Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new HashMap<>();
     //endregion Variable Declarations
 
     //region Constructors
@@ -198,7 +198,34 @@ public class LayeredForceIcon extends StandardForceIcon {
     }
     //endregion File I/O
 
-    // TODO : Equals and HashCode overrides
+    @Override
+    public String toString() {
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getCategory()).append("/");
+        for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
+            stringBuilder.append(entry.getKey()).append(":");
+            for (final ForcePieceIcon icon : entry.getValue()) {
+                stringBuilder.append(icon).append("/");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (this == other) {
+            return true;
+        } else if (other instanceof LayeredForceIcon) {
+            return ((LayeredForceIcon) other).getPieces().equals(getPieces());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getPieces().hashCode();
+    }
 
     @Override
     public LayeredForceIcon clone() {

@@ -85,7 +85,7 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
             return;
         }
 
-        // TODO : Change this to handle multiselect and more from here
+        // TODO : Windchild : Change this to handle multiselect and more from here
 
         // This cumbersome code takes the category name and transforms it into
         // a TreePath so it can be selected in the dialog
