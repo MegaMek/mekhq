@@ -4859,8 +4859,7 @@ public class Campaign implements Serializable, ITechManager {
 
         int helpMod;
         if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {
-            helpMod = getShorthandedModForCrews((partWork.getUnit().getEntity().getCrew() == null)
-                    ? MekHqConstants.ASTECH_TEAM_SIZE : partWork.getUnit().getEntity().getCrew().getHits());
+            helpMod = getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
         } else {
             final int helpers = getAvailableAstechs(minutes, isOvertime);
             helpMod = getShorthandedMod(helpers, false);
@@ -4923,19 +4922,13 @@ public class Campaign implements Serializable, ITechManager {
             // "astech days" used over
             // the cycle and take the average per day rounding down as our team
             // size
-            int helpMod = 0;
-            if (null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
-                int hits = 0;
-                if (null != partWork.getUnit().getEntity().getCrew()) {
-                    hits = partWork.getUnit().getEntity().getCrew().getHits();
-                } else {
-                    hits = 6;
-                }
-                helpMod = getShorthandedModForCrews(hits);
+            final int helpMod;
+            if (partWork.getUnit().isSelfCrewed()) {
+                helpMod = getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
             } else {
-                int helpers = partWork.getUnit().getAstechsMaintained();
-                helpMod = getShorthandedMod(helpers, false);
+                helpMod = getShorthandedMod(partWork.getUnit().getAstechsMaintained(), false);
             }
+
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
             }
@@ -5331,18 +5324,19 @@ public class Campaign implements Serializable, ITechManager {
         return helpMod;
     }
 
-    public int getShorthandedModForCrews(int hits) {
-        int helpMod = 0;
+    public int getShorthandedModForCrews(final @Nullable Crew crew) {
+        final int hits = (crew == null) ? 5 : crew.getHits();
         if (hits >= 5) {
-            helpMod = 4;
+            return 4;
         } else if (hits == 4) {
-            helpMod = 3;
+            return  3;
         } else if (hits == 3) {
-            helpMod = 2;
+            return 2;
         } else if (hits > 0) {
-            helpMod = 1;
+            return 1;
+        } else {
+            return 0;
         }
-        return helpMod;
     }
 
     public int getMedicsPerDoctor() {
