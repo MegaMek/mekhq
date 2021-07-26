@@ -3167,8 +3167,10 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
-                        Person p = newDependent(false);
-                        recruitPerson(p);
+                        final Person person = newDependent(false);
+                        recruitPerson(person, PrisonerStatus.FREE, true, false);
+                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                                person.getFullTitle()));
                     }
                 }
             }
