@@ -587,47 +587,56 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         selected, true);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add personnelTab.getCampaign() report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("gained.format"),
+                        selectedPerson.getHyperlinkedName(), SpecialAbility.getDisplayName(selected)));
                 break;
             }
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "weapon_specialist", selected);
+                        OptionsConstants.GUNNERY_WEAPON_SPECIALIST, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add campaign report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("spaGainedChoices.format"),
+                        selectedPerson.getHyperlinkedName(),
+                        SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST), selected));
                 break;
             }
             case CMD_ACQUIRE_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "specialist", selected);
+                        OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add campaign report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("spaGainedChoices.format"),
+                        selectedPerson.getHyperlinkedName(),
+                        SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST), selected));
                 break;
             }
             case CMD_ACQUIRE_RANGEMASTER: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "range_master", selected);
+                        OptionsConstants.GUNNERY_RANGE_MASTER, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add campaign report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("spaGainedChoices.format"),
+                        selectedPerson.getHyperlinkedName(),
+                        SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER), selected));
                 break;
             }
             case CMD_ACQUIRE_HUMANTRO: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
-                        "human_tro", selected);
+                        OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add campaign report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("spaGainedChoices.format"),
+                        selectedPerson.getHyperlinkedName(),
+                        SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO), selected));
                 break;
             }
             case CMD_ACQUIRE_CUSTOM_CHOICE: {
@@ -638,7 +647,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         ability, selected);
                 selectedPerson.awardXP(-cost);
                 gui.getCampaign().personUpdated(selectedPerson);
-                // TODO: add campaign report
+                gui.getCampaign().addReport(String.format(resourceMap.getString("spaGainedChoices.format"),
+                        selectedPerson.getHyperlinkedName(), SpecialAbility.getDisplayName(ability), selected));
                 break;
             }
             case CMD_CHANGE_STATUS: {
@@ -881,6 +891,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     //Make the new edge point available to support personnel, but don't reset until the week ends
                     person.changeCurrentEdge(1);
                     gui.getCampaign().personUpdated(person);
+                    gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName()));
                 }
                 break;
             }
@@ -1929,7 +1940,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
                         Unit u = person.getUnit();
                         if (null != u) {
-                            JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text"));
+                            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST));
                             TreeSet<String> uniqueWeapons = new TreeSet<>();
                             for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
                                 Mounted m = u.getEntity().getWeaponList().get(j);
@@ -1951,7 +1962,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             }
                         }
                     } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
-                        JMenu specialistMenu = new JMenu(resourceMap.getString("humantro.text"));
+                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
                         List<Object> tros = new ArrayList<>();
                         if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
                             Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
@@ -1994,7 +2005,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     } else if (spa.getName().equals(OptionsConstants.GUNNERY_SPECIALIST)
                             && !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) {
-                        JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text"));
+                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST));
                         menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc));
                         menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_ENERGY, String.valueOf(cost)));
                         menuItem.addActionListener(this);
@@ -2012,7 +2023,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         specialistMenu.add(menuItem);
                         abMenu.add(specialistMenu);
                     } else if (spa.getName().equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
-                        JMenu specialistMenu = new JMenu(resourceMap.getString("rangemaster.text"));
+                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER));
                         List<Object> ranges = new ArrayList<>();
                         if (person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).booleanValue()) {
                             Object val = person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).getValue();
