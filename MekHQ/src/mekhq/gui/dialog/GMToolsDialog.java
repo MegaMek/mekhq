@@ -257,8 +257,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblUnitPicked = lblUnitPicked;
     }
 
-    public @Nullable
-    Entity getLastRolledUnit() {
+    public @Nullable Entity getLastRolledUnit() {
         return lastRolledUnit;
     }
 
@@ -324,8 +323,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtNamesGenerated = txtNamesGenerated;
     }
 
-    public @Nullable
-    String[] getLastGeneratedName() {
+    public @Nullable String[] getLastGeneratedName() {
         return lastGeneratedName;
     }
 
@@ -357,8 +355,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.txtCallsignsGenerated = txtCallsignsGenerated;
     }
 
-    public @Nullable
-    String getLastGeneratedCallsign() {
+    public @Nullable String getLastGeneratedCallsign() {
         return lastGeneratedCallsign;
     }
 
@@ -430,8 +427,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.lblBloodnameWarning = lblBloodnameWarning;
     }
 
-    public @Nullable
-    Clan getOriginClan() {
+    public @Nullable Clan getOriginClan() {
         return originClan;
     }
 
@@ -447,8 +443,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.bloodnameYear = bloodnameYear;
     }
 
-    public @Nullable
-    Phenotype getSelectedPhenotype() {
+    public @Nullable Phenotype getSelectedPhenotype() {
         return selectedPhenotype;
     }
 
@@ -456,8 +451,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.selectedPhenotype = selectedPhenotype;
     }
 
-    public @Nullable
-    String getLastGeneratedBloodname() {
+    public @Nullable String getLastGeneratedBloodname() {
         return lastGeneratedBloodname;
     }
 
@@ -1185,6 +1179,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 return panel;
             }
         }
+
+        final JPanel procreationSimulationPanel = new JPanel();
+        procreationSimulationPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("procreationSimulationPanel.title")));
+        procreationSimulationPanel.setToolTipText(resources.getString("procreationSimulationPanel.toolTipText"));
+        procreationSimulationPanel.setName("procreationSimulationPanel");
+
 
         return panel;
     }

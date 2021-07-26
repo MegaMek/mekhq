@@ -57,7 +57,7 @@ public abstract class AbstractProcreation {
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public RandomProcreationMethod getMethod() {
         return method;
     }
@@ -69,7 +69,7 @@ public abstract class AbstractProcreation {
     public void setUseRelationshiplessProcreation(final boolean useRelationshiplessProcreation) {
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
-    //endregion Getters
+    //endregion Getters/Setters
 
     //region Determination Methods
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
@@ -293,7 +293,7 @@ public abstract class AbstractProcreation {
             return;
         }
 
-        // Make the required checks for
+        // Make the required checks for random procreation
         if (randomlyProcreates(today, person)) {
             addPregnancy(campaign, today, person);
         }
