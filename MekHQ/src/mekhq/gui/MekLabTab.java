@@ -91,10 +91,10 @@ public class MekLabTab extends CampaignGuiTab {
 
     @Override
     public void initTab() {
-        entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
+        entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
         CConfig.load();
         UnitUtil.loadFonts();
-        MekHQ.getLogger().info(this, "Starting MegaMekLab version: " + MegaMekLab.VERSION);
+        MekHQ.getLogger().info("Starting MegaMekLab version: " + MegaMekLab.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -173,7 +173,6 @@ public class MekLabTab extends CampaignGuiTab {
 
     @Override
     public void refreshAll() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -189,11 +188,11 @@ public class MekLabTab extends CampaignGuiTab {
     public void loadUnit(Unit u) {
         unit = u;
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortNameRaw());
-        Entity entity = null;
+        Entity entity;
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -224,11 +223,11 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void resetUnit() {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
-        Entity entity = null;
+        Entity entity;
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(getClass(), "resetUnit()", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());

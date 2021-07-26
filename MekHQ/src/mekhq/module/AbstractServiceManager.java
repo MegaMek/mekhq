@@ -52,12 +52,12 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
         try {
             for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
                 final T service = iter.next();
-                MekHQ.getLogger().debug(this, "Found service " + service.getModuleName());
+                MekHQ.getLogger().debug("Found service " + service.getModuleName());
 
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
     }
 

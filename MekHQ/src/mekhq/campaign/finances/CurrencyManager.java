@@ -54,7 +54,6 @@ import java.util.Set;
  * There should be only one instance of this class.
  *
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
- *
  */
 public class CurrencyManager extends CurrencyUnitDataProvider {
     private static final CurrencyManager instance = new CurrencyManager();
@@ -197,14 +196,14 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     @Override
     protected void registerCurrencies() {
-        MekHQ.getLogger().info(CurrencyManager.class, "Starting load currency information from XML...");
+        MekHQ.getLogger().info("Starting load currency information from XML...");
 
         try {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")){
+            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")) { // TODO : Remove inline file path
                 Document xmlDoc = db.parse(xmlFile);
 
                 Element root = xmlDoc.getDocumentElement();
@@ -292,9 +291,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 }
             }
 
-            MekHQ.getLogger().info(CurrencyManager.class, "Load of currency information complete!");
+            MekHQ.getLogger().info("Load of currency information complete!");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CurrencyManager.class, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 

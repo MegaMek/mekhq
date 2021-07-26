@@ -319,7 +319,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
-        for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+        for (MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, we continue
             if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
@@ -349,7 +349,7 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().warning(Utilities.class, "Could not determine tech progression for " + summary.getName()
+                MekHQ.getLogger().warning("Could not determine tech progression for " + summary.getName()
                                 + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
@@ -437,9 +437,9 @@ public class Utilities {
             return SkillType.EXP_ULTRA_GREEN;
         } else if (roll < 6) {
             return SkillType.EXP_GREEN;
-        } else if(roll < 10) {
+        } else if (roll < 10) {
             return SkillType.EXP_REGULAR;
-        } else if(roll < 12) {
+        } else if (roll < 12) {
             return SkillType.EXP_VETERAN;
         } else {
             return SkillType.EXP_ELITE;
@@ -452,26 +452,26 @@ public class Utilities {
         //if two of the same type are tie rank, take the first one
         int bestRank = -1;
         Person commander = null;
-        for(Person p : vesselCrew) {
-            if(null != p && p.getRankNumeric() > bestRank) {
+        for (Person p : vesselCrew) {
+            if (null != p && p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        for(Person p : gunners) {
-            if(p.getRankNumeric() > bestRank) {
+        for (Person p : gunners) {
+            if (p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        for(Person p : drivers) {
-            if(null != p && p.getRankNumeric() > bestRank) {
+        for (Person p : drivers) {
+            if (null != p && p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        if(navigator != null) {
-            if(navigator.getRankNumeric() > bestRank) {
+        if (navigator != null) {
+            if (navigator.getRankNumeric() > bestRank) {
                 commander = navigator;
                 bestRank = navigator.getRankNumeric();
             }
@@ -507,12 +507,12 @@ public class Utilities {
      */
     public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
         int casualties;
-        if(e instanceof Infantry) {
+        if (e instanceof Infantry) {
             e.applyDamage();
             casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
-                    if(Compute.d6(2) >= 7) {
+                    if (Compute.d6(2) >= 7) {
                         int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
                         if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
@@ -660,7 +660,7 @@ public class Utilities {
                                         - oldCrew.getPiloting()),
                                 0);
                         totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof BattleArmor) {
+                    } else if (u.getEntity() instanceof BattleArmor) {
                         p = c.newPerson(PersonnelRole.BATTLE_ARMOUR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
@@ -668,14 +668,14 @@ public class Utilities {
                                         - oldCrew.getGunnery()),
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof Infantry) {
+                    } else if (u.getEntity() instanceof Infantry) {
                         p = c.newPerson(PersonnelRole.SOLDIER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof VTOL) {
+                    } else if (u.getEntity() instanceof VTOL) {
                         p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(
@@ -994,7 +994,7 @@ public class Utilities {
     public static String getOptionDisplayName(IOption option) {
         String name = option.getDisplayableNameWithValue();
         name = name.replaceAll("\\(.+?\\)", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        if(option.getType() == IOption.CHOICE) {
+        if (option.getType() == IOption.CHOICE) {
             name += " - " + option.getValue(); //$NON-NLS-1$
         }
         return name;
@@ -1070,11 +1070,11 @@ public class Utilities {
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info(Utilities.class, "File copied.");
+            MekHQ.getLogger().info("File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Utilities.class, e.getMessage() + " in the specified directory.");
+            MekHQ.getLogger().error(e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(Utilities.class, e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -1395,20 +1395,20 @@ public class Utilities {
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
         Vector<String> output = new Vector<>();
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             output.add(st.nextToken());
         }
         return output;
     }
 
     public static String combineString(Collection<String> vec, String sep) {
-        if((null == vec) || (null == sep)) {
+        if ((null == vec) || (null == sep)) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for( String part : vec ) {
-            if( first ) {
+        for (String part : vec) {
+            if (first) {
                 first = false;
             } else {
                 sb.append(sep);
@@ -1420,16 +1420,16 @@ public class Utilities {
 
     /** @return the input string with all words capitalized */
     public static String capitalize(String str) {
-        if((null == str) || str.isEmpty()) {
+        if ((null == str) || str.isEmpty()) {
             return str;
         }
         final char[] buffer = str.toCharArray();
         boolean capitalizeNext = true;
-        for(int i = 0; i < buffer.length; ++ i) {
+        for (int i = 0; i < buffer.length; i++) {
             final char ch = buffer[i];
-            if(Character.isWhitespace(ch)) {
+            if (Character.isWhitespace(ch)) {
                 capitalizeNext = true;
-            } else if(capitalizeNext) {
+            } else if (capitalizeNext) {
                 buffer[i] = Character.toTitleCase(ch);
                 capitalizeNext = false;
             }
@@ -1468,7 +1468,7 @@ public class Utilities {
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
-        if(highFirst) {
+        if (highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
             while(li.hasPrevious()) {
                 Map.Entry<String, Integer> entry = li.previous();
@@ -1486,7 +1486,7 @@ public class Utilities {
     public static boolean isLikelyCapture(Entity en) {
         //most of these conditions are now controlled better in en.canEscape, but there
         //are some additional ones we want to add
-        if(!en.canEscape()) {
+        if (!en.canEscape()) {
             return true;
         }
         return en.isDestroyed() || en.isDoomed() || en.isStalled() || en.isStuck();
@@ -1519,8 +1519,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().error(Utilities.class, "Exception trying to parse " + file.getPath() + " - ignoring.");
-                            MekHQ.getLogger().error(Utilities.class, ex);
+                            MekHQ.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
                         }
                     }
                 }
@@ -1606,15 +1605,15 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, e);
+                    MekHQ.getLogger().error(e);
                 }
-            } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+            } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
                 // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
         }

@@ -217,12 +217,12 @@ public class Clan {
 
     public static void loadClanData() {
         allClans = new HashMap<>();
-        File f = new File("data/names/bloodnames/clans.xml");
+        File f = new File("data/names/bloodnames/clans.xml"); // TODO : Remove inline file path
         FileInputStream fis;
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Bloodname.class, "Cannot find file clans.xml");
+            MekHQ.getLogger().error("Cannot find file clans.xml");
             return;
         }
 
