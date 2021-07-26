@@ -217,6 +217,9 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkPersonnelLogSkillGain;
+    private JCheckBox chkPersonnelLogAbilityGain;
+    private JCheckBox chkPersonnelLogEdgeGain;
 
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
@@ -3671,6 +3674,18 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
 
+        chkPersonnelLogSkillGain = new JCheckBox(resources.getString("chkPersonnelLogSkillGain.text"));
+        chkPersonnelLogSkillGain.setToolTipText(resources.getString("chkPersonnelLogSkillGain.toolTipText"));
+        chkPersonnelLogSkillGain.setName("chkPersonnelLogSkillGain");
+
+        chkPersonnelLogAbilityGain = new JCheckBox(resources.getString("chkPersonnelLogAbilityGain.text"));
+        chkPersonnelLogAbilityGain.setToolTipText(resources.getString("chkPersonnelLogAbilityGain.toolTipText"));
+        chkPersonnelLogAbilityGain.setName("chkPersonnelLogAbilityGain");
+
+        chkPersonnelLogEdgeGain = new JCheckBox(resources.getString("chkPersonnelLogEdgeGain.text"));
+        chkPersonnelLogEdgeGain.setToolTipText(resources.getString("chkPersonnelLogEdgeGain.toolTipText"));
+        chkPersonnelLogEdgeGain.setName("chkPersonnelLogEdgeGain");
+
         // Layout the Panel
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -3693,6 +3708,9 @@ public class CampaignOptionsDialog extends JDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkPersonnelLogSkillGain)
+                        .addComponent(chkPersonnelLogAbilityGain)
+                        .addComponent(chkPersonnelLogEdgeGain)
         );
 
         layout.setHorizontalGroup(
@@ -3707,6 +3725,9 @@ public class CampaignOptionsDialog extends JDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkPersonnelLogSkillGain)
+                        .addComponent(chkPersonnelLogAbilityGain)
+                        .addComponent(chkPersonnelLogEdgeGain)
         );
 
         return panel;
@@ -4835,6 +4856,9 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseImplants.setSelected(options.useImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
+        chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
+        chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
+        chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
 
         // Expanded Personnel Information
         if (chkUseTimeInService.isSelected() != options.getUseTimeInService()) {
@@ -5423,6 +5447,9 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
+        options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
+        options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
 
         // Expanded Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());

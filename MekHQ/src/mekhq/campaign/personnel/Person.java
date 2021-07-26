@@ -2852,8 +2852,9 @@ public class Person implements Serializable {
         }
     }
 
-    public void changeEdge(int amount) {
-        setEdge(Math.max(getEdge() + amount, 0));
+    public void changeEdge(final int amount) {
+        final int edge = Math.max(getEdge() + amount, 0);
+        setEdge(edge);
     }
 
     /**
