@@ -73,8 +73,8 @@ public class PersonalLogger {
     public static void gainedSPA(final Campaign campaign, final Person person, final LocalDate date,
                                  final String spa) {
         if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
-            String message = resources.getString("gained.text");
-            person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spa)));
+            person.addLogEntry(new PersonalLogEntry(date,
+                    MessageFormat.format(resources.getString("gained.text"), spa)));
         }
     }
 

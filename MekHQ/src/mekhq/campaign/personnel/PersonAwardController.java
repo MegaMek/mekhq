@@ -118,8 +118,8 @@ public class PersonAwardController {
         person.awardXP(award.getXPReward());
         if (award.getEdgeReward() > 0) {
             person.changeEdge(award.getEdgeReward());
+            person.changeCurrentEdge(award.getEdgeReward());
             PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
-            person.resetCurrentEdge(); //Reset the person's edge points
         }
 
         award.addDate(date);

@@ -392,6 +392,7 @@ public final class BatchXPDialog extends JDialog {
                         if (spa == null) {
                             if (campaign.getCampaignOptions().useEdge()) {
                                 p.changeEdge(1);
+                                p.changeCurrentEdge(1);
                                 PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());
                             }
                         } else {

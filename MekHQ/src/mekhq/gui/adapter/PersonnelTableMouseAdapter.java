@@ -573,6 +573,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (spa == null) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                                 selectedPerson.changeEdge(1);
+                                selectedPerson.changeCurrentEdge(1);
                                 PersonalLogger.gainedEdge(gui.getCampaign(), selectedPerson,
                                         gui.getCampaign().getLocalDate());
                                 gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"),
