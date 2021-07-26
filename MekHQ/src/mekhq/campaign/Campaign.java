@@ -3156,7 +3156,11 @@ public class Campaign implements Serializable, ITechManager {
             if (change < 0) {
                 if (!getCampaignOptions().getDependentsNeverLeave()) {
                     while ((change < 0) && !dependents.isEmpty()) {
-                        removePerson(Utilities.getRandomItem(dependents)); // TODO : different log format for here
+                        final Person person = Utilities.getRandomItem(dependents);
+                        addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                                person.getFullTitle()));
+                        removePerson(person, false);
+                        dependents.remove(person);
                         change++;
                     }
                 }
