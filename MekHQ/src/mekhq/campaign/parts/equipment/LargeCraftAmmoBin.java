@@ -325,7 +325,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && getType().isCompatibleWith(((AmmoBin) part).getType());
     }
 

@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.unit.Unit;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -73,6 +74,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
     }
 
+    @Override
     public AmmoBin clone() {
         AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot,
                 omniPodded, campaign);
@@ -212,7 +214,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
 
         if (oneShot) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "oneShot", oneShot);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "oneShot", true);
         }
 
         super.writeToXmlEnd(pw1, indent);
@@ -459,9 +461,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         // AmmoBins are the same type of part if they can hold the same
         // AmmoType and number of rounds of ammo (i.e. they are the same
         // irrespective of "munition type" or "bomb type").
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && getType().isCompatibleWith(((AmmoBin) part).getType())
-                && ((AmmoBin) part).getFullShots() == getFullShots();
+                && (((AmmoBin) part).getFullShots() == getFullShots());
     }
 
     @Override

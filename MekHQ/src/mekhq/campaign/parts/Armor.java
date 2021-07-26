@@ -230,7 +230,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
     }
@@ -571,23 +571,19 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
-            return part instanceof Armor
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> (part instanceof Armor)
                 && part.isPresent()
                 && !part.isReservedForRefit()
-                && isSameType((Armor)part);
-        });
+                && isSameType((Armor) part));
 
-        return a != null ? a.getAmount() : 0;
+        return (a == null) ? 0 : a.getAmount();
     }
 
     public void changeAmountAvailable(int amount) {
-        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
-            return (part instanceof Armor)
-                && part.isPresent()
-                && Objects.equals(getRefitUnit(), part.getRefitUnit())
-                && isSameType((Armor)part);
-        });
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> (part instanceof Armor)
+            && part.isPresent()
+            && Objects.equals(getRefitUnit(), part.getRefitUnit())
+            && isSameType((Armor) part));
 
         if (null != a) {
             a.setAmount(a.getAmount() + amount);

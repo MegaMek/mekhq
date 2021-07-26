@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
 
@@ -38,10 +38,12 @@ public class RatingReport extends Report {
         super(c);
     }
 
+    @Override
     public String getTitle() {
         return "Unit Rating Report";
     }
 
+    @Override
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
