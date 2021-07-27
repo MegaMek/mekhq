@@ -180,6 +180,9 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useTransfers;
+    private boolean personnelLogSkillGain;
+    private boolean personnelLogAbilityGain;
+    private boolean personnelLogEdgeGain;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -524,6 +527,9 @@ public class CampaignOptions implements Serializable {
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseTransfers(true);
+        setPersonnelLogSkillGain(false);
+        setPersonnelLogAbilityGain(false);
+        setPersonnelLogEdgeGain(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -980,6 +986,30 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
+    }
+
+    public boolean isPersonnelLogSkillGain() {
+        return personnelLogSkillGain;
+    }
+
+    public void setPersonnelLogSkillGain(final boolean personnelLogSkillGain) {
+        this.personnelLogSkillGain = personnelLogSkillGain;
+    }
+
+    public boolean isPersonnelLogAbilityGain() {
+        return personnelLogAbilityGain;
+    }
+
+    public void setPersonnelLogAbilityGain(final boolean personnelLogAbilityGain) {
+        this.personnelLogAbilityGain = personnelLogAbilityGain;
+    }
+
+    public boolean isPersonnelLogEdgeGain() {
+        return personnelLogEdgeGain;
+    }
+
+    public void setPersonnelLogEdgeGain(final boolean personnelLogEdgeGain) {
+        this.personnelLogEdgeGain = personnelLogEdgeGain;
     }
     //endregion General Personnel
 
@@ -3128,6 +3158,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -3581,6 +3614,12 @@ public class CampaignOptions implements Serializable {
                     retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                     retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogSkillGain")) {
+                    retVal.setPersonnelLogSkillGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogAbilityGain")) {
+                    retVal.setPersonnelLogAbilityGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogEdgeGain")) {
+                    retVal.setPersonnelLogEdgeGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
