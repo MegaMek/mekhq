@@ -37,6 +37,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
@@ -184,6 +185,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int mapSizeX;
     private int mapSizeY;
     private String map;
+    private boolean usingFixedMap;
     private int lanceCount;
     private int rerollsRemaining;
     private int enemyHome;
@@ -1567,6 +1569,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 +"</mapSize>");
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
 
@@ -1756,6 +1759,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 mapSizeY = Integer.parseInt(xy[1]);
             } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
                 map = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
+                setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
                 lanceCount = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
@@ -2154,6 +2159,23 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setMap(String map) {
         this.map = map;
+    }
+    
+    public String getMapForDisplay() {
+        if (!isUsingFixedMap()) {
+            return getMap();
+        } else {
+            MapSettings ms = MapSettings.getInstance();
+            return LobbyUtility.cleanBoardName(getMap(), ms);
+        }
+    }
+
+    public boolean isUsingFixedMap() {
+        return usingFixedMap;
+    }
+
+    public void setUsingFixedMap(boolean usingFixedMap) {
+        this.usingFixedMap = usingFixedMap;
     }
 
     public int getLanceCount() {

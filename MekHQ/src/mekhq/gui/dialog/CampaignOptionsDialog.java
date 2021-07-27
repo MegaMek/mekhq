@@ -474,6 +474,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnOpforAeroChance;
     private JCheckBox chkOpforUsesLocalForces;
     private JSpinner spnOpforLocalForceChance;
+    private JSpinner spnFixedMapChance;
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
@@ -2874,6 +2875,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkOpforUsesLocalForces = new JCheckBox();
         spnOpforAeroChance = new JSpinner();
         spnOpforLocalForceChance = new JSpinner();
+        spnFixedMapChance = new JSpinner();
 
         availableRats = new JList<>();
         chosenRats = new JList<>();
@@ -3509,9 +3511,23 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
+        
+        JPanel panFixedMapChance = new JPanel();
+        JLabel lblFixedMapChance = new JLabel(resourceMap.getString("lblFixedMapChance.text"));
+        lblFixedMapChance.setToolTipText(resourceMap.getString("lblFixedMapChance.toolTipText"));
+        spnFixedMapChance.setModel(new SpinnerNumberModel(0, 0, 100, 10));
+        panFixedMapChance.add(lblFixedMapChance);
+        panFixedMapChance.add(spnFixedMapChance);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
-        scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
+        scrAtB.setPreferredSize(new java.awt.Dimension(500, 410));
 
         tabOptions.addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
         enableAtBComponents(panAtB, chkUseAtB.isSelected());
@@ -5141,6 +5157,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkOpforUsesLocalForces.setSelected(options.getAllowOpforLocalUnits());
         spnOpforLocalForceChance.setValue(options.getOpforLocalUnitChance());
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
+        spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
@@ -5552,6 +5569,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAllowOpforLocalUnits(chkOpforUsesLocalForces.isSelected());
         options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
         options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
+        options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
         options.setUseDropShips(chkUseDropShips.isSelected());
 
         options.setStaticRATs(btnStaticRATs.isSelected());

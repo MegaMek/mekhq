@@ -397,6 +397,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private int fixedMapChance;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -798,6 +799,7 @@ public class CampaignOptions implements Serializable {
         opforAeroChance = 5;
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
+        setFixedMapChance(25);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -3035,6 +3037,14 @@ public class CampaignOptions implements Serializable {
         return opforLocalUnitChance;
     }
 
+    public int getFixedMapChance() {
+        return fixedMapChance;
+    }
+
+    public void setFixedMapChance(int fixedMapChance) {
+        this.fixedMapChance = fixedMapChance;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3308,6 +3318,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);        
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -3931,6 +3942,8 @@ public class CampaignOptions implements Serializable {
                     retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                     retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
+                    retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                     retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
                 } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
