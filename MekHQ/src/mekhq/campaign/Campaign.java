@@ -3155,16 +3155,22 @@ public class Campaign implements Serializable, ITechManager {
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
                 if (!getCampaignOptions().getDependentsNeverLeave()) {
-                    while ((change < 0) && (dependents.size() > 0)) {
-                        removePerson(Utilities.getRandomItem(dependents).getId());
+                    while ((change < 0) && !dependents.isEmpty()) {
+                        final Person person = Utilities.getRandomItem(dependents);
+                        addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                                person.getFullTitle()));
+                        removePerson(person, false);
+                        dependents.remove(person);
                         change++;
                     }
                 }
             } else {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
-                        Person p = newDependent(false);
-                        recruitPerson(p);
+                        final Person person = newDependent(false);
+                        recruitPerson(person, PrisonerStatus.FREE, true, false);
+                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                                person.getFullTitle()));
                     }
                 }
             }
@@ -3511,22 +3517,20 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
-    public void removePerson(UUID id) {
-        removePerson(id, true);
+    public void removePerson(final @Nullable Person person) {
+        removePerson(person, true);
     }
 
-    public void removePerson(UUID id, boolean log) {
-        Person person = getPerson(id);
-
+    public void removePerson(final @Nullable Person person, final boolean log) {
         if (person == null) {
             return;
         }
 
         person.getGenealogy().clearGenealogy();
 
-        Unit u = person.getUnit();
-        if (null != u) {
-            u.remove(person, true);
+        final Unit unit = person.getUnit();
+        if (unit != null) {
+            unit.remove(person, true);
         }
         removeAllPatientsFor(person);
         person.removeAllTechJobs(this);
@@ -3537,7 +3541,7 @@ public class Campaign implements Serializable, ITechManager {
             addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
 
-        personnel.remove(id);
+        personnel.remove(person.getId());
 
         // Deal with Astech Pool Minutes
         if (person.getPrimaryRole().isAstech()) {

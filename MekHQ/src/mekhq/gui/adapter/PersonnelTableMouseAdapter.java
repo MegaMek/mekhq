@@ -683,7 +683,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         resourceMap.getString("freeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
-                        gui.getCampaign().removePerson(person.getId());
+                        gui.getCampaign().removePerson(person);
                     }
                 }
                 break;
@@ -710,7 +710,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total.toAmountAndSymbolString()));
                     gui.getCampaign().addFunds(total, resourceMap.getString("ransom.text"), Transaction.C_MISC);
                     for (Person person : people) {
-                        gui.getCampaign().removePerson(person.getId(), false);
+                        gui.getCampaign().removePerson(person, false);
                     }
                 }
                 break;
@@ -737,14 +737,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         resourceMap.getString("removeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
-                        gui.getCampaign().removePerson(person.getId());
+                        gui.getCampaign().removePerson(person);
                     }
                 }
                 break;
             }
             case CMD_SACK: {
                 boolean showDialog = false;
-                ArrayList<UUID> toRemove = new ArrayList<>();
+                List<Person> toRemove = new ArrayList<>();
                 for (Person person : people) {
                     if (gui.getCampaign().getRetirementDefectionTracker()
                             .removeFromCampaign(
@@ -758,7 +758,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     gui.getCampaign(), null)) {
                         showDialog = true;
                     } else {
-                        toRemove.add(person.getId());
+                        toRemove.add(person);
                     }
                 }
                 if (showDialog) {
@@ -773,8 +773,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     .removePayout(person);
                         }
                     } else {
-                        for (UUID id : toRemove) {
-                            gui.getCampaign().removePerson(id);
+                        for (final Person person : toRemove) {
+                            gui.getCampaign().removePerson(person);
                         }
                     }
                 } else {
@@ -788,7 +788,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             null, question, resourceMap.getString("removeQ.text"),
                             JOptionPane.YES_NO_OPTION)) {
                         for (Person person : people) {
-                            gui.getCampaign().removePerson(person.getId());
+                            gui.getCampaign().removePerson(person);
                         }
                     }
                 }
