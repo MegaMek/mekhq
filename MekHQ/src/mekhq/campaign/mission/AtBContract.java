@@ -660,10 +660,11 @@ public class AtBContract extends Contract implements Serializable {
                             partsAvailabilityLevel++;
                             break;
                         case 6:
-                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarketType.EMPLOYER,
-                                UnitType.MEK, getEmployerCode(), IUnitRating.DRAGOON_F, 50);
-                            if (unit != null) {
-                                text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
+                            final String unitName = c.getUnitMarket().addSingleUnit(c,
+                                    UnitMarketType.EMPLOYER, UnitType.MEK, getEmployerFaction(),
+                                    IUnitRating.DRAGOON_F, 50);
+                            if (unitName != null) {
+                                text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unitName);
                             }
                             break;
                     }
@@ -992,6 +993,10 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
+    public Faction getEmployerFaction() {
+        return Factions.getInstance().getFaction(getEmployerCode());
+    }
+
     public String getEmployerCode() {
         return employerCode;
     }
@@ -1002,11 +1007,8 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public String getEmployerName(int year) {
-        if (mercSubcontract) {
-            return "Mercenary (" +
-                    Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
-        }
-        return Factions.getInstance().getFaction(employerCode).getFullName(year);
+        return isMercSubcontract() ? "Mercenary (" + getEmployerFaction().getFullName(year) + ")"
+                : getEmployerFaction().getFullName(year);
     }
 
     public Faction getEnemy() {

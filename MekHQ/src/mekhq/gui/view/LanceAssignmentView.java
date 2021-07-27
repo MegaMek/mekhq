@@ -113,7 +113,7 @@ public class LanceAssignmentView extends JPanel {
         tblRequiredLances.createDefaultColumnsFromModel();
         tblRequiredLances.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
-        for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
+        for (int i = 0; i < RequiredLancesTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel) tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
