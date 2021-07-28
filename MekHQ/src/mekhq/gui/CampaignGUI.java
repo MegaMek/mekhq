@@ -385,6 +385,10 @@ public class CampaignGUI extends JPanel {
         return standardTabs.get(tabType);
     }
 
+    public CommandCenterTab getCommandCenterTab() {
+        return (CommandCenterTab) getTab(GuiTabType.COMMAND);
+    }
+
     public TOETab getTOETab() {
         return (TOETab) getTab(GuiTabType.TOE);
     }
