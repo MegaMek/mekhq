@@ -357,7 +357,7 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -393,7 +393,7 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);

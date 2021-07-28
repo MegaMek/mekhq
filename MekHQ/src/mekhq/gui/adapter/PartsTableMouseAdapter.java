@@ -37,7 +37,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         this.partsTable = partsTable;
         this.partsModel = partsModel;
     }
-        
+
     public static void connect(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
         new PartsTableMouseAdapter(gui, partsTable, partsModel)
                 .connect(partsTable);
@@ -86,11 +86,11 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getQuartermaster().sellPart(selectedPart, q);
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
-            double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund));
+                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity())
+                            .multipliedBy(gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier()));
                     gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
