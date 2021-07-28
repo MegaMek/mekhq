@@ -294,6 +294,7 @@ public class QuartermasterTest {
 
         // If we pay for units...
         when(mockOptions.payForUnits()).thenReturn(true);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -324,6 +325,7 @@ public class QuartermasterTest {
 
         // If we pay for units...
         when(mockOptions.payForUnits()).thenReturn(true);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
