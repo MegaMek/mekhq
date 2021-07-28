@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -67,6 +68,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
+import mekhq.gui.baseComponents.JDisableablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -425,6 +427,14 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkContractMarketReportRefresh;
     //endregion Markets Tab
 
+    //region RATs Tab
+    private JRadioButton btnUseRATGenerator;
+    private JRadioButton btnUseStaticRATs;
+    private DefaultListModel<String> chosenRATModel;
+    private DefaultListModel<String> availableRATModel;
+    private JCheckBox chkIgnoreRATEra;
+    //endregion RATs Tab
+
     //region Against the Bot Tab
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
@@ -463,19 +473,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner[] spnAtBBattleChance;
     private JButton btnIntensityUpdate;
     private JCheckBox chkGenerateChases;
-
-    //RATs
-    private JRadioButton btnDynamicRATs;
-    private JRadioButton btnStaticRATs;
-    private DefaultListModel<String> chosenRatModel;
-    private JList<String> chosenRats;
-    private DefaultListModel<String> availableRatModel;
-    private JList<String> availableRats;
-    private JButton btnAddRat;
-    private JButton btnRemoveRat;
-    private JButton btnMoveRatUp;
-    private JButton btnMoveRatDown;
-    private JCheckBox chkIgnoreRatEra;
 
     //scenarios
     private JCheckBox chkDoubleVehicles;
@@ -2689,6 +2686,10 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.addTab(resourceMap.getString("marketsPanel.title"), createMarketsTab());
         //endregion Markets Tab
 
+        //region RATs Tab
+        tabOptions.addTab(resourceMap.getString("ratPanel.title"), createRATTab());
+        //endregion RATs Tab
+
         //region Against the Bot Tab
         panAtB = new JPanel();
 
@@ -2720,14 +2721,6 @@ public class CampaignOptionsDialog extends JDialog {
         spnOpforAeroChance = new JSpinner();
         spnOpforLocalForceChance = new JSpinner();
 
-        availableRats = new JList<>();
-        chosenRats = new JList<>();
-        btnAddRat = new JButton();
-        btnRemoveRat = new JButton();
-        btnMoveRatUp = new JButton();
-        btnMoveRatDown = new JButton();
-        chkIgnoreRatEra = new JCheckBox();
-
         spnSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
         chkMercSizeLimited = new JCheckBox();
@@ -2736,16 +2729,13 @@ public class CampaignOptionsDialog extends JDialog {
         chkUsePlanetaryConditions = new JCheckBox();
         chkAeroRecruitsHaveUnits = new JCheckBox();
 
-
         panAtB.setName("panAtB");
         panAtB.setLayout(new GridBagLayout());
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
-        JPanel panSubAtBRat = new JPanel(new GridBagLayout());
         JPanel panSubAtBContract = new JPanel(new GridBagLayout());
         JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
         panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
-        panSubAtBRat.setBorder(BorderFactory.createTitledBorder("Random Assignment Tables"));
         panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
         panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
 
@@ -2759,11 +2749,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panAtB.add(chkUseAtB, gridBagConstraints);
-        chkUseAtB.addActionListener(ev -> {
-            enableAtBComponents(panAtB, chkUseAtB.isSelected());
-            enableAtBComponents(panSubAtBRat,
-                    chkUseAtB.isSelected() && btnStaticRATs.isSelected());
-        });
+        chkUseAtB.addActionListener(ev -> enableAtBComponents(panAtB, chkUseAtB.isSelected()));
 
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
@@ -2781,32 +2767,16 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 1;
         panAtB.add(cbSkillLevel, gridBagConstraints);
 
-        btnDynamicRATs = new JRadioButton(resourceMap.getString("btnDynamicRATs.text"));
-        btnDynamicRATs.setToolTipText(resourceMap.getString("btnDynamicRATs.tooltip"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        panAtB.add(btnDynamicRATs, gridBagConstraints);
-
-        btnStaticRATs = new JRadioButton(resourceMap.getString("btnStaticRATs.text"));
-        btnStaticRATs.setToolTipText(resourceMap.getString("btnStaticRATs.tooltip"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        panAtB.add(btnStaticRATs, gridBagConstraints);
-        btnStaticRATs.addItemListener(ev -> enableAtBComponents(panSubAtBRat, btnStaticRATs.isSelected()));
-
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         panAtB.add(panSubAtBAdmin, gridBagConstraints);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
-        panAtB.add(panSubAtBRat, gridBagConstraints);
+        panAtB.add(panSubAtBScenario, gridBagConstraints);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBContract, gridBagConstraints);
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        panAtB.add(panSubAtBScenario, gridBagConstraints);
 
         chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
         chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
@@ -2896,124 +2866,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkClanVehicles.setToolTipText(resourceMap.getString("chkClanVehicles.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(btnDynamicRATs);
-        group.add(btnStaticRATs);
-
-        chosenRatModel = new DefaultListModel<>();
-        chosenRats.setModel(chosenRatModel);
-        chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        chosenRats.addListSelectionListener(arg0 -> {
-            btnRemoveRat.setEnabled(chosenRats.getSelectedIndex() >= 0);
-            btnMoveRatUp.setEnabled(chosenRats.getSelectedIndex() > 0);
-            btnMoveRatDown.setEnabled(chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
-        });
-        availableRatModel = new DefaultListModel<>();
-        for (String rat : RATManager.getAllRATCollections().keySet()) {
-            List<Integer> eras = RATManager.getAllRATCollections().get(rat);
-            if (eras != null) {
-                StringBuilder displayName = new StringBuilder(rat);
-                if (eras.size() > 0) {
-                    displayName.append(" (").append(eras.get(0));
-                    if (eras.size() > 1) {
-                        displayName.append("-").append(eras.get(eras.size() - 1));
-                    }
-                    displayName.append(")");
-                }
-                availableRatModel.addElement(displayName.toString());
-            }
-        }
-        availableRats.setModel(availableRatModel);
-        availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableRats.addListSelectionListener(arg0 -> btnAddRat.setEnabled(availableRats.getSelectedIndex() >= 0));
-
-        JTextArea txtRatInstructions = new JTextArea();
-        txtRatInstructions.setEditable(false);
-        txtRatInstructions.setWrapStyleWord(true);
-        txtRatInstructions.setLineWrap(true);
-        txtRatInstructions.setText(resourceMap.getString("txtRatInstructions.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubAtBRat.add(txtRatInstructions, gridBagConstraints);
-
-        JLabel lblChosenRats = new JLabel(resourceMap.getString("lblChosenRats.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBRat.add(lblChosenRats, gridBagConstraints);
-
-        JLabel lblAvailableRats = new JLabel(resourceMap.getString("lblAvailableRats.text"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        panSubAtBRat.add(lblAvailableRats, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(chosenRats, gridBagConstraints);
-
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(availableRats, gridBagConstraints);
-
-        JPanel panRatButtons = new JPanel();
-        panRatButtons.setLayout(new javax.swing.BoxLayout(panRatButtons, javax.swing.BoxLayout.Y_AXIS));
-        btnAddRat.setText(resourceMap.getString("btnAddRat.text"));
-        btnAddRat.setToolTipText(resourceMap.getString("btnAddRat.toolTipText"));
-        btnAddRat.addActionListener(arg0 -> {
-            int selectedIndex = availableRats.getSelectedIndex();
-            chosenRatModel.addElement(availableRats.getSelectedValue());
-            availableRatModel.removeElementAt(availableRats.getSelectedIndex());
-            availableRats.setSelectedIndex(Math.min(selectedIndex, availableRatModel.size() - 1));
-        });
-        btnAddRat.setEnabled(false);
-        panRatButtons.add(btnAddRat);
-        btnRemoveRat.setText(resourceMap.getString("btnRemoveRat.text"));
-        btnRemoveRat.setToolTipText(resourceMap.getString("btnRemoveRat.toolTipText"));
-        btnRemoveRat.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            availableRatModel.addElement(chosenRats.getSelectedValue());
-            chosenRatModel.removeElementAt(chosenRats.getSelectedIndex());
-            chosenRats.setSelectedIndex(Math.min(selectedIndex, chosenRatModel.size() - 1));
-        });
-        btnRemoveRat.setEnabled(false);
-        panRatButtons.add(btnRemoveRat);
-        btnMoveRatUp.setText(resourceMap.getString("btnMoveRatUp.text"));
-        btnMoveRatUp.setToolTipText(resourceMap.getString("btnMoveRatUp.toolTipText"));
-        btnMoveRatUp.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            String tmp = chosenRatModel.getElementAt(selectedIndex);
-            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex - 1), selectedIndex);
-            chosenRatModel.setElementAt(tmp, selectedIndex - 1);
-            chosenRats.setSelectedIndex(selectedIndex - 1);
-        });
-        btnMoveRatUp.setEnabled(false);
-        panRatButtons.add(btnMoveRatUp);
-        btnMoveRatDown.setText(resourceMap.getString("btnMoveRatDown.text"));
-        btnMoveRatDown.setToolTipText(resourceMap.getString("btnMoveRatDown.toolTipText"));
-        btnMoveRatDown.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            String tmp = chosenRatModel.getElementAt(selectedIndex);
-            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex + 1), selectedIndex);
-            chosenRatModel.setElementAt(tmp, selectedIndex + 1);
-            chosenRats.setSelectedIndex(selectedIndex + 1);
-        });
-        btnMoveRatDown.setEnabled(false);
-        panRatButtons.add(btnMoveRatDown);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(panRatButtons, gridBagConstraints);
-
-        chkIgnoreRatEra.setText(resourceMap.getString("chkIgnoreRatEra.text"));
-        chkIgnoreRatEra.setToolTipText(resourceMap.getString("chkIgnoreRatEra.toolTipText"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        panSubAtBRat.add(chkIgnoreRatEra, gridBagConstraints);
 
         JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -3343,9 +3195,8 @@ public class CampaignOptionsDialog extends JDialog {
 
         tabOptions.addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
         enableAtBComponents(panAtB, chkUseAtB.isSelected());
-        enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected() && btnStaticRATs.isSelected());
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
             scrAtB.getVerticalScrollBar().setValue(0);
         });
@@ -4875,6 +4726,199 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Markets Tab
 
+    //region RATs Tab
+    private JScrollPane createRATTab() {
+        // Initialize Components Used in ActionListeners
+        final JDisableablePanel traditionalRATPanel = new JDisableablePanel("traditionalRATPanel");
+
+        // Initialize Parsing Variables
+        final ButtonGroup group = new ButtonGroup();
+
+        // Create the Panel
+        final JPanel panel = new JPanel(new GridBagLayout());
+        panel.setName("ratPanel");
+
+        // Create Panel Components
+        btnUseRATGenerator = new JRadioButton(resources.getString("btnUseRATGenerator.text"));
+        btnUseRATGenerator.setToolTipText(resources.getString("btnUseRATGenerator.tooltip"));
+        btnUseRATGenerator.setName("btnUseRATGenerator");
+        group.add(btnUseRATGenerator);
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+        panel.add(btnUseRATGenerator, gbc);
+
+        btnUseStaticRATs = new JRadioButton(resources.getString("btnUseStaticRATs.text"));
+        btnUseStaticRATs.setToolTipText(resources.getString("btnUseStaticRATs.tooltip"));
+        btnUseStaticRATs.setName("btnUseStaticRATs");
+        btnUseStaticRATs.addItemListener(ev -> traditionalRATPanel.setEnabled(btnUseStaticRATs.isSelected()));
+        group.add(btnUseStaticRATs);
+        gbc.gridy++;
+        panel.add(btnUseStaticRATs, gbc);
+
+        createTraditionalRATPanel(traditionalRATPanel);
+        gbc.gridy++;
+        panel.add(traditionalRATPanel, gbc);
+
+        // Disable Panel Portions by Default
+        btnUseStaticRATs.setSelected(true);
+        btnUseStaticRATs.doClick();
+
+        return new JScrollPane(panel);
+    }
+
+    private void createTraditionalRATPanel(final JDisableablePanel panel) {
+        // Initialize Components Used in ActionListeners
+        final JList<String> chosenRATs = new JList<>();
+
+        // Create Panel Components
+        final JTextArea txtRATInstructions = new JTextArea(resources.getString("txtRATInstructions.text"));
+        txtRATInstructions.setEditable(false);
+        txtRATInstructions.setLineWrap(true);
+        txtRATInstructions.setWrapStyleWord(true);
+
+        final JLabel lblAvailableRATs = new JLabel(resources.getString("lblAvailableRATs.text"));
+
+        availableRATModel = new DefaultListModel<>();
+        for (final String rat : RATManager.getAllRATCollections().keySet()) {
+            final List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+                final StringBuilder displayName = new StringBuilder(rat);
+                if (!eras.isEmpty()) {
+                    displayName.append(" (").append(eras.get(0));
+                    if (eras.size() > 1) {
+                        displayName.append("-").append(eras.get(eras.size() - 1));
+                    }
+                    displayName.append(")");
+                }
+                availableRATModel.addElement(displayName.toString());
+            }
+        }
+        final JList<String> availableRATs = new JList<>(availableRATModel);
+        availableRATs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        final JButton btnAddRAT = new MMButton("btnAddRAT", resources, "btnAddRAT.text",
+                "btnAddRAT.toolTipText", evt -> {
+            final int selectedIndex = availableRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            chosenRATModel.addElement(availableRATs.getSelectedValue());
+            availableRATModel.removeElementAt(availableRATs.getSelectedIndex());
+            availableRATs.setSelectedIndex(Math.min(selectedIndex, availableRATModel.size() - 1));
+        });
+
+        final JButton btnRemoveRAT = new MMButton("btnRemoveRAT", resources, "btnRemoveRAT.text",
+                "btnRemoveRAT.toolTipText", evt -> {
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            availableRATModel.addElement(chosenRATs.getSelectedValue());
+            chosenRATModel.removeElementAt(chosenRATs.getSelectedIndex());
+            chosenRATs.setSelectedIndex(Math.min(selectedIndex, chosenRATModel.size() - 1));
+        });
+
+        final JButton btnMoveRATUp = new MMButton("btnMoveRATUp", resources, "btnMoveRATUp.text",
+                "btnMoveRATUp.toolTipText", evt ->{
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            final String element = chosenRATModel.getElementAt(selectedIndex);
+            chosenRATModel.setElementAt(chosenRATModel.getElementAt(selectedIndex - 1), selectedIndex);
+            chosenRATModel.setElementAt(element, selectedIndex - 1);
+            chosenRATs.setSelectedIndex(selectedIndex - 1);
+        });
+
+        final JButton btnMoveRATDown = new MMButton("btnMoveRATDown", resources, "btnMoveRATDown.text",
+                "btnMoveRATDown.toolTipText", evt -> {
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            final String element = chosenRATModel.getElementAt(selectedIndex);
+            chosenRATModel.setElementAt(chosenRATModel.getElementAt(selectedIndex + 1), selectedIndex);
+            chosenRATModel.setElementAt(element, selectedIndex + 1);
+            chosenRATs.setSelectedIndex(selectedIndex + 1);
+        });
+
+        final JLabel lblChosenRATs = new JLabel(resources.getString("lblChosenRATs.text"));
+
+        chosenRATModel = new DefaultListModel<>();
+        chosenRATs.setModel(chosenRATModel);
+        chosenRATs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        chosenRATs.addListSelectionListener(evt -> {
+            btnRemoveRAT.setEnabled(chosenRATs.getSelectedIndex() >= 0);
+            btnMoveRATUp.setEnabled(chosenRATs.getSelectedIndex() > 0);
+            btnMoveRATDown.setEnabled(chosenRATModel.size() > chosenRATs.getSelectedIndex() + 1);
+        });
+
+        chkIgnoreRATEra = new JCheckBox(resources.getString("chkIgnoreRATEra.text"));
+        chkIgnoreRATEra.setToolTipText(resources.getString("chkIgnoreRATEra.toolTipText"));
+        chkIgnoreRATEra.setName("chkIgnoreRATEra");
+
+        // Add Previously Impossible Listeners
+        availableRATs.addListSelectionListener(evt -> btnAddRAT.setEnabled(availableRATs.getSelectedIndex() >= 0));
+
+        // Programmatically Assign Accessibility Labels
+        lblAvailableRATs.setLabelFor(availableRATs);
+        lblChosenRATs.setLabelFor(chosenRATs);
+
+        // Layout the UI
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("traditionalRATPanel.title")));
+        panel.setLayout(new BorderLayout());
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(txtRATInstructions)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblAvailableRATs)
+                                        .addComponent(availableRATs))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnAddRAT)
+                                        .addComponent(btnRemoveRAT)
+                                        .addComponent(btnMoveRATUp)
+                                        .addComponent(btnMoveRATDown))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblChosenRATs)
+                                        .addComponent(chosenRATs)))
+                        .addComponent(chkIgnoreRATEra)
+        );
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtRATInstructions)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblAvailableRATs)
+                                        .addComponent(lblChosenRATs))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(availableRATs)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnAddRAT)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnRemoveRAT)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnMoveRATUp)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnMoveRATDown))
+                                        .addComponent(chosenRATs))
+                                .addComponent(chkIgnoreRATEra))
+        );
+    }
+    //endregion RATs Tab
+
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
         setName("CampaignOptionsDialog");
@@ -5258,6 +5302,32 @@ public class CampaignOptionsDialog extends JDialog {
         chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
         //endregion Markets Tab
 
+        //region RATs Tab
+        btnUseRATGenerator.setSelected(!options.isUseStaticRATs());
+        if (options.isUseStaticRATs() != btnUseStaticRATs.isSelected()) {
+            btnUseStaticRATs.doClick();
+        }
+        for (final String rat : options.getRATs()) {
+            final List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+                final StringBuilder displayName = new StringBuilder(rat);
+                if (!eras.isEmpty()) {
+                    displayName.append(" (").append(eras.get(0));
+                    if (eras.size() > 1) {
+                        displayName.append("-").append(eras.get(eras.size() - 1));
+                    }
+                    displayName.append(")");
+                }
+
+                if (availableRATModel.contains(displayName.toString())) {
+                    chosenRATModel.addElement(displayName.toString());
+                    availableRATModel.removeElement(displayName.toString());
+                }
+            }
+        }
+        chkIgnoreRATEra.setSelected(options.isIgnoreRATEra());
+        //endregion RATs Tab
+
         //region Against the Bot Tab
         if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
@@ -5297,27 +5367,6 @@ public class CampaignOptionsDialog extends JDialog {
         spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.TRAINING));
         btnIntensityUpdate.doClick();
         chkGenerateChases.setSelected(options.generateChases());
-
-        btnDynamicRATs.setSelected(!options.useStaticRATs());
-        btnStaticRATs.setSelected(options.useStaticRATs());
-        for (String rat : options.getRATs()) {
-            List<Integer> eras = RATManager.getAllRATCollections().get(rat);
-            if (eras != null) {
-                StringBuilder displayName = new StringBuilder(rat);
-                if (eras.size() > 0) {
-                    displayName.append(" (").append(eras.get(0));
-                    if (eras.size() > 1) {
-                        displayName.append("-").append(eras.get(eras.size() - 1));
-                    }
-                    displayName.append(")");
-                }
-                if (availableRatModel.contains(displayName.toString())) {
-                    chosenRatModel.addElement(displayName.toString());
-                    availableRatModel.removeElement(displayName.toString());
-                }
-            }
-        }
-        chkIgnoreRatEra.setSelected(options.canIgnoreRatEra());
 
         chkDoubleVehicles.setSelected(options.getDoubleVehicles());
         spnOpforLanceTypeMechs.setValue(options.getOpforLanceTypeMechs());
@@ -5380,7 +5429,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Choose a file...
         Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -5718,6 +5767,17 @@ public class CampaignOptionsDialog extends JDialog {
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         //endregion Markets Tab
 
+        //region RATs Tab
+        options.setUseStaticRATs(btnUseStaticRATs.isSelected());
+        //Strip dates used in display name
+        String[] ratList = new String[chosenRATModel.size()];
+        for (int i = 0; i < chosenRATModel.size(); i++) {
+            ratList[i] = chosenRATModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
+        }
+        options.setRATs(ratList);
+        options.setIgnoreRATEra(chkIgnoreRATEra.isSelected());
+        //endregion RATs Tab
+
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
         options.setUseStratCon(chkUseStratCon.isSelected());
@@ -5754,15 +5814,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
         options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
         options.setUseDropShips(chkUseDropShips.isSelected());
-
-        options.setStaticRATs(btnStaticRATs.isSelected());
-        options.setIgnoreRatEra(chkIgnoreRatEra.isSelected());
-        //Strip dates used in display name
-        String[] ratList = new String[chosenRatModel.size()];
-        for (int i = 0; i < chosenRatModel.size(); i++) {
-            ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
-        }
-        options.setRATs(ratList);
         options.setSearchRadius((Integer) spnSearchRadius.getValue());
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
             options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
@@ -5997,15 +6048,6 @@ public class CampaignOptionsDialog extends JDialog {
 
             if (c instanceof JPanel) {
                 enableAtBComponents((JPanel) c, enabled);
-            } else if (enabled && c.equals(btnAddRat)) {
-                c.setEnabled(availableRats.getSelectedIndex() >= 0);
-            } else if (enabled && c.equals(btnRemoveRat)) {
-                c.setEnabled(chosenRats.getSelectedIndex() >= 0);
-            } else if (enabled && c.equals(btnMoveRatUp)) {
-                c.setEnabled(chosenRats.getSelectedIndex() > 0);
-            } else if (enabled && c.equals(btnMoveRatDown)) {
-                c.setEnabled((availableRats.getSelectedIndex() >= 0)
-                        && (chosenRatModel.size() > chosenRats.getSelectedIndex() + 1));
             } else {
                 c.setEnabled(enabled);
             }
