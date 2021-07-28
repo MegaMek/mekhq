@@ -3335,7 +3335,7 @@ public class CampaignOptions implements Serializable {
         //region RATs Tab
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useStaticRATs", isUseStaticRATs());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rats", getRATs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "ignoreRATEra", isIgnoreRATEra());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "ignoreRATEra", isIgnoreRATEra());
         //endregion RATs Tab
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
