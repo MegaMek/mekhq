@@ -32,6 +32,7 @@ VERSION HISTORY:
 + Issue #2558: Adding Custom Messages for Dependant Joining/Departing the Force
 + Issue #1767: Adding Campaign Messages when gaining SPAs/Edge and Personnel Log Options for gaining Skills/SPAs/Edge
 + Issue #2771: Fixing Missing Current Daily Log on AdvanceDaysDialog Creation
++ PR #2769: New StratCon feature - sometimes (with configurable frequency), the generated maps will be replaced by a similarly sized user-made fixed map instead.
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
