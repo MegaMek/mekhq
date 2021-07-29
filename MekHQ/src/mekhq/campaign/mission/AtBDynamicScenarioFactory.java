@@ -870,11 +870,11 @@ public class AtBDynamicScenarioFactory {
      * the given threshold, replace the scenario's generated map with a fixed map from data/boards
      */
     private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
-        if ((scenario.getMapSizeX() > 0) && (scenario.getMapSizeY() > 0)) {
+        if ((scenario.getMapSizeX() > 0) && (scenario.getMapSizeY() > 0) && (Compute.randomInt(100) <= mapChance)) {
             BoardClassifier bc = BoardClassifier.getInstance();
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
             
-            if (!maps.isEmpty() && (Compute.randomInt(100) <= mapChance)) {
+            if (!maps.isEmpty()) {
                 String mapPath = Utilities.getRandomItem(maps);
                 MegaMekFile mapFile = new MegaMekFile(mapPath);
                 BoardDimensions dimensions = Board.getSize(mapFile.getFile());
