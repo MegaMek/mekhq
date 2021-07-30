@@ -1,4 +1,5 @@
 <StratconFacility>
+	<bvBudgetModifier>0.05</bvBudgetModifier>
 	<capturedDefinition>AlliedSupplyDepot.xml</capturedDefinition>
 	<displayableName>Supply Depot</displayableName>
         <facilityType>SupplyDepot</facilityType>

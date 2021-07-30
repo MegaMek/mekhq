@@ -395,21 +395,16 @@ public class StratconRulesManager {
         }
     }
 
-    private static void processFacilityEffects(StratconTrackState track) {
-        // TODO: these are "weekly"? effects that a stratcon facility has on the
-        // campaign/track state
-        // currently, that's
-        // supply depot - allied - +1 sp
-        // supply depot - hostile - +5% BV budget to all scenarios on track (shared
-        // modifier, so should be implemented there)
-        // data center - allied - +1% star league cache contract (not implemented yet, but...)
-        // data center - hostile - +5% scenario odds in track
-        // industrial center - allied - all scenarios here have
-        //      THIS IS COMING OUT OF YOUR PAYCHECK modifier
-        // orbital defense - allied - sets 'no hostile aircraft' flag for track
-        // orbital defense - hostile - sets 'no allied aircraft' flag for track
-        // early warning system - allied - sets 'intercept allied base attacks' flag for track
-        // early warning system - hostile - sets 'intercept hostile base attacks' flag for track
+    /**
+     * Applies time-sensitive facility effects.
+     */
+    private static void processFacilityEffects(StratconTrackState track, 
+            StratconCampaignState campaignState, boolean isMonday) {
+        for (StratconFacility facility : track.getFacilities().values()) {
+            if (isMonday) {
+                campaignState.addSupportPoints(facility.getWeeklySPModifier());
+            }
+        }
     }
 
     /**
@@ -1447,19 +1442,13 @@ public class StratconRulesManager {
      * Contains logic for what should happen when a facility gets captured:
      * modifier/type/alignment switches etc.
      */
-    private static void switchFacilityOwner(StratconFacility facility) {
+    public static void switchFacilityOwner(StratconFacility facility) {
         if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
             StratconFacility newOwnerData =
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
 
             if (newOwnerData != null) {
-                // for now, we only need to change a limited subset of the captured facility's data
-                // the rest can be retained; we may revisit this assumption later
-                facility.setCapturedDefinition(newOwnerData.getCapturedDefinition());
-                facility.setLocalModifiers(new ArrayList<>(newOwnerData.getLocalModifiers()));
-                facility.setSharedModifiers(new ArrayList<>(newOwnerData.getSharedModifiers()));
-                facility.setOwner(newOwnerData.getOwner());
-
+                facility.copyRulesDataFrom(newOwnerData);
                 return;
             }
         }
@@ -1619,6 +1608,8 @@ public class StratconRulesManager {
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, ev.getCampaign());
 
+                    processFacilityEffects(track, campaignState, isMonday);
+                    
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {

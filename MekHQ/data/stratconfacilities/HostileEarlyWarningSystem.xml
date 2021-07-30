@@ -2,6 +2,7 @@
 	<capturedDefinition>AlliedEarlyWarningSystem.xml</capturedDefinition>
 	<displayableName>Early Warning Center</displayableName>
         <facilityType>EarlyWarningSystem</facilityType>
-        <owner>Allied</owner>
+        <owner>Opposing</owner>
+	<reinforcementDelayReduction>2</reinforcementDelayReduction>
         <visible>true</visible>
 </StratconFacility>

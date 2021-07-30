@@ -37,6 +37,7 @@ import java.util.Map;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -48,6 +49,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
+import mekhq.campaign.stratcon.StratconFacilityFactory;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -69,6 +71,9 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
     private static final String RCLICK_COMMAND_STICKY_FORCE = "StickyForce";
     private static final String RCLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
+    private static final String RCLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
+    private static final String RCLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
+    private static final String RCLICK_COMMAND_ADD_FACILITY = "AddFacility";
 
     /**
      * What to do when drawing a hex
@@ -104,6 +109,9 @@ public class StratconPanel extends JPanel implements ActionListener {
     private JMenuItem menuItemManageForceAssignments;
     private JMenuItem menuItemManageScenario;
     private JMenuItem menuItemGMReveal;
+    private JMenuItem menuItemRemoveFacility;
+    private JMenuItem menuItemSwitchOwner;
+    private JMenu menuItemAddFacility;
     
     // data structure holding how many unit/scenario/base icons have been drawn in the hex
     // used to control how low the text description goes.
@@ -193,6 +201,51 @@ public class StratconPanel extends JPanel implements ActionListener {
             menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
             menuItemGMReveal.addActionListener(this);
             rightClickMenu.add(menuItemGMReveal);
+            
+            if (currentTrack.getFacility(coords) != null) {
+                menuItemRemoveFacility = new JMenuItem();
+                menuItemRemoveFacility.setText("Remove Facility");
+                menuItemRemoveFacility.setActionCommand(RCLICK_COMMAND_REMOVE_FACILITY);
+                menuItemRemoveFacility.addActionListener(this);
+                rightClickMenu.add(menuItemRemoveFacility);
+                
+                menuItemSwitchOwner = new JMenuItem();
+                menuItemSwitchOwner.setText("Switch Owner");
+                menuItemSwitchOwner.setActionCommand(RCLICK_COMMAND_CAPTURE_FACILITY);
+                menuItemSwitchOwner.addActionListener(this);
+                rightClickMenu.add(menuItemSwitchOwner);
+            } else {
+                menuItemAddFacility = new JMenu();
+                menuItemAddFacility.setText("Add Facility");
+                
+                JMenu menuItemAddAlliedFacility = new JMenu();
+                menuItemAddAlliedFacility.setText("Allied");
+                menuItemAddFacility.add(menuItemAddAlliedFacility);
+                
+                for (StratconFacility facility : StratconFacilityFactory.getAlliedFacilities()) {
+                    JMenuItem facilityItem = new JMenuItem();
+                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
+                    facilityItem.putClientProperty(RCLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.addActionListener(this);
+                    menuItemAddAlliedFacility.add(facilityItem);
+                }
+                
+                JMenu menuItemAddHostileFacility = new JMenu();
+                menuItemAddHostileFacility.setText("Hostile");
+                menuItemAddFacility.add(menuItemAddHostileFacility);
+                
+                for (StratconFacility facility : StratconFacilityFactory.getHostileFacilities()) {
+                    JMenuItem facilityItem = new JMenuItem();
+                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
+                    facilityItem.putClientProperty(RCLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.addActionListener(this);
+                    menuItemAddHostileFacility.add(facilityItem);
+                }
+                
+                rightClickMenu.add(menuItemAddFacility);
+            }
         }
     }
 
@@ -697,6 +750,17 @@ public class StratconPanel extends JPanel implements ActionListener {
                     currentTrack.removeStickyForce(forceID);
                 }
                 
+                break;
+            case RCLICK_COMMAND_REMOVE_FACILITY:
+                currentTrack.removeFacility(selectedCoords);
+                break;
+            case RCLICK_COMMAND_CAPTURE_FACILITY:
+                StratconRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
+                break;
+            case RCLICK_COMMAND_ADD_FACILITY:
+                JMenuItem eventSource = (JMenuItem) e.getSource();
+                StratconFacility facility = (StratconFacility) eventSource.getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
+                currentTrack.addFacility(selectedCoords, facility.clone());
                 break;
         }
         

@@ -57,6 +57,12 @@ public class StratconFacility implements Cloneable {
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private String capturedDefinition;
+    private boolean revealTrack;
+    private int scenarioOddsModifier;
+    private int reinforcementDelayReduction;
+    private int weeklySPModifier;
+    private double bvBudgetModifier;
+    private boolean preventAerospace;
     //TODO: post-MVP
     //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
@@ -77,7 +83,29 @@ public class StratconFacility implements Cloneable {
         clone.sharedModifiers = new ArrayList<>(sharedModifiers);
         clone.localModifiers = new ArrayList<>(localModifiers);
         clone.setCapturedDefinition(capturedDefinition); 
+        clone.revealTrack = revealTrack;
+        clone.scenarioOddsModifier = scenarioOddsModifier;
+        clone.reinforcementDelayReduction = reinforcementDelayReduction;
+        clone.weeklySPModifier = weeklySPModifier;
+        clone.bvBudgetModifier = bvBudgetModifier;
+        clone.preventAerospace = preventAerospace;
         return clone;
+    }
+    
+    /**
+     * Copies data from the source facility to here. Does not copy transient or cosmetic data.
+     */
+    public void copyRulesDataFrom(StratconFacility facility) {
+        setCapturedDefinition(facility.getCapturedDefinition());
+        setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
+        setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
+        setOwner(facility.getOwner());
+        setRevealTrack(facility.revealTrack());
+        setScenarioOddsModifier(facility.getScenarioOddsModifier());
+        setReinforcementDelayReduction(facility.getReinforcementDelayReduction());
+        setWeeklySPModifier(facility.getWeeklySPModifier());
+        setBVBudgetModifier(facility.getBVBudgetModifier());
+        setPreventAerospace(facility.preventAerospace());
     }
     
     public ForceAlignment getOwner() {
@@ -186,6 +214,46 @@ public class StratconFacility implements Cloneable {
         this.capturedDefinition = capturedDefinition;
     }
 
+    public boolean revealTrack() {
+        return revealTrack;
+    }
+
+    public void setRevealTrack(boolean revealTrack) {
+        this.revealTrack = revealTrack;
+    }
+
+    public int getScenarioOddsModifier() {
+        return scenarioOddsModifier;
+    }
+
+    public void setScenarioOddsModifier(int scenarioOddsModifier) {
+        this.scenarioOddsModifier = scenarioOddsModifier;
+    }
+
+    public int getReinforcementDelayReduction() {
+        return reinforcementDelayReduction;
+    }
+
+    public void setReinforcementDelayReduction(int reinforcementDelayReduction) {
+        this.reinforcementDelayReduction = reinforcementDelayReduction;
+    }
+
+    public int getWeeklySPModifier() {
+        return weeklySPModifier;
+    }
+
+    public void setWeeklySPModifier(int weeklySPModifier) {
+        this.weeklySPModifier = weeklySPModifier;
+    }
+
+    public double getBVBudgetModifier() {
+        return bvBudgetModifier;
+    }
+
+    public void setBVBudgetModifier(double bvBudgetModifier) {
+        this.bvBudgetModifier = bvBudgetModifier;
+    }
+
     /**
      * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      * @return Possibly an instance of a StratconFacility
@@ -211,5 +279,13 @@ public class StratconFacility implements Cloneable {
         }
 
         return resultingManifest;
+    }
+
+    public boolean preventAerospace() {
+        return preventAerospace;
+    }
+
+    public void setPreventAerospace(boolean preventAerospace) {
+        this.preventAerospace = preventAerospace;
     }
 }
