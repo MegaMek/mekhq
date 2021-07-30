@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,20 +24,45 @@ import java.util.ResourceBundle;
 
 public enum ContractMarketMethod {
     //region Enum Declarations
-    ATB_MONTHLY("ContractMarketMethod.ATB_MONTHLY.text");
+    NONE("ContractMarketMethod.NONE.text", "ContractMarketMethod.NONE.toolTipText"),
+    ATB_MONTHLY("ContractMarketMethod.ATB_MONTHLY.text", "ContractMarketMethod.ATB_MONTHLY.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            new EncodeControl());
+    private final String toolTipText;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    ContractMarketMethod(String name) {
+    ContractMarketMethod(final String name, final String toolTipText) {
         this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
+    }
+    //endregion Boolean Comparison Methods
+
+    // TODO : AbstractContractMarket : Uncomment
+    //public AbstractContractMarket getContractMarket() {
+    //    switch (this) {
+    //        case ATB_MONTHLY:
+    //            return new AtBMonthlyContractMarket();
+    //        case NONE:
+    //        default:
+    //            return new EmptyContractMarket();
+    //    }
+    //}
 
     @Override
     public String toString() {

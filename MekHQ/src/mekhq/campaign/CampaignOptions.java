@@ -28,6 +28,8 @@ import java.util.List;
 import mekhq.Version;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -180,6 +182,9 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useTransfers;
+    private boolean personnelLogSkillGain;
+    private boolean personnelLogAbilityGain;
+    private boolean personnelLogEdgeGain;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -268,10 +273,18 @@ public class CampaignOptions implements Serializable {
     private boolean showPeacetimeCost;
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
-    private double clanPriceModifier;
-    private double[] usedPartsValue;
-    private double damagedPartsValue;
-    private double canceledOrderReimbursement;
+
+    // Price Multipliers
+    private double commonPartPriceMultiplier;
+    private double innerSphereUnitPriceMultiplier;
+    private double innerSpherePartPriceMultiplier;
+    private double clanUnitPriceMultiplier;
+    private double clanPartPriceMultiplier;
+    private double mixedTechUnitPriceMultiplier;
+    private double[] usedPartPriceMultipliers;
+    private double damagedPartsValueMultiplier;
+    private double unrepairablePartsValueMultiplier;
+    private double cancelledOrderRefundMultiplier;
     //endregion Finance Tab
 
     //region Mercenary Tab
@@ -321,7 +334,8 @@ public class CampaignOptions implements Serializable {
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
-    //region Personnel Market Tab
+    //region Markets Tab
+    // Personnel Market
     private String personnelMarketName;
     private boolean personnelMarketReportRefresh;
     private int personnelMarketRandomEliteRemoval;
@@ -330,15 +344,22 @@ public class CampaignOptions implements Serializable {
     private int personnelMarketRandomGreenRemoval;
     private int personnelMarketRandomUltraGreenRemoval;
     private double personnelMarketDylansWeight;
-    //endregion Personnel Market Tab
+
+    // Unit Market
+    private UnitMarketMethod unitMarketMethod;
+    private boolean unitMarketRegionalMechVariations;
+    private boolean instantUnitMarketDelivery;
+    private boolean unitMarketReportRefresh;
+
+    // Contract Market
+    private ContractMarketMethod contractMarketMethod;
+    private boolean contractMarketReportRefresh;
+    //endregion Markets Tab
 
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
     private int skillLevel;
-
-    // AtB Module: Unit Market // TODO : Fully Implement Me
-    private boolean useAtBUnitMarket;
 
     // Unit Administration
     private boolean useShareSystem;
@@ -356,9 +377,6 @@ public class CampaignOptions implements Serializable {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
-    private boolean instantUnitMarketDelivery;
-    private boolean contractMarketReportRefresh;
-    private boolean unitMarketReportRefresh;
 
     // Contract Operations
     private int searchRadius;
@@ -397,6 +415,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private int fixedMapChance;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -524,6 +543,9 @@ public class CampaignOptions implements Serializable {
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseTransfers(true);
+        setPersonnelLogSkillGain(false);
+        setPersonnelLogAbilityGain(false);
+        setPersonnelLogEdgeGain(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -659,16 +681,18 @@ public class CampaignOptions implements Serializable {
         showPeacetimeCost = false;
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
-        clanPriceModifier = 1.0;
-        usedPartsValue = new double[6];
-        usedPartsValue[0] = 0.1;
-        usedPartsValue[1] = 0.2;
-        usedPartsValue[2] = 0.3;
-        usedPartsValue[3] = 0.5;
-        usedPartsValue[4] = 0.7;
-        usedPartsValue[5] = 0.9;
-        damagedPartsValue = 0.33;
-        canceledOrderReimbursement = 0.5;
+
+        // Price Multipliers
+        setCommonPartPriceMultiplier(1.0);
+        setInnerSphereUnitPriceMultiplier(1.0);
+        setInnerSpherePartPriceMultiplier(1.0);
+        setClanUnitPriceMultiplier(1.0);
+        setClanPartPriceMultiplier(1.0);
+        setMixedTechUnitPriceMultiplier(1.0);
+        setUsedPartPriceMultipliers(0.1, 0.2, 0.3, 0.5, 0.7, 0.9);
+        setDamagedPartsValueMultiplier(0.33);
+        setUnrepairablePartsValueMultiplier(0.1);
+        setCancelledOrderRefundMultiplier(0.5);
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -726,24 +750,32 @@ public class CampaignOptions implements Serializable {
         assignPortraitOnRoleChange = false;
         //endregion Name and Portrait Generation Tab
 
-        //region Personnel Market Tab
-        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
-        personnelMarketReportRefresh = true;
-        personnelMarketRandomEliteRemoval = 10;
-        personnelMarketRandomVeteranRemoval = 8;
-        personnelMarketRandomRegularRemoval = 6;
-        personnelMarketRandomGreenRemoval = 4;
-        personnelMarketRandomUltraGreenRemoval = 4;
-        personnelMarketDylansWeight = 0.3;
-        //endregion Personnel Market Tab
+        //region Markets Tab
+        // Personnel Market
+        setPersonnelMarketType(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
+        setPersonnelMarketReportRefresh(true);
+        setPersonnelMarketRandomEliteRemoval(10);
+        setPersonnelMarketRandomVeteranRemoval(8);
+        setPersonnelMarketRandomRegularRemoval(6);
+        setPersonnelMarketRandomGreenRemoval(4);
+        setPersonnelMarketRandomUltraGreenRemoval(4);
+        setPersonnelMarketDylansWeight(0.3);
+
+        // Unit Market
+        setUnitMarketMethod(UnitMarketMethod.NONE);
+        setUnitMarketRegionalMechVariations(true);
+        setInstantUnitMarketDelivery(false);
+        setUnitMarketReportRefresh(true);
+
+        // Contract Market
+        setContractMarketMethod(ContractMarketMethod.NONE);
+        setContractMarketReportRefresh(true);
+        //endregion Markets Tab
 
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
         skillLevel = 2;
-
-        // AtB Module: Unit Market
-        useAtBUnitMarket = false;
 
         // Unit Administration
         useShareSystem = false;
@@ -761,9 +793,6 @@ public class CampaignOptions implements Serializable {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
-        instantUnitMarketDelivery = false;
-        contractMarketReportRefresh = true;
-        unitMarketReportRefresh = true;
 
         // Contract Operations
         searchRadius = 800;
@@ -798,6 +827,7 @@ public class CampaignOptions implements Serializable {
         opforAeroChance = 5;
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
+        setFixedMapChance(25);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -980,6 +1010,30 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
+    }
+
+    public boolean isPersonnelLogSkillGain() {
+        return personnelLogSkillGain;
+    }
+
+    public void setPersonnelLogSkillGain(final boolean personnelLogSkillGain) {
+        this.personnelLogSkillGain = personnelLogSkillGain;
+    }
+
+    public boolean isPersonnelLogAbilityGain() {
+        return personnelLogAbilityGain;
+    }
+
+    public void setPersonnelLogAbilityGain(final boolean personnelLogAbilityGain) {
+        this.personnelLogAbilityGain = personnelLogAbilityGain;
+    }
+
+    public boolean isPersonnelLogEdgeGain() {
+        return personnelLogEdgeGain;
+    }
+
+    public void setPersonnelLogEdgeGain(final boolean personnelLogEdgeGain) {
+        this.personnelLogEdgeGain = personnelLogEdgeGain;
     }
     //endregion General Personnel
 
@@ -1800,38 +1854,208 @@ public class CampaignOptions implements Serializable {
         newFinancialYearFinancesToCSVExport = b;
     }
 
-    public double getClanPriceModifier() {
-        return clanPriceModifier;
+    //region Price Multipliers
+    public double getCommonPartPriceMultiplier() {
+        return commonPartPriceMultiplier;
     }
 
-    public void setClanPriceModifier(double d) {
-        this.clanPriceModifier = d;
+    public void setCommonPartPriceMultiplier(final double commonPartPriceMultiplier) {
+        this.commonPartPriceMultiplier = commonPartPriceMultiplier;
     }
 
-    public double getUsedPartsValue(int quality) {
-        return usedPartsValue[quality];
+    public double getInnerSphereUnitPriceMultiplier() {
+        return innerSphereUnitPriceMultiplier;
     }
 
-    public void setUsedPartsValue(double d, int quality) {
-        this.usedPartsValue[quality] = d;
+    public void setInnerSphereUnitPriceMultiplier(final double innerSphereUnitPriceMultiplier) {
+        this.innerSphereUnitPriceMultiplier = innerSphereUnitPriceMultiplier;
     }
 
-    public double getDamagedPartsValue() {
-        return damagedPartsValue;
+    public double getInnerSpherePartPriceMultiplier() {
+        return innerSpherePartPriceMultiplier;
     }
 
-    public void setDamagedPartsValue(double d) {
-        this.damagedPartsValue = d;
+    public void setInnerSpherePartPriceMultiplier(final double innerSpherePartPriceMultiplier) {
+        this.innerSpherePartPriceMultiplier = innerSpherePartPriceMultiplier;
     }
 
-    public double GetCanceledOrderReimbursement() {
-        return canceledOrderReimbursement;
+    public double getClanUnitPriceMultiplier() {
+        return clanUnitPriceMultiplier;
     }
 
-    public void setCanceledOrderReimbursement(double d) {
-        this.canceledOrderReimbursement = d;
+    public void setClanUnitPriceMultiplier(final double clanUnitPriceMultiplier) {
+        this.clanUnitPriceMultiplier = clanUnitPriceMultiplier;
     }
+
+    public double getClanPartPriceMultiplier() {
+        return clanPartPriceMultiplier;
+    }
+
+    public void setClanPartPriceMultiplier(final double clanPartPriceMultiplier) {
+        this.clanPartPriceMultiplier = clanPartPriceMultiplier;
+    }
+
+    public double getMixedTechUnitPriceMultiplier() {
+        return mixedTechUnitPriceMultiplier;
+    }
+
+    public void setMixedTechUnitPriceMultiplier(final double mixedTechUnitPriceMultiplier) {
+        this.mixedTechUnitPriceMultiplier = mixedTechUnitPriceMultiplier;
+    }
+
+    public double[] getUsedPartPriceMultipliers() {
+        return usedPartPriceMultipliers;
+    }
+
+    public void setUsedPartPriceMultipliers(final double... usedPartPriceMultipliers) {
+        this.usedPartPriceMultipliers = usedPartPriceMultipliers;
+    }
+
+    public double getDamagedPartsValueMultiplier() {
+        return damagedPartsValueMultiplier;
+    }
+
+    public void setDamagedPartsValueMultiplier(final double damagedPartsValueMultiplier) {
+        this.damagedPartsValueMultiplier = damagedPartsValueMultiplier;
+    }
+
+    public double getUnrepairablePartsValueMultiplier() {
+        return unrepairablePartsValueMultiplier;
+    }
+
+    public void setUnrepairablePartsValueMultiplier(final double unrepairablePartsValueMultiplier) {
+        this.unrepairablePartsValueMultiplier = unrepairablePartsValueMultiplier;
+    }
+
+    public double getCancelledOrderRefundMultiplier() {
+        return cancelledOrderRefundMultiplier;
+    }
+
+    public void setCancelledOrderRefundMultiplier(final double cancelledOrderRefundMultiplier) {
+        this.cancelledOrderRefundMultiplier = cancelledOrderRefundMultiplier;
+    }
+    //endregion Price Multipliers
     //endregion Finances Tab
+
+    //region Markets Tab
+    //region Personnel Market
+    public String getPersonnelMarketType() {
+        return personnelMarketName;
+    }
+
+    public void setPersonnelMarketType(final String personnelMarketName) {
+        this.personnelMarketName = personnelMarketName;
+    }
+
+    public boolean getPersonnelMarketReportRefresh() {
+        return personnelMarketReportRefresh;
+    }
+
+    public void setPersonnelMarketReportRefresh(final boolean personnelMarketReportRefresh) {
+        this.personnelMarketReportRefresh = personnelMarketReportRefresh;
+    }
+
+    public int getPersonnelMarketRandomEliteRemoval() {
+        return personnelMarketRandomEliteRemoval;
+    }
+
+    public void setPersonnelMarketRandomEliteRemoval(final int personnelMarketRandomEliteRemoval) {
+        this.personnelMarketRandomEliteRemoval = personnelMarketRandomEliteRemoval;
+    }
+
+    public int getPersonnelMarketRandomVeteranRemoval() {
+        return personnelMarketRandomVeteranRemoval;
+    }
+
+    public void setPersonnelMarketRandomVeteranRemoval(final int personnelMarketRandomVeteranRemoval) {
+        this.personnelMarketRandomVeteranRemoval = personnelMarketRandomVeteranRemoval;
+    }
+
+    public int getPersonnelMarketRandomRegularRemoval() {
+        return personnelMarketRandomRegularRemoval;
+    }
+
+    public void setPersonnelMarketRandomRegularRemoval(final int personnelMarketRandomRegularRemoval) {
+        this.personnelMarketRandomRegularRemoval = personnelMarketRandomRegularRemoval;
+    }
+
+    public int getPersonnelMarketRandomGreenRemoval() {
+        return personnelMarketRandomGreenRemoval;
+    }
+
+    public void setPersonnelMarketRandomGreenRemoval(final int personnelMarketRandomGreenRemoval) {
+        this.personnelMarketRandomGreenRemoval = personnelMarketRandomGreenRemoval;
+    }
+
+    public int getPersonnelMarketRandomUltraGreenRemoval() {
+        return personnelMarketRandomUltraGreenRemoval;
+    }
+
+    public void setPersonnelMarketRandomUltraGreenRemoval(final int personnelMarketRandomUltraGreenRemoval) {
+        this.personnelMarketRandomUltraGreenRemoval = personnelMarketRandomUltraGreenRemoval;
+    }
+
+    public double getPersonnelMarketDylansWeight() {
+        return personnelMarketDylansWeight;
+    }
+
+    public void setPersonnelMarketDylansWeight(final double personnelMarketDylansWeight) {
+        this.personnelMarketDylansWeight = personnelMarketDylansWeight;
+    }
+    //endregion Personnel Market
+
+    //region Unit Market
+    public UnitMarketMethod getUnitMarketMethod() {
+        return unitMarketMethod;
+    }
+
+    public void setUnitMarketMethod(final UnitMarketMethod unitMarketMethod) {
+        this.unitMarketMethod = unitMarketMethod;
+    }
+
+    public boolean useUnitMarketRegionalMechVariations() {
+        return unitMarketRegionalMechVariations;
+    }
+
+    public void setUnitMarketRegionalMechVariations(final boolean unitMarketRegionalMechVariations) {
+        this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
+    }
+
+    public boolean getInstantUnitMarketDelivery() {
+        return instantUnitMarketDelivery;
+    }
+
+    public void setInstantUnitMarketDelivery(final boolean instantUnitMarketDelivery) {
+        this.instantUnitMarketDelivery = instantUnitMarketDelivery;
+    }
+
+    public boolean getUnitMarketReportRefresh() {
+        return unitMarketReportRefresh;
+    }
+
+    public void setUnitMarketReportRefresh(final boolean unitMarketReportRefresh) {
+        this.unitMarketReportRefresh = unitMarketReportRefresh;
+    }
+    //endregion Unit Market
+
+    //region Contract Market
+    public ContractMarketMethod getContractMarketMethod() {
+        return contractMarketMethod;
+    }
+
+    public void setContractMarketMethod(final ContractMarketMethod contractMarketMethod) {
+        this.contractMarketMethod = contractMarketMethod;
+    }
+
+    public boolean getContractMarketReportRefresh() {
+        return contractMarketReportRefresh;
+    }
+
+    public void setContractMarketReportRefresh(final boolean contractMarketReportRefresh) {
+        this.contractMarketReportRefresh = contractMarketReportRefresh;
+    }
+    //endregion Contract Market
+    //endregion Markets Tab
 
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
@@ -1901,71 +2125,6 @@ public class CampaignOptions implements Serializable {
         this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
-    // Personnel Market
-    public boolean getPersonnelMarketReportRefresh() {
-        return personnelMarketReportRefresh;
-    }
-
-    public void setPersonnelMarketReportRefresh(boolean b) {
-        personnelMarketReportRefresh = b;
-    }
-
-    public String getPersonnelMarketType() {
-        return personnelMarketName;
-    }
-
-    public void setPersonnelMarketType(String t) {
-        personnelMarketName = t;
-    }
-
-    public int getPersonnelMarketRandomEliteRemoval() {
-        return personnelMarketRandomEliteRemoval;
-    }
-
-    public void setPersonnelMarketRandomEliteRemoval(int i) {
-        personnelMarketRandomEliteRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomVeteranRemoval() {
-        return personnelMarketRandomVeteranRemoval;
-    }
-
-    public void setPersonnelMarketRandomVeteranRemoval(int i) {
-        personnelMarketRandomVeteranRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomRegularRemoval() {
-        return personnelMarketRandomRegularRemoval;
-    }
-
-    public void setPersonnelMarketRandomRegularRemoval(int i) {
-        personnelMarketRandomRegularRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomGreenRemoval() {
-        return personnelMarketRandomGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomGreenRemoval(int i) {
-        personnelMarketRandomGreenRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomUltraGreenRemoval() {
-        return personnelMarketRandomUltraGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomUltraGreenRemoval(int i) {
-        personnelMarketRandomUltraGreenRemoval = i;
-    }
-
-    public double getPersonnelMarketDylansWeight() {
-        return personnelMarketDylansWeight;
-    }
-
-    public void setPersonnelMarketDylansWeight(double d) {
-        personnelMarketDylansWeight = d;
-    }
-
     public boolean useQuirks() {
         return useQuirks;
     }
@@ -2029,7 +2188,6 @@ public class CampaignOptions implements Serializable {
     public void setSuccessXP(int b) {
         successXP = b;
     }
-
 
     public boolean limitByYear() {
         return limitByYear;
@@ -2513,15 +2671,6 @@ public class CampaignOptions implements Serializable {
         this.useStratCon = useStratCon;
     }
 
-
-    public boolean getUseAtBUnitMarket() {
-        return useAtBUnitMarket;
-    }
-
-    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
-        this.useAtBUnitMarket = useAtBUnitMarket;
-    }
-
     public boolean getUseAero() {
         return useAero;
     }
@@ -2762,14 +2911,6 @@ public class CampaignOptions implements Serializable {
         searchRadius = radius;
     }
 
-    public boolean getInstantUnitMarketDelivery() {
-        return instantUnitMarketDelivery;
-    }
-
-    public void setInstantUnitMarketDelivery(boolean instant) {
-        instantUnitMarketDelivery = instant;
-    }
-
     /**
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
@@ -2896,22 +3037,6 @@ public class CampaignOptions implements Serializable {
         limitLanceNumUnits = limit;
     }
 
-    public boolean getContractMarketReportRefresh() {
-        return contractMarketReportRefresh;
-    }
-
-    public void setContractMarketReportRefresh(boolean refresh) {
-        contractMarketReportRefresh = refresh;
-    }
-
-    public boolean getUnitMarketReportRefresh() {
-        return unitMarketReportRefresh;
-    }
-
-    public void setUnitMarketReportRefresh(boolean refresh) {
-        unitMarketReportRefresh = refresh;
-    }
-
     //region Mass Repair/ Mass Salvage
     public boolean massRepairUseRepair() {
         return massRepairUseRepair;
@@ -3035,6 +3160,14 @@ public class CampaignOptions implements Serializable {
         return opforLocalUnitChance;
     }
 
+    public int getFixedMapChance() {
+        return fixedMapChance;
+    }
+
+    public void setFixedMapChance(int fixedMapChance) {
+        this.fixedMapChance = fixedMapChance;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3128,6 +3261,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -3203,53 +3339,69 @@ public class CampaignOptions implements Serializable {
         //endregion Procreation
 
         //region Death
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
         //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "infantryDontCount", infantryDontCount);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRepairs", payForRepairs);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForUnits", payForUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForSalaries", payForSalaries);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForOverhead", payForOverhead);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForMaintain", payForMaintain);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellUnits", sellUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellParts", sellParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePercentageMaint", usePercentageMaint);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infantryDontCount", infantryDontCount);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showPeacetimeCost", showPeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
+
+        //region Price Multipliers
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+        //endregion Price Multipliers
         //endregion Finances Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
-                                       personnelMarketRandomEliteRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval",
-                                       personnelMarketRandomVeteranRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomRegularRemoval",
-                                       personnelMarketRandomRegularRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomGreenRemoval",
-                                       personnelMarketRandomGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomUltraGreenRemoval",
-                                       personnelMarketRandomUltraGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
+        //region Markets Tab
+        //region Personnel Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketName", getPersonnelMarketType());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        //endregion Personnel Market
+
+        //region Unit Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketMethod", getUnitMarketMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
+        //endregion Unit Market
+
+        //region Contract Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        //endregion Contract Market
+        //endregion Markets Tab
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<phenotypeProbabilities>"
                 + StringUtils.join(phenotypeProbabilities, ',')
@@ -3289,7 +3441,6 @@ public class CampaignOptions implements Serializable {
                 + "</atbBattleChance>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
@@ -3301,13 +3452,12 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);        
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -3352,7 +3502,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
 
         //region AtB Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "rats", StringUtils.join(rats, ','));
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent) + "<staticRATs/>");
@@ -3581,6 +3730,12 @@ public class CampaignOptions implements Serializable {
                     retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                     retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogSkillGain")) {
+                    retVal.setPersonnelLogSkillGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogAbilityGain")) {
+                    retVal.setPersonnelLogAbilityGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogEdgeGain")) {
+                    retVal.setPersonnelLogEdgeGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
@@ -3778,42 +3933,79 @@ public class CampaignOptions implements Serializable {
                     retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-                    retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
-                    retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
-                    retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
-                    retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
-                    retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
-                    retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
-                    retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
-                    retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
-                    retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
+
+                //region Price Multipliers
+                } else if (wn2.getNodeName().equalsIgnoreCase("commonPartPriceMultiplier")) {
+                    retVal.setCommonPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSphereUnitPriceMultiplier")) {
+                    retVal.setInnerSphereUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSpherePartPriceMultiplier")) {
+                    retVal.setInnerSpherePartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanUnitPriceMultiplier")) {
+                    retVal.setClanUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPartPriceMultiplier")) {
+                    retVal.setClanPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mixedTechUnitPriceMultiplier")) {
+                    retVal.setMixedTechUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartPriceMultipliers")) {
+                    final String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        try {
+                            retVal.getUsedPartPriceMultipliers()[i] = Double.parseDouble(values[i]);
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValueMultiplier")) {
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unrepairablePartsValueMultiplier")) {
+                    retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Price Multipliers
                 //endregion Finances Tab
 
+                //region Markets
+                //region Personnel Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
+                    retVal.setPersonnelMarketType(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.personnelMarketName = wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
-                    retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
-                    retVal.personnelMarketRandomVeteranRemoval = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
-                    retVal.personnelMarketRandomRegularRemoval = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
-                    retVal.personnelMarketRandomGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
-                    retVal.personnelMarketRandomUltraGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.setPersonnelMarketType(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
-                    retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
+                    retVal.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
+                    retVal.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
+                    retVal.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
+                    retVal.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
+                    retVal.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
-                    retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
+                    retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Personnel Market
+
+                //region Unit Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketMethod")) {
+                    retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMechVariations")) {
+                    retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
+                    retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
+                    retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Unit Market
+
+                //region Contract Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
+                    retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
+                    retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Contract Market
+                // endregion Markets
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -3823,8 +4015,6 @@ public class CampaignOptions implements Serializable {
                     retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useStratCon")) {
                     retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
-                    retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                     retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
@@ -3895,8 +4085,6 @@ public class CampaignOptions implements Serializable {
                     retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
                     retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
-                    retVal.instantUnitMarketDelivery = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
                     retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
@@ -3919,10 +4107,6 @@ public class CampaignOptions implements Serializable {
                     retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
                     retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
-                    retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
-                    retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
                     retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
@@ -3931,6 +4115,8 @@ public class CampaignOptions implements Serializable {
                     retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                     retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
+                    retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                     retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
                 } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
@@ -3959,6 +4145,28 @@ public class CampaignOptions implements Serializable {
                     retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
 
                 //region Legacy
+                // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
+                    final double value = Double.parseDouble(wn2.getTextContent());
+                    retVal.setClanUnitPriceMultiplier(value);
+                    retVal.setClanPartPriceMultiplier(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[0] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[1] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[2] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[3] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[4] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[5] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3 Removal
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+
                 // Removed in 0.47.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
                     if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
@@ -4000,6 +4208,12 @@ public class CampaignOptions implements Serializable {
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
             }
+        }
+
+        // Fixing Old Data
+        if (version.isLowerThan("0.49.0") && retVal.getUseAtB()) {
+            retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
+            retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
 
         MekHQ.getLogger().debug("Load Campaign Options Complete!");

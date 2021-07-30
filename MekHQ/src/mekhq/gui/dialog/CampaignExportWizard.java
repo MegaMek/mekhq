@@ -532,7 +532,7 @@ public class CampaignExportWizard extends JDialog {
         // overwrite any people with the same ID.
         for (Person person : personList.getSelectedValuesList()) {
             if (destinationCampaign.getPerson(person.getId()) != null) {
-                destinationCampaign.removePerson(person.getId());
+                destinationCampaign.removePerson(person);
             }
 
             destinationCampaign.importPerson(person);
@@ -587,7 +587,7 @@ public class CampaignExportWizard extends JDialog {
             }
 
             for (Person person : personList.getSelectedValuesList()) {
-                sourceCampaign.removePerson(person.getId(), true);
+                sourceCampaign.removePerson(person, true);
             }
 
             if (money > 0) {

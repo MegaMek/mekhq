@@ -431,9 +431,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
-            double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             for (Unit u : units) {
-                Money refundAmount = u.getBuyCost().multipliedBy(refund);
+                Money refundAmount = u.getBuyCost().multipliedBy(
+                        gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
                 gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
                         "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());

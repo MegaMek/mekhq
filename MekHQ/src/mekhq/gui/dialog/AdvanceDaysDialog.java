@@ -155,6 +155,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         final JPanel advanceDaysDurationPanel = createDurationPanel();
 
         setDailyLogPanel(new DailyReportLogPanel(getGUI()));
+        getDailyLogPanel().refreshLog(gui.getCommandCenterTab().getPanLog().getLogText());
 
         // Layout the Panel
         final JPanel panel = new JPanel();

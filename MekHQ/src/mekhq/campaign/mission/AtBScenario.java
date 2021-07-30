@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -21,44 +21,21 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.UUID;
-import java.util.Vector;
-
+import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.StringUtil;
-import mekhq.MekHqConstants;
-import mekhq.Version;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
+import megamek.common.util.StringUtil;
+import mekhq.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
@@ -66,6 +43,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -185,6 +169,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int mapSizeX;
     private int mapSizeY;
     private String map;
+    private boolean usingFixedMap;
     private int lanceCount;
     private int rerollsRemaining;
     private int enemyHome;
@@ -799,13 +784,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 for (int i = 0; i < Compute.d6() - 3; i++) {
                     addLance(enemyEntities, getContract(campaign).getEnemyCode(),
                             getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                            UnitMarket.getRandomWeight(UnitType.MEK, getContract(campaign).getEnemyCode(),
-                                campaign.getCampaignOptions().getRegionalMechVariations()),
+                            AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, getContract(campaign).getEnemy()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
             } else if (getLanceRole().isScouting()) {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
-                 * but only if not deploying by dropship.
+                 * but only if not deploying by DropShip.
                  */
                 alliesPlayer.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();
@@ -1568,6 +1552,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 +"</mapSize>");
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
 
@@ -1753,11 +1738,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
-                    String[] xy = wn2.getTextContent().split(",");
+                    String []xy = wn2.getTextContent().split(",");
                     mapSizeX = Integer.parseInt(xy[0]);
                     mapSizeY = Integer.parseInt(xy[1]);
                 } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
                     map = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
+                    setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
                     lanceCount = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
@@ -1769,7 +1756,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3);
+                                en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                             } catch (Exception e) {
                                 MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1788,7 +1775,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3);
+                                en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                             } catch (Exception e) {
                                 MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1815,7 +1802,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (wn4.getNodeName().equalsIgnoreCase("entity")) {
                                     Entity en = null;
                                     try {
-                                        en = MekHqXmlUtil.parseSingleEntityMul((Element) wn4);
+                                        en = MekHqXmlUtil.getEntityFromXmlString(wn4);
                                     } catch (Exception e) {
                                         MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
                                     }
@@ -2159,6 +2146,23 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setMap(String map) {
         this.map = map;
+    }
+
+    public String getMapForDisplay() {
+        if (!isUsingFixedMap()) {
+            return getMap();
+        } else {
+            MapSettings ms = MapSettings.getInstance();
+            return LobbyUtility.cleanBoardName(getMap(), ms);
+        }
+    }
+
+    public boolean isUsingFixedMap() {
+        return usingFixedMap;
+    }
+
+    public void setUsingFixedMap(boolean usingFixedMap) {
+        this.usingFixedMap = usingFixedMap;
     }
 
     public int getLanceCount() {
