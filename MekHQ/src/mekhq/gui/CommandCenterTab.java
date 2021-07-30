@@ -97,6 +97,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         MekHQ.registerHandler(this);
     }
 
+    //region Getters/Setters
+    public DailyReportLogPanel getPanLog() {
+        return panLog;
+    }
+    //endregion Getters/Setters
+
     /**
      * initialize the contents and layout of the tab
      */

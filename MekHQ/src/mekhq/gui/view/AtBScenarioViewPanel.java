@@ -525,7 +525,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAP].addItemListener(checkBoxListener);
         }
 
-        lblMapDesc.setText(scenario.getMap());
+        lblMapDesc.setText(scenario.getMapForDisplay());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapDesc, gridBagConstraints);

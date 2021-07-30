@@ -273,10 +273,18 @@ public class CampaignOptions implements Serializable {
     private boolean showPeacetimeCost;
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
-    private double clanPriceModifier;
-    private double[] usedPartsValue;
-    private double damagedPartsValue;
-    private double canceledOrderReimbursement;
+
+    // Price Multipliers
+    private double commonPartPriceMultiplier;
+    private double innerSphereUnitPriceMultiplier;
+    private double innerSpherePartPriceMultiplier;
+    private double clanUnitPriceMultiplier;
+    private double clanPartPriceMultiplier;
+    private double mixedTechUnitPriceMultiplier;
+    private double[] usedPartPriceMultipliers;
+    private double damagedPartsValueMultiplier;
+    private double unrepairablePartsValueMultiplier;
+    private double cancelledOrderRefundMultiplier;
     //endregion Finance Tab
 
     //region Mercenary Tab
@@ -408,6 +416,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private int fixedMapChance;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -673,16 +682,18 @@ public class CampaignOptions implements Serializable {
         showPeacetimeCost = false;
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
-        clanPriceModifier = 1.0;
-        usedPartsValue = new double[6];
-        usedPartsValue[0] = 0.1;
-        usedPartsValue[1] = 0.2;
-        usedPartsValue[2] = 0.3;
-        usedPartsValue[3] = 0.5;
-        usedPartsValue[4] = 0.7;
-        usedPartsValue[5] = 0.9;
-        damagedPartsValue = 0.33;
-        canceledOrderReimbursement = 0.5;
+
+        // Price Multipliers
+        setCommonPartPriceMultiplier(1.0);
+        setInnerSphereUnitPriceMultiplier(1.0);
+        setInnerSpherePartPriceMultiplier(1.0);
+        setClanUnitPriceMultiplier(1.0);
+        setClanPartPriceMultiplier(1.0);
+        setMixedTechUnitPriceMultiplier(1.0);
+        setUsedPartPriceMultipliers(0.1, 0.2, 0.3, 0.5, 0.7, 0.9);
+        setDamagedPartsValueMultiplier(0.33);
+        setUnrepairablePartsValueMultiplier(0.1);
+        setCancelledOrderRefundMultiplier(0.5);
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -818,6 +829,7 @@ public class CampaignOptions implements Serializable {
         opforAeroChance = 5;
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
+        setFixedMapChance(25);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -1844,37 +1856,87 @@ public class CampaignOptions implements Serializable {
         newFinancialYearFinancesToCSVExport = b;
     }
 
-    public double getClanPriceModifier() {
-        return clanPriceModifier;
+    //region Price Multipliers
+    public double getCommonPartPriceMultiplier() {
+        return commonPartPriceMultiplier;
     }
 
-    public void setClanPriceModifier(double d) {
-        this.clanPriceModifier = d;
+    public void setCommonPartPriceMultiplier(final double commonPartPriceMultiplier) {
+        this.commonPartPriceMultiplier = commonPartPriceMultiplier;
     }
 
-    public double getUsedPartsValue(int quality) {
-        return usedPartsValue[quality];
+    public double getInnerSphereUnitPriceMultiplier() {
+        return innerSphereUnitPriceMultiplier;
     }
 
-    public void setUsedPartsValue(double d, int quality) {
-        this.usedPartsValue[quality] = d;
+    public void setInnerSphereUnitPriceMultiplier(final double innerSphereUnitPriceMultiplier) {
+        this.innerSphereUnitPriceMultiplier = innerSphereUnitPriceMultiplier;
     }
 
-    public double getDamagedPartsValue() {
-        return damagedPartsValue;
+    public double getInnerSpherePartPriceMultiplier() {
+        return innerSpherePartPriceMultiplier;
     }
 
-    public void setDamagedPartsValue(double d) {
-        this.damagedPartsValue = d;
+    public void setInnerSpherePartPriceMultiplier(final double innerSpherePartPriceMultiplier) {
+        this.innerSpherePartPriceMultiplier = innerSpherePartPriceMultiplier;
     }
 
-    public double GetCanceledOrderReimbursement() {
-        return canceledOrderReimbursement;
+    public double getClanUnitPriceMultiplier() {
+        return clanUnitPriceMultiplier;
     }
 
-    public void setCanceledOrderReimbursement(double d) {
-        this.canceledOrderReimbursement = d;
+    public void setClanUnitPriceMultiplier(final double clanUnitPriceMultiplier) {
+        this.clanUnitPriceMultiplier = clanUnitPriceMultiplier;
     }
+
+    public double getClanPartPriceMultiplier() {
+        return clanPartPriceMultiplier;
+    }
+
+    public void setClanPartPriceMultiplier(final double clanPartPriceMultiplier) {
+        this.clanPartPriceMultiplier = clanPartPriceMultiplier;
+    }
+
+    public double getMixedTechUnitPriceMultiplier() {
+        return mixedTechUnitPriceMultiplier;
+    }
+
+    public void setMixedTechUnitPriceMultiplier(final double mixedTechUnitPriceMultiplier) {
+        this.mixedTechUnitPriceMultiplier = mixedTechUnitPriceMultiplier;
+    }
+
+    public double[] getUsedPartPriceMultipliers() {
+        return usedPartPriceMultipliers;
+    }
+
+    public void setUsedPartPriceMultipliers(final double... usedPartPriceMultipliers) {
+        this.usedPartPriceMultipliers = usedPartPriceMultipliers;
+    }
+
+    public double getDamagedPartsValueMultiplier() {
+        return damagedPartsValueMultiplier;
+    }
+
+    public void setDamagedPartsValueMultiplier(final double damagedPartsValueMultiplier) {
+        this.damagedPartsValueMultiplier = damagedPartsValueMultiplier;
+    }
+
+    public double getUnrepairablePartsValueMultiplier() {
+        return unrepairablePartsValueMultiplier;
+    }
+
+    public void setUnrepairablePartsValueMultiplier(final double unrepairablePartsValueMultiplier) {
+        this.unrepairablePartsValueMultiplier = unrepairablePartsValueMultiplier;
+    }
+
+    public double getCancelledOrderRefundMultiplier() {
+        return cancelledOrderRefundMultiplier;
+    }
+
+    public void setCancelledOrderRefundMultiplier(final double cancelledOrderRefundMultiplier) {
+        this.cancelledOrderRefundMultiplier = cancelledOrderRefundMultiplier;
+    }
+    //endregion Price Multipliers
     //endregion Finances Tab
 
     //region Markets Tab
@@ -3102,6 +3164,14 @@ public class CampaignOptions implements Serializable {
         return opforLocalUnitChance;
     }
 
+    public int getFixedMapChance() {
+        return fixedMapChance;
+    }
+
+    public void setFixedMapChance(int fixedMapChance) {
+        this.fixedMapChance = fixedMapChance;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3273,43 +3343,47 @@ public class CampaignOptions implements Serializable {
         //endregion Procreation
 
         //region Death
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
         //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "infantryDontCount", infantryDontCount);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRepairs", payForRepairs);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForUnits", payForUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForSalaries", payForSalaries);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForOverhead", payForOverhead);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForMaintain", payForMaintain);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellUnits", sellUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellParts", sellParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePercentageMaint", usePercentageMaint);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infantryDontCount", infantryDontCount);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showPeacetimeCost", showPeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
+
+        //region Price Multipliers
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+        //endregion Price Multipliers
         //endregion Finances Tab
 
         //region Markets Tab
         //region Personnel Market
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "personnelMarketName", getPersonnelMarketType());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketName", getPersonnelMarketType());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
@@ -3393,6 +3467,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -3857,24 +3932,36 @@ public class CampaignOptions implements Serializable {
                     retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-                    retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
-                    retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
-                    retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
-                    retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
-                    retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
-                    retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
-                    retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
-                    retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
-                    retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
+
+                //region Price Multipliers
+                } else if (wn2.getNodeName().equalsIgnoreCase("commonPartPriceMultiplier")) {
+                    retVal.setCommonPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSphereUnitPriceMultiplier")) {
+                    retVal.setInnerSphereUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSpherePartPriceMultiplier")) {
+                    retVal.setInnerSpherePartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanUnitPriceMultiplier")) {
+                    retVal.setClanUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPartPriceMultiplier")) {
+                    retVal.setClanPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mixedTechUnitPriceMultiplier")) {
+                    retVal.setMixedTechUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartPriceMultipliers")) {
+                    final String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        try {
+                            retVal.getUsedPartPriceMultipliers()[i] = Double.parseDouble(values[i]);
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValueMultiplier")) {
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unrepairablePartsValueMultiplier")) {
+                    retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Price Multipliers
                 //endregion Finances Tab
 
                 //region Markets Tab
@@ -4036,6 +4123,8 @@ public class CampaignOptions implements Serializable {
                     retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                     retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
+                    retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
                     retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
@@ -4063,6 +4152,26 @@ public class CampaignOptions implements Serializable {
                     retVal.setUseStaticRATs(true);
                 } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) { //Legacy - 0.49.3 Removal
                     retVal.setIgnoreRATEra(true);
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
+                    final double value = Double.parseDouble(wn2.getTextContent());
+                    retVal.setClanUnitPriceMultiplier(value);
+                    retVal.setClanPartPriceMultiplier(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[0] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[1] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[2] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[3] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[4] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[5] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3 Removal
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
 
                 // Removed in 0.47.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy

@@ -123,10 +123,21 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
+                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+                mapSettings.setMapSize(1,  1); 
+                mapSettings.getBoardsSelectedVector().clear();
+                
 
                 // if the scenario is taking place in space, do space settings instead
                 if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                } else if (scenario.isUsingFixedMap()) {
+                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                    
+                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
                     try (InputStream is = new FileInputStream(mapgenFile)) {
@@ -138,12 +149,10 @@ public class AtBGameThread extends GameThread {
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
+                    
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 }
-
-                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1,  1);
-                mapSettings.getBoardsSelectedVector().clear();
-                mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
