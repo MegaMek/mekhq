@@ -92,12 +92,12 @@ public class Asset implements Serializable {
     //region Getters/Setters
 
     //region File I/O
-    public void writeToXml(final PrintWriter pw, int indent) {
+    public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "asset");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", value.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", financialTerm);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", income.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", getName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", getValue().toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", getIncome().toXmlString());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "asset");
     }
 
