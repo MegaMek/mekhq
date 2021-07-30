@@ -293,7 +293,6 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Personnel Tab
 
     //region Finances Tab
-    private JPanel panFinances;
     private JCheckBox payForPartsBox;
     private JCheckBox payForRepairsBox;
     private JCheckBox payForUnitsBox;
@@ -312,11 +311,18 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox showPeacetimeCostBox;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
     private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
-    private JSpinner spnClanPriceModifier;
-    private JLabel[] partQualityLabels;
-    private JSpinner[] spnUsedPartsValue;
-    private JSpinner spnDamagedPartsValue;
-    private JSpinner spnOrderRefund;
+
+    // Price Multipliers
+    private JSpinner spnCommonPartPriceMultiplier;
+    private JSpinner spnInnerSphereUnitPriceMultiplier;
+    private JSpinner spnInnerSpherePartPriceMultiplier;
+    private JSpinner spnClanUnitPriceMultiplier;
+    private JSpinner spnClanPartPriceMultiplier;
+    private JSpinner spnMixedTechUnitPriceMultiplier;
+    private JSpinner[] spnUsedPartPriceMultipliers;
+    private JSpinner spnDamagedPartsValueMultiplier;
+    private JSpinner spnUnrepairablePartsValueMultiplier;
+    private JSpinner spnCancelledOrderRefundMultiplier;
     //endregion Finances Tab
 
     //region Mercenary Tab
@@ -538,7 +544,8 @@ public class CampaignOptionsDialog extends JDialog {
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         panRepair = new JPanel();
         panSupplies = new JPanel();
-        panFinances = new JPanel();
+        //region Finances Tab
+        JPanel panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
         panXP = new JPanel();
@@ -549,9 +556,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEraModsCheckBox = new JCheckBox();
         assignedTechFirstCheckBox = new JCheckBox();
         resetToFirstTechCheckBox = new JCheckBox();
-        JLabel clanPriceModifierLabel = new JLabel();
-        JLabel usedPartsValueLabel = new JLabel();
-        JLabel damagedPartsValueLabel = new JLabel();
         payForPartsBox = new JCheckBox();
         payForRepairsBox = new JCheckBox();
         payForUnitsBox = new JCheckBox();
@@ -1661,85 +1665,10 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = gridy++;
         panFinances.add(newFinancialYearFinancesToCSVExportBox, gridBagConstraints);
 
-        clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
-        clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(clanPriceModifierLabel, gridBagConstraints);
-
-        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(1.0, 1.0, null, 0.1));
-        spnClanPriceModifier.setEditor(new JSpinner.NumberEditor(spnClanPriceModifier, "0.00"));
-        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnClanPriceModifier, gridBagConstraints);
-
-        usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
-        usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(usedPartsValueLabel, gridBagConstraints);
-
-        spnUsedPartsValue = new JSpinner[6];
-        partQualityLabels = new JLabel[spnUsedPartsValue.length];
-        gridBagConstraints.gridwidth = 1;
-        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.insets = new Insets(0, 20, 0, 0);
-            partQualityLabels[i] = new JLabel();
-            panFinances.add(partQualityLabels[i], gridBagConstraints);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            spnUsedPartsValue[i] = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-            spnUsedPartsValue[i].setEditor(new JSpinner.NumberEditor(spnUsedPartsValue[i], "0.00"));
-            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText"));
-            panFinances.add(spnUsedPartsValue[i], gridBagConstraints);
-        }
-
-        damagedPartsValueLabel.setText(resourceMap.getString("damagedPartsValueLabel.text"));
-        damagedPartsValueLabel.setName("damagedPartsValueLabel");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(damagedPartsValueLabel, gridBagConstraints);
-
-        spnDamagedPartsValue = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-        spnDamagedPartsValue.setEditor(new JSpinner.NumberEditor(spnDamagedPartsValue, "0.00"));
-        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnDamagedPartsValue, gridBagConstraints);
-
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(new JLabel("Reimbursement % (as decimal) for cancelled orders"), gridBagConstraints);
-
-        spnOrderRefund = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-        spnOrderRefund.setEditor(new JSpinner.NumberEditor(spnOrderRefund, "0.00"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnOrderRefund, gridBagConstraints);
+        gridBagConstraints.gridheight = 20;
+        panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances);
         //endregion Finances Tab
@@ -4552,6 +4481,201 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Personnel Tab
 
+    //region Finances Tab
+    private JPanel createPriceModifiersPanel() {
+        // Create Panel Components
+        final JLabel lblCommonPartPriceMultiplier = new JLabel(resources.getString("lblCommonPartPriceMultiplier.text"));
+        lblCommonPartPriceMultiplier.setToolTipText(resources.getString("lblCommonPartPriceMultiplier.toolTipText"));
+        lblCommonPartPriceMultiplier.setName("lblCommonPartPriceMultiplier");
+
+        spnCommonPartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnCommonPartPriceMultiplier.setToolTipText(resources.getString("lblCommonPartPriceMultiplier.toolTipText"));
+        spnCommonPartPriceMultiplier.setName("spnCommonPartPriceMultiplier");
+
+        final JLabel lblInnerSphereUnitPriceMultiplier = new JLabel(resources.getString("lblInnerSphereUnitPriceMultiplier.text"));
+        lblInnerSphereUnitPriceMultiplier.setToolTipText(resources.getString("lblInnerSphereUnitPriceMultiplier.toolTipText"));
+        lblInnerSphereUnitPriceMultiplier.setName("lblInnerSphereUnitPriceMultiplier");
+
+        spnInnerSphereUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnInnerSphereUnitPriceMultiplier.setToolTipText(resources.getString("lblInnerSphereUnitPriceMultiplier.toolTipText"));
+        spnInnerSphereUnitPriceMultiplier.setName("spnInnerSphereUnitPriceMultiplier");
+
+        final JLabel lblInnerSpherePartPriceMultiplier = new JLabel(resources.getString("lblInnerSpherePartPriceMultiplier.text"));
+        lblInnerSpherePartPriceMultiplier.setToolTipText(resources.getString("lblInnerSpherePartPriceMultiplier.toolTipText"));
+        lblInnerSpherePartPriceMultiplier.setName("lblInnerSpherePartPriceMultiplier");
+
+        spnInnerSpherePartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnInnerSpherePartPriceMultiplier.setToolTipText(resources.getString("lblInnerSpherePartPriceMultiplier.toolTipText"));
+        spnInnerSpherePartPriceMultiplier.setName("spnInnerSpherePartPriceMultiplier");
+
+        final JLabel lblClanUnitPriceMultiplier = new JLabel(resources.getString("lblClanUnitPriceMultiplier.text"));
+        lblClanUnitPriceMultiplier.setToolTipText(resources.getString("lblClanUnitPriceMultiplier.toolTipText"));
+        lblClanUnitPriceMultiplier.setName("lblClanUnitPriceMultiplier");
+
+        spnClanUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnClanUnitPriceMultiplier.setToolTipText(resources.getString("lblClanUnitPriceMultiplier.toolTipText"));
+        spnClanUnitPriceMultiplier.setName("spnClanUnitPriceMultiplier");
+
+        final JLabel lblClanPartPriceMultiplier = new JLabel(resources.getString("lblClanPartPriceMultiplier.text"));
+        lblClanPartPriceMultiplier.setToolTipText(resources.getString("lblClanPartPriceMultiplier.toolTipText"));
+        lblClanPartPriceMultiplier.setName("lblClanPartPriceMultiplier");
+
+        spnClanPartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnClanPartPriceMultiplier.setToolTipText(resources.getString("lblClanPartPriceMultiplier.toolTipText"));
+        spnClanPartPriceMultiplier.setName("spnClanPartPriceMultiplier");
+
+        final JLabel lblMixedTechUnitPriceMultiplier = new JLabel(resources.getString("lblMixedTechUnitPriceMultiplier.text"));
+        lblMixedTechUnitPriceMultiplier.setToolTipText(resources.getString("lblMixedTechUnitPriceMultiplier.toolTipText"));
+        lblMixedTechUnitPriceMultiplier.setName("lblMixedTechUnitPriceMultiplier");
+
+        spnMixedTechUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnMixedTechUnitPriceMultiplier.setToolTipText(resources.getString("lblMixedTechUnitPriceMultiplier.toolTipText"));
+        spnMixedTechUnitPriceMultiplier.setName("spnMixedTechUnitPriceMultiplier");
+
+        final JPanel usedPartsValueMultipliersPanel = createUsedPartsValueMultipliersPanel();
+
+        final JLabel lblDamagedPartsValueMultiplier = new JLabel(resources.getString("lblDamagedPartsValueMultiplier.text"));
+        lblDamagedPartsValueMultiplier.setToolTipText(resources.getString("lblDamagedPartsValueMultiplier.toolTipText"));
+        lblDamagedPartsValueMultiplier.setName("lblDamagedPartsValueMultiplier");
+
+        spnDamagedPartsValueMultiplier = new JSpinner(new SpinnerNumberModel(0.33, 0.00, 1.00, 0.05));
+        spnDamagedPartsValueMultiplier.setToolTipText(resources.getString("lblDamagedPartsValueMultiplier.toolTipText"));
+        spnDamagedPartsValueMultiplier.setName("spnDamagedPartsValueMultiplier");
+        spnDamagedPartsValueMultiplier.setEditor(new JSpinner.NumberEditor(spnDamagedPartsValueMultiplier, "0.00"));
+
+        final JLabel lblUnrepairablePartsValueMultiplier = new JLabel(resources.getString("lblUnrepairablePartsValueMultiplier.text"));
+        lblUnrepairablePartsValueMultiplier.setToolTipText(resources.getString("lblUnrepairablePartsValueMultiplier.toolTipText"));
+        lblUnrepairablePartsValueMultiplier.setName("lblUnrepairablePartsValueMultiplier");
+
+        spnUnrepairablePartsValueMultiplier = new JSpinner(new SpinnerNumberModel(0.10, 0.00, 1.00, 0.05));
+        spnUnrepairablePartsValueMultiplier.setToolTipText(resources.getString("lblUnrepairablePartsValueMultiplier.toolTipText"));
+        spnUnrepairablePartsValueMultiplier.setName("spnUnrepairablePartsValueMultiplier");
+        spnUnrepairablePartsValueMultiplier.setEditor(new JSpinner.NumberEditor(spnUnrepairablePartsValueMultiplier, "0.00"));
+
+        final JLabel lblCancelledOrderRefundMultiplier = new JLabel(resources.getString("lblCancelledOrderRefundMultiplier.text"));
+        lblCancelledOrderRefundMultiplier.setToolTipText(resources.getString("lblCancelledOrderRefundMultiplier.toolTipText"));
+        lblCancelledOrderRefundMultiplier.setName("lblCancelledOrderRefundMultiplier");
+
+        spnCancelledOrderRefundMultiplier = new JSpinner(new SpinnerNumberModel(0.50, 0.00, 1.00, 0.05));
+        spnCancelledOrderRefundMultiplier.setToolTipText(resources.getString("lblCancelledOrderRefundMultiplier.toolTipText"));
+        spnCancelledOrderRefundMultiplier.setName("spnCancelledOrderRefundMultiplier");
+        spnCancelledOrderRefundMultiplier.setEditor(new JSpinner.NumberEditor(spnCancelledOrderRefundMultiplier, "0.00"));
+
+        // Programmatically Assign Accessibility Labels
+        lblCommonPartPriceMultiplier.setLabelFor(spnCommonPartPriceMultiplier);
+        lblInnerSphereUnitPriceMultiplier.setLabelFor(spnInnerSphereUnitPriceMultiplier);
+        lblInnerSpherePartPriceMultiplier.setLabelFor(spnInnerSpherePartPriceMultiplier);
+        lblClanUnitPriceMultiplier.setLabelFor(spnClanUnitPriceMultiplier);
+        lblClanPartPriceMultiplier.setLabelFor(spnClanPartPriceMultiplier);
+        lblMixedTechUnitPriceMultiplier.setLabelFor(spnMixedTechUnitPriceMultiplier);
+        lblDamagedPartsValueMultiplier.setLabelFor(spnDamagedPartsValueMultiplier);
+        lblUnrepairablePartsValueMultiplier.setLabelFor(spnUnrepairablePartsValueMultiplier);
+        lblCancelledOrderRefundMultiplier.setLabelFor(spnCancelledOrderRefundMultiplier);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("priceMultipliersPanel.title")));
+        panel.setName("priceMultipliersPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblCommonPartPriceMultiplier)
+                                .addComponent(spnCommonPartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInnerSphereUnitPriceMultiplier)
+                                .addComponent(spnInnerSphereUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInnerSpherePartPriceMultiplier)
+                                .addComponent(spnInnerSpherePartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblClanUnitPriceMultiplier)
+                                .addComponent(spnClanUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblClanPartPriceMultiplier)
+                                .addComponent(spnClanPartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblMixedTechUnitPriceMultiplier)
+                                .addComponent(spnMixedTechUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addComponent(usedPartsValueMultipliersPanel)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblDamagedPartsValueMultiplier)
+                                .addComponent(spnDamagedPartsValueMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblUnrepairablePartsValueMultiplier)
+                                .addComponent(spnUnrepairablePartsValueMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblCancelledOrderRefundMultiplier)
+                                .addComponent(spnCancelledOrderRefundMultiplier, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCommonPartPriceMultiplier)
+                                .addComponent(spnCommonPartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInnerSphereUnitPriceMultiplier)
+                                .addComponent(spnInnerSphereUnitPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInnerSpherePartPriceMultiplier)
+                                .addComponent(spnInnerSpherePartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblClanUnitPriceMultiplier)
+                                .addComponent(spnClanUnitPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblClanPartPriceMultiplier)
+                                .addComponent(spnClanPartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMixedTechUnitPriceMultiplier)
+                                .addComponent(spnMixedTechUnitPriceMultiplier))
+                        .addComponent(usedPartsValueMultipliersPanel)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDamagedPartsValueMultiplier)
+                                .addComponent(spnDamagedPartsValueMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUnrepairablePartsValueMultiplier)
+                                .addComponent(spnUnrepairablePartsValueMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCancelledOrderRefundMultiplier)
+                                .addComponent(spnCancelledOrderRefundMultiplier))
+        );
+
+        return panel;
+    }
+
+    private JPanel createUsedPartsValueMultipliersPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("usedPartsValueMultipliersPanel.title")));
+        panel.setName("usedPartsValueMultipliersPanel");
+
+        spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
+            final String qualityLevel = Part.getQualityName(i, false);
+
+            final JLabel label = new JLabel(qualityLevel);
+            label.setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
+            label.setName("lbl" + qualityLevel);
+            panel.add(label);
+
+            spnUsedPartPriceMultipliers[i] = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
+            spnUsedPartPriceMultipliers[i].setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
+            spnUsedPartPriceMultipliers[i].setName("spn" + qualityLevel);
+            spnUsedPartPriceMultipliers[i].setEditor(new JSpinner.NumberEditor(spnUsedPartPriceMultipliers[i], "0.00"));
+            panel.add(spnUsedPartPriceMultipliers[i]);
+
+            label.setLabelFor(spnUsedPartPriceMultipliers[i]);
+        }
+
+        return panel;
+    }
+    //endregion Finances Tab
+
     //region Rank Systems Tab
     private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
         rankSystemsPane = new RankSystemsPane(frame, campaign);
@@ -5149,13 +5273,19 @@ public class CampaignOptionsDialog extends JDialog {
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
 
-        spnClanPriceModifier.setValue(options.getClanPriceModifier());
-        for (int i = 0; i < spnUsedPartsValue.length; i++) {
-            spnUsedPartsValue[i].setValue(options.getUsedPartsValue(i));
-            partQualityLabels[i].setText(Part.getQualityName(i, options.reverseQualityNames()) + " Quality");
+        // Price Multipliers
+        spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
+        spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
+        spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
+        spnClanUnitPriceMultiplier.setValue(options.getClanUnitPriceMultiplier());
+        spnClanPartPriceMultiplier.setValue(options.getClanPartPriceMultiplier());
+        spnMixedTechUnitPriceMultiplier.setValue(options.getMixedTechUnitPriceMultiplier());
+        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
+            spnUsedPartPriceMultipliers[i].setValue(options.getUsedPartPriceMultipliers()[i]);
         }
-        spnDamagedPartsValue.setValue(options.getDamagedPartsValue());
-        spnOrderRefund.setValue(options.GetCanceledOrderReimbursement());
+        spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
+        spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
+        spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -5474,12 +5604,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
         options.setQuirks(useQuirksBox.isSelected());
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(useQuirksBox.isSelected());
-        options.setClanPriceModifier((Double) spnClanPriceModifier.getValue());
-        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            options.setUsedPartsValue((Double) spnUsedPartsValue[i].getValue(), i);
-        }
-        options.setDamagedPartsValue((Double) spnDamagedPartsValue.getValue());
-        options.setCanceledOrderReimbursement((Double) spnOrderRefund.getValue());
         options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
@@ -5708,6 +5832,23 @@ public class CampaignOptionsDialog extends JDialog {
         // Death
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //endregion Personnel Tab
+
+        //region Finances Tab
+
+        // Price Multipliers
+        options.setCommonPartPriceMultiplier((Double) spnCommonPartPriceMultiplier.getValue());
+        options.setInnerSphereUnitPriceMultiplier((Double) spnInnerSphereUnitPriceMultiplier.getValue());
+        options.setInnerSpherePartPriceMultiplier((Double) spnInnerSpherePartPriceMultiplier.getValue());
+        options.setClanUnitPriceMultiplier((Double) spnClanUnitPriceMultiplier.getValue());
+        options.setClanPartPriceMultiplier((Double) spnClanPartPriceMultiplier.getValue());
+        options.setMixedTechUnitPriceMultiplier((Double) spnMixedTechUnitPriceMultiplier.getValue());
+        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
+            options.getUsedPartPriceMultipliers()[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();
+        }
+        options.setDamagedPartsValueMultiplier((Double) spnDamagedPartsValueMultiplier.getValue());
+        options.setUnrepairablePartsValueMultiplier((Double) spnUnrepairablePartsValueMultiplier.getValue());
+        options.setCancelledOrderRefundMultiplier((Double) spnCancelledOrderRefundMultiplier.getValue());
+        //endregion Finances Tab
 
         //start SPA
         SpecialAbility.replaceSpecialAbilities(getCurrentSPA());

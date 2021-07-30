@@ -146,7 +146,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected boolean workingOvertime;
     protected int shorthandedMod;
 
-    /** This tracks the unit which resorved the part for a refit */
+    /** This tracks the unit which reserved the part for a refit */
     private Unit refitUnit;
     /** The unique identifier of the tech who is reserving this part for overnight work */
     private Person reservedBy;
@@ -310,14 +310,27 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             return Money.zero();
         }
 
-        if (getTechBase() == T_CLAN) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
+        switch (getTechBase()) {
+            case T_IS:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
+                break;
+            case T_CLAN:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
+                break;
+            case T_BOTH:
+            default:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                break;
         }
+
+        if (!isBrandNew()) {
+            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartPriceMultipliers()[getQuality()]);
+        }
+
         if (needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
-            //TODO: parts that cant be fixed should also be further reduced in price
-        } else if (!isBrandNew()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
+            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE)
+                    ? campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier()
+                    : campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
 
         return cost;
