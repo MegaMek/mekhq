@@ -190,7 +190,7 @@ public class Finances implements Serializable {
             loan.writeToXml(pw1, indent + 1);
         }
         for (Asset asset : getAllAssets()) {
-            asset.writeToXml(pw1, indent + 1);
+            asset.writeToXML(pw1, indent + 1);
         }
         if (wentIntoDebt != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt",
@@ -251,14 +251,14 @@ public class Finances implements Serializable {
 
         // Handle assets
         for (Asset asset : assets) {
-            if ((asset.getSchedule() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
+            if ((asset.getFinancialTerm() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
                         asset.getName()));
-            } else if ((asset.getSchedule() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
+            } else if ((asset.getFinancialTerm() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
@@ -413,8 +413,7 @@ public class Finances implements Serializable {
                  * payment that has just been made.
                  */
                 campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                MekHQ.getLogger().error(getClass(), "payoutShares",
-                        "Attempted to payout share amount larger than the payment of the contract");
+                MekHQ.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
     }
@@ -515,7 +514,7 @@ public class Finances implements Serializable {
 
             report = transactions.size() + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
-            MekHQ.getLogger().info(this, "Error exporting finances to " + format);
+            MekHQ.getLogger().info("Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
 

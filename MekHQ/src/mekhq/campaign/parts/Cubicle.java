@@ -163,7 +163,7 @@ public class Cubicle extends Part {
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
                 bayType = BayType.parse(wn2.getTextContent());
                 if (null == bayType) {
-                    MekHQ.getLogger().error(Cubicle.class, "Could not parse bay type " + wn2.getTextContent());
+                    MekHQ.getLogger().error("Could not parse bay type " + wn2.getTextContent());
                     bayType = BayType.MECH;
                 }
                 name = bayType.getDisplayName() + " Cubicle";

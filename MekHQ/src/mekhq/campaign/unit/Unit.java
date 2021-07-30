@@ -21,33 +21,11 @@
  */
 package mekhq.campaign.unit;
 
-import java.awt.*;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.Camouflage;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.parts.*;
-
-import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -55,24 +33,38 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.awt.*;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
- * This is a wrapper class for entity, so that we can add some functionality to
- * it
+ * This is a wrapper class for entity, so that we can add some functionality to it
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
@@ -1711,17 +1703,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getBuyCost() {
-        Money cost;
+        Money cost = Money.of((getEntity() instanceof Infantry) ? getEntity().getAlternateCost()
+                : getEntity().getCost(false));
 
-        if (entity instanceof Infantry) {
-            cost = Money.of(getEntity().getAlternateCost());
-        } else {
-            cost = Money.of(getEntity().getCost(false));
+        if (getEntity().isMixedTech()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getMixedTechUnitPriceMultiplier());
+        } else if (getEntity().isClan()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanUnitPriceMultiplier());
+        } else { // Inner Sphere Entity
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getInnerSphereUnitPriceMultiplier());
         }
 
-        if (entity.isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanPriceModifier());
-        }
         return cost;
     }
 
@@ -3432,8 +3424,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
             entity.getCrew().setGender(commander.getGender(), 0);
-            entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
-            entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
+            entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getToughness(), 0);
 
@@ -3450,8 +3441,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             PilotOptions options = new PilotOptions();
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
-            List<String> optionNames = new ArrayList<String>();
-            Set<String> cyberOptionNames = new HashSet<String>();
+            List<String> optionNames = new ArrayList<>();
+            Set<String> cyberOptionNames = new HashSet<>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
@@ -3840,8 +3831,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
         entity.getCrew().setGender(p.getGender(), slot);
-        entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
-        entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
+        entity.getCrew().setPortrait(p.getPortrait().clone(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
         int gunnery = 7;
         int artillery = 7;
@@ -4705,7 +4695,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return engineer;
     }
 
-    public Part getPartForEquipmentNum(int index, int loc) {
+    public @Nullable Part getPartForEquipmentNum(int index, int loc) {
         for (Part p : parts) {
             if (p.isPartForEquipmentNum(index, loc)) {
                 return p;
@@ -4865,7 +4855,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     //also we will take the average rounded down of the number of astechs to figure out
     //shorthanded penalty
     public double getMaintainedPct() {
-        return (daysActivelyMaintained/(double)daysSinceMaintenance);
+        return (daysActivelyMaintained / (double) daysSinceMaintenance);
     }
 
     public boolean isFullyMaintained() {
@@ -4891,8 +4881,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //no rules about this but lets assume missing parts are quality A
             if (p instanceof MissingPart) {
                 nParts++;
-            }
-            else if (p.needsMaintenance()) {
+            } else if (p.needsMaintenance()) {
                 nParts++;
                 sumQuality += p.getQuality();
             }
@@ -4900,7 +4889,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (nParts == 0) {
             return Part.QUALITY_D;
         }
-        return (int) Math.round((1.0 * sumQuality)/nParts);
+        return (int) Math.round((1.0 * sumQuality) / nParts);
     }
 
     public void setQuality(int q) {

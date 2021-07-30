@@ -145,17 +145,9 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         panButtons.add(btnUpload);
         panButtons.add(btnCancel);
 
-        btnUpload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                upload();
-            }
-        });
+        btnUpload.addActionListener(evt -> upload());
 
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
+        btnCancel.addActionListener(evt -> setVisible(false));
 
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -194,7 +186,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "that you can connect to the database remotely.",
                     "Could not connect",
                     JOptionPane.ERROR_MESSAGE);
-            MekHQ.getLogger().error(getClass(), "upload", e);
+            MekHQ.getLogger().error(e);
             return;
         }
         access.addPropertyChangeListener(this);
