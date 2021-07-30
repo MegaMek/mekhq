@@ -110,15 +110,15 @@ public class MedicalViewDialog extends JDialog {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl());
 
         // Preload default paperdolls
-        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) {
+        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file path
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e);
+            MekHQ.getLogger().error(e);
         }
-        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) {
+        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(e);
         }
 
         setPreferredSize(new Dimension(1024, 840));
@@ -132,7 +132,7 @@ public class MedicalViewDialog extends JDialog {
             handwritingFont = null;
         }
         labelColor = new Color(170, 170, 170);
-        healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
+        healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); // TODO : Remove inline file path
 
         dollActionListener = ae -> {
             final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
@@ -571,7 +571,7 @@ public class MedicalViewDialog extends JDialog {
             this.label = label;
             this.person = person;
             this.injury = injury;
-            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
+            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); // TODO : Remove inline file path
             this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
 

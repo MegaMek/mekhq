@@ -292,7 +292,7 @@ public class CurrentLocation implements Serializable {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
                         //whoops we cant find your planet man, back to Earth
-                        MekHQ.getLogger().error(CurrentLocation.class, "Couldn't find planet named " + wn2.getTextContent());
+                        MekHQ.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             //if that doesn't work then give the first planet we have
@@ -311,10 +311,7 @@ public class CurrentLocation implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(CurrentLocation.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

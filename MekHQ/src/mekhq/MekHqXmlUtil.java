@@ -346,7 +346,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             critVal = critVal.concat(" gear=\"none\"");
         }
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -442,7 +442,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
          * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -483,7 +483,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return entity;
             default:
                 throw new IllegalArgumentException(
-                        "More than one entity contained in XML string!  Expecting a single entity.");
+                        "More than one entity contained in XML string! Expecting a single entity.");
         }
     }
 

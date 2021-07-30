@@ -27,6 +27,7 @@ import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType
  * and also handles some small amount of "business logic"
  */
 public class StratconStrategicObjective {
+    public static final int OBJECTIVE_FAILED = -1;
     
     private StratconCoords objectiveCoords;
     private StrategicObjectiveType objectiveType;
@@ -69,6 +70,29 @@ public class StratconStrategicObjective {
         this.desiredObjectiveCount = desiredObjectiveCount;
     }
 
+    public boolean isObjectiveFailed(StratconTrackState trackState) {
+        switch (getObjectiveType()) {
+            case AnyScenarioVictory:
+            case SpecificScenarioVictory:
+                // you can fail this if the scenario goes away somehow
+                return getCurrentObjectiveCount() == OBJECTIVE_FAILED;
+            case AlliedFacilityControl:
+                // you can fail this by having the facility destroyed
+                StratconFacility alliedFacility = trackState.getFacility(getObjectiveCoords());
+                return alliedFacility == null;
+            case HostileFacilityControl:
+                // you can fail this by having the facility destroyed
+                StratconFacility hostileFacility = trackState.getFacility(getObjectiveCoords());
+                return hostileFacility == null;
+            case FacilityDestruction:
+                // you can't really permanently fail this
+                return false;
+            default:
+                // we shouldn't be here, but just in case
+                return false;
+        }
+    }
+    
     /**
      * Given the track that this objective is on, is it complete?
      */

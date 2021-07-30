@@ -1708,17 +1708,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getBuyCost() {
-        Money cost;
+        Money cost = Money.of((getEntity() instanceof Infantry) ? getEntity().getAlternateCost()
+                : getEntity().getCost(false));
 
-        if (entity instanceof Infantry) {
-            cost = Money.of(getEntity().getAlternateCost());
-        } else {
-            cost = Money.of(getEntity().getCost(false));
+        if (getEntity().isMixedTech()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getMixedTechUnitPriceMultiplier());
+        } else if (getEntity().isClan()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanUnitPriceMultiplier());
+        } else { // Inner Sphere Entity
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getInnerSphereUnitPriceMultiplier());
         }
 
-        if (entity.isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanPriceModifier());
-        }
         return cost;
     }
 
@@ -2012,7 +2012,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * quirks are enabled for this unit
      * @return
      */
-    public String getQuirksList() {
+    public @Nullable String getQuirksList() {
         String quirkString = "";
         boolean first = true;
         if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
@@ -2031,10 +2031,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
-        if (quirkString.equals("")) {
-            return null;
-        }
-        return "<html>" + quirkString + "</html>";
+        return quirkString.isBlank() ? null : "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {
@@ -4655,11 +4652,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (!getFluffName().equals("")) {
-            return entity.getShortName() + " - " + getFluffName();
-        } else {
-            return entity.getShortName();
-        }
+        return getFluffName().isBlank() ? getEntity().getShortName()
+                : getEntity().getShortName() + " - " + getFluffName();
     }
 
     public String getHyperlinkedName() {
@@ -4687,7 +4681,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return engineer;
     }
 
-    public Part getPartForEquipmentNum(int index, int loc) {
+    public @Nullable Part getPartForEquipmentNum(int index, int loc) {
         for (Part p : parts) {
             if (p.isPartForEquipmentNum(index, loc)) {
                 return p;
@@ -4847,7 +4841,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     //also we will take the average rounded down of the number of astechs to figure out
     //shorthanded penalty
     public double getMaintainedPct() {
-        return (daysActivelyMaintained/(double)daysSinceMaintenance);
+        return (daysActivelyMaintained / (double) daysSinceMaintenance);
     }
 
     public boolean isFullyMaintained() {
@@ -4873,8 +4867,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //no rules about this but lets assume missing parts are quality A
             if (p instanceof MissingPart) {
                 nParts++;
-            }
-            else if (p.needsMaintenance()) {
+            } else if (p.needsMaintenance()) {
                 nParts++;
                 sumQuality += p.getQuality();
             }
@@ -4882,7 +4875,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (nParts == 0) {
             return Part.QUALITY_D;
         }
-        return (int) Math.round((1.0 * sumQuality)/nParts);
+        return (int) Math.round((1.0 * sumQuality) / nParts);
     }
 
     public void setQuality(int q) {

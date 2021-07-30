@@ -109,46 +109,45 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
 
-        final String METHOD_NAME = "PlanetarySystemMapPanel()";
         try {
-            imgSpace = ImageIO.read(new File("data/images/universe/space.jpg"));
+            imgSpace = ImageIO.read(new File("data/images/universe/space.jpg")); // TODO : Remove inline file path
         } catch (IOException e1) {
             imgSpace = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default space image");
+            MekHQ.getLogger().error("missing default space image");
         }
         try {
-            imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png"));
+            imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgZenithPoint = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default zenith point image");
+            MekHQ.getLogger().error("missing default zenith point image");
         }
 
         try {
-            imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png"));
+            imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgNadirPoint = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default nadir point image");
+            MekHQ.getLogger().error("missing default nadir point image");
         }
 
         try {
-            imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png"));
+            imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgRechargeStation = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default recharge station image");
+            MekHQ.getLogger().error("missing default recharge station image");
         }
 
         try {
-            imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png"));
+            imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default dropship fleet image");
+            MekHQ.getLogger().error("missing default dropship fleet image");
         }
 
         try {
-            imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png"));
+            imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default jumpship fleet image");
+            MekHQ.getLogger().error("missing default jumpship fleet image");
         }
 
         pane = new JLayeredPane();
@@ -204,7 +203,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 chooseFont(g2, system, campaign, rectWidth-6);
 
                 //place the sun first
-                Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
+                Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system)); // TODO : Remove inline file path
                 g2.drawImage(starIcon, starWidth-starImgSize, y-(starImgSize/2), starImgSize, starImgSize, null);
 
                 //draw nadir and zenith points

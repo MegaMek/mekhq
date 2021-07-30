@@ -2317,7 +2317,7 @@ public class Person implements Serializable {
         }
 
         if (getRankSystem().isUseROMDesignation()) {
-            rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
+            rankName += ROMDesignation.getComStarBranchDesignation(this);
         }
 
         // Rank Level Modifications
@@ -2852,7 +2852,7 @@ public class Person implements Serializable {
         }
     }
 
-    public void changeEdge(int amount) {
+    public void changeEdge(final int amount) {
         setEdge(Math.max(getEdge() + amount, 0));
     }
 
@@ -2931,10 +2931,8 @@ public class Person implements Serializable {
                 edgett.append(ability.getDescription()).append("<br>");
             }
         }
-        if (edgett.toString().equals("")) {
-            return "No triggers set";
-        }
-        return "<html>" + edgett + "</html>";
+
+        return edgett.toString().isBlank() ? "No triggers set" : "<html>" + edgett + "</html>";
     }
     //endregion edge
 

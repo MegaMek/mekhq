@@ -1439,7 +1439,7 @@ public class ResolveScenarioTracker {
             }
 
             if (status.toRemove()) {
-                campaign.removePerson(pid, false);
+                campaign.removePerson(person, false);
             }
         }
 

@@ -24,9 +24,9 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
@@ -49,9 +49,9 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         assertEquals( 2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
@@ -329,11 +329,11 @@ public class PersonTest {
         verify(unit0, Mockito.times(0)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
     }
 
-    private void initPerson(){
+    private void initPerson() {
         mockPerson = spy(new Person("TestGivenName", "TestSurname", null, "MERC"));
     }
 
-    private void initAwards(){
+    private void initAwards() {
         AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(),"TestSet");
     }
 }

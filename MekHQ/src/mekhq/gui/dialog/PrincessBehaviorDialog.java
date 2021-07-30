@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.event.ActionEvent;
@@ -35,10 +34,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 public class PrincessBehaviorDialog extends BotConfigDialog implements ActionListener {
-
-    /**
-	 *
-	 */
 	private static final long serialVersionUID = -1697757949925940582L;
 
 	public PrincessBehaviorDialog(JFrame parent, BehaviorSettings princessBehavior, String name) {
@@ -46,8 +41,8 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 
 	    try {
 	        this.princessBehavior = princessBehavior.getCopy();
-	    } catch(Exception e) {
-	        handleError("PrincessBehaviorDialog", e);
+	    } catch (Exception e) {
+	        handleError(e);
 	    }
 	    this.setName(name);
 
@@ -79,6 +74,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
     	princessBehavior.setBraveryIndex(braverySlidebar.getValue());
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (butOK.equals(e.getSource())) {
         	getPrincessFields();
@@ -89,10 +85,9 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
         }
     }
 
-    private void handleError(String method, Throwable t) {
-        JOptionPane.showMessageDialog(this, t.getMessage(),
-                                      "ERROR", JOptionPane.ERROR_MESSAGE);
-        MekHQ.getLogger().error(getClass(), method, t);
+    private void handleError(Throwable t) {
+        JOptionPane.showMessageDialog(this, t.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        MekHQ.getLogger().error(t);
     }
 
     @Override

@@ -146,7 +146,7 @@ public class EditAssetDialog extends JDialog {
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
         choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(0);
-        if(asset.getSchedule() == Finances.SCHEDULE_YEARLY) {
+        if(asset.getFinancialTerm() == Finances.SCHEDULE_YEARLY) {
             choiceSchedule.setSelectedIndex(1);
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -208,9 +208,9 @@ public class EditAssetDialog extends JDialog {
 
         }
         if(choiceSchedule.getSelectedIndex() == 1) {
-            asset.setSchedule(Finances.SCHEDULE_YEARLY);
+            asset.setFinancialTerm(Finances.SCHEDULE_YEARLY);
         } else {
-            asset.setSchedule(Finances.SCHEDULE_MONTHLY);
+            asset.setFinancialTerm(Finances.SCHEDULE_MONTHLY);
         }
         this.setVisible(false);
     }
