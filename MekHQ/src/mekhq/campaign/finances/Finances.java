@@ -190,7 +190,7 @@ public class Finances implements Serializable {
             loan.writeToXml(pw1, indent + 1);
         }
         for (Asset asset : getAllAssets()) {
-            asset.writeToXml(pw1, indent + 1);
+            asset.writeToXML(pw1, indent + 1);
         }
         if (wentIntoDebt != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt",
