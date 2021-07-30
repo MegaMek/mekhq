@@ -523,20 +523,20 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void refreshLoan(Money principal) {
-    	// Modify loan settings
+        // Modify loan settings
         loan.setInstitution(txtName.getText());
         loan.setReferenceNumber(txtNumber.getText());
-    	loan.setPrincipal(principal);
-    	loan.setRate(sldInterest.getValue());
+        loan.setPrincipal(principal);
+        loan.setRate(sldInterest.getValue());
         loan.setYears(sldLength.getValue());
         loan.setFinancialTerm(choiceSchedule.getSelectedIndex());
-    	loan.setCollateral(sldCollateral.getValue());
+        loan.setCollateral(sldCollateral.getValue());
         loan.setNextPayment(loan.determineFirstPaymentDate(campaign.getLocalDate()));
 
-    	// Recalculate information based on settings
-    	loan.calculateAmortization();
+        // Recalculate information based on settings
+        loan.calculateAmortization();
 
-    	// Refresh dialog values
+        // Refresh dialog values
         refreshValues();
     }
 
