@@ -17,14 +17,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekViewDialog extends javax.swing.JDialog {
-
-    /**
-	 *
-	 */
 	private static final long serialVersionUID = 5894364756899721545L;
 	private MechView mview;
 
@@ -57,17 +52,13 @@ public class MekViewDialog extends javax.swing.JDialog {
 
         btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOkay.setName("btnOkay"); // NOI18N
-        btnOkay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOkayActionPerformed(evt);
-            }
-        });
+        btnOkay.addActionListener(this::btnOkayActionPerformed);
 
         getContentPane().add(jScrollPane2, BorderLayout.CENTER);
         getContentPane().add(btnOkay, BorderLayout.PAGE_END);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(MekViewDialog.class);
@@ -76,13 +67,10 @@ public class MekViewDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
+	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
 	    this.setVisible(false);
-	}//GEN-LAST:event_btnOkayActionPerformed
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+	}
     private javax.swing.JButton btnOkay;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane txtMek;
-    // End of variables declaration//GEN-END:variables
 }

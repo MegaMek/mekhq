@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.common.Compute;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -321,32 +322,36 @@ public class Loan implements MekHqXmlSerializable {
         Loan retVal = new Loan();
 
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("institution")) {
-                retVal.institution = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) {
-                retVal.refNumber = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
-                retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
-                retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
-                retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
-                retVal.rate = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
-                retVal.years = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
-                retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collateral")) {
-                retVal.collateral = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) {
-                retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                retVal.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
-                retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("institution")) {
+                    retVal.institution = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) {
+                    retVal.refNumber = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
+                    retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
+                    retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
+                    retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
+                    retVal.rate = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
+                    retVal.years = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
+                    retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("collateral")) {
+                    retVal.collateral = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) {
+                    retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
+                    retVal.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
+                    retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         return retVal;

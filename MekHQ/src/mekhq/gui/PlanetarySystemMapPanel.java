@@ -310,7 +310,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         }
 
                         //draw the planet icon
-                        Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p));
+                        Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p)); // TODO : Remove inline file path
                         g2.drawImage(planetIcon, x-radius, y-radius, diameter, diameter, null);
                         final String planetName = p.getPrintableName(campaign.getLocalDate());
 
@@ -330,12 +330,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         btnBack.setBorder(BorderFactory.createEmptyBorder());
         btnBack.setToolTipText("Back to Interstellar Map");
         btnBack.setBackground(Color.DARK_GRAY);
-        btnBack.setIcon(new ImageIcon("data/images/misc/back_button.png"));
+        btnBack.setIcon(new ImageIcon("data/images/misc/back_button.png")); // TODO : Remove inline file path
         btnBack.addActionListener(ev -> back());
 
         //set up key bindings
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "back");
         getActionMap().put("back", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 back();
             }
@@ -347,6 +348,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0), "left");
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "left");
         getActionMap().put("left", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int target_pos = selectedPlanet-1;
                 if (target_pos<1) {
@@ -363,6 +365,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0), "right");
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "right");
         getActionMap().put("right", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int target_pos = selectedPlanet+1;
                 if (target_pos>(system.getPlanets().size())) {

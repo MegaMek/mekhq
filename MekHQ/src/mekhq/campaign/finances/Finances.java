@@ -204,16 +204,20 @@ public class Finances implements Serializable {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
-                retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
-                retVal.loans.add(Loan.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
-                retVal.assets.add(Asset.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
-                retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
+                    retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
+                    retVal.loans.add(Loan.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
+                    retVal.assets.add(Asset.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
+                    retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
+                    retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

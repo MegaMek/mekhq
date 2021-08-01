@@ -10,28 +10,25 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
+import megamek.common.util.EncodeControl;
+
+import javax.swing.*;
+import javax.swing.text.DefaultFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
 
-import javax.swing.*;
-import javax.swing.text.DefaultFormatter;
-
-import megamek.common.util.EncodeControl;
-
 /**
- *
  * @author natit
  */
 public class PopupValueChoiceDialog extends JDialog implements WindowListener {
@@ -121,6 +118,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         java.awt.EventQueue.invokeLater(() -> {
             PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(new JFrame(), true, "Label", 0, 0, 1);
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     System.exit(0);
                 }

@@ -62,7 +62,7 @@ public class EquipmentPart extends Part {
     protected String typeName;
     protected int equipmentNum;
     protected double equipTonnage;
-    protected double size = 1.0;
+    protected double size;
 
     public EquipmentType getType() {
         return type;
@@ -116,6 +116,7 @@ public class EquipmentPart extends Part {
         equipTonnage = ton;
     }
 
+    @Override
     public EquipmentPart clone() {
         EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, size, omniPodded, campaign);
         clone.copyBaseData(this);
@@ -149,7 +150,7 @@ public class EquipmentPart extends Part {
         // they are not acceptable substitutes, so we need to check for that as
         // well
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage() && getStickerPrice().equals(part.getStickerPrice())
                 && getSize() == ((EquipmentPart) part).getSize()

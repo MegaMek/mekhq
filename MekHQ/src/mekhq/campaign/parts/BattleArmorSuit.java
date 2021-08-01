@@ -121,6 +121,7 @@ public class BattleArmorSuit extends Part {
         initializeExtraCostsAndTons();
     }
 
+    @Override
     public BattleArmorSuit clone() {
         BattleArmorSuit clone = new BattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
         clone.copyBaseData(this);
@@ -137,6 +138,7 @@ public class BattleArmorSuit extends Part {
         trooper = i;
     }
 
+    @Override
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
@@ -375,28 +377,32 @@ public class BattleArmorSuit extends Part {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
-                trooper = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("groundMP")) {
-                groundMP = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("jumpMP")) {
-                jumpMP = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("weightClass")) {
-                weightClass = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("quad")) {
-                quad = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("chassis")) {
-                chassis = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
-                model = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
-                jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
-                alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
-                alternateTon = Double.parseDouble(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
+                    trooper = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("groundMP")) {
+                    groundMP = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpMP")) {
+                    jumpMP = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("weightClass")) {
+                    weightClass = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("quad")) {
+                    quad = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                    clan = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("chassis")) {
+                    chassis = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
+                    model = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
+                    jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
+                    alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
+                    alternateTon = Double.parseDouble(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

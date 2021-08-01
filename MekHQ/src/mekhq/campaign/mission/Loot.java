@@ -192,11 +192,11 @@ public class Loot implements MekHqXmlSerializable {
                     retVal.cash = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {
                     MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
-                    if(null == summary) {
+                    if (null == summary) {
                         throw(new EntityLoadingException());
                     }
                     Entity e = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                    if(null == e) {
+                    if (null == e) {
                         continue;
                     }
                     retVal.units.add(e);

@@ -60,26 +60,26 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch(c) {
-        case COL_UNIT:
-            return 125;
-        case COL_COST:
-            return 70;
-        case COL_CLASS:
-        default:
-            return 20;
+        switch (c) {
+            case COL_UNIT:
+                return 125;
+            case COL_COST:
+                return 70;
+            case COL_CLASS:
+            default:
+                return 20;
         }
     }
 
     public int getAlignment(int col) {
-        switch(col) {
-        case COL_UNIT:
-            return SwingConstants.LEFT;
-        case COL_COST:
-            return SwingConstants.RIGHT;
-        case COL_CLASS:
-        default:
-            return SwingConstants.CENTER;
+        switch (col) {
+            case COL_UNIT:
+                return SwingConstants.LEFT;
+            case COL_COST:
+                return SwingConstants.RIGHT;
+            case COL_CLASS:
+            default:
+                return SwingConstants.CENTER;
         }
     }
 
@@ -128,11 +128,11 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         private static final long serialVersionUID = -3368335772600192895L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
             return this;
