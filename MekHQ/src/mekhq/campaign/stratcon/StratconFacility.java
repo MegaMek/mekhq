@@ -100,7 +100,7 @@ public class StratconFacility implements Cloneable {
         setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
         setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
         setOwner(facility.getOwner());
-        setRevealTrack(facility.revealTrack());
+        setRevealTrack(facility.getRevealTrack());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
         setReinforcementDelayReduction(facility.getReinforcementDelayReduction());
         setWeeklySPModifier(facility.getWeeklySPModifier());
@@ -214,7 +214,7 @@ public class StratconFacility implements Cloneable {
         this.capturedDefinition = capturedDefinition;
     }
 
-    public boolean revealTrack() {
+    public boolean getRevealTrack() {
         return revealTrack;
     }
 
@@ -259,7 +259,7 @@ public class StratconFacility implements Cloneable {
      * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility deserialize(String fileName) {
-        StratconFacility resultingManifest = null;
+        StratconFacility resultingFacility = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
             MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
@@ -271,14 +271,14 @@ public class StratconFacility implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
-                JAXBElement<StratconFacility> manifestElement = um.unmarshal(inputSource, StratconFacility.class);
-                resultingManifest = manifestElement.getValue();
+                JAXBElement<StratconFacility> facilityElement = um.unmarshal(inputSource, StratconFacility.class);
+                resultingFacility = facilityElement.getValue();
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
         }
 
-        return resultingManifest;
+        return resultingFacility;
     }
 
     public boolean preventAerospace() {

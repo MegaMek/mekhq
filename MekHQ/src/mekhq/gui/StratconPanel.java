@@ -331,6 +331,8 @@ public class StratconPanel extends JPanel implements ActionListener {
             //g2D.drawString(translatedClickedPoint.getX() + ", " + translatedClickedPoint.getY(), (int) clickedPoint.getX(), (int) clickedPoint.getY());
         }
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+        
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 if (drawHexType == DrawHexType.Outline) {
@@ -338,7 +340,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
                     
-                    if (currentTrack.coordsRevealed(x, y) || currentTrack.isGmRevealed()) {
+                    if (trackRevealed || currentTrack.isGmRevealed() || currentTrack.coordsRevealed(x, y)) {
                         g2D.setColor(Color.LIGHT_GRAY);
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
@@ -406,6 +408,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         scenarioMarker2.addPoint(-smallXRadius, smallYRadius);
         scenarioMarker2.addPoint(smallXRadius, smallYRadius);
         scenarioMarker2.addPoint(smallXRadius, -smallYRadius);
+        
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
@@ -418,7 +422,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if ((scenario != null) &&
                         ((scenario.getDeploymentDate() != null) ||
                          (scenario.isStrategicObjective() && currentTrack.getRevealedCoords().contains(currentCoords)) ||
-                                currentTrack.isGmRevealed())) {
+                                currentTrack.isGmRevealed() || trackRevealed)) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                     g2D.drawPolygon(scenarioMarker2);
@@ -453,12 +457,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         facilityMarker.addPoint(xRadius, yRadius);
         facilityMarker.addPoint(xRadius, -yRadius);
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+        
         for (int x = 0; x < currentTrack.getWidth(); x++) {            
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
                 
-                if ((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
+                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
                     drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
