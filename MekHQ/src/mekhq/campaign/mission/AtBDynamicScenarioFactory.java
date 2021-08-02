@@ -1604,6 +1604,9 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
+        
+        bvBudget += bvBudget * scenario.getEffectivePlayerBVMultiplier();
+        
 
         // allied bot forces that contribute to BV do not get multiplied by the difficulty
         // even if the player is super good, the AI doesn't get any better

@@ -67,10 +67,10 @@ public class AtBDynamicScenario extends AtBScenario {
     private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
     private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
 
-    // derived fields used for various calculations
-    private int effectivePlayerUnitCount;
-    private int effectivePlayerBV;
+    private double effectivePlayerUnitCountMultiplier;
+    private double effectivePlayerBVMultiplier;
 
+    // derived fields used for various calculations
     private int effectiveOpforSkill;
     private int effectiveOpforQuality;
 
@@ -230,20 +230,20 @@ public class AtBDynamicScenario extends AtBScenario {
         super.removeBotForce(x);
     }
 
-    public int getEffectivePlayerUnitCount() {
-        return effectivePlayerUnitCount;
+    public double getEffectivePlayerUnitCountMultiplier() {
+        return effectivePlayerUnitCountMultiplier;
     }
 
-    public void setEffectivePlayerUnitCount(int unitCount) {
-        effectivePlayerUnitCount = unitCount;
+    public void setEffectivePlayerUnitCountMultiplier(double multiplier) {
+        effectivePlayerUnitCountMultiplier = multiplier;
     }
 
-    public int getEffectivePlayerBV() {
-        return effectivePlayerBV;
+    public double getEffectivePlayerBVMultiplier() {
+        return effectivePlayerBVMultiplier;
     }
 
-    public void setEffectivePlayerBV(int unitCount) {
-        effectivePlayerBV = unitCount;
+    public void setEffectivePlayerBVMultiplier(double multiplier) {
+        effectivePlayerBVMultiplier = multiplier;
     }
 
     public void setScenarioTemplate(ScenarioTemplate template) {

@@ -4,5 +4,7 @@
 	<displayableName>Data Center</displayableName>
         <facilityType>DataCenter</facilityType>
         <owner>Opposing</owner>
+	<localModifiers>HostileBVBudgetIncrease.xml</localModifiers>
+        <sharedModifiers>HostileBVBudgetIncrease.xml</sharedModifiers>
         <visible>false</visible>
 </StratconFacility>

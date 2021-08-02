@@ -766,7 +766,9 @@ public class StratconPanel extends JPanel implements ActionListener {
             case RCLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) e.getSource();
                 StratconFacility facility = (StratconFacility) eventSource.getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
-                currentTrack.addFacility(selectedCoords, facility.clone());
+                StratconFacility newFacility = facility.clone();
+                newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
+                currentTrack.addFacility(selectedCoords, newFacility);
                 break;
         }
         

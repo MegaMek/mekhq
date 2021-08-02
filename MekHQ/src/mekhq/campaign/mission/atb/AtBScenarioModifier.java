@@ -78,6 +78,7 @@ public class AtBScenarioModifier implements Cloneable {
     private Boolean useAmbushLogic = null; 
     private Boolean switchSides = null;
     private Integer numExtraEvents = null;
+    private Double bvBudgetAdditiveMultiplier = null;
     private List<ScenarioObjective> objectives = new ArrayList<>();
     
     private Map<String, String> linkedModifiers = new HashMap<>(); 
@@ -392,7 +393,13 @@ public class AtBScenarioModifier implements Cloneable {
             }
             
             if ((getNumExtraEvents() != null) && (getNumExtraEvents() > 0)) {
-                AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
+                for (int x = 0; x < getNumExtraEvents(); x++) {
+                    AtBScenarioModifierApplicator.applyExtraEvent(scenario, getEventRecipient() == ForceAlignment.Allied);
+                }
+            }
+            
+            if ((getBVBudgetAdditiveMultiplier() != null)) {
+                scenario.setEffectivePlayerBVMultiplier(getBVBudgetAdditiveMultiplier());
             }
         }
     }
@@ -422,6 +429,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.useAmbushLogic = useAmbushLogic;
         copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
         copy.objectives = objectives == null ? new ArrayList<>() : new ArrayList<>(objectives);
+        copy.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
         return copy;
     }
     
@@ -561,6 +569,14 @@ public class AtBScenarioModifier implements Cloneable {
         this.numExtraEvents = numExtraEvents;
     }
     
+    public Double getBVBudgetAdditiveMultiplier() {
+        return bvBudgetAdditiveMultiplier;
+    }
+
+    public void setBVBudgetAdditiveMultiplier(Double bvBudgetAdditiveMultiplier) {
+        this.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
+    }
+
     /**
      * Map containing string tuples:
      * "Alternate" briefing description, name of file containing other modifiers associated with this one

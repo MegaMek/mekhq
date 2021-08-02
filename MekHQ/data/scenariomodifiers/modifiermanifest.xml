@@ -50,6 +50,9 @@
 			GoodEquipment.xml
 		</modifier>
 		<modifier>
+			HostileBVBudgetIncrease.xml
+		</modifier>
+		<modifier>
 			BadEvent.xml
 		</modifier>
 		<!--modifier> 

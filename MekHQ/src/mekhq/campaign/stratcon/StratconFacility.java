@@ -61,7 +61,6 @@ public class StratconFacility implements Cloneable {
     private int scenarioOddsModifier;
     private int reinforcementDelayReduction;
     private int weeklySPModifier;
-    private double bvBudgetModifier;
     private boolean preventAerospace;
     //TODO: post-MVP
     //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
@@ -87,7 +86,6 @@ public class StratconFacility implements Cloneable {
         clone.scenarioOddsModifier = scenarioOddsModifier;
         clone.reinforcementDelayReduction = reinforcementDelayReduction;
         clone.weeklySPModifier = weeklySPModifier;
-        clone.bvBudgetModifier = bvBudgetModifier;
         clone.preventAerospace = preventAerospace;
         return clone;
     }
@@ -104,7 +102,6 @@ public class StratconFacility implements Cloneable {
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
         setReinforcementDelayReduction(facility.getReinforcementDelayReduction());
         setWeeklySPModifier(facility.getWeeklySPModifier());
-        setBVBudgetModifier(facility.getBVBudgetModifier());
         setPreventAerospace(facility.preventAerospace());
     }
     
@@ -244,14 +241,6 @@ public class StratconFacility implements Cloneable {
 
     public void setWeeklySPModifier(int weeklySPModifier) {
         this.weeklySPModifier = weeklySPModifier;
-    }
-
-    public double getBVBudgetModifier() {
-        return bvBudgetModifier;
-    }
-
-    public void setBVBudgetModifier(double bvBudgetModifier) {
-        this.bvBudgetModifier = bvBudgetModifier;
     }
 
     /**
