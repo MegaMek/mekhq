@@ -3,6 +3,7 @@
 	<displayableName>Early Warning Center</displayableName>
         <facilityType>EarlyWarningSystem</facilityType>
         <owner>Allied</owner>
-	<reinforcementDelayReduction>1</reinforcementDelayReduction>
+	<localModifiers>ReinforcementDelayReductionAllied.xml</localModifiers>
+        <sharedModifiers>ReinforcementDelayReductionAllied.xml</sharedModifiers>
         <visible>true</visible>
 </StratconFacility>

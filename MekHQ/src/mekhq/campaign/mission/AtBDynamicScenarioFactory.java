@@ -1937,7 +1937,7 @@ public class AtBDynamicScenarioFactory {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn(), scenario);
+            setDeploymentTurns(currentBotForce, forceTemplate, scenario);
         }
     }
 
@@ -1948,18 +1948,24 @@ public class AtBDynamicScenarioFactory {
      * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
-    public static void setDeploymentTurns(BotForce botForce, int deployRound,
+    public static void setDeploymentTurns(BotForce botForce, ScenarioForceTemplate forceTemplate,
             AtBDynamicScenario scenario) {
         // deployment turns don't matter for transported entities
         List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
         
-        if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+        if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
-        } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-            setDeploymentTurnsForReinforcements(untransportedEntities, 0);
+        } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+            if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
+                setDeploymentTurnsForReinforcements(untransportedEntities, scenario.getHostileReinforcementDelayReduction());
+            } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
+                setDeploymentTurnsForReinforcements(untransportedEntities, scenario.getFriendlyReinforcementDelayReduction());
+            } else {
+                setDeploymentTurnsForReinforcements(untransportedEntities, 0);
+            }
         } else {
             for (Entity entity : untransportedEntities) {
-                entity.setDeployRound(deployRound);
+                entity.setDeployRound(forceTemplate.getArrivalTurn());
             }
         }
     }
@@ -2000,7 +2006,7 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(forceEntities, strategy);
+                    setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
                 } else {
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);

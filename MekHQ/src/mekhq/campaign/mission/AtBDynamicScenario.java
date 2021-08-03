@@ -69,6 +69,9 @@ public class AtBDynamicScenario extends AtBScenario {
 
     private double effectivePlayerUnitCountMultiplier;
     private double effectivePlayerBVMultiplier;
+    
+    private int friendlyReinforcementDelayReduction;
+    private int hostileReinforcementDelayReduction;
 
     // derived fields used for various calculations
     private int effectiveOpforSkill;
@@ -292,6 +295,22 @@ public class AtBDynamicScenario extends AtBScenario {
 
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+
+    public int getFriendlyReinforcementDelayReduction() {
+        return friendlyReinforcementDelayReduction;
+    }
+
+    public void setFriendlyReinforcementDelayReduction(int friendlyReinforcementDelayReduction) {
+        this.friendlyReinforcementDelayReduction = friendlyReinforcementDelayReduction;
+    }
+
+    public int getHostileReinforcementDelayReduction() {
+        return hostileReinforcementDelayReduction;
+    }
+
+    public void setHostileReinforcementDelayReduction(int hostileReinforcementDelayReduction) {
+        this.hostileReinforcementDelayReduction = hostileReinforcementDelayReduction;
     }
 
     /**

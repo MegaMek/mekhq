@@ -89,6 +89,12 @@
 		<modifier>
 			PiratesPresentGround.xml
 		</modifier>
+		<modifier>
+			ReinforcementDelayReductionHostile.xml
+		</modifier>
+		<modifier>
+			ReinforcementDelayReductionAllied.xml
+		</modifier>
 		<!--modifier>
 			Need "special duel flag".
 			Duel.xml

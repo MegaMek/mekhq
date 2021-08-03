@@ -79,6 +79,7 @@ public class AtBScenarioModifier implements Cloneable {
     private Boolean switchSides = null;
     private Integer numExtraEvents = null;
     private Double bvBudgetAdditiveMultiplier = null;
+    private Integer reinforcementDelayReduction = null;
     private List<ScenarioObjective> objectives = new ArrayList<>();
     
     private Map<String, String> linkedModifiers = new HashMap<>(); 
@@ -398,8 +399,12 @@ public class AtBScenarioModifier implements Cloneable {
                 }
             }
             
-            if ((getBVBudgetAdditiveMultiplier() != null)) {
+            if (getBVBudgetAdditiveMultiplier() != null) {
                 scenario.setEffectivePlayerBVMultiplier(getBVBudgetAdditiveMultiplier());
+            }
+            
+            if ((getReinforcementDelayReduction() != null) && (getEventRecipient() != null)) {
+                AtBScenarioModifierApplicator.applyReinforcementDelayReduction(scenario, eventRecipient, getReinforcementDelayReduction());
             }
         }
     }
@@ -430,6 +435,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
         copy.objectives = objectives == null ? new ArrayList<>() : new ArrayList<>(objectives);
         copy.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
+        copy .reinforcementDelayReduction = reinforcementDelayReduction;
         return copy;
     }
     
@@ -575,6 +581,14 @@ public class AtBScenarioModifier implements Cloneable {
 
     public void setBVBudgetAdditiveMultiplier(Double bvBudgetAdditiveMultiplier) {
         this.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
+    }
+
+    public Integer getReinforcementDelayReduction() {
+        return reinforcementDelayReduction;
+    }
+
+    public void setReinforcementDelayReduction(Integer reinforcementDelayReduction) {
+        this.reinforcementDelayReduction = reinforcementDelayReduction;
     }
 
     /**

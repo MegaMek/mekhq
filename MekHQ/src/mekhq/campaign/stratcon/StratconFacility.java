@@ -59,7 +59,6 @@ public class StratconFacility implements Cloneable {
     private String capturedDefinition;
     private boolean revealTrack;
     private int scenarioOddsModifier;
-    private int reinforcementDelayReduction;
     private int weeklySPModifier;
     private boolean preventAerospace;
     //TODO: post-MVP
@@ -84,7 +83,6 @@ public class StratconFacility implements Cloneable {
         clone.setCapturedDefinition(capturedDefinition); 
         clone.revealTrack = revealTrack;
         clone.scenarioOddsModifier = scenarioOddsModifier;
-        clone.reinforcementDelayReduction = reinforcementDelayReduction;
         clone.weeklySPModifier = weeklySPModifier;
         clone.preventAerospace = preventAerospace;
         return clone;
@@ -100,7 +98,6 @@ public class StratconFacility implements Cloneable {
         setOwner(facility.getOwner());
         setRevealTrack(facility.getRevealTrack());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
-        setReinforcementDelayReduction(facility.getReinforcementDelayReduction());
         setWeeklySPModifier(facility.getWeeklySPModifier());
         setPreventAerospace(facility.preventAerospace());
     }
@@ -225,14 +222,6 @@ public class StratconFacility implements Cloneable {
 
     public void setScenarioOddsModifier(int scenarioOddsModifier) {
         this.scenarioOddsModifier = scenarioOddsModifier;
-    }
-
-    public int getReinforcementDelayReduction() {
-        return reinforcementDelayReduction;
-    }
-
-    public void setReinforcementDelayReduction(int reinforcementDelayReduction) {
-        this.reinforcementDelayReduction = reinforcementDelayReduction;
     }
 
     public int getWeeklySPModifier() {
