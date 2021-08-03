@@ -418,6 +418,19 @@ public class StratconTrackState {
     }
     
     /**
+     * Count of all the scenario odds adjustments from facilities
+     * (and potentially other sources) on this track.
+     */
+    public int getScenarioOddsAdjustment() {
+        int accumulator = 0;
+        for (StratconFacility facility : getFacilities().values()) {
+            accumulator += facility.getScenarioOddsModifier();
+        }
+        
+        return accumulator;
+    }
+    
+    /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
     public boolean isForceDeployed(int forceID) {

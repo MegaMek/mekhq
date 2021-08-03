@@ -41,7 +41,6 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 
@@ -1275,7 +1274,7 @@ public class StratconRulesManager {
 
     /**
      * Given a track and the current campaign state, and if the player is deploying a force or not,
-     * figure out the odds of a scenario occuring.
+     * figure out the odds of a scenario occurring.
      */
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
@@ -1310,14 +1309,7 @@ public class StratconRulesManager {
                 break;
         }
 
-        // facilities: for each hostile data center, add +5%
-        // for each allied data center, subtract 5
-        int dataCenterModifier = 0;
-        for (StratconFacility facility : track.getFacilities().values()) {
-            if (facility.getFacilityType() == FacilityType.DataCenter) {
-                dataCenterModifier += facility.getOwner() == ForceAlignment.Allied ? -5 : 5;
-            }
-        }
+        int dataCenterModifier = track.getScenarioOddsAdjustment();        
 
         return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
