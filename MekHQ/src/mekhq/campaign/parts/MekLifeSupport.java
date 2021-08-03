@@ -49,6 +49,7 @@ public class MekLifeSupport extends Part {
         this.name = "Mech Life Support System";
     }
 
+    @Override
     public MekLifeSupport clone() {
         MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
         clone.copyBaseData(this);

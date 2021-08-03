@@ -26,6 +26,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -95,16 +96,20 @@ public class MissingMekGyro extends MissingPart {
             Node wn2 = nl.item(x);
 
             int walkMP = -1;
-            if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                type = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("gyroTonnage")) {
-                gyroTonnage = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
-                walkMP = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    type = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("gyroTonnage")) {
+                    gyroTonnage = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
+                    walkMP = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
 
             if (walkMP > -1) {
-                //need to calculate gyroTonnage for reverse compatability
+                //need to calculate gyroTonnage for reverse compatibility
                 gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
             }
         }

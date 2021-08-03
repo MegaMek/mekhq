@@ -619,13 +619,12 @@ public class CampaignXmlParser {
             int xc = wn.getNodeType();
 
             // If it's not an element, again, we're ignoring it.
-            if (xc == Node.ELEMENT_NODE) {
-                String xn = wn.getNodeName();
+            if (xc != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String xn = wn.getNodeName();
 
-                // Yeah, long if/then clauses suck.
-                // I really couldn't think of a significantly better way to
-                // handle it.
-                // They're all primitives anyway...
+            try {
                 if (xn.equalsIgnoreCase("calendar")) {
                     retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
@@ -743,6 +742,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("id")) {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

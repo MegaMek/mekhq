@@ -268,48 +268,52 @@ public class Faction {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("shortname")) {
-                retVal.shortName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
-                retVal.fullName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
-                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
-                retVal.nameChanges.put(year, wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-                retVal.altNames = wn2.getTextContent().split(",", 0);
-            } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
-                retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
-            } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
-                retVal.startingPlanet = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
-                retVal.planetChanges.put(
-                        MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
-                        wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-                retVal.eraMods = new int[] {0,0,0,0,0,0,0,0,0};
-                String[] values = wn2.getTextContent().split(",", -2);
-                for (int i = 0; i < values.length; i++) {
-                    retVal.eraMods[i] = Integer.parseInt(values[i]);
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("shortname")) {
+                    retVal.shortName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
+                    retVal.fullName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
+                    int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
+                    retVal.nameChanges.put(year, wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
+                    retVal.altNames = wn2.getTextContent().split(",", 0);
+                } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
+                    retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
+                    retVal.startingPlanet = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
+                    retVal.planetChanges.put(
+                            MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
+                            wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
+                    retVal.eraMods = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    String[] values = wn2.getTextContent().split(",", -2);
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.eraMods[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
+                    retVal.nameGenerator = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    if (values.length == 3) {
+                        int colorRed = Integer.parseInt(values[0]);
+                        int colorGreen = Integer.parseInt(values[1]);
+                        int colorBlue = Integer.parseInt(values[2]);
+                        retVal.color = new Color(colorRed, colorGreen, colorBlue);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
+                    retVal.currencyCode = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
+                    Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
+                            .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
+                } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
+                    retVal.start = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
+                    retVal.end = Integer.parseInt(wn2.getTextContent());
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
-                retVal.nameGenerator = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
-                String[] values = wn2.getTextContent().split(",");
-                if (values.length == 3) {
-                    int colorRed = Integer.parseInt(values[0]);
-                    int colorGreen = Integer.parseInt(values[1]);
-                    int colorBlue = Integer.parseInt(values[2]);
-                    retVal.color = new Color(colorRed, colorGreen, colorBlue);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
-                retVal.currencyCode = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
-                Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
-                        .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
-            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                retVal.start = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
-                retVal.end = Integer.parseInt(wn2.getTextContent());
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

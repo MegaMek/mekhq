@@ -250,7 +250,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && getType().equals(((InfantryAmmoBin) part).getType())
                 && Objects.equals(getWeaponType(), ((InfantryAmmoBin) part).getWeaponType())
                 && getClips() == ((InfantryAmmoBin) part).getClips();

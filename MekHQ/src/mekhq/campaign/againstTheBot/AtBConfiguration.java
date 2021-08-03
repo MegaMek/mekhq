@@ -133,8 +133,12 @@ public class AtBConfiguration implements Serializable {
         WeightedTable<T> retVal = new WeightedTable<>();
         String[] entries = entry.split(",");
         for (String e : entries) {
-            String[] fields = e.split(":");
-            retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
+            try {
+                String[] fields = e.split(":");
+                retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(ex);
+            }
         }
         return retVal;
     }

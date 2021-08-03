@@ -146,7 +146,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected boolean workingOvertime;
     protected int shorthandedMod;
 
-    /** This tracks the unit which resorved the part for a refit */
+    /** This tracks the unit which reserved the part for a refit */
     private Unit refitUnit;
     /** The unique identifier of the tech who is reserving this part for overnight work */
     private Person reservedBy;
@@ -310,14 +310,27 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             return Money.zero();
         }
 
-        if (getTechBase() == T_CLAN) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
+        switch (getTechBase()) {
+            case T_IS:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
+                break;
+            case T_CLAN:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
+                break;
+            case T_BOTH:
+            default:
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                break;
         }
+
+        if (!isBrandNew()) {
+            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartPriceMultipliers()[getQuality()]);
+        }
+
         if (needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
-            //TODO: parts that cant be fixed should also be further reduced in price
-        } else if (!isBrandNew()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
+            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE)
+                    ? campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier()
+                    : campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
 
         return cost;
@@ -368,6 +381,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.omniPodded = omniPod;
     }
 
+    @Override
     public @Nullable Unit getUnit() {
         return unit;
     }
@@ -414,7 +428,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     /**
      * Sets the number of hits on the part.
      *
-     * NOTE: It is the caller's responsibilty to update the condition
+     * NOTE: It is the caller's responsibility to update the condition
      * of the part and any attached unit.
      *
      * @param hits The number of hits on the part.
@@ -423,6 +437,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.hits = Math.max(hits, 0);
     }
 
+    @Override
     public String getDesc() {
         String bonus = getAllMods(null).getValueAsString();
         if (getAllMods(null).getValue() > -1) {
@@ -641,7 +656,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         if (workingOvertime) {
             builder.append(level1)
                 .append("<workingOvertime>")
-                .append(workingOvertime)
+                .append(true)
                 .append("</workingOvertime>")
                 .append(NL);
         }
@@ -669,7 +684,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         if (brandNew) {
             builder.append(level1)
                 .append("<brandNew>")
-                .append(brandNew)
+                .append(true)
                 .append("</brandNew>")
                 .append(NL);
         }
@@ -707,7 +722,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         if (isTeamSalvaging) {
             builder.append(level1)
                 .append("<isTeamSalvaging>")
-                .append(isTeamSalvaging)
+                .append(true)
                 .append("</isTeamSalvaging>")
                 .append(NL);
         }
@@ -867,14 +882,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return timeSpent;
     }
 
+    @Override
     public void addTimeSpent(int m) {
         this.timeSpent += m;
     }
 
+    @Override
     public void resetTimeSpent() {
         this.timeSpent = 0;
     }
 
+    @Override
     public void resetOvertime() {
         this.workingOvertime = false;
     }
@@ -888,6 +906,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.skillMin = i;
     }
 
+    @Override
     public WorkTime getMode() {
         return mode;
     }
@@ -974,11 +993,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             mods.addModifier(-1, "Internal specialist");
         }
 
-        mods = getQualityMods(mods, tech);
-
-        return mods;
+        return getQualityMods(mods, tech);
     }
 
+    @Override
     public TargetRoll getAllModsForMaintenance() {
         //according to StratOps you get a -1 mod when checking on individual parts
         //but we will make this user customizable
@@ -1311,6 +1329,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return daysToArrival == 0;
     }
 
+    @Override
     public boolean isBeingWorkedOn() {
         return getTech() != null;
     }
@@ -1378,6 +1397,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             && (reservedBy == null);
     }
 
+    @Override
     public boolean isRightTechType(String skillType) {
         return true;
     }

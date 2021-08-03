@@ -75,6 +75,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -110,6 +115,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -192,6 +202,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -301,8 +316,11 @@ public class RefitTest {
     @Test
     public void javelinJVN10Nto10ATest() {
         Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
@@ -503,8 +521,11 @@ public class RefitTest {
     @Test
     public void fleaFLE4toFLE15Test() {
         Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);

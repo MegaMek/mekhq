@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
@@ -30,7 +29,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorDialog extends javax.swing.JDialog {
-    
+
     private static final long serialVersionUID = 3624327778807359294L;
 
     private MarkdownEditorPanel mkEditor;
@@ -48,9 +47,9 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
     public MarkdownEditorDialog(java.awt.Frame parent, boolean modal, String title, String text) {
         super(parent, modal);
         setTitle(title);
-        
+
         initComponents();
-        
+
         setPreferredSize(new Dimension(400, 500));
 
         pack();
@@ -60,7 +59,7 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         mkEditor.setText(text);
         changed = false;
     }
-    
+
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -71,7 +70,7 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog", new EncodeControl()); //$NON-NLS-1$
 
         setLayout(new java.awt.GridBagLayout());
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -81,13 +80,9 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(mkEditor, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOK.text"));
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed();
-            }
-        });
+        btnOK.addActionListener(evt -> btnOKActionPerformed());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -96,13 +91,9 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         add(btnOK, gridBagConstraints);
-        
+
         btnCancel.setText(resourceMap.getString("btnCancel.text"));
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
+        btnCancel.addActionListener(evt -> setVisible(false));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -110,9 +101,9 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-        add(btnCancel, gridBagConstraints);     
+        add(btnCancel, gridBagConstraints);
     }
-    
+
     /**
      * Get the text currently in the editor
      * @return <code>String</code> of the current text in the editor
@@ -120,12 +111,12 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
     public String getText() {
         return mkEditor.getText();
     }
-    
+
     private void btnOKActionPerformed() {
         changed = true;
         setVisible(false);
     }
-    
+
     /**
      * Was anything changed. Used to determine whether the user canceled the dialog of hit ok
      * @return a <code>boolean</code> indicating whether anything was changed
@@ -133,5 +124,4 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
     public boolean wasChanged() {
         return changed;
     }
-    
 }

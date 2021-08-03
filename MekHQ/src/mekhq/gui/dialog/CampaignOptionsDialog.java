@@ -293,7 +293,6 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Personnel Tab
 
     //region Finances Tab
-    private JPanel panFinances;
     private JCheckBox payForPartsBox;
     private JCheckBox payForRepairsBox;
     private JCheckBox payForUnitsBox;
@@ -312,11 +311,18 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox showPeacetimeCostBox;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
     private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
-    private JSpinner spnClanPriceModifier;
-    private JLabel[] partQualityLabels;
-    private JSpinner[] spnUsedPartsValue;
-    private JSpinner spnDamagedPartsValue;
-    private JSpinner spnOrderRefund;
+
+    // Price Multipliers
+    private JSpinner spnCommonPartPriceMultiplier;
+    private JSpinner spnInnerSphereUnitPriceMultiplier;
+    private JSpinner spnInnerSpherePartPriceMultiplier;
+    private JSpinner spnClanUnitPriceMultiplier;
+    private JSpinner spnClanPartPriceMultiplier;
+    private JSpinner spnMixedTechUnitPriceMultiplier;
+    private JSpinner[] spnUsedPartPriceMultipliers;
+    private JSpinner spnDamagedPartsValueMultiplier;
+    private JSpinner spnUnrepairablePartsValueMultiplier;
+    private JSpinner spnCancelledOrderRefundMultiplier;
     //endregion Finances Tab
 
     //region Mercenary Tab
@@ -538,7 +544,8 @@ public class CampaignOptionsDialog extends JDialog {
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         panRepair = new JPanel();
         panSupplies = new JPanel();
-        panFinances = new JPanel();
+        //region Finances Tab
+        JPanel panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
         panXP = new JPanel();
@@ -549,9 +556,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEraModsCheckBox = new JCheckBox();
         assignedTechFirstCheckBox = new JCheckBox();
         resetToFirstTechCheckBox = new JCheckBox();
-        JLabel clanPriceModifierLabel = new JLabel();
-        JLabel usedPartsValueLabel = new JLabel();
-        JLabel damagedPartsValueLabel = new JLabel();
         payForPartsBox = new JCheckBox();
         payForRepairsBox = new JCheckBox();
         payForUnitsBox = new JCheckBox();
@@ -1661,85 +1665,10 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = gridy++;
         panFinances.add(newFinancialYearFinancesToCSVExportBox, gridBagConstraints);
 
-        clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
-        clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(clanPriceModifierLabel, gridBagConstraints);
-
-        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(1.0, 1.0, null, 0.1));
-        spnClanPriceModifier.setEditor(new JSpinner.NumberEditor(spnClanPriceModifier, "0.00"));
-        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnClanPriceModifier, gridBagConstraints);
-
-        usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
-        usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(usedPartsValueLabel, gridBagConstraints);
-
-        spnUsedPartsValue = new JSpinner[6];
-        partQualityLabels = new JLabel[spnUsedPartsValue.length];
-        gridBagConstraints.gridwidth = 1;
-        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.insets = new Insets(0, 20, 0, 0);
-            partQualityLabels[i] = new JLabel();
-            panFinances.add(partQualityLabels[i], gridBagConstraints);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            spnUsedPartsValue[i] = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-            spnUsedPartsValue[i].setEditor(new JSpinner.NumberEditor(spnUsedPartsValue[i], "0.00"));
-            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText"));
-            panFinances.add(spnUsedPartsValue[i], gridBagConstraints);
-        }
-
-        damagedPartsValueLabel.setText(resourceMap.getString("damagedPartsValueLabel.text"));
-        damagedPartsValueLabel.setName("damagedPartsValueLabel");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(damagedPartsValueLabel, gridBagConstraints);
-
-        spnDamagedPartsValue = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-        spnDamagedPartsValue.setEditor(new JSpinner.NumberEditor(spnDamagedPartsValue, "0.00"));
-        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnDamagedPartsValue, gridBagConstraints);
-
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(new JLabel("Reimbursement % (as decimal) for cancelled orders"), gridBagConstraints);
-
-        spnOrderRefund = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-        spnOrderRefund.setEditor(new JSpinner.NumberEditor(spnOrderRefund, "0.00"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panFinances.add(spnOrderRefund, gridBagConstraints);
+        gridBagConstraints.gridheight = 20;
+        panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances);
         //endregion Finances Tab
@@ -3339,7 +3268,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
-        
+
         JPanel panFixedMapChance = new JPanel();
         JLabel lblFixedMapChance = new JLabel(resourceMap.getString("lblFixedMapChance.text"));
         lblFixedMapChance.setToolTipText(resourceMap.getString("lblFixedMapChance.toolTipText"));
@@ -4552,6 +4481,201 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Personnel Tab
 
+    //region Finances Tab
+    private JPanel createPriceModifiersPanel() {
+        // Create Panel Components
+        final JLabel lblCommonPartPriceMultiplier = new JLabel(resources.getString("lblCommonPartPriceMultiplier.text"));
+        lblCommonPartPriceMultiplier.setToolTipText(resources.getString("lblCommonPartPriceMultiplier.toolTipText"));
+        lblCommonPartPriceMultiplier.setName("lblCommonPartPriceMultiplier");
+
+        spnCommonPartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnCommonPartPriceMultiplier.setToolTipText(resources.getString("lblCommonPartPriceMultiplier.toolTipText"));
+        spnCommonPartPriceMultiplier.setName("spnCommonPartPriceMultiplier");
+
+        final JLabel lblInnerSphereUnitPriceMultiplier = new JLabel(resources.getString("lblInnerSphereUnitPriceMultiplier.text"));
+        lblInnerSphereUnitPriceMultiplier.setToolTipText(resources.getString("lblInnerSphereUnitPriceMultiplier.toolTipText"));
+        lblInnerSphereUnitPriceMultiplier.setName("lblInnerSphereUnitPriceMultiplier");
+
+        spnInnerSphereUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnInnerSphereUnitPriceMultiplier.setToolTipText(resources.getString("lblInnerSphereUnitPriceMultiplier.toolTipText"));
+        spnInnerSphereUnitPriceMultiplier.setName("spnInnerSphereUnitPriceMultiplier");
+
+        final JLabel lblInnerSpherePartPriceMultiplier = new JLabel(resources.getString("lblInnerSpherePartPriceMultiplier.text"));
+        lblInnerSpherePartPriceMultiplier.setToolTipText(resources.getString("lblInnerSpherePartPriceMultiplier.toolTipText"));
+        lblInnerSpherePartPriceMultiplier.setName("lblInnerSpherePartPriceMultiplier");
+
+        spnInnerSpherePartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnInnerSpherePartPriceMultiplier.setToolTipText(resources.getString("lblInnerSpherePartPriceMultiplier.toolTipText"));
+        spnInnerSpherePartPriceMultiplier.setName("spnInnerSpherePartPriceMultiplier");
+
+        final JLabel lblClanUnitPriceMultiplier = new JLabel(resources.getString("lblClanUnitPriceMultiplier.text"));
+        lblClanUnitPriceMultiplier.setToolTipText(resources.getString("lblClanUnitPriceMultiplier.toolTipText"));
+        lblClanUnitPriceMultiplier.setName("lblClanUnitPriceMultiplier");
+
+        spnClanUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnClanUnitPriceMultiplier.setToolTipText(resources.getString("lblClanUnitPriceMultiplier.toolTipText"));
+        spnClanUnitPriceMultiplier.setName("spnClanUnitPriceMultiplier");
+
+        final JLabel lblClanPartPriceMultiplier = new JLabel(resources.getString("lblClanPartPriceMultiplier.text"));
+        lblClanPartPriceMultiplier.setToolTipText(resources.getString("lblClanPartPriceMultiplier.toolTipText"));
+        lblClanPartPriceMultiplier.setName("lblClanPartPriceMultiplier");
+
+        spnClanPartPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnClanPartPriceMultiplier.setToolTipText(resources.getString("lblClanPartPriceMultiplier.toolTipText"));
+        spnClanPartPriceMultiplier.setName("spnClanPartPriceMultiplier");
+
+        final JLabel lblMixedTechUnitPriceMultiplier = new JLabel(resources.getString("lblMixedTechUnitPriceMultiplier.text"));
+        lblMixedTechUnitPriceMultiplier.setToolTipText(resources.getString("lblMixedTechUnitPriceMultiplier.toolTipText"));
+        lblMixedTechUnitPriceMultiplier.setName("lblMixedTechUnitPriceMultiplier");
+
+        spnMixedTechUnitPriceMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.1, null, 0.1));
+        spnMixedTechUnitPriceMultiplier.setToolTipText(resources.getString("lblMixedTechUnitPriceMultiplier.toolTipText"));
+        spnMixedTechUnitPriceMultiplier.setName("spnMixedTechUnitPriceMultiplier");
+
+        final JPanel usedPartsValueMultipliersPanel = createUsedPartsValueMultipliersPanel();
+
+        final JLabel lblDamagedPartsValueMultiplier = new JLabel(resources.getString("lblDamagedPartsValueMultiplier.text"));
+        lblDamagedPartsValueMultiplier.setToolTipText(resources.getString("lblDamagedPartsValueMultiplier.toolTipText"));
+        lblDamagedPartsValueMultiplier.setName("lblDamagedPartsValueMultiplier");
+
+        spnDamagedPartsValueMultiplier = new JSpinner(new SpinnerNumberModel(0.33, 0.00, 1.00, 0.05));
+        spnDamagedPartsValueMultiplier.setToolTipText(resources.getString("lblDamagedPartsValueMultiplier.toolTipText"));
+        spnDamagedPartsValueMultiplier.setName("spnDamagedPartsValueMultiplier");
+        spnDamagedPartsValueMultiplier.setEditor(new JSpinner.NumberEditor(spnDamagedPartsValueMultiplier, "0.00"));
+
+        final JLabel lblUnrepairablePartsValueMultiplier = new JLabel(resources.getString("lblUnrepairablePartsValueMultiplier.text"));
+        lblUnrepairablePartsValueMultiplier.setToolTipText(resources.getString("lblUnrepairablePartsValueMultiplier.toolTipText"));
+        lblUnrepairablePartsValueMultiplier.setName("lblUnrepairablePartsValueMultiplier");
+
+        spnUnrepairablePartsValueMultiplier = new JSpinner(new SpinnerNumberModel(0.10, 0.00, 1.00, 0.05));
+        spnUnrepairablePartsValueMultiplier.setToolTipText(resources.getString("lblUnrepairablePartsValueMultiplier.toolTipText"));
+        spnUnrepairablePartsValueMultiplier.setName("spnUnrepairablePartsValueMultiplier");
+        spnUnrepairablePartsValueMultiplier.setEditor(new JSpinner.NumberEditor(spnUnrepairablePartsValueMultiplier, "0.00"));
+
+        final JLabel lblCancelledOrderRefundMultiplier = new JLabel(resources.getString("lblCancelledOrderRefundMultiplier.text"));
+        lblCancelledOrderRefundMultiplier.setToolTipText(resources.getString("lblCancelledOrderRefundMultiplier.toolTipText"));
+        lblCancelledOrderRefundMultiplier.setName("lblCancelledOrderRefundMultiplier");
+
+        spnCancelledOrderRefundMultiplier = new JSpinner(new SpinnerNumberModel(0.50, 0.00, 1.00, 0.05));
+        spnCancelledOrderRefundMultiplier.setToolTipText(resources.getString("lblCancelledOrderRefundMultiplier.toolTipText"));
+        spnCancelledOrderRefundMultiplier.setName("spnCancelledOrderRefundMultiplier");
+        spnCancelledOrderRefundMultiplier.setEditor(new JSpinner.NumberEditor(spnCancelledOrderRefundMultiplier, "0.00"));
+
+        // Programmatically Assign Accessibility Labels
+        lblCommonPartPriceMultiplier.setLabelFor(spnCommonPartPriceMultiplier);
+        lblInnerSphereUnitPriceMultiplier.setLabelFor(spnInnerSphereUnitPriceMultiplier);
+        lblInnerSpherePartPriceMultiplier.setLabelFor(spnInnerSpherePartPriceMultiplier);
+        lblClanUnitPriceMultiplier.setLabelFor(spnClanUnitPriceMultiplier);
+        lblClanPartPriceMultiplier.setLabelFor(spnClanPartPriceMultiplier);
+        lblMixedTechUnitPriceMultiplier.setLabelFor(spnMixedTechUnitPriceMultiplier);
+        lblDamagedPartsValueMultiplier.setLabelFor(spnDamagedPartsValueMultiplier);
+        lblUnrepairablePartsValueMultiplier.setLabelFor(spnUnrepairablePartsValueMultiplier);
+        lblCancelledOrderRefundMultiplier.setLabelFor(spnCancelledOrderRefundMultiplier);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("priceMultipliersPanel.title")));
+        panel.setName("priceMultipliersPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblCommonPartPriceMultiplier)
+                                .addComponent(spnCommonPartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInnerSphereUnitPriceMultiplier)
+                                .addComponent(spnInnerSphereUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInnerSpherePartPriceMultiplier)
+                                .addComponent(spnInnerSpherePartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblClanUnitPriceMultiplier)
+                                .addComponent(spnClanUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblClanPartPriceMultiplier)
+                                .addComponent(spnClanPartPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblMixedTechUnitPriceMultiplier)
+                                .addComponent(spnMixedTechUnitPriceMultiplier, GroupLayout.Alignment.LEADING))
+                        .addComponent(usedPartsValueMultipliersPanel)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblDamagedPartsValueMultiplier)
+                                .addComponent(spnDamagedPartsValueMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblUnrepairablePartsValueMultiplier)
+                                .addComponent(spnUnrepairablePartsValueMultiplier, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblCancelledOrderRefundMultiplier)
+                                .addComponent(spnCancelledOrderRefundMultiplier, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCommonPartPriceMultiplier)
+                                .addComponent(spnCommonPartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInnerSphereUnitPriceMultiplier)
+                                .addComponent(spnInnerSphereUnitPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInnerSpherePartPriceMultiplier)
+                                .addComponent(spnInnerSpherePartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblClanUnitPriceMultiplier)
+                                .addComponent(spnClanUnitPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblClanPartPriceMultiplier)
+                                .addComponent(spnClanPartPriceMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMixedTechUnitPriceMultiplier)
+                                .addComponent(spnMixedTechUnitPriceMultiplier))
+                        .addComponent(usedPartsValueMultipliersPanel)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDamagedPartsValueMultiplier)
+                                .addComponent(spnDamagedPartsValueMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUnrepairablePartsValueMultiplier)
+                                .addComponent(spnUnrepairablePartsValueMultiplier))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCancelledOrderRefundMultiplier)
+                                .addComponent(spnCancelledOrderRefundMultiplier))
+        );
+
+        return panel;
+    }
+
+    private JPanel createUsedPartsValueMultipliersPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("usedPartsValueMultipliersPanel.title")));
+        panel.setName("usedPartsValueMultipliersPanel");
+
+        spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
+            final String qualityLevel = Part.getQualityName(i, false);
+
+            final JLabel label = new JLabel(qualityLevel);
+            label.setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
+            label.setName("lbl" + qualityLevel);
+            panel.add(label);
+
+            spnUsedPartPriceMultipliers[i] = new JSpinner(new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
+            spnUsedPartPriceMultipliers[i].setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
+            spnUsedPartPriceMultipliers[i].setName("spn" + qualityLevel);
+            spnUsedPartPriceMultipliers[i].setEditor(new JSpinner.NumberEditor(spnUsedPartPriceMultipliers[i], "0.00"));
+            panel.add(spnUsedPartPriceMultipliers[i]);
+
+            label.setLabelFor(spnUsedPartPriceMultipliers[i]);
+        }
+
+        return panel;
+    }
+    //endregion Finances Tab
+
     //region Rank Systems Tab
     private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
         rankSystemsPane = new RankSystemsPane(frame, campaign);
@@ -5149,13 +5273,19 @@ public class CampaignOptionsDialog extends JDialog {
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
 
-        spnClanPriceModifier.setValue(options.getClanPriceModifier());
-        for (int i = 0; i < spnUsedPartsValue.length; i++) {
-            spnUsedPartsValue[i].setValue(options.getUsedPartsValue(i));
-            partQualityLabels[i].setText(Part.getQualityName(i, options.reverseQualityNames()) + " Quality");
+        // Price Multipliers
+        spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
+        spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
+        spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
+        spnClanUnitPriceMultiplier.setValue(options.getClanUnitPriceMultiplier());
+        spnClanPartPriceMultiplier.setValue(options.getClanPartPriceMultiplier());
+        spnMixedTechUnitPriceMultiplier.setValue(options.getMixedTechUnitPriceMultiplier());
+        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
+            spnUsedPartPriceMultipliers[i].setValue(options.getUsedPartPriceMultipliers()[i]);
         }
-        spnDamagedPartsValue.setValue(options.getDamagedPartsValue());
-        spnOrderRefund.setValue(options.GetCanceledOrderReimbursement());
+        spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
+        spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
+        spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -5444,363 +5574,381 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void updateOptions() {
-        campaign.setName(txtName.getText());
-        campaign.setLocalDate(date);
-        // Ensure that the MegaMek year GameOption matches the campaign year
-        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-        campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
-                (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
-        if (null != comboFactionNames.getSelectedItem()) {
-            RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
+        try {
+            campaign.setName(txtName.getText());
+            campaign.setLocalDate(date);
+            // Ensure that the MegaMek year GameOption matches the campaign year
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+            campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
+                    (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
+            if (null != comboFactionNames.getSelectedItem()) {
+                RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
+            }
+            RandomGenderGenerator.setPercentFemale(sldGender.getValue());
+            rankSystemsPane.applyToCampaign();
+            campaign.setCamouflage(camouflage);
+            campaign.setColour(colour);
+
+            campaign.setIconCategory(iconCategory);
+            campaign.setIconFileName(iconFileName);
+
+            for (int i = 0; i < chkUsePortrait.length; i++) {
+                options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
+            }
+
+            updateSkillTypes();
+            updateXPCosts();
+
+            // Rules panel
+            options.setEraMods(useEraModsCheckBox.isSelected());
+            options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
+            options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
+            options.setQuirks(useQuirksBox.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(useQuirksBox.isSelected());
+            options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
+            options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
+            options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
+            options.setDestroyByMargin(useDamageMargin.isSelected());
+            options.setDestroyMargin((Integer) spnDamageMargin.getValue());
+            options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getValue());
+            options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
+            options.setCheckMaintenance(checkMaintenance.isSelected());
+            options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+            options.setReverseQualityNames(reverseQualityNames.isSelected());
+            options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
+            options.setLogMaintenance(logMaintenance.isSelected());
+            options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getValue());
+            options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getValue());
+            options.setPayForParts(payForPartsBox.isSelected());
+            options.setPayForRepairs(payForRepairsBox.isSelected());
+            options.setPayForUnits(payForUnitsBox.isSelected());
+            options.setPayForSalaries(payForSalariesBox.isSelected());
+            options.setPayForOverhead(payForOverheadBox.isSelected());
+            options.setPayForMaintain(payForMaintainBox.isSelected());
+            options.setPayForTransport(payForTransportBox.isSelected());
+            options.setPayForRecruitment(payForRecruitmentBox.isSelected());
+            options.setLoanLimits(useLoanLimitsBox.isSelected());
+            options.setUsePercentageMaint(usePercentageMaintBox.isSelected());
+            options.setUseInfantryDontCount(useInfantryDontCountBox.isSelected());
+            options.setSellUnits(sellUnitsBox.isSelected());
+            options.setSellParts(sellPartsBox.isSelected());
+            options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
+            options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
+            options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
+            options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
+            options.setFinancialYearDuration((FinancialYearDuration) comboFinancialYearDuration.getSelectedItem());
+            options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
+
+            options.setEquipmentContractBase(btnContractEquipment.isSelected());
+            options.setEquipmentContractPercent((Double) spnEquipPercent.getValue());
+            options.setDropshipContractPercent((Double) spnDropshipPercent.getValue());
+            options.setJumpshipContractPercent((Double) spnJumpshipPercent.getValue());
+            options.setWarshipContractPercent((Double) spnWarshipPercent.getValue());
+            options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
+            options.setBLCSaleValue(chkBLCSaleValue.isSelected());
+            options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
+
+            options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getValue());
+            options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
+            options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
+            options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
+            options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
+            options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
+
+            options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
+            options.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());
+            options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
+            options.setAcquireMosBonus((Integer) spnAcquireMosBonus.getValue());
+            options.setAcquireMinimumTime((Integer) spnAcquireMinimum.getValue());
+            options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
+            options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
+            options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
+            options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
+            options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
+            options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+            options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
+            options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
+            options.setPlanetAcquisitionFactionLimit((PlanetaryAcquisitionFactionLimit) comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
+
+            for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
+                options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
+                options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
+                options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(), i);
+
+            }
+
+            options.setScenarioXP((Integer) spnScenarioXP.getValue());
+            options.setKillsForXP((Integer) spnKills.getValue());
+            options.setKillXPAward((Integer) spnKillXP.getValue());
+
+            options.setTaskXP((Integer) spnTaskXP.getValue());
+            options.setNTasksXP((Integer) spnNTasksXP.getValue());
+            options.setSuccessXP((Integer) spnSuccessXP.getValue());
+            options.setMistakeXP((Integer) spnMistakeXP.getValue());
+            options.setIdleXP((Integer) spnIdleXP.getValue());
+            options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
+            options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
+            options.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
+            options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
+            options.setEdgeCost((Integer) spnEdgeCost.getValue());
+            options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
+
+            options.setLimitByYear(limitByYearBox.isSelected());
+            options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
+            options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
+            options.setAllowISPurchases(allowISPurchasesBox.isSelected());
+            options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).setValue(allowCanonOnlyBox.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
+            options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
+            options.setFactionIntroDate(factionIntroDateBox.isSelected());
+            campaign.updateTechFactionCode();
+            options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
+            options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
+            options.setTechLevel(choiceTechLevel.getSelectedIndex());
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue((String) choiceTechLevel.getSelectedItem());
+
+            rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
+            for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
+                rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getValue());
+            }
+            rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
+            rSkillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getValue());
+            rSkillPrefs.setArtilleryProb((Integer) spnArtyProb.getValue());
+            rSkillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getValue());
+            rSkillPrefs.setSecondSkillProb((Integer) spnSecondProb.getValue());
+            rSkillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
+            rSkillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
+            rSkillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
+            rSkillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
+            rSkillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
+            rSkillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
+            rSkillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
+            rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getValue());
+            rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getValue());
+            rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getValue());
+            rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getValue());
+            campaign.setRandomSkillPreferences(rSkillPrefs);
+
+            for (int i = 0; i < phenotypeSpinners.length; i++) {
+                options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
+            }
+
+            //region Personnel Tab
+            // General Personnel
+            options.setUseTactics(chkUseTactics.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).setValue(chkUseTactics.isSelected());
+            options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).setValue(chkUseInitiativeBonus.isSelected());
+            options.setUseToughness(chkUseToughness.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).setValue(chkUseToughness.isSelected());
+            options.setUseArtillery(chkUseArtillery.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).setValue(chkUseArtillery.isSelected());
+            options.setUseAbilities(chkUseAbilities.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).setValue(chkUseAbilities.isSelected());
+            options.setUseEdge(chkUseEdge.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.EDGE).setValue(chkUseEdge.isSelected());
+            options.setUseSupportEdge(chkUseEdge.isSelected() && chkUseSupportEdge.isSelected());
+            options.setUseImplants(chkUseImplants.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
+            options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
+            options.setUseTransfers(chkUseTransfers.isSelected());
+            options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
+            options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
+            options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
+
+            // Expanded Personnel Information
+            options.setUseTimeInService(chkUseTimeInService.isSelected());
+            options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
+            options.setUseTimeInRank(chkUseTimeInRank.isSelected());
+            options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
+            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
+            options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
+            options.setShowOriginFaction(chkShowOriginFaction.isSelected());
+
+            // Medical
+            options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
+            // we need to reset healing time options through the campaign because we may need to
+            // loop through personnel to make adjustments
+            campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getValue(),
+                    (Integer) spnNaturalHealWaitingPeriod.getValue());
+            options.setMinimumHitsForVehicles((Integer) spnMinimumHitsForVehicles.getValue());
+            options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
+            options.setTougherHealing(chkUseTougherHealing.isSelected());
+
+            // Prisoners
+            options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
+            options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+            options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
+            options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
+            options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
+
+            // Personnel Randomization
+            options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
+            options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
+            options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
+            options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
+            options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
+            options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
+
+            // Family
+            options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
+
+            // Salary
+            options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
+            options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
+            options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
+            for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
+                options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
+            }
+            for (final PersonnelRole personnelRole : PersonnelRole.values()) {
+                options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
+            }
+
+            // Marriage
+            options.setUseManualMarriages(chkUseManualMarriages.isSelected());
+            options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
+            options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
+            options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
+            options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
+            options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getValue() / 100.0);
+            options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getValue());
+            for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
+                int val = (int) Math.round(((Double) spnMarriageSurnameWeights[i].getValue()) * 10);
+                options.setMarriageSurnameWeight(i, val);
+            }
+            options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
+            options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
+
+            // Procreation
+            options.setUseProcreation(chkUseProcreation.isSelected());
+            options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
+            options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
+            options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
+            options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setLogConception(chkLogConception.isSelected());
+            options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
+            options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+
+            // Death
+            options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
+            //endregion Personnel Tab
+
+            //region Finances Tab
+
+            // Price Multipliers
+            options.setCommonPartPriceMultiplier((Double) spnCommonPartPriceMultiplier.getValue());
+            options.setInnerSphereUnitPriceMultiplier((Double) spnInnerSphereUnitPriceMultiplier.getValue());
+            options.setInnerSpherePartPriceMultiplier((Double) spnInnerSpherePartPriceMultiplier.getValue());
+            options.setClanUnitPriceMultiplier((Double) spnClanUnitPriceMultiplier.getValue());
+            options.setClanPartPriceMultiplier((Double) spnClanPartPriceMultiplier.getValue());
+            options.setMixedTechUnitPriceMultiplier((Double) spnMixedTechUnitPriceMultiplier.getValue());
+            for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
+                options.getUsedPartPriceMultipliers()[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();
+            }
+            options.setDamagedPartsValueMultiplier((Double) spnDamagedPartsValueMultiplier.getValue());
+            options.setUnrepairablePartsValueMultiplier((Double) spnUnrepairablePartsValueMultiplier.getValue());
+            options.setCancelledOrderRefundMultiplier((Double) spnCancelledOrderRefundMultiplier.getValue());
+            //endregion Finances Tab
+
+            //start SPA
+            SpecialAbility.replaceSpecialAbilities(getCurrentSPA());
+            //end SPA
+
+            //region Markets Tab
+            // Personnel Market
+            options.setPersonnelMarketType((String) comboPersonnelMarketType.getSelectedItem());
+            options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
+            options.setPersonnelMarketRandomEliteRemoval((Integer) spnPersonnelMarketRandomEliteRemoval.getValue());
+            options.setPersonnelMarketRandomVeteranRemoval((Integer) spnPersonnelMarketRandomVeteranRemoval.getValue());
+            options.setPersonnelMarketRandomRegularRemoval((Integer) spnPersonnelMarketRandomRegularRemoval.getValue());
+            options.setPersonnelMarketRandomGreenRemoval((Integer) spnPersonnelMarketRandomGreenRemoval.getValue());
+            options.setPersonnelMarketRandomUltraGreenRemoval((Integer) spnPersonnelMarketRandomUltraGreenRemoval.getValue());
+            options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
+
+            // Unit Market
+            options.setUnitMarketMethod((UnitMarketMethod) comboUnitMarketMethod.getSelectedItem());
+            options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
+            options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
+            options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
+
+            // Contract Market
+            options.setContractMarketMethod((ContractMarketMethod) comboContractMarketMethod.getSelectedItem());
+            options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
+            //endregion Markets Tab
+
+            // Start Against the Bot
+            options.setUseAtB(chkUseAtB.isSelected());
+            options.setUseStratCon(chkUseStratCon.isSelected());
+            options.setSkillLevel(cbSkillLevel.getSelectedIndex());
+            options.setUseShareSystem(chkUseShareSystem.isSelected());
+            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
+            options.setSharesForAll(chkSharesForAll.isSelected());
+            options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
+            options.setRetirementRolls(chkRetirementRolls.isSelected());
+            options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
+            options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
+            options.setAtBAddDependents(chkAddDependents.isSelected());
+            options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
+            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
+            options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
+            options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
+            options.setUseLeadership(chkUseLeadership.isSelected());
+            options.setUseStrategy(chkUseStrategy.isSelected());
+            options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
+            options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
+            options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
+
+            options.setUseAero(chkUseAero.isSelected());
+            options.setUseVehicles(chkUseVehicles.isSelected());
+            options.setClanVehicles(chkClanVehicles.isSelected());
+            options.setDoubleVehicles(chkDoubleVehicles.isSelected());
+            options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
+            options.setOpforLanceTypeMechs((Integer) spnOpforLanceTypeMechs.getValue());
+            options.setOpforLanceTypeMixed((Integer) spnOpforLanceTypeMixed.getValue());
+            options.setOpforLanceTypeVehicles((Integer) spnOpforLanceTypeVehicles.getValue());
+            options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
+            options.setAllowOpforAeros(chkOpforUsesAero.isSelected());
+            options.setAllowOpforLocalUnits(chkOpforUsesLocalForces.isSelected());
+            options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
+            options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
+            options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
+            options.setUseDropShips(chkUseDropShips.isSelected());
+
+            options.setStaticRATs(btnStaticRATs.isSelected());
+            options.setIgnoreRatEra(chkIgnoreRatEra.isSelected());
+            //Strip dates used in display name
+            String[] ratList = new String[chosenRatModel.size()];
+            for (int i = 0; i < chosenRatModel.size(); i++) {
+                ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
+            }
+            options.setRATs(ratList);
+            options.setSearchRadius((Integer) spnSearchRadius.getValue());
+            for (int i = 0; i < spnAtBBattleChance.length; i++) {
+                options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
+            }
+            options.setGenerateChases(chkGenerateChases.isSelected());
+            options.setVariableContractLength(chkVariableContractLength.isSelected());
+            options.setMercSizeLimited(chkMercSizeLimited.isSelected());
+            options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+            options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
+            options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+            options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+            options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
+            options.setUseLightConditions(chkUseLightConditions.isSelected());
+            options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+            options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
+            // End Against the Bot
+
+            campaign.setCampaignOptions(options);
+
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            JOptionPane.showMessageDialog(frame,
+                    "Campaign Options update failure, please check the logs for the exception reason.",
+                    "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
         }
-        RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        rankSystemsPane.applyToCampaign();
-        campaign.setCamouflage(camouflage);
-        campaign.setColour(colour);
-
-        campaign.setIconCategory(iconCategory);
-        campaign.setIconFileName(iconFileName);
-
-        for (int i = 0; i < chkUsePortrait.length; i++) {
-            options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
-        }
-
-        updateSkillTypes();
-        updateXPCosts();
-
-        // Rules panel
-        options.setEraMods(useEraModsCheckBox.isSelected());
-        options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
-        options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
-        options.setQuirks(useQuirksBox.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(useQuirksBox.isSelected());
-        options.setClanPriceModifier((Double) spnClanPriceModifier.getValue());
-        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            options.setUsedPartsValue((Double) spnUsedPartsValue[i].getValue(), i);
-        }
-        options.setDamagedPartsValue((Double) spnDamagedPartsValue.getValue());
-        options.setCanceledOrderReimbursement((Double) spnOrderRefund.getValue());
-        options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
-        options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
-        options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
-        options.setDestroyByMargin(useDamageMargin.isSelected());
-        options.setDestroyMargin((Integer) spnDamageMargin.getValue());
-        options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getValue());
-        options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
-        options.setCheckMaintenance(checkMaintenance.isSelected());
-        options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
-        options.setReverseQualityNames(reverseQualityNames.isSelected());
-        options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
-        options.setLogMaintenance(logMaintenance.isSelected());
-        options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getValue());
-        options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getValue());
-        options.setPayForParts(payForPartsBox.isSelected());
-        options.setPayForRepairs(payForRepairsBox.isSelected());
-        options.setPayForUnits(payForUnitsBox.isSelected());
-        options.setPayForSalaries(payForSalariesBox.isSelected());
-        options.setPayForOverhead(payForOverheadBox.isSelected());
-        options.setPayForMaintain(payForMaintainBox.isSelected());
-        options.setPayForTransport(payForTransportBox.isSelected());
-        options.setPayForRecruitment(payForRecruitmentBox.isSelected());
-        options.setLoanLimits(useLoanLimitsBox.isSelected());
-        options.setUsePercentageMaint(usePercentageMaintBox.isSelected());
-        options.setUseInfantryDontCount(useInfantryDontCountBox.isSelected());
-        options.setSellUnits(sellUnitsBox.isSelected());
-        options.setSellParts(sellPartsBox.isSelected());
-        options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
-        options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
-        options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
-        options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
-        options.setFinancialYearDuration((FinancialYearDuration) comboFinancialYearDuration.getSelectedItem());
-        options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
-
-        options.setEquipmentContractBase(btnContractEquipment.isSelected());
-        options.setEquipmentContractPercent((Double) spnEquipPercent.getValue());
-        options.setDropshipContractPercent((Double) spnDropshipPercent.getValue());
-        options.setJumpshipContractPercent((Double) spnJumpshipPercent.getValue());
-        options.setWarshipContractPercent((Double) spnWarshipPercent.getValue());
-        options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
-        options.setBLCSaleValue(chkBLCSaleValue.isSelected());
-        options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
-
-        options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getValue());
-        options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
-        options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
-        options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
-        options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
-        options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
-
-        options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
-        options.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());
-        options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
-        options.setAcquireMosBonus((Integer) spnAcquireMosBonus.getValue());
-        options.setAcquireMinimumTime((Integer) spnAcquireMinimum.getValue());
-        options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
-        options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
-        options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
-        options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
-        options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
-        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
-        options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
-        options.setPlanetAcquisitionFactionLimit((PlanetaryAcquisitionFactionLimit) comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
-
-        for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
-            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
-            options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
-            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(), i);
-
-        }
-
-        options.setScenarioXP((Integer) spnScenarioXP.getValue());
-        options.setKillsForXP((Integer) spnKills.getValue());
-        options.setKillXPAward((Integer) spnKillXP.getValue());
-
-        options.setTaskXP((Integer) spnTaskXP.getValue());
-        options.setNTasksXP((Integer) spnNTasksXP.getValue());
-        options.setSuccessXP((Integer) spnSuccessXP.getValue());
-        options.setMistakeXP((Integer) spnMistakeXP.getValue());
-        options.setIdleXP((Integer) spnIdleXP.getValue());
-        options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
-        options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
-        options.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
-        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
-        options.setEdgeCost((Integer) spnEdgeCost.getValue());
-        options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
-
-        options.setLimitByYear(limitByYearBox.isSelected());
-        options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
-        options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
-        options.setAllowISPurchases(allowISPurchasesBox.isSelected());
-        options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).setValue(allowCanonOnlyBox.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
-        options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
-        options.setFactionIntroDate(factionIntroDateBox.isSelected());
-        campaign.updateTechFactionCode();
-        options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
-        options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
-        options.setTechLevel(choiceTechLevel.getSelectedIndex());
-        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue((String) choiceTechLevel.getSelectedItem());
-
-        rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
-        for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
-            rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getValue());
-        }
-        rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
-        rSkillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getValue());
-        rSkillPrefs.setArtilleryProb((Integer) spnArtyProb.getValue());
-        rSkillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getValue());
-        rSkillPrefs.setSecondSkillProb((Integer) spnSecondProb.getValue());
-        rSkillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
-        rSkillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
-        rSkillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getValue());
-        campaign.setRandomSkillPreferences(rSkillPrefs);
-
-        for (int i = 0; i < phenotypeSpinners.length; i++) {
-            options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
-        }
-
-        //region Personnel Tab
-        // General Personnel
-        options.setUseTactics(chkUseTactics.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).setValue(chkUseTactics.isSelected());
-        options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).setValue(chkUseInitiativeBonus.isSelected());
-        options.setUseToughness(chkUseToughness.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).setValue(chkUseToughness.isSelected());
-        options.setUseArtillery(chkUseArtillery.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).setValue(chkUseArtillery.isSelected());
-        options.setUseAbilities(chkUseAbilities.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).setValue(chkUseAbilities.isSelected());
-        options.setUseEdge(chkUseEdge.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.EDGE).setValue(chkUseEdge.isSelected());
-        options.setUseSupportEdge(chkUseEdge.isSelected() && chkUseSupportEdge.isSelected());
-        options.setUseImplants(chkUseImplants.isSelected());
-        campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
-        options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
-        options.setUseTransfers(chkUseTransfers.isSelected());
-        options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
-        options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
-        options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
-
-        // Expanded Personnel Information
-        options.setUseTimeInService(chkUseTimeInService.isSelected());
-        options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
-        options.setUseTimeInRank(chkUseTimeInRank.isSelected());
-        options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
-        options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
-        options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
-        options.setShowOriginFaction(chkShowOriginFaction.isSelected());
-
-        // Medical
-        options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
-        // we need to reset healing time options through the campaign because we may need to
-        // loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getValue(),
-                (Integer) spnNaturalHealWaitingPeriod.getValue());
-        options.setMinimumHitsForVehicles((Integer) spnMinimumHitsForVehicles.getValue());
-        options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
-        options.setTougherHealing(chkUseTougherHealing.isSelected());
-
-        // Prisoners
-        options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
-        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
-        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
-        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
-        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
-
-        // Personnel Randomization
-        options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-        options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-        options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-        options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
-        options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
-        options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
-
-        // Family
-        options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
-
-        // Salary
-        options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
-        options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
-        options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
-        for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-            options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
-        }
-        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
-        }
-
-        // Marriage
-        options.setUseManualMarriages(chkUseManualMarriages.isSelected());
-        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
-        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
-        options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
-        options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
-        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getValue() / 100.0);
-        options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getValue());
-        for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
-            int val = (int) Math.round(((Double) spnMarriageSurnameWeights[i].getValue()) * 10);
-            options.setMarriageSurnameWeight(i, val);
-        }
-        options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
-        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
-
-        // Procreation
-        options.setUseProcreation(chkUseProcreation.isSelected());
-        options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
-        options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
-        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
-        options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
-        options.setLogConception(chkLogConception.isSelected());
-        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
-        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
-
-        // Death
-        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
-        //endregion Personnel Tab
-
-        //start SPA
-        SpecialAbility.replaceSpecialAbilities(getCurrentSPA());
-        //end SPA
-
-        //region Markets Tab
-        // Personnel Market
-        options.setPersonnelMarketType((String) comboPersonnelMarketType.getSelectedItem());
-        options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
-        options.setPersonnelMarketRandomEliteRemoval((Integer) spnPersonnelMarketRandomEliteRemoval.getValue());
-        options.setPersonnelMarketRandomVeteranRemoval((Integer) spnPersonnelMarketRandomVeteranRemoval.getValue());
-        options.setPersonnelMarketRandomRegularRemoval((Integer) spnPersonnelMarketRandomRegularRemoval.getValue());
-        options.setPersonnelMarketRandomGreenRemoval((Integer) spnPersonnelMarketRandomGreenRemoval.getValue());
-        options.setPersonnelMarketRandomUltraGreenRemoval((Integer) spnPersonnelMarketRandomUltraGreenRemoval.getValue());
-        options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
-
-        // Unit Market
-        options.setUnitMarketMethod((UnitMarketMethod) comboUnitMarketMethod.getSelectedItem());
-        options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
-        options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
-        options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
-
-        // Contract Market
-        options.setContractMarketMethod((ContractMarketMethod) comboContractMarketMethod.getSelectedItem());
-        options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
-        //endregion Markets Tab
-
-        // Start Against the Bot
-        options.setUseAtB(chkUseAtB.isSelected());
-        options.setUseStratCon(chkUseStratCon.isSelected());
-        options.setSkillLevel(cbSkillLevel.getSelectedIndex());
-        options.setUseShareSystem(chkUseShareSystem.isSelected());
-        options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
-        options.setSharesForAll(chkSharesForAll.isSelected());
-        options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
-        options.setRetirementRolls(chkRetirementRolls.isSelected());
-        options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
-        options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
-        options.setAtBAddDependents(chkAddDependents.isSelected());
-        options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
-        options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
-        options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
-        options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-        options.setUseLeadership(chkUseLeadership.isSelected());
-        options.setUseStrategy(chkUseStrategy.isSelected());
-        options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
-        options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
-        options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
-
-        options.setUseAero(chkUseAero.isSelected());
-        options.setUseVehicles(chkUseVehicles.isSelected());
-        options.setClanVehicles(chkClanVehicles.isSelected());
-        options.setDoubleVehicles(chkDoubleVehicles.isSelected());
-        options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-        options.setOpforLanceTypeMechs((Integer) spnOpforLanceTypeMechs.getValue());
-        options.setOpforLanceTypeMixed((Integer) spnOpforLanceTypeMixed.getValue());
-        options.setOpforLanceTypeVehicles((Integer) spnOpforLanceTypeVehicles.getValue());
-        options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
-        options.setAllowOpforAeros(chkOpforUsesAero.isSelected());
-        options.setAllowOpforLocalUnits(chkOpforUsesLocalForces.isSelected());
-        options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
-        options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
-        options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
-        options.setUseDropShips(chkUseDropShips.isSelected());
-
-        options.setStaticRATs(btnStaticRATs.isSelected());
-        options.setIgnoreRatEra(chkIgnoreRatEra.isSelected());
-        //Strip dates used in display name
-        String[] ratList = new String[chosenRatModel.size()];
-        for (int i = 0; i < chosenRatModel.size(); i++) {
-            ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
-        }
-        options.setRATs(ratList);
-        options.setSearchRadius((Integer) spnSearchRadius.getValue());
-        for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
-        }
-        options.setGenerateChases(chkGenerateChases.isSelected());
-        options.setVariableContractLength(chkVariableContractLength.isSelected());
-        options.setMercSizeLimited(chkMercSizeLimited.isSelected());
-        options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
-        options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
-        options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
-        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
-        options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
-        options.setUseLightConditions(chkUseLightConditions.isSelected());
-        options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
-        // End Against the Bot
-
-        campaign.setCampaignOptions(options);
-
-        MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
 
     private void btnOkayActionPerformed() {

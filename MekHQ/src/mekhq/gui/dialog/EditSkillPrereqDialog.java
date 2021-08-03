@@ -12,40 +12,25 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Hashtable;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrereq;
 import mekhq.campaign.personnel.SkillType;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Hashtable;
 
 /**
- *
  * @author  Taharqa
  */
 public class EditSkillPrereqDialog extends JDialog {
@@ -57,8 +42,8 @@ public class EditSkillPrereqDialog extends JDialog {
     private JButton btnOK;
     private boolean cancelled;
 
-    private Hashtable<String, JComboBox<String>> skillLevels = new Hashtable<String, JComboBox<String>>();
-    private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
+    private Hashtable<String, JComboBox<String>> skillLevels = new Hashtable<>();
+    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
     public EditSkillPrereqDialog(Frame parent, SkillPrereq pre) {
         super(parent, true);
@@ -84,20 +69,15 @@ public class EditSkillPrereqDialog extends JDialog {
         	chkSkill = new JCheckBox(type);
         	chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
         	skillChks.put(type, chkSkill);
-        	chkSkill.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					changeLevelEnabled(type);
-				}
-    		});
+        	chkSkill.addItemListener(e -> changeLevelEnabled(type));
 
-        	skillLvlModel = new DefaultComboBoxModel<String>();
+        	skillLvlModel = new DefaultComboBoxModel<>();
             skillLvlModel.addElement("None");
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
-    		choiceLvl = new JComboBox<String>(skillLvlModel);
+    		choiceLvl = new JComboBox<>(skillLvlModel);
     		choiceLvl.setEnabled(chkSkill.isSelected());
     		int lvl = prereq.getSkillLevel(type);
     		if(lvl < 0) {
@@ -112,18 +92,10 @@ public class EditSkillPrereqDialog extends JDialog {
 
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         btnOK.setText("Done"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                done();
-            }
-        });
+        btnOK.addActionListener(evt -> done());
 
         btnClose.setText("Cancel"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnClose.addActionListener(evt -> cancel());
 
         panButtons.add(btnOK);
         panButtons.add(btnClose);

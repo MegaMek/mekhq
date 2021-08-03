@@ -124,7 +124,7 @@ public class AtBGameThread extends GameThread {
 
                 MapSettings mapSettings = MapSettings.getInstance();
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1,  1); 
+                mapSettings.setMapSize(1, 1); 
                 mapSettings.getBoardsSelectedVector().clear();
                 
 
@@ -150,6 +150,9 @@ public class AtBGameThread extends GameThread {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                     
+                    // duplicate code, but getting a new instance of map settings resets the size parameters
+                    mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+                    mapSettings.setMapSize(1, 1); 
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 }
                 

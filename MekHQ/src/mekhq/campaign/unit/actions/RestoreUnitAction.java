@@ -187,8 +187,7 @@ public class RestoreUnitAction implements IUnitAction {
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
-        @Nullable
-        public Entity copy(Entity entity);
+        @Nullable Entity copy(Entity entity);
     }
 
     /**
@@ -201,8 +200,8 @@ public class RestoreUnitAction implements IUnitAction {
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
-        @Nullable
-        public Entity copy(Entity entity) {
+        @Override
+        public @Nullable Entity copy(Entity entity) {
             final MechSummary ms = MechSummaryCache.getInstance().getMech(entity.getShortNameRaw());
             try {
                 if (ms != null) {

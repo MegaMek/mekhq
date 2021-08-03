@@ -42,10 +42,12 @@ public class CargoReport extends Report {
         super(c);
     }
 
+    @Override
     public String getTitle() {
         return "Cargo Report";
     }
 
+    @Override
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));

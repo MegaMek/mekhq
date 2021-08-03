@@ -84,6 +84,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         return false;
     }
 
+    @Override
     public String getDesc() {
         String bonus = getAllMods(null).getValueAsString();
         if (getAllMods(null).getValue() > -1) {
