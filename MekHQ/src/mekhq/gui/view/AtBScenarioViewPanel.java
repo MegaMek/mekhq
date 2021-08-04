@@ -56,6 +56,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
@@ -72,7 +74,6 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
  * @author Neoancient
@@ -995,11 +996,13 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             String command = action.getActionCommand();
 
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
-                PrincessBehaviorDialog pbd = new PrincessBehaviorDialog(frame,
+                BotConfigDialog pbd = new BotConfigDialog(frame,
+                        null,
                         scenario.getBotForce(index).getBehaviorSettings(),
-                        scenario.getBotForce(index).getName());
+                        null);
+                pbd.setBotName(scenario.getBotForce(index).getName());
                 pbd.setVisible(true);
-                if (!pbd.dialogAborted) {
+                if (pbd.getResult() != DialogResult.CANCELLED) {
                     scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }
