@@ -40,6 +40,7 @@ public class PersonnelReport extends Report {
         super(c);
     }
 
+    @Override
     public String getTitle() {
         return "Personnel Report";
     }
@@ -60,6 +61,7 @@ public class PersonnelReport extends Report {
         return txtSupport;
     }
 
+    @Override
     public JTextPane getReport() {
         // SplitPane them
         JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getCombatPersonnelReport(), getSupportPersonnelReport());

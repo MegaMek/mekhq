@@ -145,14 +145,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         txtName = new javax.swing.JTextField(loan.getInstitution());
         txtName.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 changeInstitution();
             }
@@ -163,14 +166,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         });
         txtNumber = new javax.swing.JTextField(loan.getReferenceNumber());
         txtNumber.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 changeRefNumber();
             }

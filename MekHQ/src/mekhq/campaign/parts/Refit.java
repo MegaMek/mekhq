@@ -2155,6 +2155,7 @@ public class Refit extends Part implements IAcquisitionWork {
         return null;
     }
 
+    @Override
     public Money getStickerPrice() {
         return cost;
     }

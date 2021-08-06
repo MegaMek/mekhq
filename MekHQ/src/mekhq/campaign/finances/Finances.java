@@ -131,7 +131,7 @@ public class Finances implements Serializable {
         if (getBalance().isLessThan(amount)) {
             return false;
         }
-        Transaction t = new Transaction(amount.multipliedBy(-1), category, reason, date);
+        Transaction t = new Transaction(category, date, amount.multipliedBy(-1), reason);
         transactions.add(t);
         if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
@@ -141,7 +141,7 @@ public class Finances implements Serializable {
     }
 
     public void credit(Money amount, int category, String reason, LocalDate date) {
-        Transaction t = new Transaction(amount, category, reason, date);
+        Transaction t = new Transaction(category, date, amount, reason);
         transactions.add(t);
         if ((wentIntoDebt == null) && isInDebt()) {
             wentIntoDebt = date;
@@ -183,8 +183,8 @@ public class Finances implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
-        for (Transaction trans : getAllTransactions()) {
-            trans.writeToXml(pw1, indent + 1);
+        for (Transaction transaction : getAllTransactions()) {
+            transaction.writeToXML(pw1, indent + 1);
         }
         for (final Loan loan : getAllLoans()) {
             loan.writeToXML(pw1, indent + 1);
@@ -204,16 +204,20 @@ public class Finances implements Serializable {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
-                retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
-                retVal.loans.add(Loan.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
-                retVal.assets.add(Asset.generateInstanceFromXML(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
-                retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
+                    retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
+                    retVal.loans.add(Loan.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
+                    retVal.assets.add(Asset.generateInstanceFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
+                    retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
+                    retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

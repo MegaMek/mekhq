@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
 
@@ -34,16 +34,16 @@ import mekhq.campaign.unit.Unit;
  * @author Jay Lawson
  */
 public class TransportReport extends Report {
-
-
     public TransportReport(Campaign c) {
         super(c);
     }
 
+    @Override
     public String getTitle() {
         return "Transport Capacity Report";
     }
 
+    @Override
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
@@ -159,14 +159,14 @@ public class TransportReport extends Report {
                     "ASF Not Transported:", newNoASF));
         }
 
-        // Lets do Protomechs next.
+        // Lets do ProtoMechs next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Protomech Bays (Occupied):",
-                stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "Protomechs Not Transported:", noSC));
+                stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "ProtoMechs Not Transported:", noSC));
 
         sb.append("\n\n");
 
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Docking Collars (Occupied):",
-                stats.getTotalDockingCollars(), stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), "Dropships Not Transported:", noDS));
+                stats.getTotalDockingCollars(), stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), "DropShips Not Transported:", noDS));
 
         sb.append("\n\n");
 

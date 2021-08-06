@@ -35,6 +35,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                 .connect(loanTable);
     }
 
+    @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         int row = loanTable.getSelectedRow();
@@ -96,8 +97,8 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         JPopupMenu popup = new JPopupMenu();
 
         Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(loanTable.getSelectedRow()));
-        JMenuItem menuItem = null;
-        JMenu menu = null;
+        JMenuItem menuItem;
+        JMenu menu;
         // **lets fill the pop up menu**//
         menuItem = new JMenuItem("Pay Off Full Balance ("
                 + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
