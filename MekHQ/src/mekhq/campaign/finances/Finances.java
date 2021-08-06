@@ -101,7 +101,7 @@ public class Finances implements Serializable {
 
     public Money getLoanBalance() {
         Money balance = Money.zero();
-        return balance.plus(loans.stream().map(Loan::getRemainingValue).collect(Collectors.toList()));
+        return balance.plus(loans.stream().map(Loan::determineRemainingValue).collect(Collectors.toList()));
     }
 
     public boolean isInDebt() {
@@ -186,8 +186,8 @@ public class Finances implements Serializable {
         for (Transaction transaction : getAllTransactions()) {
             transaction.writeToXML(pw1, indent + 1);
         }
-        for (Loan loan : getAllLoans()) {
-            loan.writeToXml(pw1, indent + 1);
+        for (final Loan loan : getAllLoans()) {
+            loan.writeToXML(pw1, indent + 1);
         }
         for (Asset asset : getAllAssets()) {
             asset.writeToXML(pw1, indent + 1);
@@ -362,12 +362,11 @@ public class Finances implements Serializable {
         for (Loan loan : loans) {
             if (loan.checkLoanPayment(campaign.getLocalDate())) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                        String.format(resourceMap.getString("Loan.title"), loan),
                         campaign.getLocalDate())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            loan.getPaymentAmount().toAmountAndSymbolString(),
-                            loan.getDescription()));
+                            loan.getPaymentAmount().toAmountAndSymbolString(), loan));
                     loan.paidLoan();
                 } else {
                     campaign.addReport(String.format(
@@ -379,7 +378,7 @@ public class Finances implements Serializable {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
+                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan));
             }
         }
         if ((wentIntoDebt != null) && !isInDebt()) {
@@ -428,12 +427,11 @@ public class Finances implements Serializable {
         for (Loan loan : loans) {
             if (loan.isOverdue()) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                        String.format(resourceMap.getString("Loan.title"), loan),
                         campaign.getLocalDate())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            loan.getPaymentAmount().toAmountAndSymbolString(),
-                            loan.getDescription()));
+                            loan.getPaymentAmount().toAmountAndSymbolString(), loan));
                     loan.paidLoan();
                 } else {
                     overdueAmount = overdueAmount.plus(loan.getPaymentAmount());
@@ -442,7 +440,7 @@ public class Finances implements Serializable {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
+                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan));
             }
         }
         loans = newLoans;
@@ -478,7 +476,7 @@ public class Finances implements Serializable {
 
     public Money getTotalLoanCollateral() {
         Money amount = Money.zero();
-        return amount.plus(loans.stream().map(Loan::getCollateralAmount).collect(Collectors.toList()));
+        return amount.plus(loans.stream().map(Loan::determineCollateralAmount).collect(Collectors.toList()));
     }
 
     public Money getTotalAssetValue() {

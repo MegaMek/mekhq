@@ -52,8 +52,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                     .showConfirmDialog(
                             null,
                             "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
-                            "Default on " + selectedLoan.getDescription()
-                                    + "?", JOptionPane.YES_NO_OPTION)) {
+                            "Default on " + selectedLoan + "?", JOptionPane.YES_NO_OPTION)) {
                 PayCollateralDialog pcd = new PayCollateralDialog(
                         gui.getFrame(), true, gui.getCampaign(), selectedLoan);
                 pcd.setVisible(true);
@@ -102,9 +101,9 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menu;
         // **lets fill the pop up menu**//
         menuItem = new JMenuItem("Pay Off Full Balance ("
-                + loan.getRemainingValue().toAmountAndSymbolString() + ")");
+                + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
         menuItem.setActionCommand("PAY_BALANCE");
-        menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.getRemainingValue()));
+        menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.determineRemainingValue()));
         menuItem.addActionListener(this);
         popup.add(menuItem);
         menuItem = new JMenuItem("Default on This Loan");
