@@ -6196,27 +6196,27 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addLoan(Loan loan) {
-        addReport("You have taken out loan " + loan.getDescription()
+        addReport("You have taken out loan " + loan
                 + ". Your account has been credited "
                 + loan.getPrincipal().toAmountAndSymbolString()
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
         finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
-                "loan principal for " + loan.getDescription(), getLocalDate());
+                "loan principal for " + loan, getLocalDate());
     }
 
     public void payOffLoan(Loan loan) {
-        if (finances.debit(loan.getRemainingValue(),
-                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), getLocalDate())) {
+        if (finances.debit(loan.determineRemainingValue(),
+                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan, getLocalDate())) {
             addReport("You have paid off the remaining loan balance of "
-                    + loan.getRemainingValue().toAmountAndSymbolString()
-                    + "on " + loan.getDescription());
+                    + loan.determineRemainingValue().toAmountAndSymbolString()
+                    + "on " + loan);
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
             addReport("<font color='red'>You do not have enough funds to pay off "
-                    + loan.getDescription() + "</font>");
+                    + loan + "</font>");
         }
 
     }
