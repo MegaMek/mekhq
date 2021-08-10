@@ -112,20 +112,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-<<<<<<< HEAD
      * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
      * TODO : Some of this may want to be back-ported into entity itself in MM and then
      * TODO : re-factored out of EntityListFile.
      *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ
-=======
-     * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
-     *
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
-     * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
-     * MM and then re-factored out of EntityListFile.
->>>>>>> upstream/master
      *
      * @param tgtEnt The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
