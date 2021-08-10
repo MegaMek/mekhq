@@ -206,7 +206,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
                 final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
-                final LocalDate date = (preset.getDate() == null) ? campaign.getLocalDate() : preset.getDate();
+                final LocalDate date = ((preset == null) || (preset.getDate() == null))
+                        ? campaign.getLocalDate() : preset.getDate();
 
                 // show the date chooser
                 final DateChooser dc = new DateChooser(frame, date);
@@ -229,7 +230,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
 
                 campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
-                campaign.setStartingSystem(preset.getPlanet());
+                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
                 //campaign.getContractMarket().generateContractOffers(campaign, 2);

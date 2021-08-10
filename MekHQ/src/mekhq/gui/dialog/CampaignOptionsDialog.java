@@ -26,6 +26,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
@@ -5013,7 +5014,11 @@ public class CampaignOptionsDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    public void applyPreset(final CampaignPreset preset) {
+    public void applyPreset(final @Nullable CampaignPreset preset) {
+        if (preset == null) {
+            return;
+        }
+
         // Handle CampaignOptions and RandomSkillPreferences
         setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
 

@@ -5534,7 +5534,7 @@ public class Campaign implements Serializable, ITechManager {
     public void setStartingSystem(final @Nullable Planet planet) {
         PlanetarySystem startingSystem;
         if (planet == null) {
-            Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            final Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
             startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
             if (startingSystem == null) {
@@ -5548,7 +5548,7 @@ public class Campaign implements Serializable, ITechManager {
         } else {
             startingSystem = planet.getParentSystem();
         }
-        location = new CurrentLocation(startingSystem, 0);
+        setLocation(new CurrentLocation(startingSystem, 0));
     }
 
     /**
