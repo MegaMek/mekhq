@@ -39,6 +39,7 @@ import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
@@ -600,7 +601,8 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         StringBuilder report = new StringBuilder();
-        if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT, "Ship search", getLocalDate())) {
+        if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
+                getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
             report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
                     .append(" deducted for ship search.");
         } else {
@@ -666,7 +668,7 @@ public class Campaign implements Serializable, ITechManager {
         int transitDays = getCampaignOptions().getInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
-        getFinances().debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), getLocalDate());
+        getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
         addNewUnit(en, true, transitDays);
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
@@ -684,7 +686,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
-            if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getLocalDate())) {
+            if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
                         getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
@@ -1354,8 +1356,8 @@ public class Campaign implements Serializable, ITechManager {
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
-            if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
-                    "Recruitment of " + p.getFullName(), getLocalDate())) {
+            if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
+                    p.getSalary().multipliedBy(2), "Recruitment of " + p.getFullName())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -2898,7 +2900,8 @@ public class Campaign implements Serializable, ITechManager {
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";
-                finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), getLocalDate());
+                finances.debit(TransactionType.REPAIRS, getLocalDate(), cost,
+                        "Repair of " + partWork.getPartName());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().getSuccessXP();
@@ -3991,18 +3994,17 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-    public void addFunds(Money quantity) {
-        addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
+    public void addFunds(final Money quantity) {
+        addFunds(TransactionType.MISCELLANEOUS, quantity, null);
     }
 
-    public void addFunds(Money quantity, String description, int category) {
-        if (description == null || description.isEmpty()) {
+    public void addFunds(final TransactionType type, final Money quantity,
+                         @Nullable String description) {
+        if ((description == null) || description.isEmpty()) {
             description = "Rich Uncle";
         }
-        if (category == -1) {
-            category = Transaction.C_MISC;
-        }
-        finances.credit(quantity, category, description, getLocalDate());
+
+        finances.credit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
@@ -6018,13 +6020,13 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if (remainingMoney.isPositive()) {
-                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
-                        "Remaining payment for " + contract.getName(), getLocalDate());
+                getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
+                        "Remaining payment for " + contract.getName());
                 addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract " + contract.getName());
             } else if (remainingMoney.isNegative()) {
-                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
-                        "Repaying payment overages for " + contract.getName(), getLocalDate());
+                getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
+                        "Repaying payment overages for " + contract.getName());
                 addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
             }
@@ -6202,13 +6204,13 @@ public class Campaign implements Serializable, ITechManager {
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
-        finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
-                "loan principal for " + loan, getLocalDate());
+        finances.credit(TransactionType.LOAN_PRINCIPAL, getLocalDate(), loan.getPrincipal(),
+                "Loan principal for " + loan);
     }
 
     public void payOffLoan(Loan loan) {
-        if (finances.debit(loan.determineRemainingValue(),
-                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan, getLocalDate())) {
+        if (finances.debit(TransactionType.LOAN_PAYMENT, getLocalDate(), loan.determineRemainingValue(),
+                "Loan payoff for " + loan)) {
             addReport("You have paid off the remaining loan balance of "
                     + loan.determineRemainingValue().toAmountAndSymbolString()
                     + "on " + loan);
@@ -6286,8 +6288,8 @@ public class Campaign implements Serializable, ITechManager {
         if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
-                if (!(finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for "
-                                + u.getName(), getLocalDate()))) {
+                if (!(finances.debit(TransactionType.MAINTENANCE, getLocalDate(), u.getMaintenanceCost(),
+                        "Maintenance for " + u.getName()))) {
                     addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
                             + u.getHyperlinkedName() + "!</b></font>");
                     paidMaintenance = false;

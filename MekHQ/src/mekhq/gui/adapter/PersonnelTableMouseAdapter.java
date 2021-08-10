@@ -33,7 +33,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.*;
@@ -747,7 +747,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         JOptionPane.YES_NO_OPTION)) {
 
                     gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total.toAmountAndSymbolString()));
-                    gui.getCampaign().addFunds(total, resourceMap.getString("ransom.text"), Transaction.C_MISC);
+                    gui.getCampaign().addFunds(TransactionType.RANSOM, total, resourceMap.getString("ransom.text"));
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person, false);
                     }
