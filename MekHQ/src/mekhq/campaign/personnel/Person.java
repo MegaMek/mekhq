@@ -360,6 +360,8 @@ public class Person implements Serializable {
         secondaryRole = PersonnelRole.NONE;
         primaryDesignator = ROMDesignation.NONE;
         secondaryDesignator = ROMDesignation.NONE;
+        setBirthday(LocalDate.now());
+
         commander = false;
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
@@ -390,7 +392,6 @@ public class Person implements Serializable {
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
-        birthday = null;
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
