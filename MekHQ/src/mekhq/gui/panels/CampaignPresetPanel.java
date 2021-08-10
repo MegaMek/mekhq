@@ -20,14 +20,12 @@ package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.CampaignPresetCustomizationDialog;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 public class CampaignPresetPanel extends AbstractMHQPanel {
     //region Variable Declarations
