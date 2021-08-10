@@ -64,27 +64,6 @@ public class Finances implements Serializable {
     private int failCollateral;
     private LocalDate wentIntoDebt;
 
-    public static final int SCHEDULE_BIWEEKLY  = 0;
-    public static final int SCHEDULE_MONTHLY   = 1;
-    public static final int SCHEDULE_QUARTERLY = 2;
-    public static final int SCHEDULE_YEARLY    = 3;
-    public static final int SCHEDULE_NUM       = 4;
-
-    public static String getScheduleName(int schedule) {
-        switch (schedule) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                return "Bi-Weekly";
-            case Finances.SCHEDULE_MONTHLY:
-                return "Monthly";
-            case Finances.SCHEDULE_QUARTERLY:
-                return "Quarterly";
-            case Finances.SCHEDULE_YEARLY:
-                return "Yearly";
-            default:
-                return "?";
-        }
-    }
-
     public Finances() {
         transactions = new ArrayList<>();
         loans = new ArrayList<>();
@@ -254,15 +233,15 @@ public class Finances implements Serializable {
         }
 
         // Handle assets
-        for (Asset asset : assets) {
-            if ((asset.getFinancialTerm() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
+        for (final Asset asset : assets) {
+            if (asset.getFinancialTerm().isAnnually() && (campaign.getLocalDate().getDayOfYear() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
                         asset.getName()));
-            } else if ((asset.getFinancialTerm() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
+            } else if (asset.getFinancialTerm().isMonthly() && (campaign.getLocalDate().getDayOfMonth() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
