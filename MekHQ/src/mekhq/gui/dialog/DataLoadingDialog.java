@@ -206,6 +206,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
                 final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
+                if ((preset != null) && (preset.getGameOptions() != null)) {
+                    campaign.setGameOptions(preset.getGameOptions());
+                }
+
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
                         ? campaign.getLocalDate() : preset.getDate();
 
@@ -233,7 +237,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
-                //campaign.getContractMarket().generateContractOffers(campaign, 2);
+                //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
                 campaign.getUnitMarket().generateUnitOffers(campaign);
                 campaign.reloadNews();
                 campaign.readNews();

@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -41,7 +42,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -50,23 +50,16 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -83,8 +76,8 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -122,8 +115,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region General Tab
     private JPanel panGeneral;
     private JTextField txtName;
-    private JComboBox<String> comboFaction;
-    private SortedComboBoxModel<String> factionModel;
+    private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
@@ -626,16 +618,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblFaction, gridBagConstraints);
 
-        factionModel = new SortedComboBoxModel<>();
-        for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
-            if (faction.validIn(date.getYear())) {
-                factionModel.addElement(faction.getFullName(date.getYear()));
-            }
-        }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
-        comboFaction = new JComboBox<>();
-        comboFaction.setName("comboFaction");
-        comboFaction.setModel(factionModel);
+        final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
+        factionModel.addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
+        comboFaction = new MMComboBox<>("comboFaction", factionModel);
+        comboFaction.setSelectedItem(campaign.getFaction());
         comboFaction.setMinimumSize(new Dimension(400, 30));
         comboFaction.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints.gridx = gridx--;
@@ -5019,11 +5006,23 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
+        // Handle Date
+        setDate(preset.getDate());
+
+        // Handle Faction
+        if (preset.getFaction() != null) {
+            comboFaction.setSelectedItem(preset.getFaction());
+        }
+
+        if (preset.getRankSystem() != null) {
+            rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
+        }
+
         // Handle CampaignOptions and RandomSkillPreferences
         setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
 
         // Handle SPAs
-        tempSPA = (preset.getSpecialAbilities() != null) ? preset.getSpecialAbilities() : new Hashtable<>();
+        tempSPA = (preset.getSpecialAbilities() == null) ? new Hashtable<>() : preset.getSpecialAbilities();
         recreateSPAPanel(!getUnusedSPA().isEmpty());
 
         if (preset.getSkills() != null) {
@@ -5032,10 +5031,10 @@ public class CampaignOptionsDialog extends JDialog {
             ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
 
             // Overwriting Skill List
-            for (String skillName : SkillType.getSkillList()) {
-                SkillType skillType = preset.getSkills().get(skillName);
+            for (final String skillName : SkillType.getSkillList()) {
+                final SkillType skillType = preset.getSkills().get(skillName);
 
-                JSpinner spnTarget = hashSkillTargets.get(skillName);
+                final JSpinner spnTarget = hashSkillTargets.get(skillName);
                 if (spnTarget == null) {
                     continue;
                 }
@@ -5049,7 +5048,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    public void setOptions(CampaignOptions options, RandomSkillPreferences randomSkillPreferences) {
+    public void setOptions(@Nullable CampaignOptions options,
+                           @Nullable RandomSkillPreferences randomSkillPreferences) {
         // Use the provided options and preferences when possible, but flip if they are null to be safe
         if (options != null) {
             this.options = options;
@@ -5936,17 +5936,21 @@ public class CampaignOptionsDialog extends JDialog {
         DateChooser dc = new DateChooser(frame, date);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
-            factionModel = new SortedComboBoxModel<>();
-            for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
-                if (faction.validIn(date.getYear())) {
-                    factionModel.addElement(faction.getFullName(date.getYear()));
-                }
-            }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
-            comboFaction.setModel(factionModel);
+            setDate(dc.getDate());
         }
+    }
+
+    private void setDate(final @Nullable LocalDate date) {
+        if (date == null) {
+            return;
+        }
+
+        this.date = date;
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+
+        comboFaction.removeAllItems();
+        ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
     }
 
     private void btnIconActionPerformed(ActionEvent evt) {
