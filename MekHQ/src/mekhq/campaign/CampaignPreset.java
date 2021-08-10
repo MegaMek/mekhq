@@ -255,6 +255,7 @@ public class CampaignPreset implements Serializable {
     }
 
     public void applyContinuousToCampaign(final Campaign campaign) {
+        // TODO : implement me
         if (getCampaignOptions() != null) {
             campaign.setCampaignOptions(getCampaignOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));

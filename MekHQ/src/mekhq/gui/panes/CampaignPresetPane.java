@@ -80,7 +80,7 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
     }
 
     @Override
-    protected void setCustomPreferences(PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
         preferences.manage(new JListPreference(getPresets()));
     }

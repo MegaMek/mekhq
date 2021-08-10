@@ -622,7 +622,7 @@ public class CampaignOptionsDialog extends JDialog {
         factionModel.addAll(FactionDisplay
                 .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
         comboFaction = new MMComboBox<>("comboFaction", factionModel);
-        comboFaction.setSelectedItem(campaign.getFaction());
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), date));
         comboFaction.setMinimumSize(new Dimension(400, 30));
         comboFaction.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints.gridx = gridx--;
@@ -5011,7 +5011,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Handle Faction
         if (preset.getFaction() != null) {
-            comboFaction.setSelectedItem(preset.getFaction());
+            comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
         }
 
         if (preset.getRankSystem() != null) {
@@ -5503,8 +5503,7 @@ public class CampaignOptionsDialog extends JDialog {
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-            campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
-                    (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
+            campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
             if (null != comboFactionNames.getSelectedItem()) {
                 RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
             }
@@ -5948,9 +5947,11 @@ public class CampaignOptionsDialog extends JDialog {
         this.date = date;
         btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
 
+        final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
         ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
                 .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
+        comboFaction.setSelectedItem(factionDisplay);
     }
 
     private void btnIconActionPerformed(ActionEvent evt) {
