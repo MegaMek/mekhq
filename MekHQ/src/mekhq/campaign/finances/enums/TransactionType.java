@@ -193,6 +193,8 @@ public enum TransactionType {
                     return REPAIRS;
                 case 16:
                     return RANSOM;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
 

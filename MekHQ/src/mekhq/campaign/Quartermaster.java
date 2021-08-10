@@ -463,7 +463,7 @@ public class Quartermaster {
 
         if (getCampaignOptions().payForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
-            if (getCampaign().getFinances().debit(TransactionType.UNIT_SALE, getCampaign().getLocalDate(),
+            if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                     cost, "Purchased " + en.getShortName())) {
                 getCampaign().addNewUnit(en, false, days);
                 return true;

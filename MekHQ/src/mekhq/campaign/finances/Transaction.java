@@ -134,7 +134,7 @@ public class Transaction implements Serializable {
                     transaction.setAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
                     transaction.setDescription(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("category")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("category")) { // Legacy - 0.49.4 Removal
                     transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
