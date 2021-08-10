@@ -87,7 +87,7 @@ public class AtBScenarioModifierApplicator {
      */
     private static void preAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
         if (scenario.getTemplate() != null) {
-            scenario.getTemplate().scenarioForces.put(forceToApply.getForceName(), forceToApply);
+            scenario.getTemplate().getScenarioForces().put(forceToApply.getForceName(), forceToApply);
         }
     }
 

@@ -149,11 +149,11 @@ public final class StarUtil {
     private static final int[] HOT_SPECTRAL_TYPE = {
             PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_A, PlanetarySystem.SPECTRAL_A, PlanetarySystem.SPECTRAL_A,
             PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F};
-    
+
     private static final int[] LIFEFRIENDLY_SPECTRAL_TYPE = new int[]{
             PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_K, PlanetarySystem.SPECTRAL_K,
             PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F};
-    
+
     private static final double[] MIN_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -424,7 +424,7 @@ public final class StarUtil {
         if( null == spectralClass || null == subtype ) {
             return null;
         }
-        
+
         if(spectralClass == PlanetarySystem.SPECTRAL_Q) {
             return (null != luminosity) ? "Q" + luminosity : "Q"; //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -437,7 +437,7 @@ public final class StarUtil {
         String subtypeFormat = "%.2f"; //$NON-NLS-1$
         if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
         else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
-        
+
         if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI) ) {
             // subdwarfs
             return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
@@ -518,7 +518,7 @@ public final class StarUtil {
                 // We might have a luminosity, try to parse it
                 parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
                 //Taharqa: This was code from akjosch, trying to be all realistic. However, the
-                //code in Campaign Ops conflicts with this which causes null values and NPE bugs, so 
+                //code in Campaign Ops conflicts with this which causes null values and NPE bugs, so
                 //I don't really care how white dwarfs really work
                 //if( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
                     // That's not how white dwarfs work
@@ -569,10 +569,10 @@ public final class StarUtil {
     }
 
     public static String getPopulationRatingString(int pops) {
-        if(pops < 0) {
+        if (pops < 0) {
             return "None";
         }
-        switch(pops) {
+        switch (pops) {
             case 0: return "Few";
             case 1: return "Tens";
             case 2: return "Hundreds";
@@ -591,10 +591,10 @@ public final class StarUtil {
     }
 
     public static String getControlRatingString(int cr) {
-        if(cr < 0) {
+        if (cr < 0) {
             return "in total anarchy";
         }
-        switch(cr) {
+        switch (cr) {
             case 0: return "in anarchy";
             case 1: return "very free society";
             case 2: return "free society";
@@ -607,10 +607,10 @@ public final class StarUtil {
     }
 
     public static String getHPGClass(Integer hpg) {
-        if(null == hpg) {
+        if (null == hpg) {
             return null;
         }
-        switch(hpg.intValue()) {
+        switch (hpg) {
             case EquipmentType.RATING_A: return "A-rated HPG";
             case EquipmentType.RATING_B: return "B-rated HPG";
             case EquipmentType.RATING_C: return "C-rated Service (pony express)";
@@ -621,55 +621,48 @@ public final class StarUtil {
     }
 
     public static String getIconImage(Planet planet) {
-        final String METHOD_NAME = "getIconImage(Planet)"; //$NON-NLS-1$
-
-        if(!planetIconDataLoaded) {
-            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", PLANET_ICON_DATA_FILE)))) {
+        if (!planetIconDataLoaded) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(new File("data", PLANET_ICON_DATA_FILE)))) {
                 String line;
-                while(null != (line = reader.readLine())) {
-                    if(line.startsWith("#")) {
+                while (null != (line = reader.readLine())) {
+                    if (line.startsWith("#")) {
                         // Ignore comments
                         continue;
                     }
                     String[] parts = line.split("=", 2);
-                    if((null != parts) && (parts.length == 2)) {
+                    if (parts.length == 2) {
                         PLANET_ICON_DATA.put(parts[0], parts[1]);
                     }
                 }
                 planetIconDataLoaded = true;
-            } catch (FileNotFoundException e) {
-                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
-            } catch (IOException e) {
-                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
-        if(!PLANET_ICON_DATA.containsKey(Utilities.nonNull(planet.getIcon(), "default"))) {
-            MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, "no planet icon " + planet.getIcon());
+
+        if (!PLANET_ICON_DATA.containsKey(Utilities.nonNull(planet.getIcon(), "default"))) {
+            MekHQ.getLogger().error("no planet icon " + planet.getIcon());
         }
         return PLANET_ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
     }
-    
-    public static String getIconImage(PlanetarySystem system) {
-        final String METHOD_NAME = "getIconImage(PlanetarySystem)"; //$NON-NLS-1$
 
-        if(!starIconDataLoaded) {
-            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", STAR_ICON_DATA_FILE)))) {
+    public static String getIconImage(PlanetarySystem system) {
+        if (!starIconDataLoaded) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(new File("data", STAR_ICON_DATA_FILE)))) {
                 String line;
-                while(null != (line = reader.readLine())) {
-                    if(line.startsWith("#")) {
+                while (null != (line = reader.readLine())) {
+                    if (line.startsWith("#")) {
                         // Ignore comments
                         continue;
                     }
                     String[] parts = line.split("=", 2);
-                    if((null != parts) && (parts.length == 2)) {
+                    if (parts.length == 2) {
                         STAR_ICON_DATA.put(parts[0], parts[1]);
                     }
                 }
                 starIconDataLoaded = true;
-            } catch (FileNotFoundException e) {
-                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
-            } catch (IOException e) {
-                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));

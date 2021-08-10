@@ -32,7 +32,6 @@ import mekhq.gui.utilities.JMoneyTextField;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- *
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
@@ -61,7 +60,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
         btnAddFunds.setName("btnAddFunds"); // NOI18N
-        btnAddFunds.addActionListener(evt -> btnAddFundsActionPerformed(evt));
+        btnAddFunds.addActionListener(this::btnAddFundsActionPerformed);
 
         getContentPane().add(buildFieldsPanel(), BorderLayout.NORTH);
         getContentPane().add(btnAddFunds, BorderLayout.PAGE_END);
@@ -112,7 +111,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     }
 
     public int getCategory() {
-        return Transaction.getCategoryIndex((String)categoryCombo.getSelectedItem());
+        return Transaction.getCategoryIndex((String) categoryCombo.getSelectedItem());
     }
 
     @Override
@@ -131,25 +130,24 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         return closedType;
     }
 
-    private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
+    private void btnAddFundsActionPerformed(ActionEvent evt) {
         this.closedType = JOptionPane.OK_OPTION;
         this.setVisible(false);
-    }//GEN-LAST:event_btnAddFundsActionPerformed
+    }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
-                dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
         });
     }
 }

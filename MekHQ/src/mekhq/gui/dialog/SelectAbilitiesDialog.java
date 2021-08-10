@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -39,7 +38,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class SelectAbilitiesDialog extends JDialog {
@@ -69,15 +67,13 @@ public class SelectAbilitiesDialog extends JDialog {
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
 
-        chkAbil = new ArrayList<JCheckBox>();
-        spaNames = new ArrayList<String>();
+        chkAbil = new ArrayList<>();
+        spaNames = new ArrayList<>();
 
-        for(String name: allSPA.keySet()) {
-        	spaNames.add(name);
-        }
+        spaNames.addAll(allSPA.keySet());
 
         int ncol = 3;
-        JPanel panMain = new JPanel(new GridLayout((int)Math.ceil(spaNames.size() / (ncol*1.0)),ncol));
+        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(spaNames.size() / (ncol * 1.0)),ncol));
 
         JCheckBox chk;
         for(String name : spaNames) {
@@ -90,19 +86,11 @@ public class SelectAbilitiesDialog extends JDialog {
         }
 
         JPanel panButtons = new JPanel(new GridLayout(0,2));
-        btnOK.setText("Done"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                done();
-            }
-        });
+        btnOK.setText("Done");
+        btnOK.addActionListener(evt -> done());
 
-        btnClose.setText("Cancel"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnClose.setText("Cancel");
+        btnClose.addActionListener(evt -> cancel());
 
         panButtons.add(btnOK);
         panButtons.add(btnClose);
@@ -125,9 +113,9 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void done() {
-    	selected = new Vector<String>();
-    	for(int i = 0; i < spaNames.size(); i++) {
-    		if(chkAbil.get(i).isSelected()) {
+    	selected = new Vector<>();
+    	for (int i = 0; i < spaNames.size(); i++) {
+    		if (chkAbil.get(i).isSelected()) {
     			selected.add(spaNames.get(i));
     		}
     	}

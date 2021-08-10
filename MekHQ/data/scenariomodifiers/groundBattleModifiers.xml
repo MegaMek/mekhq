@@ -29,6 +29,9 @@
 			LocalGarrisonTurrets.xml
 		</modifier>
 		<modifier>
+			LocalGarrisonBoats.xml
+		</modifier>
+		<modifier>
 			EnemyTurrets.xml
 		</modifier>
 		<modifier>

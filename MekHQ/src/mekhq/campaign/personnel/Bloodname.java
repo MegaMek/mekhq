@@ -21,24 +21,22 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.util.*;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -85,6 +83,10 @@ public class Bloodname implements Serializable {
 
     public String getFounder() {
         return founder;
+    }
+
+    public Clan getOriginClan() {
+        return origClan;
     }
 
     public String getOrigClan() {
@@ -172,43 +174,47 @@ public class Bloodname implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
 
-            if (wn.getNodeName().equalsIgnoreCase("name")) {
-                retVal.name = wn.getTextContent().trim();
-            } else if (wn.getNodeName().equalsIgnoreCase("founder")) {
-                retVal.founder = wn.getTextContent().trim();
-            } else if (wn.getNodeName().equalsIgnoreCase("clan")) {
-                retVal.origClan = Clan.getClan(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("exclusive")) {
-                retVal.exclusive = true;
-            } else if (wn.getNodeName().equalsIgnoreCase("reaved")) {
-                retVal.inactive = Integer.parseInt(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("dormant")) {
-                retVal.inactive = Integer.parseInt(wn.getTextContent().trim()) + 10;
-            } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
-                retVal.abjured = Integer.parseInt(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
-                retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
-            } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
-                String[] clans = wn.getTextContent().trim().split(",");
-                for (String c : clans) {
-                    retVal.postReavingClans.add(Clan.getClan(c));
+            try {
+                if (wn.getNodeName().equalsIgnoreCase("name")) {
+                    retVal.name = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("founder")) {
+                    retVal.founder = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("clan")) {
+                    retVal.origClan = Clan.getClan(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("exclusive")) {
+                    retVal.exclusive = true;
+                } else if (wn.getNodeName().equalsIgnoreCase("reaved")) {
+                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("dormant")) {
+                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim()) + 10;
+                } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
+                    retVal.abjured = Integer.parseInt(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
+                    retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
+                } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
+                    retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
+                    String[] clans = wn.getTextContent().trim().split(",");
+                    for (String c : clans) {
+                        retVal.postReavingClans.add(Clan.getClan(c));
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
+                    retVal.acquiringClans.add(new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
+                            wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
+                    retVal.acquiringClans.add(new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                            wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
+                    retVal.absorbed = new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                            wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("created")) {
+                    retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
-            } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
-                retVal.acquiringClans.add(new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
-                        wn.getTextContent().trim()));
-            } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
-                retVal.acquiringClans.add(new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                        wn.getTextContent().trim()));
-            } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
-                retVal.absorbed = new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                        wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("created")) {
-                retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -411,12 +417,12 @@ public class Bloodname implements Serializable {
         Clan.loadClanData();
         bloodnames = new ArrayList<>();
 
-        File f = new File("data/names/bloodnames/bloodnames.xml");
+        File f = new File("data/names/bloodnames/bloodnames.xml"); // TODO : Remove inline file path
         FileInputStream fis;
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Bloodname.class, "Cannot find file bloodnames.xml");
+            MekHQ.getLogger().error("Cannot find file bloodnames.xml");
             return;
         }
 
@@ -427,8 +433,7 @@ public class Bloodname implements Serializable {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, "Could not parse bloodnames.xml");
-            MekHQ.getLogger().error(Bloodname.class, ex);
+            MekHQ.getLogger().error("Could not parse bloodnames.xml", ex);
             return;
         }
 
@@ -444,7 +449,7 @@ public class Bloodname implements Serializable {
                 }
             }
         }
-        MekHQ.getLogger().info(Bloodname.class, "Loaded " + bloodnames.size() + " Bloodname records.");
+        MekHQ.getLogger().info("Loaded " + bloodnames.size() + " Bloodname records.");
     }
 
     private static class NameAcquired {
@@ -488,17 +493,29 @@ public class Bloodname implements Serializable {
         }
 
         @Override
-        public Object clone() {
-            return new Fraction(this);
-        }
-
-        @Override
         public String toString() {
             return numerator + "/" + denominator;
         }
 
-        public boolean equals(Fraction f) {
-            return value() == f.value();
+        @Override
+        public boolean equals(final @Nullable Object object) {
+            if (this == object) {
+                return true;
+            } else if (!(object instanceof Fraction)) {
+                return false;
+            } else {
+                return value() == ((Fraction) object).value();
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Double.valueOf(value()).hashCode();
+        }
+
+        @Override
+        public Object clone() {
+            return new Fraction(this);
         }
 
         public double value() {

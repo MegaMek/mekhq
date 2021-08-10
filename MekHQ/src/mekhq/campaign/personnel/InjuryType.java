@@ -75,7 +75,7 @@ public class InjuryType {
             throw new IllegalArgumentException("Injury type key can't be an empty string.");
         }
         if (REV_REGISTRY.containsKey(injType)) {
-            throw new IllegalArgumentException("Injury type " + injType + " is already registered");
+            throw new IllegalArgumentException("Injury type " + injType.getSimpleName() + " is already registered");
         }
         // All checks done
         if (id >= 0) {

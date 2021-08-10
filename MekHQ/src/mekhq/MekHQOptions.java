@@ -479,7 +479,7 @@ public final class MekHQOptions {
 
     //region File Paths
     /**
-     * @return the path of the folder to load when loading or saving rank systems
+     * @return the path of the folder to load when loading or saving bulk rank systems
      */
     public String getRankSystemsPath() {
         return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, "userdata/data/universe/");
@@ -489,7 +489,7 @@ public final class MekHQOptions {
      * This sets the path where one saves or loads their rank systems from, as this is not required
      * for any data but improves UX.
      *
-     * @param value the path where the person saved their last individual rank system.
+     * @param value the path where the person saved their last bulk rank system export
      */
     public void setRankSystemsPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, value);
@@ -512,6 +512,16 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
     //endregion File Paths
+
+    //region Nag Tab
+    public boolean getNagDialogIgnore(final String key) {
+        return userPreferences.node(MekHqConstants.NAG_NODE).getBoolean(key, false);
+    }
+
+    public void setNagDialogIgnore(final String key, final boolean value) {
+        userPreferences.node(MekHqConstants.NAG_NODE).putBoolean(key, value);
+    }
+    //endregion Nag Tab
 
     //region Miscellaneous Options
     public int getStartGameDelay() {

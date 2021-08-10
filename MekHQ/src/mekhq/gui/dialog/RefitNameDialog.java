@@ -123,13 +123,9 @@ public class RefitNameDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtModel, gridBagConstraints);
 
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
+        btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -138,13 +134,9 @@ public class RefitNameDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnClose"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnCancel.setText(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
+        btnCancel.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -163,16 +155,16 @@ public class RefitNameDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
     	String chassis = txtChassis.getText().trim();
     	String model = txtModel.getText().trim();
-    	if(chassis.isEmpty()) {
+    	if (chassis.isEmpty()) {
     		chassis = refit.getOriginalEntity().getChassis();
     	}
-    	if(model.isEmpty()) {
+    	if (model.isEmpty()) {
     		model = refit.getOriginalEntity().getModel() + " Mk II";
     	}
-    	if(null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
+    	if (null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
     		JOptionPane.showMessageDialog(null,
 					"There is already a unit in the database with this name.\nPlease select a different name.",
 					"Name already in use",
@@ -184,7 +176,7 @@ public class RefitNameDialog extends JDialog {
     	this.setVisible(false);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
     	cancelled = true;
     	this.setVisible(false);
     }

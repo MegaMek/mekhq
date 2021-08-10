@@ -53,8 +53,8 @@ public class StratconCampaignState {
     private double globalOpforBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
-    private String briefingText; 
-    private boolean strategicObjectivesBehaveAsVPs;
+    private String briefingText;
+    private boolean allowEarlyVictory;
     
     // these are applied to any scenario generated in the campaign; use sparingly
     private List<String> globalScenarioModifiers = new ArrayList<>(); 
@@ -133,12 +133,12 @@ public class StratconCampaignState {
         this.briefingText = briefingText;
     }
 
-    public boolean strategicObjectivesBehaveAsVPs() {
-        return strategicObjectivesBehaveAsVPs;
+    public boolean allowEarlyVictory() {
+        return allowEarlyVictory;
     }
 
-    public void setStrategicObjectivesBehaveAsVPs(boolean strategicObjectivesBehaveAsVPs) {
-        this.strategicObjectivesBehaveAsVPs = strategicObjectivesBehaveAsVPs;
+    public void setAllowEarlyVictory(boolean allowEarlyVictory) {
+        this.allowEarlyVictory = allowEarlyVictory;
     }
 
     public List<String> getGlobalScenarioModifiers() {

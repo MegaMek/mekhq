@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,10 +19,18 @@
 package mekhq.gui.displayWrappers;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.universe.Faction;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * FactionDisplay is a display wrapper around a Faction, primarily to be used in ComboBoxes.
+ * This removes the need to track based on the index, thus simplifying the dev work.
+ */
 public class FactionDisplay {
     //region Variable Declarations
     private final Faction faction;
@@ -30,21 +38,28 @@ public class FactionDisplay {
     //endregion Variable Declarations
 
     //region Constructors
-    public FactionDisplay(final Faction faction, final int year) {
-        this(faction, LocalDate.ofYearDay(year, 1));
-    }
-
-    public FactionDisplay(final Faction faction, final LocalDate year) {
+    public FactionDisplay(final Faction faction, final LocalDate today) {
         this.faction = faction;
-        this.displayName = String.format("%s [%s]", faction.getFullName(year.getYear()), faction.getId());
+        this.displayName = String.format("%s [%s]", getFaction().getFullName(today.getYear()),
+                getFaction().getShortName());
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public Faction getFaction() {
         return faction;
     }
-    //endregion Getters
+    //endregion Getters/Setters
+
+    public static List<FactionDisplay> getSortedValidFactionDisplays(
+            final Collection<Faction> factions, final LocalDate today) {
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        return factions.stream()
+                .filter(faction -> faction.validIn(today))
+                .map(faction -> new FactionDisplay(faction, today))
+                .sorted((a, b) -> naturalOrderComparator.compare(a.toString(), b.toString()))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public String toString() {
@@ -52,13 +67,17 @@ public class FactionDisplay {
     }
 
     @Override
-    public boolean equals(final @Nullable Object object) {
-        if (this == object) {
-            return true;
-        } else if (!(object instanceof FactionDisplay)) {
+    public boolean equals(final @Nullable Object other) {
+        if (other == null) {
             return false;
+        } else if (this == other) {
+            return true;
+        } else if (other instanceof FactionDisplay) {
+            return getFaction().equals(((FactionDisplay) other).getFaction());
+        } else if (other instanceof Faction) {
+            return getFaction().equals(other);
         } else {
-            return getFaction().equals(((FactionDisplay) object).getFaction());
+            return false;
         }
     }
 
@@ -67,4 +86,3 @@ public class FactionDisplay {
         return getFaction().hashCode();
     }
 }
-

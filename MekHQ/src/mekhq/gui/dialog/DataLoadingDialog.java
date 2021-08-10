@@ -209,7 +209,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 final LocalDate date = (preset.getDate() == null) ? campaign.getLocalDate() : preset.getDate();
 
                 // show the date chooser
-                DateChooser dc = new DateChooser(frame, date);
+                final DateChooser dc = new DateChooser(frame, date);
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
                     campaign.setLocalDate(dc.getDate());
@@ -230,9 +230,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
                 campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                 campaign.setStartingSystem(preset.getPlanet());
-                campaign.generateNewPersonnelMarket();
+                campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
+                // TODO : AbstractContractMarket : Uncomment
+                //campaign.getContractMarket().generateContractOffers(campaign, 2);
+                campaign.getUnitMarket().generateUnitOffers(campaign);
                 campaign.reloadNews();
                 campaign.readNews();
+
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
@@ -325,5 +329,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             default:
                 break;
         }
+
+        getAccessibleContext().setAccessibleDescription(
+                String.format(resourceMap.getString("accessibleDescription.format"), progressBar.getString()));
     }
 }

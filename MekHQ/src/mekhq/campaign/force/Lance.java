@@ -36,10 +36,11 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -289,7 +290,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             // No battle
             return null;
         }
-        
+
         // if we are using StratCon, don't *also* generate legacy scenarios
         if (c.getCampaignOptions().getUseStratCon() &&
                 (getContract(c).getStratconCampaignState() != null)) {
@@ -298,7 +299,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
-        int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
+        int battleTypeMod = 1 + (AtBMoraleLevel.NORMAL.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular scenario.
@@ -473,8 +474,6 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)";
-
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -497,7 +496,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
         return retVal;
     }

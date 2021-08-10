@@ -13,9 +13,9 @@ import mekhq.campaign.unit.Unit;
 public class OrgTreeModel implements TreeModel {
 
     private Force rootForce;
-    private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+    private Vector<TreeModelListener> listeners = new Vector<>();
     private Campaign campaign;
-    
+
     public OrgTreeModel(Campaign c) {
         campaign = c;
         rootForce = campaign.getForces();
@@ -23,24 +23,24 @@ public class OrgTreeModel implements TreeModel {
 
     @Override
     public Object getChild(Object parent, int index) {
-        if(parent instanceof Force) {
-            return ((Force)parent).getAllChildren(campaign).get(index);
+        if (parent instanceof Force) {
+            return ((Force) parent).getAllChildren(campaign).get(index);
         }
         return null;
     }
 
     @Override
     public int getChildCount(Object parent) {
-        if(parent instanceof Force) {
-            return ((Force)parent).getAllChildren(campaign).size();
+        if (parent instanceof Force) {
+            return ((Force) parent).getAllChildren(campaign).size();
         }
         return 0;
     }
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if(parent instanceof Force) {
-            return ((Force)parent).getAllChildren(campaign).indexOf(child);
+        if (parent instanceof Force) {
+            return ((Force) parent).getAllChildren(campaign).indexOf(child);
         }
         return 0;
     }
@@ -52,7 +52,7 @@ public class OrgTreeModel implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        return node instanceof Unit || (node instanceof Force && ((Force)node).getAllChildren(campaign).size() == 0);
+        return node instanceof Unit || (node instanceof Force && ((Force) node).getAllChildren(campaign).size() == 0);
     }
 
     @Override
@@ -61,15 +61,17 @@ public class OrgTreeModel implements TreeModel {
 
     }
 
-    public void addTreeModelListener( TreeModelListener listener ) {
-        if ( listener != null && !listeners.contains( listener ) ) {
+    @Override
+    public void addTreeModelListener(TreeModelListener listener) {
+        if ((listener != null) && !listeners.contains(listener)) {
             listeners.addElement( listener );
         }
     }
 
-    public void removeTreeModelListener( TreeModelListener listener ) {
-        if ( listener != null ) {
-            listeners.removeElement( listener );
+    @Override
+    public void removeTreeModelListener(TreeModelListener listener) {
+        if (listener != null) {
+            listeners.removeElement(listener);
         }
     }
 }

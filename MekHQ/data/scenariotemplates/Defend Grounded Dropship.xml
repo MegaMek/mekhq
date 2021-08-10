@@ -15,6 +15,59 @@
         <useStandardAtBSizing>true</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>DropShip</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+                <additionalDetail>If the DropShip cannot be deployed, this objective may be ignored.</additionalDetail>
+            </additionalDetails>
+            <description>Protect the following units:</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimit>30</timeLimit>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitType>Fixed</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects/>
+            <additionalDetails/>
+            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
     <scenarioForces>
         <entry>
             <key>Player</key>
@@ -39,7 +92,7 @@
                     <deploymentZone>8</deploymentZone>
                     <deploymentZone>9</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -78,7 +131,7 @@
                     <deploymentZone>8</deploymentZone>
                     <deploymentZone>9</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -109,12 +162,12 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Dropship</forceName>
-                <generationMethod>3</generationMethod>
+                <generationMethod>4</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
@@ -126,57 +179,4 @@
             </value>
         </entry>
     </scenarioForces>
-    <scenarioObjectives>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Dropship</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
-            </additionalDetails>
-            <description>Protect the following units:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>30</timeLimit>
-            <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitType>Fixed</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects/>
-            <additionalDetails/>
-            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-    </scenarioObjectives>
 </ScenarioTemplate>

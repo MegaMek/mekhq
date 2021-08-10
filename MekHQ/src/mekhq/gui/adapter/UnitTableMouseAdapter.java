@@ -88,6 +88,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -138,7 +139,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
-    public static final String COMMAND_SHOW_BV_CALC = "SHOW_BV_CALC";
     public static final String COMMAND_CHANGE_MAINT_MULTI = "CHANGE_MAINT_MULT";
     //endregion Standard Commands
 
@@ -379,17 +379,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);
             gui.getTabMain().setSelectedIndex(GuiTabType.MEKLAB.getDefaultPos());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
-            for (Unit unit : units) {
-                if (unit.isRefitting()) {
-                    selectedUnit.getRefit().cancel();
-                }
-            }
+            Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
-            for (Unit unit : units) {
-                if (unit.isRefitting()) {
-                    gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
-                }
-            }
+            Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().succeed());
         } else if (command.equals(COMMAND_REFURBISH)) {
             for (Unit unit : units) {
                 Refit refit = new Refit(unit, unit.getEntity(), false, true);
@@ -439,9 +431,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
-            double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             for (Unit u : units) {
-                Money refundAmount = u.getBuyCost().multipliedBy(refund);
+                Money refundAmount = u.getBuyCost().multipliedBy(
+                        gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
                 gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
                         "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
@@ -527,7 +519,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.startsWith(COMMAND_CHANGE_MAINT_MULTI)) {
             int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
-            
+
             for (Unit u : units) {
                 if (!u.isSelfCrewed()) {
                     u.setMaintenanceMultiplier(multiplier);
@@ -882,27 +874,27 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 }
             }
-            
+
             // if we're using maintenance and have selected something that requires maintenance
             if (gui.getCampaign().getCampaignOptions().checkMaintenance() &&
                     (maintenanceTime > 0)) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
-                
+
                 for (int x = 1; x <= 4; x++) {
                     JMenuItem maintenanceMultiplierItem = new JCheckBoxMenuItem("x" + x);
-                    
-                    // if we've got just one unit selected, 
+
+                    // if we've got just one unit selected,
                     // have the courtesy to show the multiplier if relevant
-                    if (oneSelected && (unit.getMaintenanceMultiplier() == x) 
+                    if (oneSelected && (unit.getMaintenanceMultiplier() == x)
                             && !unit.isSelfCrewed()) {
                         maintenanceMultiplierItem.setSelected(true);
                     }
-                    
+
                     maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINT_MULTI + ":" + x);
                     maintenanceMultiplierItem.addActionListener(this);
                     menuItem.add(maintenanceMultiplierItem);
                 }
-                
+
                 popup.add(menuItem);
             }
 

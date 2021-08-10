@@ -112,14 +112,14 @@ public class AtBConfiguration implements Serializable {
 
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
-            MekHQ.getLogger().error(this, "Default force tables don't support negative weights, limiting to 0");
+            MekHQ.getLogger().error("Default force tables don't support negative weights, limiting to 0");
             index = 0;
         }
         String property = defaultProperties.getString(key);
         String[] fields = property.split("\\|");
         if (index >= fields.length) {
             // Deal with too short field lengths
-            MekHQ.getLogger().error(this, String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
+            MekHQ.getLogger().error(String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -133,8 +133,12 @@ public class AtBConfiguration implements Serializable {
         WeightedTable<T> retVal = new WeightedTable<>();
         String[] entries = entry.split(",");
         for (String e : entries) {
-            String[] fields = e.split(":");
-            retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
+            try {
+                String[] fields = e.split(":");
+                retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(ex);
+            }
         }
         return retVal;
     }
@@ -231,20 +235,20 @@ public class AtBConfiguration implements Serializable {
             int weightClassIndex = weightClassIndex(weightClass);
             WeightedTable<String> table;
             if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                MekHQ.getLogger().error(this, String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+                MekHQ.getLogger().error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
                 weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
             }
             table = botForceTable.get(weightClassIndex);
             if (null == table) {
                 table = getDefaultForceTable("botForce." + org, weightClassIndex);
                 if (null == table) {
-                    MekHQ.getLogger().error(this, String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
+                    MekHQ.getLogger().error(String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
                     return null;
                 }
             }
             return table.select(rollMod);
         } else {
-            MekHQ.getLogger().error(this, String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
+            MekHQ.getLogger().error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
     }
@@ -391,19 +395,19 @@ public class AtBConfiguration implements Serializable {
     public static AtBConfiguration loadFromXml() {
         AtBConfiguration retVal = new AtBConfiguration();
 
-        MekHQ.getLogger().info(AtBConfiguration.class, "Starting load of AtB configuration data from XML...");
+        MekHQ.getLogger().info("Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
-        try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
+        try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) { // TODO : Remove inline file path
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
-            MekHQ.getLogger().info(AtBConfiguration.class, "File data/universe/atbconfig.xml not found. Loading defaults.");
+            MekHQ.getLogger().info("File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(AtBConfiguration.class, ex);
+            MekHQ.getLogger().error(ex);
             return retVal;
         }
 
@@ -478,7 +482,7 @@ public class AtBConfiguration implements Serializable {
                     }
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
-                    MekHQ.getLogger().error(this, "Could not parse weight class attribute for enemy forces table", ex);
+                    MekHQ.getLogger().error("Could not parse weight class attribute for enemy forces table", ex);
                 }
             }
         }

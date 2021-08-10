@@ -42,12 +42,12 @@ public class InfantryArmorPart extends Part {
     private static final long serialVersionUID = 8298691936947743373L;
 
     private double damageDivisor;
-    private boolean encumbering = false;
-    private boolean spaceSuit = false;
-    private boolean dest = false;
-    private boolean sneak_camo = false;
-    private boolean sneak_ir = false;
-    private boolean sneak_ecm = false;
+    private boolean encumbering;
+    private boolean spaceSuit;
+    private boolean dest;
+    private boolean sneak_camo;
+    private boolean sneak_ir;
+    private boolean sneak_ecm;
 
     public InfantryArmorPart() {
         this(0, null, 1.0, false, false, false, false, false, false);
@@ -93,24 +93,28 @@ public class InfantryArmorPart extends Part {
         if (isEncumbering()) {
             details += "encumbering";
         }
+
         if (isSneakCamo()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "camo";
         }
+
         if (isSneakECM()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "ECM";
         }
+
         if (isSneakIR()) {
-            if (!details.equals("")) {
+            if (!details.isBlank()) {
                 details += ", ";
             }
             details += "IR";
         }
+
         return details;
     }
 
@@ -214,14 +218,14 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
-                && damageDivisor == ((InfantryArmorPart)part).getDamageDivisor()
-                && dest == ((InfantryArmorPart)part).isDest()
-                && encumbering == ((InfantryArmorPart)part).isEncumbering()
-                && sneak_camo == ((InfantryArmorPart)part).isSneakCamo()
-                && sneak_ecm == ((InfantryArmorPart)part).isSneakECM()
-                && sneak_ir == ((InfantryArmorPart)part).isSneakIR()
-                && spaceSuit == ((InfantryArmorPart)part).isSpaceSuit();
+        return (getClass() == part.getClass())
+                && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
+                && dest == ((InfantryArmorPart) part).isDest()
+                && encumbering == ((InfantryArmorPart) part).isEncumbering()
+                && sneak_camo == ((InfantryArmorPart) part).isSneakCamo()
+                && sneak_ecm == ((InfantryArmorPart) part).isSneakECM()
+                && sneak_ir == ((InfantryArmorPart) part).isSneakIR()
+                && spaceSuit == ((InfantryArmorPart) part).isSpaceSuit();
     }
 
     public double getDamageDivisor() {

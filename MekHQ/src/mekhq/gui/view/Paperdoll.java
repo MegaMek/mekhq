@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,27 +10,27 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
-import java.awt.AWTEvent;
-import java.awt.AWTEventMulticaster;
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.gui.utilities.MultiplyComposite;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.transform.Source;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -38,37 +38,9 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
-
-import org.xml.sax.SAXException;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.gui.utilities.MultiplyComposite;
 
 /**
  * A component allowing to display a "paper doll" image, with overlays
@@ -101,8 +73,8 @@ public class Paperdoll extends Component {
 
         try {
             loadShapeData(is);
-        } catch(Exception ex) {
-            MekHQ.getLogger().error(getClass(), "<init>(InputStream)", ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
         }
 
         highlightColor = null;
@@ -110,37 +82,31 @@ public class Paperdoll extends Component {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
 
-    public void loadShapeData(InputStream is) throws JAXBException, SAXException, ParserConfigurationException {
-        final String METHOD_NAME = "loadShapeData(InputStream)"; //$NON-NLS-1$
-
+    public void loadShapeData(InputStream is) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         Source inputSource = MekHqXmlUtil.createSafeXmlSource(is);
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(inputSource);
-        if(null != dataList.locs) {
+        if (null != dataList.locs) {
             dataList.locs.forEach(data -> {
                 locShapes.put(data.loc, data.genPath());
-                if(null != data.overlayImages) {
+                if (null != data.overlayImages) {
                     data.overlayImages.forEach(imgSpec -> {
-                        Map<String, Image> overlayMap = locOverlays.get(data.loc);
-                        if(null == overlayMap) {
-                            overlayMap = new HashMap<>();
-                            locOverlays.put(data.loc, overlayMap);
-                        }
+                        Map<String, Image> overlayMap = locOverlays.computeIfAbsent(data.loc, k -> new HashMap<>());
                         Image img = Toolkit.getDefaultToolkit().createImage(imgSpec.image);
                         overlayMap.put(imgSpec.tag, img);
                     });
                 }
             });
         }
-        if((null != dataList.base) && !dataList.base.isEmpty()) {
+        if ((null != dataList.base) && !dataList.base.isEmpty()) {
             base = Toolkit.getDefaultToolkit().createImage(dataList.base);
             MediaTracker mt = new MediaTracker(this);
             mt.addImage(base, 0);
             try {
                 mt.waitForAll();
-            } catch(InterruptedException iex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, iex);
+            } catch(InterruptedException e) {
+                MekHQ.getLogger().error(e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -150,7 +116,7 @@ public class Paperdoll extends Component {
 
     public void setLocShape(BodyLocation loc, Path2D path) {
         Objects.requireNonNull(loc);
-        if(null != path) {
+        if (null != path) {
             locShapes.put(loc, (Path2D) path.clone());
         } else {
             locShapes.remove(loc);
@@ -162,7 +128,7 @@ public class Paperdoll extends Component {
         Objects.requireNonNull(loc);
         Color oldColor = locColors.get(loc);
         locColors.put(loc, color);
-        if(!Objects.equals(color, oldColor)) {
+        if (!Objects.equals(color, oldColor)) {
             invalidate();
         }
     }
@@ -170,12 +136,13 @@ public class Paperdoll extends Component {
     public void setLocTag(BodyLocation loc, String tag) {
         Objects.requireNonNull(loc);
         String oldTag = locTags.get(loc);
-        if(null == tag) {
+        if (null == tag) {
             locTags.remove(loc);
         } else {
             locTags.put(loc, tag);
         }
-        if(!Objects.equals(tag, oldTag)) {
+
+        if (!Objects.equals(tag, oldTag)) {
             invalidate();
         }
     }
@@ -193,7 +160,7 @@ public class Paperdoll extends Component {
     }
 
     public void setHighlightColor(Color highlightColor) {
-        if(!Objects.equals(this.highlightColor, highlightColor)) {
+        if (!Objects.equals(this.highlightColor, highlightColor)) {
             invalidate();
         }
         this.highlightColor = highlightColor;
@@ -233,7 +200,7 @@ public class Paperdoll extends Component {
             });
         g2.setComposite(AlphaComposite.SrcOver);
 
-        if((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
+        if ((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
             g2.setPaint(highlightColor);
             g2.setStroke(new BasicStroke(5f));
             g2.draw(locShapes.get(hoverLoc));
@@ -245,7 +212,7 @@ public class Paperdoll extends Component {
         final double scaledY = y / scale;
         return locShapes.entrySet().stream()
             .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
-            .map(entry -> entry.getKey()).orElse(BodyLocation.GENERIC);
+            .map(Map.Entry::getKey).orElse(BodyLocation.GENERIC);
     }
 
     @Override
@@ -263,22 +230,22 @@ public class Paperdoll extends Component {
 
     @Override
     public void processEvent(AWTEvent e) {
-        if(e instanceof MouseEvent) {
+        if (e instanceof MouseEvent) {
             final MouseEvent event = (MouseEvent) e;
-            if((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
+            if ((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
                 BodyLocation oldHoverLoc = hoverLoc;
                 hoverLoc = locationUnderPoint(event.getX(), event.getY());
                 if(oldHoverLoc != hoverLoc) {
                     repaint();
                 }
             }
-            if(event.getID() == MouseEvent.MOUSE_EXITED) {
+            if (event.getID() == MouseEvent.MOUSE_EXITED) {
                 hoverLoc = null;
                 repaint();
             }
-            if(event.getButton() == MouseEvent.BUTTON1) {
-                if(event.getID() == MouseEvent.MOUSE_CLICKED) {
-                    if((null != listener) && (null != hoverLoc)) {
+            if (event.getButton() == MouseEvent.BUTTON1) {
+                if (event.getID() == MouseEvent.MOUSE_CLICKED) {
+                    if ((null != listener) && (null != hoverLoc)) {
                         ActionEvent myEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, hoverLoc.toString());
                         listener.actionPerformed(myEvent);
                     }
@@ -330,16 +297,16 @@ public class Paperdoll extends Component {
     private static class XMLPoint2DAdapter extends XmlAdapter<String, Point2D> {
         @Override
         public Point2D unmarshal(String v) throws Exception {
-            if((null == v) || v.isEmpty()) {
+            if ((null == v) || v.isEmpty()) {
                 return null;
             }
-            String data[] = v.split(",", 2);
-            if(data.length < 2) {
+            String[] data = v.split(",", 2);
+            if (data.length < 2) {
                 return null;
             }
             try {
                 return new Point2D.Float(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
-            } catch(NumberFormatException nfex) {
+            } catch (NumberFormatException ignored) {
                 // Oh well, we tried
             }
             return null;

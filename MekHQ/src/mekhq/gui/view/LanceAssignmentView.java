@@ -46,7 +46,7 @@ import javax.swing.table.TableRowSorter;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -91,6 +91,19 @@ public class LanceAssignmentView extends JPanel {
         });
 
         cbRole = new JComboBox<>(AtBLanceRole.values());
+        cbRole.setName("cbRole");
+        cbRole.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AtBLanceRole) {
+                    list.setToolTipText(((AtBLanceRole) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -100,7 +113,7 @@ public class LanceAssignmentView extends JPanel {
         tblRequiredLances.createDefaultColumnsFromModel();
         tblRequiredLances.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
-        for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
+        for (int i = 0; i < RequiredLancesTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel) tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
@@ -281,13 +294,12 @@ class RequiredLancesTableModel extends DataTableModel {
     public static final int COL_TRAINING = 5;
     public static final int COL_NUM = 6;
 
-    protected String[] columnNames = {"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
-
     private Campaign campaign;
 
-    public RequiredLancesTableModel(Campaign campaign) {
+    public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
+        columnNames = new String[]{"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
     }
 
     @Override
@@ -354,11 +366,11 @@ class RequiredLancesTableModel extends DataTableModel {
                     return t + "/" + contract.getRequiredLances();
                 }
                 return Integer.toString(contract.getRequiredLances());
-            } else if (contract.getRequiredLanceType().ordinal() == column - 2) {
+            } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
                     if (data.get(row).equals(l.getContract(campaign))
-                            && (l.getRole() == l.getContract(campaign).getRequiredLanceType())
+                            && (l.getRole() == l.getContract(campaign).getContractType().getRequiredLanceRole())
                             && l.isEligible(campaign)) {
                         t++;
                     }
@@ -383,12 +395,12 @@ class LanceAssignmentTableModel extends DataTableModel {
     public static final int COL_ROLE = 3;
     public static final int COL_NUM = 4;
 
-    protected String[] columnNames = {"Force", "Wt", "Mission", "Role"};
     private Campaign campaign;
 
     public LanceAssignmentTableModel(Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<>();
+        columnNames = new String[]{"Force", "Wt", "Mission", "Role"};
     }
 
     @Override

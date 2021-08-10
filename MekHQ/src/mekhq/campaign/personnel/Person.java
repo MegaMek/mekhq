@@ -41,7 +41,6 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -185,7 +184,7 @@ public class Person implements Serializable {
     //endregion Name
 
     private Gender gender;
-    private AbstractIcon portrait;
+    private Portrait portrait;
 
     private PersonnelRole primaryRole;
     private PersonnelRole secondaryRole;
@@ -769,22 +768,13 @@ public class Person implements Serializable {
     }
     //endregion Names
 
-    //region Portrait
-    public AbstractIcon getPortrait() {
+    public Portrait getPortrait() {
         return portrait;
     }
 
-    public void setPortrait(AbstractIcon portrait) {
-        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+    public void setPortrait(final Portrait portrait) {
+        assert (portrait != null) : "Illegal assignment: cannot have a null Portrait for a Portrait";
         this.portrait = Objects.requireNonNull(portrait);
-    }
-
-    public String getPortraitCategory() {
-        return getPortrait().getCategory();
-    }
-
-    public String getPortraitFileName() {
-        return getPortrait().getFilename();
     }
 
     //region Personnel Roles
@@ -2327,7 +2317,7 @@ public class Person implements Serializable {
         }
 
         if (getRankSystem().isUseROMDesignation()) {
-            rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
+            rankName += ROMDesignation.getComStarBranchDesignation(this);
         }
 
         // Rank Level Modifications
@@ -2582,6 +2572,10 @@ public class Person implements Serializable {
         return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
     }
 
+    public String getHTMLTitle() {
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
+    }
+
     public String getFullTitle() {
         String rank = getRankName();
 
@@ -2593,11 +2587,7 @@ public class Person implements Serializable {
     }
 
     public String makeHTMLRank() {
-        return String.format("<html>%s</html>", makeHTMLRankDiv());
-    }
-
-    public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s</div>", getId(), getRankName().trim());
+        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getRankName().trim());
     }
 
     public String getHyperlinkedFullTitle() {
@@ -2862,7 +2852,7 @@ public class Person implements Serializable {
         }
     }
 
-    public void changeEdge(int amount) {
+    public void changeEdge(final int amount) {
         setEdge(Math.max(getEdge() + amount, 0));
     }
 
@@ -2941,10 +2931,8 @@ public class Person implements Serializable {
                 edgett.append(ability.getDescription()).append("<br>");
             }
         }
-        if (edgett.toString().equals("")) {
-            return "No triggers set";
-        }
-        return "<html>" + edgett + "</html>";
+
+        return edgett.toString().isBlank() ? "No triggers set" : "<html>" + edgett + "</html>";
     }
     //endregion edge
 
@@ -3169,8 +3157,8 @@ public class Person implements Serializable {
     }
 
     public boolean isTaskOvertime(IPartWork partWork) {
-        return partWork.getTimeLeft() > getMinutesLeft()
-               && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
+        return (partWork.getTimeLeft() > getMinutesLeft())
+               && (getOvertimeLeft() > 0);
     }
 
     public Skill getSkillForWorkingOn(IPartWork part) {

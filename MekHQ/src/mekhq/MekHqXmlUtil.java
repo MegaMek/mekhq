@@ -112,12 +112,20 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
+<<<<<<< HEAD
      * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
      * TODO : Some of this may want to be back-ported into entity itself in MM and then
      * TODO : re-factored out of EntityListFile.
      *
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ
+=======
+     * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
+     *
+     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
+     * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
+     * MM and then re-factored out of EntityListFile.
+>>>>>>> upstream/master
      *
      * @param tgtEnt The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
@@ -369,7 +377,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             critVal = critVal.concat(" gear=\"none\"");
         }
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -465,7 +473,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
          * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -508,12 +516,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             case 0:
                 return null;
             case 1:
-                Entity entity = entities.get(0);
+                final Entity entity = entities.get(0);
                 MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException(
-                        "More than one entity contained in XML string!  Expecting a single entity.");
+                        "More than one entity contained in XML string! Expecting a single entity.");
         }
     }
 
