@@ -35,6 +35,9 @@ VERSION HISTORY:
 + PR #2769: New StratCon feature - sometimes (with configurable frequency), the generated maps will be replaced by a similarly sized user-made fixed map instead.
 + PR #2775: Finances Tab: Price Multipliers Panel Cleanup and Expansion
 + PR #2760: Rank fixes and improvements from HB: Major Periphery States
++ PR #2796: AtB/StratCon: Preventing Hidden Units With Option Disabled
++ Issue #2790: Fixing Null Birthday
++ Issue #2779: Can now cancel a bulk part purchase
 
 0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
