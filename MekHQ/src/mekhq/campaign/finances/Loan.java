@@ -39,7 +39,6 @@ import java.util.Objects;
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
  * TODO : Move MADE_UP_INSTITUTIONS to data
- * TODO : Move determineFirstPaymentDate to FinancialTerm Enum
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loan implements Serializable {
