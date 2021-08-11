@@ -29,6 +29,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.HitData;
 import megamek.common.Mounted;
 import megamek.common.ToHitData;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -99,7 +100,7 @@ public class AtBScenarioModifierApplicator {
         if (scenario.getNumBots() == 0) {
             return;
         }
-        
+
         int actualUnitsToRemove = unitRemovalCount;
 
         if (unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
@@ -117,7 +118,7 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            
+
             // only remove units from a bot force if it's on the affected team
             // AND if it has any units to remove
             if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
@@ -240,6 +241,12 @@ public class AtBScenarioModifierApplicator {
 
                 if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
+
+                    // Prevent Hidden Units from Causing Issues if Disabled
+                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+                        continue;
+                    }
+
                     Force playerForce = campaign.getForce(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep at least one visible
@@ -269,6 +276,11 @@ public class AtBScenarioModifierApplicator {
 
                 if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
+
+                    // Prevent Hidden Units from Causing Issues if Disabled
+                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+                        continue;
+                    }
 
                     int maxHiddenUnits = currentBotForce.getEntityList().size() / 2;
                     int numHiddenUnits = 0;
@@ -334,12 +346,12 @@ public class AtBScenarioModifierApplicator {
             scenario.getScenarioObjectives().add(actualObjective);
         }
     }
-    
+
     /**
      * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
      */
     public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
-        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(), 
+        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(),
                 (Boolean) goodEvent));
     }
     
