@@ -3457,7 +3457,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);        
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -4211,7 +4211,7 @@ public class CampaignOptions implements Serializable {
         }
 
         // Fixing Old Data
-        if (version.isLowerThan("0.49.0") && retVal.getUseAtB()) {
+        if (version.isLowerThan("0.49.3") && retVal.getUseAtB()) {
             retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
             retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
