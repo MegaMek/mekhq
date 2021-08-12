@@ -240,7 +240,6 @@ public class CampaignPreset implements Serializable {
     //endregion Getters/Setters
 
     /**
-     * TODO : I need a way of ensuring uniqueness and proper sort order
      * @return a list of all of the campaign presets in the default and userdata folders
      */
     public static List<CampaignPreset> getCampaignPresets() {
