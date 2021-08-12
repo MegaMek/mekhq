@@ -87,11 +87,12 @@ public class CampaignOptionsDialog extends JDialog {
     private static final long serialVersionUID = 1935043247792962964L;
 
     //region General Variables (ones not relating to a specific tab)
-    private Campaign campaign;
+    private final JFrame frame;
+    private final Campaign campaign;
+    private final boolean startup;
     private CampaignOptions options;
     private RandomSkillPreferences rSkillPrefs;
     private LocalDate date;
-    private JFrame frame;
     private Camouflage camouflage;
     private PlayerColour colour;
     private String iconCategory;
@@ -487,11 +488,12 @@ public class CampaignOptionsDialog extends JDialog {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
     //endregion Variable Declarations
 
-    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.campaign = c;
-        //this is a hack but I have no idea what is going on here
-        this.frame = parent;
+    //region Constructors
+    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
+        super(frame);
+        this.frame = frame;
+        this.campaign = campaign;
+        this.startup = startup;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
@@ -505,13 +507,20 @@ public class CampaignOptionsDialog extends JDialog {
         cancelled = false;
 
         initComponents();
-        setOptions(c.getCampaignOptions(), c.getRandomSkillPreferences());
+        setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
         btnCamo.setIcon(camouflage.getImageIcon());
         setForceIcon();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
 
         setUserPreferences();
     }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public boolean isStartup() {
+        return startup;
+    }
+    //endregion Getters/Setters
 
     //region Initialization
     /**
@@ -5006,16 +5015,18 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        // Handle Date
-        setDate(preset.getDate());
+        if (isStartup()) {
+            // Handle Date
+            setDate(preset.getDate());
 
-        // Handle Faction
-        if (preset.getFaction() != null) {
-            comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
-        }
+            // Handle Faction
+            if (preset.getFaction() != null) {
+                comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
+            }
 
-        if (preset.getRankSystem() != null) {
-            rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
+            if (preset.getRankSystem() != null) {
+                rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
+            }
         }
 
         // Handle CampaignOptions and RandomSkillPreferences

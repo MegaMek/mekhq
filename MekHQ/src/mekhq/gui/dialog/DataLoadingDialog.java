@@ -224,7 +224,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 // This must be after the date chooser to enable correct functionality.
                 setVisible(false);
 
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign);
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, campaign, true);
                 optionsDialog.applyPreset(preset);
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCancelled()) {
