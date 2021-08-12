@@ -27,7 +27,7 @@ import java.awt.*;
 public class CampaignPresetRenderer extends CampaignPresetPanel implements ListCellRenderer<CampaignPreset> {
     //region Constructors
     public CampaignPresetRenderer(final JFrame frame) {
-        super(frame, null);
+        super(frame, null, null);
     }
     //endregion Constructors
 

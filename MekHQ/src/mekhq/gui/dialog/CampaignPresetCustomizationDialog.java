@@ -31,6 +31,7 @@ import java.awt.*;
 
 public class CampaignPresetCustomizationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
+    private final Campaign campaign;
     private final CampaignPreset preset;
 
     private JTextField txtTitle;
@@ -49,15 +50,20 @@ public class CampaignPresetCustomizationDialog extends AbstractMHQValidationButt
     //endregion Variable Declarations
 
     //region Constructors
-    public CampaignPresetCustomizationDialog(final JFrame frame, final Campaign campaign,
+    public CampaignPresetCustomizationDialog(final JFrame frame, final @Nullable Campaign campaign,
                                              final @Nullable CampaignPreset preset) {
         super(frame, "CampaignPresetCustomizationDialog", "CampaignPresetCustomizationDialog.title");
+        this.campaign = campaign;
         this.preset = preset;
         initialize();
     }
     //endregion Constructors
 
     //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
     public CampaignPreset getPreset() {
         return preset;
     }

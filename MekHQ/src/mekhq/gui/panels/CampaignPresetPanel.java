@@ -20,6 +20,7 @@ package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.CampaignPresetCustomizationDialog;
@@ -27,22 +28,35 @@ import mekhq.gui.dialog.CampaignPresetCustomizationDialog;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class displays a Campaign Preset. It is used in a List Renderer for preset selection, and
+ * as the panel for preset customization and addition. We only want to be able to edit the preset if
+ * the campaign and preset are both not null, and the preset is in the userdata folder. This
+ * prevents it from being shown on the renderer, where the button cannot be used.
+ */
 public class CampaignPresetPanel extends AbstractMHQPanel {
     //region Variable Declarations
+    private final Campaign campaign;
     private CampaignPreset preset;
     private JLabel lblTitle;
     private JTextArea txtDescription;
     //endregion Variable Declarations
 
     //region Constructors
-    public CampaignPresetPanel(final JFrame frame, final @Nullable CampaignPreset preset) {
+    public CampaignPresetPanel(final JFrame frame, final @Nullable Campaign campaign,
+                               final @Nullable CampaignPreset preset) {
         super(frame, "CampaignPresetPanel");
+        this.campaign = campaign;
         setPreset(preset);
         initialize();
     }
     //endregion Constructors
 
     //region Getters/Setters
+    public @Nullable Campaign getCampaign() {
+        return campaign;
+    }
+
     public @Nullable CampaignPreset getPreset() {
         return preset;
     }
@@ -71,7 +85,7 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
     //region Initialization
     @Override
     protected void initialize() {
-        final boolean editPreset = (getPreset() != null) && getPreset().isUserData();
+        final boolean editPreset = (getCampaign() != null) && (getPreset() != null) && getPreset().isUserData();
 
         // Setup the Panel
         setBorder(BorderFactory.createCompoundBorder(
@@ -95,7 +109,8 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
         if (editPreset) {
             final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
                     resources.getString("btnEditPreset.toolTipText"), evt -> {
-                final CampaignPresetCustomizationDialog dialog = new CampaignPresetCustomizationDialog(getFrame(), getPreset());
+                final CampaignPresetCustomizationDialog dialog = new CampaignPresetCustomizationDialog(
+                        getFrame(), getCampaign(), getPreset());
                 if (dialog.showDialog().isConfirmed()) {
                     dialog.updatePreset(getPreset());
                     updateFromPreset(getPreset());
