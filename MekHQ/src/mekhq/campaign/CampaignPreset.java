@@ -242,11 +242,16 @@ public class CampaignPreset implements Serializable {
     //endregion Getters/Setters
 
     /**
+     * @param userdata whether to include the default presets or just the userdata ones (true for
+     *                 just userdata)
      * @return a list of all of the campaign presets in the default and userdata folders
      */
-    public static List<CampaignPreset> getCampaignPresets() {
-        final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
+    public static List<CampaignPreset> getCampaignPresets(final boolean userdata) {
+        final List<CampaignPreset> presets = new ArrayList<>();
+        if (!userdata) {
+            presets.addAll(loadCampaignPresetsFromDirectory(
+                    new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY)));
+        }
         presets.addAll(loadCampaignPresetsFromDirectory(
                 new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();

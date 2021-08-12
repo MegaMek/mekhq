@@ -60,7 +60,7 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
     @Override
     protected void initialize() {
         final DefaultListModel<CampaignPreset> listModel = new DefaultListModel<>();
-        listModel.addAll(CampaignPreset.getCampaignPresets());
+        listModel.addAll(CampaignPreset.getCampaignPresets(false));
         setPresets(new JList<>(listModel));
         getPresets().setName("campaignPresetList");
         getPresets().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -226,8 +226,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, campaign, true);
                 optionsDialog.applyPreset(preset);
-                optionsDialog.setVisible(true);
-                if (optionsDialog.wasCancelled()) {
+                if (optionsDialog.showDialog().isCancelled()) {
                     cancelled = true;
                     cancel(true);
                     return campaign; // shouldn't be required, but this ensures no further code runs
