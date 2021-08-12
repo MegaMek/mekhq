@@ -20,6 +20,8 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -47,7 +49,8 @@ public class CampaignPresetCustomizationDialog extends AbstractMHQValidationButt
     //endregion Variable Declarations
 
     //region Constructors
-    public CampaignPresetCustomizationDialog(final JFrame frame, final CampaignPreset preset) {
+    public CampaignPresetCustomizationDialog(final JFrame frame, final Campaign campaign,
+                                             final @Nullable CampaignPreset preset) {
         super(frame, "CampaignPresetCustomizationDialog", "CampaignPresetCustomizationDialog.title");
         this.preset = preset;
         initialize();

@@ -32,7 +32,7 @@ public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    protected CampaignPresetSelectionDialog(final JFrame parent) {
+    public CampaignPresetSelectionDialog(final JFrame parent) {
         super(parent, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
         initialize();
     }

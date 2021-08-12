@@ -37,6 +37,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -565,10 +566,20 @@ public class CampaignGUI extends JPanel {
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
         menuImport.setMnemonic(KeyEvent.VK_I);
 
-        // FIXME : Windchild I don't do anything
-        JMenuItem miImportCampaignPreset = new JMenuItem(resourceMap.getString("miImportCampaignPreset.text"));
+        final JMenuItem miImportCampaignPreset = new JMenuItem(resourceMap.getString("miImportCampaignPreset.text"));
+        miImportCampaignPreset.setName("miImportCampaignPreset");
         miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
-        //miImportCampaignPreset.addActionListener(this::miImportOptionsActionPerformed);
+        miImportCampaignPreset.addActionListener(evt -> {
+            final CampaignPresetSelectionDialog campaignPresetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
+            if (!campaignPresetSelectionDialog.showDialog().isConfirmed()) {
+                return;
+            }
+            final CampaignPreset preset = campaignPresetSelectionDialog.getSelectedPreset();
+            if (preset == null) {
+                return;
+            }
+            preset.applyContinuousToCampaign(getCampaign());
+        });
         menuImport.add(miImportCampaignPreset);
 
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
@@ -619,7 +630,7 @@ public class CampaignGUI extends JPanel {
         miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
         miExportCSVFile.add(miExportUnitCSV);
 
-        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
         miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
         miExportCSVFile.add(miExportFinancesCSV);
@@ -633,10 +644,21 @@ public class CampaignGUI extends JPanel {
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
-        // FIXME : Windchild I don't do anything
-        JMenuItem miExportCampaignPreset = new JMenuItem(resourceMap.getString("miExportCampaignPreset.text"));
+        final JMenuItem miExportCampaignPreset = new JMenuItem(resourceMap.getString("miExportCampaignPreset.text"));
+        miExportCampaignPreset.setName("miExportCampaignPreset");
         miExportCampaignPreset.setMnemonic(KeyEvent.VK_C);
-        //miExportCampaignPreset.addActionListener(this::miExportOptionsActionPerformed);
+        miExportCampaignPreset.addActionListener(evt -> {
+            final CampaignPresetCustomizationDialog campaignPresetCustomizationDialog
+                    = new CampaignPresetCustomizationDialog(getFrame(), getCampaign(), null);
+            if (!campaignPresetCustomizationDialog.showDialog().isConfirmed()) {
+                return;
+            }
+            final CampaignPreset preset = campaignPresetCustomizationDialog.getPreset();
+            if (preset == null) {
+                return;
+            }
+            preset.writeToFile(FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
+        });
         miExportXMLFile.add(miExportCampaignPreset);
 
         JMenuItem miExportRankSystems = new JMenuItem(resourceMap.getString("miExportRankSystems.text"));
