@@ -4955,7 +4955,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                 evt -> btnSaveActionPerformed()));
 
         panel.add(new MMButton("btnManagePresets", resources, "btnManagePresets.text", null,
-                evt -> new CampaignPresetManagementDialog(getFrame(), getCampaign()).showDialog()));
+                evt -> new CampaignPresetManagementDialog(getFrame(), getCampaign()).setVisible(true)));
 
         panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text", null,
                 evt -> {
