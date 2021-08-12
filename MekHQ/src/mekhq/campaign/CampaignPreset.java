@@ -21,6 +21,7 @@ package mekhq.campaign;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
@@ -50,19 +51,19 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
- * This is an object which holds a set of objects that collectively define the game options
- * for a campaign. This includes the campaign options, the skill types, the random skill preferences,
- * and the special ability list. There will also be a short title and description here that allows users
- * to create and save different presets. The goal is to allow users to create and load various different
- * presets.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * This is an object which holds a set of objects that collectively define the initial options setup
+ * for a campaign.
+ *
+ * It includes both startup values, which are only used on initial startup (the date, starting
+ * planet, and rank system), and continuous options, which can be applied at any time (campaign
+ * options, skills, SPAs).
+ *
+ * It also includes a short title and description that allows one to create and save different
+ * presets. The goal is to allow users to create and load various different presets.
+ * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset implements Serializable {
     //region Variable Declarations
@@ -139,10 +140,6 @@ public class CampaignPreset implements Serializable {
     //region Getters/Setters
     public boolean isUserData() {
         return userData;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public void setTitle(final String title) {
@@ -251,11 +248,12 @@ public class CampaignPreset implements Serializable {
                 new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
         presets.addAll(loadCampaignPresetsFromDirectory(
                 new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return presets;
     }
 
     public void applyContinuousToCampaign(final Campaign campaign) {
-        // TODO : implement me
         if (getCampaignOptions() != null) {
             campaign.setCampaignOptions(getCampaignOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));
@@ -266,11 +264,11 @@ public class CampaignPreset implements Serializable {
         }
 
         if (!getSkills().isEmpty()) {
-
+            SkillType.setSkillHash(getSkills());
         }
 
         if (!getSpecialAbilities().isEmpty()) {
-
+            SpecialAbility.setSpecialAbilities(getSpecialAbilities());
         }
     }
 
@@ -298,7 +296,7 @@ public class CampaignPreset implements Serializable {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         pw.println("<campaignPreset version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ")
                 .getString("Application.version") + "\">");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", getTitle());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
@@ -333,8 +331,8 @@ public class CampaignPreset implements Serializable {
 
         if (getSkills() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "skillTypes");
-            for (String name : SkillType.skillList) {
-                SkillType type = getSkills().get(name);
+            for (final String name : SkillType.skillList) {
+                final SkillType type = getSkills().get(name);
                 if (type != null) {
                     type.writeToXml(pw, indent);
                 }
@@ -487,4 +485,9 @@ public class CampaignPreset implements Serializable {
         return preset;
     }
     //endregion File I/O
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

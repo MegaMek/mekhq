@@ -136,6 +136,10 @@ public class SkillType implements Serializable {
         return lookupHash;
     }
 
+    public static void setSkillHash(final Hashtable<String, SkillType> hash) {
+        lookupHash = hash;
+    }
+
     public static String[] getSkillList() {
         return skillList;
     }

@@ -138,7 +138,7 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
     //endregion Initialization
 
     protected void updateFromPreset(final CampaignPreset preset) {
-        getLblTitle().setText(preset.getTitle());
+        getLblTitle().setText(preset.toString());
         getTxtDescription().setText(preset.getDescription());
     }
 }
