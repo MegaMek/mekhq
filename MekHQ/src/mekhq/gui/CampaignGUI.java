@@ -657,7 +657,8 @@ public class CampaignGUI extends JPanel {
             if (preset == null) {
                 return;
             }
-            preset.writeToFile(FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
+            preset.writeToFile(getFrame(),
+                    FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
         });
         miExportXMLFile.add(miExportCampaignPreset);
 

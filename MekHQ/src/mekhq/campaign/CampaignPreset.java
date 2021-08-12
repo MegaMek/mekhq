@@ -21,6 +21,7 @@ package mekhq.campaign;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -40,6 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -272,7 +274,7 @@ public class CampaignPreset implements Serializable {
     }
 
     //region File I/O
-    public void writeToFile(@Nullable File file) {
+    public void writeToFile(final JFrame frame, @Nullable File file) {
         if (file == null) {
             return;
         }
@@ -288,6 +290,9 @@ public class CampaignPreset implements Serializable {
             writeToXML(pw, 0);
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+            JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
+                    resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
