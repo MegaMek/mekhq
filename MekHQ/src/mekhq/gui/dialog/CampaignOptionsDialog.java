@@ -62,7 +62,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
