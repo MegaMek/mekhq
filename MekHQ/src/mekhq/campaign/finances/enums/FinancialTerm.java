@@ -71,6 +71,11 @@ public enum FinancialTerm {
     }
     //endregion Boolean Comparison Methods
 
+    /**
+     * @param origin the origin date, which will normally (but not always) be the current date
+     * @return the next valid date for the financial term, with a built-in grace period to line up
+     * everything to the first day of a financial setup (Monday, First of the Month, First of the Year)
+     */
     public LocalDate nextValidDate(final LocalDate origin) {
         switch (this) {
             case BIWEEKLY:
