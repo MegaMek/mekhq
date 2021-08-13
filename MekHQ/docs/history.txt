@@ -22,11 +22,12 @@ VERSION HISTORY:
 + PR #2745: Fixing Two AtB Scenario View Panel NPEs
 + PR #2725: StratCon campaign state management: GM Tool to add VP/SP; Ability to convert VP to SP manually; Ability to convert SP to bonus parts; GM mode viewing of current track's "scenario spawn odds".
 + PR #2751: Fixing Astech Divide By Zero Errors
-+ PR #2756: StratCon
++ PR #2756, 2802: StratCon
 	- Fix incorrect bot configuration in pursuit scenario that would cause it to bee-line for the opposite edge
 	- When objective scenarios move, they will take their objectives with them
 	- Strategic objective display improvement - colorcoding and symbols to indicate in-progress/complete/failed.
-	- Prevent phantom scenarios from showing up in TO&E deploy menu
+	- Prevent phantom scenarios from showing up in TO&E deploy menu for both forces and individual units
+	- Removing a force that's assigned to a StratCon track will no longer cause the strategic map to fail to render
 + Issue #1098: Fixing Repair Tab Tech Order Options
 + PR #2478: Markets Tab and AbstractUnitMarket
 + Issue #2558: Adding Custom Messages for Dependant Joining/Departing the Force
