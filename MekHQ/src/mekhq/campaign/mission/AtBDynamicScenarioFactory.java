@@ -1943,8 +1943,8 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
-     * @param botForce The bot force to process
-     * @param deployRound The specific deployment round, or a special constant.
+     * Also makes use of the given scenarios reinforcement delay modifier.
+     * 
      * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */

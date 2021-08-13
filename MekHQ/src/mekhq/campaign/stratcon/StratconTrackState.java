@@ -408,13 +408,7 @@ public class StratconTrackState {
      * Whether or not this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
-        for (StratconFacility facility : getFacilities().values()) {
-            if (facility.getRevealTrack()) {
-                return true;
-            }
-        }
-        
-        return false;
+        return getFacilities().values().stream().anyMatch(facility -> facility.getRevealTrack());
     }
     
     /**
