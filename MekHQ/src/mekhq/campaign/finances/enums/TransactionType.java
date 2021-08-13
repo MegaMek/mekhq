@@ -45,6 +45,11 @@ public enum TransactionType {
     LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     STARTING_CAPITAL("TransactionType.STARTING_CAPITAL.text", "TransactionType.STARTING_CAPITAL.toolTipText"),
     CARRYOVER("TransactionType.CARRYOVER.text", "TransactionType.CARRYOVER.toolTipText"),
+    FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
+    RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
+    CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
+    TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
+    MEDICAL_EXPENSES("TransactionType.MEDICAL_EXPENSES.text", "TransactionType.MEDICAL_EXPENSES.toolTipText"),
     MISCELLANEOUS("TransactionType.MISCELLANEOUS.text", "TransactionType.MISCELLANEOUS.toolTipText");
     //endregion Enum Declarations
 
@@ -142,6 +147,26 @@ public enum TransactionType {
 
     public boolean isCarryover() {
         return this == CARRYOVER;
+    }
+
+    public boolean isFine() {
+        return this == FINE;
+    }
+
+    public boolean isRent() {
+        return this == RENT;
+    }
+
+    public boolean isConstruction() {
+        return this == CONSTRUCTION;
+    }
+
+    public boolean isTaxes() {
+        return this == TAXES;
+    }
+
+    public boolean isMedicalExpenses() {
+        return this == MEDICAL_EXPENSES;
     }
 
     public boolean isMiscellaneous() {
