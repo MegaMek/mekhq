@@ -33,7 +33,7 @@ public class CampaignPresetManagementDialog extends AbstractMHQDialog {
 
     //region Constructors
     public CampaignPresetManagementDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "CampaignPresetManagementDialog", "CampaignPresetManagementDialog.title");
+        super(frame, true, "CampaignPresetManagementDialog", "CampaignPresetManagementDialog.title");
         this.campaign = campaign;
         initialize();
     }
