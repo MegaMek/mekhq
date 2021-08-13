@@ -1269,9 +1269,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 for (final Mission mission : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
-                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                        if (scenario.isCloaked() ||
+                                (gui.getCampaign().getCampaignOptions().getUseAtB()
                                 && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign())) {
+                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign()))) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
@@ -1283,7 +1284,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (missionMenu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(missionMenu, 30);
                     }
-                    menu.add(missionMenu);
+                    
+                    if(missionMenu.getItemCount() > 0) {
+                        menu.add(missionMenu);
+                    }
                 }
                 // Scroll bar in case the list is too long for one screen
                 if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
