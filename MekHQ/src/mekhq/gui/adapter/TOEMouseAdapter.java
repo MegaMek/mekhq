@@ -1285,7 +1285,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         MenuScroller.setScrollerFor(missionMenu, 30);
                     }
                     
-                    if(missionMenu.getItemCount() > 0) {
+                    if (missionMenu.getItemCount() > 0) {
                         menu.add(missionMenu);
                     }
                 }
