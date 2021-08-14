@@ -710,10 +710,13 @@ public class ContractMarket implements Serializable {
                 if (i == CLAUSE_SALVAGE) mods.mods[i] -= 2;
                 else mods.mods[i] += 1;
         } else {
-            if (contract.getEnemySkill().isVeteranOrGreater())
+            if (contract.getEnemySkill().isVeteranOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
-            if (contract.getEnemySkill().isElite())
+            }
+
+            if (contract.getEnemySkill().isEliteOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
+            }
         }
 
         int[][] missionMods = {
