@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.universe.eras.Eras;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -148,7 +149,7 @@ import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.DefaultPlanetSelector;
-import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -381,18 +382,14 @@ public class Campaign implements Serializable, ITechManager {
         this.name = s;
     }
 
-    public String getEraName() {
-        return Era.getEraNameFromYear(getGameYear());
-    }
-
-    public int getEra() {
-        return Era.getEra(getGameYear());
+    public Era getEra() {
+        return Eras.getInstance().getEra(getLocalDate());
     }
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
                 + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
-                + " (" + getEraName() + ")";
+                + " (" + getEra() + ")";
     }
 
     public LocalDate getLocalDate() {
@@ -3691,16 +3688,16 @@ public class Campaign implements Serializable, ITechManager {
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
-        
+
         // clear out StratCon force assignments
         for (AtBContract contract : getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() != null) {
                 for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                     track.unassignForce(fid);
                 }
-            }   
+            }
         }
-        
+
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
