@@ -556,7 +556,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 int oldExpLevel = selectedPerson.getExperienceLevel(false);
                 selectedPerson.improveSkill(type);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
 
                 PersonalLogger.improvedSkill(gui.getCampaign(), selectedPerson,
                         gui.getCampaign().getLocalDate(), selectedPerson.getSkill(type).getType().getName(),
@@ -595,7 +595,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         selected, true);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
                         gui.getCampaign().getLocalDate(), displayName);
@@ -609,7 +609,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_WEAPON_SPECIALIST, selected);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
@@ -624,7 +624,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_SPECIALIST, selected);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
@@ -639,7 +639,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_RANGE_MASTER, selected);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
@@ -654,7 +654,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         OptionsConstants.MISC_HUMAN_TRO, selected);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
@@ -670,7 +670,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String ability = data[3];
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         ability, selected);
-                selectedPerson.awardXP(-cost);
+                selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(ability), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
@@ -875,7 +875,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_1_XP: {
                 for (Person person : people) {
-                    person.awardXP(1);
+                    person.awardXP(gui.getCampaign(), 1);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -893,7 +893,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 for (Person person : people) {
-                    person.awardXP(ia);
+                    person.awardXP(gui.getCampaign(), ia);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -907,7 +907,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 int i = pvcd.getValue();
                 for (Person person : people) {
-                    person.setXP(i);
+                    person.setXP(gui.getCampaign(), i);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -915,7 +915,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_BUY_EDGE: {
                 final int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
                 for (Person person : people) {
-                    selectedPerson.awardXP(-cost);
+                    selectedPerson.spendXP(cost);
                     person.changeEdge(1);
                     // Make the new edge point available to support personnel, but don't reset until
                     // the week ends

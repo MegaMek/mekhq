@@ -207,6 +207,7 @@ public class Person implements Serializable {
 
     private PersonnelStatus status;
     private int xp;
+    private int totalXPEarnings;
     private int acquisitions;
     private Money salary;
     private Money totalEarnings;
@@ -375,7 +376,8 @@ public class Person implements Serializable {
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
-        xp = 0;
+        setXPDirect(0);
+        setTotalXPEarnings(0);
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
         setRankSystemDirect((campaign == null) ? null : campaign.getRankSystem());
@@ -1521,12 +1523,38 @@ public class Person implements Serializable {
         return xp;
     }
 
-    public void setXP(int xp) {
+    public void awardXP(final Campaign campaign, final int xp) {
+        this.xp += xp;
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
+            changeTotalXPEarnings(xp);
+        }
+    }
+
+    public void spendXP(final int xp) {
+        this.xp -= xp;
+    }
+
+    public void setXP(final Campaign campaign, final int xp) {
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
+            changeTotalXPEarnings(xp - getXP());
+        }
+        setXPDirect(xp);
+    }
+
+    private void setXPDirect(final int xp) {
         this.xp = xp;
     }
 
-    public void awardXP(int xp) {
-        this.xp += xp;
+    public int getTotalXPEarnings() {
+        return totalXPEarnings;
+    }
+
+    public void changeTotalXPEarnings(final int xp) {
+        setTotalXPEarnings(getTotalXPEarnings() + xp);
+    }
+
+    public void setTotalXPEarnings(final int totalXPEarnings) {
+        this.totalXPEarnings = totalXPEarnings;
     }
     //endregion Experience
 
@@ -1663,8 +1691,14 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
             getPortrait().writeToXML(pw1, indent + 1);
-            // Always save the current XP
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
+            if (getXP() != 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", getXP());
+            }
+
+            if (getTotalXPEarnings() != 0) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "totalXPEarnings", getTotalXPEarnings());
+            }
+
             if (daysToWaitForHealing != 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
@@ -1909,7 +1943,9 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    retVal.xp = Integer.parseInt(wn2.getTextContent());
+                    retVal.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("totalXPEarnings")) {
+                    retVal.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
                     retVal.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {

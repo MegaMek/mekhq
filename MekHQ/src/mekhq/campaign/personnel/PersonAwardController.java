@@ -115,7 +115,13 @@ public class PersonAwardController {
             }
             awards.add(award);
         }
-        person.awardXP(award.getXPReward());
+
+        if (award.getXPReward() > 0) {
+            person.awardXP(campaign, award.getXPReward());
+        } else {
+            person.spendXP(award.getXPReward());
+        }
+
         if (award.getEdgeReward() > 0) {
             person.changeEdge(award.getEdgeReward());
             person.changeCurrentEdge(award.getEdgeReward());

@@ -2031,7 +2031,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         if (xpGained > 0) {
-            doctor.awardXP(xpGained);
+            doctor.awardXP(this, xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
         medWork.setDaysToWaitForHealing(getCampaignOptions()
@@ -2525,7 +2525,7 @@ public class Campaign implements Serializable, ITechManager {
             person.incrementAcquisition();
 
             if (xpGained > 0) {
-                person.awardXP(xpGained);
+                person.awardXP(this, xpGained);
                 report += " (" + xpGained + "XP gained) ";
             }
         }
@@ -2930,8 +2930,9 @@ public class Campaign implements Serializable, ITechManager {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
+
         if (xpGained > 0) {
-            tech.awardXP(xpGained);
+            tech.awardXP(this, xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
@@ -3243,7 +3244,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.awardXP(getCampaignOptions().getIdleXP());
+                        p.awardXP(this, getCampaignOptions().getIdleXP());
                         addReport(p.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
@@ -3599,7 +3600,7 @@ public class Campaign implements Serializable, ITechManager {
                                             : SkillType.EXP_ELITE);
                             if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
                                 // ...add one XP.
-                                p.awardXP(1);
+                                p.awardXP(this, 1);
                                 addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
                             }
                         }
@@ -3691,16 +3692,16 @@ public class Campaign implements Serializable, ITechManager {
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
-        
+
         // clear out StratCon force assignments
         for (AtBContract contract : getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() != null) {
                 for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                     track.unassignForce(fid);
                 }
-            }   
+            }
         }
-        
+
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
@@ -5455,7 +5456,7 @@ public class Campaign implements Serializable, ITechManager {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
                 Person p = getPerson(k.getPilotId());
                 if (null != p) {
-                    p.awardXP(getCampaignOptions().getKillXPAward());
+                    p.awardXP(this, getCampaignOptions().getKillXPAward());
                     MekHQ.triggerEvent(new PersonChangedEvent(p));
                 }
             }
