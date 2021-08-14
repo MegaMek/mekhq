@@ -116,10 +116,10 @@ public class PersonAwardController {
             awards.add(award);
         }
 
-        if (award.getXPReward() > 0) {
-            person.awardXP(campaign, award.getXPReward());
+        if (award.getXPReward() < 0) {
+            person.spendXP(-award.getXPReward());
         } else {
-            person.spendXP(award.getXPReward());
+            person.awardXP(campaign, award.getXPReward());
         }
 
         if (award.getEdgeReward() > 0) {
