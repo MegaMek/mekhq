@@ -1436,7 +1436,7 @@ public class ResolveScenarioTracker {
                 if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
                         && isAtBContract) {
                     // Are they actually a defector?
-                    if (Compute.d6(2) >= (10 + ((AtBContract) mission).getEnemySkill() - getCampaign().getUnitRatingAsInteger())) {
+                    if (Compute.d6(2) >= (8 + ((AtBContract) mission).getEnemySkill().ordinal() - getCampaign().getUnitRatingAsInteger())) {
                         prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
                     }
                 }

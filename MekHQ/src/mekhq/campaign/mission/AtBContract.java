@@ -21,7 +21,6 @@
  */
 package mekhq.campaign.mission;
 
-import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Compute;
@@ -29,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
@@ -95,9 +95,9 @@ public class AtBContract extends Contract implements Serializable {
     protected String enemyCode;
 
     protected AtBContractType contractType;
-    protected int allySkill;
+    protected SkillLevel allySkill;
     protected int allyQuality;
-    protected int enemySkill;
+    protected SkillLevel enemySkill;
     protected int enemyQuality;
     protected String allyBotName;
     protected String enemyBotName;
@@ -149,9 +149,9 @@ public class AtBContract extends Contract implements Serializable {
         mercSubcontract = false;
 
         setContractType(AtBContractType.GARRISON_DUTY);
-        allySkill = RandomSkillsGenerator.L_REG;
+        setAllySkill(SkillLevel.REGULAR);
         allyQuality = IUnitRating.DRAGOON_C;
-        enemySkill = RandomSkillsGenerator.L_REG;
+        setEnemySkill(SkillLevel.REGULAR);
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
@@ -318,7 +318,7 @@ public class AtBContract extends Contract implements Serializable {
         //
 
         // Enemy skill rating: Green -1, Veteran +1, Elite +2
-        int mod = Math.max(enemySkill - 2, -1);
+        int mod = Math.max(getEnemySkill().ordinal() - 3, -1);
 
         // Player Dragoon/MRBC rating: F +2, D +1, B -1, A -2
         mod -= dragoonRating - IUnitRating.DRAGOON_C;
@@ -896,11 +896,11 @@ public class AtBContract extends Contract implements Serializable {
                         || wn2.getNodeName().equalsIgnoreCase("missionType")) { // Mission Type is Legacy - 0.49.2 removal
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
-                    allySkill = Integer.parseInt(wn2.getTextContent());
+                    setAllySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allyQuality")) {
                     allyQuality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemySkill")) {
-                    enemySkill = Integer.parseInt(wn2.getTextContent());
+                    setEnemySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     enemyQuality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("allyBotName")) {
@@ -1040,19 +1040,19 @@ public class AtBContract extends Contract implements Serializable {
         setType(contractType.toString());
     }
 
-    public int getAllySkill() {
+    public SkillLevel getAllySkill() {
         return allySkill;
     }
 
-    public void setAllySkill(int allySkill) {
+    public void setAllySkill(final SkillLevel allySkill) {
         this.allySkill = allySkill;
     }
 
-    public int getEnemySkill() {
+    public SkillLevel getEnemySkill() {
         return enemySkill;
     }
 
-    public void setEnemySkill(int enemySkill) {
+    public void setEnemySkill(final SkillLevel enemySkill) {
         this.enemySkill = enemySkill;
     }
 

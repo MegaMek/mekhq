@@ -21,7 +21,9 @@ package mekhq.campaign.mission.atb;
 
 import java.util.UUID;
 
-import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.enums.SkillGeneratorType;
+import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
+import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -29,6 +31,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.HitData;
 import megamek.common.Mounted;
 import megamek.common.ToHitData;
+import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -179,18 +182,16 @@ public class AtBScenarioModifierApplicator {
      */
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
-        // we want a number between 0 (which indicates "Green") and 3 ("Elite"), inclusive. Anything outside those bounds is
-        // meaningless within the context of the skill generator
-        int adjustedSkill = Math.min(RandomSkillsGenerator.L_ELITE,
-                Math.max(RandomSkillsGenerator.L_GREEN, scenario.getEffectiveOpforSkill() + skillAdjustment));
+        // We want a non-none Skill Level
+        final SkillLevel adjustedSkill = SkillLevel.values()[Math.min(SkillLevel.HEROIC.ordinal(),
+                Math.max(SkillLevel.ULTRA_GREEN.ordinal(), scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment))];
 
         // fire up a skill generator set to the appropriate skill model
-        RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-        rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-        rsg.setLevel(adjustedSkill);
+        final AbstractSkillGenerator abstractSkillGenerator = new TaharqaSkillGenerator();
+        abstractSkillGenerator.setLevel(adjustedSkill);
 
         if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {
-            rsg.setType(RandomSkillsGenerator.T_CLAN);
+            abstractSkillGenerator.setType(SkillGeneratorType.CLAN);
         }
 
         // now go through all the opfor entities currently in the scenario
@@ -199,8 +200,7 @@ public class AtBScenarioModifierApplicator {
             BotForce bf = scenario.getBotForce(x);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
                 for (Entity en : bf.getEntityList()) {
-                    int[] skills = rsg.getRandomSkills(en);
-
+                    int[] skills = abstractSkillGenerator.generateRandomSkills(en);
                     en.getCrew().setGunnery(skills[0]);
                     en.getCrew().setPiloting(skills[1]);
                 }
