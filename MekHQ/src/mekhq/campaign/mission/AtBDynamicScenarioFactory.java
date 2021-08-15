@@ -1604,6 +1604,9 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
+        
+        bvBudget += bvBudget * scenario.getEffectivePlayerBVMultiplier();
+        
 
         // allied bot forces that contribute to BV do not get multiplied by the difficulty
         // even if the player is super good, the AI doesn't get any better
@@ -1934,29 +1937,35 @@ public class AtBDynamicScenarioFactory {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn(), scenario);
+            setDeploymentTurns(currentBotForce, forceTemplate, scenario);
         }
     }
 
     /**
      * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
-     * @param botForce The bot force to process
-     * @param deployRound The specific deployment round, or a special constant.
+     * Also makes use of the given scenarios reinforcement delay modifier.
+     * 
      * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
-    public static void setDeploymentTurns(BotForce botForce, int deployRound,
+    public static void setDeploymentTurns(BotForce botForce, ScenarioForceTemplate forceTemplate,
             AtBDynamicScenario scenario) {
         // deployment turns don't matter for transported entities
         List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
         
-        if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+        if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
-        } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-            setDeploymentTurnsForReinforcements(untransportedEntities, 0);
+        } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+            if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
+                setDeploymentTurnsForReinforcements(untransportedEntities, scenario.getHostileReinforcementDelayReduction());
+            } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
+                setDeploymentTurnsForReinforcements(untransportedEntities, scenario.getFriendlyReinforcementDelayReduction());
+            } else {
+                setDeploymentTurnsForReinforcements(untransportedEntities, 0);
+            }
         } else {
             for (Entity entity : untransportedEntities) {
-                entity.setDeployRound(deployRound);
+                entity.setDeployRound(forceTemplate.getArrivalTurn());
             }
         }
     }
@@ -1997,7 +2006,7 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(forceEntities, strategy);
+                    setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
                 } else {
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
