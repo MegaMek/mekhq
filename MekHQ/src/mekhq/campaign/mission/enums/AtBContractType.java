@@ -544,7 +544,7 @@ public enum AtBContractType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning ACTIVE.");
+        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }

@@ -78,7 +78,7 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn(), scenario);
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario);
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
 
         // at this point, we have to re-translate the scenario objectives
@@ -353,5 +353,16 @@ public class AtBScenarioModifierApplicator {
     public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
         scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(),
                 (Boolean) goodEvent));
+    }
+    
+    /**
+     * Applies a flat reduction to the reinforcement arrival times, either of player/allied forces or hostile forces.
+     */
+    public static void applyReinforcementDelayReduction(AtBDynamicScenario scenario, ForceAlignment recipient, int value) {
+        if (recipient == ForceAlignment.Allied) {
+            scenario.setFriendlyReinforcementDelayReduction(value);
+        } else if (recipient == ForceAlignment.Opposing) {
+            scenario.setHostileReinforcementDelayReduction(value);
+        }
     }
 }
