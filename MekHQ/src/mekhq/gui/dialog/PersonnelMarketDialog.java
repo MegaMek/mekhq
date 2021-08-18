@@ -322,7 +322,7 @@ public class PersonnelMarketDialog extends JDialog {
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
             if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
-                            ? selectedPerson.getSalary().multipliedBy(2)
+                            ? selectedPerson.getSalary(campaign).multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
                  campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {

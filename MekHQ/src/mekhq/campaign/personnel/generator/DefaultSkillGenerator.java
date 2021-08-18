@@ -18,21 +18,20 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import megamek.common.Compute;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
-public class DefaultSkillGenerator extends AbstractSkillGenerator {
+import java.util.ArrayList;
+import java.util.List;
 
+public class DefaultSkillGenerator extends AbstractSkillGenerator {
     @Override
-    public void generateSkills(Person person, int expLvl) {
+    public void generateSkills(final Campaign campaign, final Person person, final int expLvl) {
         PersonnelRole primaryRole = person.getPrimaryRole();
         PersonnelRole secondaryRole = person.getSecondaryRole();
         RandomSkillPreferences rskillPrefs = getSkillPreferences();
@@ -71,7 +70,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         // roll artillery skill
-        if (getCampaignOptions(person).useArtillery()
+        if (campaign.getCampaignOptions().useArtillery()
                 && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             int artyLvl = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
@@ -92,9 +91,5 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);
         }
-    }
-
-    private CampaignOptions getCampaignOptions(Person person) {
-        return person.getCampaign().getCampaignOptions();
     }
 }

@@ -333,7 +333,7 @@ public class Finances implements Serializable {
 
                     if (campaign.getCampaignOptions().trackTotalEarnings()) {
                         for (Person person : campaign.getActivePersonnel()) {
-                            person.payPersonSalary();
+                            person.payPersonSalary(campaign);
                         }
                     }
                 } else {
@@ -402,12 +402,12 @@ public class Finances implements Serializable {
                     int numberOfShares = 0;
                     boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {
-                        numberOfShares += person.getNumShares(sharesForAll);
+                        numberOfShares += person.getNumShares(campaign, sharesForAll);
                     }
 
                     Money singleShare = shares.dividedBy(numberOfShares);
                     for (Person person : campaign.getActivePersonnel()) {
-                        person.payPersonShares(singleShare, sharesForAll);
+                        person.payPersonShares(campaign, singleShare, sharesForAll);
                     }
                 }
             } else {

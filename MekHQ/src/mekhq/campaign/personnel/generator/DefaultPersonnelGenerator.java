@@ -95,11 +95,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator();
         skillGenerator.setSkillPreferences(getSkillPreferences());
-        skillGenerator.generateSkills(person, expLvl);
+        skillGenerator.generateSkills(campaign, person, expLvl);
 
         AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
         specialAbilityGenerator.setSkillPreferences(getSkillPreferences());
-        specialAbilityGenerator.generateSpecialAbilities(person, expLvl);
+        specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
 
         // Do naming at the end, to ensure the keys are set
         generateName(campaign, person, gender);

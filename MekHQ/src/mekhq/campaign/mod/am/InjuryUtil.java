@@ -243,7 +243,7 @@ public final class InjuryUtil {
             time += Compute.d6();
         }
 
-        time = (int) Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
+        time = (int) Math.round((time * mod * p.getAbilityTimeModifier(c)) / 10000.0);
         return time;
     }
 

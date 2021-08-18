@@ -1392,27 +1392,27 @@ public class ResolveScenarioTracker {
                         scenario.getName(), mission.getName());
             }
             for (Kill k : status.getKills()) {
-                campaign.addKill(k);
+                getCampaign().addKill(k);
             }
             if (status.isMissing()) {
                 person.changeStatus(getCampaign(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), PersonnelStatus.KIA);
-                if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
-                    campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, campaign.getCampaignOptions().getUseShareSystem()
-                                    ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
+                if (getCampaign().getCampaignOptions().getUseAtB() && isAtBContract) {
+                    getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
+                            true, getCampaign().getCampaignOptions().getUseShareSystem()
+                                    ? person.getNumShares(getCampaign(), getCampaign().getCampaignOptions().getSharesForAll())
                                     : 0,
                             campaign, (AtBContract) mission);
                 }
             }
 
-            if (campaign.getCampaignOptions().useAdvancedMedical()) {
-                person.diagnose(status.getHits());
+            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+                person.diagnose(getCampaign(), status.getHits());
             }
 
             if (status.toRemove()) {
-                campaign.removePerson(person, false);
+                getCampaign().removePerson(person, false);
             }
         }
 
@@ -1427,7 +1427,7 @@ public class ResolveScenarioTracker {
             if (status.isDead()) {
                 continue;
             } else if (status.isRansomed()) {
-                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue());
+                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue(getCampaign()));
                 continue;
             } else if (status.isCaptured()) {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
@@ -1461,7 +1461,7 @@ public class ResolveScenarioTracker {
             }
 
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
-                person.diagnose(status.getHits());
+                person.diagnose(getCampaign(), status.getHits());
             }
         }
 

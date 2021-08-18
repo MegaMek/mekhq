@@ -665,7 +665,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
 
         JLabel lblShares = new JLabel();
-        lblShares.setText(person.getNumShares(campaign.getCampaignOptions().getSharesForAll()) + " shares");
+        lblShares.setText(person.getNumShares(campaign,
+                campaign.getCampaignOptions().getSharesForAll()) + " shares");
 
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
