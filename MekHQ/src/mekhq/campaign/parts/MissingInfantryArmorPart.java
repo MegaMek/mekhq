@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -160,20 +161,24 @@ public class MissingInfantryArmorPart extends MissingPart {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("damageDivisor")) {
-                damageDivisor = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
-                dest = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
-                encumbering = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
-                sneak_camo = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
-                sneak_ecm = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
-                sneak_ir = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
-                spaceSuit = Boolean.parseBoolean(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("damageDivisor")) {
+                    damageDivisor = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
+                    dest = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
+                    encumbering = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
+                    sneak_camo = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
+                    sneak_ecm = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
+                    sneak_ir = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
+                    spaceSuit = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
