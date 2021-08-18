@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Improved coordination allows hostile reinforcements to deploy quicker.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<reinforcementDelayReduction>1</reinforcementDelayReduction>
+</AtBScenarioModifier>
