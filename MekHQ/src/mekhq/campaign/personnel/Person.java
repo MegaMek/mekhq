@@ -337,7 +337,7 @@ public class Person implements Serializable {
     public Person(final String preNominal, final String givenName, final String surname,
                   final String postNominal, final @Nullable Campaign campaign,
                   final String factionCode) {
-        // Then, we assign the variables in XML file order
+        // We assign the variables in XML file order
         id = UUID.randomUUID();
 
         //region Name
@@ -2554,16 +2554,17 @@ public class Person implements Serializable {
     }
 
     /**
-     * returns a full description in HTML format that will be used for the graphical display in the
+     * @param campaign the campaign the person is a part of
+     * @return a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
-     * @return String
      */
     public String getFullDesc(final Campaign campaign) {
         return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + " " + getRoleDesc();
     }
 
     public String getHTMLTitle() {
-        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>",
+                getId(), getFullTitle());
     }
 
     public String getFullTitle() {
