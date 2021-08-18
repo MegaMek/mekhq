@@ -100,8 +100,8 @@ public class AtBDynamicScenarioFactory {
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
     // bomb types assignable to aerospace units on ground maps
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, 
-            BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE, 
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL,
+            BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE,
             BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
@@ -163,8 +163,8 @@ public class AtBDynamicScenarioFactory {
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
-            
-            // the default template should not allow the user to deploy ground units as 
+
+            // the default template should not allow the user to deploy ground units as
             // reinforcements to aerospace battles
             // space battles are even more restrictive
             if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
@@ -172,8 +172,8 @@ public class AtBDynamicScenarioFactory {
             } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
                 defaultReinforcements.setAllowedUnitType(UnitType.AERO);
             }
-            
-            
+
+
             template.getScenarioForces().put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
@@ -194,7 +194,7 @@ public class AtBDynamicScenarioFactory {
         for (int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
         }
-        
+
         applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
 
         // Now we can clear the other related lists
@@ -228,7 +228,7 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().useAbilities()) {
             upgradeBotCrews(scenario);
         }
-        
+
         scenario.setFinalized(true);
     }
 
@@ -428,7 +428,7 @@ public class AtBDynamicScenarioFactory {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
                 boolean isAeroMap = (mapLocation == MapLocation.LowAtmosphere) ||
                         (mapLocation == MapLocation.Space);
-                        
+
                 populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
 
@@ -864,21 +864,21 @@ public class AtBDynamicScenarioFactory {
         scenario.setMapSizeX(mapSizeX);
         scenario.setMapSizeY(mapSizeY);
     }
-    
+
     /**
-     * If there are maps of the appropriate size available and we roll higher than 
+     * If there are maps of the appropriate size available and we roll higher than
      * the given threshold, replace the scenario's generated map with a fixed map from data/boards
      */
     private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
         if ((scenario.getMapSizeX() > 0) && (scenario.getMapSizeY() > 0) && (Compute.randomInt(100) <= mapChance)) {
             BoardClassifier bc = BoardClassifier.getInstance();
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
-            
+
             if (!maps.isEmpty()) {
                 String mapPath = Utilities.getRandomItem(maps);
                 MegaMekFile mapFile = new MegaMekFile(mapPath);
                 BoardDimensions dimensions = Board.getSize(mapFile.getFile());
-                
+
                 scenario.setMap(bc.getBoardPaths().get(mapPath));
                 scenario.setMapSizeX(dimensions.width());
                 scenario.setMapSizeY(dimensions.height());
@@ -886,7 +886,7 @@ public class AtBDynamicScenarioFactory {
                 return;
             }
         }
-        
+
         scenario.setUsingFixedMap(false);
         scenario.setMapFile();
     }
@@ -1604,9 +1604,8 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
-        
-        bvBudget += bvBudget * scenario.getEffectivePlayerBVMultiplier();
-        
+
+        bvBudget += (int) Math.round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
 
         // allied bot forces that contribute to BV do not get multiplied by the difficulty
         // even if the player is super good, the AI doesn't get any better
@@ -1944,7 +1943,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
      * Also makes use of the given scenarios reinforcement delay modifier.
-     * 
+     *
      * ARRIVAL_TURN_STAGGERED_BY_LANCE is not implemented.
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
@@ -1952,7 +1951,7 @@ public class AtBDynamicScenarioFactory {
             AtBDynamicScenario scenario) {
         // deployment turns don't matter for transported entities
         List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
-        
+
         if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
@@ -2133,7 +2132,7 @@ public class AtBDynamicScenarioFactory {
             if (entity.getTransportId() != Entity.NONE) {
                 continue;
             }
-            
+
             int speed = calculateAtBSpeed(entity);
 
             // don't reduce minimum speed to 0, since dividing by zero further down is problematic
@@ -2307,7 +2306,7 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Helper function that puts the units in the given list at the given altitude. 
+     * Helper function that puts the units in the given list at the given altitude.
      * Use with caution, as may lead to splattering or aerospace units starting on the ground.
      * @param entityList The entity list to process.
      * @param startingAltitude Starting altitude.
@@ -2316,7 +2315,7 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             if (entity instanceof IAero) {
                 entity.setAltitude(startingAltitude);
-                
+
                 // there's a lot of stuff that happens whan an aerospace unit
                 // "lands", so let's make sure it all happens
                 if (startingAltitude == 0) {
@@ -2325,7 +2324,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
     }
-    
+
     /**
      * This method contains various hacks intended to put "special units"
      * such as LAMs, VTOLs and WIGEs into a reasonable state that the bot can use
@@ -2334,7 +2333,7 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             boolean inSpace = terrainType == AtBScenario.TER_SPACE;
             boolean inAtmo = terrainType == AtBScenario.TER_LOW_ATMO;
-            
+
             // hack for land-air mechs
             if (entity instanceof LandAirMech) {
                 if (inSpace || inAtmo) {
@@ -2344,9 +2343,9 @@ public class AtBDynamicScenarioFactory {
                     ((LandAirMech) entity).setConversionMode(LandAirMech.CONV_MODE_MECH);
                 }
             }
-            
+
             // hack - set helis and WIGEs to an explicit altitude of 1
-            // currently there is no support for setting elevation for "ground" units 
+            // currently there is no support for setting elevation for "ground" units
             // in the scenario template editor, but it looks dumb to have choppers
             // start out on the ground
             if ((entity.getMovementMode() == EntityMovementMode.VTOL) ||
@@ -2389,29 +2388,29 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function that takes an entity and an array of bomb types
-     * and loads it up with as many of a mostly period-appropriate random bomb type 
+     * and loads it up with as many of a mostly period-appropriate random bomb type
      * as it's capable of holding
      */
     private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
         int[] bombChoices = new int[BombType.B_NUM];
-        
+
         // remove bomb choices if they're not era-appropriate
         List<Integer> actualValidBombChoices = new ArrayList<>();
         for (int x = 0; x < validBombChoices.length; x++) {
             String typeName = BombType.getBombInternalName(validBombChoices[x]);
-            
+
             // hack: make rocket launcher pods available before 3055
             if ((validBombChoices[x] == BombType.B_RL) ||
                     BombType.get(typeName).isAvailableIn(year)) {
                 actualValidBombChoices.add(validBombChoices[x]);
             }
         }
-        
+
         // pick out the index in the BombType array
         int randomBombChoiceIndex = Compute.randomInt(actualValidBombChoices.size());
         int bombIndex = actualValidBombChoices.get(randomBombChoiceIndex);
         int weightModifier = 0;
-        
+
         // hack: we only really need one "tag", so add it then pack on some more bombs
         if (bombIndex == BombType.B_TAG) {
             weightModifier = 5;
@@ -2419,9 +2418,9 @@ public class AtBDynamicScenarioFactory {
             actualValidBombChoices.remove(randomBombChoiceIndex);
             bombIndex = Utilities.getRandomItem(actualValidBombChoices);
         }
-        
+
         // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) Math.floor((entity.getWeight() - weightModifier) / 
+        int numBombs = (int) Math.floor((entity.getWeight() - weightModifier) /
                 (BombType.getBombCost(bombIndex) * 5.0));
         bombChoices[bombIndex] = numBombs;
 
@@ -2490,7 +2489,7 @@ public class AtBDynamicScenarioFactory {
             csu.upgradeCrew(entity);
         }
     }
-    
+
     /**
      * Highly paranoid function that will check if the given faction is one of the
      * owners of the contract's location at the current date.
@@ -2500,12 +2499,12 @@ public class AtBDynamicScenarioFactory {
                 (contract.getSystem().getFactions(currentDate) == null)) {
             return false;
         }
-        
+
         return contract.getSystem().getFactions(currentDate).contains(factionCode);
     }
-    
+
     /**
-     * Given a player unit ID and a template name, if the player unit type matches  
+     * Given a player unit ID and a template name, if the player unit type matches
      * the template's unit type and the template generation method is PlayerOrAllied,
      * take the first unit that we find in the given scenario that's a part of that
      * template and "put it away".
@@ -2515,48 +2514,48 @@ public class AtBDynamicScenarioFactory {
         if (scenario.getTemplate().getScenarioForces().containsKey(templateName)) {
             destinationTemplate = scenario.getTemplate().getScenarioForces().get(templateName);
         }
-        
-        if ((destinationTemplate == null) || 
+
+        if ((destinationTemplate == null) ||
                 (destinationTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             return;
         }
-        
+
         // two possible situations here:
-        // 1 - the unit is an "attached" unit. This requires a mapping between template name and 
+        // 1 - the unit is an "attached" unit. This requires a mapping between template name and
         //      individual attached units. At this point, we remove the first unit matching the template
         //      from the attached units list. The benched unit should have the player unit's ID
         //      stored so that if the player unit is detached, the benched unit comes back.
         // 2 - the unit is part of a bot force. In this case, we need a mapping between template names
-        //      and bot forces. 
+        //      and bot forces.
 
         if (destinationTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) {
             Entity swapTarget = null;
-            
+
             // look through the "allies" player to see a unit that was put there
             // under a matching template
             for (Entity entity : scenario.getAlliesPlayer()) {
                 UUID unitID = UUID.fromString(entity.getExternalIdAsString());
-                
+
                 if (scenario.getBotUnitTemplates().get(unitID).getForceName().equals(templateName)) {
                     swapTarget = entity;
                     break;
                 }
             }
-            
+
             if (swapTarget == null) {
                 return;
             }
-            
+
             BenchedEntityData benchedEntity = new BenchedEntityData();
             benchedEntity.entity = swapTarget;
             benchedEntity.templateName = "";
-            
+
             scenario.getAlliesPlayer().remove(swapTarget);
             scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
             swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), "", scenario);
         } else {
             BotForce botForce = null;
-            
+
             // slightly inefficient to loop through all bot forces looking for our template
             // but it is also difficult to create a reverse lookup, so we avoid that problem for now
             for (int x = 0; x < scenario.getNumBots(); x++) {
@@ -2566,20 +2565,20 @@ public class AtBDynamicScenarioFactory {
                     break;
                 }
             }
-            
+
             if ((botForce != null) && !botForce.getEntityList().isEmpty()) {
                 Entity swapTarget = botForce.getEntityList().get(0);
                 BenchedEntityData benchedEntity = new BenchedEntityData();
                 benchedEntity.entity = swapTarget;
                 benchedEntity.templateName = destinationTemplate.getForceName();
-                
+
                 botForce.removeEntity(0);
                 scenario.getPlayerUnitSwaps().put(playerUnitID, benchedEntity);
                 swapUnitInObjectives(playerUnitID.toString(), benchedEntity.entity.getExternalIdAsString(), botForce.getName(), scenario);
             }
         }
     }
-    
+
     /**
      * Given a scenario and a pair of unit IDs (and a force), swap the first one for the second one.
      * Or, add the unit to all objectives containing the given force.
@@ -2589,23 +2588,23 @@ public class AtBDynamicScenarioFactory {
             // if the sub-out unit is explicitly referenced, do a direct substitution
             if (objective.getAssociatedUnitIDs().contains(subOut)) {
                 objective.removeUnit(subOut);
-                
+
                 // don't want to add an empty unit to the objective
                 if (!subIn.isEmpty()) {
                     objective.addUnit(subIn);
                 }
-                
+
                 continue;
             }
-            
-            // if the sub-out unit is replacing a unit that's part of a force, 
+
+            // if the sub-out unit is replacing a unit that's part of a force,
             // just add it individually
             if (objective.getAssociatedForceNames().contains(subOutForceName)) {
                 objective.addUnit(subIn);
             }
         }
     }
-    
+
     /**
      * Given a player unit ID and a scenario, return a benched allied unit, if one exists
      * that was benched in favor of the player's unit.
@@ -2615,7 +2614,7 @@ public class AtBDynamicScenarioFactory {
         // add it to to bot force being worked with or attached ally list
         if (scenario.getPlayerUnitSwaps().containsKey(playerUnitID)) {
             BenchedEntityData benchedEntityData = scenario.getPlayerUnitSwaps().get(playerUnitID);
-            
+
             if (benchedEntityData.templateName.isEmpty()) {
                 scenario.getAlliesPlayer().add(benchedEntityData.entity);
                 swapUnitInObjectives(benchedEntityData.entity.getExternalIdAsString(), playerUnitID.toString(), "", scenario);
@@ -2624,14 +2623,14 @@ public class AtBDynamicScenarioFactory {
                     BotForce botForce = scenario.getBotForce(x);
                     if (botForce.getTemplateName().equals(benchedEntityData.templateName)) {
                         botForce.addEntity(benchedEntityData.entity);
-                        // in this situation, the entity is being added back to a force, 
-                        // so we just want to clear out the player unit. 
+                        // in this situation, the entity is being added back to a force,
+                        // so we just want to clear out the player unit.
                         swapUnitInObjectives("", playerUnitID.toString(), "", scenario);
                         break;
                     }
                 }
             }
-            
+
             scenario.getPlayerUnitSwaps().remove(playerUnitID);
         }
     }
