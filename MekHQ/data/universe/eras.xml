@@ -41,13 +41,13 @@ Note that internal use of this setup is minimal at best, at least as of 0.49.3.
 	</era>
 	<era>
 		<code>LSWL</code>
-		<name>Late Succession War - LosTech</name>
+		<name>Late Succession Wars - LosTech</name>
 		<end>3020</end>
 		<flag>LATE_SUCCESSION_WARS_LOSTECH</flag>
 	</era>
 	<era>
 		<code>LSWR</code>
-		<name>Late Succession War - Renaissance</name>
+		<name>Late Succession Wars - Renaissance</name>
 		<end>3050</end>
 		<flag>LATE_SUCCESSION_WARS_RENAISSANCE</flag>
 	</era>

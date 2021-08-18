@@ -41,7 +41,7 @@ public class Eras {
     //region Variable Declarations
     private static Eras instance;
 
-    private SortedMap<LocalDate, Era> eras;
+    private TreeMap<LocalDate, Era> eras;
     //endregion Variable Declarations
 
     //region Constructors
@@ -63,7 +63,7 @@ public class Eras {
         Eras.instance = instance;
     }
 
-    public SortedMap<LocalDate, Era> getEras() {
+    public TreeMap<LocalDate, Era> getEras() {
         return eras;
     }
 
@@ -72,14 +72,7 @@ public class Eras {
     }
 
     public Era getEra(final LocalDate today) {
-        for (final Map.Entry<LocalDate, Era> entry : getEras().entrySet()) {
-            if (today.isBefore(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-
-        MekHQ.getLogger().error("Failed to determine a valid era for the date " + today);
-        return getEras().values().stream().findFirst().orElse(new Era());
+        return getEras().ceilingEntry(today).getValue();
     }
     //endregion Getters/Setters
 
