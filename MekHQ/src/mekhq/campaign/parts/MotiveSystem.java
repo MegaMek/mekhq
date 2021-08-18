@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,14 +34,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MotiveSystem extends Part {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -5637743997294510810L;
 
 	int damage;
@@ -68,7 +63,8 @@ public class MotiveSystem extends Part {
 		return -1;
 	}
 
-	public MotiveSystem clone() {
+	@Override
+    public MotiveSystem clone() {
 		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
@@ -100,14 +96,18 @@ public class MotiveSystem extends Part {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
+		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("damage")) {
-				damage = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("penalty")) {
-				penalty = Integer.parseInt(wn2.getTextContent());
-			}
+			try {
+                if (wn2.getNodeName().equalsIgnoreCase("damage")) {
+                    damage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("penalty")) {
+                    penalty = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
 		}
 
 	}
@@ -138,8 +138,8 @@ public class MotiveSystem extends Part {
 		super.fix();
 		damage = 0;
 		penalty = 0;
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).resetMovementDamage();
+		if (null != unit && unit.getEntity() instanceof Tank) {
+			((Tank) unit.getEntity()).resetMovementDamage();
 		}
 	}
 
@@ -187,7 +187,7 @@ public class MotiveSystem extends Part {
         if (includeRepairDetails) {
             return "-" + damage + " MP/-" + penalty + " Piloting";
         } else {
-            return super.getDetails(includeRepairDetails);
+            return super.getDetails(false);
         }
     }
 

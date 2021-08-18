@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -32,14 +32,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingVeeStabiliser extends MissingPart {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 2806921577150714477L;
 	private int loc;
 
@@ -97,19 +92,23 @@ public class MissingVeeStabiliser extends MissingPart {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
+		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-				loc = Integer.parseInt(wn2.getTextContent());
-			}
+			try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
 		}
 	}
 
 	@Override
 	public void fix() {
-		VeeStabiliser replacement = (VeeStabiliser)findReplacement(false);
-		if(null != replacement) {
+		VeeStabiliser replacement = (VeeStabiliser) findReplacement(false);
+		if (null != replacement) {
 			VeeStabiliser actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
 			campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -121,13 +120,14 @@ public class MissingVeeStabiliser extends MissingPart {
 		}
 	}
 
-	public int getLocation() {
+	@Override
+    public int getLocation() {
 		return loc;
 	}
 
 	@Override
 	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Tank) {
+		if (null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).setStabiliserHit(loc);
 		}
 	}
@@ -141,6 +141,4 @@ public class MissingVeeStabiliser extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return TankLocation.TECH_ADVANCEMENT;
     }
-
-
 }
