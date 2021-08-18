@@ -1,7 +1,7 @@
 /*
  * CombatInformationCenter.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rightss Reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

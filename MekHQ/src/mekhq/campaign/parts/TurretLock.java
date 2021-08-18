@@ -34,129 +34,129 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TurretLock extends Part {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public TurretLock(Campaign c) {
-		super(0, c);
-		this.name = "Turret Lock";
-	}
+    public TurretLock(Campaign c) {
+        super(0, c);
+        this.name = "Turret Lock";
+    }
 
-	@Override
-	public int getBaseTime() {
-		return 90;
-	}
+    @Override
+    public int getBaseTime() {
+        return 90;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return -1;
-	}
+    @Override
+    public int getDifficulty() {
+        return -1;
+    }
 
-	@Override
+    @Override
     public TurretLock clone() {
-		TurretLock clone = new TurretLock(campaign);
+        TurretLock clone = new TurretLock(campaign);
         clone.copyBaseData(this);
         return clone;
-	}
+    }
 
-	@Override
-	public Money getStickerPrice() {
-		return Money.zero();
-	}
+    @Override
+    public Money getStickerPrice() {
+        return Money.zero();
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof TurretLock;
-	}
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof TurretLock;
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		// TODO Auto-generated method stub
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public String checkFixable() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).unlockTurret();
-		}
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            ((Tank) unit.getEntity()).unlockTurret();
+        }
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-		//nothing to do here
-	}
+    @Override
+    public void remove(boolean salvage) {
+        //nothing to do here
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		//nothing to do here because we are just going to check directly in needsFixing()
-		//since this "part" can never be removed
-	}
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        //nothing to do here because we are just going to check directly in needsFixing()
+        //since this "part" can never be removed
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		//nothing to do here
-	}
+    @Override
+    public void updateConditionFromPart() {
+        //nothing to do here
+    }
 
-	@Override
-	public boolean needsFixing() {
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			return ((Tank)unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
-		}
-		return false;
-	}
+    @Override
+    public boolean needsFixing() {
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            return ((Tank)unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
+        }
+        return false;
+    }
 
-	@Override
-	public boolean isSalvaging() {
-		return false;
-	}
+    @Override
+    public boolean isSalvaging() {
+        return false;
+    }
 
-	@Override
-	public String checkScrappable() {
-		return "Turret Lock is not scrappable";
-	}
+    @Override
+    public String checkScrappable() {
+        return "Turret Lock is not scrappable";
+    }
 
-	@Override
-	public boolean canNeverScrap() {
-		return true;
-	}
+    @Override
+    public boolean canNeverScrap() {
+        return true;
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 }
