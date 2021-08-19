@@ -53,6 +53,7 @@ public class NewsReportDialog extends AbstractMHQDialog {
         final JTextPane txtNews = new JTextPane();
         txtNews.setContentType("text/html");
         txtNews.setText(getNews().getFullDescription());
+        txtNews.setName("txtNews");
         txtNews.setEditable(false);
         txtNews.setCaretPosition(0);
 
