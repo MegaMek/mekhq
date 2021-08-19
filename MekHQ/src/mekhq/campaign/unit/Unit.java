@@ -129,7 +129,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private Campaign campaign;
 
     private ArrayList<Part> parts;
-    private String lastMaintenanceReport;
+    private String lastMaintenanceReport; // TODO : Swap to be a Report
     private ArrayList<PodSpace> podSpace;
 
     private Refit refit;
