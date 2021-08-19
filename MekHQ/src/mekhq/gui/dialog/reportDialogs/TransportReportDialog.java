@@ -16,52 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.campaign.report.TransportReport;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
-public class MaintenanceReportDialog extends AbstractMHQDialog {
+public class TransportReportDialog extends AbstractReportDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 3624327778807359294L;
-
-    private final Unit unit;
+    private final TransportReport transportReport;
     //endregion Variable Declarations
 
     //region Constructors
-    public MaintenanceReportDialog(final JFrame frame, final Unit unit) {
-        super(frame, "MaintenanceReportDialog", "MaintenanceReportDialog.title");
-        this.unit = unit;
-        setTitle(String.format(resources.getString("MaintenanceReportDialog.Unit.title"), unit.getName()));
+    public TransportReportDialog(final JFrame frame, final TransportReport transportReport) {
+        super(frame, "TransportReportDialog", "TransportReportDialog.title");
+        this.transportReport = transportReport;
         initialize();
     }
     //endregion Constructors
 
     //region Getters
-    public Unit getUnit() {
-        return unit;
+    public TransportReport getTransportReport() {
+        return transportReport;
     }
-    //endregion Getters
 
-    //region Initialization
     @Override
-    protected Container createCenterPane() {
+    protected JTextPane createTxtReport() {
         final JTextPane txtReport = new JTextPane();
-        txtReport.setContentType("text/html");
-        txtReport.setText(getUnit().getLastMaintenanceReport());
+        txtReport.setText(getTransportReport().getTransportDetails());
         txtReport.setName("txtReport");
         txtReport.setEditable(false);
         txtReport.setCaretPosition(0);
-
-        final JScrollPane scrollPane = new JScrollPane(txtReport);
-        scrollPane.setBorder(new EmptyBorder(2, 10, 2, 2));
-        scrollPane.setName("reportPane");
-
-        return scrollPane;
+        return txtReport;
     }
-    //endregion Initialization
+    //endregion Getters
 }

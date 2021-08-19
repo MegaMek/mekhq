@@ -1,7 +1,8 @@
 /*
  * TransportReport.java
  *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,12 +21,7 @@
  */
 package mekhq.campaign.report;
 
-import java.awt.Dimension;
-import java.awt.Font;
-
-import javax.swing.JTextPane;
-
-import megamek.common.*;
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -33,24 +29,12 @@ import mekhq.campaign.unit.Unit;
 /**
  * @author Jay Lawson
  */
-public class TransportReport extends Report {
-    public TransportReport(Campaign c) {
-        super(c);
+public class TransportReport extends AbstractReport {
+    //region Constructors
+    public TransportReport(final Campaign campaign) {
+        super(campaign);
     }
-
-    @Override
-    public String getTitle() {
-        return "Transport Capacity Report";
-    }
-
-    @Override
-    public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(getTransportDetails());
-        return txtReport;
-    }
+    //endregion Constructors
 
     public String getTransportDetails() {
         HangarStatistics stats = getCampaign().getHangarStatistics();
@@ -174,5 +158,4 @@ public class TransportReport extends Report {
 
         return new String(sb);
     }
-
 }

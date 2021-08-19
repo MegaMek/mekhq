@@ -1,7 +1,8 @@
 /*
  * CargoReport.java
  *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,49 +13,28 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
-
-import java.awt.Dimension;
-import java.awt.Font;
-
-import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
 
-
-
 /**
  * @author Jay Lawson
  */
-public class CargoReport extends Report {
-
-
-    public CargoReport(Campaign c) {
-        super(c);
+public class CargoReport extends AbstractReport {
+    //region Constructors
+    public CargoReport(final Campaign campaign) {
+        super(campaign);
     }
-
-    @Override
-    public String getTitle() {
-        return "Cargo Report";
-    }
-
-    @Override
-    public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(getCargoDetails());
-        return txtReport;
-    }
+    //endregion Constructors
 
     public String getCargoDetails() {
         CargoStatistics cargoStats = getCampaign().getCargoStatistics();

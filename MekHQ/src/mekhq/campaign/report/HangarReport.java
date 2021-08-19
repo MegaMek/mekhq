@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -19,64 +19,36 @@
  */
 package mekhq.campaign.report;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.JTextPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.ConvFighter;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.GunEmplacement;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.SpaceStation;
-import megamek.common.Tank;
-import megamek.common.Warship;
-import megamek.common.util.EncodeControl;
+import megamek.common.*;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Jay Lawson
  * @since 3/12/2012
  */
-public class HangarReport extends Report {
+public class HangarReport extends AbstractReport {
     //region Variable Declarations
     private int totalNumberOfUnits = 0;
     private int countUnitsInTransit = 0;
     private int countUnitsPresent = 0;
     private int countDamagedUnits = 0;
     private int countDeployedUnits = 0;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    public HangarReport(Campaign c) {
-        super(c);
+    public HangarReport(final Campaign campaign) {
+        super(campaign);
     }
     //endregion Constructors
-
-    @Override
-    public String getTitle() {
-        return resources.getString("HangarReport.title");
-    }
 
     public JTree getHangarTree() {
         //region Variable Declarations
@@ -293,10 +265,10 @@ public class HangarReport extends Report {
         int countSupportRailMedium = 0;
         int countSupportRailSmall = 0;
 
-        int countSupportMaglev = 0;
-        int countSupportMaglevLarge = 0;
-        int countSupportMaglevMedium = 0;
-        int countSupportMaglevSmall = 0;
+        int countSupportMagLev = 0;
+        int countSupportMagLevLarge = 0;
+        int countSupportMagLevMedium = 0;
+        int countSupportMagLevSmall = 0;
 
         int countSupportOmniVees = 0;
 
@@ -358,10 +330,10 @@ public class HangarReport extends Report {
         int countSupportOmniRailMedium = 0;
         int countSupportOmniRailSmall = 0;
 
-        int countSupportOmniMaglev = 0;
-        int countSupportOmniMaglevLarge = 0;
-        int countSupportOmniMaglevMedium = 0;
-        int countSupportOmniMaglevSmall = 0;
+        int countSupportOmniMagLev = 0;
+        int countSupportOmniMagLevLarge = 0;
+        int countSupportOmniMagLevMedium = 0;
+        int countSupportOmniMagLevSmall = 0;
         //endregion Vehicles
 
         //region Battle Armor and Infantry
@@ -800,14 +772,14 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode sSupportRailSmall = new DefaultMutableTreeNode();
         sSupportRail.add(sSupportRailSmall);
 
-        DefaultMutableTreeNode sSupportMaglev = new DefaultMutableTreeNode();
-        sSupportVees.add(sSupportMaglev);
-        DefaultMutableTreeNode sSupportMaglevLarge = new DefaultMutableTreeNode();
-        sSupportMaglev.add(sSupportMaglevLarge);
-        DefaultMutableTreeNode sSupportMaglevMedium = new DefaultMutableTreeNode();
-        sSupportMaglev.add(sSupportMaglevMedium);
-        DefaultMutableTreeNode sSupportMaglevSmall = new DefaultMutableTreeNode();
-        sSupportMaglev.add(sSupportMaglevSmall);
+        DefaultMutableTreeNode sSupportMagLev = new DefaultMutableTreeNode();
+        sSupportVees.add(sSupportMagLev);
+        DefaultMutableTreeNode sSupportMagLevLarge = new DefaultMutableTreeNode();
+        sSupportMagLev.add(sSupportMagLevLarge);
+        DefaultMutableTreeNode sSupportMagLevMedium = new DefaultMutableTreeNode();
+        sSupportMagLev.add(sSupportMagLevMedium);
+        DefaultMutableTreeNode sSupportMagLevSmall = new DefaultMutableTreeNode();
+        sSupportMagLev.add(sSupportMagLevSmall);
 
 
         // Omni Support Vees
@@ -922,14 +894,14 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode oSupportRailSmall = new DefaultMutableTreeNode();
         oSupportRail.add(oSupportRailSmall);
 
-        DefaultMutableTreeNode oSupportMaglev = new DefaultMutableTreeNode();
-        oSupportVees.add(oSupportMaglev);
-        DefaultMutableTreeNode oSupportMaglevLarge = new DefaultMutableTreeNode();
-        oSupportMaglev.add(oSupportMaglevLarge);
-        DefaultMutableTreeNode oSupportMaglevMedium = new DefaultMutableTreeNode();
-        oSupportMaglev.add(oSupportMaglevMedium);
-        DefaultMutableTreeNode oSupportMaglevSmall = new DefaultMutableTreeNode();
-        oSupportMaglev.add(oSupportMaglevSmall);
+        DefaultMutableTreeNode oSupportMagLev = new DefaultMutableTreeNode();
+        oSupportVees.add(oSupportMagLev);
+        DefaultMutableTreeNode oSupportMagLevLarge = new DefaultMutableTreeNode();
+        oSupportMagLev.add(oSupportMagLevLarge);
+        DefaultMutableTreeNode oSupportMagLevMedium = new DefaultMutableTreeNode();
+        oSupportMagLev.add(oSupportMagLevMedium);
+        DefaultMutableTreeNode oSupportMagLevSmall = new DefaultMutableTreeNode();
+        oSupportMagLev.add(oSupportMagLevSmall);
 
         top.add(supportVees);
 
@@ -1324,19 +1296,19 @@ public class HangarReport extends Report {
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
-                        countSupportOmniMaglev++;
+                        countSupportOmniMagLev++;
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniMaglevLarge++;
-                                oSupportMaglevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportOmniMagLevLarge++;
+                                oSupportMagLevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniMaglevMedium++;
-                                oSupportMaglevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportOmniMagLevMedium++;
+                                oSupportMagLevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniMaglevSmall++;
-                                oSupportMaglevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportOmniMagLevSmall++;
+                                oSupportMagLevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
@@ -1535,19 +1507,19 @@ public class HangarReport extends Report {
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
-                        countSupportMaglev++;
+                        countSupportMagLev++;
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportMaglevLarge++;
-                                sSupportMaglevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportMagLevLarge++;
+                                sSupportMagLevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportMaglevMedium++;
-                                sSupportMaglevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportMagLevMedium++;
+                                sSupportMagLevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportMaglevSmall++;
-                                sSupportMaglevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
+                                countSupportMagLevSmall++;
+                                sSupportMagLevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
@@ -2255,10 +2227,10 @@ public class HangarReport extends Report {
         sSupportRailMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportRailMedium);
         sSupportRailSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportRailSmall);
 
-        sSupportMaglev.setUserObject(resources.getString("HangarReport.Maglev") + " " + countSupportMaglev);
-        sSupportMaglevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportMaglevLarge);
-        sSupportMaglevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportMaglevMedium);
-        sSupportMaglevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportMaglevSmall);
+        sSupportMagLev.setUserObject(resources.getString("HangarReport.MagLev") + " " + countSupportMagLev);
+        sSupportMagLevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportMagLevLarge);
+        sSupportMagLevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportMagLevMedium);
+        sSupportMagLevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportMagLevSmall);
 
         // Omni Support Vees
         oSupportVees.setUserObject(resources.getString("HangarReport.OmniVees") + " " + countSupportOmniVees);
@@ -2323,10 +2295,10 @@ public class HangarReport extends Report {
         oSupportRailMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniRailMedium);
         oSupportRailSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniRailSmall);
 
-        oSupportMaglev.setUserObject(resources.getString("HangarReport.Maglev") + " " + countSupportOmniMaglev);
-        oSupportMaglevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniMaglevLarge);
-        oSupportMaglevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniMaglevMedium);
-        oSupportMaglevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniMaglevSmall);
+        oSupportMagLev.setUserObject(resources.getString("HangarReport.MagLev") + " " + countSupportOmniMagLev);
+        oSupportMagLevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniMagLevLarge);
+        oSupportMagLevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniMagLevMedium);
+        oSupportMagLevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniMagLevSmall);
 
         // Infantry Nodes
         int allInfantry = (countInfantry + countBA);
@@ -2384,23 +2356,12 @@ public class HangarReport extends Report {
         return overviewHangarTree;
     }
 
-    private String createNodeName(Unit u) {
-        return u.getName() + (u.isMothballed() ? resources.getString("HangarReport.Mothballed") : "");
+    private String createNodeName(final Unit unit) {
+        return unit.getName() + (unit.isMothballed() ? resources.getString("HangarReport.Mothballed") : "");
     }
 
     public String getHangarTotals() {
         return String.format(resources.getString("HangarReport.HangarTotals"),
                 totalNumberOfUnits, countUnitsPresent, countUnitsInTransit, countDamagedUnits, countDeployedUnits);
-    }
-
-    @Override
-    public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setAlignmentY(1.0f);
-        txtReport.insertComponent(getHangarTree());
-
-        return txtReport;
     }
 }
