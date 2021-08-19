@@ -1662,30 +1662,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showMaintenanceReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
-        mrd.setVisible(true);
-    }
-
-    public void showUnitCostReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        MonthlyUnitCostReportDialog mrd = new MonthlyUnitCostReportDialog(getFrame(), u);
-        mrd.setVisible(true);
-    }
-
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
      *

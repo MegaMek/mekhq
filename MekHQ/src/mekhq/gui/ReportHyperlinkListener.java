@@ -1,25 +1,31 @@
 /*
  * ReportHyperlinkListener.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.gui;
+
+import mekhq.MekHQ;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
 import java.util.UUID;
 
@@ -41,11 +47,11 @@ public class ReportHyperlinkListener implements HyperlinkListener {
 
 
     private CampaignGUI campaignGUI;
-  
+
     public ReportHyperlinkListener(CampaignGUI gui) {
         campaignGUI = gui;
     }
-    
+
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
@@ -70,8 +76,17 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                 campaignGUI.showNews(id);
             }
             else if(e.getDescription().startsWith(MAINTENANCE)) {
-                UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
-                campaignGUI.showMaintenanceReport(id);
+                try {
+                    final UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
+                    final Unit unit = campaignGUI.getCampaign().getUnit(id);
+                    if (unit == null) {
+                        MekHQ.getLogger().error("Unit id determination failure for " + id);
+                        return;
+                    }
+                    new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
+                } catch (Exception ex) {
+                    MekHQ.getLogger().error(ex);
+                }
             }
             else if(e.getDescription().startsWith(REPAIR)) {
                 UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
@@ -84,4 +99,3 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     }
 
 }
- 
