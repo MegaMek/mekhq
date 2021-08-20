@@ -27,7 +27,7 @@ import java.awt.*;
 /**
  * This displays a standard report for MekHQ.
  *
- * Inheriting classes must call initialize() in their constructors and override getText
+ * Inheriting classes must call initialize() in their constructors and override getText.
  */
 public abstract class AbstractReportDialog extends AbstractMHQDialog {
     //region Constructors
