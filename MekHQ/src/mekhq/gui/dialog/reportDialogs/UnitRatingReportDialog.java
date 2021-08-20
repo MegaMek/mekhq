@@ -21,6 +21,7 @@ package mekhq.gui.dialog.reportDialogs;
 import mekhq.campaign.Campaign;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class UnitRatingReportDialog extends AbstractReportDialog {
     //region Variable Declarations
@@ -45,6 +46,7 @@ public class UnitRatingReportDialog extends AbstractReportDialog {
         final JTextPane txtReport = new JTextPane();
         txtReport.setText(getCampaign().getUnitRating().getDetails());
         txtReport.setName("txtReport");
+        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
         txtReport.setEditable(false);
         txtReport.setCaretPosition(0);
         return txtReport;

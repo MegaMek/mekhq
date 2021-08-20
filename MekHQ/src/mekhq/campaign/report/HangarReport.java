@@ -36,14 +36,6 @@ import java.util.List;
  * @since 3/12/2012
  */
 public class HangarReport extends AbstractReport {
-    //region Variable Declarations
-    private int totalNumberOfUnits = 0;
-    private int countUnitsInTransit = 0;
-    private int countUnitsPresent = 0;
-    private int countDamagedUnits = 0;
-    private int countDeployedUnits = 0;
-    //endregion Variable Declarations
-
     //region Constructors
     public HangarReport(final Campaign campaign) {
         super(campaign);
@@ -996,22 +988,6 @@ public class HangarReport extends AbstractReport {
         unitList.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
         for (Unit u : unitList) {
             Entity e = u.getEntity();
-
-            // Create general stats
-            totalNumberOfUnits++;
-            if (u.isPresent()) {
-                countUnitsPresent++;
-            } else {
-                countUnitsInTransit++;
-            }
-
-            if (u.isDamaged()) {
-                countDamagedUnits++;
-            }
-
-            if (u.isDeployed()) {
-                countDeployedUnits++;
-            }
 
             // Determine what type of unit, and add it to the proper subtree
             if (e instanceof Mech) {
@@ -2358,10 +2334,5 @@ public class HangarReport extends AbstractReport {
 
     private String createNodeName(final Unit unit) {
         return unit.getName() + (unit.isMothballed() ? resources.getString("HangarReport.Mothballed") : "");
-    }
-
-    public String getHangarTotals() {
-        return String.format(resources.getString("HangarReport.HangarTotals"),
-                totalNumberOfUnits, countUnitsPresent, countUnitsInTransit, countDamagedUnits, countDeployedUnits);
     }
 }

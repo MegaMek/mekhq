@@ -21,6 +21,7 @@ package mekhq.gui.dialog.reportDialogs;
 import mekhq.campaign.report.PersonnelReport;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PersonnelReportDialog extends AbstractReportDialog {
     //region Variable Declarations
@@ -44,9 +45,15 @@ public class PersonnelReportDialog extends AbstractReportDialog {
     protected JTextPane createTxtReport() {
         final JTextPane txtCombatPersonnel = new JTextPane();
         txtCombatPersonnel.setText(getPersonnelReport().getCombatPersonnelDetails());
+        txtCombatPersonnel.setName("txtCombatPersonnel");
+        txtCombatPersonnel.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtCombatPersonnel.setEditable(false);
 
         final JTextPane txtSupportPersonnel = new JTextPane();
         txtSupportPersonnel.setText(getPersonnelReport().getSupportPersonnelDetails());
+        txtSupportPersonnel.setName("txtSupportPersonnel");
+        txtSupportPersonnel.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtSupportPersonnel.setEditable(false);
 
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 txtCombatPersonnel, txtSupportPersonnel);

@@ -62,7 +62,7 @@ public class TransportReport extends AbstractReport {
         String asfAppend = "";
         int newNoASF = Math.max(noASF - freeSC, 0);
         int placedASF = Math.max(noASF - newNoASF, 0);
-        if (noASF > 0 && freeSC > 0) {
+        if ((noASF > 0) && (freeSC > 0)) {
             asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
             freeSC -= placedASF;
         }
@@ -70,20 +70,20 @@ public class TransportReport extends AbstractReport {
         String lvAppend = "";
         int newNolv = Math.max(nolv - freehv, 0);
         int placedlv = Math.max(nolv - newNolv, 0);
-        if (nolv > 0 && freehv > 0) {
+        if ((nolv > 0) && (freehv > 0)) {
             lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
             freehv -= placedlv;
         }
 
-        if (noBA > 0 && freeinf > 0) {
+        if ((noBA > 0) && (freeinf > 0)) {
 
         }
 
-        if (noinf > 0 && freeba > 0) {
+        if ((noinf > 0) && (freeba > 0)) {
 
         }
 
-        StringBuffer sb = new StringBuffer("Transports\n\n");
+        final StringBuilder sb = new StringBuilder("Transports\n\n");
 
         // Lets do Mechs first.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mech Bays (Occupied):",
@@ -110,7 +110,7 @@ public class TransportReport extends AbstractReport {
                     "Light Vehicles Not Transported:", newNolv));
         }
 
-        if (nolv > 0 && freehv > 0) {
+        if ((nolv > 0) && (freehv > 0)) {
 
         }
 
@@ -118,7 +118,7 @@ public class TransportReport extends AbstractReport {
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Infantry Bays (Occupied):",
                 stats.getTotalInfantryBays(), stats.getOccupiedBays(Entity.ETYPE_INFANTRY), "Infantry Not Transported:", noinf));
 
-        if (noBA > 0 && freeinf > 0) {
+        if ((noBA > 0) && (freeinf > 0)) {
 
         }
 
@@ -127,7 +127,7 @@ public class TransportReport extends AbstractReport {
                 stats.getTotalBattleArmorBays(), stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), "Battle Armor Not Transported:",
                 noBA));
 
-        if (noinf > 0 && freeba > 0) {
+        if ((noinf > 0) && (freeba > 0)) {
 
         }
 
@@ -136,7 +136,7 @@ public class TransportReport extends AbstractReport {
                 stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), "Small Craft Not Transported:",
                 noSC));
 
-        if (noASF > 0 && freeSC > 0) {
+        if ((noASF > 0) && (freeSC > 0)) {
             // Lets do ASF in Free Small Craft Bays next.
             sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   ASF in Small Craft Bays (Occupied):",
                     stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
@@ -144,7 +144,7 @@ public class TransportReport extends AbstractReport {
         }
 
         // Lets do ProtoMechs next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Protomech Bays (Occupied):",
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "ProtoMech Bays (Occupied):",
                 stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "ProtoMechs Not Transported:", noSC));
 
         sb.append("\n\n");
@@ -156,6 +156,6 @@ public class TransportReport extends AbstractReport {
 
         sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
 
-        return new String(sb);
+        return sb.toString();
     }
 }
