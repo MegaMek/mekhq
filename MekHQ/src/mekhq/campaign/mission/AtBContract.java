@@ -578,7 +578,7 @@ public class AtBContract extends Contract implements Serializable {
                 case EVT_SPECIALMISSION:
                     c.addReport("<b>Special Event:</b> Special mission this month");
                     specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialMissionType();
+                    specialEventScenarioType = getContractType().generateSpecialMissionType(c);
                     break;
                 case EVT_CIVILDISTURBANCE:
                     c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
