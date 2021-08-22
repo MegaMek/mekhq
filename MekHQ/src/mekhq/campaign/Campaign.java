@@ -3691,16 +3691,16 @@ public class Campaign implements Serializable, ITechManager {
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
-        
+
         // clear out StratCon force assignments
         for (AtBContract contract : getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() != null) {
                 for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                     track.unassignForce(fid);
                 }
-            }   
+            }
         }
-        
+
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
@@ -5597,6 +5597,10 @@ public class Campaign implements Serializable, ITechManager {
         p.setOriginPlanet(planet);
     }
 
+    /**
+     * Clears Transient Game Data for an Entity
+     * @param entity the entity to clear the game data for
+     */
     public void clearGameData(Entity entity) {
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
@@ -5627,6 +5631,8 @@ public class Campaign implements Serializable, ITechManager {
         entity.resetCoolantFailureAmount();
         entity.setConversionMode(0);
         entity.setDoomed(false);
+        entity.setHidden(false);
+        entity.clearNarcAndiNarcPods();
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());

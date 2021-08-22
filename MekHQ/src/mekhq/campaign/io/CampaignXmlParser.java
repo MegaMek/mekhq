@@ -1370,9 +1370,16 @@ public class CampaignXmlParser {
 
             Unit u = prt.getUnit();
             if (u != null) {
-                // get rid of any equipmentparts without locations or mounteds
+                // get rid of any equipmentparts without types, locations or mounteds
                 if (prt instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart) prt;
+                    final EquipmentPart ePart = (EquipmentPart) prt;
+
+                    // Null Type... parsing failure
+                    if (ePart.getType() == null) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+
                     Mounted m = u.getEntity().getEquipment(ePart.getEquipmentNum());
 
                     // Remove equipment parts missing mounts
@@ -1381,7 +1388,8 @@ public class CampaignXmlParser {
                         continue;
                     }
 
-                    // Remove equipment parts without a valid location, unless they're an ammo bin as they may not have a location
+                    // Remove equipment parts without a valid location, unless they're an ammo bin
+                    // as they may not have a location
                     if ((m.getLocation() == Entity.LOC_NONE) && !(prt instanceof AmmoBin)) {
                         removeParts.add(prt);
                         continue;
