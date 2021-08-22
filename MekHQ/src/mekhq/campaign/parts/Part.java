@@ -1009,46 +1009,48 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + ITechnology.getRatingName(getTechRating()));
 
-        if (getUnit() != null) {
-            mods.append(getUnit().getSiteMod());
-            if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                mods.addModifier(-1, "easy to maintain");
-            } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                mods.addModifier(1, "difficult to maintain");
+        if (getUnit() == null) {
+            return mods;
+        }
+
+        mods.append(getUnit().getSiteMod());
+        if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
+            mods.addModifier(-1, "easy to maintain");
+        } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
+            mods.addModifier(1, "difficult to maintain");
+        }
+
+        if (getUnit().getTech() != null) {
+            if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
+                    && (!getUnit().getTech().isClanner()
+                    && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
+                mods.addModifier(2, "Clan tech");
             }
 
-            if (getUnit().getTech() != null) {
-                if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
-                        && (!getUnit().getTech().isClanner()
-                        && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
-                    mods.addModifier(2, "Clan tech");
-                }
-
-                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
-                        && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                    mods.addModifier(-1, "Weapon specialist");
-                }
-
-                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                        && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
-                    mods.addModifier(-1, "Armor specialist");
-                }
-
-                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
-                        && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
-                    mods.addModifier(-1, "Internal specialist");
-                }
+            if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
+                    && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                mods.addModifier(-1, "Weapon specialist");
             }
 
-            if (getUnit().hasPrototypeTSM()) {
-                mods.addModifier(1, "prototype TSM");
+            if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
+                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                mods.addModifier(-1, "Armor specialist");
             }
+
+            if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
+                    && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                mods.addModifier(-1, "Internal specialist");
+            }
+        }
+
+        if (getUnit().hasPrototypeTSM()) {
+            mods.addModifier(1, "prototype TSM");
         }
 
         return getCampaign().getCampaignOptions().useQualityMaintenance()
