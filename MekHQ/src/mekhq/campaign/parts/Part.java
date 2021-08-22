@@ -969,14 +969,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             }
         }
 
-        if ((isClanTechBase()
-                || ((this instanceof MekLocation) && (getUnit() != null) && getUnit().getEntity().isClan()))
-                && ((tech != null) && !tech.isClanner()
-                && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
-            mods.addModifier(2, "Clan tech");
-        }
-
         if (tech != null) {
+            if ((isClanTechBase()
+                    || ((this instanceof MekLocation) && (getUnit() != null) && getUnit().getEntity().isClan()))
+                    && (!tech.isClanner()
+                    && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
+                mods.addModifier(2, "Clan tech");
+            }
+
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
                     || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
