@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -24,25 +24,24 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
-import java.time.DayOfWeek;
 
-public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
+public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     //region Constructors
-    public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "ShortDeploymentNagDialog", "ShortDeploymentNagDialog.title",
-                "ShortDeploymentNagDialog.text", campaign, MekHqConstants.NAG_SHORT_DEPLOYMENT);
+    public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "OutstandingScenariosNagDialog", "OutstandingScenariosNagDialog.title",
+                "OutstandingScenariosNagDialog.text", campaign,
+                MekHqConstants.NAG_OUTSTANDING_SCENARIOS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getLocation().isOnPlanet()
-                || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
-            return false;
-        }
-
-        return campaign.getActiveAtBContracts().stream()
-                .anyMatch(contract -> campaign.getDeploymentDeficit(contract) > 0);
+        // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
+        // date is today
+        return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+                && campaign.getActiveAtBContracts(true).stream()
+                        .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
+                                .anyMatch(scenario -> (scenario.getDate() != null)
+                                        && scenario.getDate().isEqual(campaign.getLocalDate())));
     }
 }
