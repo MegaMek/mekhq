@@ -999,7 +999,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(+2, "Maintainer");
+                mods.addModifier(1, "Maintainer");
             }
         }
 
@@ -1053,7 +1053,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(-2, "Maintainer");
+                mods.addModifier(-1, "Maintainer");
             }
         }
 
