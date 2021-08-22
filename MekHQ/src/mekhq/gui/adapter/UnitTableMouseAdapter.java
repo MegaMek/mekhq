@@ -421,6 +421,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (final Unit unit : units) {
                 unit.getEntity().setCamouflage(new Camouflage());
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) {
             final CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
