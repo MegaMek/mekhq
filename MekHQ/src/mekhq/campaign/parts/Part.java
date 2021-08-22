@@ -1017,10 +1017,33 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 mods.addModifier(1, "difficult to maintain");
             }
 
-            if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
-                    && ((getUnit().getTech() != null) && !getUnit().getTech().isClanner()
-                    && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
-                mods.addModifier(2, "Clan tech");
+            if (getUnit().getTech() != null) {
+                if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
+                        && (!getUnit().getTech().isClanner()
+                        && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
+                    mods.addModifier(2, "Clan tech");
+                }
+
+                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
+                        && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    mods.addModifier(-1, "Weapon specialist");
+                }
+
+                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
+                        && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    mods.addModifier(-1, "Armor specialist");
+                }
+
+                if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
+                        && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
+                        || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    mods.addModifier(-1, "Internal specialist");
+                }
             }
 
             if (getUnit().hasPrototypeTSM()) {
