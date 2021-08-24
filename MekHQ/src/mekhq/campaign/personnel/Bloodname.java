@@ -21,24 +21,22 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.util.*;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -176,43 +174,47 @@ public class Bloodname implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
 
-            if (wn.getNodeName().equalsIgnoreCase("name")) {
-                retVal.name = wn.getTextContent().trim();
-            } else if (wn.getNodeName().equalsIgnoreCase("founder")) {
-                retVal.founder = wn.getTextContent().trim();
-            } else if (wn.getNodeName().equalsIgnoreCase("clan")) {
-                retVal.origClan = Clan.getClan(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("exclusive")) {
-                retVal.exclusive = true;
-            } else if (wn.getNodeName().equalsIgnoreCase("reaved")) {
-                retVal.inactive = Integer.parseInt(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("dormant")) {
-                retVal.inactive = Integer.parseInt(wn.getTextContent().trim()) + 10;
-            } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
-                retVal.abjured = Integer.parseInt(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
-                retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
-            } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
-                String[] clans = wn.getTextContent().trim().split(",");
-                for (String c : clans) {
-                    retVal.postReavingClans.add(Clan.getClan(c));
+            try {
+                if (wn.getNodeName().equalsIgnoreCase("name")) {
+                    retVal.name = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("founder")) {
+                    retVal.founder = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("clan")) {
+                    retVal.origClan = Clan.getClan(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("exclusive")) {
+                    retVal.exclusive = true;
+                } else if (wn.getNodeName().equalsIgnoreCase("reaved")) {
+                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("dormant")) {
+                    retVal.inactive = Integer.parseInt(wn.getTextContent().trim()) + 10;
+                } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
+                    retVal.abjured = Integer.parseInt(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
+                    retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
+                } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
+                    retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
+                    String[] clans = wn.getTextContent().trim().split(",");
+                    for (String c : clans) {
+                        retVal.postReavingClans.add(Clan.getClan(c));
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
+                    retVal.acquiringClans.add(new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
+                            wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
+                    retVal.acquiringClans.add(new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                            wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
+                    retVal.absorbed = new NameAcquired(
+                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                            wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("created")) {
+                    retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
-            } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
-                retVal.acquiringClans.add(new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
-                        wn.getTextContent().trim()));
-            } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
-                retVal.acquiringClans.add(new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                        wn.getTextContent().trim()));
-            } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
-                retVal.absorbed = new NameAcquired(
-                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                        wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("created")) {
-                retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

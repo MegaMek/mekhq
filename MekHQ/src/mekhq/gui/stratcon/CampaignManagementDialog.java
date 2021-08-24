@@ -22,6 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.StratconTab;
 
@@ -57,7 +58,8 @@ public class CampaignManagementDialog extends JDialog {
         
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
-            lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%", currentTrack.getScenarioOdds()));
+            lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%", 
+                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(), false)));
         }
     }
     

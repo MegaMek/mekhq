@@ -32,6 +32,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 
 /**
  * Common interface to interact with various methods for generating units.
@@ -293,5 +294,5 @@ public interface IUnitGenerator {
      * @param currentYear The current year
      * @return List of turrets
      */
-    List<MechSummary> generateTurrets(final int num, final int skill, final int quality, final int currentYear);
+    List<MechSummary> generateTurrets(final int num, final SkillLevel skill, final int quality, final int currentYear);
 }

@@ -71,7 +71,6 @@ import java.util.Vector;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
-
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -126,7 +125,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
 
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+    @Override
+    @SuppressWarnings(value = "unchecked") // FIXME: Broken Java with it's Object clones
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -514,7 +514,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return specialAbilities;
     }
 
-    public static SpecialAbility getDefaultAbility(String name) {
+    public static @Nullable SpecialAbility getDefaultAbility(String name) {
         if (null != defaultSpecialAbilities) {
             return defaultSpecialAbilities.get(name);
         }
@@ -750,7 +750,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>)specialAbilities.clone();
+        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
     }
 
     public static void nullifyDefaultSPA() {

@@ -19,33 +19,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.util.EncodeControl;
@@ -57,15 +34,23 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
-import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.eras.Eras;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
     private static final long serialVersionUID = -3454307876761238915L;
@@ -134,11 +119,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         private boolean cancelled = false;
 
         @Override
-        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException,
-                DOMException, ParseException, SAXException, ParserConfigurationException {
+        public Campaign doInBackground() throws Exception {
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
+
+            Eras.initializeEras();
 
             Factions.setInstance(Factions.loadDefault());
 
@@ -178,7 +164,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             //region Progress 3
             setProgress(3);
-            
+
             Campaign campaign;
             boolean newCampaign = false;
             if (fileCampaign == null) {

@@ -79,7 +79,7 @@ public class ExtraData {
     private static final Marshaller marshaller;
     private static final Unmarshaller unmarshaller;
     static {
-        Marshaller m = null;;
+        Marshaller m = null;
         Unmarshaller u = null;
         try {
             JAXBContext context = JAXBContext.newInstance(ExtraData.class);
@@ -102,15 +102,36 @@ public class ExtraData {
         });
         ADAPTERS.put(Integer.class, new StringAdapter<Integer>() {
             @Override
-            public Integer adapt(String str) { return Integer.valueOf(str); }
+            public Integer adapt(String str) {
+                try {
+                    return Integer.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return 0;
+                }
+            }
         });
         ADAPTERS.put(Double.class, new StringAdapter<Double>() {
             @Override
-            public Double adapt(String str) { return Double.valueOf(str); }
+            public Double adapt(String str) {
+                try {
+                    return Double.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return 0.0;
+                }
+            }
         });
         ADAPTERS.put(Boolean.class, new StringAdapter<Boolean>() {
             @Override
-            public Boolean adapt(String str) { return Boolean.valueOf(str); }
+            public Boolean adapt(String str) {
+                try {
+                    return Boolean.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return false;
+                }
+            }
         });
     }
 
@@ -145,7 +166,7 @@ public class ExtraData {
             return null;
         }
         // Prevent unneeded loops and lookups for straight strings
-        if(key.type == String.class) {
+        if (key.type == String.class) {
             Map<String, Object> map = getOrCreateClassMap(key.type);
             return key.type.cast(map.put(key.name, value));
         }

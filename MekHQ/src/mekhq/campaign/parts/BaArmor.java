@@ -59,6 +59,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         super(tonnage, type, points, loc, false, clan, c);
     }
 
+    @Override
     public BaArmor clone() {
         BaArmor clone = new BaArmor(0, amount, type, location, clan, campaign);
         clone.copyBaseData(this);
@@ -71,23 +72,23 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     public Money getPointCost() {
-        switch(type) {
-        case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
-            return Money.of(12500);
-        case EquipmentType.T_ARMOR_BA_MIMETIC:
-        case EquipmentType.T_ARMOR_BA_STEALTH:
-            return Money.of(15000);
-        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            return Money.of(12000);
-        case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
-            return Money.of(20000);
-        case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
-            return Money.of(50000);
-        case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
-        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
-        case EquipmentType.T_ARMOR_BA_STANDARD:
-        default:
-            return Money.of(10000);
+        switch (type) {
+            case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
+                return Money.of(12500);
+            case EquipmentType.T_ARMOR_BA_MIMETIC:
+            case EquipmentType.T_ARMOR_BA_STEALTH:
+                return Money.of(15000);
+            case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
+                return Money.of(12000);
+            case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
+                return Money.of(20000);
+            case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
+                return Money.of(50000);
+            case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
+            case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
+            case EquipmentType.T_ARMOR_BA_STANDARD:
+            default:
+                return Money.of(10000);
         }
     }
 
@@ -128,7 +129,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && (isClanTechBase() == part.isClanTechBase())
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && (((BaArmor) part).getType() == getType());
@@ -139,6 +140,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         return !hasParentPart() && !part.hasParentPart() && this.getDaysToArrival() == part.getDaysToArrival();
     }
 
+    @Override
     public double getArmorWeight(int points) {
         return points * 50/1000.0;
     }
@@ -148,35 +150,33 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
+    @Override
     public Part getNewPart() {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
+    @Override
     public int getAmountAvailable() {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
-            return part instanceof BaArmor
-                && part.isPresent()
-                && !part.isReservedForRefit()
-                && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor)part).getType() == getType();
-        });
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> (part instanceof BaArmor)
+            && part.isPresent()
+            && !part.isReservedForRefit()
+            && isClanTechBase() == part.isClanTechBase()
+            && ((BaArmor) part).getType() == getType());
 
         return a != null ? a.getAmount() : 0;
     }
 
     @Override
     public void changeAmountAvailable(int amount) {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                && part.isPresent();
-        });
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part ->
+                isSamePartType(part) && part.isPresent());
 
-        if(null != a) {
+        if (null != a) {
             a.setAmount(a.getAmount() + amount);
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
             }
-        } else if(amount > 0) {
+        } else if (amount > 0) {
             campaign.getQuartermaster().addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
     }

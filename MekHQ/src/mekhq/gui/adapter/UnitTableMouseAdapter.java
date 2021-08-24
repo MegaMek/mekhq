@@ -34,7 +34,7 @@ import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -240,14 +240,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            int selected = Integer.parseInt(command.split(":")[1]);
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    if ((selected > -1) && (selected < Unit.SITE_N)) {
-                        unit.setSite(selected);
-                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+            try {
+                int selected = Integer.parseInt(command.split(":")[1]);
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        if ((selected > -1) && (selected < Unit.SITE_N)) {
+                            unit.setSite(selected);
+                            MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+                        }
                     }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -374,8 +378,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 Money refundAmount = u.getBuyCost().multipliedBy(
                         gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                        "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
+                gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
+                        gui.getCampaign().getLocalDate(), refundAmount,
+                        "refund for cancelled equipment sale");
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {
@@ -457,12 +462,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.startsWith(COMMAND_CHANGE_MAINT_MULTI)) {
-            int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
+            try {
+                int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
 
-            for (Unit u : units) {
-                if (!u.isSelfCrewed()) {
-                    u.setMaintenanceMultiplier(multiplier);
+                for (Unit u : units) {
+                    if (!u.isSelfCrewed()) {
+                        u.setMaintenanceMultiplier(multiplier);
+                    }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
