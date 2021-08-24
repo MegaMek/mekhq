@@ -79,7 +79,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
@@ -1478,10 +1478,9 @@ public class AtBDynamicScenarioFactory {
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (useVehicles) {
                 // some specialized logic for clan opfors
-                int era = Era.getEra(campaign.getGameYear());
-
                 // if we're in the late republic or dark ages, clans no longer have the luxury of mech only stars
-                boolean clanEquipmentScarcity = era == Era.E_LATE_REPUBLIC || era == Era.E_DARK_AGES;
+                boolean clanEquipmentScarcity = campaign.getEra()
+                        .hasFlag(EraFlag.LATE_REPUBLIC, EraFlag.DARK_AGES, EraFlag.ILCLAN);
 
                 if (faction.isClan() && !clanEquipmentScarcity) {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
