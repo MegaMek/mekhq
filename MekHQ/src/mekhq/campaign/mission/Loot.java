@@ -20,9 +20,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -33,11 +30,13 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -138,8 +137,8 @@ public class Loot implements MekHqXmlSerializable {
     public void get(Campaign campaign, Scenario s) {
         //TODO: put in some reports
         if(cash.isPositive()) {
-            campaign.getFinances().credit(cash, Transaction.C_MISC,
-                    "Reward for " + getName() + " during " + s.getName(), campaign.getLocalDate());
+            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
+                    "Reward for " + getName() + " during " + s.getName());
         }
         for(Entity e : units) {
             campaign.addNewUnit(e, false, 0);

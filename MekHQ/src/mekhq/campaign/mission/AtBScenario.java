@@ -24,6 +24,7 @@ package mekhq.campaign.mission;
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.*;
@@ -1426,8 +1427,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             scrubs.stream().filter(Objects::nonNull).forEach(en -> {
                 en.setStartingPos(Board.START_CENTER);
 
-                // if it's a short range enemy unit, it has a chance to be hidden based on difficulty
-                if (en.getMaxWeaponRange() <= 4 && Compute.randomInt(4) <= campaign.getCampaignOptions().getSkillLevel()) {
+                // if it's a short range enemy unit, it has a chance to be hidden based on
+                // the option being enabled and the difficulty
+                if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)
+                        && (en.getMaxWeaponRange() <= 4)
+                        && (Compute.randomInt(4) <= campaign.getCampaignOptions().getSkillLevel())) {
                     en.setHidden(true);
                 }
             });
@@ -1910,7 +1914,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Worker function that loads the minefield counts for the player
      */
-    private void loadMinefieldCounts(Node wn) {
+    private void loadMinefieldCounts(Node wn) throws NumberFormatException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

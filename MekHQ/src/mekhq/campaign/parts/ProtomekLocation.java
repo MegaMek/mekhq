@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -78,28 +79,28 @@ public class ProtomekLocation extends Part {
         this.percent = 1.0;
         this.forQuad = quad;
         this.breached = false;
-        this.name = "Protomech Location";
+        this.name = "ProtoMech Location";
         switch (loc) {
             case Protomech.LOC_HEAD:
-                this.name = "Protomech Head";
+                this.name = "ProtoMech Head";
                 break;
             case Protomech.LOC_TORSO:
-                this.name = "Protomech Torso";
+                this.name = "ProtoMech Torso";
                 break;
             case Protomech.LOC_LARM:
-                this.name = "Protomech Left Arm";
+                this.name = "ProtoMech Left Arm";
                 break;
             case Protomech.LOC_RARM:
-                this.name = "Protomech Right Arm";
+                this.name = "ProtoMech Right Arm";
                 break;
             case Protomech.LOC_LEG:
-                this.name = "Protomech Legs";
+                this.name = "ProtoMech Legs";
                 if (forQuad) {
-                    this.name = "Protomech Legs (Quad)";
+                    this.name = "ProtoMech Legs (Quad)";
                 }
                 break;
             case Protomech.LOC_MAINGUN:
-                this.name = "Protomech Main Gun";
+                this.name = "ProtoMech Main Gun";
                 break;
         }
         if (booster) {
@@ -107,6 +108,7 @@ public class ProtomekLocation extends Part {
         }
     }
 
+    @Override
     public ProtomekLocation clone() {
         ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
         clone.copyBaseData(this);
@@ -219,18 +221,22 @@ public class ProtomekLocation extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-                loc = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
-                structureType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
-                percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
-                booster = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-                forQuad = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-                breached = wn2.getTextContent().equalsIgnoreCase("true");
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
+                    structureType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
+                    percent = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
+                    booster = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
+                    forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+                    breached = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

@@ -372,9 +372,9 @@ public class AtBContract extends Contract implements Serializable {
         } else if (roll <= 5) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 1, 0)]);
         } else if ((roll >= 9) && (roll <= 12)) {
-            setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
         } else if (roll >= 13) {
-            setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
         }
 
         // Enemy defeated, retreats or do not offer opposition to the player

@@ -20,11 +20,7 @@ package mekhq.gui.panes;
 
 import megamek.client.ui.panels.EntityImagePanel;
 import megamek.client.ui.panes.EntityViewPane;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JTabbedPanePreference;
-import megamek.client.ui.preferences.JTablePreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -34,7 +30,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
@@ -412,16 +408,16 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final int roll = Compute.d6();
             if (offer.getMarketType().isBlackMarket() && (roll < 3)) {
-                getCampaign().getFinances().debit(price.dividedBy(roll), Transaction.C_UNIT,
-                        String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
-                                entity.getShortName()), getCampaign().getLocalDate());
+                getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+                        price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
+                                entity.getShortName()));
                 getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
                 offersIterator.remove();
                 continue;
             }
 
-            getCampaign().getFinances().debit(price, Transaction.C_UNIT,
-                    String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()), getCampaign().getLocalDate());
+            getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+                    price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 
         finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());

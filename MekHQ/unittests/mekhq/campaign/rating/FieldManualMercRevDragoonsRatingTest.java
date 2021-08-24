@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -516,7 +517,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(0).when(testRating).getHeavyVeeCount();
         doReturn(5).when(testRating).getLightVeeCount();
 
-        assertEquals(BigDecimal.valueOf(100.0)
-                .setScale(0, BigDecimal.ROUND_HALF_EVEN), testRating.getTransportPercent());
+        assertEquals(BigDecimal.valueOf(100.0).setScale(0, RoundingMode.HALF_EVEN),
+                testRating.getTransportPercent());
     }
 }

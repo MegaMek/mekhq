@@ -861,13 +861,13 @@ public class ContractMarket implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     Mission m = Mission.generateInstanceFromXML(wn2, c, version);
 
-                    if (m != null && m instanceof Contract) {
-                        retVal.contracts.add((Contract)m);
+                    if (m instanceof Contract) {
+                        retVal.contracts.add((Contract) m);
                         retVal.contractIds.put(m.getId(), (Contract)m);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());
-                    ClauseMods cm = retVal.new ClauseMods();
+                    ClauseMods cm = new ClauseMods();
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
@@ -908,7 +908,7 @@ public class ContractMarket implements Serializable {
      * based on the admin's negotiation skill. Also track bonuses, as
      * the random clause bonuses should be persistent.
      */
-    public class ClauseMods {
+    public static class ClauseMods {
         public int[] rerollsUsed = {0, 0, 0, 0};
         public int[] mods = {0, 0, 0, 0};
     }

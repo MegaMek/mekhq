@@ -150,7 +150,7 @@ public class UnitMarketOffer {
                     retVal.setUnitType(Integer.parseInt(wn3.getTextContent().trim()));
                 } else if (wn3.getNodeName().equalsIgnoreCase("unit")) {
                     retVal.setUnit(MechSummaryCache.getInstance().getMech(wn3.getTextContent().trim()));
-                } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.X removal
+                } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.3 removal
                         || wn3.getNodeName().equalsIgnoreCase("percent")) {
                     retVal.setPercent(Integer.parseInt(wn3.getTextContent().trim()));
                 } else if (wn3.getNodeName().equalsIgnoreCase("transitDuration")) {
@@ -161,7 +161,7 @@ public class UnitMarketOffer {
             MekHQ.getLogger().error(e);
         }
 
-        if (version.isLowerThan("0.49.0")) {
+        if (version.isLowerThan("0.49.3")) {
             retVal.setTransitDuration(campaign.getCampaignOptions().getInstantUnitMarketDelivery()
                     ? 0 : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
