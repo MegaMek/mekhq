@@ -18,19 +18,8 @@
  */
 package mekhq.module.atb;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
@@ -39,7 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -47,6 +36,10 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -70,8 +63,8 @@ public class AtBEventProcessor {
         // TODO: move code from Campaign here
         if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
                 && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", ev.getCampaign().getLocalDate())) {
+            if (ev.getCampaign().getFinances().debit(TransactionType.RECRUITMENT,
+                    ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");

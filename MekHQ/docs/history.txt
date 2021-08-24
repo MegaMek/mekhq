@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-0.49.3-SNAPSHOT
+0.49.4-SNAPSHOT
+
+0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
 + Issue #2709: Two Scenario Date NPEs
 + Issue #2685: Preventing NPE when loading scenario save games
