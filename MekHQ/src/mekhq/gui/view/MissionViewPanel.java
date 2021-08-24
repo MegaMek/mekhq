@@ -561,8 +561,6 @@ public class MissionViewPanel extends JScrollablePanel {
         AtBContract contract = (AtBContract) mission;
         Campaign campaign = gui.getCampaign();
 
-        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
         lblStatus = new JLabel();
@@ -709,7 +707,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtType, gridBagConstraints);
 
-        lblAllyRating.setName("lblAllyRating"); // NOI18N
+        lblAllyRating.setName("lblAllyRating");
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -718,9 +716,8 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblAllyRating, gridBagConstraints);
 
-        txtAllyRating.setName("txtAllyRating"); // NOI18N
-        txtAllyRating.setText(skillNames[contract.getAllySkill()] + "/" +
-                ratingNames[contract.getAllyQuality()]);
+        txtAllyRating.setName("txtAllyRating");
+        txtAllyRating.setText(contract.getAllySkill() + "/" + ratingNames[contract.getAllyQuality()]);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -730,7 +727,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtAllyRating, gridBagConstraints);
 
-        lblEnemyRating.setName("lblEnemyRating"); // NOI18N
+        lblEnemyRating.setName("lblEnemyRating");
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -739,9 +736,8 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblEnemyRating, gridBagConstraints);
 
-        txtEnemyRating.setName("txtEnemyRating"); // NOI18N
-        txtEnemyRating.setText(skillNames[contract.getEnemySkill()] + "/" +
-                ratingNames[contract.getEnemyQuality()]);
+        txtEnemyRating.setName("txtEnemyRating");
+        txtEnemyRating.setText(contract.getEnemySkill() + "/" + ratingNames[contract.getEnemyQuality()]);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -974,10 +970,10 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
         // do not display it in that situation
-        boolean showContractScore = 
+        boolean showContractScore =
                 !gui.getCampaign().getCampaignOptions().getUseStratCon() &&
                 (mission instanceof AtBContract) && (((AtBContract) mission).getStratconCampaignState() != null);
-        
+
         if (showContractScore) {
             lblScore.setName("lblScore");
             lblScore.setText(resourceMap.getString("lblScore.text"));

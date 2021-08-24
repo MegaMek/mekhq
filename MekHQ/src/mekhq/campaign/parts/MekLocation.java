@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 import megamek.common.MiscType;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -283,24 +284,28 @@ public class MekLocation extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-                loc = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
-                structureType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
-                percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
-                tsm = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-                forQuad = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sensors")) {
-                sensors = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("lifeSupport")) {
-                lifeSupport = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-                breached = Boolean.parseBoolean(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
+                    structureType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                    clan = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
+                    percent = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+                    tsm = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
+                    forQuad = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sensors")) {
+                    sensors = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("lifeSupport")) {
+                    lifeSupport = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+                    breached = Boolean.parseBoolean(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -753,7 +758,7 @@ public class MekLocation extends Part {
                 partsToSalvageOrScrap.add(String.format("%s (%s)", partName, unit.getEntity().getLocationName(loc)));
             }
         }
-        
+
         if (partsToSalvageOrScrap.length() == 0) {
             return null;
         }

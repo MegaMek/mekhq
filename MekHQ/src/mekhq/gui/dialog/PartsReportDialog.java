@@ -119,6 +119,9 @@ public class PartsReportDialog extends JDialog {
                         "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
+                if (quantity <= 0) {
+                    return;
+                }
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
                 refreshOverviewSpecificPart(row, piu, partToBuy);

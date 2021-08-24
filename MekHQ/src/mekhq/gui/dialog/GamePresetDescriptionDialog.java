@@ -94,11 +94,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		add(scrText, gridBagConstraints);
 
 		btnOK.setText(resourceMap.getString("btnOK.text"));
-		btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed();
-            }
-        });
+		btnOK.addActionListener(evt -> btnOKActionPerformed());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
@@ -109,11 +105,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		add(btnOK, gridBagConstraints);
 
 		btnCancel.setText(resourceMap.getString("btnCancel.text"));
-		btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
+		btnCancel.addActionListener(evt -> setVisible(false));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
@@ -131,7 +123,8 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-	public String getTitle() {
+	@Override
+    public String getTitle() {
 		return txtTitle.getText();
 	}
 

@@ -619,13 +619,12 @@ public class CampaignXmlParser {
             int xc = wn.getNodeType();
 
             // If it's not an element, again, we're ignoring it.
-            if (xc == Node.ELEMENT_NODE) {
-                String xn = wn.getNodeName();
+            if (xc != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String xn = wn.getNodeName();
 
-                // Yeah, long if/then clauses suck.
-                // I really couldn't think of a significantly better way to
-                // handle it.
-                // They're all primitives anyway...
+            try {
                 if (xn.equalsIgnoreCase("calendar")) {
                     retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
@@ -743,6 +742,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("id")) {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -1048,11 +1049,17 @@ public class CampaignXmlParser {
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
-            customsDir.mkdir();
+            if (!customsDir.mkdir()) {
+                MekHQ.getLogger().error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                return false;
+            }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
-            customsDirCampaign.mkdir();
+            if (!customsDirCampaign.mkdir()) {
+                MekHQ.getLogger().error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                return false;
+            }
         }
 
         NodeList wList = wn.getChildNodes();
@@ -1369,9 +1376,16 @@ public class CampaignXmlParser {
 
             Unit u = prt.getUnit();
             if (u != null) {
-                // get rid of any equipmentparts without locations or mounteds
+                // get rid of any equipmentparts without types, locations or mounteds
                 if (prt instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart) prt;
+                    final EquipmentPart ePart = (EquipmentPart) prt;
+
+                    // Null Type... parsing failure
+                    if (ePart.getType() == null) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+
                     Mounted m = u.getEntity().getEquipment(ePart.getEquipmentNum());
 
                     // Remove equipment parts missing mounts
@@ -1380,7 +1394,8 @@ public class CampaignXmlParser {
                         continue;
                     }
 
-                    // Remove equipment parts without a valid location, unless they're an ammo bin as they may not have a location
+                    // Remove equipment parts without a valid location, unless they're an ammo bin
+                    // as they may not have a location
                     if ((m.getLocation() == Entity.LOC_NONE) && !(prt instanceof AmmoBin)) {
                         removeParts.add(prt);
                         continue;

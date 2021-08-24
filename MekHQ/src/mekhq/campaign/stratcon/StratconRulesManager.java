@@ -41,7 +41,6 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 
@@ -152,6 +151,11 @@ public class StratconRulesManager {
                 StratconScenario scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
                 generatedScenarios.add(scenario);
             }
+        }
+
+        // If we didn't generate any scenarios, we can just return here
+        if (generatedScenarios.isEmpty()) {
+            return;
         }
 
         // if under liaison command, pick a random scenario from the ones generated
@@ -395,21 +399,16 @@ public class StratconRulesManager {
         }
     }
 
-    private static void processFacilityEffects(StratconTrackState track) {
-        // TODO: these are "weekly"? effects that a stratcon facility has on the
-        // campaign/track state
-        // currently, that's
-        // supply depot - allied - +1 sp
-        // supply depot - hostile - +5% BV budget to all scenarios on track (shared
-        // modifier, so should be implemented there)
-        // data center - allied - +1% star league cache contract (not implemented yet, but...)
-        // data center - hostile - +5% scenario odds in track
-        // industrial center - allied - all scenarios here have
-        //      THIS IS COMING OUT OF YOUR PAYCHECK modifier
-        // orbital defense - allied - sets 'no hostile aircraft' flag for track
-        // orbital defense - hostile - sets 'no allied aircraft' flag for track
-        // early warning system - allied - sets 'intercept allied base attacks' flag for track
-        // early warning system - hostile - sets 'intercept hostile base attacks' flag for track
+    /**
+     * Applies time-sensitive facility effects.
+     */
+    private static void processFacilityEffects(StratconTrackState track,
+            StratconCampaignState campaignState, boolean isMonday) {
+        for (StratconFacility facility : track.getFacilities().values()) {
+            if (isMonday) {
+                campaignState.addSupportPoints(facility.getWeeklySPModifier());
+            }
+        }
     }
 
     /**
@@ -1280,7 +1279,7 @@ public class StratconRulesManager {
 
     /**
      * Given a track and the current campaign state, and if the player is deploying a force or not,
-     * figure out the odds of a scenario occuring.
+     * figure out the odds of a scenario occurring.
      */
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
@@ -1315,14 +1314,7 @@ public class StratconRulesManager {
                 break;
         }
 
-        // facilities: for each hostile data center, add +5%
-        // for each allied data center, subtract 5
-        int dataCenterModifier = 0;
-        for (StratconFacility facility : track.getFacilities().values()) {
-            if (facility.getFacilityType() == FacilityType.DataCenter) {
-                dataCenterModifier += facility.getOwner() == ForceAlignment.Allied ? -5 : 5;
-            }
-        }
+        int dataCenterModifier = track.getScenarioOddsAdjustment();
 
         return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
@@ -1426,7 +1418,7 @@ public class StratconRulesManager {
         StratconStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
         if ((specificObjective != null) &&
                 (specificObjective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory)) {
-            
+
             if (victory) {
                 specificObjective.incrementCurrentObjectiveCount();
             } else {
@@ -1447,19 +1439,13 @@ public class StratconRulesManager {
      * Contains logic for what should happen when a facility gets captured:
      * modifier/type/alignment switches etc.
      */
-    private static void switchFacilityOwner(StratconFacility facility) {
+    public static void switchFacilityOwner(StratconFacility facility) {
         if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
             StratconFacility newOwnerData =
                     StratconFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
 
             if (newOwnerData != null) {
-                // for now, we only need to change a limited subset of the captured facility's data
-                // the rest can be retained; we may revisit this assumption later
-                facility.setCapturedDefinition(newOwnerData.getCapturedDefinition());
-                facility.setLocalModifiers(new ArrayList<>(newOwnerData.getLocalModifiers()));
-                facility.setSharedModifiers(new ArrayList<>(newOwnerData.getSharedModifiers()));
-                facility.setOwner(newOwnerData.getOwner());
-
+                facility.copyRulesDataFrom(newOwnerData);
                 return;
             }
         }
@@ -1549,12 +1535,12 @@ public class StratconRulesManager {
                     if (closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords()
                                 .translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
-                        
+
                         boolean objectiveMoved = track.moveObjective(scenario.getCoords(), newCoords);
                         if (!objectiveMoved) {
                             track.failObjective(scenario.getCoords());
                         }
-                        
+
                         scenario.setCoords(newCoords);
 
                         int daysForward = Math.max(1, track.getDeploymentTime());
@@ -1618,6 +1604,8 @@ public class StratconRulesManager {
                     // to avoid unintentionally cleaning out integrated force deployments on
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, ev.getCampaign());
+
+                    processFacilityEffects(track, campaignState, isMonday);
 
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences

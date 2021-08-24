@@ -129,11 +129,6 @@ public final class MekHqConstants {
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
-    public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
-    public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
-    public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
-    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
-    public static final String RATINFO_DIR = "data/universe/ratdata";
     public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Type/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
@@ -142,6 +137,12 @@ public final class MekHqConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String RATINFO_DIR = "data/universe/ratdata/";
+    public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
+    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
+    public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
 
     //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";

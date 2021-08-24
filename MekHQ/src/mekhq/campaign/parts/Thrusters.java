@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
@@ -38,14 +38,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Thrusters extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -336290094932539638L;
     private boolean isLeftThrusters;
 
@@ -63,6 +58,7 @@ public class Thrusters extends Part {
         this.name = "Thrusters";
     }
 
+    @Override
     public Thrusters clone() {
         Thrusters clone = new Thrusters(0, campaign, isLeftThrusters);
         clone.copyBaseData(this);
@@ -94,7 +90,7 @@ public class Thrusters extends Part {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if(isSalvaging()) {
+            if (isSalvaging()) {
                 time = 600;
             } else {
                 time = 90;
@@ -256,7 +252,7 @@ public class Thrusters extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("isLeftThrusters")) {
