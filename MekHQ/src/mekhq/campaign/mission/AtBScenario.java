@@ -1914,7 +1914,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Worker function that loads the minefield counts for the player
      */
-    private void loadMinefieldCounts(Node wn) {
+    private void loadMinefieldCounts(Node wn) throws NumberFormatException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

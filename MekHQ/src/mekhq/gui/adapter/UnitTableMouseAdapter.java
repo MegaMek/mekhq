@@ -272,14 +272,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            int selected = Integer.parseInt(command.split(":")[1]);
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    if ((selected > -1) && (selected < Unit.SITE_N)) {
-                        unit.setSite(selected);
-                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+            try {
+                int selected = Integer.parseInt(command.split(":")[1]);
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        if ((selected > -1) && (selected < Unit.SITE_N)) {
+                            unit.setSite(selected);
+                            MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+                        }
                     }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -490,12 +494,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.startsWith(COMMAND_CHANGE_MAINT_MULTI)) {
-            int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
+            try {
+                int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
 
-            for (Unit u : units) {
-                if (!u.isSelfCrewed()) {
-                    u.setMaintenanceMultiplier(multiplier);
+                for (Unit u : units) {
+                    if (!u.isSelfCrewed()) {
+                        u.setMaintenanceMultiplier(multiplier);
+                    }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

@@ -228,10 +228,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANK: {
-                final int rank = Integer.parseInt(data[1]);
-                final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
-                for (final Person person : people) {
-                    person.changeRank(gui.getCampaign(), rank, level, true);
+                try {
+                    final int rank = Integer.parseInt(data[1]);
+                    final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
+                    for (final Person person : people) {
+                        person.changeRank(gui.getCampaign(), rank, level, true);
+                    }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
                 }
                 break;
             }
@@ -785,16 +789,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
                 for (Person person : people) {
-                    if (gui.getCampaign().getRetirementDefectionTracker()
-                            .removeFromCampaign(
-                                    person,
-                                    false,
-                                    gui.getCampaign().getCampaignOptions()
-                                            .getUseShareSystem() ? person
-                                            .getNumShares(gui.getCampaign()
-                                                    .getCampaignOptions()
-                                                    .getSharesForAll()) : 0,
-                                    gui.getCampaign(), null)) {
+                    if (gui.getCampaign().getRetirementDefectionTracker().removeFromCampaign(
+                            person, false, gui.getCampaign(), null)) {
                         showDialog = true;
                     } else {
                         toRemove.add(person);

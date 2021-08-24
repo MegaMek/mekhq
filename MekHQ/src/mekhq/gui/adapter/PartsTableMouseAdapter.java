@@ -37,6 +37,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 .connect(partsTable);
     }
 
+    @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         int row = partsTable.getSelectedRow();
