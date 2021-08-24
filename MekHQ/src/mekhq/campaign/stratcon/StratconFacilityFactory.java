@@ -16,11 +16,11 @@ package mekhq.campaign.stratcon;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -134,5 +134,13 @@ public class StratconFacilityFactory {
     
     public static StratconFacility getRandomAlliedFacility() {
     	return Utilities.getRandomItem(alliedFacilities).clone();
+    }
+
+    public static List<StratconFacility> getHostileFacilities() {
+        return Collections.unmodifiableList(hostileFacilities);
+    }
+
+    public static List<StratconFacility> getAlliedFacilities() {
+        return Collections.unmodifiableList(alliedFacilities);
     }
 }

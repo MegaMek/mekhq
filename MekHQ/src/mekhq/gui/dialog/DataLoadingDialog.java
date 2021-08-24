@@ -35,25 +35,20 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
-import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
+import mekhq.campaign.universe.eras.Eras;
 
 import javax.swing.*;
-import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -125,11 +120,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         private boolean cancelled = false;
 
         @Override
-        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException,
-                DOMException, ParseException, SAXException, ParserConfigurationException {
+        public Campaign doInBackground() throws Exception {
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
+
+            Eras.initializeEras();
 
             Factions.setInstance(Factions.loadDefault());
 

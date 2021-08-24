@@ -20,15 +20,16 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.ResourceBundle;
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.rating.IUnitRating;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -37,16 +38,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.rating.IUnitRating;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -62,7 +58,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private int rating;
     private Money maxCollateralValue;
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panMain;
     private JPanel panInfo;
     private JPanel panBtn;
@@ -86,7 +81,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JSlider sldInterest;
     private JSlider sldCollateral;
     private JSlider sldLength;
-    private JComboBox<String> choiceSchedule;
+    private MMComboBox<FinancialTerm> choiceSchedule;
 
     private JLabel lblAPR;
     private JLabel lblCollateralPct;
@@ -263,13 +258,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
-            scheduleModel.addElement(Finances.getScheduleName(i));
-        }
-        choiceSchedule = new JComboBox<>(scheduleModel);
-        choiceSchedule.setSelectedIndex(loan.getFinancialTerm());
-
+        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.values());
+        choiceSchedule.setSelectedItem(loan.getFinancialTerm());
         choiceSchedule.addActionListener(this);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -535,9 +525,9 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         loan.setPrincipal(principal);
         loan.setRate(sldInterest.getValue());
         loan.setYears(sldLength.getValue());
-        loan.setFinancialTerm(choiceSchedule.getSelectedIndex());
+        loan.setFinancialTerm(choiceSchedule.getSelectedItem());
         loan.setCollateral(sldCollateral.getValue());
-        loan.setNextPayment(loan.determineFirstPaymentDate(campaign.getLocalDate()));
+        loan.setNextPayment(loan.getFinancialTerm().nextValidDate(campaign.getLocalDate()));
 
         // Recalculate information based on settings
         loan.calculateAmortization();
@@ -552,7 +542,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblAPR.setText(loan.getRate() + "%");
             lblCollateralPct.setText(loan.getCollateral() + "%");
             lblYears.setText(loan.getYears() + " years");
-            lblSchedule.setText(Finances.getScheduleName(loan.getFinancialTerm()));
+            lblSchedule.setText(loan.getFinancialTerm().toString());
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
             lblFirstPayment.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());

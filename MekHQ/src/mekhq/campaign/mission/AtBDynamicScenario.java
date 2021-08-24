@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.enums.SkillLevel;
 import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -55,23 +56,26 @@ public class AtBDynamicScenario extends AtBScenario {
         public Entity entity;
         public String templateName;
     }
-    
+
     private static final long serialVersionUID = 4671466413188687036L;
 
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
-    
+
     private static final String PLAYER_UNIT_SWAPS_ELEMENT = "PlayerUnitSwaps";
     private static final String PLAYER_UNIT_SWAP_ELEMENT = "PlayerUnitSwap";
     private static final String PLAYER_UNIT_SWAP_ID_ELEMENT = "UnitID";
     private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
     private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
 
-    // derived fields used for various calculations
-    private int effectivePlayerUnitCount;
-    private int effectivePlayerBV;
+    private double effectivePlayerUnitCountMultiplier;
+    private double effectivePlayerBVMultiplier;
 
-    private int effectiveOpforSkill;
+    private int friendlyReinforcementDelayReduction;
+    private int hostileReinforcementDelayReduction;
+
+    // derived fields used for various calculations
+    private SkillLevel effectiveOpforSkill;
     private int effectiveOpforQuality;
 
     // convenient pointers that let us keep data around that would otherwise need reloading
@@ -84,7 +88,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
     // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
     private Map<UUID, BenchedEntityData> playerUnitSwaps;
-    
+
     private List<AtBScenarioModifier> scenarioModifiers;
 
     private boolean finalized;
@@ -230,20 +234,20 @@ public class AtBDynamicScenario extends AtBScenario {
         super.removeBotForce(x);
     }
 
-    public int getEffectivePlayerUnitCount() {
-        return effectivePlayerUnitCount;
+    public double getEffectivePlayerUnitCountMultiplier() {
+        return effectivePlayerUnitCountMultiplier;
     }
 
-    public void setEffectivePlayerUnitCount(int unitCount) {
-        effectivePlayerUnitCount = unitCount;
+    public void setEffectivePlayerUnitCountMultiplier(double multiplier) {
+        effectivePlayerUnitCountMultiplier = multiplier;
     }
 
-    public int getEffectivePlayerBV() {
-        return effectivePlayerBV;
+    public double getEffectivePlayerBVMultiplier() {
+        return effectivePlayerBVMultiplier;
     }
 
-    public void setEffectivePlayerBV(int unitCount) {
-        effectivePlayerBV = unitCount;
+    public void setEffectivePlayerBVMultiplier(double multiplier) {
+        effectivePlayerBVMultiplier = multiplier;
     }
 
     public void setScenarioTemplate(ScenarioTemplate template) {
@@ -278,7 +282,7 @@ public class AtBDynamicScenario extends AtBScenario {
         this.playerUnitSwaps = playerUnitSwaps;
     }
 
-    public int getEffectiveOpforSkill() {
+    public SkillLevel getEffectiveOpforSkill() {
         return effectiveOpforSkill;
     }
 
@@ -286,12 +290,28 @@ public class AtBDynamicScenario extends AtBScenario {
         return effectiveOpforQuality;
     }
 
-    public void setEffectiveOpforSkill(int skillLevel) {
+    public void setEffectiveOpforSkill(SkillLevel skillLevel) {
         effectiveOpforSkill = skillLevel;
     }
 
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+
+    public int getFriendlyReinforcementDelayReduction() {
+        return friendlyReinforcementDelayReduction;
+    }
+
+    public void setFriendlyReinforcementDelayReduction(int friendlyReinforcementDelayReduction) {
+        this.friendlyReinforcementDelayReduction = friendlyReinforcementDelayReduction;
+    }
+
+    public int getHostileReinforcementDelayReduction() {
+        return hostileReinforcementDelayReduction;
+    }
+
+    public void setHostileReinforcementDelayReduction(int hostileReinforcementDelayReduction) {
+        this.hostileReinforcementDelayReduction = hostileReinforcementDelayReduction;
     }
 
     /**
@@ -444,24 +464,24 @@ public class AtBDynamicScenario extends AtBScenario {
         // in its current state
         if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
-            
+
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
-            
+
             if (!playerUnitSwaps.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
-                
+
                 // note: if you update the order in which data is stored here or anything else about it
                 // double check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
                     MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
                     MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
-                    
+
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
                     MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
                     pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent + 2, Collections.emptyList()));
                     MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
                 }
-                
+
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
         }
@@ -483,14 +503,14 @@ public class AtBDynamicScenario extends AtBScenario {
             } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
                 for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
                     Node swapNode = wn2.getChildNodes().item(snsIndex);
-                    
+
                     if (swapNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ELEMENT)) {
                         BenchedEntityData benchedEntityData = new BenchedEntityData();
                         UUID playerUnitID = null;
-                        
+
                         for (int swapIndex = 0; swapIndex < swapNode.getChildNodes().getLength(); swapIndex++) {
-                            Node dataNode = swapNode.getChildNodes().item(swapIndex);                           
-                            
+                            Node dataNode = swapNode.getChildNodes().item(swapIndex);
+
                             if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ID_ELEMENT)) {
                                 playerUnitID = UUID.fromString(dataNode.getTextContent());
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
@@ -499,7 +519,7 @@ public class AtBDynamicScenario extends AtBScenario {
                                 benchedEntityData.entity = MekHqXmlUtil.getEntityFromXmlString(dataNode);
                             }
                         }
-                        
+
                         playerUnitSwaps.put(playerUnitID, benchedEntityData);
                     }
                 }

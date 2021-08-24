@@ -46,6 +46,9 @@
 		<modifier>
 			GoodEquipment.xml
 		</modifier>
+		<modifier>
+			HostileBVBudgetIncrease.xml
+		</modifier>
 		<!--modifier> 
 			Need ability to allow player to specifically deploy dropships
 			HotDrop.xml

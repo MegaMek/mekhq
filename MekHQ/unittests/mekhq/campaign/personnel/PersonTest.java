@@ -24,9 +24,15 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
@@ -49,9 +55,15 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward(null, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         assertEquals( 2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 

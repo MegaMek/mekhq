@@ -40,6 +40,7 @@ import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.MMPreferences;
+import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.EventBus;
@@ -247,8 +248,10 @@ public class MekHQ implements GameListener {
         showInfo();
 
         // Setup user preferences
+        MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
         getPreferences().loadFromFile(PREFERENCES_FILE);
         setUserPreferences();
+        ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
         // create a start up frame and display it
@@ -302,6 +305,7 @@ public class MekHQ implements GameListener {
         if (campaignGUI != null) {
             campaignGUI.getFrame().dispose();
         }
+        MegaMek.getPreferences().saveToFile(MegaMek.PREFERENCES_FILE);
         getPreferences().saveToFile(PREFERENCES_FILE);
         System.exit(0);
     }
@@ -366,7 +370,10 @@ public class MekHQ implements GameListener {
             System.out.println("Redirecting output to mekhqlog.txt");
             File logDir = new File("logs");
             if (!logDir.exists()) {
-                logDir.mkdir();
+                if (!logDir.mkdir()) {
+                    MekHQ.getLogger().error("Failed to create directory " + logDir + ", and therefore redirect the logs.");
+                    return;
+                }
             }
 
             // Note: these are not closed on purpose

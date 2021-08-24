@@ -3,5 +3,6 @@
 	<displayableName>Data Center</displayableName>
         <facilityType>DataCenter</facilityType>
         <owner>Allied</owner>
+	<revealTrack>true</revealTrack>
         <visible>true</visible>
 </StratconFacility>

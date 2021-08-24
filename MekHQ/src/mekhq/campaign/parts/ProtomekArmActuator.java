@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -48,6 +49,7 @@ public class ProtomekArmActuator extends Part {
         this(0, 0, null);
     }
 
+    @Override
     public ProtomekArmActuator clone() {
         ProtomekArmActuator clone = new ProtomekArmActuator(getUnitTonnage(), location, campaign);
         clone.copyBaseData(this);
@@ -60,7 +62,7 @@ public class ProtomekArmActuator extends Part {
 
     public ProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Arm Actuator";
+        this.name = "ProtoMech Arm Actuator";
         this.location = loc;
     }
 
@@ -109,8 +111,12 @@ public class ProtomekArmActuator extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("location")) {
-                location = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                    location = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
