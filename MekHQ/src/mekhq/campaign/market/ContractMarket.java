@@ -20,41 +20,32 @@
  */
 package mekhq.campaign.market;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.*;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -404,7 +395,7 @@ public class ContractMarket implements Serializable {
         setEnemyRating(contract, isAttacker, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(RandomSkillsGenerator.L_GREEN);
+            contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
@@ -484,7 +475,7 @@ public class ContractMarket implements Serializable {
         setEnemyRating(contract, isAttacker, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(RandomSkillsGenerator.L_GREEN);
+            contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
         contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
@@ -641,11 +632,16 @@ public class ContractMarket implements Serializable {
         contract.setEnemyQuality(getQualityRating(Compute.d6(2) + mod));
     }
 
-    protected int getSkillRating(int roll) {
-        if (roll <= 5) return RandomSkillsGenerator.L_GREEN;
-        if (roll <= 9) return RandomSkillsGenerator.L_REG;
-        if (roll <= 11) return RandomSkillsGenerator.L_VET;
-        return RandomSkillsGenerator.L_ELITE;
+    protected SkillLevel getSkillRating(int roll) {
+        if (roll <= 5) {
+            return SkillLevel.GREEN;
+        } else if (roll <= 9) {
+            return SkillLevel.REGULAR;
+        } else if (roll <= 11) {
+            return SkillLevel.VETERAN;
+        } else {
+            return SkillLevel.ELITE;
+        }
     }
 
     protected int getQualityRating(int roll) {
@@ -714,10 +710,13 @@ public class ContractMarket implements Serializable {
                 if (i == CLAUSE_SALVAGE) mods.mods[i] -= 2;
                 else mods.mods[i] += 1;
         } else {
-            if (contract.getEnemySkill() >= SkillType.EXP_VETERAN)
+            if (contract.getEnemySkill().isVeteranOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
-            if (contract.getEnemySkill() == SkillType.EXP_ELITE)
+            }
+
+            if (contract.getEnemySkill().isEliteOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
+            }
         }
 
         int[][] missionMods = {
@@ -861,13 +860,13 @@ public class ContractMarket implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     Mission m = Mission.generateInstanceFromXML(wn2, c, version);
 
-                    if (m != null && m instanceof Contract) {
-                        retVal.contracts.add((Contract)m);
+                    if (m instanceof Contract) {
+                        retVal.contracts.add((Contract) m);
                         retVal.contractIds.put(m.getId(), (Contract)m);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());
-                    ClauseMods cm = retVal.new ClauseMods();
+                    ClauseMods cm = new ClauseMods();
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
@@ -908,7 +907,7 @@ public class ContractMarket implements Serializable {
      * based on the admin's negotiation skill. Also track bonuses, as
      * the random clause bonuses should be persistent.
      */
-    public class ClauseMods {
+    public static class ClauseMods {
         public int[] rerollsUsed = {0, 0, 0, 0};
         public int[] mods = {0, 0, 0, 0};
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -319,10 +319,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             genderModel.addElement(gender);
         }
         choiceGender = new JComboBox<>(genderModel);
-        choiceGender.setName("choiceGender"); // NOI18N
+        choiceGender.setName("choiceGender");
         choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
                 : person.getGender().getExternalVariant());
-        choiceGender.addActionListener(evt -> randomName());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
@@ -1371,12 +1370,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
                 selectedPhenotype = newPhenotype;
             }
-
-            choicePhenotype.setEnabled(true);
         } else {
             choicePhenotype.setSelectedItem(Phenotype.NONE);
-            choicePhenotype.setEnabled(false);
         }
+
+        choicePhenotype.setEnabled(chkClan.isSelected());
     }
 
     private void increasePhenotypeBonus(String skillType) {

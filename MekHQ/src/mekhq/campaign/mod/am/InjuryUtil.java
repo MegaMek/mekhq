@@ -320,7 +320,7 @@ public final class InjuryUtil {
                         rnd -> {
                             int taskXP = c.getCampaignOptions().getTaskXP();
                             if ((taskXP > 0) && (doc.getNTasks() >= c.getCampaignOptions().getNTasksXP())) {
-                                doc.awardXP(taskXP);
+                                doc.awardXP(c, taskXP);
                                 doc.setNTasks(0);
 
                                 ServiceLogger.gainedXpFromMedWork(doc, c.getLocalDate(), taskXP);
@@ -365,7 +365,7 @@ public final class InjuryUtil {
             result.add(new GameEffect(treatmentSummary,
                 rnd -> {
                     if (xp > 0) {
-                        doc.awardXP(xp);
+                        doc.awardXP(c, xp);
                         ServiceLogger.successfullyTreatedWithXp(doc, p, c.getLocalDate(), injuries, xp);
                     } else {
                         ServiceLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);

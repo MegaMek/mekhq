@@ -182,6 +182,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
+    @Override
     public Campaign getCampaign() {
         return campaign;
     }
@@ -1420,7 +1421,7 @@ public class Refit extends Part implements IAcquisitionWork {
         int expectedHeatSinkParts = 0;
         if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
             // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
-            // SmallCraft, Dropship, Jumpship, Warship, and SpaceStation use SpacecraftCoolingSystem instead
+            // SmallCraft, DropShip, JumpShip, WarShip, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
                     untrackedHeatSinkCount(newEntity);
         }
@@ -1985,7 +1986,7 @@ public class Refit extends Part implements IAcquisitionWork {
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("time")) {

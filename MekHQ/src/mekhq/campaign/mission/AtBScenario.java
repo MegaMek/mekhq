@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
@@ -947,14 +948,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
      * @param faction        The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill            The RandomSkillGenerator constant that represents the skill level of the overall force.
+     * @param skill          The {@link SkillLevel} that represents the skill level of the overall force.
      * @param quality        The equipment rating of the force.
-     * @param unitType        The UnitTableData constant for the type of unit to generate.
+     * @param unitType       The UnitTableData constant for the type of unit to generate.
      * @param weightClass    The weight class of the unit to generate
      * @param campaign
-     * @return                A new Entity with crew.
+     * @return               A new Entity with crew.
      */
-    protected Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    protected Entity getEntity(String faction, SkillLevel skill, int quality, int unitType, int weightClass, Campaign campaign) {
         return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
     }
 
@@ -1009,16 +1010,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /*
      * Convenience functions overloaded to provide default values.
      */
-    protected void addLance(List<Entity> list, String faction,
-            int skill, int quality, int weightClass, Campaign campaign) {
+    protected void addLance(List<Entity> list, String faction, SkillLevel skill, int quality,
+                            int weightClass, Campaign campaign) {
         addLance(list, faction, skill, quality, weightClass,
                 EntityWeightClass.WEIGHT_ASSAULT, campaign, 0);
     }
 
-    protected void addLance(List<Entity> list, String faction,
-            int skill, int quality, int weightClass, int maxWeight, Campaign c) {
-        addLance(list, faction, skill, quality, weightClass,
-                maxWeight, c, 0);
+    protected void addLance(List<Entity> list, String faction, SkillLevel skill, int quality,
+                            int weightClass, int maxWeight, Campaign c) {
+        addLance(list, faction, skill, quality, weightClass, maxWeight, c, 0);
     }
 
     /**
@@ -1034,8 +1034,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      * @param arrivalTurn    The turn in which the Lance is deployed in the scenario.
      */
-    private void addLance(List<Entity> list, String faction, int skill, int quality, int weightClass,
-            int maxWeight, Campaign campaign, int arrivalTurn) {
+    private void addLance(List<Entity> list, String faction, SkillLevel skill, int quality,
+                          int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
         if (Factions.getInstance().getFaction(faction).isClan()) {
             addStar(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
@@ -1115,7 +1115,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      * @param arrivalTurn    The turn in which the Lance is deployed in the scenario.
      */
-    private void addStar(List<Entity> list, String faction, int skill, int quality, int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
+    private void addStar(List<Entity> list, String faction, SkillLevel skill, int quality,
+                         int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
         int forceType = FORCE_MEK;
         /* 1 chance in 12 of a Nova, per AtB rules; CHH/CSL
          * close to 1/2, no chance for CBS. Added a chance to encounter
@@ -1213,8 +1214,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      * @param arrivalTurn    The turn in which the Lance is deployed in the scenario.
      */
-    private void addLevelII(List<Entity> list, String faction, int skill, int quality, int weightClass,
-            int maxWeight, Campaign campaign, int arrivalTurn) {
+    private void addLevelII(List<Entity> list, String faction, SkillLevel skill, int quality,
+                            int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
         String weights = adjustForMaxWeight(campaign.getAtBConfig()
                 .selectBotUnitWeights(AtBConfiguration.ORG_CS, weightClass), maxWeight);
 
@@ -1277,13 +1278,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Generates the indicated number of turret entities.
      *
-     * @param list        Generated entities are added to this list
-     * @param num        The number of turrets to generate
+     * @param list      Generated entities are added to this list
+     * @param num       The number of turrets to generate
      * @param skill     The skill level of the turret operators
      * @param quality   The quality level of the turrets
      * @param campaign  The campaign for which the turrets are being generated.
      */
-    protected void addTurrets(List<Entity> list, int num, int skill, int quality, Campaign campaign) {
+    protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality,
+                              Campaign campaign) {
         list.addAll(AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign));
     }
 
@@ -1914,7 +1916,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Worker function that loads the minefield counts for the player
      */
-    private void loadMinefieldCounts(Node wn) {
+    private void loadMinefieldCounts(Node wn) throws NumberFormatException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

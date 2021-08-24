@@ -67,6 +67,7 @@ public class SpacecraftEngine extends Part {
         this.name = "Spacecraft Engine";
     }
 
+    @Override
     public SpacecraftEngine clone() {
         SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
         clone.copyBaseData(this);

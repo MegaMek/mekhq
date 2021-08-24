@@ -19,10 +19,6 @@
 
 package mekhq.campaign;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
@@ -31,17 +27,15 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.InfantryAmmoStorage;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.Refit;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Manages machines and materiel for a campaign.
@@ -469,8 +463,8 @@ public class Quartermaster {
 
         if (getCampaignOptions().payForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
-            if (getCampaign().getFinances().debit(cost, Transaction.C_UNIT,
-                    "Purchased " + en.getShortName(), getCampaign().getLocalDate())) {
+            if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+                    cost, "Purchased " + en.getShortName())) {
                 getCampaign().addNewUnit(en, false, days);
                 return true;
             } else {
@@ -491,8 +485,8 @@ public class Quartermaster {
 
         Money sellValue = unit.getSellValue();
 
-        getCampaign().getFinances().credit(sellValue, Transaction.C_UNIT_SALE,
-                "Sale of " + unit.getName(), getCampaign().getLocalDate());
+        getCampaign().getFinances().credit(TransactionType.UNIT_SALE, getCampaign().getLocalDate(),
+                sellValue, "Sale of " + unit.getName());
 
         getCampaign().removeUnit(unit.getId());
     }
@@ -543,8 +537,8 @@ public class Quartermaster {
             plural = "s";
         }
 
-        getCampaign().getFinances().credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + quantity
-                + " " + part.getName() + plural, getCampaign().getLocalDate());
+        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+                cost, "Sale of " + quantity + " " + part.getName() + plural);
 
         getWarehouse().removePart(part, quantity);
     }
@@ -582,8 +576,8 @@ public class Quartermaster {
 
         Money cost = ammo.getActualValue().multipliedBy(saleProportion);
 
-        getCampaign().getFinances().credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
-                + " " + ammo.getName(), getCampaign().getLocalDate());
+        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+                cost, "Sale of " + shots + " " + ammo.getName());
 
         getWarehouse().removeAmmo(ammo, shots);
     }
@@ -621,8 +615,8 @@ public class Quartermaster {
 
         Money cost = armor.getActualValue().multipliedBy(saleProportion);
 
-        getCampaign().getFinances().credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
-                + " " + armor.getName(), getCampaign().getLocalDate());
+        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+                cost, "Sale of " + points + " " + armor.getName());
 
         getWarehouse().removeArmor(armor, points);
     }
@@ -688,8 +682,9 @@ public class Quartermaster {
      */
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().payForParts()) {
-            return getCampaign().getFinances().debit(part.getStickerPrice(), Transaction.C_EQUIP,
-                    "Purchase of " + part.getName(), getCampaign().getLocalDate());
+            return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
+                    getCampaign().getLocalDate(), part.getStickerPrice(),
+                    "Purchase of " + part.getName());
         } else {
             return true;
         }
@@ -717,8 +712,8 @@ public class Quartermaster {
 
         if (getCampaignOptions().payForParts()) {
             Money cost = part.getStickerPrice().multipliedBy(costMultiplier);
-            if (getCampaign().getFinances().debit(cost,
-                    Transaction.C_EQUIP, "Purchase of " + part.getName(), getCampaign().getLocalDate())) {
+            if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
+                    getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 if (part instanceof Refit) {
                     ((Refit) part).addRefitKitParts(transitDays);
                 } else {
