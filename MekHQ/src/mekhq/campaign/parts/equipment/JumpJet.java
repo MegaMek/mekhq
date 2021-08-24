@@ -49,6 +49,7 @@ public class JumpJet extends EquipmentPart {
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
     }
 
+    @Override
     public JumpJet clone() {
     	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
@@ -75,7 +76,7 @@ public class JumpJet extends EquipmentPart {
         	    ton = 0.5;
         	}
         }
-    	if(type.hasSubType(MiscType.S_IMPROVED)) {
+    	if (type.hasSubType(MiscType.S_IMPROVED)) {
     		ton *= 2;
     	}
     	return ton;
@@ -101,7 +102,7 @@ public class JumpJet extends EquipmentPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-    	if(null != unit) {
+    	if (null != unit) {
 			return super.getDetails(includeRepairDetails);
     	}
     	return getUnitTonnage() + " ton unit";
@@ -114,17 +115,17 @@ public class JumpJet extends EquipmentPart {
 
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
-		if(null != unit) {
+		if (null != unit) {
 			int priorHits = hits;
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
-				if(mounted.isMissing()) {
+			if (null != mounted) {
+				if (mounted.isMissing()) {
 					remove(false);
 					return;
 				}
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 			}
-			if(checkForDestruction
+			if (checkForDestruction
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
@@ -134,7 +135,7 @@ public class JumpJet extends EquipmentPart {
 
 	@Override
 	public int getBaseTime() {
-		if(isSalvaging()) {
+		if (isSalvaging()) {
 			return isOmniPodded()? 30 : 60;
 		}
 		return 100;
@@ -142,7 +143,7 @@ public class JumpJet extends EquipmentPart {
 
 	@Override
 	public int getDifficulty() {
-		if(isSalvaging()) {
+		if (isSalvaging()) {
 			return 0;
 		}
 		return -3;

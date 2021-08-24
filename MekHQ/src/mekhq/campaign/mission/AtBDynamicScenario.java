@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.enums.SkillLevel;
 import mekhq.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
@@ -68,11 +69,14 @@ public class AtBDynamicScenario extends AtBScenario {
     private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
     private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
 
-    // derived fields used for various calculations
-    private int effectivePlayerUnitCount;
-    private int effectivePlayerBV;
+    private double effectivePlayerUnitCountMultiplier;
+    private double effectivePlayerBVMultiplier;
 
-    private int effectiveOpforSkill;
+    private int friendlyReinforcementDelayReduction;
+    private int hostileReinforcementDelayReduction;
+
+    // derived fields used for various calculations
+    private SkillLevel effectiveOpforSkill;
     private int effectiveOpforQuality;
 
     // convenient pointers that let us keep data around that would otherwise need reloading
@@ -231,20 +235,20 @@ public class AtBDynamicScenario extends AtBScenario {
         super.removeBotForce(x);
     }
 
-    public int getEffectivePlayerUnitCount() {
-        return effectivePlayerUnitCount;
+    public double getEffectivePlayerUnitCountMultiplier() {
+        return effectivePlayerUnitCountMultiplier;
     }
 
-    public void setEffectivePlayerUnitCount(int unitCount) {
-        effectivePlayerUnitCount = unitCount;
+    public void setEffectivePlayerUnitCountMultiplier(double multiplier) {
+        effectivePlayerUnitCountMultiplier = multiplier;
     }
 
-    public int getEffectivePlayerBV() {
-        return effectivePlayerBV;
+    public double getEffectivePlayerBVMultiplier() {
+        return effectivePlayerBVMultiplier;
     }
 
-    public void setEffectivePlayerBV(int unitCount) {
-        effectivePlayerBV = unitCount;
+    public void setEffectivePlayerBVMultiplier(double multiplier) {
+        effectivePlayerBVMultiplier = multiplier;
     }
 
     public void setScenarioTemplate(ScenarioTemplate template) {
@@ -279,7 +283,7 @@ public class AtBDynamicScenario extends AtBScenario {
         this.playerUnitSwaps = playerUnitSwaps;
     }
 
-    public int getEffectiveOpforSkill() {
+    public SkillLevel getEffectiveOpforSkill() {
         return effectiveOpforSkill;
     }
 
@@ -287,12 +291,28 @@ public class AtBDynamicScenario extends AtBScenario {
         return effectiveOpforQuality;
     }
 
-    public void setEffectiveOpforSkill(int skillLevel) {
+    public void setEffectiveOpforSkill(SkillLevel skillLevel) {
         effectiveOpforSkill = skillLevel;
     }
 
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+
+    public int getFriendlyReinforcementDelayReduction() {
+        return friendlyReinforcementDelayReduction;
+    }
+
+    public void setFriendlyReinforcementDelayReduction(int friendlyReinforcementDelayReduction) {
+        this.friendlyReinforcementDelayReduction = friendlyReinforcementDelayReduction;
+    }
+
+    public int getHostileReinforcementDelayReduction() {
+        return hostileReinforcementDelayReduction;
+    }
+
+    public void setHostileReinforcementDelayReduction(int hostileReinforcementDelayReduction) {
+        this.hostileReinforcementDelayReduction = hostileReinforcementDelayReduction;
     }
 
     /**

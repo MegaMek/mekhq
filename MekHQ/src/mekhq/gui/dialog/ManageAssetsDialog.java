@@ -249,7 +249,7 @@ public class ManageAssetsDialog extends JDialog {
                 return asset.getIncome().toAmountAndSymbolString();
             }
             if (col == COL_SCHEDULE) {
-                return Finances.getScheduleName(asset.getFinancialTerm());
+                return asset.getFinancialTerm();
             }
             return "?";
         }

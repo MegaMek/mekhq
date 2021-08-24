@@ -390,6 +390,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     /**
      * @return TechConstants tech level
      */
+    @Override
     public int getTechLevel() {
         return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getFaction().isClan());
     }

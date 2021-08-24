@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
@@ -695,58 +696,62 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("employer")) {
-                employer = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                startDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                endDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
-                nMonths = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
-                paymentMultiplier = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
-                setCommandRights(ContractCommandRights.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
-                overheadComp = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
-                salvagePct = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
-                salvageExchange = wn2.getTextContent().trim().equals("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
-                straightSupport = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
-                battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
-                salvagePct = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
-                transportComp = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {
-                advancePct = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
-                signBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
-                mrbcFee = wn2.getTextContent().trim().equals("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
-                advanceAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
-                signingAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
-                transportAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
-                transitAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
-                overheadAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
-                supportAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
-                baseAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
-                feeAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
-                salvagedByUnit = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
-                salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("employer")) {
+                    employer = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
+                    startDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
+                    endDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
+                    nMonths = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
+                    paymentMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
+                    setCommandRights(ContractCommandRights.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
+                    overheadComp = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
+                    salvagePct = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
+                    salvageExchange = wn2.getTextContent().trim().equals("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
+                    straightSupport = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
+                    battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
+                    salvagePct = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
+                    transportComp = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {
+                    advancePct = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
+                    signBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
+                    mrbcFee = wn2.getTextContent().trim().equals("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
+                    advanceAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
+                    signingAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
+                    transportAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
+                    transitAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
+                    overheadAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
+                    supportAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
+                    baseAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
+                    feeAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
+                    salvagedByUnit = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
+                    salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

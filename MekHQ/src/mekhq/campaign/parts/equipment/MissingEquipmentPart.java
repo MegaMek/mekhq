@@ -53,7 +53,7 @@ public class MissingEquipmentPart extends MissingPart {
     //crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
-    protected int equipmentNum = -1;
+    protected int equipmentNum;
     protected double equipTonnage;
     protected double size;
 
@@ -171,12 +171,12 @@ public class MissingEquipmentPart extends MissingPart {
         if (replacement != null) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            
+
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            
+
             ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
-            
+
             remove(false);
 
             actualReplacement.updateConditionFromPart();
@@ -192,7 +192,7 @@ public class MissingEquipmentPart extends MissingPart {
         EquipmentPart newPart = getNewPart();
 
         // Don't replace with parts that don't match our expected type!
-        if (!newPart.getClass().equals(part.getClass())) {
+        if (newPart.getClass() != part.getClass()) {
             return false;
         }
 
@@ -235,7 +235,7 @@ public class MissingEquipmentPart extends MissingPart {
             if (unit.isLocationBreached(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is breached.";
             }
-    
+
             if (unit.isLocationDestroyed(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is destroyed.";
             }

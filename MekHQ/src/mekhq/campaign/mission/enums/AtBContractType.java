@@ -148,7 +148,7 @@ public enum AtBContractType {
             case RECON_RAID:
                 return 1;
             case EXTRACTION_RAID:
-                return 3 + contract.getEnemySkill();
+                return 1 + contract.getEnemySkill().ordinal();
             case OBJECTIVE_RAID:
             case PIRATE_HUNTING:
                 return 3 + Compute.randomInt(3);
@@ -544,7 +544,7 @@ public enum AtBContractType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning ACTIVE.");
+        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }

@@ -22,6 +22,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -90,10 +91,12 @@ public class SVArmor extends Armor {
         return Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
     }
 
+    @Override
     public double getTonnageNeeded() {
         return amountNeeded * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
     }
 
+    @Override
     public Money getValueNeeded() {
         return adjustCostsForCampaignOptions(Money.of(amountNeeded * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
     }
@@ -107,11 +110,12 @@ public class SVArmor extends Armor {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
-                && bar == ((SVArmor) part).bar
-                && techRating == ((SVArmor) part).techRating;
+        return (getClass() == part.getClass())
+                && (bar == ((SVArmor) part).bar)
+                && (techRating == ((SVArmor) part).techRating);
     }
 
+    @Override
     public double getArmorWeight(int points) {
         return points * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
     }
@@ -126,10 +130,12 @@ public class SVArmor extends Armor {
         return 1.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
     }
 
+    @Override
     public Part getNewPart() {
         return new SVArmor(bar, techRating, (int) Math.round(5 * getArmorPointsPerTon()), -1, campaign);
     }
 
+    @Override
     public int getAmountAvailable() {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
@@ -140,6 +146,7 @@ public class SVArmor extends Armor {
         return a != null ? a.getAmount() : 0;
     }
 
+    @Override
     public void changeAmountAvailable(int amount) {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
@@ -171,18 +178,22 @@ public class SVArmor extends Armor {
         super.loadFieldsFromXmlNode(node);
         for (int x = 0; x < node.getChildNodes().getLength(); x++) {
             final Node wn = node.getChildNodes().item(x);
-            switch (wn.getNodeName()) {
-                case NODE_BAR:
-                    bar = Integer.parseInt(wn.getTextContent());
-                    break;
-                case NODE_TECH_RATING:
-                    for (int r = 0; r < ratingNames.length; r++) {
-                        if (ratingNames[r].equals(wn.getTextContent())) {
-                            techRating = r;
-                            break;
+            try {
+                switch (wn.getNodeName()) {
+                    case NODE_BAR:
+                        bar = Integer.parseInt(wn.getTextContent());
+                        break;
+                    case NODE_TECH_RATING:
+                        for (int r = 0; r < ratingNames.length; r++) {
+                            if (ratingNames[r].equals(wn.getTextContent())) {
+                                techRating = r;
+                                break;
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
