@@ -20,21 +20,20 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Locale;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Locale;
 
 /**
  * This keeps track of a location, which includes both the planet
@@ -208,12 +207,11 @@ public class CurrentLocation implements Serializable {
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 //jump
                 if (campaign.getCampaignOptions().payForTransport()) {
-                    if (!campaign.getFinances().debit(campaign.calculateCostPerJump(
-                            true, campaign.getCampaignOptions().useEquipmentContractBase()),
-                            Transaction.C_TRANSPORT,
+                    if (!campaign.getFinances().debit(TransactionType.TRANSPORTATION, campaign.getLocalDate(),
+                            campaign.calculateCostPerJump(
+                                    true, campaign.getCampaignOptions().useEquipmentContractBase()),
                             "Jump from " + currentSystem.getName(campaign.getLocalDate())
-                                    + " to " + jumpPath.get(1).getName(campaign.getLocalDate()),
-                            campaign.getLocalDate())) {
+                                    + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
                         campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }

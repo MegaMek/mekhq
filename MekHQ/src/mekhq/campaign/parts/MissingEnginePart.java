@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -145,15 +146,19 @@ public class MissingEnginePart extends MissingPart {
         int engineRating = -1;
         int engineFlags = 0;
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
-                engineType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-                engineRating = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
-                engineFlags = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
+                    engineType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+                    engineRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
+                    engineFlags = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -164,14 +169,14 @@ public class MissingEnginePart extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         int year = campaign.getGameYear();
-        if(part instanceof EnginePart) {
-            Engine eng = ((EnginePart)part).getEngine();
+        if (part instanceof EnginePart) {
+            Engine eng = ((EnginePart) part).getEngine();
             if (null != eng) {
-                return getEngine().getEngineType() == eng.getEngineType()
-                        && getEngine().getRating() == eng.getRating()
-                        && getEngine().getTechType(year) == eng.getTechType(year)
-                        && getUnitTonnage() == ((EnginePart)part).getUnitTonnage()
-                        && getTonnage() == ((EnginePart)part).getTonnage();
+                return (getEngine().getEngineType() == eng.getEngineType())
+                        && (getEngine().getRating() == eng.getRating())
+                        && (getEngine().getTechType(year) == eng.getTechType(year))
+                        && (getUnitTonnage() == part.getUnitTonnage())
+                        && (getTonnage() == part.getTonnage());
             }
         }
         return false;
@@ -179,7 +184,7 @@ public class MissingEnginePart extends MissingPart {
 
     public void fixTankFlag(boolean hover) {
         int flags = engine.getFlags();
-        if(!engine.hasFlag(Engine.TANK_ENGINE)) {
+        if (!engine.hasFlag(Engine.TANK_ENGINE)) {
             flags |= Engine.TANK_ENGINE;
         }
         engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
@@ -189,7 +194,7 @@ public class MissingEnginePart extends MissingPart {
 
     public void fixClanFlag() {
         int flags = engine.getFlags();
-        if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+        if (!engine.hasFlag(Engine.CLAN_ENGINE)) {
             flags |= Engine.CLAN_ENGINE;
         }
         engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
