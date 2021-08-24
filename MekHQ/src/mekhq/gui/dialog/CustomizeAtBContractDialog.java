@@ -25,6 +25,7 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -68,9 +69,9 @@ public class CustomizeAtBContractDialog extends JDialog {
     protected MMComboBox<AtBContractType> comboContractType;
     protected MarkdownEditorPanel txtDesc;
     protected JSuggestField suggestPlanet;
-    protected JComboBox<String> cbAllySkill;
+    protected MMComboBox<SkillLevel> comboAllySkill;
     protected JComboBox<String> cbAllyQuality;
-    protected JComboBox<String> cbEnemySkill;
+    protected MMComboBox<SkillLevel> comboEnemySkill;
     protected JComboBox<String> cbEnemyQuality;
     protected JSpinner spnRequiredLances;
     protected MMComboBox<AtBMoraleLevel> comboEnemyMorale;
@@ -161,14 +162,16 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
-        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-        cbAllySkill = new JComboBox<>(skillNames);
+        final DefaultComboBoxModel<SkillLevel> allySkillModel = new DefaultComboBoxModel<>();
+        allySkillModel.addAll(SkillLevel.getGeneratableValues());
+        comboAllySkill = new MMComboBox<>("comboAllySkill", allySkillModel);
         cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-        cbEnemySkill = new JComboBox<>(skillNames);
+        final DefaultComboBoxModel<SkillLevel> enemySkillModel = new DefaultComboBoxModel<>();
+        enemySkillModel.addAll(SkillLevel.getGeneratableValues());
+        comboEnemySkill = new MMComboBox<>("comboEnemySkill", enemySkillModel);
         cbEnemyQuality = new JComboBox<>(ratingNames);;
         JLabel lblAllyBotName = new JLabel();
         txtAllyBotName = new JTextField();
@@ -311,14 +314,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(lblAllyRating, gbc);
 
-        cbAllySkill.setSelectedIndex(contract.getAllySkill());
+        comboAllySkill.setSelectedItem(contract.getAllySkill());
         gbc.gridx = 1;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-        leftPanel.add(cbAllySkill, gbc);
+        leftPanel.add(comboAllySkill, gbc);
 
         cbAllyQuality.setSelectedIndex(contract.getAllyQuality());
         gbc.gridx = 2;
@@ -336,14 +339,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemyRating, gbc);
 
-        cbEnemySkill.setSelectedIndex(contract.getEnemySkill());
+        comboEnemySkill.setSelectedItem(contract.getEnemySkill());
         gbc.gridx = 1;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-        leftPanel.add(cbEnemySkill, gbc);
+        leftPanel.add(comboEnemySkill, gbc);
 
         cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());
         gbc.gridx = 2;
@@ -537,9 +540,9 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
         contract.setEnemyCode(cbEnemy.getSelectedItemKey());
         contract.setContractType(comboContractType.getSelectedItem());
-        contract.setAllySkill(cbAllySkill.getSelectedIndex());
+        contract.setAllySkill(comboAllySkill.getSelectedItem());
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
-        contract.setEnemySkill(cbEnemySkill.getSelectedIndex());
+        contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
         contract.setRequiredLances((Integer)spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
