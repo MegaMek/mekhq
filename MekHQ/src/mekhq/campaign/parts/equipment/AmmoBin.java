@@ -226,10 +226,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
-                shotsNeeded = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-                oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
+                    shotsNeeded = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
+                    oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

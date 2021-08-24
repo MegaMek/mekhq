@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
@@ -26,6 +25,7 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -107,9 +107,9 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
             if (roll > 1) {
                 enemyEntities = new ArrayList<Entity>();
                 for (int i = 0; i < 3; i++) {
-                    enemyEntities
-                            .add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                                    getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                    enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
+                            getContract(campaign).getEnemySkill(),
+                            getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
                 }
             }
 
@@ -136,7 +136,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         }
         Entity en = (ms == null) ? null
                 : AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFactionCode(),
-                        RandomSkillsGenerator.L_GREEN, campaign, ms);
+                        SkillLevel.GREEN, campaign, ms);
         otherForce.add(en);
 
         // TODO: During SW offer a choice between an employer exchange or a contract breach

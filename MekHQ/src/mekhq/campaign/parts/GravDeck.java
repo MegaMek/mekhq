@@ -1,7 +1,8 @@
 /*
  * GravDeck.java
  *
- * Copyright (c) 2019, MegaMek team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
@@ -11,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,14 +37,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author MKerensky
  */
 public class GravDeck extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -3387290388135852860L;
 
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
@@ -81,6 +77,7 @@ public class GravDeck extends Part {
         return deckNumber;
     }
 
+    @Override
     public GravDeck clone() {
         GravDeck clone = new GravDeck(0, deckNumber, campaign, deckType);
         clone.copyBaseData(this);
@@ -107,7 +104,7 @@ public class GravDeck extends Part {
 
     @Override
     public int getBaseTime() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 4800;
         }
         return 1440;
@@ -115,7 +112,7 @@ public class GravDeck extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 3;
         }
         return 2;
@@ -142,9 +139,9 @@ public class GravDeck extends Part {
             ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 1);
 
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -213,12 +210,17 @@ public class GravDeck extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("deckType")) {
-                deckType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
-                deckNumber = Integer.parseInt(wn2.getTextContent());
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("deckType")) {
+                    deckType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
+                    deckNumber = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
