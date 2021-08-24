@@ -23,15 +23,14 @@ package mekhq.campaign.finances;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.finances.enums.TransactionType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Vector;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -40,115 +39,25 @@ public class Transaction implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = -8772148858528954672L;
 
-    private int category;
+    private TransactionType type;
     private LocalDate date;
     private Money amount;
     private String description;
     //endregion Variable Declarations
 
-    //region TransactionType Enum
-    // TODO : Windchild : Enum Me
-    public final static int C_MISC            = 0;
-    public final static int C_EQUIP           = 1;
-    public final static int C_UNIT            = 2;
-    public final static int C_SALARY          = 3;
-    public final static int C_OVERHEAD        = 4;
-    public final static int C_MAINTAIN        = 5;
-    public final static int C_UNIT_SALE       = 6;
-    public final static int C_EQUIP_SALE      = 7;
-    public final static int C_START           = 8;
-    public final static int C_TRANSPORT       = 9;
-    public final static int C_CONTRACT       = 10;
-    public final static int C_BLC            = 11;
-    public final static int C_SALVAGE        = 12;
-    public final static int C_LOAN_PRINCIPAL = 13;
-    public final static int C_LOAN_PAYMENT   = 14;
-    public final static int C_REPAIRS        = 15;
-    public static final int C_RANSOM         = 16;
-    public final static int C_NUM            = 17;
-
-    @Deprecated // Replace with Enum
-    public String getCategoryName() {
-        return getCategoryName(getCategory());
-    }
-
-    @Deprecated // Replace with Enum
-    public static String getCategoryName(int cat) {
-        switch (cat) {
-            case C_MISC:
-                return "Miscellaneous";
-            case C_EQUIP:
-                return "Equipment Purchases";
-            case C_UNIT:
-                return "Unit Purchases";
-            case C_SALARY:
-                return "Salary Payments";
-            case C_OVERHEAD:
-                return "Overhead Expenses";
-            case C_MAINTAIN:
-                return "Maintenance Expenses";
-            case C_UNIT_SALE:
-                return "Unit Sales";
-            case C_EQUIP_SALE:
-                return "Equipment Sales";
-            case C_CONTRACT:
-                return "Contract payments";
-            case C_BLC:
-                return "Battle Loss Compensation";
-            case C_SALVAGE:
-                return "Salvage Exchange";
-            case C_START:
-                return "Starting Capital";
-            case C_TRANSPORT:
-                return "Transportation";
-            case C_LOAN_PRINCIPAL:
-                return "Loan Principal";
-            case C_LOAN_PAYMENT:
-                return "Loan Payment";
-            case C_REPAIRS:
-                return "Repairs";
-            case C_RANSOM:
-                return "Ransom";
-            default:
-                return "Unknown category";
-        }
-    }
-
-    @Deprecated // Replace with Enum
-    public static Vector<String> getCategoryList() {
-        Vector<String> out = new Vector<>();
-
-        for (int i = 0; i < C_NUM; i++) {
-            out.add(Transaction.getCategoryName(i));
-        }
-        Collections.sort(out);
-        return out;
-    }
-
-    @Deprecated // Replace with Enum
-    public static int getCategoryIndex(String name) {
-        for (int i = 0; i < getCategoryList().size(); i++) {
-            if (getCategoryName(i).equalsIgnoreCase(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    //endregion TransactionType Enum
-
     //region Constructors
     public Transaction() {
-        this(C_MISC, LocalDate.now(), Money.zero(), "");
+        this(TransactionType.MISCELLANEOUS, LocalDate.now(), Money.zero(), "");
     }
 
     public Transaction(final Transaction transaction) {
-        this(transaction.getCategory(), transaction.getDate(), transaction.getAmount(),
+        this(transaction.getType(), transaction.getDate(), transaction.getAmount(),
                 transaction.getDescription());
     }
 
-    public Transaction(final int category, final LocalDate date, final Money amount,
+    public Transaction(final TransactionType type, final LocalDate date, final Money amount,
                        final String description) {
-        setCategory(category);
+        setType(type);
         setDate(date);
         setAmount(amount);
         setDescription(description);
@@ -156,12 +65,12 @@ public class Transaction implements Serializable {
     //endregion Constructors
 
     //region Getters/Setters
-    public int getCategory() {
-        return category;
+    public TransactionType getType() {
+        return type;
     }
 
-    public void setCategory(final int category) {
-        this.category = category;
+    public void setType(final TransactionType type) {
+        this.type = type;
     }
 
     public LocalDate getDate() {
@@ -204,7 +113,7 @@ public class Transaction implements Serializable {
     //region File I/O
     protected void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "transaction");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "category", getCategory());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", getDate());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "amount", getAmount().toXmlString());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "description", getDescription());
@@ -217,14 +126,16 @@ public class Transaction implements Serializable {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("category")) {
-                    transaction.setCategory(Integer.parseInt(wn2.getTextContent().trim()));
+                if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    transaction.setType(TransactionType.valueOf(wn.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     transaction.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("amount")) {
                     transaction.setAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
                     transaction.setDescription(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("category")) { // Legacy - 0.49.4 Removal
+                    transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
@@ -236,7 +147,7 @@ public class Transaction implements Serializable {
 
     @Override
     public String toString() {
-        return getCategoryName() + ", " + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate())
+        return getType() + ", " + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate())
                 + ", " + getAmount() + ", " + getDescription();
     }
 
@@ -248,7 +159,7 @@ public class Transaction implements Serializable {
             return true;
         } else if (other instanceof Transaction) {
             final Transaction transaction = (Transaction) other;
-            return (getCategory() == transaction.getCategory())
+            return (getType() == transaction.getType())
                     && getDate().equals(transaction.getDate())
                     && getAmount().equals(transaction.getAmount())
                     && getDescription().equals(transaction.getDescription());
@@ -259,6 +170,6 @@ public class Transaction implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCategory(), getDate(), getAmount(), getDescription());
+        return Objects.hash(getType(), getDate(), getAmount(), getDescription());
     }
 }

@@ -231,6 +231,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
     private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
+    private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
 
     // Medical
@@ -3549,6 +3550,10 @@ public class CampaignOptionsDialog extends JDialog {
         chkTrackTotalEarnings.setToolTipText(resources.getString("chkTrackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setName("chkTrackTotalEarnings");
 
+        chkTrackTotalXPEarnings = new JCheckBox(resources.getString("chkTrackTotalXPEarnings.text"));
+        chkTrackTotalXPEarnings.setToolTipText(resources.getString("chkTrackTotalXPEarnings.toolTipText"));
+        chkTrackTotalXPEarnings.setName("chkTrackTotalXPEarnings");
+
         chkShowOriginFaction = new JCheckBox(resources.getString("chkShowOriginFaction.text"));
         chkShowOriginFaction.setToolTipText(resources.getString("chkShowOriginFaction.toolTipText"));
         chkShowOriginFaction.setName("chkShowOriginFaction");
@@ -3585,6 +3590,7 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(comboTimeInRankDisplayFormat, GroupLayout.Alignment.LEADING))
                         .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkTrackTotalEarnings)
+                        .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
         );
 
@@ -3600,6 +3606,7 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(comboTimeInRankDisplayFormat))
                         .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkTrackTotalEarnings)
+                        .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
         );
 
@@ -5167,7 +5174,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
         comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
         chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
-        chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
+        chkTrackTotalEarnings.setSelected(options.isTrackTotalEarnings());
+        chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
         chkShowOriginFaction.setSelected(options.showOriginFaction());
 
         // Medical
@@ -5764,6 +5772,7 @@ public class CampaignOptionsDialog extends JDialog {
             options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
             options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
             options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
+            options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
 
             // Medical

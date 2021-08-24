@@ -18,17 +18,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -37,7 +27,7 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -48,14 +38,19 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JTablePreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -363,9 +358,9 @@ public class PersonnelMarketDialog extends JDialog {
         if (null == en) {
             return;
         }
-        if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
-                "Purchased " + en.getShortName(),
-                campaign.getLocalDate())) {
+
+        if (pay && !campaign.getFinances().debit(TransactionType.UNIT_PURCHASE, campaign.getLocalDate(),
+                unitCost, "Purchased " + en.getShortName())) {
             return;
         }
         Unit unit = campaign.addNewUnit(en, false, 0);

@@ -669,9 +669,9 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free person, or if the
+        // We show the following if track total earnings is on for a free person or if the
         // person has previously tracked total earnings
-        if (campaign.getCampaignOptions().trackTotalEarnings()
+        if (campaign.getCampaignOptions().isTrackTotalEarnings()
                 && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
@@ -693,6 +693,33 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
+            firsty++;
+        }
+
+        // We show the following if track total xp earnings is on for a free person or if the
+        // person has previously tracked total xp earnings
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()
+                && (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
+            JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));
+            lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings1, gridBagConstraints);
+
+            JLabel lblTotalXPEarnings2 = new JLabel(Integer.toString(person.getTotalXPEarnings()));
+            lblTotalXPEarnings2.setName("lblTotalXPEarnings2");
+            lblTotalXPEarnings1.setLabelFor(lblTotalXPEarnings2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings2, gridBagConstraints);
             firsty++;
         }
 

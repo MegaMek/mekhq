@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -60,6 +61,7 @@ public class TankLocation extends Part {
         this(0, 0, null);
     }
 
+    @Override
     public TankLocation clone() {
         TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
         clone.copyBaseData(this);
@@ -141,12 +143,16 @@ public class TankLocation extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-                loc = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
-                damage = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-                breached = Boolean.parseBoolean(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
+                    damage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+                    breached = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

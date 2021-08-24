@@ -21,11 +21,11 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -107,7 +107,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
         final List<Entity> otherForce = new ArrayList<>();
         final Faction faction = Factions.getInstance().getFaction("PIR");
         for (int i = 0; i < 12; i++) {
-            otherForce.add(getEntity(faction.getShortName(), RandomSkillsGenerator.L_REG,
+            otherForce.add(getEntity(faction.getShortName(), SkillLevel.REGULAR,
                     IUnitRating.DRAGOON_C, UnitType.MEK,
                     AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, faction), campaign));
         }
