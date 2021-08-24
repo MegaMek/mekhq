@@ -153,6 +153,11 @@ public class StratconRulesManager {
             }
         }
 
+        // If we didn't generate any scenarios, we can just return here
+        if (generatedScenarios.isEmpty()) {
+            return;
+        }
+
         // if under liaison command, pick a random scenario from the ones generated
         // to set as required and attach liaison
         if (contract.getCommandRights().isLiaison()) {
@@ -397,7 +402,7 @@ public class StratconRulesManager {
     /**
      * Applies time-sensitive facility effects.
      */
-    private static void processFacilityEffects(StratconTrackState track, 
+    private static void processFacilityEffects(StratconTrackState track,
             StratconCampaignState campaignState, boolean isMonday) {
         for (StratconFacility facility : track.getFacilities().values()) {
             if (isMonday) {
@@ -1309,7 +1314,7 @@ public class StratconRulesManager {
                 break;
         }
 
-        int dataCenterModifier = track.getScenarioOddsAdjustment();        
+        int dataCenterModifier = track.getScenarioOddsAdjustment();
 
         return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
@@ -1413,7 +1418,7 @@ public class StratconRulesManager {
         StratconStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
         if ((specificObjective != null) &&
                 (specificObjective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory)) {
-            
+
             if (victory) {
                 specificObjective.incrementCurrentObjectiveCount();
             } else {
@@ -1530,12 +1535,12 @@ public class StratconRulesManager {
                     if (closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords()
                                 .translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
-                        
+
                         boolean objectiveMoved = track.moveObjective(scenario.getCoords(), newCoords);
                         if (!objectiveMoved) {
                             track.failObjective(scenario.getCoords());
                         }
-                        
+
                         scenario.setCoords(newCoords);
 
                         int daysForward = Math.max(1, track.getDeploymentTime());
@@ -1601,7 +1606,7 @@ public class StratconRulesManager {
                     processTrackForceReturnDates(track, ev.getCampaign());
 
                     processFacilityEffects(track, campaignState, isMonday);
-                    
+
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {

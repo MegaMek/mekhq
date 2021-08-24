@@ -40,6 +40,7 @@ import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.MMPreferences;
+import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.EventBus;
@@ -253,8 +254,10 @@ public class MekHQ implements GameListener {
         showInfo();
 
         // Setup user preferences
+        MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
         getPreferences().loadFromFile(PREFERENCES_FILE);
         setUserPreferences();
+        ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
         // create a start up frame and display it
@@ -311,6 +314,7 @@ public class MekHQ implements GameListener {
         if (campaignGUI != null) {
             campaignGUI.getFrame().dispose();
         }
+        MegaMek.getPreferences().saveToFile(MegaMek.PREFERENCES_FILE);
         getPreferences().saveToFile(PREFERENCES_FILE);
         System.exit(0);
     }
