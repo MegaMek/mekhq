@@ -1381,7 +1381,7 @@ public class ResolveScenarioTracker {
             }
 
             if (status.wasDeployed()) {
-                person.awardXP(status.getXP());
+                person.awardXP(campaign, status.getXP());
                 ServiceLogger.participatedInMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
@@ -1443,7 +1443,7 @@ public class ResolveScenarioTracker {
             } else {
                 continue;
             }
-            person.awardXP(status.getXP());
+            person.awardXP(campaign, status.getXP());
             if (status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }

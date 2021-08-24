@@ -193,6 +193,7 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInRankDisplayFormat;
     private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
+    private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
 
     // Medical
@@ -554,6 +555,7 @@ public class CampaignOptions implements Serializable {
         setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
         setUseRetirementDateTracking(false);
         setTrackTotalEarnings(false);
+        setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
 
         // Medical
@@ -1111,7 +1113,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to track the total earnings of personnel
      */
-    public boolean trackTotalEarnings() {
+    public boolean isTrackTotalEarnings() {
         return trackTotalEarnings;
     }
 
@@ -1120,6 +1122,21 @@ public class CampaignOptions implements Serializable {
      */
     public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
+    }
+
+    /**
+     * @return whether or not to track the total experience earnings of personnel
+     */
+    public boolean isTrackTotalXPEarnings() {
+        return trackTotalXPEarnings;
+    }
+
+    /**
+     * @param trackTotalXPEarnings the new value for whether or not to track total experience
+     *                             earnings for personnel
+     */
+    public void setTrackTotalXPEarnings(final boolean trackTotalXPEarnings) {
+        this.trackTotalXPEarnings = trackTotalXPEarnings;
     }
 
     /**
@@ -3272,7 +3289,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
         //endregion Expanded Personnel Information
 
@@ -3751,6 +3769,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                     retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalXPEarnings")) {
+                    retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
                     retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
                 //endregion Expanded Personnel Information

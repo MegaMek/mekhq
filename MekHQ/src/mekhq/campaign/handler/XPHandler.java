@@ -58,12 +58,12 @@ public class XPHandler {
                     }
 
                     if (--weeksLeft == 0) {
-                        person.awardXP(adminXP);
+                        person.awardXP(campaign, adminXP);
                         weeksLeft = adminXPPeriod;
                     }
                     person.getExtraData().set(NEXT_ADMIN_XP_DELAY, weeksLeft);
                 } else {
-                    person.awardXP(adminXP);
+                    person.awardXP(campaign, adminXP);
                 }
             }
         }

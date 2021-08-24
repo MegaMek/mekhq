@@ -378,7 +378,7 @@ public final class BatchXPDialog extends JDialog {
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
-                p.awardXP(-cost);
+                p.spendXP(cost);
                 PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 

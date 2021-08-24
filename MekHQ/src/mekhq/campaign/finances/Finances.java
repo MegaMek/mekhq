@@ -336,7 +336,7 @@ public class Finances implements Serializable {
                             String.format(resourceMap.getString("Salaries.text"),
                                     payRollCost.toAmountAndSymbolString()));
 
-                    if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                    if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                         for (Person person : campaign.getActivePersonnel()) {
                             person.payPersonSalary();
                         }
@@ -402,7 +402,7 @@ public class Finances implements Serializable {
                 campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
                         shares.toAmountAndSymbolString()));
 
-                if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                     int numberOfShares = 0;
                     boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {

@@ -687,7 +687,7 @@ public class NewContractDialog extends JDialog {
         // Negotiator XP
         Person negotiator = (Person) cboNegotiator.getSelectedItem();
         if ((negotiator != null) && (campaign.getCampaignOptions().getContractNegotiationXP() > 0)) {
-            negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
+            negotiator.awardXP(campaign, campaign.getCampaignOptions().getContractNegotiationXP());
         }
 
         this.setVisible(false);
