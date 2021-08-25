@@ -6,6 +6,7 @@ VERSION HISTORY:
 + Issue #2798: Adding Total XP Earnings Tracking
 + PR #2818: ReportHyperlinkListener Parsing Bugfixes
 + Issue #2825: Individual Camouflage Bulk Assignment from Same Original Camouflage
++ Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
