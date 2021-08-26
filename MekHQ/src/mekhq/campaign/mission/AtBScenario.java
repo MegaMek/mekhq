@@ -41,10 +41,7 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1283,10 +1280,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param skill     The skill level of the turret operators
      * @param quality   The quality level of the turrets
      * @param campaign  The campaign for which the turrets are being generated.
+     * @param faction   The faction the turrets are being generated for
      */
-    protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality,
-                              Campaign campaign) {
-        list.addAll(AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign));
+    protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality, Campaign campaign,
+                              Faction faction) {
+        list.addAll(AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction));
     }
 
     /**
@@ -1393,7 +1391,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // don't bother spawning turrets if there won't be anything to put them on
         if (spawnTurrets && isTurretAppropriateTerrain) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
-            addTurrets(scrubs,  campaign.getCampaignOptions().getSkillLevel() + 1, contract.getEnemySkill(), contract.getEnemyQuality(), campaign);
+            addTurrets(scrubs,  campaign.getCampaignOptions().getSkillLevel() + 1, contract.getEnemySkill(),
+                    contract.getEnemyQuality(), campaign, contract.getEnemy());
         }
 
         if (spawnConventionalInfantry && isInfantryAppropriateTerrain) {
