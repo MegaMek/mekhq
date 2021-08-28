@@ -10,6 +10,7 @@ VERSION HISTORY:
 + Issue #2838: Turrets now generate with the proper faction and thus names
 + Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
 + Issue #2747: Fixing StratOps Scenario Template Path Capitalization
++ PR #2847: Preventing Null Force Template Addition
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
