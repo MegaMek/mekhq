@@ -487,7 +487,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getTabbedPane().setName("GMToolsTabbedPane");
         getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
         getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
-        getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
+        //getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
         return getTabbedPane();
     }
 
@@ -1211,12 +1211,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
         if (getSpnCallsignNumber() != null) {
             preferences.manage(new JIntNumberSpinnerPreference(getSpnCallsignNumber()));
         }
-
-        if (getChkProcreationEligibilityType() != null) {
-            preferences.manage(new JToggleButtonPreference(getChkProcreationEligibilityType()));
-        }
-
-        preferences.manage(new JIntNumberSpinnerPreference(getSpnPregnancySize()));
     }
 
     private void setValuesFromPerson() {
@@ -1273,9 +1267,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         getComboPhenotype().setSelectedItem(getPerson().getPhenotype());
-
-        getChkProcreationEligibilityType().setSelected(!getChkProcreationEligibilityType().isSelected());
-        getChkProcreationEligibilityType().doClick();
     }
 
     /**
