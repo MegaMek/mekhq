@@ -2773,14 +2773,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
-                if (StaticChecks.anyCanBePregnant(gui.getCampaign().getLocalDate(), gui.getCampaign().getProcreation(), selected)) {
+                if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
+                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) != null)) {
                     menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
 
-                if (StaticChecks.anyPregnant(selected)) {
+                if (Stream.of(selected).anyMatch(Person::isPregnant)) {
                     menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
