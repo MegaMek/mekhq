@@ -131,15 +131,16 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     public void addForce(int forceID, String templateName) {
         // if we're not supplied a template name, fall back to trying to automatically place the force
-        if(StringUtils.isEmpty(templateName)) {
+        if (StringUtils.isEmpty(templateName)) {
             addForces(forceID);
             return;
         }
 
-        super.addForces(forceID);
-
-        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
-        playerForceTemplates.put(forceID, forceTemplate);
+        final ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
+        if (forceTemplate != null) {
+            super.addForces(forceID);
+            playerForceTemplates.put(forceID, forceTemplate);
+        }
     }
 
     public void addUnit(UUID unitID, String templateName) {
@@ -170,7 +171,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // If we've assigned at least one force
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
-        if(!getForceIDs().isEmpty() &&
+        if (!getForceIDs().isEmpty() &&
                 playerForceTemplates.containsKey(getForceIDs().get(0))) {
             return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
         }
