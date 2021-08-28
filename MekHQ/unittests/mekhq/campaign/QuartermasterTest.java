@@ -19,6 +19,7 @@
 
 package mekhq.campaign;
 
+import mekhq.campaign.finances.enums.TransactionType;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
@@ -273,7 +274,7 @@ public class QuartermasterTest {
         // ...but can't afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
-        doReturn(false).when(mockFinances).debit(any(), eq(Transaction.C_UNIT), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), any(), anyString());
 
         Entity mockEntity = mock(Entity.class);
         doReturn(1.0).when(mockEntity).getCost(anyBoolean());
@@ -294,12 +295,13 @@ public class QuartermasterTest {
 
         // If we pay for units...
         when(mockOptions.payForUnits()).thenReturn(true);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         Entity mockEntity = mock(Entity.class);
         double cost = 1.0;
@@ -324,12 +326,13 @@ public class QuartermasterTest {
 
         // If we pay for units...
         when(mockOptions.payForUnits()).thenReturn(true);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         Infantry mockEntity = mock(Infantry.class);
         double cost = 2.0;
@@ -357,13 +360,13 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         // ...and the unit is a clan unit...
         Entity mockEntity = mock(Entity.class);
@@ -393,13 +396,13 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+        when(mockOptions.getClanUnitPriceMultiplier()).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         // ...and the unit is clan infantry...
         Infantry mockEntity = mock(Infantry.class);
@@ -433,7 +436,7 @@ public class QuartermasterTest {
         quartermaster.sellUnit(mockUnit);
 
         // ...make sure we get that money!
-        verify(mockFinances, times(1)).credit(eq(sellValue), eq(Transaction.C_UNIT_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.UNIT_SALE), any(), eq(sellValue), anyString());
     }
 
     @Test
@@ -522,7 +525,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the part...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should not be able to buy the part...
         assertFalse(quartermaster.buyPart(mockPart, 0));
@@ -550,7 +553,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the refit kit...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should not be able to buy the refit kit...
         assertFalse(quartermaster.buyPart(mockRefit, 0));
@@ -578,7 +581,8 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
+                any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the part...
         quartermaster.buyPart(mockPart, 0);
@@ -606,7 +610,8 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
+                any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the part...
         double costMultiplier = 10.0;
@@ -635,7 +640,8 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
+                any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the refit kit...
         quartermaster.buyPart(mockRefit, 0);
@@ -663,7 +669,8 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
+                any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the refit kit with a cost multiplier...
         double costMultiplier = 2.0;
@@ -692,7 +699,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the part...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should be able to buy the part...
         assertTrue(quartermaster.buyPart(mockPart, 0));
@@ -720,7 +727,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the refit kit...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should be able to buy the refit kit...
         assertTrue(quartermaster.buyPart(mockRefit, 0));
@@ -751,7 +758,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyRefurbishment(mockPart));
 
         // ...and we never should have tried to spend our money!
-        verify(mockFinances, times(0)).debit(any(), anyInt(), anyString(), any());
+        verify(mockFinances, times(0)).debit(any(), any(), any(), anyString());
     }
 
     @Test
@@ -773,7 +780,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the refurbishment...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should not be able to refurbish the part.
         assertFalse(quartermaster.buyRefurbishment(mockPart));
@@ -798,7 +805,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the refurbishment...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
 
         // ...then we should be able to refurbish the part.
         assertTrue(quartermaster.buyRefurbishment(mockPart));
@@ -818,7 +825,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, 0);
 
         // No attempt should be made to sell or remove zero parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removePart(eq(mockPart), anyInt());
     }
 
@@ -836,7 +843,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, -10);
 
         // No attempt should be made to sell or remove negative parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removePart(eq(mockPart), anyInt());
     }
 
@@ -857,7 +864,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, 10);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removePart(eq(mockPart), anyInt());
     }
 
@@ -879,7 +886,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(Money.of(2.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
     }
 
     @Test
@@ -948,8 +955,8 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(Money.of(warehouseQuantity * value)), eq(Transaction.C_EQUIP_SALE),
-                anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+                any(), eq(Money.of(warehouseQuantity * value)), anyString());
     }
 
     @Test
@@ -969,7 +976,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removePart(eq(mockPart), anyInt());
     }
 
@@ -992,7 +999,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart);
 
         // ...and we should remove all of them!
-        verify(mockFinances, times(1)).credit(eq(Money.of(10.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(10.0)), anyString());
         verify(mockWarehouse, times(1)).removePart(eq(mockPart), eq(warehouseQuantity));
     }
 
@@ -1010,7 +1017,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, 0);
 
         // No attempt should be made to sell or remove zero parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeAmmo(eq(mockAmmo), anyInt());
     }
 
@@ -1028,7 +1035,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, -10);
 
         // No attempt should be made to sell or remove negative parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeAmmo(eq(mockAmmo), anyInt());
     }
 
@@ -1049,7 +1056,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, 10);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeAmmo(eq(mockAmmo), anyInt());
     }
 
@@ -1071,7 +1078,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(Money.of(2.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
     }
 
     @Test
@@ -1140,7 +1147,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(value)), anyString());
     }
 
     @Test
@@ -1160,7 +1167,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeAmmo(eq(mockAmmo), anyInt());
     }
 
@@ -1183,7 +1190,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
     }
 
@@ -1206,7 +1213,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockAmmo, saleQuantity);
 
         // ...and we should sell and remove that exact number!
-        verify(mockFinances, times(1)).credit(eq(Money.of(7.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(7.0)), anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(saleQuantity));
     }
 
@@ -1229,7 +1236,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockAmmo);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
     }
 
@@ -1247,7 +1254,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, 0);
 
         // No attempt should be made to sell or remove zero parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeArmor(eq(mockArmor), anyInt());
     }
 
@@ -1265,7 +1272,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, -10);
 
         // No attempt should be made to sell or remove negative parts.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeArmor(eq(mockArmor), anyInt());
     }
 
@@ -1286,7 +1293,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, 10);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeArmor(eq(mockArmor), anyInt());
     }
 
@@ -1308,7 +1315,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(Money.of(2.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
     }
 
     @Test
@@ -1377,7 +1384,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(value)), anyString());
     }
 
     @Test
@@ -1397,7 +1404,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor);
 
         // ...and no attempt should be made to sell or remove parts we don't have.
-        verify(mockFinances, times(0)).credit(any(), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(0)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), any(), anyString());
         verify(mockWarehouse, times(0)).removeArmor(eq(mockArmor), anyInt());
     }
 
@@ -1420,7 +1427,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(warehouseQuantity));
     }
 
@@ -1443,7 +1450,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockArmor, saleQuantity);
 
         // ...and we should sell and remove that exact number!
-        verify(mockFinances, times(1)).credit(eq(Money.of(7.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(7.0)), anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(saleQuantity));
     }
 
@@ -1466,7 +1473,7 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockArmor);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(warehouseQuantity));
     }
 

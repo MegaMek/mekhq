@@ -6,33 +6,21 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.event.*;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
-import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.gui.utilities.JMoneyTextField;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ResourceBundle;
 
 /**
- *
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
@@ -41,7 +29,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private JButton btnAddFunds;
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
-    private JComboBox<String> categoryCombo;
+    private MMComboBox<TransactionType> categoryCombo;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
     private int closedType = JOptionPane.CLOSED_OPTION;
 
@@ -61,14 +49,14 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
         btnAddFunds.setName("btnAddFunds"); // NOI18N
-        btnAddFunds.addActionListener(evt -> btnAddFundsActionPerformed(evt));
+        btnAddFunds.addActionListener(this::btnAddFundsActionPerformed);
 
         getContentPane().add(buildFieldsPanel(), BorderLayout.NORTH);
         getContentPane().add(btnAddFunds, BorderLayout.PAGE_END);
 
         setLocationRelativeTo(getParent());
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(AddFundsDialog.class);
@@ -87,8 +75,8 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         fundsQuantityField.setColumns(10);
         panel.add(fundsQuantityField);
 
-        categoryCombo = new JComboBox<>(Transaction.getCategoryList());
-        categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
+        categoryCombo = new MMComboBox<>("categoryCombo", TransactionType.values());
+        categoryCombo.setSelectedItem(TransactionType.MISCELLANEOUS);
         categoryCombo.setToolTipText("The category the transaction falls into.");
         categoryCombo.setName("categoryCombo");
         panel.add(categoryCombo);
@@ -111,8 +99,8 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         return descriptionField.getText();
     }
 
-    public int getCategory() {
-        return Transaction.getCategoryIndex((String)categoryCombo.getSelectedItem());
+    public TransactionType getTransactionType() {
+        return categoryCombo.getSelectedItem();
     }
 
     @Override
@@ -131,25 +119,24 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         return closedType;
     }
 
-    private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
+    private void btnAddFundsActionPerformed(ActionEvent evt) {
         this.closedType = JOptionPane.OK_OPTION;
         this.setVisible(false);
-    }//GEN-LAST:event_btnAddFundsActionPerformed
+    }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
-                dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
         });
     }
 }

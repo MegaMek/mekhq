@@ -259,13 +259,15 @@ public class Utilities {
     }
 
     public static boolean compareMounted(Mounted a, Mounted b) {
-        if (!a.getType().equals(b.getType()))
+        if (!a.getType().equals(b.getType())) {
             return false;
-        if (!a.getClass().equals(b.getClass()))
+        } else if (a.getClass() != b.getClass()) {
             return false;
-        if (!a.getName().equals(b.getName()))
+        } else if (!a.getName().equals(b.getName())) {
             return false;
-        return a.getLocation() == b.getLocation();
+        } else {
+            return a.getLocation() == b.getLocation();
+        }
     }
 
     /**

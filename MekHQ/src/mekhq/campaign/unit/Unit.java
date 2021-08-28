@@ -1707,17 +1707,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getBuyCost() {
-        Money cost;
+        Money cost = Money.of((getEntity() instanceof Infantry) ? getEntity().getAlternateCost()
+                : getEntity().getCost(false));
 
-        if (entity instanceof Infantry) {
-            cost = Money.of(getEntity().getAlternateCost());
-        } else {
-            cost = Money.of(getEntity().getCost(false));
+        if (getEntity().isMixedTech()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getMixedTechUnitPriceMultiplier());
+        } else if (getEntity().isClan()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanUnitPriceMultiplier());
+        } else { // Inner Sphere Entity
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getInnerSphereUnitPriceMultiplier());
         }
 
-        if (entity.isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanPriceModifier());
-        }
         return cost;
     }
 
@@ -3926,12 +3926,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             }
                         }
                         //If the engineer gained XP, add it for each crewman
-                        p.awardXP(engineer.getXP());
+                        p.awardXP(getCampaign(), engineer.getXP());
 
                         //Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            p.awardXP(getCampaign().getCampaignOptions().getTaskXP());
+                            p.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
                             p.setNTasks(0);
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();

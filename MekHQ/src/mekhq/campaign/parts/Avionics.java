@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -40,14 +39,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Avionics extends Part {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
 	public Avionics() {
@@ -59,6 +53,7 @@ public class Avionics extends Part {
         this.name = "Avionics";
     }
 
+    @Override
     public Avionics clone() {
     	Avionics clone = new Avionics(0, campaign);
         clone.copyBaseData(this);
@@ -68,10 +63,10 @@ public class Avionics extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if(null != unit
+		if (null != unit
 		        && (unit.getEntity().getEntityType() & (Entity.ETYPE_AERO | Entity.ETYPE_LAND_AIR_MECH)) != 0) {
-			hits = ((IAero)unit.getEntity()).getAvionicsHits();
-			if(checkForDestruction
+			hits = ((IAero) unit.getEntity()).getAvionicsHits();
+			if (checkForDestruction
 					&& hits > priorHits
 					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -84,7 +79,7 @@ public class Avionics extends Part {
 
 	@Override
 	public int getBaseTime() {
-	    int time = 0;
+	    int time;
 		if (campaign.getCampaignOptions().useAeroSystemHits()) {
 		    //Test of proposed errata for repair times
 		    if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
@@ -119,7 +114,7 @@ public class Avionics extends Part {
 	public int getDifficulty() {
 	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair time and difficulty
-            if(isSalvaging()) {
+            if (isSalvaging()) {
                 return 1;
             }
             if (hits == 1) {
@@ -129,7 +124,7 @@ public class Avionics extends Part {
                 return 1;
             }
         }
-		if(isSalvaging()) {
+		if (isSalvaging()) {
 			return 1;
 		}
 		return 0;
@@ -141,9 +136,9 @@ public class Avionics extends Part {
 	        return;
 	    }
 	    if (unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(hits);
+			((Aero) unit.getEntity()).setAvionicsHits(hits);
 		} else if (unit.getEntity() instanceof LandAirMech) {
-		    if(hits == 0) {
+		    if (hits == 0) {
 		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
 		    } else {
 		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, hits);
@@ -154,9 +149,9 @@ public class Avionics extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if(null != unit) {
+		if (null != unit) {
 		    if (unit.getEntity() instanceof Aero) {
-		        ((Aero)unit.getEntity()).setAvionicsHits(0);
+		        ((Aero) unit.getEntity()).setAvionicsHits(0);
 		    } else if (unit.getEntity() instanceof LandAirMech) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
 		    }
@@ -165,16 +160,16 @@ public class Avionics extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit) {
+		if (null != unit) {
 		    if (unit.getEntity() instanceof Aero) {
-		        ((Aero)unit.getEntity()).setAvionicsHits(3);
+		        ((Aero) unit.getEntity()).setAvionicsHits(3);
 		    } else if (unit.getEntity() instanceof LandAirMech) {
 		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
 		    }
 			Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-			if(!salvage) {
+			if (!salvage) {
 				campaign.getWarehouse().removePart(this);
-			} else if(null != spare) {
+			} else if (null != spare) {
 				spare.incrementQuantity();
 				campaign.getWarehouse().removePart(this);
 			}
@@ -263,5 +258,4 @@ public class Avionics extends Part {
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;
 	}
-
 }

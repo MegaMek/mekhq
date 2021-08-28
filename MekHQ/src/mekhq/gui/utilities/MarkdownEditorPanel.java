@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,47 +10,25 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.utilities;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * This class implements a markdown editor that comes with buttons for common markup as well as a preview
  * tab for seeing what the results look like. It can be embedded as a panel in other components.
  * @author Taharqa (Aaron Gullickson)
- *
  */
 public class MarkdownEditorPanel extends JPanel {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 7534667332172721918L;
 
     private JTabbedPane tabPane;
@@ -94,80 +72,60 @@ public class MarkdownEditorPanel extends JPanel {
 
         //set up buttons
         JPanel pnlButtons = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        btnH1 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924.png"));
+        btnH1 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924.png")); // TODO : Remove inline file path
         btnH1.setToolTipText("Header 1");
         btnH1.setPreferredSize(new Dimension(36, 36));
-        btnH1.addActionListener(ev -> {
-            insertHeader(1);
-        });
+        btnH1.addActionListener(ev -> insertHeader(1));
         pnlButtons.add(btnH1);
 
-        btnH2 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_20px.png"));
+        btnH2 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_20px.png")); // TODO : Remove inline file path
         btnH2.setToolTipText("Header 2");
         btnH2.setPreferredSize(new Dimension(36, 36));
-        btnH2.addActionListener(ev -> {
-            insertHeader(2);
-        });
+        btnH2.addActionListener(ev -> insertHeader(2));
         pnlButtons.add(btnH2);
 
-        btnH3 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_16px.png"));
+        btnH3 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_16px.png")); // TODO : Remove inline file path
         btnH3.setToolTipText("Header 3");
         btnH3.setPreferredSize(new Dimension(36, 36));
-        btnH3.addActionListener(ev -> {
-            insertHeader(3);
-        });
+        btnH3.addActionListener(ev -> insertHeader(3));
         pnlButtons.add(btnH3);
 
-        btnBold = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_bold_48px_352381.png"));
+        btnBold = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_bold_48px_352381.png")); // TODO : Remove inline file path
         btnBold.setToolTipText("Bold");
         btnBold.setPreferredSize(new Dimension(36, 36));
-        btnBold.addActionListener(ev -> {
-            boldText();
-        });
+        btnBold.addActionListener(ev -> boldText());
         pnlButtons.add(btnBold);
 
-        btnItalic = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png"));
+        btnItalic = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png")); // TODO : Remove inline file path
         btnItalic.setToolTipText("Italicize");
         btnItalic.setPreferredSize(new Dimension(36, 36));
-        btnItalic.addActionListener(ev -> {
-            italicizeText();
-        });
+        btnItalic.addActionListener(ev -> italicizeText());
         pnlButtons.add(btnItalic);
 
-        btnHR = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_remove_48px_352440.png"));
+        btnHR = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_remove_48px_352440.png")); // TODO : Remove inline file path
         btnHR.setToolTipText("Horizontal line");
         btnHR.setPreferredSize(new Dimension(36, 36));
-        btnHR.addActionListener(ev -> {
-            insertHR();
-        });
+        btnHR.addActionListener(ev -> insertHR());
         pnlButtons.add(btnHR);
 
-        btnUL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png"));
+        btnUL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png")); // TODO : Remove inline file path
         btnUL.setToolTipText("Unordered list");
         btnUL.setPreferredSize(new Dimension(36, 36));
-        btnUL.addActionListener(ev -> {
-            insertBullet(false);
-        });
+        btnUL.addActionListener(ev -> insertBullet(false));
         pnlButtons.add(btnUL);
 
-        btnOL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png"));
+        btnOL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png")); // TODO : Remove inline file path
         btnOL.setToolTipText("Ordered list");
         btnOL.setPreferredSize(new Dimension(36, 36));
-        btnOL.addActionListener(ev -> {
-            insertBullet(true);
-        });
+        btnOL.addActionListener(ev -> insertBullet(true));
         pnlButtons.add(btnOL);
 
-        btnQuestion = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_help_48px_352423.png"));
+        btnQuestion = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_help_48px_352423.png")); // TODO : Remove inline file path
         btnQuestion.setToolTipText("More information");
         btnQuestion.setPreferredSize(new Dimension(36, 36));
-        btnQuestion.addActionListener(ev -> {
-            JOptionPane.showMessageDialog(null,
-                    "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>");
-        });
+        btnQuestion.addActionListener(ev -> JOptionPane.showMessageDialog(null,
+                "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>"));
         pnlButtons.add(btnQuestion);
-
-
 
         JPanel editorPanel = new JPanel(new BorderLayout());
         editorPanel.add(pnlButtons, BorderLayout.NORTH);
@@ -181,24 +139,21 @@ public class MarkdownEditorPanel extends JPanel {
         scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tabPane.add("Preview", scrollViewer);
 
-        tabPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if(tabPane.getSelectedIndex()==1) {
-                    viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        scrollViewer.getVerticalScrollBar().setValue(0);
-                    });
-                }
+        tabPane.addChangeListener(e -> {
+            if (tabPane.getSelectedIndex()==1) {
+                viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
+                javax.swing.SwingUtilities.invokeLater(() -> scrollViewer.getVerticalScrollBar().setValue(0));
             }
         });
         add(tabPane, BorderLayout.CENTER);
-        if(null != title) {
+        if (null != title) {
             add(new JLabel("<html><h4>" + title + "</h4></html>"), BorderLayout.NORTH);
         }
 
         //set up key bindings
         editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "bold");
         editor.getActionMap().put("bold", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boldText();
             }
@@ -206,6 +161,7 @@ public class MarkdownEditorPanel extends JPanel {
 
         editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "italic");
         editor.getActionMap().put("italic", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 italicizeText();
             }
@@ -219,9 +175,7 @@ public class MarkdownEditorPanel extends JPanel {
      */
     public void setText(String text) {
         editor.setText(text);
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            scrollEditor.getVerticalScrollBar().setValue(0);
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> scrollEditor.getVerticalScrollBar().setValue(0));
     }
 
     /**
@@ -240,11 +194,11 @@ public class MarkdownEditorPanel extends JPanel {
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
         editor.insert("**", start);
-        editor.insert("**", end+2);
-        if(start==end) {
-            editor.setCaretPosition(start+2);
+        editor.insert("**", end + 2);
+        if (start == end) {
+            editor.setCaretPosition(start + 2);
         } else {
-            editor.setCaretPosition(end+4);
+            editor.setCaretPosition(end + 4);
         }
         editor.requestFocusInWindow();
     }
@@ -257,11 +211,11 @@ public class MarkdownEditorPanel extends JPanel {
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
         editor.insert("*", start);
-        editor.insert("*", end+1);
-        if(start==end) {
-            editor.setCaretPosition(start+1);
+        editor.insert("*", end + 1);
+        if (start == end) {
+            editor.setCaretPosition(start + 1);
         } else {
-            editor.setCaretPosition(end+2);
+            editor.setCaretPosition(end + 2);
         }
         editor.requestFocusInWindow();
     }
@@ -272,13 +226,13 @@ public class MarkdownEditorPanel extends JPanel {
      */
     private void insertHeader(int level) {
         String toInsert = "";
-        for(int i = 0; i < level; i++) {
+        for (int i = 0; i < level; i++) {
             toInsert = toInsert + "#";
         }
         toInsert = toInsert + " ";
         int start = editor.getSelectionStart();
         editor.insert(toInsert, start);
-        editor.setCaretPosition(start+toInsert.length());
+        editor.setCaretPosition(start + toInsert.length());
         editor.requestFocusInWindow();
     }
 
@@ -289,7 +243,7 @@ public class MarkdownEditorPanel extends JPanel {
         String toInsert = "\n---\n";
         int start = editor.getSelectionStart();
         editor.insert(toInsert, start);
-        editor.setCaretPosition(start+toInsert.length());
+        editor.setCaretPosition(start + toInsert.length());
         editor.requestFocusInWindow();
     }
 
@@ -300,16 +254,16 @@ public class MarkdownEditorPanel extends JPanel {
      */
     private void insertBullet(boolean ordered) {
         String toInsert = "\n\n- ";
-        if(ordered) {
+        if (ordered) {
             toInsert = "\n\n1. ";
         }
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
         editor.insert(toInsert, start);
-        if(start!=end) {
-            editor.insert("\n\n", end+toInsert.length());
+        if (start!=end) {
+            editor.insert("\n\n", end + toInsert.length());
         }
-        editor.setCaretPosition(start+toInsert.length());
+        editor.setCaretPosition(start + toInsert.length());
         editor.requestFocusInWindow();
     }
 }
