@@ -1044,15 +1044,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_TRYING_TO_CONCEIVE: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isTryingToConceive();
-                    for (Person person : people) {
-                        person.setTryingToConceive(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
-                    gui.getCampaign().personUpdated(selectedPerson);
+                final boolean tryingToConceive = !people[0].isTryingToConceive();
+                for (final Person person : people) {
+                    person.setTryingToConceive(tryingToConceive);
                 }
                 break;
             }

@@ -4427,7 +4427,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createRandomProcreationPanel() {
-        // Initialize Labels Used in ActionListeners
+        // Initialize Components Used in ActionListeners
         final JPanel percentageRandomProcreationPanel = new JDisableablePanel("percentageRandomProcreationPanel");
 
         // Create Panel Components
@@ -4455,21 +4455,27 @@ public class CampaignOptionsDialog extends JDialog {
                 return;
             }
             final boolean enabled = !method.isNone();
+            final boolean percentageEnabled = method.isPercentage();
             final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
             chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
-            percentageRandomProcreationPanel.setEnabled(method.isPercentage());
-            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled);
-            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled);
+            percentageRandomProcreationPanel.setEnabled(percentageEnabled);
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
         });
 
         chkUseRelationshiplessRandomProcreation = new JCheckBox(resources.getString("chkUseRelationshiplessRandomProcreation.text"));
         chkUseRelationshiplessRandomProcreation.setToolTipText(resources.getString("chkUseRelationshiplessRandomProcreation.toolTipText"));
         chkUseRelationshiplessRandomProcreation.setName("chkUseRelationshiplessRandomProcreation");
         chkUseRelationshiplessRandomProcreation.addActionListener(evt -> {
-            final boolean selected = chkUseRelationshiplessRandomProcreation.isEnabled()
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean sameSexEnabled = chkUseRelationshiplessRandomProcreation.isEnabled()
                     && chkUseRelationshiplessRandomProcreation.isSelected();
-            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(selected);
-            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(selected);
+            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
         });
 
         createPercentageRandomProcreationPanel(percentageRandomProcreationPanel);
@@ -4525,6 +4531,10 @@ public class CampaignOptionsDialog extends JDialog {
         spnPercentageRandomProcreationRelationshiplessChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
         spnPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
         spnPercentageRandomProcreationRelationshiplessChance.setName("spnPercentageRandomProcreationRelationshiplessChance");
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomProcreationRelationshipChance.setLabelFor(spnPercentageRandomProcreationRelationshipChance);
+        lblPercentageRandomProcreationRelationshiplessChance.setLabelFor(spnPercentageRandomProcreationRelationshiplessChance);
 
         // Layout the Panel
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomProcreationPanel.title")));

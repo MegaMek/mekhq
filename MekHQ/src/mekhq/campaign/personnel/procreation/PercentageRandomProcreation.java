@@ -37,7 +37,7 @@ public class PercentageRandomProcreation extends AbstractProcreation {
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public double getPercentage() {
         return percentage;
     }
@@ -53,7 +53,7 @@ public class PercentageRandomProcreation extends AbstractProcreation {
     public void setRelationshiplessPercentage(final double relationshiplessPercentage) {
         this.relationshiplessPercentage = relationshiplessPercentage;
     }
-    //endregion Getters
+    //endregion Getters/Setters
 
     @Override
     protected boolean relationshipProcreation(final Person person) {
