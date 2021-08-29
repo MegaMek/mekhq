@@ -3843,6 +3843,9 @@ public class CampaignOptions implements Serializable {
                     final NodeList nl2 = wn2.getChildNodes();
                     for (int j = 0; j < nl2.getLength(); j++) {
                         final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
                         retVal.getMarriageSurnameWeights().put(
                                 MarriageSurnameStyle.valueOf(wn3.getNodeName().trim()),
                                 Integer.parseInt(wn3.getTextContent().trim()));
