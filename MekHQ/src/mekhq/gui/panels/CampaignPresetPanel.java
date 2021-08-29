@@ -23,14 +23,14 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
-import mekhq.gui.dialog.CampaignPresetCustomizationDialog;
+import mekhq.gui.dialog.CreateCampaignPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class displays a Campaign Preset. It is used in a List Renderer for preset selection, and
- * as the panel for preset customization and addition. We only want to be able to edit the preset if
+ * This class displays a Campaign Preset. It is used in a List Renderer for preset selection, and as
+ * the panel for preset customization and addition. We only want to be able to edit the preset if
  * the campaign and preset are both not null, and the preset is in the userdata folder. This
  * prevents it from being shown on the renderer, where the button cannot be used.
  */
@@ -106,10 +106,10 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
         getLblTitle().setAlignmentX(Component.CENTER_ALIGNMENT);
         add(getLblTitle(), gbc);
 
-        if (editPreset) {
+        if (editPreset) { // TODO : Add a way to access this
             final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
                     resources.getString("btnEditPreset.toolTipText"), evt -> {
-                final CampaignPresetCustomizationDialog dialog = new CampaignPresetCustomizationDialog(
+                final CreateCampaignPresetDialog dialog = new CreateCampaignPresetDialog(
                         getFrame(), getCampaign(), getPreset());
                 if (dialog.showDialog().isConfirmed()) {
                     dialog.updatePreset(getPreset());

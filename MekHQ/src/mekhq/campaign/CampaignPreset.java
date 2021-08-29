@@ -82,9 +82,9 @@ public class CampaignPreset implements Serializable {
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
-    private GameOptions gameOptions;
 
     // Continuous Preset Values
+    private GameOptions gameOptions;
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences;
     private Hashtable<String, SkillType> skills;
@@ -129,9 +129,9 @@ public class CampaignPreset implements Serializable {
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
-        setGameOptions(gameOptions);
 
         // Continuous Preset Values
+        setGameOptions(gameOptions);
         setCampaignOptions(campaignOptions);
         setRandomSkillPreferences(randomSkillPreferences);
         setSkills(skills);
@@ -196,7 +196,9 @@ public class CampaignPreset implements Serializable {
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
     }
+    //endregion Startup Preset Values
 
+    //region Continuous Preset Values
     public @Nullable GameOptions getGameOptions() {
         return gameOptions;
     }
@@ -204,9 +206,7 @@ public class CampaignPreset implements Serializable {
     public void setGameOptions(final @Nullable GameOptions gameOptions) {
         this.gameOptions = gameOptions;
     }
-    //endregion Startup Preset Values
 
-    //region Continuous Preset Values
     public @Nullable CampaignOptions getCampaignOptions() {
         return campaignOptions;
     }
@@ -242,16 +242,11 @@ public class CampaignPreset implements Serializable {
     //endregion Getters/Setters
 
     /**
-     * @param userdata whether to include the default presets or just the userdata ones (true for
-     *                 just userdata)
      * @return a list of all of the campaign presets in the default and userdata folders
      */
-    public static List<CampaignPreset> getCampaignPresets(final boolean userdata) {
-        final List<CampaignPreset> presets = new ArrayList<>();
-        if (!userdata) {
-            presets.addAll(loadCampaignPresetsFromDirectory(
-                    new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY)));
-        }
+    public static List<CampaignPreset> getCampaignPresets() {
+        final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
+                new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
         presets.addAll(loadCampaignPresetsFromDirectory(
                 new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
@@ -260,6 +255,13 @@ public class CampaignPreset implements Serializable {
     }
 
     public void applyContinuousToCampaign(final Campaign campaign) {
+        if (getGameOptions() != null) {
+            campaign.setGameOptions(getGameOptions());
+            if (getCampaignOptions() == null) {
+                campaign.updateCampaignOptionsFromGameOptions();
+            }
+        }
+
         if (getCampaignOptions() != null) {
             campaign.setCampaignOptions(getCampaignOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));
@@ -310,7 +312,7 @@ public class CampaignPreset implements Serializable {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
-        //region Continuous Preset Values
+        //region Startup Preset Values
         if (getDate() != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", getDate());
         }
@@ -328,12 +330,13 @@ public class CampaignPreset implements Serializable {
             getRankSystem().writeToXML(pw, indent, false);
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "contractCount", getContractCount());
+        //endregion Startup Preset Values
+
+        //region Continuous Preset Values
         if (getGameOptions() != null) {
             getGameOptions().writeToXML(pw, indent);
         }
-        //endregion Continuous Preset Values
 
-        //region Continuous Preset Values
         if (getCampaignOptions() != null) {
             getCampaignOptions().writeToXml(pw, indent);
         }
@@ -439,13 +442,13 @@ public class CampaignPreset implements Serializable {
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
                         break;
+                    //endregion Startup Preset Values
+
+                    //region Continuous Preset Values
                     case "gameOptions":
                         final GameOptions gameOptions = new GameOptions();
                         gameOptions.fillFromXML(wn.getChildNodes());
                         break;
-                    //endregion Startup Preset Values
-
-                    //region Continuous Preset Values
                     case "campaignOptions":
                         preset.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                         break;

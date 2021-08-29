@@ -567,6 +567,7 @@ public class CampaignGUI extends JPanel {
         menuImport.setMnemonic(KeyEvent.VK_I);
 
         final JMenuItem miImportCampaignPreset = new JMenuItem(resourceMap.getString("miImportCampaignPreset.text"));
+        miImportCampaignPreset.setToolTipText(resourceMap.getString("miImportCampaignPreset.toolTipText"));
         miImportCampaignPreset.setName("miImportCampaignPreset");
         miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
         miImportCampaignPreset.addActionListener(evt -> {
@@ -648,12 +649,12 @@ public class CampaignGUI extends JPanel {
         miExportCampaignPreset.setName("miExportCampaignPreset");
         miExportCampaignPreset.setMnemonic(KeyEvent.VK_C);
         miExportCampaignPreset.addActionListener(evt -> {
-            final CampaignPresetCustomizationDialog campaignPresetCustomizationDialog
-                    = new CampaignPresetCustomizationDialog(getFrame(), getCampaign(), null);
-            if (!campaignPresetCustomizationDialog.showDialog().isConfirmed()) {
+            final CreateCampaignPresetDialog createCampaignPresetDialog
+                    = new CreateCampaignPresetDialog(getFrame(), getCampaign(), null);
+            if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
                 return;
             }
-            final CampaignPreset preset = campaignPresetCustomizationDialog.getPreset();
+            final CampaignPreset preset = createCampaignPresetDialog.getPreset();
             if (preset == null) {
                 return;
             }
@@ -1477,7 +1478,6 @@ public class CampaignGUI extends JPanel {
         god.setVisible(true);
         if (!god.wasCancelled()) {
             getCampaign().setGameOptions(god.getOptions());
-            setCampaignOptionsFromGameOptions();
             refreshCalendar();
         }
     }
@@ -2571,19 +2571,5 @@ public class CampaignGUI extends JPanel {
      */
     public ResourceBundle getResourceMap() {
         return resourceMap;
-    }
-
-    private void setCampaignOptionsFromGameOptions() {
-        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
-        getCampaign().getCampaignOptions().setUseInitiativeBonus(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
-        getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
-        getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
-        getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
-        getCampaign().getCampaignOptions().setUseEdge(getCampaign().getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
-        getCampaign().getCampaignOptions().setUseImplants(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
-        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
-        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
-        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
-        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }

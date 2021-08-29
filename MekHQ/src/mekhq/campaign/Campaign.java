@@ -39,10 +39,9 @@ import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.event.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.event.MissionRemovedEvent;
-import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -78,29 +77,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
-import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.DayEndingEvent;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.GMModeEvent;
-import mekhq.campaign.event.LoanNewEvent;
-import mekhq.campaign.event.LoanPaidEvent;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.NetworkChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.OvertimeModeEvent;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartWorkEvent;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonNewEvent;
-import mekhq.campaign.event.PersonRemovedEvent;
-import mekhq.campaign.event.ReportEvent;
-import mekhq.campaign.event.ScenarioNewEvent;
-import mekhq.campaign.event.UnitNewEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.ContractMarket;
@@ -5413,14 +5389,29 @@ public class Campaign implements Serializable, ITechManager {
         return options;
     }
 
-    public void setGameOptions(GameOptions gameOptions) {
+    public void setGameOptions(final GameOptions gameOptions) {
         this.gameOptions = gameOptions;
     }
 
-    public void setGameOptions(Vector<IBasicOption> options) {
-        for (IBasicOption option : options) {
-            gameOptions.getOption(option.getName()).setValue(option.getValue());
+    public void setGameOptions(final Vector<IBasicOption> options) {
+        for (final IBasicOption option : options) {
+            getGameOptions().getOption(option.getName()).setValue(option.getValue());
         }
+        updateCampaignOptionsFromGameOptions();
+    }
+
+    public void updateCampaignOptionsFromGameOptions() {
+        getCampaignOptions().setUseTactics(getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
+        getCampaignOptions().setUseInitiativeBonus(getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
+        getCampaignOptions().setUseToughness(getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
+        getCampaignOptions().setUseArtillery(getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
+        getCampaignOptions().setUseAbilities(getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
+        getCampaignOptions().setUseEdge(getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
+        getCampaignOptions().setUseImplants(getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
+        getCampaignOptions().setQuirks(getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
+        getCampaignOptions().setAllowCanonOnly(getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
+        getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
+        MekHQ.triggerEvent(new OptionsChangedEvent(this));
     }
 
     /**

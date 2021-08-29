@@ -4961,9 +4961,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text", null,
                 evt -> btnSaveActionPerformed()));
 
-        panel.add(new MMButton("btnManagePresets", resources, "btnManagePresets.text", null,
-                evt -> new CampaignPresetManagementDialog(getFrame(), getCampaign()).setVisible(true)));
-
         panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text", null,
                 evt -> {
             final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
@@ -4990,10 +4987,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         if (isStartup()) {
-            // Handle Date
             setDate(preset.getDate());
 
-            // Handle Faction
             if (preset.getFaction() != null) {
                 comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
             }
