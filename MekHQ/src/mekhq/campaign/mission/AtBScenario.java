@@ -465,7 +465,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 "Cliffs", "Mountain-medium", "Mountain-high"} //mountains
         };
 
-        map = maps[terrainType][Compute.d6() - 1];
+        int actualTerrainType = terrainType;
+        
+        // we want to make sure the terrain type we pick is in bounds, 
+        if ((terrainType < 0) || (terrainType >= maps.length)) {
+            actualTerrainType = Compute.randomInt(maps.length);
+        }
+        
+        map = maps[actualTerrainType][Compute.d6() - 1];
     }
 
     public boolean canRerollTerrain() {
