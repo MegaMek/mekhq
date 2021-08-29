@@ -354,7 +354,7 @@ public class CampaignPreset implements Serializable {
 
         if (getSpecialAbilities() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "specialAbilities");
-            for (String key : getSpecialAbilities().keySet()) {
+            for (final String key : getSpecialAbilities().keySet()) {
                 getSpecialAbilities().get(key).writeToXml(pw, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
@@ -458,7 +458,7 @@ public class CampaignPreset implements Serializable {
                     case "skillTypes": {
                         final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
-                            Node wn2 = nl2.item(y);
+                            final Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
@@ -473,7 +473,7 @@ public class CampaignPreset implements Serializable {
                         final PilotOptions options = new PilotOptions();
                         final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
-                            Node wn2 = nl2.item(y);
+                            final Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
