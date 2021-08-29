@@ -95,7 +95,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_COMMANDER = "COMMANDER";
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
-    private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
+    private static final String CMD_MARRIAGEABLE = "MARRIAGEABLE";
     private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
@@ -528,8 +528,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_SPOUSE: {
-                Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                Marriage.valueOf(data[2]).marry(gui.getCampaign(), selectedPerson, spouse);
+                gui.getCampaign().getMarriage().marry(gui.getCampaign(),
+                        gui.getCampaign().getLocalDate(), selectedPerson,
+                        gui.getCampaign().getPerson(UUID.fromString(data[1])),
+                        MarriageSurnameStyle.valueOf(data[2]));
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -1026,16 +1028,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_TRYING_TO_MARRY: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isTryingToMarry();
-                    for (Person person : people) {
-                        person.setTryingToMarry(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
-                    gui.getCampaign().personUpdated(selectedPerson);
+            case CMD_MARRIAGEABLE: {
+                final boolean marriageable = !people[0].isMarriageable();
+                for (final Person person : people) {
+                    person.setMarriageable(marriageable);
                 }
                 break;
             }
@@ -1786,8 +1782,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (oneSelected && person.getStatus().isActive()) {
-            if (gui.getCampaign().getCampaignOptions().useManualMarriages()
-                    && person.oldEnoughToMarry(gui.getCampaign()) && !person.getGenealogy().hasSpouse()) {
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    && gui.getCampaign().getMarriage().oldEnoughToMarry(gui.getCampaign(), gui.getCampaign().getLocalDate(), person)
+                    && !person.getGenealogy().hasSpouse()) {
                 menu = new JMenu(resourceMap.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
@@ -1798,29 +1795,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
                 personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
-                for (Person ps : personnel) {
-                    if (person.safeSpouse(ps, gui.getCampaign())) {
-                        String pStatus;
-
-                        if (ps.getPrisonerStatus().isBondsman()) {
-                            pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                        } else if (ps.getPrisonerStatus().isPrisoner()) {
-                            pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
+                for (final Person potentialSpouse : personnel) {
+                    if (gui.getCampaign().getMarriage().safeSpouse(
+                            gui.getCampaign(), gui.getCampaign().getLocalDate(), person, potentialSpouse)) {
+                        final String status;
+                        if (potentialSpouse.getPrisonerStatus().isBondsman()) {
+                            status = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
+                                    potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                    potentialSpouse.getRoleDesc());
+                        } else if (potentialSpouse.getPrisonerStatus().isPrisoner()) {
+                            status = String.format(resourceMap.getString("marriagePrisonerDesc.format"),
+                                    potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                    potentialSpouse.getRoleDesc());
                         } else {
-                            pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
+                            status = String.format(resourceMap.getString("marriagePartnerDesc.format"), potentialSpouse.getFullName(),
+                                    potentialSpouse.getAge(today), potentialSpouse.getRoleDesc());
                         }
 
-                        spouseMenu = new JMenu(pStatus);
+                        spouseMenu = new JMenu(status);
 
-                        for (Marriage style : Marriage.values()) {
+                        for (final MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
                             spouseMenu.add(newMenuItem(style.getDropDownText(),
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
+                                    makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
                         }
 
-                        if (ps.getGender().isMale()) {
+                        if (potentialSpouse.getGender().isMale()) {
                             maleMenu.add(spouseMenu);
                         } else {
                             femaleMenu.add(spouseMenu);
@@ -2316,10 +2315,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
-            cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
-            cbMenuItem.setSelected(person.isTryingToMarry());
-            cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("cbMarriageable.text"));
+            cbMenuItem.setToolTipText(resourceMap.getString("cbMarriageable.toolTipText"));
+            cbMenuItem.setName("cbMarriageable");
+            cbMenuItem.setSelected(person.isMarriageable());
+            cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
@@ -2506,10 +2506,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menu = new JMenu(resourceMap.getString("specialFlags.text"));
             if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
-                cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
-                cbMenuItem.setSelected(selected[0].isTryingToMarry());
-                cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("cbMarriageable.text"));
+                cbMenuItem.setToolTipText(resourceMap.getString("cbMarriageable.toolTipText"));
+                cbMenuItem.setSelected(selected[0].isMarriageable());
+                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }

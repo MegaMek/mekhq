@@ -331,6 +331,8 @@ public class CampaignXmlParser {
 
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
+        final CampaignOptions options = retVal.getCampaignOptions();
+
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
@@ -342,6 +344,9 @@ public class CampaignXmlParser {
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
+
+        // Update the Personnel Modules
+        retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
 
         long timestamp = System.currentTimeMillis();
 

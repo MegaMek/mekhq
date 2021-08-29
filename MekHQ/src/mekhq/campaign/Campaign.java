@@ -57,6 +57,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -263,6 +265,9 @@ public class Campaign implements Serializable, ITechManager {
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
+
+    private transient AbstractMarriage marriage;
+
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -322,6 +327,7 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setMarriage(new DisabledRandomMarriage());
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -474,6 +480,16 @@ public class Campaign implements Serializable, ITechManager {
         this.unitMarket = unitMarket;
     }
     //endregion Markets
+
+    //region Personnel Modules
+    public AbstractMarriage getMarriage() {
+        return marriage;
+    }
+
+    public void setMarriage(final AbstractMarriage marriage) {
+        this.marriage = marriage;
+    }
+    //endregion Personnel Modules
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -3199,9 +3215,7 @@ public class Campaign implements Serializable, ITechManager {
             // Random Death
 
             // Random Marriages
-            if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage(this);
-            }
+            getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();
             // Reset acquisitions made to 0

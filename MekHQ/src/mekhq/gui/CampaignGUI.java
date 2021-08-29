@@ -74,6 +74,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -1445,14 +1447,21 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuOptionsActionPerformed(final ActionEvent evt) {
+        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
+        // We need to handle it like this for now, as the options above get written to currently
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
         boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
+        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
+
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
+
+        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
+
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                 getCampaign().initTimeInService();
@@ -1480,6 +1489,18 @@ public class CampaignGUI extends JPanel {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setRetirement(null);
                 }
+            }
+        }
+
+        if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
+            getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
+            if (getCampaign().getMarriage().getMethod().isPercentage()) {
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setPercentage(
+                        newOptions.getPercentageRandomMarriageChance());
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
+                        newOptions.getPercentageRandomMarriageSameSexChance());
             }
         }
 

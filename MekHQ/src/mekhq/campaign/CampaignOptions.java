@@ -19,41 +19,31 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import mekhq.Version;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.service.MassRepairOption;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.Version;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.service.MassRepairOption;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author natit
@@ -233,13 +223,13 @@ public class CampaignOptions implements Serializable {
     private boolean useManualMarriages;
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
-    private boolean logMarriageNameChange;
-    private int[] marriageSurnameWeights;
-    private boolean useRandomMarriages;
-    private double chanceRandomMarriages;
-    private int marriageAgeRange;
+    private boolean logMarriageNameChanges;
+    private Map<MarriageSurnameStyle, Integer> marriageSurnameWeights;
+    private RandomMarriageMethod randomMarriageMethod;
     private boolean useRandomSameSexMarriages;
-    private double chanceRandomSameSexMarriages;
+    private int randomMarriageAgeRange;
+    private double percentageRandomMarriageChance;
+    private double percentageRandomMarriageSameSexChance;
 
     // Procreation
     private boolean useProcreation;
@@ -629,26 +619,26 @@ public class CampaignOptions implements Serializable {
         setUseManualMarriages(true);
         setMinimumMarriageAge(16);
         setCheckMutualAncestorsDepth(4);
-        setLogMarriageNameChange(false);
-        setMarriageSurnameWeights(new int[Marriage.values().length - 1]);
-        setMarriageSurnameWeight(Marriage.NO_CHANGE.ordinal(), 100);
-        setMarriageSurnameWeight(Marriage.YOURS.ordinal(), 55);
-        setMarriageSurnameWeight(Marriage.SPOUSE.ordinal(), 55);
-        setMarriageSurnameWeight(Marriage.SPACE_YOURS.ordinal(), 10);
-        setMarriageSurnameWeight(Marriage.BOTH_SPACE_YOURS.ordinal(), 5);
-        setMarriageSurnameWeight(Marriage.HYP_YOURS.ordinal(), 30);
-        setMarriageSurnameWeight(Marriage.BOTH_HYP_YOURS.ordinal(), 20);
-        setMarriageSurnameWeight(Marriage.SPACE_SPOUSE.ordinal(), 10);
-        setMarriageSurnameWeight(Marriage.BOTH_SPACE_SPOUSE.ordinal(), 5);
-        setMarriageSurnameWeight(Marriage.HYP_SPOUSE.ordinal(), 30);
-        setMarriageSurnameWeight(Marriage.BOTH_HYP_SPOUSE.ordinal(), 20);
-        setMarriageSurnameWeight(Marriage.MALE.ordinal(), 500);
-        setMarriageSurnameWeight(Marriage.FEMALE.ordinal(), 160);
-        setUseRandomMarriages(false);
-        setChanceRandomMarriages(0.00025);
-        setMarriageAgeRange(10);
+        setLogMarriageNameChanges(false);
+        setMarriageSurnameWeights(new HashMap<>());
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.NO_CHANGE, 100);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.YOURS, 55);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.SPOUSE, 55);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.SPACE_YOURS, 10);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_SPACE_YOURS, 5);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.HYP_YOURS, 30);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_HYP_YOURS, 20);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.SPACE_SPOUSE, 10);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_SPACE_SPOUSE, 5);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.HYP_SPOUSE, 30);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_HYP_SPOUSE, 20);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.MALE, 500);
+        getMarriageSurnameWeights().put(MarriageSurnameStyle.FEMALE, 160);
+        setRandomMarriageMethod(RandomMarriageMethod.NONE);
         setUseRandomSameSexMarriages(false);
-        setChanceRandomSameSexMarriages(0.00002);
+        setRandomMarriageAgeRange(10);
+        setPercentageRandomMarriageChance(0.00025);
+        setPercentageRandomMarriageSameSexChance(0.00002);
 
         // Procreation
         setUseProcreation(false);
@@ -1415,7 +1405,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to use manual marriages
      */
-    public boolean useManualMarriages() {
+    public boolean isUseManualMarriages() {
         return useManualMarriages;
     }
 
@@ -1444,7 +1434,7 @@ public class CampaignOptions implements Serializable {
      * This gets the number of recursions to use when checking mutual ancestors between two personnel
      * @return the number of recursions to use
      */
-    public int checkMutualAncestorsDepth() {
+    public int getCheckMutualAncestorsDepth() {
         return checkMutualAncestorsDepth;
     }
 
@@ -1459,99 +1449,43 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to log a name change in a marriage
      */
-    public boolean logMarriageNameChange() {
-        return logMarriageNameChange;
+    public boolean isLogMarriageNameChanges() {
+        return logMarriageNameChanges;
     }
 
     /**
-     * @param logMarriageNameChange whether to log marriage name changes or not
+     * @param logMarriageNameChanges whether to log marriage name changes or not
      */
-    public void setLogMarriageNameChange(final boolean logMarriageNameChange) {
-        this.logMarriageNameChange = logMarriageNameChange;
+    public void setLogMarriageNameChanges(final boolean logMarriageNameChanges) {
+        this.logMarriageNameChanges = logMarriageNameChanges;
     }
 
     /**
-     * @return the array of weights of potential surname changes for weighted marriage surname generation
+     * @return the weight map of potential surname changes for weighted marriage surname generation
      */
-    public int[] getMarriageSurnameWeights() {
+    public Map<MarriageSurnameStyle, Integer> getMarriageSurnameWeights() {
         return marriageSurnameWeights;
     }
 
     /**
-     * This gets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
-     * @param index the array index to get
-     * @return the weight at the index
+     * @param marriageSurnameWeights the new marriage surname weight map
      */
-    public int getMarriageSurnameWeight(final int index) {
-        return getMarriageSurnameWeights()[index];
-    }
-
-    /**
-     * @param marriageSurnameWeights the new marriage surname weight array
-     */
-    public void setMarriageSurnameWeights(final int... marriageSurnameWeights) {
+    public void setMarriageSurnameWeights(final Map<MarriageSurnameStyle, Integer> marriageSurnameWeights) {
         this.marriageSurnameWeights = marriageSurnameWeights;
     }
 
-    /**
-     * This sets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
-     * @param index the array index to set
-     * @param marriageSurnameWeight the weight to use
-     */
-    public void setMarriageSurnameWeight(final int index, final int marriageSurnameWeight) {
-        marriageSurnameWeights[index] = marriageSurnameWeight;
+    public RandomMarriageMethod getRandomMarriageMethod() {
+        return randomMarriageMethod;
     }
 
-    /**
-     * @return whether or not to use random marriages
-     */
-    public boolean useRandomMarriages() {
-        return useRandomMarriages;
-    }
-
-    /**
-     * @param useRandomMarriages whether or not to use random marriages
-     */
-    public void setUseRandomMarriages(final boolean useRandomMarriages) {
-        this.useRandomMarriages = useRandomMarriages;
-    }
-
-    /**
-     * This gets the decimal chance (between 0 and 1) of a random marriage occurring
-     * @return the chance, with a value between 0 and 1
-     */
-    public double getChanceRandomMarriages() {
-        return chanceRandomMarriages;
-    }
-
-    /**
-     * This sets the decimal chance (between 0 and 1) of a random marriage occurring
-     * @param chanceRandomMarriages the chance, with a value between 0 and 1
-     */
-    public void setChanceRandomMarriages(final double chanceRandomMarriages) {
-        this.chanceRandomMarriages = chanceRandomMarriages;
-    }
-
-    /**
-     * A random marriage can only happen between two people whose ages differ (+/-) by the returned value
-     * @return the age range ages can differ (+/-)
-     */
-    public int getMarriageAgeRange() {
-        return marriageAgeRange;
-    }
-
-    /**
-     * A random marriage can only happen between two people whose ages differ (+/-) by this value
-     * @param marriageAgeRange the maximum age range
-     */
-    public void setMarriageAgeRange(final int marriageAgeRange) {
-        this.marriageAgeRange = marriageAgeRange;
+    public void setRandomMarriageMethod(final RandomMarriageMethod randomMarriageMethod) {
+        this.randomMarriageMethod = randomMarriageMethod;
     }
 
     /**
      * @return whether or not to use random same sex marriages
      */
-    public boolean useRandomSameSexMarriages() {
+    public boolean isUseRandomSameSexMarriages() {
         return useRandomSameSexMarriages;
     }
 
@@ -1563,19 +1497,51 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by the returned value
+     * @return the age range ages can differ (+/-)
+     */
+    public int getRandomMarriageAgeRange() {
+        return randomMarriageAgeRange;
+    }
+
+    /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by this value
+     * @param randomMarriageAgeRange the new maximum age range
+     */
+    public void setRandomMarriageAgeRange(final int randomMarriageAgeRange) {
+        this.randomMarriageAgeRange = randomMarriageAgeRange;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getPercentageRandomMarriageChance() {
+        return percentageRandomMarriageChance;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @param percentageRandomMarriageChance the chance, with a value between 0 and 1
+     */
+    public void setPercentageRandomMarriageChance(final double percentageRandomMarriageChance) {
+        this.percentageRandomMarriageChance = percentageRandomMarriageChance;
+    }
+
+    /**
      * This gets the decimal chance (between 0 and 1) of a random same sex marriage occurring
      * @return the chance, with a value between 0 and 1
      */
-    public double getChanceRandomSameSexMarriages() {
-        return chanceRandomSameSexMarriages;
+    public double getPercentageRandomMarriageSameSexChance() {
+        return percentageRandomMarriageSameSexChance;
     }
 
     /**
      * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
-     * @param chanceRandomSameSexMarriages the chance, with a value between 0 and 1
+     * @param percentageRandomMarriageSameSexChance the chance, with a value between 0 and 1
      */
-    public void setChanceRandomSameSexMarriages(final double chanceRandomSameSexMarriages) {
-        this.chanceRandomSameSexMarriages = chanceRandomSameSexMarriages;
+    public void setPercentageRandomMarriageSameSexChance(final double percentageRandomMarriageSameSexChance) {
+        this.percentageRandomMarriageSameSexChance = percentageRandomMarriageSameSexChance;
     }
     //endregion Marriage
 
@@ -3333,16 +3299,20 @@ public class CampaignOptions implements Serializable {
         //endregion Salary
 
         //region Marriage
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualMarriages", useManualMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualMarriages", isUseManualMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", checkMutualAncestorsDepth());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logMarriageNameChange", logMarriageNameChange());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageSurnameWeights", getMarriageSurnameWeights());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomMarriages", useRandomMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomMarriages", getChanceRandomMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "marriageAgeRange", getMarriageAgeRange());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", useRandomSameSexMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "marriageSurnameWeights");
+        for (final Map.Entry<MarriageSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "marriageSurnameWeights");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageChance", getPercentageRandomMarriageChance());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
         //endregion Marriage
 
         //region Procreation
@@ -3864,29 +3834,29 @@ public class CampaignOptions implements Serializable {
                     retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                     retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
-                    retVal.setLogMarriageNameChange(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    if (values.length == 13) {
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.marriageSurnameWeights[i] = Integer.parseInt(values[i]);
-                        }
-                    } else if (values.length == 9) {
-                        migrateMarriageSurnameWeights(retVal, values);
-                    } else {
-                        MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
+                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChanges")) {
+                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageSurnameWeights")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
-                    retVal.setUseRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
-                    retVal.setChanceRandomMarriages(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
-                    retVal.setMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        retVal.getMarriageSurnameWeights().put(
+                                MarriageSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                Integer.parseInt(wn3.getTextContent().trim()));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
+                    retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                     retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
-                    retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
+                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageChance")) {
+                    retVal.setPercentageRandomMarriageChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
+                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Marriage
 
                 //region Procreation
@@ -4166,6 +4136,29 @@ public class CampaignOptions implements Serializable {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) { // Legacy - 0.49.4 Removal
+                    retVal.setPercentageRandomMarriageChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) { // Legacy - 0.49.4 Removal
+                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.4 Removal
+                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.4 Removal
+                    retVal.setRandomMarriageMethod(Boolean.parseBoolean(wn2.getTextContent().trim())
+                            ? RandomMarriageMethod.PERCENTAGE : RandomMarriageMethod.NONE);
+                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.4 Removal
+                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.4 Removal
+                    final String[] values = wn2.getTextContent().split(",");
+                    if (values.length == 13) {
+                        final MarriageSurnameStyle[] marriageSurnameStyles = MarriageSurnameStyle.values();
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.getMarriageSurnameWeights().put(marriageSurnameStyles[i], Integer.parseInt(values[i]));
+                        }
+                    } else if (values.length == 9) {
+                        retVal.migrateMarriageSurnameWeights47(values);
+                    } else {
+                        MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
                     final double value = Double.parseDouble(wn2.getTextContent());
                     retVal.setClanUnitPriceMultiplier(value);
@@ -4241,14 +4234,12 @@ public class CampaignOptions implements Serializable {
         return retVal;
     }
 
-    //region Migration
     /**
      * This is annoyingly required for the case of anyone having changed the surname weights.
      * The code is not nice, but will nicely handle the cases where anyone has made changes
-     * @param retVal the return CampaignOptions
      * @param values the values to migrate
      */
-    private static void migrateMarriageSurnameWeights(CampaignOptions retVal, String... values) {
+    public void migrateMarriageSurnameWeights47(final String... values) {
         int[] weights = new int[values.length];
 
         for (int i = 0; i < weights.length; i++) {
@@ -4263,30 +4254,29 @@ public class CampaignOptions implements Serializable {
         // Now we need to test to figure out the weights have changed. If not, we will keep the
         // new default values. If they have, we save their changes and add the new surname weights
         if (
-                (weights[0] != retVal.marriageSurnameWeights[0])
-                || (weights[1] != retVal.marriageSurnameWeights[1] + 5)
-                || (weights[2] != retVal.marriageSurnameWeights[2] + 5)
-                || (weights[3] != retVal.marriageSurnameWeights[9] + 5)
-                || (weights[4] != retVal.marriageSurnameWeights[10] + 5)
-                || (weights[5] != retVal.marriageSurnameWeights[5] + 5)
-                || (weights[6] != retVal.marriageSurnameWeights[6] + 5)
-                || (weights[7] != retVal.marriageSurnameWeights[11])
-                || (weights[8] != retVal.marriageSurnameWeights[12])
+                (weights[0] != getMarriageSurnameWeights().get(MarriageSurnameStyle.NO_CHANGE))
+                        || (weights[1] != getMarriageSurnameWeights().get(MarriageSurnameStyle.YOURS) + 5)
+                        || (weights[2] != getMarriageSurnameWeights().get(MarriageSurnameStyle.SPOUSE) + 5)
+                        || (weights[3] != getMarriageSurnameWeights().get(MarriageSurnameStyle.HYP_SPOUSE) + 5)
+                        || (weights[4] != getMarriageSurnameWeights().get(MarriageSurnameStyle.BOTH_HYP_SPOUSE) + 5)
+                        || (weights[5] != getMarriageSurnameWeights().get(MarriageSurnameStyle.HYP_YOURS) + 5)
+                        || (weights[6] != getMarriageSurnameWeights().get(MarriageSurnameStyle.BOTH_HYP_YOURS) + 5)
+                        || (weights[7] != getMarriageSurnameWeights().get(MarriageSurnameStyle.MALE))
+                        || (weights[8] != getMarriageSurnameWeights().get(MarriageSurnameStyle.FEMALE))
         ) {
-            retVal.marriageSurnameWeights[0] = weights[0];
-            retVal.marriageSurnameWeights[1] = weights[1];
-            retVal.marriageSurnameWeights[2] = weights[2];
-            // 3 is newly added
-            // 4 is newly added
-            retVal.marriageSurnameWeights[5] = weights[3];
-            retVal.marriageSurnameWeights[6] = weights[4];
-            // 7 is newly added
-            // 8 is newly added
-            retVal.marriageSurnameWeights[9] = weights[5];
-            retVal.marriageSurnameWeights[10] = weights[6];
-            retVal.marriageSurnameWeights[11] = weights[7];
-            retVal.marriageSurnameWeights[12] = weights[8];
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.NO_CHANGE, weights[0]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.YOURS, weights[1]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.SPOUSE, weights[2]);
+            // SPACE_YOURS is newly added
+            // BOTH_SPACE_YOURS is newly added
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.HYP_YOURS, weights[3]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_HYP_YOURS, weights[4]);
+            // SPACE_SPOUSE is newly added
+            // BOTH_SPACE_SPOUSE is newly added
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.HYP_SPOUSE, weights[5]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.BOTH_HYP_SPOUSE, weights[6]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.MALE, weights[7]);
+            getMarriageSurnameWeights().put(MarriageSurnameStyle.FEMALE, weights[8]);
         }
     }
-    //endregion Migration
 }

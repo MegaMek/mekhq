@@ -60,7 +60,7 @@ public class Genealogy implements Serializable {
     public Genealogy(final Person origin) {
         setOrigin(origin);
         setSpouse(null);
-        formerSpouses = new ArrayList<>();
+        setFormerSpouses(new ArrayList<>());
         setFamily(new HashMap<>());
     }
     //endregion Constructors
@@ -113,6 +113,10 @@ public class Genealogy implements Serializable {
      */
     public void removeFormerSpouse(Person formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
+    }
+
+    public void setFormerSpouses(final List<FormerSpouse> formerSpouses) {
+        this.formerSpouses = formerSpouses;
     }
 
     /**
@@ -210,31 +214,20 @@ public class Genealogy implements Serializable {
     /**
      * This is used to determine if two people have mutual ancestors based on their genealogies
      * @param person the person to check if they are related or not
-     * @param campaign the campaign the two people are a part of
+     * @param depth the depth to check mutual ancestry up to
      * @return true if they have mutual ancestors, otherwise false
      */
-    public boolean checkMutualAncestors(Person person, Campaign campaign) {
+    public boolean checkMutualAncestors(final Person person, final int depth) {
         if (getOrigin().equals(person)) {
             // Same person will always return true, to prevent any weirdness
             return true;
-        }
-
-        final int depth = campaign.getCampaignOptions().checkMutualAncestorsDepth();
-        if (depth == 0) {
+        } else if (depth == 0) {
             // Check is disabled, return false for no mutual ancestors
             return false;
         }
 
-        Set<Person> originAncestors = getAncestors(depth);
-        Set<Person> checkAncestors = person.getGenealogy().getAncestors(depth);
-
-        for (Person ancestor : checkAncestors) {
-            if (originAncestors.contains(ancestor)) {
-                return true;
-            }
-        }
-
-        return false;
+        final Set<Person> originAncestors = getAncestors(depth);
+        return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
     }
 
     /**
