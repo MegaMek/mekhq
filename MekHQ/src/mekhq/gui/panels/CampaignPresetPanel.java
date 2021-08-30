@@ -112,7 +112,6 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
                 final CreateCampaignPresetDialog dialog = new CreateCampaignPresetDialog(
                         getFrame(), getCampaign(), getPreset());
                 if (dialog.showDialog().isConfirmed()) {
-                    dialog.updatePreset(getPreset());
                     updateFromPreset(getPreset());
                 }
             });

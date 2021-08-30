@@ -32,8 +32,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -43,15 +47,18 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.stream.Collectors;
 
 public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
-    private final CampaignPreset preset;
+    private CampaignPreset preset;
 
     private JTextField txtPresetName;
     private JTextArea txtPresetDescription;
@@ -72,32 +79,47 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     //region Continuous
     private JCheckBox chkSpecifyGameOptions;
-    private GameOptions gameOptions;
+    private final GameOptions gameOptions;
     private JCheckBox chkSpecifyCampaignOptions;
-    private CampaignOptions campaignOptions;
+    private final CampaignOptions campaignOptions;
+    private final RandomSkillPreferences randomSkillPreferences;
+    private final Hashtable<String, SkillType> skills;
+    private final Hashtable<String, SpecialAbility> specialAbilities;
     //endregion Continuous
     //endregion Variable Declarations
 
     //region Constructors
-    public CreateCampaignPresetDialog(final JFrame frame, final @Nullable Campaign campaign,
+    public CreateCampaignPresetDialog(final JFrame frame, final Campaign campaign,
                                       final @Nullable CampaignPreset preset) {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
-        this.preset = preset;
+        setPreset(preset);
         setDate(campaign.getLocalDate());
-        setGameOptions(campaign.getGameOptions());
-        setCampaignOptions(campaign.getCampaignOptions());
+        this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
+                ? campaign.getGameOptions() : preset.getGameOptions();
+        this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
+                ? campaign.getCampaignOptions() : preset.getCampaignOptions();
+        this.randomSkillPreferences = ((preset == null) || (preset.getRandomSkillPreferences() == null))
+                ? campaign.getRandomSkillPreferences() : preset.getRandomSkillPreferences();
+        this.skills = ((preset == null) || preset.getSkills().isEmpty())
+                ? SkillType.getSkillHash() : preset.getSkills();
+        this.specialAbilities = ((preset == null) || preset.getSpecialAbilities().isEmpty())
+                ? SpecialAbility.getAllSpecialAbilities() : preset.getSpecialAbilities();
         initialize();
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public @Nullable Campaign getCampaign() {
+    public Campaign getCampaign() {
         return campaign;
     }
 
     public @Nullable CampaignPreset getPreset() {
         return preset;
+    }
+
+    public void setPreset(final @Nullable CampaignPreset preset) {
+        this.preset = preset;
     }
 
     public JTextField getTxtPresetName() {
@@ -237,10 +259,6 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         return gameOptions;
     }
 
-    public void setGameOptions(final GameOptions gameOptions) {
-        this.gameOptions = gameOptions;
-    }
-
     public JCheckBox getChkSpecifyCampaignOptions() {
         return chkSpecifyCampaignOptions;
     }
@@ -253,8 +271,16 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         return campaignOptions;
     }
 
-    public void setCampaignOptions(final CampaignOptions campaignOptions) {
-        this.campaignOptions = campaignOptions;
+    public RandomSkillPreferences getRandomSkillPreferences() {
+        return randomSkillPreferences;
+    }
+
+    public Hashtable<String, SkillType> getSkills() {
+        return skills;
+    }
+
+    public Hashtable<String, SpecialAbility> getSpecialAbilities() {
+        return specialAbilities;
     }
     //endregion Continuous
     //endregion Getters/Setters
@@ -274,6 +300,22 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         setTxtPresetName(new JTextField(resources.getString("txtPresetName.text")));
         getTxtPresetName().setToolTipText(resources.getString("txtPresetName.toolTipText"));
         getTxtPresetName().setName("txtPresetName");
+        getTxtPresetName().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent evt) {
+                revalidateAction(null);
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent evt) {
+                revalidateAction(null);
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent evt) {
+                revalidateAction(null);
+            }
+        });
         panel.add(getTxtPresetName(), gbc);
 
         setTxtPresetDescription(new JTextArea(resources.getString("txtPresetDescription.text")));
@@ -546,6 +588,22 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     }
 
     @Override
+    protected void finalizeInitialization() {
+        super.finalizeInitialization();
+        getOkButton().setEnabled(false);
+        final Faction faction = (getPreset() == null) || (getPreset().getFaction() == null)
+                ? getCampaign().getFaction() : getPreset().getFaction();
+        getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
+        getComboStartingSystem().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
+                ? getCampaign().getLocation().getCurrentSystem() : getPreset().getPlanet().getParentSystem());
+        getComboStartingPlanet().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
+                ? getCampaign().getLocation().getCurrentSystem().getPrimaryPlanet() : getPreset().getPlanet());
+        getComboRankSystem().setSelectedItem((getPreset() == null) || (getPreset().getRankSystem() == null)
+                ? getCampaign().getRankSystem() : getPreset().getRankSystem());
+        getSpnContractCount().setValue((getPreset() == null) ? 2 : getPreset().getContractCount());
+    }
+
+    @Override
     protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
         preferences.manage(new JToggleButtonPreference(getChkSpecifyDate()));
@@ -560,8 +618,63 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     //region Button Actions
     @Override
+    protected void okAction() {
+        updatePreset();
+    }
+
+    @Override
     protected ValidationState validateAction(final boolean display) {
-        return null;
+        if (getTxtPresetName().getText().isBlank()) {
+            final String text = resources.getString("blankPresetName.text");
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(), text, resources.getString("ValidationFailure.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            getOkButton().setEnabled(false);
+            getOkButton().setToolTipText(text);
+            return ValidationState.FAILURE;
+        }
+
+        getOkButton().setEnabled(true);
+
+        if (getChkSpecifyFaction().isSelected() && (getComboFaction().getSelectedItem() == null)) {
+            final String text = resources.getString("nullFactionSpecified.text");
+            getOkButton().setEnabled(false);
+            getOkButton().setToolTipText(text);
+            if (display && JOptionPane.showConfirmDialog(getFrame(), text,
+                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return ValidationState.FAILURE;
+            }
+        }
+
+        if (getChkSpecifyPlanet().isSelected()
+                && (getComboStartingPlanet().getSelectedItem() == null)) {
+            final String text = resources.getString("nullPlanetSpecified.text");
+            getOkButton().setEnabled(false);
+            getOkButton().setToolTipText(text);
+            if (display && JOptionPane.showConfirmDialog(getFrame(), text,
+                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return ValidationState.FAILURE;
+            }
+        }
+
+        if (getChkSpecifyRankSystem().isSelected()
+                && (getComboRankSystem().getSelectedItem() == null)) {
+            final String text = resources.getString("nullRankSystemSpecified.text");
+            getOkButton().setEnabled(false);
+            getOkButton().setToolTipText(text);
+            if (display && JOptionPane.showConfirmDialog(getFrame(), text,
+                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return ValidationState.FAILURE;
+            }
+        }
+
+        if (!getOkButton().isEnabled()) {
+            return display ? ValidationState.WARNING : ValidationState.FAILURE;
+        }
+
+        getOkButton().setToolTipText(resources.getString("ValidationSuccess.text"));
+        return ValidationState.SUCCESS;
     }
     //endregion Button Actions
 
@@ -572,13 +685,41 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                 .collect(Collectors.toList()).toArray(new PlanetarySystem[]{});
     }
 
-    public void updatePreset(final CampaignPreset preset) {
+    public void updatePreset() {
         if (!getState().isSuccess()) {
             validateButtonActionPerformed(null);
         }
 
         if (getState().isSuccess() || getState().isWarning()) {
-            // TODO : Update the preset based on the dialog
+            if (getPreset() == null) {
+                setPreset(new CampaignPreset());
+            }
+
+            getPreset().setTitle(getTxtPresetName().getText().trim());
+            getPreset().setDescription(getTxtPresetDescription().getText().trim());
+            if (getChkSpecifyFaction().isSelected()) {
+                final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
+                getPreset().setFaction((factionDisplay == null) ? null : factionDisplay.getFaction());
+            }
+
+            if (getChkSpecifyPlanet().isSelected()) {
+                getPreset().setPlanet(getComboStartingPlanet().getSelectedItem());
+            }
+
+            if (getChkSpecifyRankSystem().isSelected()) {
+                getPreset().setRankSystem(getComboRankSystem().getSelectedItem());
+            }
+            getPreset().setContractCount((int) getSpnContractCount().getValue());
+            if (getChkSpecifyGameOptions().isSelected()) {
+                getPreset().setGameOptions(getGameOptions());
+            }
+
+            if (getChkSpecifyCampaignOptions().isSelected()) {
+                getPreset().setCampaignOptions(getCampaignOptions());
+                getPreset().setRandomSkillPreferences(getRandomSkillPreferences());
+                getPreset().setSkills(getSkills());
+                getPreset().setSpecialAbilities(getSpecialAbilities());
+            }
         }
     }
 }

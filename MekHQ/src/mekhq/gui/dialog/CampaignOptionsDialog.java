@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
+import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -529,7 +530,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     @Override
     protected Container createCenterPane() {
         //region Variable Declaration and Initialisation
-        //region Shared UI Variables
         comboFactionNames = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         panRepair = new JPanel();
@@ -4958,11 +4958,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.add(new MMButton("btnOkay", resources, "btnOkay.text", null,
                 this::okButtonActionPerformed));
 
-        panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text", null,
-                evt -> btnSaveActionPerformed()));
+        panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text",
+                "btnSavePreset.toolTipText", evt -> btnSaveActionPerformed()));
 
-        panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text", null,
-                evt -> {
+        panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text",
+                "btnLoadPreset.toolTipText", evt -> {
             final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
             if (presetSelectionDialog.showDialog().isConfirmed()) {
                 applyPreset(presetSelectionDialog.getSelectedPreset());
@@ -4987,7 +4987,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         if (isStartup()) {
-            setDate(preset.getDate());
+            if (preset.getDate() != null) {
+                setDate(preset.getDate());
+            }
 
             if (preset.getFaction() != null) {
                 comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
@@ -4999,25 +5001,28 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         // Handle CampaignOptions and RandomSkillPreferences
-        setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
+        if (preset.getCampaignOptions() != null) {
+            setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
+        }
 
         // Handle SPAs
-        tempSPA = (preset.getSpecialAbilities() == null) ? new Hashtable<>() : preset.getSpecialAbilities();
-        recreateSPAPanel(!getUnusedSPA().isEmpty());
+        if (!preset.getSpecialAbilities().isEmpty()) {
+            tempSPA = preset.getSpecialAbilities();
+            recreateSPAPanel(!getUnusedSPA().isEmpty());
+        }
 
-        if (preset.getSkills() != null) {
+        if (!preset.getSkills().isEmpty()) {
             // Overwriting XP Table
             tableXP.setModel(new DefaultTableModel(getSkillCostsArray(preset.getSkills()), TABLE_XP_COLUMN_NAMES));
             ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
 
             // Overwriting Skill List
             for (final String skillName : SkillType.getSkillList()) {
-                final SkillType skillType = preset.getSkills().get(skillName);
-
                 final JSpinner spnTarget = hashSkillTargets.get(skillName);
                 if (spnTarget == null) {
                     continue;
                 }
+                final SkillType skillType = preset.getSkills().get(skillName);
 
                 spnTarget.setValue(skillType.getTarget());
                 hashGreenSkill.get(skillName).setValue(skillType.getGreenLevel());
@@ -5866,8 +5871,26 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private void btnSaveActionPerformed() {
-        // FIXME : Windchild I'm completely unimplemented
+        if (txtName.getText().isBlank()) {
+            return;
+        }
+        updateOptions();
+        setResult(DialogResult.CONFIRMED);
 
+        final CreateCampaignPresetDialog createCampaignPresetDialog
+                = new CreateCampaignPresetDialog(getFrame(), getCampaign(), null);
+        if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+            setVisible(false);
+            return;
+        }
+        final CampaignPreset preset = createCampaignPresetDialog.getPreset();
+        if (preset == null) {
+            setVisible(false);
+            return;
+        }
+        preset.writeToFile(getFrame(),
+                FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
+        setVisible(false);
     }
 
     private void updateXPCosts() {
