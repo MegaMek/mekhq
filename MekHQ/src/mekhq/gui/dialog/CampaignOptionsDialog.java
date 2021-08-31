@@ -4996,6 +4996,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
 
             if (preset.getRankSystem() != null) {
+                if (preset.getRankSystem().getType().isCampaign()) {
+                    rankSystemsPane.getRankSystemModel().addElement(preset.getRankSystem());
+                }
                 rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
             }
         }
@@ -5889,7 +5892,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             return;
         }
         preset.writeToFile(getFrame(),
-                FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
+                FileDialogs.saveCampaignPreset(getFrame(), preset).orElse(null));
         setVisible(false);
     }
 

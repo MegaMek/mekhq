@@ -289,9 +289,6 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
-                    if (!wn.hasChildNodes()) {
-                        continue;
-                    }
                     retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
                     processKillNodes(retVal, wn, version);

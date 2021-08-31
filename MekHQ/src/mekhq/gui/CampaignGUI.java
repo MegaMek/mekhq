@@ -32,7 +32,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.*;
 import mekhq.campaign.Campaign;
@@ -659,7 +658,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             preset.writeToFile(getFrame(),
-                    FileDialogs.saveCampaignPreset(getFrame(), getCampaign()).orElse(null));
+                    FileDialogs.saveCampaignPreset(getFrame(), preset).orElse(null));
         });
         miExportXMLFile.add(miExportCampaignPreset);
 

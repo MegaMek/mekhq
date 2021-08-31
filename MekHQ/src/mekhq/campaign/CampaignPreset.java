@@ -76,14 +76,14 @@ public class CampaignPreset implements Serializable {
     private String title;
     private String description;
 
-    // Startup Preset Values
+    // Startup
     private LocalDate date;
     private Faction faction;
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
 
-    // Continuous Preset Values
+    // Continuous
     private GameOptions gameOptions;
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences;
@@ -123,14 +123,14 @@ public class CampaignPreset implements Serializable {
         setTitle(title);
         setDescription(description);
 
-        // Startup Preset Values
+        // Startup
         setDate(date);
         setFaction(faction);
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
 
-        // Continuous Preset Values
+        // Continuous
         setGameOptions(gameOptions);
         setCampaignOptions(campaignOptions);
         setRandomSkillPreferences(randomSkillPreferences);
@@ -156,7 +156,7 @@ public class CampaignPreset implements Serializable {
         this.description = description;
     }
 
-    //region Startup Preset Values
+    //region Startup
     public @Nullable LocalDate getDate() {
         return date;
     }
@@ -196,9 +196,9 @@ public class CampaignPreset implements Serializable {
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
     }
-    //endregion Startup Preset Values
+    //endregion Startup
 
-    //region Continuous Preset Values
+    //region Continuous
     public @Nullable GameOptions getGameOptions() {
         return gameOptions;
     }
@@ -238,7 +238,7 @@ public class CampaignPreset implements Serializable {
     public void setSpecialAbilities(final Hashtable<String, SpecialAbility> specialAbilities) {
         this.specialAbilities = specialAbilities;
     }
-    //endregion Continuous Preset Values
+    //endregion Continuous
     //endregion Getters/Setters
 
     /**
@@ -307,18 +307,18 @@ public class CampaignPreset implements Serializable {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         pw.println("<campaignPreset version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ")
                 .getString("Application.version") + "\">");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, ++indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
-        //region Startup Preset Values
+        //region Startup
         if (getDate() != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", getDate());
         }
 
         if (getFaction() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "faction", getFaction().getShortName());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         }
 
         if (getPlanet() != null) {
@@ -330,9 +330,9 @@ public class CampaignPreset implements Serializable {
             getRankSystem().writeToXML(pw, indent, false);
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "contractCount", getContractCount());
-        //endregion Startup Preset Values
+        //endregion Startup
 
-        //region Continuous Preset Values
+        //region Continuous
         if (getGameOptions() != null) {
             getGameOptions().writeToXML(pw, indent);
         }
@@ -341,7 +341,11 @@ public class CampaignPreset implements Serializable {
             getCampaignOptions().writeToXml(pw, indent);
         }
 
-        if (getSkills() != null) {
+        if (getRandomSkillPreferences() != null) {
+            getRandomSkillPreferences().writeToXml(pw, indent);
+        }
+
+        if (!getSkills().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "skillTypes");
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
@@ -352,18 +356,14 @@ public class CampaignPreset implements Serializable {
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "skillTypes");
         }
 
-        if (getSpecialAbilities() != null) {
+        if (!getSpecialAbilities().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
                 getSpecialAbilities().get(key).writeToXml(pw, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
         }
-
-        if (getRandomSkillPreferences() != null) {
-            getRandomSkillPreferences().writeToXml(pw, indent);
-        }
-        //endregion Continuous Preset Values
+        //endregion Continuous
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "campaignPreset");
     }
 
@@ -424,7 +424,7 @@ public class CampaignPreset implements Serializable {
                         preset.setDescription(wn.getTextContent().trim());
                         break;
 
-                    //region Startup Preset Values
+                    //region Startup
                     case "date":
                         preset.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                         break;
@@ -437,17 +437,17 @@ public class CampaignPreset implements Serializable {
                                 .getPlanetById(wn.getTextContent().trim()));
                         break;
                     case "rankSystem":
-                        preset.setRankSystem(Ranks.getRankSystemFromCode(wn.getTextContent().trim()));
+                        preset.setRankSystem(RankSystem.generateInstanceFromXML(wn.getChildNodes(), version));
                         break;
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
                         break;
-                    //endregion Startup Preset Values
+                    //endregion Startup
 
-                    //region Continuous Preset Values
+                    //region Continuous
                     case "gameOptions":
-                        final GameOptions gameOptions = new GameOptions();
-                        gameOptions.fillFromXML(wn.getChildNodes());
+                        preset.setGameOptions(new GameOptions());
+                        preset.getGameOptions().fillFromXML(wn.getChildNodes());
                         break;
                     case "campaignOptions":
                         preset.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
@@ -484,7 +484,7 @@ public class CampaignPreset implements Serializable {
                         }
                         break;
                     }
-                    //end Continuous Preset Values
+                    //end Continuous
 
                     default:
                         break;

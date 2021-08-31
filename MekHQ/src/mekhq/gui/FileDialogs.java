@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;
@@ -133,23 +134,13 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> openCampaignPreset(final JFrame frame) {
-        return GUI.fileDialogOpen(frame, "Select Campaign Preset", FileType.XML,
-                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
-    }
-
-    /**
      * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveCampaignPreset(final JFrame frame, final Campaign campaign) {
+    public static Optional<File> saveCampaignPreset(final JFrame frame, final CampaignPreset preset) {
         return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
-                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY, campaign.getName() + " Preset.xml");
+                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
     }
 
     /**

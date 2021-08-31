@@ -591,6 +591,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     protected void finalizeInitialization() {
         super.finalizeInitialization();
         getOkButton().setEnabled(false);
+        restoreComboStartingSystem();
         final Faction faction = (getPreset() == null) || (getPreset().getFaction() == null)
                 ? getCampaign().getFaction() : getPreset().getFaction();
         getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
@@ -600,7 +601,9 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                 ? getCampaign().getLocation().getCurrentSystem().getPrimaryPlanet() : getPreset().getPlanet());
         getComboRankSystem().setSelectedItem((getPreset() == null) || (getPreset().getRankSystem() == null)
                 ? getCampaign().getRankSystem() : getPreset().getRankSystem());
-        getSpnContractCount().setValue((getPreset() == null) ? 2 : getPreset().getContractCount());
+        if (getPreset() != null) {
+            getSpnContractCount().setValue(getPreset().getContractCount());
+        }
     }
 
     @Override
@@ -635,14 +638,15 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
             return ValidationState.FAILURE;
         }
 
+        getOkButton().setToolTipText(null);
         getOkButton().setEnabled(true);
 
         if (getChkSpecifyFaction().isSelected() && (getComboFaction().getSelectedItem() == null)) {
             final String text = resources.getString("nullFactionSpecified.text");
-            getOkButton().setEnabled(false);
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                     resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
         }
@@ -650,10 +654,10 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         if (getChkSpecifyPlanet().isSelected()
                 && (getComboStartingPlanet().getSelectedItem() == null)) {
             final String text = resources.getString("nullPlanetSpecified.text");
-            getOkButton().setEnabled(false);
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                     resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
         }
@@ -661,15 +665,15 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         if (getChkSpecifyRankSystem().isSelected()
                 && (getComboRankSystem().getSelectedItem() == null)) {
             final String text = resources.getString("nullRankSystemSpecified.text");
-            getOkButton().setEnabled(false);
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                     resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
         }
 
-        if (!getOkButton().isEnabled()) {
+        if (getOkButton().getToolTipText() != null) {
             return display ? ValidationState.WARNING : ValidationState.FAILURE;
         }
 
@@ -697,6 +701,10 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
             getPreset().setTitle(getTxtPresetName().getText().trim());
             getPreset().setDescription(getTxtPresetDescription().getText().trim());
+            if (getChkSpecifyDate().isSelected()) {
+                getPreset().setDate(getDate());
+            }
+
             if (getChkSpecifyFaction().isSelected()) {
                 final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
                 getPreset().setFaction((factionDisplay == null) ? null : factionDisplay.getFaction());
