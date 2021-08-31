@@ -22,6 +22,9 @@ import megamek.common.util.EncodeControl;
 
 import java.util.ResourceBundle;
 
+/**
+ * TODO : Add On Leave and AWOL implementations
+ */
 public enum PersonnelStatus {
     //region Enum Declarations
     ACTIVE("PersonnelStatus.ACTIVE.text", "PersonnelStatus.ACTIVE.toolTipText", "PersonnelStatus.ACTIVE.logText"),
