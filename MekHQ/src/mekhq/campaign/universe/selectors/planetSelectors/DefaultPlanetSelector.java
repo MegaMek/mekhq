@@ -25,11 +25,11 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
 /**
- * Selects planets using the default MekHQ logic.
+ * Selects a {@link Planet} using either the specified planet or the current campaign's planet
  */
 public class DefaultPlanetSelector extends AbstractPlanetSelector {
     //region Variable Declarations
-    private final Planet selectedPlanet;
+    private Planet planet;
     //endregion Variable Declarations
 
     //region Constructors
@@ -43,23 +43,26 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     /**
      * Creates a new DefaultPlanetSelector that always selects a specific planet.
-     * @param selectedPlanet The {@link Planet} to use.
+     * @param planet The {@link Planet} to use.
      */
-    public DefaultPlanetSelector(final @Nullable Planet selectedPlanet) {
-        this.selectedPlanet = selectedPlanet;
+    public DefaultPlanetSelector(final @Nullable Planet planet) {
+        setPlanet(planet);
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public Planet getSelectedPlanet() {
-        return selectedPlanet;
+    public @Nullable Planet getPlanet() {
+        return planet;
+    }
+
+    public void setPlanet(final @Nullable Planet planet) {
+        this.planet = planet;
     }
     //endregion Getters/Setters
 
     @Override
     public @Nullable Planet selectPlanet(final Campaign campaign) {
-        return (getSelectedPlanet() == null) ? campaign.getLocation().getPlanet()
-                : getSelectedPlanet();
+        return (getPlanet() == null) ? campaign.getLocation().getPlanet() : getPlanet();
     }
 
     @Override

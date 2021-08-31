@@ -179,6 +179,7 @@ public class RandomOriginOptions implements Serializable {
 
     /**
      * @param nl the node list to parse the options from
+     * @param campaignOptions if the parser is for a Campaign Options parsing or not
      * @return the parsed random origin options, or null if the parsing fails
      */
     public static @Nullable RandomOriginOptions parseFromXML(final NodeList nl,

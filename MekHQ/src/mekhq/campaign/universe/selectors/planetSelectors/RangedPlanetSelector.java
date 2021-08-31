@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -41,14 +42,14 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     /**
      * The range around {@link Campaign#getCurrentSystem()} to search for planets.
      */
-    private final int range;
+    private int range;
 
     /**
      * A value indicating if extra randomness should be used when selecting planets. Currently,
      * this is implemented by including planets within systems, rather than just the primary planet
      * for a system.
      */
-    private final boolean extraRandom;
+    private boolean extraRandom;
 
     /**
      * A scale to apply to planetary distances.
@@ -94,6 +95,19 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     //endregion Constructors
 
     //endregion Getters/Setters
+    public int getRange() {
+        return range;
+    }
+
+    public void setRange(final int range) {
+        setRangeDirect(range);
+        clearCache();
+    }
+
+    public void setRangeDirect(final int range) {
+        this.range = range;
+    }
+
     /**
      * Gets a value indicating if extra randomness should be used when selecting planets. Currently,
      * this is implemented by including planets within systems, rather than just the primary planet
@@ -102,6 +116,15 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
      */
     public boolean isExtraRandom() {
         return extraRandom;
+    }
+
+    public void setExtraRandom(final boolean extraRandom) {
+        setExtraRandomDirect(extraRandom);
+        clearCache();
+    }
+
+    public void setExtraRandomDirect(final boolean extraRandom) {
+        this.extraRandom = extraRandom;
     }
 
     /**
@@ -119,8 +142,36 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
      *                      while values closer to 0.1 spread out the faction selection.
      */
     public void setDistanceScale(final double distanceScale) {
-        this.distanceScale = distanceScale;
+        setDistanceScaleDirect(distanceScale);
         clearCache();
+    }
+
+    public void setDistanceScaleDirect(final double distanceScale) {
+        this.distanceScale = distanceScale;
+    }
+
+    public @Nullable LocalDate getCachedDate() {
+        return cachedDate;
+    }
+
+    public void setCachedDate(final @Nullable LocalDate cachedDate) {
+        this.cachedDate = cachedDate;
+    }
+
+    public @Nullable PlanetarySystem getCachedSystem() {
+        return cachedSystem;
+    }
+
+    public void setCachedSystem(final @Nullable PlanetarySystem cachedSystem) {
+        this.cachedSystem = cachedSystem;
+    }
+
+    public @Nullable Map<Faction, TreeMap<Double, Planet>> getCachedPlanets() {
+        return cachedPlanets;
+    }
+
+    public void setCachedPlanets(final @Nullable Map<Faction, TreeMap<Double, Planet>> cachedPlanets) {
+        this.cachedPlanets = cachedPlanets;
     }
     //endregion Getters/Setters
 
@@ -131,14 +182,14 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     @Override
     public Planet selectPlanet(final Campaign campaign, final Faction faction) {
-        if ((cachedPlanets == null)
-                || !cachedPlanets.containsKey(faction)
-                || !cachedSystem.equals(campaign.getCurrentSystem())
-                || campaign.getLocalDate().isAfter(cachedDate)) {
+        if ((getCachedPlanets() == null)
+                || !getCachedPlanets().containsKey(faction)
+                || !campaign.getCurrentSystem().equals(getCachedSystem())
+                || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
             createLookupMap(campaign, faction);
         }
 
-        final TreeMap<Double, Planet> planets = cachedPlanets.get(faction);
+        final TreeMap<Double, Planet> planets = getCachedPlanets().get(faction);
         final double random = ThreadLocalRandom.current().nextDouble(planets.lastKey());
         return planets.ceilingEntry(random).getValue();
     }
@@ -149,9 +200,9 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     @Override
     public void clearCache() {
         super.clearCache();
-        cachedDate = null;
-        cachedSystem = null;
-        cachedPlanets = null;
+        setCachedDate(null);
+        setCachedSystem(null);
+        setCachedPlanets(null);
     }
 
     private void createLookupMap(final Campaign campaign, final Faction faction) {
@@ -160,24 +211,24 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         final PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
         final TreeMap<Double, Planet> planets = new TreeMap<>();
-        final List<PlanetarySystem> systems = Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), range);
+        final List<PlanetarySystem> systems = Systems.getInstance().getNearbySystems(currentSystem, getRange());
 
         double total = 0.0;
         for (final PlanetarySystem system : systems) {
             final double distance = system.getDistanceTo(currentSystem);
-            if (faction.is(Tag.MERC) || system.getFactionSet(now).contains(faction)) {
+            if (faction.isMercenary() || system.getFactionSet(now).contains(faction)) {
                 if (!isExtraRandom()) {
                     final Planet planet = system.getPrimaryPlanet();
                     final Long pop = planet.getPopulation(now);
                     if ((pop != null) && (pop > 0.0)) {
-                        total += 100.0 * Math.log10(pop) / (1.0 + distance * distanceScale);
+                        total += 100.0 * Math.log10(pop) / (1.0 + distance * getDistanceScale());
                         planets.put(total, planet);
                     }
                 } else {
                     for (final Planet planet : system.getPlanets()) {
                         final Long pop = planet.getPopulation(now);
                         if ((pop != null) && (pop > 0.0)) {
-                            total += 100.0 * Math.log10(pop) / (1.0 + distance * distanceScale);
+                            total += 100.0 * Math.log10(pop) / (1.0 + distance * getDistanceScale());
                             planets.put(total, planet);
                         }
                     }
@@ -189,12 +240,11 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
             planets.put(1.0, currentSystem.getPrimaryPlanet());
         }
 
-        cachedDate = now;
-        cachedSystem = currentSystem;
-        if (cachedPlanets == null) {
-            cachedPlanets = new HashMap<>();
+        setCachedDate(now);
+        setCachedSystem(currentSystem);
+        if (getCachedPlanets() == null) {
+            setCachedPlanets(new HashMap<>());
         }
-
-        cachedPlanets.put(faction, planets);
+        getCachedPlanets().put(faction, planets);
     }
 }

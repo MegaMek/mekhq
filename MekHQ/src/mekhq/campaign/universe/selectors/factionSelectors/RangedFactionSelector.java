@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
@@ -44,7 +45,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     /**
      * The range around {@link Campaign#getCurrentSystem()} to search for factions.
      */
-    private final int range;
+    private int range;
 
     /**
      * A scale to apply to planetary distances.
@@ -81,14 +82,26 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      *              from which to select factions.
      */
     public RangedFactionSelector(final int range, final double distanceScale) {
-        this.range = range;
+        setRangeDirect(range);
         setDistanceScaleDirect(distanceScale);
+        setCachedDate(null);
+        setCachedSystem(null);
+        setCachedFactions(null);
     }
     //endregion Constructors
 
     //region Getters/Setters
     public int getRange() {
         return range;
+    }
+
+    public void setRange(final int range) {
+        setRangeDirect(range);
+        clearCache();
+    }
+
+    public void setRangeDirect(final int range) {
+        this.range = range;
     }
 
     /**
@@ -113,18 +126,42 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private void setDistanceScaleDirect(final double distanceScale) {
         this.distanceScale = distanceScale;
     }
+
+    public @Nullable LocalDate getCachedDate() {
+        return cachedDate;
+    }
+
+    public void setCachedDate(final @Nullable LocalDate cachedDate) {
+        this.cachedDate = cachedDate;
+    }
+
+    public @Nullable PlanetarySystem getCachedSystem() {
+        return cachedSystem;
+    }
+
+    public void setCachedSystem(final @Nullable PlanetarySystem cachedSystem) {
+        this.cachedSystem = cachedSystem;
+    }
+
+    public @Nullable TreeMap<Double, Faction> getCachedFactions() {
+        return cachedFactions;
+    }
+
+    public void setCachedFactions(final @Nullable TreeMap<Double, Faction> cachedFactions) {
+        this.cachedFactions = cachedFactions;
+    }
     //endregion Getters/Setters
 
     @Override
     public Faction selectFaction(final Campaign campaign) {
-        if ((cachedFactions == null)
-                || !cachedSystem.equals(campaign.getCurrentSystem())
-                || campaign.getLocalDate().isAfter(cachedDate)) {
+        if ((getCachedFactions() == null)
+                || !campaign.getCurrentSystem().equals(getCachedSystem())
+                || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
             createLookupMap(campaign);
         }
 
-        final double random = ThreadLocalRandom.current().nextDouble(cachedFactions.lastKey());
-        return cachedFactions.ceilingEntry(random).getValue();
+        final double random = ThreadLocalRandom.current().nextDouble(getCachedFactions().lastKey());
+        return getCachedFactions().ceilingEntry(random).getValue();
     }
 
     /**
@@ -133,8 +170,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     @Override
     public void clearCache() {
         super.clearCache();
-        cachedDate = null;
-        cachedFactions = null;
+        setCachedDate(null);
+        setCachedSystem(null);
+        setCachedFactions(null);
     }
 
     /**
@@ -162,7 +200,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             final double delta = Math.log10(pop) / (1.0 + distance * getDistanceScale());
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
-                        || faction.is(Tag.MERC)) {
+                        || faction.isMercenary()) {
                     continue;
                 }
 
@@ -191,9 +229,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
             factions.put(2.0, campaign.getFaction());
 
-            cachedDate = now;
-            cachedSystem = currentSystem;
-            cachedFactions = factions;
+            setCachedDate(now);
+            setCachedSystem(currentSystem);
+            setCachedFactions(factions);
             return;
         }
 
@@ -233,9 +271,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         }
 
-        cachedDate = now;
-        cachedSystem = currentSystem;
-        cachedFactions = factions;
+        setCachedDate(now);
+        setCachedSystem(currentSystem);
+        setCachedFactions(factions);
     }
 
     /**
@@ -259,18 +297,17 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * @return A weight to apply to the given {@link Faction}.
      */
     private double getFactionWeight(final Faction faction) {
-        if (faction.isComStar() || faction.getShortName().equals("WOB")) {
+        if (faction.isComStarOrWoB()) {
             return 0.05;
-        } else if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
+        } else if (faction.isMercenary() || faction.isMajorOrSuperPower()) {
             return 1.0;
-        } else if (faction.is(Tag.MINOR)) {
+        } else if (faction.isMinorPower()) {
             return 0.5;
-        } else if (faction.is(Tag.SMALL)) {
+        } else if (faction.isSmall()) {
             return 0.2;
-        } else if (faction.is(Tag.REBEL) || faction.is(Tag.CHAOS)
-                    || faction.is(Tag.TRADER) || faction.is(Tag.PIRATE)) {
+        } else if (faction.isRebelOrPirate() || faction.is(Tag.CHAOS) || faction.is(Tag.TRADER)) {
             return 0.05;
-        } else if (faction.is(Tag.CLAN)) {
+        } else if (faction.isClan()) {
             return 0.01;
         } else {
             // Don't include any of the other tags like hidden or inactive

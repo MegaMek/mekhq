@@ -1172,7 +1172,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_ORIGIN_FACTION: {
                 for (final Person person : people) {
-                    final Faction faction = gui.getCampaign().getFactionSelector().selectFaction(gui.getCampaign());
+                    final Faction faction = gui.getCampaign().getFactionSelector()
+                            .selectFaction(gui.getCampaign());
                     if (faction != null) {
                         person.setOriginFaction(faction);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));

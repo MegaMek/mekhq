@@ -44,9 +44,9 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
      * Creates a new DefaultFactionSelector using the specified faction.
      * @param factionCode The short name of the {@link Faction}.
      */
-    @Deprecated
+    @Deprecated // Replaced with it being based on Faction
     public DefaultFactionSelector(final @Nullable String factionCode) {
-        setFaction((factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
+        this((factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
     }
 
     /**
@@ -70,6 +70,6 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     @Override
     public Faction selectFaction(final Campaign campaign) {
-        return (getFaction() != null) ? getFaction() : campaign.getFaction();
+        return (getFaction() == null) ? campaign.getFaction() : getFaction();
     }
 }
