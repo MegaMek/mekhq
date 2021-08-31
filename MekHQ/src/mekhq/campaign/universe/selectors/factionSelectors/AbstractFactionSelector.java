@@ -19,6 +19,7 @@
 package mekhq.campaign.universe.selectors.factionSelectors;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -26,30 +27,27 @@ import mekhq.campaign.universe.Faction;
  */
 public abstract class AbstractFactionSelector {
     //region Variable Declarations
-    /**
-     * A value indicating whether or not the clans are a valid
-     * faction to choose from.
-     */
-    private boolean allowClan = false;
+    private RandomOriginOptions options;
     //endregion Variable Declarations
 
+    //region Constructors
+    protected AbstractFactionSelector(final RandomOriginOptions options) {
+        setOptionsDirect(options);
+    }
+    //endregion Constructors
+
     //region Getters/Setters
-    /**
-     * Gets a value indicating whether or not the clans are a valid faction to choose from.
-     * @return A value indicating whether or not the clans are a valid faction to choose from.
-     */
-    public boolean isAllowClan() {
-        return allowClan;
+    public RandomOriginOptions getOptions() {
+        return options;
     }
 
-    /**
-     * Sets a value indicating whether or not the clans are a valid faction to choose from.
-     * @param allowClan {@code true} if clans should be considered during faction selection,
-     *                              otherwise {@code false}.
-     */
-    public void setAllowClan(boolean allowClan) {
-        this.allowClan = allowClan;
+    public void setOptions(final RandomOriginOptions options) {
+        setOptionsDirect(options);
         clearCache();
+    }
+
+    public void setOptionsDirect(final RandomOriginOptions options) {
+        this.options = options;
     }
     //endregion Getters/Setters
 

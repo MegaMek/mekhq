@@ -18,19 +18,17 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.util.Objects;
-
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
-import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
-import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
-import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+
+import java.util.Objects;
 
 /**
  * Creates {@link Person} instances using the default MekHQ algorithm.
@@ -39,15 +37,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     private final AbstractFactionSelector factionSelector;
     private final AbstractPlanetSelector planetSelector;
-
-    /**
-     * Creates a new DefaultPersonnelGenerator, which will create
-     * {@link Person} objects using the faction and current location
-     * in a {@link Campaign}.
-     */
-    public DefaultPersonnelGenerator() {
-        this(new DefaultFactionSelector(), new DefaultPlanetSelector());
-    }
 
     /**
      * Creates a new DefaultPersonGenerator with a faction selector.

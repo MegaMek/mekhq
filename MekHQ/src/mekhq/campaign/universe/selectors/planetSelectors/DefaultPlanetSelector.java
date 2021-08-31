@@ -20,7 +20,7 @@ package mekhq.campaign.universe.selectors.planetSelectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
@@ -34,18 +34,18 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     //region Constructors
     /**
-     * Creates a new DefaultPlanetSelector that uses {@link CurrentLocation#getPlanet()} to produce
-     * the planet.
+     * Creates a new DefaultPlanetSelector that uses the central planet to produce the planet.
      */
-    public DefaultPlanetSelector() {
-        this(null);
+    public DefaultPlanetSelector(final RandomOriginOptions options) {
+        this(options, null);
     }
 
     /**
      * Creates a new DefaultPlanetSelector that always selects a specific planet.
      * @param planet The {@link Planet} to use.
      */
-    public DefaultPlanetSelector(final @Nullable Planet planet) {
+    public DefaultPlanetSelector(final RandomOriginOptions options, final @Nullable Planet planet) {
+        super(options);
         setPlanet(planet);
     }
     //endregion Constructors
@@ -62,7 +62,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     @Override
     public @Nullable Planet selectPlanet(final Campaign campaign) {
-        return (getPlanet() == null) ? campaign.getLocation().getPlanet() : getPlanet();
+        return (getPlanet() == null) ? getOptions().determinePlanet(campaign.getLocation().getPlanet()) : getPlanet();
     }
 
     @Override

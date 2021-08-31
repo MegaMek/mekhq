@@ -20,6 +20,7 @@ package mekhq.campaign.universe.selectors.factionSelectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -33,27 +34,32 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     //region Constructors
     /**
-     * Creates a new DefaultFactionSelector class which uses
-     * {@link Campaign#getFaction()} to select the faction.
+     * Creates a new DefaultFactionSelector class which uses {@link Campaign#getFaction()} to
+     * select the faction.
+     * @param options the {@link RandomOriginOptions} to use in faction selection
      */
-    public DefaultFactionSelector() {
-
+    public DefaultFactionSelector(final RandomOriginOptions options) {
+        super(options);
     }
 
     /**
      * Creates a new DefaultFactionSelector using the specified faction.
+     * @param options the {@link RandomOriginOptions} to use in faction selection
      * @param factionCode The short name of the {@link Faction}.
      */
     @Deprecated // Replaced with it being based on Faction
-    public DefaultFactionSelector(final @Nullable String factionCode) {
-        this((factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
+    public DefaultFactionSelector(final RandomOriginOptions options,
+                                  final @Nullable String factionCode) {
+        this(options, (factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
     }
 
     /**
      * Creates a new DefaultFactionSelector using the specified faction
+     * @param options the {@link RandomOriginOptions} to use in faction selection
      * @param faction The {@link Faction}.
      */
-    public DefaultFactionSelector(final @Nullable Faction faction) {
+    public DefaultFactionSelector(final RandomOriginOptions options, final @Nullable Faction faction) {
+        super(options);
         setFaction(faction);
     }
     //endregion Constructors

@@ -21,21 +21,15 @@ package mekhq.campaign.universe.selectors.factionSelectors;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -45,26 +39,14 @@ import java.util.stream.Collectors;
 public class RangedFactionSelector extends AbstractFactionSelector {
     //region Variable Declarations
     /**
-     * The range around {@link Campaign#getCurrentSystem()} to search for factions.
-     */
-    private int range;
-
-    /**
-     * A scale to apply to planetary distances.
-     */
-    private double distanceScale;
-
-    /**
-     * The current date of the {@link Campaign} when the values were
-     * cached.
+     * The current date of the {@link Campaign} when the values were cached.
      */
     private LocalDate cachedDate;
 
     /**
-     * The current {@link PlanetarySystem} of the {@link Campaign} when
-     * the values were cached.
+     * The {@link Planet} when the values were cached.
      */
-    private PlanetarySystem cachedSystem;
+    private Planet cachedPlanet;
 
     /**
      * This map stores weighted factions
@@ -73,57 +55,15 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     //endregion Variable Declarations
 
     //region Constructors
-    /**
-     * Creates a new {@code RangedFactionSelector} with the given range.
-     * @param range The range around the current location ({@link Campaign#getCurrentSystem()})
-     *              from which to select factions.
-     */
-    public RangedFactionSelector(final int range, final double distanceScale) {
-        setRangeDirect(range);
-        setDistanceScaleDirect(distanceScale);
+    public RangedFactionSelector(final RandomOriginOptions options) {
+        super(options);
         setCachedDate(null);
-        setCachedSystem(null);
+        setCachedPlanet(null);
         setCachedFactions(null);
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public int getRange() {
-        return range;
-    }
-
-    public void setRange(final int range) {
-        setRangeDirect(range);
-        clearCache();
-    }
-
-    public void setRangeDirect(final int range) {
-        this.range = range;
-    }
-
-    /**
-     * Gets a scale to apply to planetary distances.
-     * @return The scaling factor to apply to planetary distances.
-     */
-    public double getDistanceScale() {
-        return distanceScale;
-    }
-
-    /**
-     * Sets the scale to apply to planetary distances.
-     * @param distanceScale A scaling factor, ideally between 0.1 and 2.0, to apply to planetary
-     *                      distances during weighting. Values above 1.0 prefer the current location,
-     *                      while values closer to 0.1 spread out the faction selection.
-     */
-    public void setDistanceScale(final double distanceScale) {
-        setDistanceScaleDirect(distanceScale);
-        clearCache();
-    }
-
-    private void setDistanceScaleDirect(final double distanceScale) {
-        this.distanceScale = distanceScale;
-    }
-
     public @Nullable LocalDate getCachedDate() {
         return cachedDate;
     }
@@ -132,12 +72,12 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         this.cachedDate = cachedDate;
     }
 
-    public @Nullable PlanetarySystem getCachedSystem() {
-        return cachedSystem;
+    public @Nullable Planet getCachedPlanet() {
+        return cachedPlanet;
     }
 
-    public void setCachedSystem(final @Nullable PlanetarySystem cachedSystem) {
-        this.cachedSystem = cachedSystem;
+    public void setCachedPlanet(final @Nullable Planet cachedPlanet) {
+        this.cachedPlanet = cachedPlanet;
     }
 
     public @Nullable WeightedDoubleMap<Faction> getCachedFactions() {
@@ -151,10 +91,11 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
     @Override
     public Faction selectFaction(final Campaign campaign) {
+        final Planet planet = getOptions().determinePlanet(campaign.getCurrentSystem().getPrimaryPlanet());
         if ((getCachedFactions() == null)
-                || !campaign.getCurrentSystem().equals(getCachedSystem())
+                || !planet.equals(getCachedPlanet())
                 || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
-            createLookupMap(campaign);
+            createLookupMap(campaign, planet);
         }
 
         return getCachedFactions().randomItem();
@@ -167,21 +108,22 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     public void clearCache() {
         super.clearCache();
         setCachedDate(null);
-        setCachedSystem(null);
+        setCachedPlanet(null);
         setCachedFactions(null);
     }
 
     /**
      * Creates the cached {@link Faction} lookup map.
      */
-    private void createLookupMap(final Campaign campaign) {
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+    private void createLookupMap(final Campaign campaign, final Planet centralPlanet) {
+        final PlanetarySystem currentSystem = centralPlanet.getParentSystem();
 
         final LocalDate now = campaign.getLocalDate();
         final boolean isClan = campaign.getFaction().isClan();
 
         final Map<Faction, Double> weights = new HashMap<>();
-        Systems.getInstance().visitNearbySystems(currentSystem, getRange(), planetarySystem -> {
+        Systems.getInstance().visitNearbySystems(currentSystem, getOptions().getOriginSearchRadius(),
+                planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
             if ((pop == null) || (pop <= 0)) {
@@ -193,7 +135,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // Weight the faction by the planet's population divided by its
             // distance from our current system. The scaling factor is used
             // to affect the 'spread'.
-            final double delta = Math.log10(pop) / (1.0 + distance * getDistanceScale());
+            final double delta = Math.log10(pop) / (1.0 + distance * getOptions().getOriginDistanceScale());
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
                         || faction.isMercenary()) {
@@ -205,7 +147,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                     continue;
                 }
 
-                if (faction.isClan() && !(isClan || isAllowClan())) {
+                if (faction.isClan() && !(isClan || getOptions().isAllowClanOrigins())) {
                     continue;
                 }
 
@@ -226,7 +168,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             factions.add(2.0, campaign.getFaction());
 
             setCachedDate(now);
-            setCachedSystem(currentSystem);
+            setCachedPlanet(centralPlanet);
             setCachedFactions(factions);
             return;
         }
@@ -239,13 +181,11 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         //
 
         double total = 0.0;
-        for (Map.Entry<Faction, Double> entry : weights.entrySet()) {
-            Faction faction = entry.getKey();
-
+        for (final Map.Entry<Faction, Double> entry : weights.entrySet()) {
             // Only take factions which are not actively fighting us
-            if (!enemies.contains(faction)) {
-                total += entry.getValue() * getFactionWeight(faction);
-                factions.add(total, faction);
+            if (!enemies.contains(entry.getKey())) {
+                total += entry.getValue() * getFactionWeight(entry.getKey());
+                factions.add(total, entry.getKey());
             }
         }
 
@@ -268,7 +208,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         }
 
         setCachedDate(now);
-        setCachedSystem(currentSystem);
+        setCachedPlanet(centralPlanet);
         setCachedFactions(factions);
     }
 

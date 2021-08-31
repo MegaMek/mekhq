@@ -19,22 +19,22 @@
 package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class RandomOriginOptionsPanel extends JPanel {
+public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;
     private final JComboBox<FactionDisplay> comboFaction;
@@ -46,14 +46,15 @@ public class RandomOriginOptionsPanel extends JPanel {
     private JComboBox<PlanetarySystem> comboCentralSystem;
     private JComboBox<Planet> comboCentralPlanet;
     private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private JCheckBox chkAllowClanOrigins;
+    private JCheckBox chkExtraRandomOrigin;
     //endregion Variable Declarations
 
     //region Constructors
-    public RandomOriginOptionsPanel(final Campaign campaign, final JComboBox<FactionDisplay> comboFaction) {
+    public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
+                                    final JComboBox<FactionDisplay> comboFaction) {
+        super(frame, "RandomOriginOptionsPanel");
         this.campaign = campaign;
         this.comboFaction = comboFaction;
         initialize();
@@ -153,6 +154,21 @@ public class RandomOriginOptionsPanel extends JPanel {
     public void setSpnOriginSearchRadius(final JSpinner spnOriginSearchRadius) {
         this.spnOriginSearchRadius = spnOriginSearchRadius;
     }
+    public JSpinner getSpnOriginDistanceScale() {
+        return spnOriginDistanceScale;
+    }
+
+    public void setSpnOriginDistanceScale(final JSpinner spnOriginDistanceScale) {
+        this.spnOriginDistanceScale = spnOriginDistanceScale;
+    }
+
+    public JCheckBox getChkAllowClanOrigins() {
+        return chkAllowClanOrigins;
+    }
+
+    public void setChkAllowClanOrigins(final JCheckBox chkAllowClanOrigins) {
+        this.chkAllowClanOrigins = chkAllowClanOrigins;
+    }
 
     public JCheckBox getChkExtraRandomOrigin() {
         return chkExtraRandomOrigin;
@@ -161,18 +177,11 @@ public class RandomOriginOptionsPanel extends JPanel {
     public void setChkExtraRandomOrigin(final JCheckBox chkExtraRandomOrigin) {
         this.chkExtraRandomOrigin = chkExtraRandomOrigin;
     }
-
-    public JSpinner getSpnOriginDistanceScale() {
-        return spnOriginDistanceScale;
-    }
-
-    public void setSpnOriginDistanceScale(final JSpinner spnOriginDistanceScale) {
-        this.spnOriginDistanceScale = spnOriginDistanceScale;
-    }
     //endregion Getters/Setters
 
     //region Initialization
-    private void initialize() {
+    @Override
+    protected void initialize() {
         // Initialize Labels Used in ActionListeners
         final JLabel lblCentralPlanet = new JLabel();
         final JLabel lblOriginSearchRadius = new JLabel();
@@ -191,9 +200,10 @@ public class RandomOriginOptionsPanel extends JPanel {
             getComboCentralPlanet().setEnabled(selected && getChkRandomizeAroundCentralPlanet().isSelected());
             lblOriginSearchRadius.setEnabled(selected);
             getSpnOriginSearchRadius().setEnabled(selected);
-            getChkExtraRandomOrigin().setEnabled(selected);
             lblOriginDistanceScale.setEnabled(selected);
             getSpnOriginDistanceScale().setEnabled(selected);
+            getChkAllowClanOrigins().setEnabled(selected);
+            getChkExtraRandomOrigin().setEnabled(selected);
         });
 
         setChkRandomizeDependentsOrigin(new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text")));
@@ -272,10 +282,6 @@ public class RandomOriginOptionsPanel extends JPanel {
         getSpnOriginSearchRadius().setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
         getSpnOriginSearchRadius().setName("spnOriginSearchRadius");
 
-        setChkExtraRandomOrigin(new JCheckBox(resources.getString("chkExtraRandomOrigin.text")));
-        getChkExtraRandomOrigin().setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
-        getChkExtraRandomOrigin().setName("chkExtraRandomOrigin");
-
         lblOriginDistanceScale.setText(resources.getString("lblOriginDistanceScale.text"));
         lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         lblOriginDistanceScale.setName("lblOriginDistanceScale");
@@ -283,6 +289,14 @@ public class RandomOriginOptionsPanel extends JPanel {
         setSpnOriginDistanceScale(new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1)));
         getSpnOriginDistanceScale().setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         getSpnOriginDistanceScale().setName("spnOriginDistanceScale");
+
+        setChkAllowClanOrigins(new JCheckBox(resources.getString("chkAllowClanOrigins.text")));
+        getChkAllowClanOrigins().setToolTipText(resources.getString("chkAllowClanOrigins.toolTipText"));
+        getChkAllowClanOrigins().setName("chkAllowClanOrigins");
+
+        setChkExtraRandomOrigin(new JCheckBox(resources.getString("chkExtraRandomOrigin.text")));
+        getChkExtraRandomOrigin().setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
+        getChkExtraRandomOrigin().setName("chkExtraRandomOrigin");
 
         // Programmatically Assign Accessibility Labels
         lblCentralPlanet.setLabelFor(getComboCentralPlanet());
@@ -316,10 +330,11 @@ public class RandomOriginOptionsPanel extends JPanel {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(getSpnOriginSearchRadius(), GroupLayout.Alignment.LEADING))
-                        .addComponent(getChkExtraRandomOrigin())
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(getSpnOriginDistanceScale(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkAllowClanOrigins())
+                        .addComponent(getChkExtraRandomOrigin())
         );
 
         layout.setHorizontalGroup(
@@ -336,10 +351,11 @@ public class RandomOriginOptionsPanel extends JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(getSpnOriginSearchRadius()))
-                        .addComponent(getChkExtraRandomOrigin())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(getSpnOriginDistanceScale()))
+                        .addComponent(getChkAllowClanOrigins())
+                        .addComponent(getChkExtraRandomOrigin())
         );
     }
 
@@ -364,19 +380,25 @@ public class RandomOriginOptionsPanel extends JPanel {
         getComboCentralSystem().setSelectedItem(options.getCentralPlanet().getParentSystem());
         getComboCentralPlanet().setSelectedItem(options.getCentralPlanet());
         getSpnOriginSearchRadius().setValue(options.getOriginSearchRadius());
-        getChkExtraRandomOrigin().setSelected(options.isExtraRandomOrigin());
         getSpnOriginDistanceScale().setValue(options.getOriginDistanceScale());
+        getChkAllowClanOrigins().setSelected(options.isAllowClanOrigins());
+        getChkExtraRandomOrigin().setSelected(options.isExtraRandomOrigin());
     }
 
     public RandomOriginOptions createOptionsFromPanel() {
         final RandomOriginOptions options = new RandomOriginOptions(true);
-        options.setRandomizeOrigin(getChkRandomizeOrigin().isSelected());
-        options.setRandomizeDependentOrigin(getChkRandomizeDependentsOrigin().isSelected());
-        options.setRandomizeAroundCentralPlanet(getChkRandomizeAroundCentralPlanet().isSelected());
-        options.setCentralPlanet(getCentralPlanet());
-        options.setOriginSearchRadius((Integer) getSpnOriginSearchRadius().getValue());
-        options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
-        options.setOriginDistanceScale((Double) getSpnOriginDistanceScale().getValue());
+        try {
+            options.setRandomizeOrigin(getChkRandomizeOrigin().isSelected());
+            options.setRandomizeDependentOrigin(getChkRandomizeDependentsOrigin().isSelected());
+            options.setRandomizeAroundCentralPlanet(getChkRandomizeAroundCentralPlanet().isSelected());
+            options.setCentralPlanet(getCentralPlanet());
+            options.setOriginSearchRadius((Integer) getSpnOriginSearchRadius().getValue());
+            options.setOriginDistanceScale((Double) getSpnOriginDistanceScale().getValue());
+            options.setAllowClanOrigins(getChkAllowClanOrigins().isSelected());
+            options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
         return options;
     }
 }

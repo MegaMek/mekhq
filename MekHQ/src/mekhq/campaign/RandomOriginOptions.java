@@ -39,8 +39,9 @@ public class RandomOriginOptions implements Serializable {
     private boolean randomizeAroundCentralPlanet;
     private Planet centralPlanet;
     private int originSearchRadius;
-    private boolean extraRandomOrigin;
     private double originDistanceScale;
+    private boolean allowClanOrigins;
+    private boolean extraRandomOrigin;
     //endregion Variable Declarations
 
     //region Constructors
@@ -51,8 +52,9 @@ public class RandomOriginOptions implements Serializable {
         setCentralPlanet(Systems.getInstance().getSystemByName("Terra", LocalDate.ofYearDay(3067, 1))
                 .getPrimaryPlanet());
         setOriginSearchRadius(campaignOptions ? 45 : 1000);
-        setExtraRandomOrigin(false);
         setOriginDistanceScale(campaignOptions ? 0.6 : 0.2);
+        setAllowClanOrigins(false);
+        setExtraRandomOrigin(false);
     }
     //endregion Constructors
 
@@ -132,6 +134,33 @@ public class RandomOriginOptions implements Serializable {
     }
 
     /**
+     * Gets the distance scale factor to apply when weighting random origin planets.
+     */
+    public double getOriginDistanceScale() {
+        return originDistanceScale;
+    }
+
+    /**
+     * Sets the distance scale factor to apply when weighting random origin planets (should be
+     * between 0.1 and 2.0, with 0.6 being the standard base). Values above 1.0 prefer the current
+     * location, while values closer to 0.1 spread out the selection.
+     */
+    public void setOriginDistanceScale(final double originDistanceScale) {
+        this.originDistanceScale = originDistanceScale;
+    }
+
+    /**
+     * @return if clan origins are allowed to be generated for non-Clan Factions
+     */
+    public boolean isAllowClanOrigins() {
+        return allowClanOrigins;
+    }
+
+    public void setAllowClanOrigins(final boolean allowClanOrigins) {
+        this.allowClanOrigins = allowClanOrigins;
+    }
+
+    /**
      * Gets a value indicating whether or not to randomize origin to the planetary level, rather
      * than just the system level.
      */
@@ -146,22 +175,11 @@ public class RandomOriginOptions implements Serializable {
     public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
         this.extraRandomOrigin = extraRandomOrigin;
     }
-
-    /**
-     * Gets the distance scale factor to apply when weighting random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting random origin planets (should be
-     * between 0.1 and 2.0, with 0.6 being the standard base)
-     */
-    public void setOriginDistanceScale(final double originDistanceScale) {
-        this.originDistanceScale = originDistanceScale;
-    }
     //endregion Getters/Setters
+
+    public Planet determinePlanet(final Planet planet) {
+        return isRandomizeAroundCentralPlanet() ? getCentralPlanet() : planet;
+    }
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -172,8 +190,9 @@ public class RandomOriginOptions implements Serializable {
         MekHqXmlUtil.writeAttributedTag(pw, indent, "centralPlanet", "systemId",
                 getCentralPlanet().getParentSystem().getId(), getCentralPlanet().getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowClanOrigins", isAllowClanOrigins());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "randomOriginOptions");
     }
 
@@ -206,11 +225,14 @@ public class RandomOriginOptions implements Serializable {
                     case "originSearchRadius":
                         options.setOriginSearchRadius(Integer.parseInt(wn.getTextContent().trim()));
                         break;
-                    case "extraRandomOrigin":
-                        options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
                     case "originDistanceScale":
                         options.setOriginDistanceScale(Double.parseDouble(wn.getTextContent().trim()));
+                        break;
+                    case "allowClanOrigins":
+                        options.setAllowClanOrigins(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "extraRandomOrigin":
+                        options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                 }
             }

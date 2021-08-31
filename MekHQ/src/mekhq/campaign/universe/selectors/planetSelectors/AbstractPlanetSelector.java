@@ -20,6 +20,7 @@ package mekhq.campaign.universe.selectors.planetSelectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
@@ -28,6 +29,31 @@ import mekhq.campaign.universe.Planet;
  * from a {@link Campaign} and optionally a {@link Faction}.
  */
 public abstract class AbstractPlanetSelector {
+    //region Variable Declarations
+    private RandomOriginOptions options;
+    //endregion Variable Declarations
+
+    //region Constructors
+    protected AbstractPlanetSelector(final RandomOriginOptions options) {
+        setOptions(options);
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public RandomOriginOptions getOptions() {
+        return options;
+    }
+
+    public void setOptions(final RandomOriginOptions options) {
+        setOptionsDirect(options);
+        clearCache();
+    }
+
+    public void setOptionsDirect(final RandomOriginOptions options) {
+        this.options = options;
+    }
+    //endregion Getters/Setters
+
     /**
      * Select a {@link Planet} for a {@link Campaign}.
      * @param campaign The {@link Campaign} to use when selecting a planet.

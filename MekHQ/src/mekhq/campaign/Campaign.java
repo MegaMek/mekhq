@@ -1227,8 +1227,10 @@ public class Campaign implements Serializable, ITechManager {
         if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
             person = newPerson(PersonnelRole.DEPENDENT);
         } else {
-            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Gender.RANDOMIZE);
+            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
+                    new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
+                    new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
+                    Gender.RANDOMIZE);
         }
 
         return person;
@@ -1268,7 +1270,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
-        return newPerson(primaryRole, PersonnelRole.NONE, new DefaultFactionSelector(factionCode),
+        return newPerson(primaryRole, PersonnelRole.NONE,
+                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), factionCode),
                 getPlanetSelector(), gender);
     }
 
@@ -1602,9 +1605,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
      */
     public AbstractFactionSelector getFactionSelector(final RandomOriginOptions options) {
-        return options.isRandomizeOrigin()
-                ? new RangedFactionSelector(options.getOriginSearchRadius(), options.getOriginDistanceScale())
-                : new DefaultFactionSelector();
+        return options.isRandomizeOrigin() ? new RangedFactionSelector(options)
+                : new DefaultFactionSelector(options);
     }
 
     /**
@@ -1621,10 +1623,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
      */
     public AbstractPlanetSelector getPlanetSelector(final RandomOriginOptions options) {
-        return options.isRandomizeOrigin()
-                ? new RangedPlanetSelector(options.getOriginSearchRadius(),
-                        options.isExtraRandomOrigin(), options.getOriginDistanceScale())
-                : new DefaultPlanetSelector();
+        return options.isRandomizeOrigin() ? new RangedPlanetSelector(options)
+                : new DefaultPlanetSelector(options);
     }
 
     /**

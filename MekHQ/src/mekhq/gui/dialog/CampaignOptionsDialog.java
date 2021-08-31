@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -124,7 +125,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JPanel panGeneral;
     private JTextField txtName;
     private SortedComboBoxModel<FactionDisplay> factionModel;
-    private JComboBox<FactionDisplay> comboFaction;
+    private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
@@ -625,8 +626,7 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         createFactionModel();
-        comboFaction = new JComboBox<>(factionModel);
-        comboFaction.setName("comboFaction");
+        comboFaction = new MMComboBox<>("comboFaction", factionModel);
         comboFaction.setMinimumSize(new Dimension(400, 30));
         comboFaction.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints.gridx = gridx--;
@@ -3787,7 +3787,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        randomOriginOptionsPanel = new RandomOriginOptionsPanel(campaign, comboFaction);
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(frame, campaign, comboFaction);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -5484,8 +5484,7 @@ public class CampaignOptionsDialog extends JDialog {
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-            campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
-                    (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
+            campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
             if (null != comboFactionNames.getSelectedItem()) {
                 RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
             }
