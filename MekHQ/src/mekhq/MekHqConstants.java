@@ -155,7 +155,7 @@ public final class MekHqConstants {
     public static final String STRATCON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
     public static final String STRATCON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
     public static final String STRATCON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
-    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/ScenarioTemplates/";
+    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
     public static final String STRATCON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
     public static final String STRATCON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
     public static final String STRATCON_FACILITY_PATH = "./data/stratconfacilities/";
