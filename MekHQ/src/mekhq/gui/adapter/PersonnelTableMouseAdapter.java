@@ -690,7 +690,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()),
                             status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
-                        person.changeStatus(gui.getCampaign(), status);
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), status);
                     }
                 }
                 break;
