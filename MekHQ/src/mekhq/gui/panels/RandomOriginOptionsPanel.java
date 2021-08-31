@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;
-    private final JComboBox<FactionDisplay> comboFaction;
+    private final MMComboBox<FactionDisplay> comboFaction;
 
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
@@ -53,7 +54,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
 
     //region Constructors
     public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
-                                    final JComboBox<FactionDisplay> comboFaction) {
+                                    final MMComboBox<FactionDisplay> comboFaction) {
         super(frame, "RandomOriginOptionsPanel");
         this.campaign = campaign;
         this.comboFaction = comboFaction;
@@ -66,12 +67,12 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         return campaign;
     }
 
-    public JComboBox<FactionDisplay> getComboFaction() {
+    public MMComboBox<FactionDisplay> getComboFaction() {
         return comboFaction;
     }
 
     public Faction getFaction() {
-        return ((FactionDisplay) Objects.requireNonNull(getComboFaction().getSelectedItem())).getFaction();
+        return Objects.requireNonNull(getComboFaction().getSelectedItem()).getFaction();
     }
 
     public JCheckBox getChkRandomizeOrigin() {
