@@ -25,14 +25,13 @@ import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.finances.enums.FinancialTerm;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +39,6 @@ import java.util.Objects;
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
  * TODO : Move MADE_UP_INSTITUTIONS to data
- * TODO : Move determineFirstPaymentDate to FinancialTerm Enum
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loan implements Serializable {
@@ -52,7 +50,7 @@ public class Loan implements Serializable {
     private Money principal;
     private int rate;
     private int years;
-    private int financialTerm;
+    private FinancialTerm financialTerm;
     private int collateral;
     private int remainingPayments;
     private Money paymentAmount;
@@ -77,15 +75,15 @@ public class Loan implements Serializable {
         //don't do anything, this is for loading
     }
 
-    public Loan(final Money principal, final int rate, final int years, final int financialTerm,
-                final int collateral, final LocalDate today) {
+    public Loan(final Money principal, final int rate, final int years,
+                final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
         this(Utilities.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
                 years, financialTerm, collateral, today);
     }
 
     public Loan(final String institution, final String referenceNumber, final Money principal,
-                final int rate, final int years, final int financialTerm, final int collateral,
-                final LocalDate today) {
+                final int rate, final int years, final FinancialTerm financialTerm,
+                final int collateral, final LocalDate today) {
         setInstitution(institution);
         setReferenceNumber(referenceNumber);
         setPrincipal(principal);
@@ -93,7 +91,7 @@ public class Loan implements Serializable {
         setYears(years);
         setFinancialTerm(financialTerm);
         setCollateral(collateral);
-        setNextPayment(determineFirstPaymentDate(today));
+        setNextPayment(getFinancialTerm().nextValidDate(today));
         setOverdue(false);
 
         calculateAmortization();
@@ -141,11 +139,11 @@ public class Loan implements Serializable {
         this.years = years;
     }
 
-    public int getFinancialTerm() {
+    public FinancialTerm getFinancialTerm() {
         return financialTerm;
     }
 
-    public void setFinancialTerm(final int financialTerm) {
+    public void setFinancialTerm(final FinancialTerm financialTerm) {
         this.financialTerm = financialTerm;
     }
 
@@ -198,66 +196,12 @@ public class Loan implements Serializable {
     public Money determineRemainingValue() {
         return getPaymentAmount().multipliedBy(getRemainingPayments());
     }
-
-    public LocalDate determineFirstPaymentDate(final LocalDate today) {
-        // TODO : Move to FinancialTerm Enum
-        // We are going to assume a standard grace period, so you have to go
-        // through the first full time length (not partial) before your first
-        // payment
-
-        // First, we need to increase the number of days by one
-        LocalDate date = today.plusDays(1);
-
-        // Finally, we use that and the schedule type to determine the length including the grace period
-        switch (getFinancialTerm()) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).plusWeeks(2);
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                if (date.getDayOfMonth() != 1) {
-                    date = date.with(TemporalAdjusters.firstDayOfNextMonth());
-                }
-                date = date.plusMonths(1);
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                if (date.getDayOfMonth() != 1) {
-                    date = date.with(TemporalAdjusters.firstDayOfNextMonth());
-                }
-                date = date.plusMonths(3);
-                break;
-            case Finances.SCHEDULE_YEARLY:
-                if (date.getDayOfYear() != 1) {
-                    date = date.with(TemporalAdjusters.firstDayOfNextYear());
-                }
-                date = date.plusYears(1);
-                break;
-        }
-
-        return date;
-    }
     //endregion Determination Methods
 
     public void calculateAmortization() {
         // figure out actual rate from APR
-        // TODO : FinancialTerm Enum
-        final int paymentsPerYear;
-        switch (getFinancialTerm()) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                paymentsPerYear = 26;
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                paymentsPerYear = 12;
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                paymentsPerYear = 4;
-                break;
-            case Finances.SCHEDULE_YEARLY:
-            default:
-                paymentsPerYear = 1;
-                break;
-        }
-
-        final int numberOfPayments = getYears() * paymentsPerYear;
+        final double paymentsPerYear = getFinancialTerm().determineYearlyDenominator();
+        final int numberOfPayments = (int) Math.ceil(getYears() * paymentsPerYear);
         final double periodicRate = (getRate() / 100.0) / paymentsPerYear;
 
         setRemainingPayments(numberOfPayments);
@@ -267,20 +211,7 @@ public class Loan implements Serializable {
     }
 
     public void paidLoan() {
-        switch (getFinancialTerm()) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                setNextPayment(getNextPayment().plusWeeks(2));
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                setNextPayment(getNextPayment().plusMonths(1));
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                setNextPayment(getNextPayment().plusMonths(3));
-                break;
-            case Finances.SCHEDULE_YEARLY:
-                setNextPayment(getNextPayment().plusYears(1));
-                break;
-        }
+        setNextPayment(getFinancialTerm().nextValidDate(getNextPayment()));
         setRemainingPayments(getRemainingPayments() - 1);
         setOverdue(false);
     }
@@ -294,15 +225,15 @@ public class Loan implements Serializable {
         // we are going to treat the score from StellarOps the same as dragoons score
         // TODO: pirates and government forces
         if (rating <= 0) {
-            return new Loan(Money.of(10000000), 35, 1, Finances.SCHEDULE_MONTHLY, 80, date);
+            return new Loan(Money.of(10000000), 35, 1, FinancialTerm.MONTHLY, 80, date);
         } else if (rating < 5) {
-            return new Loan(Money.of(10000000), 20, 1, Finances.SCHEDULE_MONTHLY, 60, date);
+            return new Loan(Money.of(10000000), 20, 1, FinancialTerm.MONTHLY, 60, date);
         } else if (rating < 10) {
-            return new Loan(Money.of(10000000), 15, 2, Finances.SCHEDULE_MONTHLY, 40, date);
+            return new Loan(Money.of(10000000), 15, 2, FinancialTerm.MONTHLY, 40, date);
         } else if (rating < 14) {
-            return new Loan(Money.of(10000000), 10, 3, Finances.SCHEDULE_MONTHLY, 25, date);
+            return new Loan(Money.of(10000000), 10, 3, FinancialTerm.MONTHLY, 25, date);
         } else {
-            return new Loan(Money.of(10000000), 7, 5, Finances.SCHEDULE_MONTHLY, 15, date);
+            return new Loan(Money.of(10000000), 7, 5, FinancialTerm.MONTHLY, 15, date);
         }
     }
 
@@ -409,7 +340,7 @@ public class Loan implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "principal", getPrincipal().toXmlString());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "rate", getRate());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "years", getYears());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "collateral", getCollateral());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "remainingPayments", getRemainingPayments());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "paymentAmount", getPaymentAmount().toXmlString());
@@ -435,7 +366,7 @@ public class Loan implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
                     loan.setYears(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("financialTerm")) {
-                    loan.setFinancialTerm(Integer.parseInt(wn2.getTextContent().trim()));
+                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("collateral")) {
                     loan.setCollateral(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("remainingPayments")) {
@@ -451,7 +382,7 @@ public class Loan implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) { // Legacy - 0.49.3 Removal
                     loan.setReferenceNumber(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    loan.setFinancialTerm(Integer.parseInt(wn2.getTextContent().trim()));
+                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) { // Legacy - 0.49.3 Removal
                     loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
                 }
