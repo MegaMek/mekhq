@@ -19,6 +19,7 @@
 package mekhq.campaign.universe.selectors.factionSelectors;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of {@link AbstractFactionSelector} which chooses
@@ -65,14 +67,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private PlanetarySystem cachedSystem;
 
     /**
-     * This map stores weights for a faction. Each weight should
-     * be cumulative. That is, if two factions have equal weights,
-     * you could express this with weights of 1.0 and 2.0 or 5.0 and 10.0.
-     * This way, when selecting a faction at random using the weights
-     * you can create a random double between 0.0 and the largest value
-     * in the map, then select the key equal to or greater than the value.
+     * This map stores weighted factions
      */
-    private TreeMap<Double, Faction> cachedFactions;
+    private WeightedDoubleMap<Faction> cachedFactions;
     //endregion Variable Declarations
 
     //region Constructors
@@ -143,11 +140,11 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         this.cachedSystem = cachedSystem;
     }
 
-    public @Nullable TreeMap<Double, Faction> getCachedFactions() {
+    public @Nullable WeightedDoubleMap<Faction> getCachedFactions() {
         return cachedFactions;
     }
 
-    public void setCachedFactions(final @Nullable TreeMap<Double, Faction> cachedFactions) {
+    public void setCachedFactions(final @Nullable WeightedDoubleMap<Faction> cachedFactions) {
         this.cachedFactions = cachedFactions;
     }
     //endregion Getters/Setters
@@ -160,8 +157,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             createLookupMap(campaign);
         }
 
-        final double random = ThreadLocalRandom.current().nextDouble(getCachedFactions().lastKey());
-        return getCachedFactions().ceilingEntry(random).getValue();
+        return getCachedFactions().randomItem();
     }
 
     /**
@@ -220,14 +216,14 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         });
 
         final Faction mercenaries = Factions.getInstance().getFaction("MERC");
-        final TreeMap<Double, Faction> factions = new TreeMap<>();
+        final WeightedDoubleMap<Faction> factions = new WeightedDoubleMap<>();
         if (weights.isEmpty()) {
             // If we have no valid factions use the campaign's faction ...
             if (!isClan) {
                 // ... and if we're not a clan faction, we can have mercs too.
-                factions.put(1.0, mercenaries);
+                factions.add(1.0, mercenaries);
             }
-            factions.put(2.0, campaign.getFaction());
+            factions.add(2.0, campaign.getFaction());
 
             setCachedDate(now);
             setCachedSystem(currentSystem);
@@ -249,7 +245,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // Only take factions which are not actively fighting us
             if (!enemies.contains(faction)) {
                 total += entry.getValue() * getFactionWeight(faction);
-                factions.put(total, faction);
+                factions.add(total, faction);
             }
         }
 
@@ -257,17 +253,17 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // If we have no valid factions use the campaign's faction ...
             if (!isClan) {
                 // ... and if we're not a clan faction, we can have mercs too.
-                factions.put(1.0, mercenaries);
+                factions.add(1.0, mercenaries);
             }
-            factions.put(2.0, campaign.getFaction());
+            factions.add(2.0, campaign.getFaction());
         } else {
             if (!isClan) {
                 // There is a good chance they're a merc if we're not a clan faction!
                 // The 1.0 prevents no weight calculations
-                factions.put((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
+                factions.add((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
             } else {
                 // There is a lopsided chance they're from the campaign faction if it is a clan faction.
-                factions.put((total == 0.0) ? 1.0 : total + (15 * total), campaign.getFaction());
+                factions.add((total == 0.0) ? 1.0 : total + (15 * total), campaign.getFaction());
             }
         }
 
@@ -282,11 +278,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * @return A set of current enemies for the {@link Campaign}.
      */
     private Set<Faction> getEnemies(final Campaign campaign) {
-        final Set<Faction> enemies = new HashSet<>();
-        for (final AtBContract contract : campaign.getActiveAtBContracts()) {
-            enemies.add(contract.getEnemy());
-        }
-        return enemies;
+        return campaign.getActiveAtBContracts().stream().map(AtBContract::getEnemy).collect(Collectors.toSet());
     }
 
     /**

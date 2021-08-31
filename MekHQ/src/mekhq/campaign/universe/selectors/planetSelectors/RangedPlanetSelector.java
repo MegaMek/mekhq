@@ -18,20 +18,18 @@
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ThreadLocalRandom;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 
 /**
  * An implementation of {@link AbstractPlanetSelector} which chooses
@@ -67,14 +65,9 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     private PlanetarySystem cachedSystem;
 
     /**
-     * This map stores cached weights for a planet keyed by faction.
-     * Each weight should be cumulative. That is, if two planets have
-     * equal weights, you could express this with weights of 1.0 and 2.0
-     * or 5.0 and 10.0. This way, when selecting a planet at random using
-     * the weights you can create a random double between 0.0 and the largest
-     * value in the map, then select the key equal to or greater than the value.
+     * {@link Faction} keyed {@link WeightedDoubleMap} for potential {@link Planet}s to generate
      */
-    private Map<Faction, TreeMap<Double, Planet>> cachedPlanets;
+    private Map<Faction, WeightedDoubleMap<Planet>> cachedPlanets;
     //endregion Variable Declarations
 
     //region Constructors
@@ -166,22 +159,22 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         this.cachedSystem = cachedSystem;
     }
 
-    public @Nullable Map<Faction, TreeMap<Double, Planet>> getCachedPlanets() {
+    public @Nullable Map<Faction, WeightedDoubleMap<Planet>> getCachedPlanets() {
         return cachedPlanets;
     }
 
-    public void setCachedPlanets(final @Nullable Map<Faction, TreeMap<Double, Planet>> cachedPlanets) {
+    public void setCachedPlanets(final @Nullable Map<Faction, WeightedDoubleMap<Planet>> cachedPlanets) {
         this.cachedPlanets = cachedPlanets;
     }
     //endregion Getters/Setters
 
     @Override
-    public Planet selectPlanet(final Campaign campaign) {
+    public @Nullable Planet selectPlanet(final Campaign campaign) {
         return selectPlanet(campaign, campaign.getFaction());
     }
 
     @Override
-    public Planet selectPlanet(final Campaign campaign, final Faction faction) {
+    public @Nullable Planet selectPlanet(final Campaign campaign, final Faction faction) {
         if ((getCachedPlanets() == null)
                 || !getCachedPlanets().containsKey(faction)
                 || !campaign.getCurrentSystem().equals(getCachedSystem())
@@ -189,9 +182,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
             createLookupMap(campaign, faction);
         }
 
-        final TreeMap<Double, Planet> planets = getCachedPlanets().get(faction);
-        final double random = ThreadLocalRandom.current().nextDouble(planets.lastKey());
-        return planets.ceilingEntry(random).getValue();
+        return getCachedPlanets().get(faction).randomItem();
     }
 
     /**
@@ -210,7 +201,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
         final PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
-        final TreeMap<Double, Planet> planets = new TreeMap<>();
+        final WeightedDoubleMap<Planet> planets = new WeightedDoubleMap<>();
         final List<PlanetarySystem> systems = Systems.getInstance().getNearbySystems(currentSystem, getRange());
 
         double total = 0.0;
@@ -222,14 +213,14 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
                     final Long pop = planet.getPopulation(now);
                     if ((pop != null) && (pop > 0.0)) {
                         total += 100.0 * Math.log10(pop) / (1.0 + distance * getDistanceScale());
-                        planets.put(total, planet);
+                        planets.add(total, planet);
                     }
                 } else {
                     for (final Planet planet : system.getPlanets()) {
                         final Long pop = planet.getPopulation(now);
                         if ((pop != null) && (pop > 0.0)) {
                             total += 100.0 * Math.log10(pop) / (1.0 + distance * getDistanceScale());
-                            planets.put(total, planet);
+                            planets.add(total, planet);
                         }
                     }
                 }
@@ -237,7 +228,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         }
 
         if (planets.isEmpty()) {
-            planets.put(1.0, currentSystem.getPrimaryPlanet());
+            planets.add(1.0, currentSystem.getPrimaryPlanet());
         }
 
         setCachedDate(now);
