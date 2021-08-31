@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,7 +36,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeStabiliser extends Part {
@@ -54,6 +53,7 @@ public class VeeStabiliser extends Part {
         this.name = "Vehicle Stabiliser";
     }
 
+    @Override
     public VeeStabiliser clone() {
         VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
         clone.copyBaseData(this);
@@ -79,11 +79,15 @@ public class VeeStabiliser extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-                loc = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

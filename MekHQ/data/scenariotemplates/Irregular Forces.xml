@@ -42,7 +42,7 @@
                     <deploymentZone>8</deploymentZone>
                     <deploymentZone>9</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -71,7 +71,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones/>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>-1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -103,7 +103,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>2.0</forceMultiplier>
@@ -134,7 +134,7 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>4</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>2.0</forceMultiplier>
@@ -168,9 +168,9 @@
             </successEffects>
             <failureEffects/>
             <additionalDetails/>
-            <description>Destroy, cripple or force the withdrawal of the following forces and units:</description>
+            <description>Destroy, cripple or force the withdrawal of 50% of the following forces and units:</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Destroy</objectiveCriterion>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

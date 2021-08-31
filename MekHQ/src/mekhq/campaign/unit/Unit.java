@@ -21,32 +21,11 @@
  */
 package mekhq.campaign.unit;
 
-import java.awt.*;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.Camouflage;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.parts.*;
-
-import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -54,24 +33,38 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.awt.*;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
- * This is a wrapper class for entity, so that we can add some functionality to
- * it
+ * This is a wrapper class for entity, so that we can add some functionality to it
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
@@ -131,6 +124,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int daysSinceMaintenance;
     private int daysActivelyMaintained;
     private int astechDaysMaintained;
+    private int maintenanceMultiplier;
 
     private Campaign campaign;
 
@@ -171,6 +165,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.history = "";
         this.lastMaintenanceReport = "";
         this.fluffName = "";
+        this.maintenanceMultiplier = 1;
         reCalc();
     }
 
@@ -1712,17 +1707,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getBuyCost() {
-        Money cost;
+        Money cost = Money.of((getEntity() instanceof Infantry) ? getEntity().getAlternateCost()
+                : getEntity().getCost(false));
 
-        if (entity instanceof Infantry) {
-            cost = Money.of(getEntity().getAlternateCost());
-        } else {
-            cost = Money.of(getEntity().getCost(false));
+        if (getEntity().isMixedTech()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getMixedTechUnitPriceMultiplier());
+        } else if (getEntity().isClan()) {
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanUnitPriceMultiplier());
+        } else { // Inner Sphere Entity
+            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getInnerSphereUnitPriceMultiplier());
         }
 
-        if (entity.isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanPriceModifier());
-        }
         return cost;
     }
 
@@ -1837,6 +1832,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "astechDaysMaintained", astechDaysMaintained);
         }
 
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maintenanceMultiplier", maintenanceMultiplier);
+
         if (mothballTime > 0) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mothballTime", mothballTime);
         }
@@ -1900,6 +1897,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
                     retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) {
+                    retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
                     retVal.drivers.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
@@ -1983,9 +1982,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         } catch (Exception ex) {
-            // Doh!
             MekHQ.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
+        }
+
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         if (retVal.id == null) {
@@ -2008,7 +2010,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * quirks are enabled for this unit
      * @return
      */
-    public String getQuirksList() {
+    public @Nullable String getQuirksList() {
         String quirkString = "";
         boolean first = true;
         if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
@@ -2027,10 +2029,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
-        if (quirkString.equals("")) {
-            return null;
-        }
-        return "<html>" + quirkString + "</html>";
+        return quirkString.isBlank() ? null : "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {
@@ -3063,7 +3062,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToAdd.add(gravDeckPart);
                 }
             }
-            
+
             //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
                 int hsinks = ((Aero)entity).getOHeatSinks()
@@ -3075,7 +3074,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
                     sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
                 }
-                
+
                 // add busted heat sinks even if they're "engine free" so they can be repaired
                 if (hsinks == 0) {
                     for (int x = 0; x < ((Aero) entity).getHeatSinkHits(); x++) {
@@ -3429,8 +3428,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
             entity.getCrew().setGender(commander.getGender(), 0);
-            entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
-            entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
+            entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getToughness(), 0);
 
@@ -3447,8 +3445,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             PilotOptions options = new PilotOptions();
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
-            List<String> optionNames = new ArrayList<String>();
-            Set<String> cyberOptionNames = new HashSet<String>();
+            List<String> optionNames = new ArrayList<>();
+            Set<String> cyberOptionNames = new HashSet<>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
@@ -3687,9 +3685,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //console we will flag the entity as using the console commander, which has the effect of limiting
         //the tank to a single commander. As the console commander is not counted against crew requirements,
         //we do not increase nCrew if present.
-        if (entity instanceof Tank && ((Tank)entity).hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+        if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
             if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
-                ((Tank)entity).setUsingConsoleCommander(true);
+                ((Tank) entity).setUsingConsoleCommander(true);
             }
         }
 
@@ -3706,9 +3704,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
                 //armor when a perfectly good suit is waiting further down the line.
                 Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
-                    if (entity.getInternal(i)<0) {
+                    if (entity.getInternal(i) < 0) {
                         bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
                     }
                     bestSuits = Utilities.sortMapByValue(bestSuits, true);
@@ -3837,8 +3835,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
         entity.getCrew().setGender(p.getGender(), slot);
-        entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
-        entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
+        entity.getCrew().setPortrait(p.getPortrait().clone(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
         int gunnery = 7;
         int artillery = 7;
@@ -3897,12 +3894,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (!isUnmanned()) {
                 engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
                 engineer.setEngineer(true);
+                engineer.setClanner(getCommander().isClanner());
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
                 engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
-                engineer.setRankNumeric(getCommander().getRankNumeric());
-                //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
+                engineer.setRank(getCommander().getRankNumeric());
+                // will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
             } else {
                 engineer = null;
@@ -3928,12 +3926,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             }
                         }
                         //If the engineer gained XP, add it for each crewman
-                        p.awardXP(engineer.getXP());
+                        p.awardXP(getCampaign(), engineer.getXP());
 
                         //Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            p.awardXP(getCampaign().getCampaignOptions().getTaskXP());
+                            p.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
                             p.setNTasks(0);
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
@@ -3960,6 +3958,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (nCrew > 0) {
                     engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
                     engineer.setEngineer(true);
+                    engineer.setClanner(getCommander().isClanner());
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
@@ -3967,7 +3966,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setId(getCommander().getId());
                     engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
-                        engineer.setRankNumeric(bestRank);
+                        engineer.setRank(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
@@ -4229,7 +4228,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
+            getCampaign().recruitPerson(p, p.getPrisonerStatus(), true,  false);
             MekHQ.getLogger().warning(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
@@ -4573,16 +4572,28 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 crew.add(p);
             }
         }
-        for (Person p : vesselCrew) {
-            crew.add(p);
-        }
+        crew.addAll(vesselCrew);
         if (navigator != null) {
             crew.add(navigator);
         }
         if (techOfficer != null) {
-                crew.add(techOfficer);
+            crew.add(techOfficer);
         }
         return crew;
+    }
+
+    /**
+     * Prototype TSM makes a unit harder to repair and maintain.
+     *
+     * @return Whether the unit has prototype TSM
+     */
+    public boolean hasPrototypeTSM() {
+        for (Mounted m : getEntity().getMisc()) {
+            if (m.getType().hasFlag(MiscType.F_TSM) && m.getType().hasFlag(MiscType.F_PROTOTYPE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -4639,11 +4650,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (!getFluffName().equals("")) {
-            return entity.getShortName() + " - " + getFluffName();
-        } else {
-            return entity.getShortName();
-        }
+        return getFluffName().isBlank() ? getEntity().getShortName()
+                : getEntity().getShortName() + " - " + getFluffName();
     }
 
     public String getHyperlinkedName() {
@@ -4671,7 +4679,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return engineer;
     }
 
-    public Part getPartForEquipmentNum(int index, int loc) {
+    public @Nullable Part getPartForEquipmentNum(int index, int loc) {
         for (Part p : parts) {
             if (p.isPartForEquipmentNum(index, loc)) {
                 return p;
@@ -4724,74 +4732,87 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public int getMaintenanceTime() {
+        int retVal = 0;
+
         if (getEntity() instanceof Mech) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-                    return 30;
+                    retVal = 30;
+                    break;
                 case EntityWeightClass.WEIGHT_LIGHT:
-                    return 45;
+                    retVal = 45;
+                    break;
                 case EntityWeightClass.WEIGHT_MEDIUM:
-                    return 60;
+                    retVal = 60;
+                    break;
                 case EntityWeightClass.WEIGHT_HEAVY:
-                    return 75;
+                    retVal = 75;
+                    break;
                 case EntityWeightClass.WEIGHT_ASSAULT:
                 default:
-                    return  90;
+                    retVal = 90;
+                    break;
             }
-        }
-        if (getEntity() instanceof Protomech) {
-            return 20;
-        }
-        if (getEntity() instanceof BattleArmor) {
-            return 10;
-        }
-        if (getEntity() instanceof ConvFighter) {
-            return 45;
-        }
-        if (getEntity() instanceof SmallCraft && !(getEntity() instanceof Dropship)) {
-            return 90;
-        }
-        if (getEntity() instanceof Aero
+        } else if (getEntity() instanceof Protomech) {
+            retVal = 20;
+        } else if (getEntity() instanceof BattleArmor) {
+            retVal = 10;
+        } else if (getEntity() instanceof ConvFighter) {
+            retVal = 45;
+        } else if (getEntity() instanceof SmallCraft && !(getEntity() instanceof Dropship)) {
+            retVal = 90;
+        } else if (getEntity() instanceof Aero
                 && !(getEntity() instanceof Dropship)
                 && !(getEntity() instanceof Jumpship)) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT:
-                    return 45;
+                    retVal = 45;
+                    break;
                 case EntityWeightClass.WEIGHT_MEDIUM:
-                    return 60;
+                    retVal = 60;
+                    break;
                 case EntityWeightClass.WEIGHT_HEAVY:
                 default:
-                    return  75;
+                    retVal = 75;
+                    break;
             }
-        }
-        if (getEntity() instanceof SupportTank) {
+        } else if (getEntity() instanceof SupportTank) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                    return 20;
+                    retVal = 20;
+                    break;
                 case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                    return 35;
+                    retVal = 35;
+                    break;
                 case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                 default:
-                    return  100;
+                    retVal = 100;
+                    break;
             }
-        }
-        if (getEntity() instanceof Tank) {
+        } else if (getEntity() instanceof Tank) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT:
-                    return 30;
+                    retVal = 30;
+                    break;
                 case EntityWeightClass.WEIGHT_MEDIUM:
-                    return 50;
+                    retVal = 50;
+                    break;
                 case EntityWeightClass.WEIGHT_HEAVY:
-                    return 75;
+                    retVal = 75;
+                    break;
                 case EntityWeightClass.WEIGHT_ASSAULT:
-                    return 90;
+                    retVal = 90;
+                    break;
                 case EntityWeightClass.WEIGHT_SUPER_HEAVY:
                 default:
-                    return  120;
+                    retVal = 120;
+                    break;
             }
         }
-        //the rest get support from crews, so zero
-        return 0;
+
+        // default value for retVal is zero, so anything that didn't fall into one of the
+        // above classifications is self-maintaining, meaning zero.
+        return retVal * getMaintenanceMultiplier();
     }
 
     public void incrementDaysSinceMaintenance(boolean maintained, int astechs) {
@@ -4818,7 +4839,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     //also we will take the average rounded down of the number of astechs to figure out
     //shorthanded penalty
     public double getMaintainedPct() {
-        return (daysActivelyMaintained/(double)daysSinceMaintenance);
+        return (daysActivelyMaintained / (double) daysSinceMaintenance);
     }
 
     public boolean isFullyMaintained() {
@@ -4829,6 +4850,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (int) Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
     }
 
+    public int getMaintenanceMultiplier() {
+        return maintenanceMultiplier;
+    }
+
+    public void setMaintenanceMultiplier(int value) {
+        maintenanceMultiplier = value;
+    }
+
     public int getQuality() {
         int nParts = 0;
         int sumQuality = 0;
@@ -4836,8 +4865,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //no rules about this but lets assume missing parts are quality A
             if (p instanceof MissingPart) {
                 nParts++;
-            }
-            else if (p.needsMaintenance()) {
+            } else if (p.needsMaintenance()) {
                 nParts++;
                 sumQuality += p.getQuality();
             }
@@ -4845,7 +4873,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (nParts == 0) {
             return Part.QUALITY_D;
         }
-        return (int) Math.round((1.0 * sumQuality)/nParts);
+        return (int) Math.round((1.0 * sumQuality) / nParts);
     }
 
     public void setQuality(int q) {
@@ -4949,7 +4977,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         for (Part part : getParts()) {
             if (part instanceof MissingBattleArmorEquipmentPart &&
-                    ((MissingBattleArmorEquipmentPart)part).getTrooper() == trooper) {
+                    ((MissingBattleArmorEquipmentPart) part).getTrooper() == trooper) {
                 return false;
             }
         }
@@ -5407,6 +5435,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
+
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
@@ -5416,6 +5445,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         getId(), getName(), id));
             }
         }
+
         if (navigator instanceof UnitPersonRef) {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
@@ -5425,6 +5455,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         getId(), getName(), id));
             }
         }
+
+        if (getTechOfficer() instanceof UnitPersonRef) {
+            final UUID id = getTechOfficer().getId();
+            techOfficer = campaign.getPerson(id);
+            if (getTechOfficer() == null) {
+                MekHQ.getLogger().error(
+                        String.format("Unit %s ('%s') references missing tech officer %s",
+                                getId(), getName(), id));
+            }
+        }
+
         if (mothballInfo != null) {
             mothballInfo.fixReferences(campaign);
         }

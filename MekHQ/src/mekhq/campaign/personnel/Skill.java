@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
@@ -110,8 +109,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
         int roll = Compute.d6() + rollModifier;
         if (roll < 2 && level > 0) {
             level--;
-        }
-        else if (roll > 5 && level < 10) {
+        } else if (roll > 5 && level < 10) {
             level++;
         }
 
@@ -139,7 +137,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
 
     public int getFinalSkillValue() {
-        if(type.countUp()) {
+        if (type.countUp()) {
             return type.getTarget() + level + bonus;
         } else {
             return type.getTarget() - level - bonus;
@@ -147,14 +145,14 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
 
     public void improve() {
-        if(level >= SkillType.NUM_LEVELS - 1) {
+        if (level >= SkillType.NUM_LEVELS - 1) {
             // Can't improve past the max
             return;
         }
         level = level + 1;
         //if the cost for the next level is zero (or less than zero), then
         //keep improve until you hit a non-zero cost
-        if(type.getCost(level) <= 0) {
+        if (type.getCost(level) <= 0) {
             improve();
         }
     }
@@ -162,7 +160,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while(cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
+        while (cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
             cost = type.getCost(level+i);
             ++i;
         }
@@ -175,13 +173,14 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 
     @Override
     public String toString() {
-        if(type.countUp()) {
+        if (type.countUp()) {
             return "+" + getFinalSkillValue();
         } else {
             return getFinalSkillValue() + "+";
         }
     }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -200,8 +199,6 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
 
     public static Skill generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-
         Skill retVal = null;
 
         try {
@@ -210,7 +207,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
             // Okay, now load Skill-specific fields!
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
@@ -222,10 +219,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Skill.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

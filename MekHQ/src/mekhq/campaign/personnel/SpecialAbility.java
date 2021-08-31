@@ -20,35 +20,14 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import megamek.common.Mounted;
-import megamek.common.annotations.Nullable;
-import megamek.common.util.WeightedMap;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.EquipmentType;
+import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.autocannons.LBXACWeapon;
@@ -60,6 +39,25 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
@@ -73,7 +71,6 @@ import mekhq.Version;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
-
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -128,7 +125,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
 
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+    @Override
+    @SuppressWarnings(value = "unchecked") // FIXME: Broken Java with it's Object clones
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -401,21 +399,17 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
-        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
-
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
@@ -455,29 +449,25 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
     public static void initializeSPA() {
-        final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
         specialAbilities = new Hashtable<>();
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
+        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -524,7 +514,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return specialAbilities;
     }
 
-    public static SpecialAbility getDefaultAbility(String name) {
+    public static @Nullable SpecialAbility getDefaultAbility(String name) {
         if (null != defaultSpecialAbilities) {
             return defaultSpecialAbilities.get(name);
         }
@@ -586,7 +576,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
      */
     public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel,
                                                               final int year, final boolean clusterOnly) {
-        final WeightedMap<EquipmentType> weapons = new WeightedMap<>();
+        final WeightedIntMap<EquipmentType> weapons = new WeightedIntMap<>();
         // First try to generate based on the person's unit
         if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
             for (final Mounted mounted : person.getUnit().getEntity().getEquipment()) {
@@ -618,7 +608,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     private static void addValidWeaponryToMap(final EquipmentType equipmentType,
                                               final Person person, final int techLevel,
                                               final int year, final boolean clusterOnly,
-                                              final WeightedMap<EquipmentType> weapons) {
+                                              final WeightedIntMap<EquipmentType> weapons) {
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is IS for
         // IS personnel and Clan for Clan personnel
         if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
@@ -701,7 +691,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             toReturn += getDisplayName(prereq) + "<br>";
         }
         for (SkillPrereq skPr : prereqSkills) {
-            toReturn += skPr.toString() + "<br>";
+            toReturn += skPr + "<br>";
         }
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
@@ -760,7 +750,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>)specialAbilities.clone();
+        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
     }
 
     public static void nullifyDefaultSPA() {

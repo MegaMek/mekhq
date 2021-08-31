@@ -31,6 +31,7 @@ public class PartsTableModel extends DataTableModel {
         data = new ArrayList<Part>();
     }
 
+    @Override
     public int getRowCount() {
         return data.size();
     }
@@ -42,32 +43,33 @@ public class PartsTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
-        case COL_NAME:
-            return "Name";
-        case COL_COST:
-            return "Value per Unit";
-        case COL_TOTAL_COST:
-        	return "Total Value";
-        case COL_QUANTITY:
-            return "#";
-        case COL_QUALITY:
-            return "Quality";
-        case COL_TON:
-            return "Tonnage";
-        case COL_STATUS:
-            return "Status";
-        case COL_DETAIL:
-            return "Detail";
-        case COL_TECH_BASE:
-            return "Tech Base";
-        case COL_REPAIR:
-            return "Repair Details";
-        default:
-            return "?";
+        switch (column) {
+            case COL_NAME:
+                return "Name";
+            case COL_COST:
+                return "Value per Unit";
+            case COL_TOTAL_COST:
+                return "Total Value";
+            case COL_QUANTITY:
+                return "#";
+            case COL_QUALITY:
+                return "Quality";
+            case COL_TON:
+                return "Tonnage";
+            case COL_STATUS:
+                return "Status";
+            case COL_DETAIL:
+                return "Detail";
+            case COL_TECH_BASE:
+                return "Tech Base";
+            case COL_REPAIR:
+                return "Repair Details";
+            default:
+                return "?";
         }
     }
 
+    @Override
     public Object getValueAt(int row, int col) {
         Part part;
         if(data.isEmpty()) {
@@ -115,42 +117,40 @@ public class PartsTableModel extends DataTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch(c) {
-        case COL_NAME:
-        case COL_DETAIL:
-            return 120;
-        case COL_REPAIR:
-            return 140;
-        case COL_STATUS:
-            return 40;
-        case COL_TECH_BASE:
-            return 20;
-        case COL_COST:
-            return 20;
-        case COL_TOTAL_COST:
-        	return 20;
-        default:
-            return 3;
+        switch (c) {
+            case COL_NAME:
+            case COL_DETAIL:
+                return 120;
+            case COL_REPAIR:
+                return 140;
+            case COL_STATUS:
+                return 40;
+            case COL_TECH_BASE:
+            case COL_COST:
+            case COL_TOTAL_COST:
+                return 20;
+            default:
+                return 3;
         }
     }
 
     public int getAlignment(int col) {
-        switch(col) {
-        case COL_QUALITY:
-        	return SwingConstants.CENTER;
-        case COL_COST:
-        case COL_TOTAL_COST:
-        case COL_TON:
-            return SwingConstants.RIGHT;
-        default:
-            return SwingConstants.LEFT;
+        switch (col) {
+            case COL_QUALITY:
+                return SwingConstants.CENTER;
+            case COL_COST:
+            case COL_TOTAL_COST:
+            case COL_TON:
+                return SwingConstants.RIGHT;
+            default:
+                return SwingConstants.LEFT;
         }
     }
 
     public String getTooltip(int row, int col) {
-        switch(col) {
-        default:
-            return null;
+        switch (col) {
+            default:
+                return null;
         }
     }
     public PartsTableModel.Renderer getRenderer() {
@@ -161,11 +161,11 @@ public class PartsTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -174,6 +174,5 @@ public class PartsTableModel extends DataTableModel {
 
             return this;
         }
-
     }
 }

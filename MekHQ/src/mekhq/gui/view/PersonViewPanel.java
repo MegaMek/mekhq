@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.accessibility.AccessibleRelation;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -60,6 +61,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -72,7 +74,7 @@ import mekhq.gui.utilities.WrapLayout;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends ScrollablePanel {
+public class PersonViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -85,6 +87,7 @@ public class PersonViewPanel extends ScrollablePanel {
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+        super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
@@ -96,6 +99,7 @@ public class PersonViewPanel extends ScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
+        getAccessibleContext().setAccessibleName("Details for " + person.getFullName());
 
         JPanel pnlPortrait = setPortrait();
         GridBagConstraints gbc_pnlPortrait = new GridBagConstraints();
@@ -296,7 +300,7 @@ public class PersonViewPanel extends ScrollablePanel {
         Collections.reverse(awards);
 
         int i = 0;
-        Box rowRibbonsBox = null;
+        Box rowRibbonsBox = Box.createHorizontalBox();
         ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
 
         for (Award award : awards) {
@@ -415,6 +419,7 @@ public class PersonViewPanel extends ScrollablePanel {
         // Panel portrait will include the person picture and the ribbons
         pnlPortrait.setName("pnlPortrait");
         pnlPortrait.setLayout(new GridBagLayout());
+        pnlPortrait.getAccessibleContext().setAccessibleName("Portrait for: " + person.getFullName());
 
         JLabel lblPortrait = new JLabel();
         lblPortrait.setName("lblPortrait");
@@ -459,6 +464,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblType.setName("lblType");
         lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
+        lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = firsty;
@@ -482,6 +488,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblStatus2.setName("lblStatus2");
         lblStatus2.setText(person.getStatus().toString() + person.pregnancyStatus());
+        lblStatus1.setLabelFor(lblStatus2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -504,6 +511,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblOrigin1, gridBagConstraints);
 
             lblOrigin2.setName("lblOrigin2");
+            lblOrigin1.setLabelFor(lblOrigin2);
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
@@ -550,6 +558,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             lblCall2.setName("lblCall2");
             lblCall2.setText(person.getCallsign());
+            lblCall1.setLabelFor(lblCall2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -573,6 +582,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblAge2.setName("lblAge2");
         lblAge2.setText(Integer.toString(person.getAge(campaign.getLocalDate())));
+        lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -595,6 +605,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblGender2.setName("lblGender2");
         lblGender2.setText(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender()));
+        lblGender1.setLabelFor(lblGender2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -622,6 +633,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             lblDueDate2.setName("lblDueDate2");
             lblDueDate2.setText(dueDate);
+            lblDueDate1.setLabelFor(lblDueDate2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -645,6 +657,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             JLabel lblRetirement2 = new JLabel(person.getRetirementAsString());
             lblRetirement2.setName("lblRetirement2");
+            lblRetirement1.setLabelFor(lblRetirement2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -656,11 +669,10 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free non-dependent, or if the
-        // person has tracked total earnings
-        if (campaign.getCampaignOptions().trackTotalEarnings()
-                && ((person.getPrisonerStatus().isFree() && !person.isDependent())
-                || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
+        // We show the following if track total earnings is on for a free person or if the
+        // person has previously tracked total earnings
+        if (campaign.getCampaignOptions().isTrackTotalEarnings()
+                && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
@@ -672,6 +684,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             JLabel lblTotalEarnings2 = new JLabel(person.getTotalEarnings().toAmountAndSymbolString());
             lblTotalEarnings2.setName("lblTotalEarnings2");
+            lblTotalEarnings1.setLabelFor(lblTotalEarnings2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -680,6 +693,33 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
+            firsty++;
+        }
+
+        // We show the following if track total xp earnings is on for a free person or if the
+        // person has previously tracked total xp earnings
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()
+                && (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
+            JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));
+            lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings1, gridBagConstraints);
+
+            JLabel lblTotalXPEarnings2 = new JLabel(Integer.toString(person.getTotalXPEarnings()));
+            lblTotalXPEarnings2.setName("lblTotalXPEarnings2");
+            lblTotalXPEarnings1.setLabelFor(lblTotalXPEarnings2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings2, gridBagConstraints);
             firsty++;
         }
 
@@ -695,6 +735,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             lblRecruited2.setName("lblRecruited2");
             lblRecruited2.setText(person.getRecruitmentAsString());
+            lblRecruited1.setLabelFor(lblRecruited2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = secondy;
@@ -716,6 +757,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             lblTimeServed2.setName("lblTimeServed2");
             lblTimeServed2.setText(person.getTimeInService(campaign));
+            lblTimeServed1.setLabelFor(lblTimeServed2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = secondy;
@@ -739,6 +781,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString());
             lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
+            lblLastRankChangeDate1.setLabelFor(lblLastRankChangeDate2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = secondy;
@@ -760,6 +803,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign));
             lblTimeInRank2.setName("lblTimeInRank2");
+            lblTimeInRank1.setLabelFor(lblTimeInRank2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = secondy;
@@ -811,6 +855,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlFamily.add(lblSpouse1, gridBagConstraints);
 
             lblSpouse2.setName("lblSpouse2");
+            lblSpouse1.setLabelFor(lblSpouse2);
             lblSpouse2.setText(String.format("<html>%s</html>", spouse.getHyperlinkedName()));
             lblSpouse2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             lblSpouse2.addMouseListener(new MouseAdapter() {
@@ -846,6 +891,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.gridy = firsty;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
+                lblFormerSpouses2.getAccessibleContext().getAccessibleRelationSet().add(
+                    new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1)
+                );
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
                         ex.getFullName(), formerSpouse.getReason(),
@@ -881,6 +929,9 @@ public class PersonViewPanel extends ScrollablePanel {
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
+                    lblChildren2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1)
+                    );
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
                     lblChildren2.addMouseListener(new MouseAdapter() {
@@ -916,6 +967,9 @@ public class PersonViewPanel extends ScrollablePanel {
                     gridBagConstraints.gridy = firsty;
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
+                    lblGrandchildren2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1)
+                    );
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
@@ -943,6 +997,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
                     JLabel labelParentName = new JLabel(String.format("<html>%s</html>", parent.getHyperlinkedName()));
                     labelParentName.setName("lblParentName");
+                    labelParent.setLabelFor(labelParentName);
                     labelParentName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     labelParentName.addMouseListener(new MouseAdapter() {
                         @Override
@@ -980,6 +1035,9 @@ public class PersonViewPanel extends ScrollablePanel {
                     gridBagConstraints.gridy = firsty;
                     lblSiblings2 = new JLabel(String.format("<html>%s</html>", sibling.getHyperlinkedName()));
                     lblSiblings2.setName("lblSiblings2");
+                    lblSiblings2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
+
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1015,6 +1073,8 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
                             grandparent.getHyperlinkedName()));
                     lblGrandparents2.setName("lblGrandparents2");
+                    lblGrandparents2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
                     lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1050,6 +1110,9 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
                             auntOrUncle.getHyperlinkedName()));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
+                    lblAuntsOrUncles2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
+
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1084,6 +1147,8 @@ public class PersonViewPanel extends ScrollablePanel {
                     gridBagConstraints.gridy = firsty;
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
+                    lblCousins2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblCousins2.setText(String.format("<html>%s</html>", cousin.getHyperlinkedName()));
                     lblCousins2.addMouseListener(new MouseAdapter() {
@@ -1135,6 +1200,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
                 lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i]));
                 lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
+                lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
                 gridBagConstraints.gridy = firsty;
@@ -1177,6 +1243,8 @@ public class PersonViewPanel extends ScrollablePanel {
                     JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
                     lblAbility2.setToolTipText(option.getDescription());
                     lblAbility2.setName("lblAbility2");
+                    lblAbility2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblAbility2, gridBagConstraints);
                 }
@@ -1205,6 +1273,8 @@ public class PersonViewPanel extends ScrollablePanel {
                     JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
                     lblImplants2.setToolTipText(option.getDescription());
                     lblImplants2.setName("lblImplants2");
+                    lblImplants2.getAccessibleContext().getAccessibleRelationSet().add(
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblImplants2, gridBagConstraints);
                 }
@@ -1222,6 +1292,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlSkills.add(lblEdge1, gridBagConstraints);
 
             lblEdge2.setName("lblEdge2");
+            lblEdge1.setLabelFor(lblEdge2);
             lblEdge2.setText(Integer.toString(person.getEdge()));
             lblEdge2.setToolTipText(person.getEdgeTooltip());
             gridBagConstraints = new GridBagConstraints();
@@ -1246,6 +1317,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlSkills.add(lblEdgeAvail1, gridBagConstraints);
 
                 lblEdgeAvail2.setName("lblEdgeAvail2");
+                lblEdgeAvail1.setLabelFor(lblEdgeAvail2);
                 lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridwidth = 1;
@@ -1268,6 +1340,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             lblTough2.setName("lblTough2");
             lblTough2.setText("+" + person.getToughness());
+            lblTough1.setLabelFor(lblTough2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -1290,6 +1363,7 @@ public class PersonViewPanel extends ScrollablePanel {
         PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
+        eventTable.getAccessibleContext().setAccessibleName("Event log for " + person.getFullName());
         eventTable.setRowSelectionAllowed(false);
         eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
@@ -1337,6 +1411,8 @@ public class PersonViewPanel extends ScrollablePanel {
         PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
         eventModel.setData(missionLog);
         JTable missionsTable = new JTable(eventModel);
+        lblMissions.setLabelFor(missionsTable);
+        missionsTable.getAccessibleContext().setAccessibleName("Mission log for " + person.getFullName());
         missionsTable.setRowSelectionAllowed(false);
         missionsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
@@ -1369,6 +1445,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title")));
 
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
+        medicalButton.getAccessibleContext().setAccessibleName(resourceMap.getString("btnMedical.tooltip"));
         medicalButton.addActionListener(event -> {
             MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person);
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
@@ -1387,6 +1464,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInjuries.add(medicalButton, BorderLayout.LINE_START);
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
+        pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());
         pnlInjuryDetails.setAlignmentY(Component.TOP_ALIGNMENT);
 
 
@@ -1411,6 +1489,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");
         lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -1440,6 +1519,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     ? resourceMap.getString("lblPermanentInjury.text")
                     : String.format(resourceMap.getString("format.injuryTime"), injury.getTime());
             txtInjury = new JLabel("<html>" + text + "</html>");
+            lblInjury.setLabelFor(txtInjury);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = row;
@@ -1503,6 +1583,8 @@ public class PersonViewPanel extends ScrollablePanel {
         PersonnelKillLogModel killModel = new PersonnelKillLogModel();
         killModel.setData(kills);
         JTable killTable = new JTable(killModel);
+        lblRecord.setLabelFor(killTable);
+        killTable.getAccessibleContext().setAccessibleName("Personnel Kill Log");
         killTable.setRowSelectionAllowed(false);
         killTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;

@@ -16,11 +16,12 @@ package mekhq.campaign.stratcon;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.Utilities;
@@ -105,10 +106,19 @@ public class StratconFacilityFactory {
     }
     
     /**
-     * Gets a specific facility given an "ID" (the file name)
+     * Gets a specific facility given an "ID" (the file name).
+     * This method does not clone the facility and should not be used to put one on the board
      */
     public static StratconFacility getFacilityByName(String name) {
         return stratconFacilityMap.get(name);
+    }
+    
+    /**
+     * Gets a clone of a specific facility given the "ID" (file name), null if it doesn't exist.
+     */
+    @Nullable
+    public static StratconFacility getFacilityCloneByName(String name) {
+        return stratconFacilityMap.containsKey(name) ? stratconFacilityMap.get(name).clone() : null;
     }
     
     /**
@@ -124,5 +134,13 @@ public class StratconFacilityFactory {
     
     public static StratconFacility getRandomAlliedFacility() {
     	return Utilities.getRandomItem(alliedFacilities).clone();
+    }
+
+    public static List<StratconFacility> getHostileFacilities() {
+        return Collections.unmodifiableList(hostileFacilities);
+    }
+
+    public static List<StratconFacility> getAlliedFacilities() {
+        return Collections.unmodifiableList(alliedFacilities);
     }
 }

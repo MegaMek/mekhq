@@ -186,9 +186,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * @param elements the elements to replace the current elements with, which may be null to remove
      *                 all elements, although this is not recommended.
      */
-    @SuppressWarnings(value = "unchecked")
     public void setElements(final @Nullable Collection<E> elements) {
-        final E selectedElement = (E) getSelectedItem();
+        final E selectedElement = getSelectedItem();
         removeAllElements();
 
         if (elements == null) {
@@ -204,5 +203,15 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
         } else if (elements.size() > 0) {
             setSelectedItem(getElementAt(0));
         }
+    }
+
+    /**
+     * @return the selected item, cast to the proper class stored by the model
+     */
+    @Override
+    @SuppressWarnings(value = "unchecked")
+    public @Nullable E getSelectedItem() {
+        final Object item = super.getSelectedItem();
+        return (item == null) ? null : (E) item;
     }
 }

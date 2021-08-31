@@ -1,7 +1,7 @@
 /*
  * KFFieldInitiator.java
  *
- * Copyright (c) 2019, The MegaMek Team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,18 +12,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,14 +37,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author MKerensky
  */
 public class KFFieldInitiator extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 855888549623558483L;
 
     public static final TechAdvancement TA_FIELD_INITIATOR = new TechAdvancement(TECH_BASE_ALL)
@@ -78,6 +73,7 @@ public class KFFieldInitiator extends Part {
         this.name = "K-F Field Initiator";
     }
 
+    @Override
     public KFFieldInitiator clone() {
         KFFieldInitiator clone = new KFFieldInitiator(0, coreType, docks, campaign);
         clone.copyBaseData(this);
@@ -87,15 +83,15 @@ public class KFFieldInitiator extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit) {
+        if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                if(((Jumpship)unit.getEntity()).getKFFieldInitiatorHit()) {
+                if (((Jumpship) unit.getEntity()).getKFFieldInitiatorHit()) {
                     hits = 1;
                 } else {
                     hits = 0;
                 }
             }
-            if(checkForDestruction
+            if (checkForDestruction
                     && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -106,7 +102,7 @@ public class KFFieldInitiator extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             //SO KF Drive times, p184-5
             time = 28800;
         } else {
@@ -118,7 +114,7 @@ public class KFFieldInitiator extends Part {
     @Override
     public int getDifficulty() {
         //SO Difficulty Mods
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 2;
         }
         return 5;
@@ -126,8 +122,8 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFFieldInitiatorHit(needsFixing());
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setKFFieldInitiatorHit(needsFixing());
         }
     }
 
@@ -149,7 +145,7 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
                 Jumpship js = ((Jumpship)unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
@@ -157,9 +153,9 @@ public class KFFieldInitiator extends Part {
                 //You can transport a field initiator
                 //See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-                if(!salvage) {
+                if (!salvage) {
                     campaign.getWarehouse().removePart(this);
-                } else if(null != spare) {
+                } else if (null != spare) {
                     spare.incrementQuantity();
                     campaign.getWarehouse().removePart(this);
                 } else {
@@ -238,13 +234,17 @@ public class KFFieldInitiator extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
-                coreType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
-                docks = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
+                    coreType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
+                    docks = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

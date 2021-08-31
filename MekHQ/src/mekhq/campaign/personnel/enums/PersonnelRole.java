@@ -20,12 +20,12 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.ranks.Ranks;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum PersonnelRole {
     //region Enum Declarations
@@ -305,110 +305,47 @@ public enum PersonnelRole {
     }
     //endregion Boolean Comparisons
 
-    @Deprecated // This will go into a profession enum once that it ready
-    public int getProfession() {
-        switch (this) {
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return Ranks.RPROF_ASF;
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-                return Ranks.RPROF_VEE;
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-                return Ranks.RPROF_INF;
-            case VESSEL_PILOT:
-            case VESSEL_CREW:
-            case VESSEL_GUNNER:
-            case VESSEL_NAVIGATOR:
-                return Ranks.RPROF_NAVAL;
-            case MECH_TECH:
-            case MECHANIC:
-            case AERO_TECH:
-            case BA_TECH:
-            case ASTECH:
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_HR:
-            case ADMINISTRATOR_TRANSPORT:
-                return Ranks.RPROF_TECH;
-            case MECHWARRIOR:
-            case LAM_PILOT:
-            case PROTOMECH_PILOT:
-            case DOCTOR:
-            case MEDIC:
-            default:
-                return Ranks.RPROF_MW;
-        }
-    }
-
     //region Static Methods
     /**
      * @return a list of roles that can be included in the personnel market
      */
     public static List<PersonnelRole> getMarketableRoles() {
-        final List<PersonnelRole> marketableRoles = new ArrayList<>();
-        for (final PersonnelRole role : values()) {
-            if (role.isMarketable()) {
-                marketableRoles.add(role);
-            }
-        }
-        return marketableRoles;
+        return Stream.of(values()).filter(PersonnelRole::isMarketable).collect(Collectors.toList());
+    }
+
+    /**
+     * @return a list of roles that are potential primary roles. Currently this is all bar NONE
+     */
+    public static List<PersonnelRole> getPrimaryRoles() {
+        return Stream.of(values()).filter(role -> !role.isNone()).collect(Collectors.toList());
     }
 
     /**
      * @return a list of roles that are considered to be vessel (as in spacecraft) crewmembers
      */
     public static List<PersonnelRole> getVesselRoles() {
-        final List<PersonnelRole> vesselRoles = new ArrayList<>();
-        for (final PersonnelRole role : values()) {
-            if (role.isVesselCrewmember()) {
-                vesselRoles.add(role);
-            }
-        }
-        return vesselRoles;
+        return Stream.of(values()).filter(PersonnelRole::isVesselCrewmember).collect(Collectors.toList());
     }
 
     /**
      * @return a list of roles that are considered to be techs
      */
     public static List<PersonnelRole> getTechRoles() {
-        final List<PersonnelRole> techRoles = new ArrayList<>();
-        for (final PersonnelRole role : values()) {
-            if (role.isTech()) {
-                techRoles.add(role);
-            }
-        }
-        return techRoles;
+        return Stream.of(values()).filter(PersonnelRole::isTech).collect(Collectors.toList());
     }
 
     /**
      * @return a list of all roles that are considered to be administrators
      */
     public static List<PersonnelRole> getAdministratorRoles() {
-        final List<PersonnelRole> administratorRoles = new ArrayList<>();
-        for (final PersonnelRole role : values()) {
-            if (role.isAdministrator()) {
-                administratorRoles.add(role);
-            }
-        }
-        return administratorRoles;
+        return Stream.of(values()).filter(PersonnelRole::isAdministrator).collect(Collectors.toList());
     }
 
     /**
      * @return the number of roles that are not tagged as marketable
      */
     public static int getUnmarketableCount() {
-        int unmarketable = 0;
-        for (final PersonnelRole role : values()) {
-            if (!role.isMarketable()) {
-                unmarketable++;
-            }
-        }
-        return unmarketable;
+        return Math.toIntExact(Stream.of(values()).filter(role -> !role.isMarketable()).count());
     }
     //endregion Static Methods
 

@@ -21,8 +21,39 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.EntityReadoutDialog;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.GunEmplacement;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioObjectiveProcessor;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.unit.TestUnit;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.gui.view.PersonViewPanel;
+
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -32,37 +63,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.*;
-
-import megamek.client.ui.Messages;
-import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.client.ui.swing.MechViewPanel;
-import megamek.common.Entity;
-import megamek.common.GunEmplacement;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
-import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjectiveProcessor;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.gui.view.PersonViewPanel;
-import megamek.client.ui.preferences.PreferencesNode;
-
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     //region Variable Declarations
@@ -166,7 +168,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<Loot> loots;
 
     //region Preview Panel components
-    private JComboBox<String> choiceStatus;
+    private JComboBox<ScenarioStatus> choiceStatus;
     private JScrollPane scrRecoveredUnits;
     private JScrollPane scrRecoveredPilots;
     private JScrollPane scrMissingUnits;
@@ -819,17 +821,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JPanel pnlStatus = new JPanel();
 
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
-        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
-        for (int k = 1; k < Scenario.S_NUM; k++) {
-            statusModel.addElement(Scenario.getStatusName(k));
-        }
-        choiceStatus.setModel(statusModel);
+        DefaultComboBoxModel<ScenarioStatus> scenarioStatusModel = new DefaultComboBoxModel<>(ScenarioStatus.values());
+        scenarioStatusModel.removeElement(ScenarioStatus.CURRENT);
+        choiceStatus.setModel(scenarioStatusModel);
         choiceStatus.setName("choiceStatus");
 
         // dynamically update victory/defeat dropdown based on objective checkboxes
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
+        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<>(), getObjectiveUnitCounts());
-        choiceStatus.setSelectedIndex(scenarioStatus - 1);
+        choiceStatus.setSelectedItem(scenarioStatus);
 
         pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
         pnlStatus.add(lblStatus);
@@ -1377,7 +1377,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now process
-        tracker.resolveScenario(choiceStatus.getSelectedIndex() + 1, txtReport.getText());
+        tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
 
         if (tracker.getScenario().hasObjectives()) {
             // process objectives here
@@ -1400,7 +1400,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
             }
         }
-        
+
         StratconRulesManager.processScenarioCompletion(tracker);
 
         this.setVisible(false);
@@ -1572,9 +1572,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void updatePreviewPanel() {
         // set victory/defeat status based on scenario objectives
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
+        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<>(), getObjectiveUnitCounts());
-        choiceStatus.setSelectedIndex(scenarioStatus - 1);
+        choiceStatus.setSelectedItem(scenarioStatus);
 
         // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
@@ -1666,40 +1666,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             ustatus = tracker.getUnitsStatus().get(id);
         }
 
-        if (null == ustatus || null == ustatus.getEntity()) {
+        if ((ustatus == null) || (ustatus.getEntity() == null)) {
             return;
         }
-        Entity entity = ustatus.getEntity();
-        final JDialog dialog = new JDialog(frame, "Unit View", true);
-        MechViewPanel mvp = new MechViewPanel();
-        mvp.setMech(entity, true);
-        JButton btn = new JButton(Messages.getString("Okay"));
-        btn.addActionListener(e -> dialog.setVisible(false));
-
-        dialog.getContentPane().setLayout(new GridBagLayout());
-        GridBagConstraints c;
-
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        dialog.getContentPane().add(mvp, c);
-
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 1;
-        c.fill = GridBagConstraints.NONE;
-        c.anchor = GridBagConstraints.CENTER;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        dialog.getContentPane().add(btn, c);
-        dialog.setSize(mvp.getBestWidth(), mvp.getBestHeight() + 75);
-        dialog.validate();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        new EntityReadoutDialog(frame, true, ustatus.getEntity()).setVisible(true);
     }
 
     private void editUnit(UUID id, int idx, boolean salvage) {
@@ -1728,10 +1698,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
                 : tracker.getCampaign().getPerson(status.getId());
         if (person == null) {
-            MekHQ.getLogger().error(getClass(), "showPerson",
-                    "Failed to show person after selecting view personnel for a "
-                            + (isPrisoner ? "Prisoner" : "member of the force") +
-                            " because the person could not be found.");
+            MekHQ.getLogger().error("Failed to show person after selecting view personnel for a "
+                    + (isPrisoner ? "Prisoner" : "member of the force") +
+                    " because the person could not be found.");
             return;
         }
         PersonViewPanel personViewPanel = new PersonViewPanel(person, tracker.getCampaign(),

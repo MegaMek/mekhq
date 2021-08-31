@@ -19,7 +19,6 @@
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.personnel.Person;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -39,21 +38,6 @@ public class LogEntryController {
     private static final Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
     private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
     private static final Map<String, Pattern> patternCache = new HashMap<>();
-
-    /**
-     * Generates a string with the rank of the person
-     * @param person whose rank we want to generate the string
-     * @return string with the rank
-     */
-    public static String generateRankEntryString(Person person) {
-        String rankEntry = "";
-        if (person.getRankNumeric() > 0) {
-            String message = logEntriesResourceMap.getString("asA.text");
-            rankEntry = MessageFormat.format(message, person.getRankName());
-        }
-
-        return rankEntry;
-    }
 
     private static Pattern compilePattern(String key, Supplier<String> regex) {
         Pattern pattern = patternCache.get(key);
@@ -97,7 +81,7 @@ public class LogEntryController {
         if (foundExpressionWithOneVariable("spouseKia.text", description) ||
                 foundExpressionWithOneVariable("divorcedFrom.text", description) ||
                 foundExpressionWithOneVariable("marries.text", description) ||
-                foundExpressionWithOneVariable("gained.text", description) ||
+                foundExpressionWithOneVariable("gainedSPA.text", description) ||
                 foundSingleExpression("spouseConceived.text", description) ||
                 foundExpressionWithOneVariable("spouseConceived.text", description) ||
                 foundSingleExpression("ourChildBorn.text", description) ||

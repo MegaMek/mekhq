@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,9 +34,11 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
@@ -46,7 +48,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
+import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -62,59 +64,61 @@ public class PersonnelTableModel extends DataTableModel {
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
 
-    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
-    public static final int COL_GIVEN_NAME      = 1;
+    public static final int COL_FIRST_NAME      = 1;
     public static final int COL_LAST_NAME       = 2;
-    public static final int COL_SURNAME         = 3;
-    public static final int COL_BLOODNAME       = 4;
-    public static final int COL_HONORIFIC       = 5;
-    public static final int COL_CALL            = 6;
-    public static final int COL_AGE             = 7;
-    public static final int COL_STATUS          = 8;
-    public static final int COL_GENDER          = 9;
-    public static final int COL_SKILL           = 10;
-    public static final int COL_TYPE            = 11;
-    public static final int COL_ASSIGN          = 12;
-    public static final int COL_FORCE           = 13;
-    public static final int COL_DEPLOY          = 14;
-    public static final int COL_MECH            = 15;
-    public static final int COL_AERO            = 16;
-    public static final int COL_JET             = 17;
-    public static final int COL_VEE             = 18;
-    public static final int COL_VTOL            = 19;
-    public static final int COL_NVEE            = 20;
-    public static final int COL_SPACE           = 21;
-    public static final int COL_ARTY            = 22;
-    public static final int COL_GUN_BA          = 23;
-    public static final int COL_SMALL_ARMS      = 24;
-    public static final int COL_ANTI_MECH       = 25;
-    public static final int COL_TACTICS         = 26;
-    public static final int COL_STRATEGY        = 27;
-    public static final int COL_TECH_MECH       = 28;
-    public static final int COL_TECH_AERO       = 29;
-    public static final int COL_TECH_VEE        = 30;
-    public static final int COL_TECH_BA         = 31;
-    public static final int COL_MEDICAL         = 32;
-    public static final int COL_ADMIN           = 33;
-    public static final int COL_NEG             = 34;
-    public static final int COL_SCROUNGE        = 35;
-    public static final int COL_HITS            = 36;
-    public static final int COL_KILLS           = 37;
-    public static final int COL_SALARY          = 38;
-    public static final int COL_XP              = 39;
-    public static final int COL_ORIGIN_FACTION  = 40;
-    public static final int COL_ORIGIN_PLANET   = 41;
-    public static final int COL_RECRUIT_DATE    = 42;
-    public static final int COL_DEATH_DATE      = 43;
+    public static final int COL_PRENOMINAL      = 3;
+    public static final int COL_GIVEN_NAME      = 4;
+    public static final int COL_SURNAME         = 5;
+    public static final int COL_BLOODNAME       = 6;
+    public static final int COL_POSTNOMINAL     = 7;
+    public static final int COL_CALL            = 8;
+    public static final int COL_AGE             = 9;
+    public static final int COL_STATUS          = 10;
+    public static final int COL_GENDER          = 11;
+    public static final int COL_SKILL           = 12;
+    public static final int COL_TYPE            = 13;
+    public static final int COL_ASSIGN          = 14;
+    public static final int COL_FORCE           = 15;
+    public static final int COL_DEPLOY          = 16;
+    public static final int COL_MECH            = 17;
+    public static final int COL_AERO            = 18;
+    public static final int COL_JET             = 19;
+    public static final int COL_VEE             = 20;
+    public static final int COL_VTOL            = 21;
+    public static final int COL_NVEE            = 22;
+    public static final int COL_SPACE           = 23;
+    public static final int COL_ARTY            = 24;
+    public static final int COL_GUN_BA          = 25;
+    public static final int COL_SMALL_ARMS      = 26;
+    public static final int COL_ANTI_MECH       = 27;
+    public static final int COL_TACTICS         = 28;
+    public static final int COL_STRATEGY        = 29;
+    public static final int COL_LEADERSHIP      = 30;
+    public static final int COL_TECH_MECH       = 31;
+    public static final int COL_TECH_AERO       = 32;
+    public static final int COL_TECH_VEE        = 33;
+    public static final int COL_TECH_BA         = 34;
+    public static final int COL_MEDICAL         = 35;
+    public static final int COL_ADMIN           = 36;
+    public static final int COL_NEG             = 37;
+    public static final int COL_SCROUNGE        = 38;
+    public static final int COL_HITS            = 39;
+    public static final int COL_KILLS           = 40;
+    public static final int COL_SALARY          = 41;
+    public static final int COL_XP              = 42;
+    public static final int COL_ORIGIN_FACTION  = 43;
+    public static final int COL_ORIGIN_PLANET   = 44;
+    public static final int COL_RECRUIT_DATE    = 45;
+    public static final int COL_DEATH_DATE      = 46;
     //Export Only Columns
-    public static final int COL_TOUGH           = 44;
-    public static final int COL_EDGE            = 45;
-    public static final int COL_NABIL           = 46;
-    public static final int COL_NIMP            = 47;
-    public static final int COL_PORTRAIT        = 48;
-    public static final int N_COL               = 49;
+    public static final int COL_TOUGH           = 47;
+    public static final int COL_EDGE            = 48;
+    public static final int COL_NABIL           = 49;
+    public static final int COL_NIMP            = 50;
+    public static final int COL_PORTRAIT        = 51;
+    public static final int N_COL               = 52;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -155,14 +159,18 @@ public class PersonnelTableModel extends DataTableModel {
         switch (column) {
             case COL_RANK:
                 return resources.getString("col_rank.text");
-            case COL_GIVEN_NAME:
-                return resources.getString("col_given_name.text");
+            case COL_FIRST_NAME:
+                return resources.getString("col_first_name.text");
             case COL_LAST_NAME:
                 return resources.getString("col_last_name.text");
+            case COL_PRENOMINAL:
+                return resources.getString("col_prenominal.text");
+            case COL_GIVEN_NAME:
+                return resources.getString("col_given_name.text");
             case COL_SURNAME:
                 return resources.getString("col_surname.text");
-            case COL_HONORIFIC:
-                return resources.getString("col_honorific.text");
+            case COL_POSTNOMINAL:
+                return resources.getString("col_postnominal.text");
             case COL_CALL:
                 return resources.getString("col_call.text");
             case COL_BLOODNAME:
@@ -201,6 +209,8 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_tactics.text");
             case COL_STRATEGY:
                 return resources.getString("col_strategy.text");
+            case COL_LEADERSHIP:
+                return resources.getString("col_leadership.text");
             case COL_TECH_MECH:
                 return resources.getString("col_tech_mech.text");
             case COL_TECH_AERO:
@@ -259,6 +269,7 @@ public class PersonnelTableModel extends DataTableModel {
     public int getColumnWidth(int c) {
         switch (c) {
             case COL_GIVEN_NAME:
+            case COL_FIRST_NAME:
             case COL_RANK:
             case COL_DEPLOY:
                 return 70;
@@ -284,11 +295,14 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_SALARY:
                 return SwingConstants.RIGHT;
             case COL_RANK:
-            case COL_GIVEN_NAME:
+            case COL_FIRST_NAME:
             case COL_LAST_NAME:
+            case COL_PRENOMINAL:
+            case COL_GIVEN_NAME:
             case COL_SURNAME:
-            case COL_HONORIFIC:
             case COL_BLOODNAME:
+            case COL_POSTNOMINAL:
+            case COL_CALL:
             case COL_GENDER:
             case COL_TYPE:
             case COL_DEPLOY:
@@ -347,10 +361,14 @@ public class PersonnelTableModel extends DataTableModel {
         switch (col) {
             case COL_RANK:
                 return p.makeHTMLRank();
-            case COL_GIVEN_NAME:
-                return p.getGivenName();
+            case COL_FIRST_NAME:
+                return p.getFirstName();
             case COL_LAST_NAME:
                 return p.getLastName();
+            case COL_PRENOMINAL:
+                return p.getPreNominal();
+            case COL_GIVEN_NAME:
+                return p.getGivenName();
             case COL_SURNAME: {
                 toReturn = p.getSurname();
                 if (StringUtil.isNullOrEmpty(toReturn)) {
@@ -381,8 +399,8 @@ public class PersonnelTableModel extends DataTableModel {
                                     : resources.getString("surname_crew.text"));
                 }
             }
-            case COL_HONORIFIC:
-                return p.getHonorific();
+            case COL_POSTNOMINAL:
+                return p.getPostNominal();
             case COL_CALL:
                 return p.getCallsign();
             case COL_BLOODNAME:
@@ -514,6 +532,11 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_STRATEGY:
                 if (p.hasSkill(SkillType.S_STRATEGY)) {
                     return Integer.toString(p.getSkill(SkillType.S_STRATEGY).getFinalSkillValue());
+                }
+                break;
+            case COL_LEADERSHIP:
+                if (p.hasSkill(SkillType.S_LEADER)) {
+                    return Integer.toString(p.getSkill(SkillType.S_LEADER).getFinalSkillValue());
                 }
                 break;
             case COL_TECH_MECH:
@@ -674,12 +697,8 @@ public class PersonnelTableModel extends DataTableModel {
         }
     }
 
-    public TableCellRenderer getRenderer(boolean graphic) {
-        if (graphic) {
-            return new PersonnelTableModel.VisualRenderer();
-        } else {
-            return new PersonnelTableModel.Renderer();
-        }
+    public TableCellRenderer getRenderer(final @Nullable PersonnelTabView view) {
+        return ((view != null) && view.isGraphic()) ? new VisualRenderer() : new Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {
@@ -697,15 +716,15 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (isDeployed(actualRow)) {
-                    colors.getDeployed().getColor().ifPresent(this::setBackground);
-                    colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
                         || getPerson(actualRow).hasInjuries(true)) {
-                    colors.getInjured().getColor().ifPresent(this::setBackground);
-                    colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
+                    setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
-                    colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
+                    setBackground(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

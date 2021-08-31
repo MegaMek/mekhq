@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
+    <contractTypeName>Pirate Hunting</contractTypeName>
     <alliedFacilityCount>0</alliedFacilityCount>
     <briefing>Locate and destroy pirate facilities.</briefing>
-    <contractTypeName>Pirate Hunting</contractTypeName>
     <hostileFacilityCount>0</hostileFacilityCount>
 	<scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>
@@ -19,13 +19,14 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>FacilityDestruction</objectiveType>
-		<objectiveCount>-0.3</objectiveCount>
+		<objectiveCount>-0.33</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
 		<objectiveType>AlliedFacilityControl</objectiveType>
-		<objectiveCount>-0.3</objectiveCount>
+		<objectiveCount>-0.33</objectiveCount>
         </objectiveParameter>
 	<objectiveParameter>
+		<objectiveCount>-0.33</objectiveCount>
 		<objectiveType>AnyScenarioVictory</objectiveType>
 		<objectiveScenarios>
                 	<objectiveScenario>Destroy Grounded Dropship.xml</objectiveScenario>

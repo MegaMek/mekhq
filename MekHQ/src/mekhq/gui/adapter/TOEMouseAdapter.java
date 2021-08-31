@@ -18,26 +18,13 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.*;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
-import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.gui.utilities.JMenuHelpers;
-
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -51,13 +38,29 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.Vector;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
@@ -262,7 +265,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         }
-                        if (!cantTech.equals("")) {
+
+                        if (!cantTech.isBlank()) {
                             cantTech += "You will need to assign a tech manually.";
                             JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                         }
@@ -359,8 +363,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             if (singleForce != null) {
                 CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
                         singleForce.getCamouflageOrElse(gui.getCampaign().getCamouflage()), true);
-
-                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                if (ccd.showDialog().isCancelled()) {
                     return;
                 }
                 singleForce.setCamouflage(ccd.getSelectedItem());
@@ -910,23 +913,21 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (StaticChecks.areAllForcesUndeployed(forces) && StaticChecks.areAllCombatForces(forces)) {
                 menu = new JMenu("Deploy Force");
-                menu.setEnabled(false);
+
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getActiveMissions()) {
-                    missionMenu = new JMenu(m.getName());
-                    for (Scenario s : m.getScenarios()) {
-                        if (s.isCurrent()) {
-                            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                                    && (s instanceof AtBScenario)
-                                    && !((AtBScenario) s).canDeployForces(forces, gui.getCampaign())) {
-                                continue;
-                            }
-                            menuItem = new JMenuItem(s.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + s.getId() + "|" + forceIds);
-                            menuItem.addActionListener(this);
-                            missionMenu.add(menuItem);
-                            menu.setEnabled(true);
+                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                    missionMenu = new JMenu(mission.getName());
+                    for (final Scenario scenario : mission.getCurrentScenarios()) {
+                        if (scenario.isCloaked()
+                                || (gui.getCampaign().getCampaignOptions().getUseAtB()
+                                && (scenario instanceof AtBScenario)
+                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign()))) {
+                            continue;
                         }
+                        menuItem = new JMenuItem(scenario.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + "|" + forceIds);
+                        menuItem.addActionListener(this);
+                        missionMenu.add(menuItem);
                     }
                     JMenuHelpers.addMenuIfNonEmpty(menu, missionMenu);
                 }
@@ -1098,9 +1099,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForSlaves()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForSlaves()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1123,9 +1130,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(true);
                 networkMenu.add(menuItem);
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForMasters()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForMasters()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1170,9 +1183,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotNC3Networked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableNC3Networks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableNC3Networks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1217,9 +1236,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotC3iNetworked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableC3iNetworks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableC3iNetworks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1265,30 +1290,28 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 //Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getActiveMissions()) {
-                    missionMenu = new JMenu(m.getName());
-                    for (Scenario s : m.getScenarios()) {
-                        if (s.isCurrent()) {
-                            if (gui.getCampaign().getCampaignOptions()
-                                    .getUseAtB()
-                                    && s instanceof AtBScenario
-                                    && !((AtBScenario) s)
-                                    .canDeployUnits(units,
-                                            gui.getCampaign())) {
-                                continue;
-                            }
-                            menuItem = new JMenuItem(s.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
-                                    + s.getId() + "|" + unitIds);
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(true);
-                            missionMenu.add(menuItem);
+                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                    missionMenu = new JMenu(mission.getName());
+                    for (final Scenario scenario : mission.getCurrentScenarios()) {
+                        if (scenario.isCloaked() ||
+                                (gui.getCampaign().getCampaignOptions().getUseAtB()
+                                && (scenario instanceof AtBScenario)
+                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign()))) {
+                            continue;
                         }
+                        menuItem = new JMenuItem(scenario.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
+                                + scenario.getId() + "|" + unitIds);
+                        menuItem.addActionListener(this);
+                        missionMenu.add(menuItem);
                     }
                     if (missionMenu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(missionMenu, 30);
                     }
-                    menu.add(missionMenu);
+
+                    if (missionMenu.getItemCount() > 0) {
+                        menu.add(missionMenu);
+                    }
                 }
                 // Scroll bar in case the list is too long for one screen
                 if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {

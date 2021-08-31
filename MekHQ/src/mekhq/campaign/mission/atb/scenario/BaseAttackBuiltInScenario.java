@@ -27,7 +27,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -134,15 +134,15 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addBotForce(civilianForce);
 
         ArrayList<Entity> turretForce = new ArrayList<>();
-        
+
         if (isAttacker()) {
             addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                    campaign);
+                    campaign, getContract(campaign).getEnemy());
         } else {
             addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
-                    campaign);
+                    campaign, getContract(campaign).getEmployerFaction());
         }
-        
+
         addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
 
         /* Roll 2x on bot lances roll */
@@ -189,8 +189,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // while completing this scenario on others just puts the morale to
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
-            if ((contract.getRequiredLanceType() == AtBLanceRole.FIGHTING)
-                    || (contract.getRequiredLanceType() == AtBLanceRole.SCOUTING)) {
+            final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
+            if (requiredLanceRole.isFighting() || requiredLanceRole.isScouting()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {

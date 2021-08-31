@@ -26,7 +26,7 @@
 			<deploymentZone>8</deploymentZone>
 			<deploymentZone>9</deploymentZone>
 		</deploymentZones>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
@@ -38,6 +38,7 @@
 		<objectiveLinkedForces>
                     <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
                 </objectiveLinkedForces>
+		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
 	</forceDefinition>

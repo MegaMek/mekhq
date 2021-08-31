@@ -121,8 +121,6 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
 
@@ -244,7 +242,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblAllyRating, gridBagConstraintsLabels);
 
         if (contract instanceof AtBContract) {
-            JLabel txtAllyRating = new JLabel(skillNames[((AtBContract) contract).getAllySkill()]
+            JLabel txtAllyRating = new JLabel(((AtBContract) contract).getAllySkill()
                     + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             gridBagConstraintsText.gridy = y;
@@ -255,7 +253,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemyRating, gridBagConstraintsLabels);
 
-            JLabel txtEnemyRating = new JLabel(skillNames[((AtBContract) contract).getEnemySkill()]
+            JLabel txtEnemyRating = new JLabel(((AtBContract) contract).getEnemySkill()
                     + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
             gridBagConstraintsText.gridy = y;
@@ -297,7 +295,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
-        txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand = new JLabel(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         txtCommand.setName("txtCommand");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -326,7 +325,8 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             ContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
-                    txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+                    txtCommand.setText(contract.getCommandRights().toString());
+                    txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);

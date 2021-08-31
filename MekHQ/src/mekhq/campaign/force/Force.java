@@ -33,8 +33,10 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -74,7 +76,6 @@ public class Force implements Serializable {
     private Force parentForce;
     private Vector<Force> subForces;
     private Vector<UUID> units;
-    private Vector<Integer> oldUnits;
     private int scenarioId;
 
     protected UUID techId;
@@ -90,7 +91,6 @@ public class Force implements Serializable {
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
-        this.oldUnits = new Vector<>();
         this.scenarioId = -1;
 
         // Initialize the Force Icon
@@ -207,15 +207,46 @@ public class Force implements Serializable {
     }
 
     /**
+     * @return A String representation of the full hierarchical force including ID for MM export
+     */
+    public String getFullMMName() {
+        var ancestors = new ArrayList<Force>();
+        ancestors.add(this);
+        var p = parentForce;
+        while (p != null) {
+            ancestors.add(p);
+            p = p.parentForce;
+        }
+
+        var result = "";
+        int id = 0;
+        for (int i = ancestors.size() - 1; i >= 0; i--) {
+            Force ancestor = ancestors.get(i);
+            id = 17 * id + ancestor.id + 1;
+            result += "\\" + ancestor.getName() + "|" + id;
+        }
+        // Remove the backslash at the start
+        if (result.length() > 0) {
+            result = result.substring(1);
+        }
+        return result;
+    }
+
+    /**
      * Add a subforce to the subforce vector. In general, this
      * should not be called directly to add forces to the campaign
      * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}
      * instead
      * The boolean assignParent here is set to false when assigning forces from the
      * TOE to a scenario, because we don't want to switch this forces real parent
-     * @param sub
+     * @param sub the subforce to add, which may be null from a load failure. This returns without
+     *            adding in that case
      */
-    public void addSubForce(Force sub, boolean assignParent) {
+    public void addSubForce(final @Nullable Force sub, boolean assignParent) {
+        if (sub == null) {
+            return;
+        }
+
         if (assignParent) {
             sub.setParentForce(this);
         }
@@ -384,14 +415,8 @@ public class Force implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
-        if (!getCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageCategory", getCamouflage().getCategory());
-        }
-        if (!getCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camouflageFilename", getCamouflage().getFilename());
-        }
-        // TODO : Java 11 : swap to isBlank
-        if (!getDescription().trim().isEmpty()) {
+        getCamouflage().writeToXML(pw1, indent);
+        if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
@@ -413,7 +438,7 @@ public class Force implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
-        
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
 
         if (units.size() > 0) {
@@ -434,14 +459,13 @@ public class Force implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "force");
     }
 
-    public static Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        Force retVal = null;
+    public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        Force retVal = new Force("");
         NamedNodeMap attrs = wn.getAttributes();
         Node idNameNode = attrs.getNamedItem("id");
         String idString = idNameNode.getTextContent();
 
         try {
-            retVal = new Force("");
             NodeList nl = wn.getChildNodes();
             retVal.id = Integer.parseInt(idString);
 
@@ -449,9 +473,11 @@ public class Force implements Serializable {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
+                    retVal.setCamouflage(Camouflage.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) { // Legacy - 0.49.3 removal
                     retVal.getCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageFilename")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageFilename")) { // Legacy - 0.49.3 removal
                     retVal.getCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.setDescription(wn2.getTextContent().trim());
@@ -491,10 +517,12 @@ public class Force implements Serializable {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             MekHQ.getLogger().error(ex);
+            return null;
+        }
+
+        if (version.isLowerThan("0.49.3")) {
+            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         return retVal;
@@ -591,18 +619,6 @@ public class Force implements Serializable {
         return Objects.hash(getId(), getFullName());
     }
 
-    public void fixIdReferences(Map<Integer, UUID> uHash) {
-        for (int oid : oldUnits) {
-            UUID nid = uHash.get(oid);
-            if (null != nid) {
-                units.add(nid);
-            }
-        }
-        for (Force sub : subForces) {
-            sub.fixIdReferences(uHash);
-        }
-    }
-    
     /**
      * Calculates the force's total BV, including sub forces.
      * @param c The working campaign.
@@ -626,7 +642,7 @@ public class Force implements Serializable {
 
         return bvTotal;
     }
-    
+
     /**
      * Calculates the unit type most represented in this force
      * and all subforces.
@@ -637,18 +653,18 @@ public class Force implements Serializable {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
-        
+
         for (UUID id : getUnits()) {
             int unitType = c.getUnit(id).getEntity().getUnitType();
 
-            unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
-            
+            unitTypeBuckets.merge(unitType, 1, Integer::sum);
+
             if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
                 biggestBucketCount = unitTypeBuckets.get(unitType);
                 biggestBucketID = unitType;
             }
         }
-        
+
         return biggestBucketID;
     }
 }

@@ -8,7 +8,7 @@
 MekHQ/MekHQ.iml
 
 # Build directories
-MekHQ/pkgdir
+MekHQ/pkgdir/
 /build/
 
 # IDE directories
@@ -22,11 +22,25 @@ MekHQ/.idea/
 /.project
 /properties_local.gradle
 
-MekHQ/out/
-MekHQ/mmconf/mekhq.preferences
-MekHQ/userdata/
 *.sav.gz
-/MekHQ/campaigns
+
+MekHQ/campaigns/
 !/MekHQ/campaigns/Fist and Falcon
 !/MekHQ/campaigns/Sword and Dragon
 !/MekHQ/campaigns/Wolf and Blake
+
+MekHQ/data/images/temp
+
+MekHQ/mmconf/megamek.preferences
+MekHQ/mmconf/megameklab.preferences
+MekHQ/mmconf/mekhq.preferences
+
+MekHQ/out/
+
+MekHQ/userdata/**
+!/MekHQ/userdata/README.md
+!/MekHQ/userdata/data
+/MekHQ/userdata/data/**
+!/MekHQ/userdata/data/universe/
+/MekHQ/userdata/data/universe/**
+!/MekHQ/userdata/data/universe/ranks.xml

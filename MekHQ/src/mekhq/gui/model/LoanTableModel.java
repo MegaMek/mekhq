@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -29,7 +29,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
-import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying active loans
@@ -47,8 +46,6 @@ public class LoanTableModel extends DataTableModel {
     public final static int COL_NLEFT      =   7;
     public final static int COL_NEXT_PAY   =   8;
     public final static int N_COL            = 9;
-
-    private static final transient MekHqColors colors = new MekHqColors();
 
     public LoanTableModel() {
         data = new ArrayList<Loan>();
@@ -94,19 +91,19 @@ public class LoanTableModel extends DataTableModel {
     public Object getValueAt(int row, int col) {
         Loan loan = getLoan(row);
         if (col == COL_DESC) {
-            return loan.getDescription();
+            return loan.toString();
         } else if (col == COL_COLLATERAL) {
-            return loan.getCollateralAmount().toAmountAndSymbolString();
+            return loan.determineCollateralAmount().toAmountAndSymbolString();
         } else if (col == COL_VALUE) {
-            return loan.getRemainingValue().toAmountAndSymbolString();
+            return loan.determineRemainingValue().toAmountAndSymbolString();
         } else if (col == COL_PAYMENT) {
             return loan.getPaymentAmount().toAmountAndSymbolString();
         } else if (col == COL_PRINCIPAL) {
             return loan.getPrincipal().toAmountAndSymbolString();
         } else if (col == COL_SCHEDULE) {
-            return Finances.getScheduleName(loan.getPaymentSchedule());
+            return loan.getFinancialTerm();
         } else if (col == COL_RATE) {
-            return loan.getInterestRate() + "%";
+            return loan.getRate() + "%";
         } else if (col == COL_NLEFT) {
             return loan.getRemainingPayments();
         } else if (col == COL_NEXT_PAY) {
@@ -175,8 +172,8 @@ public class LoanTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (loan.isOverdue()) {
-                    colors.getLoanOverdue().getColor().ifPresent(this::setBackground);
-                    colors.getLoanOverdue().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getLoanOverdueForeground());
+                    setBackground(MekHQ.getMekHQOptions().getLoanOverdueBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }

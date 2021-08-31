@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -78,8 +79,12 @@ public class MissingTurret extends MissingPart {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-                weight = Double.parseDouble(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("weight")) {
+                    weight = Double.parseDouble(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

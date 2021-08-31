@@ -1,5 +1,9 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>This location is defended by additional fixed turrets.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
@@ -14,7 +18,7 @@
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
 		</deploymentZones>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>0</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>

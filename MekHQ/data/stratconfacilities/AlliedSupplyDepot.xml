@@ -1,6 +1,8 @@
 <StratconFacility>
+	<capturedDefinition>HostileSupplyDepot.xml</capturedDefinition>
 	<displayableName>Supply Depot</displayableName>
         <facilityType>SupplyDepot</facilityType>
         <owner>Allied</owner>
+	<weeklySPModifier>1</weeklySPModifier>
         <visible>true</visible>
 </StratconFacility>

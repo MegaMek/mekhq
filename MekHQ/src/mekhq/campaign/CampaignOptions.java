@@ -25,20 +25,16 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
@@ -76,25 +72,13 @@ public class CampaignOptions implements Serializable {
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
 
-    public static final int REPAIR_SYSTEM_STRATOPS = 0;
-    public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
-
-    public static final int PLANET_ACQUISITION_ALL = 0;
-    public static final int PLANET_ACQUISITION_NEUTRAL = 1;
-    public static final int PLANET_ACQUISITION_ALLY = 2;
-    public static final int PLANET_ACQUISITION_SELF = 3;
     //endregion Magic Numbers and Constants
 
     //region Unlisted Variables
-    private int repairSystem;
-    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"}; // FIXME: This needs to be localized
-
     //Mass Repair/Salvage Options
     private boolean massRepairUseRepair;
     private boolean massRepairUseSalvage;
@@ -155,7 +139,7 @@ public class CampaignOptions implements Serializable {
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
     private int maxJumpsPlanetaryAcquisition;
-    private int planetAcquisitionFactionLimit;
+    private PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
     private boolean planetAcquisitionNoClanCrossover;
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
@@ -190,6 +174,9 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useTransfers;
+    private boolean personnelLogSkillGain;
+    private boolean personnelLogAbilityGain;
+    private boolean personnelLogEdgeGain;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -198,6 +185,7 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInRankDisplayFormat;
     private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
+    private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
 
     // Medical
@@ -274,10 +262,18 @@ public class CampaignOptions implements Serializable {
     private boolean showPeacetimeCost;
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
-    private double clanPriceModifier;
-    private double[] usedPartsValue;
-    private double damagedPartsValue;
-    private double canceledOrderReimbursement;
+
+    // Price Multipliers
+    private double commonPartPriceMultiplier;
+    private double innerSphereUnitPriceMultiplier;
+    private double innerSpherePartPriceMultiplier;
+    private double clanUnitPriceMultiplier;
+    private double clanPartPriceMultiplier;
+    private double mixedTechUnitPriceMultiplier;
+    private double[] usedPartPriceMultipliers;
+    private double damagedPartsValueMultiplier;
+    private double unrepairablePartsValueMultiplier;
+    private double cancelledOrderRefundMultiplier;
     //endregion Finance Tab
 
     //region Mercenary Tab
@@ -327,7 +323,8 @@ public class CampaignOptions implements Serializable {
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
-    //region Personnel Market Tab
+    //region Markets Tab
+    // Personnel Market
     private String personnelMarketName;
     private boolean personnelMarketReportRefresh;
     private int personnelMarketRandomEliteRemoval;
@@ -336,15 +333,22 @@ public class CampaignOptions implements Serializable {
     private int personnelMarketRandomGreenRemoval;
     private int personnelMarketRandomUltraGreenRemoval;
     private double personnelMarketDylansWeight;
-    //endregion Personnel Market Tab
+
+    // Unit Market
+    private UnitMarketMethod unitMarketMethod;
+    private boolean unitMarketRegionalMechVariations;
+    private boolean instantUnitMarketDelivery;
+    private boolean unitMarketReportRefresh;
+
+    // Contract Market
+    private ContractMarketMethod contractMarketMethod;
+    private boolean contractMarketReportRefresh;
+    //endregion Markets Tab
 
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
     private int skillLevel;
-
-    // AtB Module: Unit Market // TODO : Fully Implement Me
-    private boolean useAtBUnitMarket;
 
     // Unit Administration
     private boolean useShareSystem;
@@ -362,9 +366,6 @@ public class CampaignOptions implements Serializable {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
-    private boolean instantUnitMarketDelivery;
-    private boolean contractMarketReportRefresh;
-    private boolean unitMarketReportRefresh;
 
     // Contract Operations
     private int searchRadius;
@@ -403,6 +404,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private int fixedMapChance;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -412,8 +414,6 @@ public class CampaignOptions implements Serializable {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
         //region Unlisted Variables
-        repairSystem = REPAIR_SYSTEM_STRATOPS;
-
         //Mass Repair/Salvage Options
         massRepairUseRepair = true;
         massRepairUseSalvage = true;
@@ -478,7 +478,7 @@ public class CampaignOptions implements Serializable {
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
         maxJumpsPlanetaryAcquisition = 2;
-        planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
+        planetAcquisitionFactionLimit = PlanetaryAcquisitionFactionLimit.NEUTRAL;
         planetAcquisitionNoClanCrossover = true;
         noClanPartsFromIS = true;
         penaltyClanPartsFromIS = 4;
@@ -532,6 +532,9 @@ public class CampaignOptions implements Serializable {
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseTransfers(true);
+        setPersonnelLogSkillGain(false);
+        setPersonnelLogAbilityGain(false);
+        setPersonnelLogEdgeGain(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -540,6 +543,7 @@ public class CampaignOptions implements Serializable {
         setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
         setUseRetirementDateTracking(false);
         setTrackTotalEarnings(false);
+        setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
 
         // Medical
@@ -663,16 +667,18 @@ public class CampaignOptions implements Serializable {
         showPeacetimeCost = false;
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
-        clanPriceModifier = 1.0;
-        usedPartsValue = new double[6];
-        usedPartsValue[0] = 0.1;
-        usedPartsValue[1] = 0.2;
-        usedPartsValue[2] = 0.3;
-        usedPartsValue[3] = 0.5;
-        usedPartsValue[4] = 0.7;
-        usedPartsValue[5] = 0.9;
-        damagedPartsValue = 0.33;
-        canceledOrderReimbursement = 0.5;
+
+        // Price Multipliers
+        setCommonPartPriceMultiplier(1.0);
+        setInnerSphereUnitPriceMultiplier(1.0);
+        setInnerSpherePartPriceMultiplier(1.0);
+        setClanUnitPriceMultiplier(1.0);
+        setClanPartPriceMultiplier(1.0);
+        setMixedTechUnitPriceMultiplier(1.0);
+        setUsedPartPriceMultipliers(0.1, 0.2, 0.3, 0.5, 0.7, 0.9);
+        setDamagedPartsValueMultiplier(0.33);
+        setUnrepairablePartsValueMultiplier(0.1);
+        setCancelledOrderRefundMultiplier(0.5);
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -730,24 +736,32 @@ public class CampaignOptions implements Serializable {
         assignPortraitOnRoleChange = false;
         //endregion Name and Portrait Generation Tab
 
-        //region Personnel Market Tab
-        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
-        personnelMarketReportRefresh = true;
-        personnelMarketRandomEliteRemoval = 10;
-        personnelMarketRandomVeteranRemoval = 8;
-        personnelMarketRandomRegularRemoval = 6;
-        personnelMarketRandomGreenRemoval = 4;
-        personnelMarketRandomUltraGreenRemoval = 4;
-        personnelMarketDylansWeight = 0.3;
-        //endregion Personnel Market Tab
+        //region Markets Tab
+        // Personnel Market
+        setPersonnelMarketType(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
+        setPersonnelMarketReportRefresh(true);
+        setPersonnelMarketRandomEliteRemoval(10);
+        setPersonnelMarketRandomVeteranRemoval(8);
+        setPersonnelMarketRandomRegularRemoval(6);
+        setPersonnelMarketRandomGreenRemoval(4);
+        setPersonnelMarketRandomUltraGreenRemoval(4);
+        setPersonnelMarketDylansWeight(0.3);
+
+        // Unit Market
+        setUnitMarketMethod(UnitMarketMethod.NONE);
+        setUnitMarketRegionalMechVariations(true);
+        setInstantUnitMarketDelivery(false);
+        setUnitMarketReportRefresh(true);
+
+        // Contract Market
+        setContractMarketMethod(ContractMarketMethod.NONE);
+        setContractMarketReportRefresh(true);
+        //endregion Markets Tab
 
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
         skillLevel = 2;
-
-        // AtB Module: Unit Market
-        useAtBUnitMarket = false;
 
         // Unit Administration
         useShareSystem = false;
@@ -765,9 +779,6 @@ public class CampaignOptions implements Serializable {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
-        instantUnitMarketDelivery = false;
-        contractMarketReportRefresh = true;
-        unitMarketReportRefresh = true;
 
         // Contract Operations
         searchRadius = 800;
@@ -802,6 +813,7 @@ public class CampaignOptions implements Serializable {
         opforAeroChance = 5;
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
+        setFixedMapChance(25);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -985,6 +997,30 @@ public class CampaignOptions implements Serializable {
     public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
     }
+
+    public boolean isPersonnelLogSkillGain() {
+        return personnelLogSkillGain;
+    }
+
+    public void setPersonnelLogSkillGain(final boolean personnelLogSkillGain) {
+        this.personnelLogSkillGain = personnelLogSkillGain;
+    }
+
+    public boolean isPersonnelLogAbilityGain() {
+        return personnelLogAbilityGain;
+    }
+
+    public void setPersonnelLogAbilityGain(final boolean personnelLogAbilityGain) {
+        this.personnelLogAbilityGain = personnelLogAbilityGain;
+    }
+
+    public boolean isPersonnelLogEdgeGain() {
+        return personnelLogEdgeGain;
+    }
+
+    public void setPersonnelLogEdgeGain(final boolean personnelLogEdgeGain) {
+        this.personnelLogEdgeGain = personnelLogEdgeGain;
+    }
     //endregion General Personnel
 
     //region Expanded Personnel Information
@@ -1061,7 +1097,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to track the total earnings of personnel
      */
-    public boolean trackTotalEarnings() {
+    public boolean isTrackTotalEarnings() {
         return trackTotalEarnings;
     }
 
@@ -1070,6 +1106,21 @@ public class CampaignOptions implements Serializable {
      */
     public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
+    }
+
+    /**
+     * @return whether or not to track the total experience earnings of personnel
+     */
+    public boolean isTrackTotalXPEarnings() {
+        return trackTotalXPEarnings;
+    }
+
+    /**
+     * @param trackTotalXPEarnings the new value for whether or not to track total experience
+     *                             earnings for personnel
+     */
+    public void setTrackTotalXPEarnings(final boolean trackTotalXPEarnings) {
+        this.trackTotalXPEarnings = trackTotalXPEarnings;
     }
 
     /**
@@ -1736,42 +1787,208 @@ public class CampaignOptions implements Serializable {
         newFinancialYearFinancesToCSVExport = b;
     }
 
-    public double getClanPriceModifier() {
-        return clanPriceModifier;
+    //region Price Multipliers
+    public double getCommonPartPriceMultiplier() {
+        return commonPartPriceMultiplier;
     }
 
-    public void setClanPriceModifier(double d) {
-        this.clanPriceModifier = d;
+    public void setCommonPartPriceMultiplier(final double commonPartPriceMultiplier) {
+        this.commonPartPriceMultiplier = commonPartPriceMultiplier;
     }
 
-    public double getUsedPartsValue(int quality) {
-        return usedPartsValue[quality];
+    public double getInnerSphereUnitPriceMultiplier() {
+        return innerSphereUnitPriceMultiplier;
     }
 
-    public void setUsedPartsValue(double d, int quality) {
-        this.usedPartsValue[quality] = d;
+    public void setInnerSphereUnitPriceMultiplier(final double innerSphereUnitPriceMultiplier) {
+        this.innerSphereUnitPriceMultiplier = innerSphereUnitPriceMultiplier;
     }
 
-    public double getDamagedPartsValue() {
-        return damagedPartsValue;
+    public double getInnerSpherePartPriceMultiplier() {
+        return innerSpherePartPriceMultiplier;
     }
 
-    public void setDamagedPartsValue(double d) {
-        this.damagedPartsValue = d;
+    public void setInnerSpherePartPriceMultiplier(final double innerSpherePartPriceMultiplier) {
+        this.innerSpherePartPriceMultiplier = innerSpherePartPriceMultiplier;
     }
 
-    public double GetCanceledOrderReimbursement() {
-        return canceledOrderReimbursement;
+    public double getClanUnitPriceMultiplier() {
+        return clanUnitPriceMultiplier;
     }
 
-    public void setCanceledOrderReimbursement(double d) {
-        this.canceledOrderReimbursement = d;
+    public void setClanUnitPriceMultiplier(final double clanUnitPriceMultiplier) {
+        this.clanUnitPriceMultiplier = clanUnitPriceMultiplier;
     }
+
+    public double getClanPartPriceMultiplier() {
+        return clanPartPriceMultiplier;
+    }
+
+    public void setClanPartPriceMultiplier(final double clanPartPriceMultiplier) {
+        this.clanPartPriceMultiplier = clanPartPriceMultiplier;
+    }
+
+    public double getMixedTechUnitPriceMultiplier() {
+        return mixedTechUnitPriceMultiplier;
+    }
+
+    public void setMixedTechUnitPriceMultiplier(final double mixedTechUnitPriceMultiplier) {
+        this.mixedTechUnitPriceMultiplier = mixedTechUnitPriceMultiplier;
+    }
+
+    public double[] getUsedPartPriceMultipliers() {
+        return usedPartPriceMultipliers;
+    }
+
+    public void setUsedPartPriceMultipliers(final double... usedPartPriceMultipliers) {
+        this.usedPartPriceMultipliers = usedPartPriceMultipliers;
+    }
+
+    public double getDamagedPartsValueMultiplier() {
+        return damagedPartsValueMultiplier;
+    }
+
+    public void setDamagedPartsValueMultiplier(final double damagedPartsValueMultiplier) {
+        this.damagedPartsValueMultiplier = damagedPartsValueMultiplier;
+    }
+
+    public double getUnrepairablePartsValueMultiplier() {
+        return unrepairablePartsValueMultiplier;
+    }
+
+    public void setUnrepairablePartsValueMultiplier(final double unrepairablePartsValueMultiplier) {
+        this.unrepairablePartsValueMultiplier = unrepairablePartsValueMultiplier;
+    }
+
+    public double getCancelledOrderRefundMultiplier() {
+        return cancelledOrderRefundMultiplier;
+    }
+
+    public void setCancelledOrderRefundMultiplier(final double cancelledOrderRefundMultiplier) {
+        this.cancelledOrderRefundMultiplier = cancelledOrderRefundMultiplier;
+    }
+    //endregion Price Multipliers
     //endregion Finances Tab
 
-    public static String getRepairSystemName(int repairSystem) {
-        return REPAIR_SYSTEM_NAMES[repairSystem];
+    //region Markets Tab
+    //region Personnel Market
+    public String getPersonnelMarketType() {
+        return personnelMarketName;
     }
+
+    public void setPersonnelMarketType(final String personnelMarketName) {
+        this.personnelMarketName = personnelMarketName;
+    }
+
+    public boolean getPersonnelMarketReportRefresh() {
+        return personnelMarketReportRefresh;
+    }
+
+    public void setPersonnelMarketReportRefresh(final boolean personnelMarketReportRefresh) {
+        this.personnelMarketReportRefresh = personnelMarketReportRefresh;
+    }
+
+    public int getPersonnelMarketRandomEliteRemoval() {
+        return personnelMarketRandomEliteRemoval;
+    }
+
+    public void setPersonnelMarketRandomEliteRemoval(final int personnelMarketRandomEliteRemoval) {
+        this.personnelMarketRandomEliteRemoval = personnelMarketRandomEliteRemoval;
+    }
+
+    public int getPersonnelMarketRandomVeteranRemoval() {
+        return personnelMarketRandomVeteranRemoval;
+    }
+
+    public void setPersonnelMarketRandomVeteranRemoval(final int personnelMarketRandomVeteranRemoval) {
+        this.personnelMarketRandomVeteranRemoval = personnelMarketRandomVeteranRemoval;
+    }
+
+    public int getPersonnelMarketRandomRegularRemoval() {
+        return personnelMarketRandomRegularRemoval;
+    }
+
+    public void setPersonnelMarketRandomRegularRemoval(final int personnelMarketRandomRegularRemoval) {
+        this.personnelMarketRandomRegularRemoval = personnelMarketRandomRegularRemoval;
+    }
+
+    public int getPersonnelMarketRandomGreenRemoval() {
+        return personnelMarketRandomGreenRemoval;
+    }
+
+    public void setPersonnelMarketRandomGreenRemoval(final int personnelMarketRandomGreenRemoval) {
+        this.personnelMarketRandomGreenRemoval = personnelMarketRandomGreenRemoval;
+    }
+
+    public int getPersonnelMarketRandomUltraGreenRemoval() {
+        return personnelMarketRandomUltraGreenRemoval;
+    }
+
+    public void setPersonnelMarketRandomUltraGreenRemoval(final int personnelMarketRandomUltraGreenRemoval) {
+        this.personnelMarketRandomUltraGreenRemoval = personnelMarketRandomUltraGreenRemoval;
+    }
+
+    public double getPersonnelMarketDylansWeight() {
+        return personnelMarketDylansWeight;
+    }
+
+    public void setPersonnelMarketDylansWeight(final double personnelMarketDylansWeight) {
+        this.personnelMarketDylansWeight = personnelMarketDylansWeight;
+    }
+    //endregion Personnel Market
+
+    //region Unit Market
+    public UnitMarketMethod getUnitMarketMethod() {
+        return unitMarketMethod;
+    }
+
+    public void setUnitMarketMethod(final UnitMarketMethod unitMarketMethod) {
+        this.unitMarketMethod = unitMarketMethod;
+    }
+
+    public boolean useUnitMarketRegionalMechVariations() {
+        return unitMarketRegionalMechVariations;
+    }
+
+    public void setUnitMarketRegionalMechVariations(final boolean unitMarketRegionalMechVariations) {
+        this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
+    }
+
+    public boolean getInstantUnitMarketDelivery() {
+        return instantUnitMarketDelivery;
+    }
+
+    public void setInstantUnitMarketDelivery(final boolean instantUnitMarketDelivery) {
+        this.instantUnitMarketDelivery = instantUnitMarketDelivery;
+    }
+
+    public boolean getUnitMarketReportRefresh() {
+        return unitMarketReportRefresh;
+    }
+
+    public void setUnitMarketReportRefresh(final boolean unitMarketReportRefresh) {
+        this.unitMarketReportRefresh = unitMarketReportRefresh;
+    }
+    //endregion Unit Market
+
+    //region Contract Market
+    public ContractMarketMethod getContractMarketMethod() {
+        return contractMarketMethod;
+    }
+
+    public void setContractMarketMethod(final ContractMarketMethod contractMarketMethod) {
+        this.contractMarketMethod = contractMarketMethod;
+    }
+
+    public boolean getContractMarketReportRefresh() {
+        return contractMarketReportRefresh;
+    }
+
+    public void setContractMarketReportRefresh(final boolean contractMarketReportRefresh) {
+        this.contractMarketReportRefresh = contractMarketReportRefresh;
+    }
+    //endregion Contract Market
+    //endregion Markets Tab
 
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
@@ -1785,21 +2002,6 @@ public class CampaignOptions implements Serializable {
                 return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL:
                 return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
-    }
-
-    public static String getFactionLimitName(int lvl) {
-        switch (lvl) {
-            case PLANET_ACQUISITION_ALL:
-                return "All factions";
-            case PLANET_ACQUISITION_NEUTRAL:
-                return "Neutral or allied factions";
-            case PLANET_ACQUISITION_ALLY:
-                return "Allied factions";
-            case PLANET_ACQUISITION_SELF:
-                return "Only own faction";
             default:
                 return "Unknown";
         }
@@ -1842,14 +2044,6 @@ public class CampaignOptions implements Serializable {
         this.resetToFirstTech = resetToFirstTech;
     }
 
-    public int getRepairSystem() {
-        return repairSystem;
-    }
-
-    public void setRepairSystem(int i) {
-        this.repairSystem = i;
-    }
-
     /**
      * @return true to use the origin faction for personnel names instead of a set faction
      */
@@ -1862,71 +2056,6 @@ public class CampaignOptions implements Serializable {
      */
     public void setUseOriginFactionForNames(boolean useOriginFactionForNames) {
         this.useOriginFactionForNames = useOriginFactionForNames;
-    }
-
-    // Personnel Market
-    public boolean getPersonnelMarketReportRefresh() {
-        return personnelMarketReportRefresh;
-    }
-
-    public void setPersonnelMarketReportRefresh(boolean b) {
-        personnelMarketReportRefresh = b;
-    }
-
-    public String getPersonnelMarketType() {
-        return personnelMarketName;
-    }
-
-    public void setPersonnelMarketType(String t) {
-        personnelMarketName = t;
-    }
-
-    public int getPersonnelMarketRandomEliteRemoval() {
-        return personnelMarketRandomEliteRemoval;
-    }
-
-    public void setPersonnelMarketRandomEliteRemoval(int i) {
-        personnelMarketRandomEliteRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomVeteranRemoval() {
-        return personnelMarketRandomVeteranRemoval;
-    }
-
-    public void setPersonnelMarketRandomVeteranRemoval(int i) {
-        personnelMarketRandomVeteranRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomRegularRemoval() {
-        return personnelMarketRandomRegularRemoval;
-    }
-
-    public void setPersonnelMarketRandomRegularRemoval(int i) {
-        personnelMarketRandomRegularRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomGreenRemoval() {
-        return personnelMarketRandomGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomGreenRemoval(int i) {
-        personnelMarketRandomGreenRemoval = i;
-    }
-
-    public int getPersonnelMarketRandomUltraGreenRemoval() {
-        return personnelMarketRandomUltraGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomUltraGreenRemoval(int i) {
-        personnelMarketRandomUltraGreenRemoval = i;
-    }
-
-    public double getPersonnelMarketDylansWeight() {
-        return personnelMarketDylansWeight;
-    }
-
-    public void setPersonnelMarketDylansWeight(double d) {
-        personnelMarketDylansWeight = d;
     }
 
     public boolean useQuirks() {
@@ -1992,7 +2121,6 @@ public class CampaignOptions implements Serializable {
     public void setSuccessXP(int b) {
         successXP = b;
     }
-
 
     public boolean limitByYear() {
         return limitByYear;
@@ -2250,12 +2378,12 @@ public class CampaignOptions implements Serializable {
         usePlanetaryAcquisition = b;
     }
 
-    public int getPlanetAcquisitionFactionLimit() {
+    public PlanetaryAcquisitionFactionLimit getPlanetAcquisitionFactionLimit() {
         return planetAcquisitionFactionLimit;
     }
 
-    public void setPlanetAcquisitionFactionLimit(int b) {
-        planetAcquisitionFactionLimit = b;
+    public void setPlanetAcquisitionFactionLimit(final PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit) {
+        this.planetAcquisitionFactionLimit = planetAcquisitionFactionLimit;
     }
 
     public boolean disallowPlanetAcquisitionClanCrossover() {
@@ -2474,15 +2602,6 @@ public class CampaignOptions implements Serializable {
 
     public void setUseStratCon(boolean useStratCon) {
         this.useStratCon = useStratCon;
-    }
-
-
-    public boolean getUseAtBUnitMarket() {
-        return useAtBUnitMarket;
-    }
-
-    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
-        this.useAtBUnitMarket = useAtBUnitMarket;
     }
 
     public boolean getUseAero() {
@@ -2725,20 +2844,12 @@ public class CampaignOptions implements Serializable {
         searchRadius = radius;
     }
 
-    public boolean getInstantUnitMarketDelivery() {
-        return instantUnitMarketDelivery;
-    }
-
-    public void setInstantUnitMarketDelivery(boolean instant) {
-        instantUnitMarketDelivery = instant;
-    }
-
     /**
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
      */
-    public int getAtBBattleChance(AtBLanceRole role) {
-        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
+    public int getAtBBattleChance(final AtBLanceRole role) {
+        return role.isUnassigned() ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**
@@ -2857,22 +2968,6 @@ public class CampaignOptions implements Serializable {
 
     public void setLimitLanceNumUnits(boolean limit) {
         limitLanceNumUnits = limit;
-    }
-
-    public boolean getContractMarketReportRefresh() {
-        return contractMarketReportRefresh;
-    }
-
-    public void setContractMarketReportRefresh(boolean refresh) {
-        contractMarketReportRefresh = refresh;
-    }
-
-    public boolean getUnitMarketReportRefresh() {
-        return unitMarketReportRefresh;
-    }
-
-    public void setUnitMarketReportRefresh(boolean refresh) {
-        unitMarketReportRefresh = refresh;
     }
 
     //region Mass Repair/ Mass Salvage
@@ -2998,6 +3093,14 @@ public class CampaignOptions implements Serializable {
         return opforLocalUnitChance;
     }
 
+    public int getFixedMapChance() {
+        return fixedMapChance;
+    }
+
+    public void setFixedMapChance(int fixedMapChance) {
+        this.fixedMapChance = fixedMapChance;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3011,7 +3114,6 @@ public class CampaignOptions implements Serializable {
         //endregion Repair and Maintenance Tab
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
@@ -3052,7 +3154,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", planetAcquisitionFactionLimit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "noClanPartsFromIS", noClanPartsFromIS);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
@@ -3092,6 +3194,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -3100,7 +3205,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
         //endregion Expanded Personnel Information
 
@@ -3163,53 +3269,69 @@ public class CampaignOptions implements Serializable {
         //endregion Procreation
 
         //region Death
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
         //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "infantryDontCount", infantryDontCount);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRepairs", payForRepairs);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForUnits", payForUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForSalaries", payForSalaries);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForOverhead", payForOverhead);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForMaintain", payForMaintain);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellUnits", sellUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellParts", sellParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePercentageMaint", usePercentageMaint);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infantryDontCount", infantryDontCount);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showPeacetimeCost", showPeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
+
+        //region Price Multipliers
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+        //endregion Price Multipliers
         //endregion Finances Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
-                                       personnelMarketRandomEliteRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval",
-                                       personnelMarketRandomVeteranRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomRegularRemoval",
-                                       personnelMarketRandomRegularRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomGreenRemoval",
-                                       personnelMarketRandomGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomUltraGreenRemoval",
-                                       personnelMarketRandomUltraGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
+        //region Markets Tab
+        //region Personnel Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketName", getPersonnelMarketType());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        //endregion Personnel Market
+
+        //region Unit Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketMethod", getUnitMarketMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
+        //endregion Unit Market
+
+        //region Contract Market
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        //endregion Contract Market
+        //endregion Markets Tab
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<phenotypeProbabilities>"
                 + StringUtils.join(phenotypeProbabilities, ',')
@@ -3249,7 +3371,6 @@ public class CampaignOptions implements Serializable {
                 + "</atbBattleChance>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
@@ -3261,13 +3382,12 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -3312,7 +3432,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
 
         //region AtB Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "rats", StringUtils.join(rats, ','));
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent) + "<staticRATs/>");
@@ -3342,632 +3461,700 @@ public class CampaignOptions implements Serializable {
             }
 
             MekHQ.getLogger().debug(String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            try {
+                //region Repair and Maintenance Tab
+                if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+                    retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+                    retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
+                    retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
+                    retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
+                    retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
+                    retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
+                    retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                //endregion Repair and Maintenance Tab
 
-            //region Repair and Maintenance Tab
-            if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
-                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
-                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
-                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
-                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
-                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
-                retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            //endregion Repair and Maintenance Tab
-
-            } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
-                retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
-                retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
-                retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {
-                retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
-                retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
-                retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
-                retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
-                retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
-                retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nTasksXP")) {
-                retVal.nTasksXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tasksXP")) {
-                retVal.tasksXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("successXP")) {
-                retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
-                retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
-                retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
-                retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
-                retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
-                retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
-                retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
-                retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("edgeCost")) {
-                retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
-                retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
-                retVal.acquisitionSkill = wn2.getTextContent().trim();
-            } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
-                retVal.nDiceTransitTime = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("constantTransitTime")) {
-                retVal.constantTransitTime = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitTransitTime")) {
-                retVal.unitTransitTime = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosBonus")) {
-                retVal.acquireMosBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosUnit")) {
-                retVal.acquireMosUnit = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTime")) {
-                retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
-                retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clanAcquisitionPenalty")) {
-                retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
-                retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryAcquisition")) {
-                retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionFactionLimit")) {
-                retVal.planetAcquisitionFactionLimit = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
-                retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("noClanPartsFromIS")) {
-                retVal.noClanPartsFromIS = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("penaltyClanPartsFromIS")) {
-                retVal.penaltyClanPartsFromIS = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionVerbose")) {
-                retVal.planetAcquisitionVerbose = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maxJumpsPlanetaryAcquisition")) {
-                retVal.maxJumpsPlanetaryAcquisition = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetTechAcquisitionBonus")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("planetOutputAcquisitionBonus")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
-                retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
-                retVal.setDropshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
-                retVal.setJumpshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
-                retVal.setWarshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
-                retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
-                retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
-                retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("overageRepaymentInFinalPayment")) {
-                retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
-                retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
-                retVal.disallowExtinctStuff = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
-                retVal.allowClanPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
-                retVal.allowISPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
-                retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
-                retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
-                retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
-                retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
-                retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
-                retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")
-                    || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
-                retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
-                retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                String[] values = wn2.getTextContent().split(",");
-                if (version.isLowerThan("0.49.0")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
+                    retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
+                    retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {
+                    retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
+                    retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
+                    retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
+                    retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
+                    retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
+                    retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nTasksXP")) {
+                    retVal.nTasksXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tasksXP")) {
+                    retVal.tasksXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("successXP")) {
+                    retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
+                    retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                    retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+                    retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+                    retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
+                    retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
+                    retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
+                    retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("edgeCost")) {
+                    retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
+                    retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
+                    retVal.acquisitionSkill = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
+                    retVal.nDiceTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("constantTransitTime")) {
+                    retVal.constantTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitTransitTime")) {
+                    retVal.unitTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosBonus")) {
+                    retVal.acquireMosBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosUnit")) {
+                    retVal.acquireMosUnit = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTime")) {
+                    retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
+                    retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanAcquisitionPenalty")) {
+                    retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
+                    retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryAcquisition")) {
+                    retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionFactionLimit")) {
+                    retVal.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
+                    retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("noClanPartsFromIS")) {
+                    retVal.noClanPartsFromIS = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("penaltyClanPartsFromIS")) {
+                    retVal.penaltyClanPartsFromIS = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionVerbose")) {
+                    retVal.planetAcquisitionVerbose = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maxJumpsPlanetaryAcquisition")) {
+                    retVal.maxJumpsPlanetaryAcquisition = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetTechAcquisitionBonus")) {
+                    String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.setUsePortraitForRole(PersonnelRole.parseFromString(String.valueOf(i)).ordinal(),
-                                Boolean.parseBoolean(values[i].trim()));
+                        retVal.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
                     }
-                } else {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
+                    String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
+                        retVal.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
-                retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
-                retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
-                retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
-                retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
-                retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
-                retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
-
-            //region Personnel Tab
-            //region General Personnel
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
-                retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useInitiativeBonus")) {
-                retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
-                retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
-                retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
-                retVal.setUseAbilities(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
-                retVal.setUseEdge(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useSupportEdge")) {
-                retVal.setUseSupportEdge(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
-                retVal.setUseImplants(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("alternativeQualityAveraging")) {
-                retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
-                retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            //endregion General Personnel
-
-            //region Expanded Personnel Information
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
-                retVal.setUseTimeInService(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
-                retVal.setTimeInServiceDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
-                retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
-                retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
-                retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
-                retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
-            //endregion Expanded Personnel Information
-
-            //region Medical
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
-                retVal.setUseAdvancedMedical(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
-                retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
-                retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("minimumHitsForVehicles")) {
-                retVal.setMinimumHitsForVehicles(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVehicles")) {
-                retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
-                retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            //endregion Medical
-
-            //region Prisoners
-            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
-                retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                // Most of this is legacy - 0.47.X removal
-                String prisonerStatus = wn2.getTextContent().trim();
-
-                try {
-                    prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
-                } catch (Exception ignored) {
-
-                }
-
-                retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
-            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
-                retVal.setPrisonerBabyStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerDefection")) {
-                retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
-                retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            //endregion Prisoners
-
-            //region Personnel Randomization
-            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
-                retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
-                if (!wn2.hasChildNodes()) {
-                    continue;
-                }
-                final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
-                if (randomOriginOptions == null) {
-                    continue;
-                }
-                retVal.setRandomOriginOptions(randomOriginOptions);
-            //endregion Personnel Randomization
-
-            //region Family
-            } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
-            //endregion Family
-
-            //region Salary
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
-                retVal.setSalaryCommissionMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
-                retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
-                retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                if (version.isLowerThan("0.49.0")) {
-                    Money[] roleBaseSalaries = Utilities.readMoneyArray(wn2);
-                    for (int i = 0; i < roleBaseSalaries.length; i++) {
-                        retVal.setRoleBaseSalary(PersonnelRole.parseFromString(String.valueOf(i)), roleBaseSalaries[i]);
-                    }
-                } else {
-                    retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
-                }
-            //endregion Salary
-
-            //region Marriage
-            } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
-                retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
-                retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
-                retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
-                retVal.setLogMarriageNameChange(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
-                String[] values = wn2.getTextContent().split(",");
-                if (values.length == 13) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetOutputAcquisitionBonus")) {
+                    String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.marriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                        retVal.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
                     }
-                } else if (values.length == 9) {
-                    migrateMarriageSurnameWeights(retVal, values);
-                } else {
-                    MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
-                retVal.setUseRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
-                retVal.setChanceRandomMarriages(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
-                retVal.setMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
-                retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
-                retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
-            //endregion Marriage
+                } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
+                    retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
+                    retVal.setDropshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
+                    retVal.setJumpshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
+                    retVal.setWarshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
+                    retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
+                    retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
+                    retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("overageRepaymentInFinalPayment")) {
+                    retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
+                    retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
+                    retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
+                    retVal.disallowExtinctStuff = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
+                    retVal.allowClanPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
+                    retVal.allowISPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
+                    retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
+                    retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
+                    retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
+                    retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
+                    retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
+                    retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")
+                        || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
+                    retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
+                    retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    if (version.isLowerThan("0.49.0")) {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.setUsePortraitForRole(PersonnelRole.parseFromString(String.valueOf(i)).ordinal(),
+                                    Boolean.parseBoolean(values[i].trim()));
+                        }
+                    } else {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
+                    retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
+                    retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
+                    retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
+                    retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
+                    retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
+                    retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
 
-            //region Procreation
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useProcreation")) {
-                retVal.setUseProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
-                retVal.setChanceProcreation(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.1 removal
-                    || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) {
-                retVal.setUseProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
-                retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
-                retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
-                retVal.setLogConception(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
-                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
-                retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            //endregion Procreation
+                //region Personnel Tab
+                //region General Personnel
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
+                    retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("useInitiativeBonus")) {
+                    retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
+                    retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
+                    retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
+                    retVal.setUseAbilities(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
+                    retVal.setUseEdge(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSupportEdge")) {
+                    retVal.setUseSupportEdge(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
+                    retVal.setUseImplants(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("alternativeQualityAveraging")) {
+                    retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
+                    retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogSkillGain")) {
+                    retVal.setPersonnelLogSkillGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogAbilityGain")) {
+                    retVal.setPersonnelLogAbilityGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogEdgeGain")) {
+                    retVal.setPersonnelLogEdgeGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion General Personnel
 
-            //region Death
-            } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
-                retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            //endregion Death
-            //endregion Personnel Tab
+                //region Expanded Personnel Information
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
+                    retVal.setUseTimeInService(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
+                    retVal.setTimeInServiceDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
+                    retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
+                    retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
+                    retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalXPEarnings")) {
+                    retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
+                    retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
+                //endregion Expanded Personnel Information
 
-            //region Finances Tab
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
-                retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
-                retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
-                retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
-                retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
-                retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
-                retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
-                retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
-                retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
-                retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
-                retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
-                retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
-                retVal.usePercentageMaint = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("infantryDontCount")) {
-                retVal.infantryDontCount = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
-                retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
-                retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
-                retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
-                retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
-                retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-                retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
-                retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
-                retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
-                retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
-                retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
-                retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
-                retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
-                retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
-                retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
-            //endregion Finances Tab
+                //region Medical
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
+                    retVal.setUseAdvancedMedical(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
+                    retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
+                    retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("minimumHitsForVehicles")) {
+                    retVal.setMinimumHitsForVehicles(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVehicles")) {
+                    retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
+                    retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Medical
 
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                retVal.personnelMarketName = wn2.getTextContent().trim();
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
-                retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
-                retVal.personnelMarketRandomVeteranRemoval = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
-                retVal.personnelMarketRandomRegularRemoval = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
-                retVal.personnelMarketRandomGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
-                retVal.personnelMarketRandomUltraGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
-                retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
-                retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
-                retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useStratCon")) {
-                retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
-                retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
-                retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
-                retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
-                retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
-                retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
-                retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMechs")) {
-                retVal.opforLanceTypeMechs = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMixed")) {
-                retVal.opforLanceTypeMixed = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeVehicles")) {
-                retVal.opforLanceTypeVehicles = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforUsesVTOLs")) {
-                retVal.opforUsesVTOLs = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
-                retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
-                retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
-                retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
-                retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
-                retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
-                retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
-                retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
-                retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
-                retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) {
-                retVal.atbAddDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) {
-                retVal.dependentsNeverLeave = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
-                retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
-                retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
-                retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {
-                retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("attachedPlayerCamouflage")) {
-                retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
-                retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
-                retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
+                //region Prisoners
+                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
+                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                    // Most of this is legacy - 0.47.X removal
+                    String prisonerStatus = wn2.getTextContent().trim();
+
                     try {
-                        retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                        prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
                     } catch (Exception ignored) {
-                        // Badly coded, but this is to migrate devs and their games as the swap was
-                        // done before a release and is thus better to handle this way than through
-                        // a more code complex method
-                        retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
-                retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
-                retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
-                retVal.instantUnitMarketDelivery = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
-                retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
-                retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryConditions")) {
-                retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useLeadership")) {
-                retVal.useLeadership = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useStrategy")) {
-                retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("baseStrategyDeployment")) {
-                retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("additionalStrategyDeployment")) {
-                retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("adjustPaymentForStrategy")) {
-                retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
-                retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {
-                retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
-                retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
-                retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
-                retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
-                retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
-                retVal.allowOpforAeros = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforAeroChance")) {
-                retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
-                retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
-                retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
-            } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
-                retVal.staticRATs = true;
-            } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
-                retVal.ignoreRatEra = true;
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
-                retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
-                retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
-                retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
-                retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
-                retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
-                retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
-                retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
-                retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
 
-            //region Legacy
-            // Removed in 0.49.*
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.1 Removal
-                retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.1 Removal
-                retVal.getRandomOriginOptions().setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.1 Removal
-                retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.1 Removal
-                retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.1 Removal
-                retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
-            // Removed in 0.47.*
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
-                if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
-                    retVal.setUseAtBPrisonerDefection(true);
-                    retVal.setUseAtBPrisonerRansom(true);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
-                double intensity = Double.parseDouble(wn2.getTextContent().trim());
+                    retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
+                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
+                    retVal.setPrisonerBabyStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerDefection")) {
+                    retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
+                    retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Prisoners
 
-                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
-                retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
-                retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
-                        ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
-            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
-                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
-                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
-                if (!Boolean.parseBoolean(wn2.getTextContent())) {
-                    retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
+                //region Personnel Randomization
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
+                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
+                    if (randomOriginOptions == null) {
+                        continue;
+                    }
+                    retVal.setRandomOriginOptions(randomOriginOptions);
+                //endregion Personnel Randomization
+
+                //region Family
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
+                    retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+                //endregion Family
+
+                //region Salary
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
+                    retVal.setSalaryCommissionMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
+                    retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
+                    retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
+                    if (version.isLowerThan("0.49.0")) {
+                        Money[] roleBaseSalaries = Utilities.readMoneyArray(wn2);
+                        for (int i = 0; i < roleBaseSalaries.length; i++) {
+                            retVal.setRoleBaseSalary(PersonnelRole.parseFromString(String.valueOf(i)), roleBaseSalaries[i]);
+                        }
+                    } else {
+                        retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
+                    }
+                //endregion Salary
+
+                //region Marriage
+                } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
+                    retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
+                    retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
+                    retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
+                    retVal.setLogMarriageNameChange(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    if (values.length == 13) {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.marriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                        }
+                    } else if (values.length == 9) {
+                        migrateMarriageSurnameWeights(retVal, values);
+                    } else {
+                        MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
+                    retVal.setUseRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
+                    retVal.setChanceRandomMarriages(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
+                    retVal.setMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
+                    retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
+                    retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Marriage
+
+                //region Procreation
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("useProcreation")) {
+                    retVal.setUseProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
+                    retVal.setChanceProcreation(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.1 removal
+                        || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) {
+                    retVal.setUseProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
+                    retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
+                    retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
+                    retVal.setLogConception(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
+                    retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
+                    retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Procreation
+
+                //region Death
+                } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
+                    retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Death
+                //endregion Personnel Tab
+
+                //region Finances Tab
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
+                    retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
+                    retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
+                    retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
+                    retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
+                    retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
+                    retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
+                    retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
+                    retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
+                    retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
+                    retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
+                    retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
+                    retVal.usePercentageMaint = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("infantryDontCount")) {
+                    retVal.infantryDontCount = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
+                    retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
+                    retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
+                    retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
+                    retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
+                    retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+
+                //region Price Multipliers
+                } else if (wn2.getNodeName().equalsIgnoreCase("commonPartPriceMultiplier")) {
+                    retVal.setCommonPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSphereUnitPriceMultiplier")) {
+                    retVal.setInnerSphereUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("innerSpherePartPriceMultiplier")) {
+                    retVal.setInnerSpherePartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanUnitPriceMultiplier")) {
+                    retVal.setClanUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPartPriceMultiplier")) {
+                    retVal.setClanPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mixedTechUnitPriceMultiplier")) {
+                    retVal.setMixedTechUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartPriceMultipliers")) {
+                    final String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        try {
+                            retVal.getUsedPartPriceMultipliers()[i] = Double.parseDouble(values[i]);
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValueMultiplier")) {
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unrepairablePartsValueMultiplier")) {
+                    retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Price Multipliers
+                //endregion Finances Tab
+
+                //region Markets
+                //region Personnel Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
+                    retVal.setPersonnelMarketType(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
+                    retVal.setPersonnelMarketType(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
+                    retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
+                    retVal.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
+                    retVal.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
+                    retVal.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
+                    retVal.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
+                    retVal.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
+                    retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Personnel Market
+
+                //region Unit Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketMethod")) {
+                    retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMechVariations")) {
+                    retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
+                    retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
+                    retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Unit Market
+
+                //region Contract Market
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
+                    retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
+                    retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Contract Market
+                // endregion Markets
+
+                } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
+                    retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useStratCon")) {
+                    retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
+                    retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
+                    retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
+                    retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
+                    retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
+                    retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMechs")) {
+                    retVal.opforLanceTypeMechs = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMixed")) {
+                    retVal.opforLanceTypeMixed = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeVehicles")) {
+                    retVal.opforLanceTypeVehicles = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforUsesVTOLs")) {
+                    retVal.opforUsesVTOLs = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
+                    retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
+                    retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
+                    retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
+                    retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
+                    retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
+                    retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
+                    retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
+                    retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
+                    retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) {
+                    retVal.atbAddDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) {
+                    retVal.dependentsNeverLeave = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
+                    retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
+                    retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
+                    retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {
+                    retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("attachedPlayerCamouflage")) {
+                    retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
+                    retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
+                    retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        try {
+                            retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                        } catch (Exception ignored) {
+                            // Badly coded, but this is to migrate devs and their games as the swap was
+                            // done before a release and is thus better to handle this way than through
+                            // a more code complex method
+                            retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
+                    retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
+                    retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
+                    retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
+                    retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryConditions")) {
+                    retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadership")) {
+                    retVal.useLeadership = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useStrategy")) {
+                    retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("baseStrategyDeployment")) {
+                    retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("additionalStrategyDeployment")) {
+                    retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adjustPaymentForStrategy")) {
+                    retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
+                    retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {
+                    retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
+                    retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
+                    retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
+                    retVal.allowOpforAeros = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforAeroChance")) {
+                    retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
+                    retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
+                    retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
+                    retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
+                } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
+                    retVal.staticRATs = true;
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
+                    retVal.ignoreRatEra = true;
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
+                    retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
+                    retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
+                    retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
+                    retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
+                    retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
+                    retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
+                    retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
+                    retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
+                    retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
+                    retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
+
+                //region Legacy
+                // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.4 Removal
+                    retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.4 Removal
+                    retVal.getRandomOriginOptions().setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.4 Removal
+                    retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.4 Removal
+                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.4 Removal
+                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
+                    final double value = Double.parseDouble(wn2.getTextContent());
+                    retVal.setClanUnitPriceMultiplier(value);
+                    retVal.setClanPartPriceMultiplier(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[0] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[1] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[2] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[3] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[4] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[5] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3 Removal
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+
+                // Removed in 0.47.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
+                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
+                        retVal.setUseAtBPrisonerDefection(true);
+                        retVal.setUseAtBPrisonerRansom(true);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
+                    double intensity = Double.parseDouble(wn2.getTextContent().trim());
+
+                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
+                    retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
+                            ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
+                } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                    MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                    MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
+                        || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
+                    if (!Boolean.parseBoolean(wn2.getTextContent())) {
+                        retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
-                retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
-                retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
-                retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                //endregion Legacy
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
+        }
+
+        // Fixing Old Data
+        if (version.isLowerThan("0.49.3") && retVal.getUseAtB()) {
+            retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
+            retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
 
         MekHQ.getLogger().debug("Load Campaign Options Complete!");
@@ -3982,11 +4169,16 @@ public class CampaignOptions implements Serializable {
      * @param retVal the return CampaignOptions
      * @param values the values to migrate
      */
-    private static void migrateMarriageSurnameWeights(CampaignOptions retVal, String[] values) {
+    private static void migrateMarriageSurnameWeights(CampaignOptions retVal, String... values) {
         int[] weights = new int[values.length];
 
         for (int i = 0; i < weights.length; i++) {
-            weights[i] = Integer.parseInt(values[i]);
+            try {
+                weights[i] = Integer.parseInt(values[i]);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+                weights[i] = 0;
+            }
         }
 
         // Now we need to test to figure out the weights have changed. If not, we will keep the

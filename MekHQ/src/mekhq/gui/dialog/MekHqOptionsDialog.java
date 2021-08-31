@@ -18,8 +18,10 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -48,6 +50,39 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     //endregion Personnel Tab Display Options
+
+    //region Colors
+    private ColourSelectorButton optionDeployedForeground;
+    private ColourSelectorButton optionDeployedBackground;
+    private ColourSelectorButton optionBelowContractMinimumForeground;
+    private ColourSelectorButton optionBelowContractMinimumBackground;
+    private ColourSelectorButton optionInTransitForeground;
+    private ColourSelectorButton optionInTransitBackground;
+    private ColourSelectorButton optionRefittingForeground;
+    private ColourSelectorButton optionRefittingBackground;
+    private ColourSelectorButton optionMothballingForeground;
+    private ColourSelectorButton optionMothballingBackground;
+    private ColourSelectorButton optionMothballedForeground;
+    private ColourSelectorButton optionMothballedBackground;
+    private ColourSelectorButton optionNotRepairableForeground;
+    private ColourSelectorButton optionNotRepairableBackground;
+    private ColourSelectorButton optionNonFunctionalForeground;
+    private ColourSelectorButton optionNonFunctionalBackground;
+    private ColourSelectorButton optionNeedsPartsFixedForeground;
+    private ColourSelectorButton optionNeedsPartsFixedBackground;
+    private ColourSelectorButton optionUnmaintainedForeground;
+    private ColourSelectorButton optionUnmaintainedBackground;
+    private ColourSelectorButton optionUncrewedForeground;
+    private ColourSelectorButton optionUncrewedBackground;
+    private ColourSelectorButton optionLoanOverdueForeground;
+    private ColourSelectorButton optionLoanOverdueBackground;
+    private ColourSelectorButton optionInjuredForeground;
+    private ColourSelectorButton optionInjuredBackground;
+    private ColourSelectorButton optionHealedInjuriesForeground;
+    private ColourSelectorButton optionHealedInjuriesBackground;
+    private ColourSelectorButton optionPaidRetirementForeground;
+    private ColourSelectorButton optionPaidRetirementBackground;
+    //endregion Colors
     //endregion Display
 
     //region Autosave
@@ -61,6 +96,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Autosave
 
     //region New Day
+    private JCheckBox optionNewDayAstechPoolFill;
+    private JCheckBox optionNewDayMedicPoolFill;
     private JCheckBox optionNewDayMRMS;
     //endregion New Day
 
@@ -69,6 +106,16 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionWriteCustomsToXML;
     private JCheckBox optionSaveMothballState;
     //endregion Campaign XML Save
+
+    //region Nag Tab
+    private JCheckBox optionUnmaintainedUnitsNag;
+    private JCheckBox optionInsufficientAstechsNag;
+    private JCheckBox optionInsufficientAstechTimeNag;
+    private JCheckBox optionInsufficientMedicsNag;
+    private JCheckBox optionShortDeploymentNag;
+    private JCheckBox optionUnresolvedStratConContactsNag;
+    private JCheckBox optionOutstandingScenariosNag;
+    //endregion Nag Tab
 
     //region Miscellaneous
     private JSpinner optionStartGameDelay;
@@ -94,9 +141,11 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         JTabbedPane optionsTabbedPane = new JTabbedPane();
         optionsTabbedPane.setName("optionsTabbedPane");
         optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));
+        optionsTabbedPane.add(resources.getString("displayColourTab.title"), new JScrollPane(createDisplayColourTab()));
         optionsTabbedPane.add(resources.getString("autosaveTab.title"), new JScrollPane(createAutosaveTab()));
         optionsTabbedPane.add(resources.getString("newDayTab.title"), new JScrollPane(createNewDayTab()));
         optionsTabbedPane.add(resources.getString("campaignXMLSaveTab.title"), new JScrollPane(createCampaignXMLSaveTab()));
+        optionsTabbedPane.add(resources.getString("nagTab.title"), new JScrollPane(createNagTab()));
         optionsTabbedPane.add(resources.getString("miscellaneousTab.title"), new JScrollPane(createMiscellaneousTab()));
 
         return optionsTabbedPane;
@@ -216,6 +265,180 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         return body;
     }
 
+    private JPanel createDisplayColourTab() {
+        //region Create Graphical Components
+        optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
+
+        optionDeployedBackground = new ColourSelectorButton(resources.getString("optionDeployedBackground.text"));
+
+        optionBelowContractMinimumForeground = new ColourSelectorButton(resources.getString("optionBelowContractMinimumForeground.text"));
+
+        optionBelowContractMinimumBackground = new ColourSelectorButton(resources.getString("optionBelowContractMinimumBackground.text"));
+
+        optionInTransitForeground = new ColourSelectorButton(resources.getString("optionInTransitForeground.text"));
+
+        optionInTransitBackground = new ColourSelectorButton(resources.getString("optionInTransitBackground.text"));
+
+        optionRefittingForeground = new ColourSelectorButton(resources.getString("optionRefittingForeground.text"));
+
+        optionRefittingBackground = new ColourSelectorButton(resources.getString("optionRefittingBackground.text"));
+
+        optionMothballingForeground = new ColourSelectorButton(resources.getString("optionMothballingForeground.text"));
+
+        optionMothballingBackground = new ColourSelectorButton(resources.getString("optionMothballingBackground.text"));
+
+        optionMothballedForeground = new ColourSelectorButton(resources.getString("optionMothballedForeground.text"));
+
+        optionMothballedBackground = new ColourSelectorButton(resources.getString("optionMothballedBackground.text"));
+
+        optionNotRepairableForeground = new ColourSelectorButton(resources.getString("optionNotRepairableForeground.text"));
+
+        optionNotRepairableBackground = new ColourSelectorButton(resources.getString("optionNotRepairableBackground.text"));
+
+        optionNonFunctionalForeground = new ColourSelectorButton(resources.getString("optionNonFunctionalForeground.text"));
+
+        optionNonFunctionalBackground = new ColourSelectorButton(resources.getString("optionNonFunctionalBackground.text"));
+
+        optionNeedsPartsFixedForeground = new ColourSelectorButton(resources.getString("optionNeedsPartsFixedForeground.text"));
+
+        optionNeedsPartsFixedBackground = new ColourSelectorButton(resources.getString("optionNeedsPartsFixedBackground.text"));
+
+        optionUnmaintainedForeground = new ColourSelectorButton(resources.getString("optionUnmaintainedForeground.text"));
+
+        optionUnmaintainedBackground = new ColourSelectorButton(resources.getString("optionUnmaintainedBackground.text"));
+
+        optionUncrewedForeground = new ColourSelectorButton(resources.getString("optionUncrewedForeground.text"));
+
+        optionUncrewedBackground = new ColourSelectorButton(resources.getString("optionUncrewedBackground.text"));
+
+        optionLoanOverdueForeground = new ColourSelectorButton(resources.getString("optionLoanOverdueForeground.text"));
+
+        optionLoanOverdueBackground = new ColourSelectorButton(resources.getString("optionLoanOverdueBackground.text"));
+
+        optionInjuredForeground = new ColourSelectorButton(resources.getString("optionInjuredForeground.text"));
+
+        optionInjuredBackground = new ColourSelectorButton(resources.getString("optionInjuredBackground.text"));
+
+        optionHealedInjuriesForeground = new ColourSelectorButton(resources.getString("optionHealedInjuriesForeground.text"));
+
+        optionHealedInjuriesBackground = new ColourSelectorButton(resources.getString("optionHealedInjuriesBackground.text"));
+
+        optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
+
+        optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
+        //endregion Create Graphical Components
+
+        //region Layout
+        // Layout the UI
+        JPanel body = new JPanel();
+        GroupLayout layout = new GroupLayout(body);
+        body.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionDeployedForeground)
+                                .addComponent(optionDeployedBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionBelowContractMinimumForeground)
+                                .addComponent(optionBelowContractMinimumBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInTransitForeground)
+                                .addComponent(optionInTransitBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionRefittingForeground)
+                                .addComponent(optionRefittingBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballingForeground)
+                                .addComponent(optionMothballingBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballedForeground)
+                                .addComponent(optionMothballedBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNotRepairableForeground)
+                                .addComponent(optionNotRepairableBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNonFunctionalForeground)
+                                .addComponent(optionNonFunctionalBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNeedsPartsFixedForeground)
+                                .addComponent(optionNeedsPartsFixedBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUnmaintainedForeground)
+                                .addComponent(optionUnmaintainedBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUncrewedForeground)
+                                .addComponent(optionUncrewedBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionLoanOverdueForeground)
+                                .addComponent(optionLoanOverdueBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInjuredForeground)
+                                .addComponent(optionInjuredBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionHealedInjuriesForeground)
+                                .addComponent(optionHealedInjuriesBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPaidRetirementForeground)
+                                .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionDeployedForeground)
+                                .addComponent(optionDeployedBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionBelowContractMinimumForeground)
+                                .addComponent(optionBelowContractMinimumBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionInTransitForeground)
+                                .addComponent(optionInTransitBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionRefittingForeground)
+                                .addComponent(optionRefittingBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionMothballingForeground)
+                                .addComponent(optionMothballingBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionMothballedForeground)
+                                .addComponent(optionMothballedBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionNotRepairableForeground)
+                                .addComponent(optionNotRepairableBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionNonFunctionalForeground)
+                                .addComponent(optionNonFunctionalBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionNeedsPartsFixedForeground)
+                                .addComponent(optionNeedsPartsFixedBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionUnmaintainedForeground)
+                                .addComponent(optionUnmaintainedBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionUncrewedForeground)
+                                .addComponent(optionUncrewedBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionLoanOverdueForeground)
+                                .addComponent(optionLoanOverdueBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionInjuredForeground)
+                                .addComponent(optionInjuredBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionHealedInjuriesForeground)
+                                .addComponent(optionHealedInjuriesBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionPaidRetirementForeground)
+                                .addComponent(optionPaidRetirementBackground))
+        );
+        //endregion Layout
+
+        return body;
+    }
+
     private JPanel createAutosaveTab() {
         //region Create Graphical Components
         optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
@@ -289,31 +512,44 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createNewDayTab() {
-        //region Create Graphical Components
-        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
-        //endregion Create Graphical Components
+        // Create Panel Components
+        optionNewDayAstechPoolFill = new JCheckBox(resources.getString("optionNewDayAstechPoolFill.text"));
+        optionNewDayAstechPoolFill.setToolTipText(resources.getString("optionNewDayAstechPoolFill.toolTipText"));
+        optionNewDayAstechPoolFill.setName("optionNewDayAstechPoolFill");
 
-        //region Layout
+        optionNewDayMedicPoolFill = new JCheckBox(resources.getString("optionNewDayMedicPoolFill.text"));
+        optionNewDayMedicPoolFill.setToolTipText(resources.getString("optionNewDayMedicPoolFill.toolTipText"));
+        optionNewDayMedicPoolFill.setName("optionNewDayMedicPoolFill");
+
+        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
+        optionNewDayMRMS.setToolTipText(resources.getString("optionNewDayMRMS.toolTipText"));
+        optionNewDayMRMS.setName("optionNewDayMRMS");
+
         // Layout the UI
-        JPanel body = new JPanel();
-        GroupLayout layout = new GroupLayout(body);
-        body.setLayout(layout);
+        final JPanel panel = new JPanel();
+        panel.setName("newDayPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(optionNewDayAstechPoolFill)
+                        .addComponent(optionNewDayMedicPoolFill)
                         .addComponent(optionNewDayMRMS)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(optionNewDayAstechPoolFill)
+                        .addComponent(optionNewDayMedicPoolFill)
                         .addComponent(optionNewDayMRMS)
         );
         //endregion Layout
 
-        return body;
+        return panel;
     }
 
     private JPanel createCampaignXMLSaveTab() {
@@ -354,6 +590,69 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         //endregion Layout
 
         return body;
+    }
+
+    private JPanel createNagTab() {
+        // Create Panel Components
+        optionUnmaintainedUnitsNag = new JCheckBox(resources.getString("optionUnmaintainedUnitsNag.text"));
+        optionUnmaintainedUnitsNag.setToolTipText(resources.getString("optionUnmaintainedUnitsNag.toolTipText"));
+        optionUnmaintainedUnitsNag.setName("optionUnmaintainedUnitsNag");
+
+        optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
+        optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
+        optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
+
+        optionInsufficientAstechTimeNag = new JCheckBox(resources.getString("optionInsufficientAstechTimeNag.text"));
+        optionInsufficientAstechTimeNag.setToolTipText(resources.getString("optionInsufficientAstechTimeNag.toolTipText"));
+        optionInsufficientAstechTimeNag.setName("optionInsufficientAstechTimeNag");
+
+        optionInsufficientMedicsNag = new JCheckBox(resources.getString("optionInsufficientMedicsNag.text"));
+        optionInsufficientMedicsNag.setToolTipText(resources.getString("optionInsufficientMedicsNag.toolTipText"));
+        optionInsufficientMedicsNag.setName("optionInsufficientMedicsNag");
+
+        optionShortDeploymentNag = new JCheckBox(resources.getString("optionShortDeploymentNag.text"));
+        optionShortDeploymentNag.setToolTipText(resources.getString("optionShortDeploymentNag.toolTipText"));
+        optionShortDeploymentNag.setName("optionShortDeploymentNag");
+
+        optionUnresolvedStratConContactsNag = new JCheckBox(resources.getString("optionUnresolvedStratConContactsNag.text"));
+        optionUnresolvedStratConContactsNag.setToolTipText(resources.getString("optionUnresolvedStratConContactsNag.toolTipText"));
+        optionUnresolvedStratConContactsNag.setName("optionUnresolvedStratConContactsNag");
+
+        optionOutstandingScenariosNag = new JCheckBox(resources.getString("optionOutstandingScenariosNag.text"));
+        optionOutstandingScenariosNag.setToolTipText(resources.getString("optionOutstandingScenariosNag.toolTipText"));
+        optionOutstandingScenariosNag.setName("optionOutstandingScenariosNag");
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setName("nagPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionInsufficientAstechsNag)
+                        .addComponent(optionInsufficientAstechTimeNag)
+                        .addComponent(optionInsufficientMedicsNag)
+                        .addComponent(optionShortDeploymentNag)
+                        .addComponent(optionUnresolvedStratConContactsNag)
+                        .addComponent(optionOutstandingScenariosNag)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionInsufficientAstechsNag)
+                        .addComponent(optionInsufficientAstechTimeNag)
+                        .addComponent(optionInsufficientMedicsNag)
+                        .addComponent(optionShortDeploymentNag)
+                        .addComponent(optionUnresolvedStratConContactsNag)
+                        .addComponent(optionOutstandingScenariosNag)
+        );
+
+        return panel;
     }
 
     private JPanel createMiscellaneousTab() {
@@ -408,6 +707,37 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
+        MekHQ.getMekHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
+        MekHQ.getMekHQOptions().setDeployedBackground(optionDeployedBackground.getColour());
+        MekHQ.getMekHQOptions().setBelowContractMinimumForeground(optionBelowContractMinimumForeground.getColour());
+        MekHQ.getMekHQOptions().setBelowContractMinimumBackground(optionBelowContractMinimumBackground.getColour());
+        MekHQ.getMekHQOptions().setInTransitForeground(optionInTransitForeground.getColour());
+        MekHQ.getMekHQOptions().setInTransitBackground(optionInTransitBackground.getColour());
+        MekHQ.getMekHQOptions().setRefittingForeground(optionRefittingForeground.getColour());
+        MekHQ.getMekHQOptions().setRefittingBackground(optionRefittingBackground.getColour());
+        MekHQ.getMekHQOptions().setMothballingForeground(optionMothballingForeground.getColour());
+        MekHQ.getMekHQOptions().setMothballingBackground(optionMothballingBackground.getColour());
+        MekHQ.getMekHQOptions().setMothballedForeground(optionMothballedForeground.getColour());
+        MekHQ.getMekHQOptions().setMothballedBackground(optionMothballedBackground.getColour());
+        MekHQ.getMekHQOptions().setNotRepairableForeground(optionNotRepairableForeground.getColour());
+        MekHQ.getMekHQOptions().setNotRepairableBackground(optionNotRepairableBackground.getColour());
+        MekHQ.getMekHQOptions().setNonFunctionalForeground(optionNonFunctionalForeground.getColour());
+        MekHQ.getMekHQOptions().setNonFunctionalBackground(optionNonFunctionalBackground.getColour());
+        MekHQ.getMekHQOptions().setNeedsPartsFixedForeground(optionNeedsPartsFixedForeground.getColour());
+        MekHQ.getMekHQOptions().setNeedsPartsFixedBackground(optionNeedsPartsFixedBackground.getColour());
+        MekHQ.getMekHQOptions().setUnmaintainedForeground(optionUnmaintainedForeground.getColour());
+        MekHQ.getMekHQOptions().setUnmaintainedBackground(optionUnmaintainedBackground.getColour());
+        MekHQ.getMekHQOptions().setUncrewedForeground(optionUncrewedForeground.getColour());
+        MekHQ.getMekHQOptions().setUncrewedBackground(optionUncrewedBackground.getColour());
+        MekHQ.getMekHQOptions().setLoanOverdueForeground(optionLoanOverdueForeground.getColour());
+        MekHQ.getMekHQOptions().setLoanOverdueBackground(optionLoanOverdueBackground.getColour());
+        MekHQ.getMekHQOptions().setInjuredForeground(optionInjuredForeground.getColour());
+        MekHQ.getMekHQOptions().setInjuredBackground(optionInjuredBackground.getColour());
+        MekHQ.getMekHQOptions().setHealedInjuriesForeground(optionHealedInjuriesForeground.getColour());
+        MekHQ.getMekHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
+        MekHQ.getMekHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
+        MekHQ.getMekHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
+
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
         MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
@@ -416,11 +746,21 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
+        MekHQ.getMekHQOptions().setNewDayAstechPoolFill(optionNewDayAstechPoolFill.isSelected());
+        MekHQ.getMekHQOptions().setNewDayMedicPoolFill(optionNewDayMedicPoolFill.isSelected());
         MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
 
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
         MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
+
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
+        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
 
@@ -436,6 +776,37 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMekHQOptions().getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
 
+        optionDeployedForeground.setColour(MekHQ.getMekHQOptions().getDeployedForeground());
+        optionDeployedBackground.setColour(MekHQ.getMekHQOptions().getDeployedBackground());
+        optionBelowContractMinimumForeground.setColour(MekHQ.getMekHQOptions().getBelowContractMinimumForeground());
+        optionBelowContractMinimumBackground.setColour(MekHQ.getMekHQOptions().getBelowContractMinimumBackground());
+        optionInTransitForeground.setColour(MekHQ.getMekHQOptions().getInTransitForeground());
+        optionInTransitBackground.setColour(MekHQ.getMekHQOptions().getInTransitBackground());
+        optionRefittingForeground.setColour(MekHQ.getMekHQOptions().getRefittingForeground());
+        optionRefittingBackground.setColour(MekHQ.getMekHQOptions().getRefittingBackground());
+        optionMothballingForeground.setColour(MekHQ.getMekHQOptions().getMothballingForeground());
+        optionMothballingBackground.setColour(MekHQ.getMekHQOptions().getMothballingBackground());
+        optionMothballedForeground.setColour(MekHQ.getMekHQOptions().getMothballedForeground());
+        optionMothballedBackground.setColour(MekHQ.getMekHQOptions().getMothballedBackground());
+        optionNotRepairableForeground.setColour(MekHQ.getMekHQOptions().getNotRepairableForeground());
+        optionNotRepairableBackground.setColour(MekHQ.getMekHQOptions().getNotRepairableBackground());
+        optionNonFunctionalForeground.setColour(MekHQ.getMekHQOptions().getNonFunctionalForeground());
+        optionNonFunctionalBackground.setColour(MekHQ.getMekHQOptions().getNonFunctionalBackground());
+        optionNeedsPartsFixedForeground.setColour(MekHQ.getMekHQOptions().getNeedsPartsFixedForeground());
+        optionNeedsPartsFixedBackground.setColour(MekHQ.getMekHQOptions().getNeedsPartsFixedBackground());
+        optionUnmaintainedForeground.setColour(MekHQ.getMekHQOptions().getUnmaintainedForeground());
+        optionUnmaintainedBackground.setColour(MekHQ.getMekHQOptions().getUnmaintainedBackground());
+        optionUncrewedForeground.setColour(MekHQ.getMekHQOptions().getUncrewedForeground());
+        optionUncrewedBackground.setColour(MekHQ.getMekHQOptions().getUncrewedBackground());
+        optionLoanOverdueForeground.setColour(MekHQ.getMekHQOptions().getLoanOverdueForeground());
+        optionLoanOverdueBackground.setColour(MekHQ.getMekHQOptions().getLoanOverdueBackground());
+        optionInjuredForeground.setColour(MekHQ.getMekHQOptions().getInjuredForeground());
+        optionInjuredBackground.setColour(MekHQ.getMekHQOptions().getInjuredBackground());
+        optionHealedInjuriesForeground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
+        optionHealedInjuriesBackground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
+        optionPaidRetirementForeground.setColour(MekHQ.getMekHQOptions().getPaidRetirementForeground());
+        optionPaidRetirementBackground.setColour(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
         optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
@@ -444,17 +815,27 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
 
+        optionNewDayAstechPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayAstechPoolFill());
+        optionNewDayMedicPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayMedicPoolFill());
         optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
         optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
 
+        optionUnmaintainedUnitsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS));
+        optionInsufficientAstechsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS));
+        optionInsufficientAstechTimeNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME));
+        optionInsufficientMedicsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS));
+        optionShortDeploymentNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT));
+        optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
+        optionOutstandingScenariosNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS));
+
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
     }
 
     //region Data Validation
-    private boolean validateDateFormat(String format) {
+    private boolean validateDateFormat(final String format) {
         try {
             LocalDate.now().format(DateTimeFormatter.ofPattern(format));
         } catch (Exception ignored) {

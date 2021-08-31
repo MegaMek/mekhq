@@ -1,5 +1,9 @@
 <StratconFacility>
+	<bvBudgetModifier>0.05</bvBudgetModifier>
+	<capturedDefinition>AlliedSupplyDepot.xml</capturedDefinition>
 	<displayableName>Supply Depot</displayableName>
+	<localModifiers>HostileBVBudgetIncrease.xml</localModifiers>
+        <sharedModifiers>HostileBVBudgetIncrease.xml</sharedModifiers>
         <facilityType>SupplyDepot</facilityType>
         <owner>Opposing</owner>
         <visible>false</visible>

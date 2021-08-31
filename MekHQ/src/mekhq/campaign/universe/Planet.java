@@ -749,8 +749,7 @@ public class Planet implements Serializable {
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if (null == parentSystem) {
-        	MekHQ.getLogger().error(Planet.class, "getDistanceToJumpPoint",
-        			"reference to planet with no parent system");
+        	MekHQ.getLogger().error("reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
@@ -827,14 +826,14 @@ public class Planet implements Serializable {
             }
             if (!ownFaction) {
                 if (enemies && !neutrals && !allies
-                        && (options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALL)) {
+                        && !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
                 } else if (neutrals && !allies
-                        && (options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_NEUTRAL)) {
+                        && !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
-                } else if (allies && (options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALLY)) {
+                } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
-                } else if (options.disallowPlanetAcquisitionClanCrossover() && clanCrossover) {
+                } else if (clanCrossover && options.disallowPlanetAcquisitionClanCrossover()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
                 }
             }
@@ -859,9 +858,9 @@ public class Planet implements Serializable {
         }
 
         //don't allow acquisitions from caveman planets
-        if (socioIndustrial.tech==EquipmentType.RATING_X ||
-                socioIndustrial.industry==EquipmentType.RATING_X ||
-                socioIndustrial.output==EquipmentType.RATING_X) {
+        if ((socioIndustrial.tech == EquipmentType.RATING_X)
+                || (socioIndustrial.industry == EquipmentType.RATING_X)
+                || (socioIndustrial.output == EquipmentType.RATING_X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,"Regressed: Pre-industrial world");
         }
 

@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import mekhq.campaign.mission.enums.AtBContractType;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,6 +49,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -158,6 +160,7 @@ public class ContractMarketIntegrationTest {
         AtBContract existing = mock(AtBContract.class);
         when(existing.getId()).thenReturn(1);
         when(existing.getScenarios()).thenReturn(new ArrayList<>());
+        when(existing.getContractType()).thenReturn(AtBContractType.GARRISON_DUTY);
         when(existing.getStatus()).thenReturn(MissionStatus.ACTIVE);
         when(existing.getEmployerCode()).thenReturn("FWL");
         when(existing.getEnemyCode()).thenReturn("CC");
@@ -165,6 +168,7 @@ public class ContractMarketIntegrationTest {
         when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
         when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
         when(existing.isActiveOn(campaign.getLocalDate(), false)).thenCallRealMethod();
+        when(existing.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
         campaign.importMission(existing);
 
         ContractMarket market = new ContractMarket();
