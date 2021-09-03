@@ -13,6 +13,8 @@ VERSION HISTORY:
 + PR #2847: Preventing Null Force Template Addition
 + PR #2849: Addressed error resulting in failure to generate aerospace scenarios
 + PR #2860: Unit Market properly initializes for new campaigns
++ PR #2861: StratCon Tab NPE
++ PR #2862: Removing Useless Shares Sorter
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
