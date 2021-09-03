@@ -785,7 +785,7 @@ public class AtBContract extends Contract implements Serializable {
         if (!getAllyCamouflage().hasDefaultFilename()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "allyColour", getAllyColour().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyColour", getAllyColour().name());
         if (!getEnemyCamouflage().hasDefaultCategory()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyCamoCategory", getEnemyCamouflage().getCategory());
         }
@@ -797,7 +797,7 @@ public class AtBContract extends Contract implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredLances", getRequiredLances());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "moraleLevel", getMoraleLevel().name());
         if (routEnd != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "routEnd", routEnd);
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "routEnd", routEnd);
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "numBonusParts", getNumBonusParts());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
@@ -815,8 +815,8 @@ public class AtBContract extends Contract implements Serializable {
         }
 
         if (specialEventScenarioDate != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "specialEventScenarioDate", specialEventScenarioDate);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "specialEventScenarioType", specialEventScenarioType);
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "specialEventScenarioDate", specialEventScenarioDate);
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "specialEventScenarioType", specialEventScenarioType);
         }
 
         if (stratconCampaignState != null) {
