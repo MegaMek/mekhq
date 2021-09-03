@@ -16,38 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
+import java.time.DayOfWeek;
 
-public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
+public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
     //region Constructors
-    public UnresolvedStratConContactsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UnresolvedStratConContactsNagDialog", "UnresolvedStratConContactsNagDialog.title",
-                "", campaign, MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+    public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "ShortDeploymentNagDialog", "ShortDeploymentNagDialog.title",
+                "ShortDeploymentNagDialog.text", campaign, MekHqConstants.NAG_SHORT_DEPLOYMENT);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
         if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getCampaignOptions().getUseStratCon()) {
+                || !campaign.getLocation().isOnPlanet()
+                || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
             return false;
         }
 
-        final String text = StratconRulesManager.nagUnresolvedContacts(campaign);
-
-        if (text.isEmpty()) {
-            return false;
-        } else {
-            setDescription(String.format(resources.getString("UnresolvedStratConContactsNagDialog.text"), text));
-            return true;
-        }
+        return campaign.getActiveAtBContracts().stream()
+                .anyMatch(contract -> campaign.getDeploymentDeficit(contract) > 0);
     }
 }

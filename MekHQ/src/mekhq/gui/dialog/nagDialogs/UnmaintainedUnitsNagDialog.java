@@ -16,35 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
-public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
+public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
-    public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "InsufficientAstechsNagDialog", "InsufficientAstechsNagDialog.title",
-                "", campaign, MekHqConstants.NAG_INSUFFICIENT_ASTECHS);
+    public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "UnmaintainedUnitsNagDialog", "UnmaintainedUnitsNagDialog.title",
+                "UnmaintainedUnitsNagDialog.text", campaign, MekHqConstants.NAG_UNMAINTAINED_UNITS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())) {
-            return false;
-        }
-
-        final int need = campaign.getAstechNeed();
-        if (need > 0) {
-            setDescription(String.format(resources.getString("InsufficientAstechsNagDialog.text"), need));
-            return true;
-        } else {
-            return false;
-        }
+        return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+                && campaign.getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
     }
 }
