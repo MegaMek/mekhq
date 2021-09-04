@@ -110,15 +110,19 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_XP              = 42;
     public static final int COL_ORIGIN_FACTION  = 43;
     public static final int COL_ORIGIN_PLANET   = 44;
-    public static final int COL_RECRUIT_DATE    = 45;
-    public static final int COL_DEATH_DATE      = 46;
+    public static final int COL_BIRTHDAY        = 45;
+    public static final int COL_RECRUIT_DATE    = 46;
+    public static final int COL_LAST_RANK_DATE  = 47;
+    public static final int COL_DUE_DATE        = 48;
+    public static final int COL_RETIREMENT_DATE = 49;
+    public static final int COL_DEATH_DATE      = 50;
     //Export Only Columns
-    public static final int COL_TOUGH           = 47;
-    public static final int COL_EDGE            = 48;
-    public static final int COL_NABIL           = 49;
-    public static final int COL_NIMP            = 50;
-    public static final int COL_PORTRAIT        = 51;
-    public static final int N_COL               = 52;
+    public static final int COL_TOUGH           = 51;
+    public static final int COL_EDGE            = 52;
+    public static final int COL_NABIL           = 53;
+    public static final int COL_NIMP            = 54;
+    public static final int COL_PORTRAIT        = 55;
+    public static final int N_COL               = 56;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -247,8 +251,16 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_origin_faction.text");
             case COL_ORIGIN_PLANET:
                 return resources.getString("col_origin_planet.text");
+            case COL_BIRTHDAY:
+                return resources.getString("col_birthday.text");
             case COL_RECRUIT_DATE:
                 return resources.getString("col_recruit_date.text");
+            case COL_LAST_RANK_DATE:
+                return resources.getString("col_last_rank_date.text");
+            case COL_DUE_DATE:
+                return resources.getString("col_due_date.text");
+            case COL_RETIREMENT_DATE:
+                return resources.getString("col_retirement_date.text");
             case COL_DEATH_DATE:
                 return resources.getString("col_death_date.text");
             case COL_TOUGH:
@@ -650,13 +662,18 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_ORIGIN_FACTION:
                 return p.getOriginFaction().getFullName(getCampaign().getGameYear());
             case COL_ORIGIN_PLANET:
-                Planet originPlanet = p.getOriginPlanet();
-                if (originPlanet != null) {
-                    return originPlanet.getName(getCampaign().getLocalDate());
-                }
-                break;
+                final Planet originPlanet = p.getOriginPlanet();
+                return (originPlanet == null) ? "" : originPlanet.getName(getCampaign().getLocalDate());
+            case COL_BIRTHDAY:
+                return p.getBirthdayAsString();
             case COL_RECRUIT_DATE:
                 return p.getRecruitmentAsString();
+            case COL_LAST_RANK_DATE:
+                return p.getLastRankChangeDateAsString();
+            case COL_DUE_DATE:
+                return p.getDueDateAsString(getCampaign());
+            case COL_RETIREMENT_DATE:
+                return p.getRetirementAsString();
             case COL_DEATH_DATE:
                 return p.getDeathDateAsString();
             case COL_TOUGH:
@@ -715,16 +732,20 @@ public class PersonnelTableModel extends DataTableModel {
             setToolTipText(getTooltip(actualRow, actualCol));
 
             if (!isSelected) {
+                final Person person = getPerson(actualRow);
                 if (isDeployed(actualRow)) {
                     setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
-                        || getPerson(actualRow).hasInjuries(true)) {
+                        || person.hasInjuries(true)) {
                     setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
                     setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
-                } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
+                } else if (person.hasOnlyHealedPermanentInjuries()) {
                     setForeground(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
                     setBackground(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
+                } else if (person.isPregnant()) {
+                    setForeground(MekHQ.getMekHQOptions().getPregnantForeground());
+                    setBackground(MekHQ.getMekHQOptions().getPregnantBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

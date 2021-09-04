@@ -338,6 +338,22 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.HEALED_INJURIES_BACKGROUND, value.getRGB());
     }
 
+    public Color getPregnantForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PREGNANT_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setPregnantForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PREGNANT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getPregnantBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PREGNANT_BACKGROUND, 0X2BAD43));
+    }
+
+    public void setPregnantBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PREGNANT_BACKGROUND, value.getRGB());
+    }
+
     public Color getPaidRetirementForeground() {
         return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PAID_RETIREMENT_FOREGROUND, Color.BLACK.getRGB()));
     }
