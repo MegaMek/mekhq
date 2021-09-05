@@ -16,6 +16,7 @@ VERSION HISTORY:
 + PR #2861: StratCon Tab NPE
 + PR #2862: Removing Useless Shares Sorter
 + Issue #2865: Specialist Infantry Salary Multiplier
++ PR #2844: AbstractIcon: Force Camouflage: Layering and Properly Sending to MegaMek
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
