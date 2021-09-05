@@ -264,6 +264,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnCommissionedSalary;
     private JSpinner spnEnlistedSalary;
     private JSpinner spnAntiMekSalary;
+    private JSpinner spnSpecialistInfantrySalary;
     private JSpinner[] spnSalaryExperienceMultipliers;
     private JSpinner[] spnBaseSalary;
 
@@ -4008,14 +4009,23 @@ public class CampaignOptionsDialog extends JDialog {
         lblAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         lblAntiMekSalary.setName("lblAntiMekSalary");
 
-        spnAntiMekSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        spnAntiMekSalary = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.05));
         spnAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         spnAntiMekSalary.setName("spnAntiMekSalary");
+
+        final JLabel lblSpecialistInfantrySalary = new JLabel(resources.getString("lblSpecialistInfantrySalary.text"));
+        lblSpecialistInfantrySalary.setToolTipText(resources.getString("lblSpecialistInfantrySalary.toolTipText"));
+        lblSpecialistInfantrySalary.setName("lblSpecialistInfantrySalary");
+
+        spnSpecialistInfantrySalary = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.05));
+        spnSpecialistInfantrySalary.setToolTipText(resources.getString("lblSpecialistInfantrySalary.toolTipText"));
+        spnSpecialistInfantrySalary.setName("spnSpecialistInfantrySalary");
 
         // Programmatically Assign Accessibility Labels
         lblCommissionedSalary.setLabelFor(spnCommissionedSalary);
         lblEnlistedSalary.setLabelFor(spnEnlistedSalary);
         lblAntiMekSalary.setLabelFor(spnAntiMekSalary);
+        lblSpecialistInfantrySalary.setLabelFor(spnSpecialistInfantrySalary);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4036,7 +4046,9 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(lblEnlistedSalary)
                                 .addComponent(spnEnlistedSalary)
                                 .addComponent(lblAntiMekSalary)
-                                .addComponent(spnAntiMekSalary, GroupLayout.Alignment.LEADING))
+                                .addComponent(spnAntiMekSalary)
+                                .addComponent(lblSpecialistInfantrySalary)
+                                .addComponent(spnSpecialistInfantrySalary, GroupLayout.Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4047,7 +4059,9 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(lblEnlistedSalary)
                                 .addComponent(spnEnlistedSalary)
                                 .addComponent(lblAntiMekSalary)
-                                .addComponent(spnAntiMekSalary))
+                                .addComponent(spnAntiMekSalary)
+                                .addComponent(lblSpecialistInfantrySalary)
+                                .addComponent(spnSpecialistInfantrySalary))
         );
 
         return panel;
@@ -5210,6 +5224,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
         spnEnlistedSalary.setValue(options.getSalaryEnlistedMultiplier());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
+        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
             spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
         }
@@ -5807,6 +5822,7 @@ public class CampaignOptionsDialog extends JDialog {
             options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
             options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
+            options.setSalarySpecialistInfantryMultiplier((Double) spnSpecialistInfantrySalary.getValue());
             for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
                 options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
             }
