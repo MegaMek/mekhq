@@ -1850,9 +1850,13 @@ public class AtBDynamicScenarioFactory {
     public static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
         int calculatedEdge = Board.START_ANY;
 
-        // if we have a specific deployment zone OR have looped around
-        if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
+        // if we got in here without a force template somehow, just return a random start zone
+        if (forceTemplate == null) {
+            return Compute.randomInt(Board.START_CENTER);
+        // if we have a specific calculated deployment zone already
+        } else if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
             return forceTemplate.getActualDeploymentZone();
+        // if we have a chain of deployment-synced forces that forms a loop and have looped around once, avoid endless loops
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.None ||
                 Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
