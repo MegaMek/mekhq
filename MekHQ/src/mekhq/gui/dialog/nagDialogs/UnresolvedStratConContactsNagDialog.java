@@ -16,32 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
-public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
+public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
-    public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "OutstandingScenariosNagDialog", "OutstandingScenariosNagDialog.title",
-                "OutstandingScenariosNagDialog.text", campaign,
-                MekHqConstants.NAG_OUTSTANDING_SCENARIOS);
+    public UnresolvedStratConContactsNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "UnresolvedStratConContactsNagDialog", "UnresolvedStratConContactsNagDialog.title",
+                "", campaign, MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
-        // date is today
-        return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
-                && campaign.getActiveAtBContracts(true).stream()
-                        .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
-                                .anyMatch(scenario -> (scenario.getDate() != null)
-                                        && scenario.getDate().isEqual(campaign.getLocalDate())));
+        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+                || !campaign.getCampaignOptions().getUseStratCon()) {
+            return false;
+        }
+
+        final String text = StratconRulesManager.nagUnresolvedContacts(campaign);
+
+        if (text.isEmpty()) {
+            return false;
+        } else {
+            setDescription(String.format(resources.getString("UnresolvedStratConContactsNagDialog.text"), text));
+            return true;
+        }
     }
 }

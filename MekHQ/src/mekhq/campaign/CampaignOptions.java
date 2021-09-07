@@ -214,6 +214,7 @@ public class CampaignOptions implements Serializable {
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
+    private double salarySpecialistInfantryMultiplier;
     private double[] salaryXPMultipliers;
     private Money[] roleBaseSalaries;
 
@@ -572,6 +573,7 @@ public class CampaignOptions implements Serializable {
         setSalaryCommissionMultiplier(1.2);
         setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
+        setSalarySpecialistInfantryMultiplier(1.0);
         setSalaryXPMultipliers(new double[5]);
         setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
         setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
@@ -1289,6 +1291,14 @@ public class CampaignOptions implements Serializable {
 
     public void setSalaryAntiMekMultiplier(final double salaryAntiMekMultiplier) {
         this.salaryAntiMekMultiplier = salaryAntiMekMultiplier;
+    }
+
+    public double getSalarySpecialistInfantryMultiplier() {
+        return salarySpecialistInfantryMultiplier;
+    }
+
+    public void setSalarySpecialistInfantryMultiplier(final double salarySpecialistInfantryMultiplier) {
+        this.salarySpecialistInfantryMultiplier = salarySpecialistInfantryMultiplier;
     }
 
     public double[] getSalaryXPMultipliers() {
@@ -3240,6 +3250,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
@@ -3752,6 +3763,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
+                    retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
