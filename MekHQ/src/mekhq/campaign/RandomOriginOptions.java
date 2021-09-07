@@ -36,8 +36,8 @@ public class RandomOriginOptions implements Serializable {
 
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
-    private boolean randomizeAroundCentralPlanet;
-    private Planet centralPlanet;
+    private boolean randomizeAroundSpecifiedPlanet;
+    private Planet specifiedPlanet;
     private int originSearchRadius;
     private double originDistanceScale;
     private boolean allowClanOrigins;
@@ -48,8 +48,8 @@ public class RandomOriginOptions implements Serializable {
     public RandomOriginOptions(final boolean campaignOptions) {
         setRandomizeOrigin(!campaignOptions);
         setRandomizeDependentOrigin(!campaignOptions);
-        setRandomizeAroundCentralPlanet(!campaignOptions);
-        setCentralPlanet(Systems.getInstance().getSystemByName("Terra", LocalDate.ofYearDay(3067, 1))
+        setRandomizeAroundSpecifiedPlanet(!campaignOptions);
+        setSpecifiedPlanet(Systems.getInstance().getSystemByName("Terra", LocalDate.ofYearDay(3067, 1))
                 .getPrimaryPlanet());
         setOriginSearchRadius(campaignOptions ? 45 : 1000);
         setOriginDistanceScale(campaignOptions ? 0.6 : 0.2);
@@ -60,14 +60,14 @@ public class RandomOriginOptions implements Serializable {
 
     //region Getters/Setters
     /**
-     * Gets a value indicating whether or not to randomize the origin of personnel.
+     * Gets a value indicating whether to randomize the origin of personnel.
      */
     public boolean isRandomizeOrigin() {
         return randomizeOrigin;
     }
 
     /**
-     * Sets a value indicating whether or not to randomize the origin of personnel.
+     * Sets a value indicating whether to randomize the origin of personnel.
      * @param randomizeOrigin true for randomize, otherwise false
      */
     public void setRandomizeOrigin(final boolean randomizeOrigin) {
@@ -75,14 +75,14 @@ public class RandomOriginOptions implements Serializable {
     }
 
     /**
-     * Gets a value indicating whether or not to randomize the origin of dependents
+     * Gets a value indicating whether to randomize the origin of dependents
      */
     public boolean isRandomizeDependentOrigin() {
         return randomizeDependentOrigin;
     }
 
     /**
-     * Sets a value indicating whether or not to randomize the origin of dependents
+     * Sets a value indicating whether to randomize the origin of dependents
      * @param randomizeDependentOrigin true for randomize, otherwise false
      */
     public void setRandomizeDependentOrigin(final boolean randomizeDependentOrigin) {
@@ -90,32 +90,32 @@ public class RandomOriginOptions implements Serializable {
     }
 
     /**
-     * @return whether to randomize around a central planet of the campaign's current planet
+     * @return whether to randomize around a specified planet of the campaign's current planet
      */
-    public boolean isRandomizeAroundCentralPlanet() {
-        return randomizeAroundCentralPlanet;
+    public boolean isRandomizeAroundSpecifiedPlanet() {
+        return randomizeAroundSpecifiedPlanet;
     }
 
     /**
-     * @param randomizeAroundCentralPlanet true to randomize around a central planet, otherwise
-     *                                     it will randomize around the campaign's current planet
+     * @param randomizeAroundSpecifiedPlanet true to randomize around a specified planet, otherwise
+     *                                       it will randomize around the campaign's current planet
      */
-    public void setRandomizeAroundCentralPlanet(final boolean randomizeAroundCentralPlanet) {
-        this.randomizeAroundCentralPlanet = randomizeAroundCentralPlanet;
+    public void setRandomizeAroundSpecifiedPlanet(final boolean randomizeAroundSpecifiedPlanet) {
+        this.randomizeAroundSpecifiedPlanet = randomizeAroundSpecifiedPlanet;
     }
 
     /**
-     * @return the central planet to randomize around
+     * @return the specified planet to randomize around
      */
-    public Planet getCentralPlanet() {
-        return centralPlanet;
+    public Planet getSpecifiedPlanet() {
+        return specifiedPlanet;
     }
 
     /**
-     * @param centralPlanet the new central planet to randomize around
+     * @param specifiedPlanet the new specified planet to randomize around
      */
-    public void setCentralPlanet(final Planet centralPlanet) {
-        this.centralPlanet = centralPlanet;
+    public void setSpecifiedPlanet(final Planet specifiedPlanet) {
+        this.specifiedPlanet = specifiedPlanet;
     }
 
     /**
@@ -161,16 +161,16 @@ public class RandomOriginOptions implements Serializable {
     }
 
     /**
-     * Gets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
+     * Gets a value indicating whether to randomize origin to the planetary level, rather than just
+     * the system level.
      */
     public boolean isExtraRandomOrigin() {
         return extraRandomOrigin;
     }
 
     /**
-     * Sets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
+     * Sets a value indicating whether to randomize origin to the planetary level, rather than just
+     * the system level.
      */
     public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
         this.extraRandomOrigin = extraRandomOrigin;
@@ -178,22 +178,22 @@ public class RandomOriginOptions implements Serializable {
     //endregion Getters/Setters
 
     public Planet determinePlanet(final Planet planet) {
-        return isRandomizeAroundCentralPlanet() ? getCentralPlanet() : planet;
+        return isRandomizeAroundSpecifiedPlanet() ? getSpecifiedPlanet() : planet;
     }
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "randomOriginOptions");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "randomOriginOptions");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundCentralPlanet", isRandomizeAroundCentralPlanet());
-        MekHqXmlUtil.writeAttributedTag(pw, indent, "centralPlanet", "systemId",
-                getCentralPlanet().getParentSystem().getId(), getCentralPlanet().getId());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", isRandomizeAroundSpecifiedPlanet());
+        MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
+                getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowClanOrigins", isAllowClanOrigins());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "randomOriginOptions");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "randomOriginOptions");
     }
 
     /**
@@ -214,13 +214,13 @@ public class RandomOriginOptions implements Serializable {
                     case "randomizeDependentOrigin":
                         options.setRandomizeDependentOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "randomizeAroundCentralPlanet":
-                        options.setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "randomizeAroundSpecifiedPlanet":
+                        options.setRandomizeAroundSpecifiedPlanet(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "centralPlanet":
-                        final String centralPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                        final String centralPlanetPlanetId = wn.getTextContent().trim();
-                        options.setCentralPlanet(Systems.getInstance().getSystemById(centralPlanetSystemId).getPlanetById(centralPlanetPlanetId));
+                    case "specifiedPlanet":
+                        final String specifiedPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                        final String specifiedPlanetPlanetId = wn.getTextContent().trim();
+                        options.setSpecifiedPlanet(Systems.getInstance().getSystemById(specifiedPlanetSystemId).getPlanetById(specifiedPlanetPlanetId));
                         break;
                     case "originSearchRadius":
                         options.setOriginSearchRadius(Integer.parseInt(wn.getTextContent().trim()));

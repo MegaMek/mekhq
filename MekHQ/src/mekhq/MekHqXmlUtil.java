@@ -18,40 +18,21 @@
  */
 package mekhq;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import megamek.common.annotations.Nullable;
+import megamek.common.*;
 import megamek.utils.MegaMekXmlUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import megamek.common.Aero;
-import megamek.common.BombType;
-import megamek.common.CommonConstants;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.FighterSquadron;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.Tank;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -521,29 +502,5 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
-    }
-
-    /**
-     * This writes a String or an array of Strings to file, with an the possible addition of an
-     * attribute and its value
-     * @param pw the PrintWriter to use
-     * @param indent the indent to write at
-     * @param name the name of the XML tag
-     * @param attributeName the attribute to write as part of the XML tag
-     * @param attributeValue the value of the attribute
-     * @param values the String or String[] to write to XML
-     */
-    public static void writeAttributedTag(final PrintWriter pw, final int indent, final String name,
-                                          final @Nullable String attributeName,
-                                          final @Nullable String attributeValue,
-                                          final String... values) {
-        if (values.length > 0) {
-            final boolean hasAttribute = attributeValue != null;
-            pw.print(indentStr(indent) + "<" + name);
-            if (hasAttribute) {
-                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
-            }
-            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
-        }
     }
 }
