@@ -19,6 +19,7 @@ VERSION HISTORY:
 + PR #2844: AbstractIcon: Force Camouflage: Layering and Properly Sending to MegaMek
 + Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder. 
 + Issue #2873: Part doesn't serlialize brandNew flag
++ Issue #2878: Prevent dropship bay doors from continuously breaking down when loading saves
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
