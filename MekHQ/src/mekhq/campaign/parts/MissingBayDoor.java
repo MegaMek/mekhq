@@ -74,13 +74,13 @@ public class MissingBayDoor extends MissingPart {
             replacement.decrementQuantity();
 
             // Calling 'remove()' has the side effect of setting this.parentPart to null.
-            // Issue #2878
-            Part _parentPart = parentPart;
+            // Issue #2878 - Missing Bay Door on reload.
+            Part parentReference = parentPart;
             remove(false);
             
-            if (null != _parentPart) {
-                _parentPart.addChildPart(actualReplacement);
-                _parentPart.updateConditionFromPart();
+            if (null != parentReference) {
+                parentReference.addChildPart(actualReplacement);
+                parentReference.updateConditionFromPart();
             }
         }
     }
