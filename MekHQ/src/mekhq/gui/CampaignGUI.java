@@ -46,7 +46,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
@@ -2023,7 +2023,7 @@ public class CampaignGUI extends JPanel {
             // Stupid weird parsing of XML. At least this cleans it up.
             personnelEle.normalize();
 
-            Version version = new Version(personnelEle.getAttribute("version"));
+            final Version version = new Version(personnelEle.getAttribute("version"));
 
             // we need to iterate through three times, the first time to collect
             // any custom units that might not be written yet
@@ -2255,7 +2255,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
@@ -2317,7 +2317,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         CampaignOptions options = null;
         RandomSkillPreferences rsp = null;

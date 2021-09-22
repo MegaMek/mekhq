@@ -25,7 +25,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;

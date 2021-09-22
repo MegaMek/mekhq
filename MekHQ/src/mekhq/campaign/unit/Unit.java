@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.unit;
 
+import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;

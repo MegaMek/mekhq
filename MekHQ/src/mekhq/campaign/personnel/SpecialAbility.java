@@ -38,7 +38,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Document;

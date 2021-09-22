@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.Version;
+import megamek.Version;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -190,7 +190,7 @@ public class GamePreset implements MekHqXmlSerializable {
 
         // Legacy Parsing method for any presets created before 0.47.11, as they did not include a version
         final String versionString = optionsEle.getAttribute("version");
-        Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
+        final Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
