@@ -21,6 +21,7 @@
  */
 package mekhq.gui.view;
 
+import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
@@ -29,34 +30,21 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.*;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -509,7 +497,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAP].addItemListener(checkBoxListener);
         }
 
-        lblMapDesc.setText(scenario.getMap());
+        lblMapDesc.setText(scenario.getMapForDisplay());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapDesc, gridBagConstraints);
@@ -866,65 +854,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
     }
 
-    protected static class EntityListModel implements TreeModel {
-        private ArrayList<String> root;
-        private Vector<TreeModelListener> listeners = new Vector<>();
-        private String name;
-
-        public EntityListModel(ArrayList<String> root, String name) {
-            this.root = root;
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public @Nullable Object getChild(final @Nullable Object parent, final int index) {
-            return (parent instanceof ArrayList<?>) ? ((ArrayList<?>) parent).get(index) : null;
-        }
-
-        @Override
-        public int getChildCount(final @Nullable Object parent) {
-            return (parent instanceof ArrayList<?>) ? ((ArrayList<?>) parent).size() : 0;
-        }
-
-        @Override
-        public int getIndexOfChild(final @Nullable Object parent, final @Nullable Object child) {
-            return (parent instanceof ArrayList<?>) ? ((ArrayList<?>) parent).indexOf(child) : 0;
-        }
-
-        @Override
-        public Object getRoot() {
-            return root;
-        }
-
-        @Override
-        public boolean isLeaf(final @Nullable Object node) {
-            return node instanceof String;
-        }
-
-        @Override
-        public void valueForPathChanged(final TreePath arg0, final Object arg1) {
-
-        }
-
-        @Override
-        public void addTreeModelListener(final @Nullable TreeModelListener listener) {
-            if ((listener != null) && !listeners.contains(listener)) {
-                listeners.addElement(listener);
-            }
-        }
-
-        @Override
-        public void removeTreeModelListener(final @Nullable TreeModelListener listener) {
-            if (listener != null) {
-                listeners.removeElement(listener);
-            }
-        }
-    }
-
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
         private JTree tree;
         int index;
@@ -939,11 +868,13 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             String command = action.getActionCommand();
 
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
-                PrincessBehaviorDialog pbd = new PrincessBehaviorDialog(frame,
+                BotConfigDialog pbd = new BotConfigDialog(frame,
+                        null,
                         scenario.getBotForce(index).getBehaviorSettings(),
-                        scenario.getBotForce(index).getName());
+                        null);
+                pbd.setBotName(scenario.getBotForce(index).getName());
                 pbd.setVisible(true);
-                if (!pbd.dialogAborted) {
+                if (!pbd.getResult().isCancelled()) {
                     scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }

@@ -19,6 +19,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -156,24 +157,28 @@ public class SVEnginePart extends Part {
         NodeList nl = node.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
-            switch (wn.getNodeName()) {
-                case NODE_ENGINE_TONNAGE:
-                    engineTonnage = Double.parseDouble(wn.getTextContent());
-                    break;
-                case NODE_ETYPE:
-                    etype = Integer.parseInt(wn.getTextContent());
-                    break;
-                case NODE_TECH_RATING:
-                    for (int i = 0; i < ratingNames.length; i++) {
-                        if (ratingNames[i].equals(wn.getTextContent())) {
-                            techRating = i;
-                            break;
+            try {
+                switch (wn.getNodeName()) {
+                    case NODE_ENGINE_TONNAGE:
+                        engineTonnage = Double.parseDouble(wn.getTextContent());
+                        break;
+                    case NODE_ETYPE:
+                        etype = Integer.parseInt(wn.getTextContent());
+                        break;
+                    case NODE_TECH_RATING:
+                        for (int i = 0; i < ratingNames.length; i++) {
+                            if (ratingNames[i].equals(wn.getTextContent())) {
+                                techRating = i;
+                                break;
+                            }
                         }
-                    }
-                    break;
-                case NODE_FUEL_TYPE:
-                    fuelType = FuelType.valueOf(wn.getTextContent());
-                    break;
+                        break;
+                    case NODE_FUEL_TYPE:
+                        fuelType = FuelType.valueOf(wn.getTextContent());
+                        break;
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

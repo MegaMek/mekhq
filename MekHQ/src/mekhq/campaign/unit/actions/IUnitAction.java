@@ -34,5 +34,5 @@ public interface IUnitAction {
      * @param campaign The campaign object this action is executed against.
      * @param unit The unit object this action is executed against.
      */
-    public void execute(Campaign campaign, Unit unit);
+    void execute(Campaign campaign, Unit unit);
 }

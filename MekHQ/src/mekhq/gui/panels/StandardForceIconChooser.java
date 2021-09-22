@@ -34,7 +34,7 @@ public class StandardForceIconChooser extends AbstractIconChooser {
         super(new StandardForceIconChooserTree(), icon);
     }
 
-    protected StandardForceIconChooser(final JTree tree, final @Nullable AbstractIcon icon,
+    protected StandardForceIconChooser(final @Nullable JTree tree, final @Nullable AbstractIcon icon,
                                        final boolean initialize) {
         super(tree, icon, initialize);
     }

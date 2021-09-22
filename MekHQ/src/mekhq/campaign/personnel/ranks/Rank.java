@@ -126,13 +126,15 @@ public class Rank implements Serializable {
         setRankLevels(new HashMap<>());
         for (final Profession profession : Profession.values()) {
             String name = (names.length > profession.ordinal()) ? names[profession.ordinal()] : "-";
-            final int level;
+            int level = 1;
             if (name.matches(".+:\\d+\\s*$")) {
                 final String[] split = name.split(":");
                 name = split[0];
-                level = Integer.parseInt(split[1].trim());
-            } else {
-                level = 1;
+                try {
+                    level = Integer.parseInt(split[1].trim());
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
             }
             getRankNames().put(profession, name);
             getRankLevels().put(profession, level);

@@ -2,6 +2,8 @@
 	<capturedDefinition>AlliedEarlyWarningSystem.xml</capturedDefinition>
 	<displayableName>Early Warning Center</displayableName>
         <facilityType>EarlyWarningSystem</facilityType>
-        <owner>Allied</owner>
+        <owner>Opposing</owner>
+	<localModifiers>ReinforcementDelayReductionHostile.xml</localModifiers>
+        <sharedModifiers>ReinforcementDelayReductionHostile.xml</sharedModifiers>
         <visible>true</visible>
 </StratconFacility>

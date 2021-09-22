@@ -67,6 +67,7 @@ import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -94,9 +95,9 @@ import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
-import mekhq.gui.dialog.InsufficientAstechTimeNagDialog;
-import mekhq.gui.dialog.InsufficientAstechsNagDialog;
-import mekhq.gui.dialog.InsufficientMedicsNagDialog;
+import mekhq.gui.dialog.nagDialogs.InsufficientAstechTimeNagDialog;
+import mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog;
+import mekhq.gui.dialog.nagDialogs.InsufficientMedicsNagDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
@@ -105,7 +106,7 @@ import mekhq.gui.dialog.MekHqOptionsDialog;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
-import mekhq.gui.dialog.OutstandingScenariosNagDialog;
+import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PersonnelMarketDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -114,11 +115,11 @@ import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
-import mekhq.gui.dialog.ShortDeploymentNagDialog;
+import mekhq.gui.dialog.nagDialogs.ShortDeploymentNagDialog;
 import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
-import mekhq.gui.dialog.UnmaintainedUnitsNagDialog;
-import mekhq.gui.dialog.UnresolvedStratConContactsNagDialog;
+import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
+import mekhq.gui.dialog.nagDialogs.UnresolvedStratConContactsNagDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import org.w3c.dom.Document;
@@ -402,6 +403,10 @@ public class CampaignGUI extends JPanel {
 
     public CampaignGuiTab getTab(GuiTabType tabType) {
         return standardTabs.get(tabType);
+    }
+
+    public CommandCenterTab getCommandCenterTab() {
+        return (CommandCenterTab) getTab(GuiTabType.COMMAND);
     }
 
     public TOETab getTOETab() {
@@ -875,7 +880,7 @@ public class CampaignGUI extends JPanel {
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
@@ -1335,8 +1340,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
-        umd.setVisible(true);
+        if (getCampaign().getUnitMarket().getMethod().isNone()) {
+            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+        } else {
+            new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
+        }
     }
 
     public void showShipSearch() {
@@ -1456,7 +1464,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuOptionsActionPerformed(final ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
@@ -1495,6 +1503,13 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
+        if (getCampaign().getCampaignOptions().getUnitMarketMethod() != unitMarket.getMethod()) {
+            getCampaign().setUnitMarket(getCampaign().getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+            getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
+            miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        }
+
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB(false);
@@ -1502,7 +1517,6 @@ public class CampaignGUI extends JPanel {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
             miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
@@ -2647,7 +2661,7 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(OptionsChangedEvent ev) {
+    public void handle(final OptionsChangedEvent evt) {
         if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
             removeStandardTab(GuiTabType.STRATCON);
         } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
@@ -2657,6 +2671,7 @@ public class CampaignGUI extends JPanel {
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
+        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
     @Subscribe

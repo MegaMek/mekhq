@@ -130,11 +130,6 @@ public final class MekHqConstants {
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
-    public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
-    public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
-    public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
-    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
-    public static final String RATINFO_DIR = "data/universe/ratdata";
     public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Types/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
@@ -144,6 +139,12 @@ public final class MekHqConstants {
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String RATINFO_DIR = "data/universe/ratdata/";
+    public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
+    public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
+    public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
 
     //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
@@ -154,7 +155,7 @@ public final class MekHqConstants {
     public static final String STRATCON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
     public static final String STRATCON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
     public static final String STRATCON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
-    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/ScenarioTemplates/";
+    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
     public static final String STRATCON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
     public static final String STRATCON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
     public static final String STRATCON_FACILITY_PATH = "./data/stratconfacilities/";

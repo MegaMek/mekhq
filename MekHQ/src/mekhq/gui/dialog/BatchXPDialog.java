@@ -18,12 +18,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.options.PilotOptions;
+import megamek.client.ui.preferences.*;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -43,11 +38,8 @@ import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public final class BatchXPDialog extends JDialog {
     private static final long serialVersionUID = -7897406116865495209L;
@@ -367,7 +359,7 @@ public final class BatchXPDialog extends JDialog {
 
     protected void spendXP() {
         String skillName = (String) choiceSkill.getSelectedItem();
-        if (choiceNoSkill.equals(skillName)) {
+        if (choiceNoSkill.equals(skillName) || (skillName == null)) {
             // This shouldn't happen, but guard against it anyway.
             return;
         }
@@ -386,22 +378,25 @@ public final class BatchXPDialog extends JDialog {
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
-                p.awardXP(-cost);
+                p.spendXP(cost);
+                PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
+                        p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
-                        SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        String spa = spaGenerator.rollSPA(p);
-                        if (null == spa) {
+                        final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
+                        final String spa = spaGenerator.rollSPA(p);
+                        if (spa == null) {
                             if (campaign.getCampaignOptions().useEdge()) {
-                                p.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
-                                PersonalLogger.gainedEdge(p, campaign.getLocalDate());
+                                p.changeEdge(1);
+                                p.changeCurrentEdge(1);
+                                PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());
                             }
                         } else {
-                            PersonalLogger.gained(p, campaign.getLocalDate(), spa);
+                            PersonalLogger.gainedSPA(campaign, p, campaign.getLocalDate(), spa);
                         }
                     }
                 }

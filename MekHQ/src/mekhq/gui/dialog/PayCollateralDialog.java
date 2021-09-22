@@ -303,10 +303,10 @@ public class PayCollateralDialog extends JDialog {
         }
 
         int percent = 0;
-        if (loan.getCollateralAmount().isPositive()) {
+        if (loan.determineCollateralAmount().isPositive()) {
             percent = amount
                     .multipliedBy(100)
-                    .dividedBy(loan.getCollateralAmount())
+                    .dividedBy(loan.determineCollateralAmount())
                     .getAmount().intValue();
         }
 
@@ -316,7 +316,7 @@ public class PayCollateralDialog extends JDialog {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(amount.toAmountString() + "/" + loan.getCollateralAmount().toAmountString());
+        barAmount.setString(amount.toAmountString() + "/" + loan.determineCollateralAmount().toAmountString());
     }
 
     public ArrayList<UUID> getUnits() {

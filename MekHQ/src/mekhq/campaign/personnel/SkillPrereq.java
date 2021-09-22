@@ -61,10 +61,11 @@ public class SkillPrereq implements MekHqXmlSerializable {
         skillSet = new Hashtable<>();
     }
 
+    @Override
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
 	public SkillPrereq clone() {
     	SkillPrereq clone = new SkillPrereq();
-    	clone.skillSet = (Hashtable<String, Integer>)this.skillSet.clone();
+    	clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
     	return clone;
     }
 

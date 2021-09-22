@@ -12,28 +12,27 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts.equipment;
-
-import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  *
@@ -54,21 +53,23 @@ public class MASC extends EquipmentPart {
         equipTonnage = calculateTonnage();
     }
 
+    @Override
     public MASC clone() {
     	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
         clone.copyBaseData(this);
     	return clone;
     }
 
+    @Override
     public void setUnit(Unit u) {
     	super.setUnit(u);
-    	if(null != unit && null != unit.getEntity().getEngine()) {
+    	if (null != unit && null != unit.getEntity().getEngine()) {
     		engineRating = unit.getEntity().getEngine().getRating();
     	}
     }
 
     private double calculateTonnage() {
-    	if(null == type) {
+    	if (null == type) {
     		return 0;
     	}
     	//supercharger tonnage will need to be set by hand in parts store
@@ -95,10 +96,9 @@ public class MASC extends EquipmentPart {
     	return type.hasSubType(MiscType.S_SUPERCHARGER);
     }
 
-
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if (needsFixing() || part.needsFixing()) {
     		return false;
     	}
         return part instanceof MASC
@@ -134,20 +134,21 @@ public class MASC extends EquipmentPart {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
+		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-				equipmentNum = Integer.parseInt(wn2.getTextContent());
-			}
-			else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-				typeName = wn2.getTextContent();
-			}
-			else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-				equipTonnage = Double.parseDouble(wn2.getTextContent());
-			}
-			else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-				engineRating = Integer.parseInt(wn2.getTextContent());
-			}
+			try {
+                if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
+                    equipmentNum = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+                    typeName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
+                    equipTonnage = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+                    engineRating = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
 		}
 		restore();
 	}
@@ -166,13 +167,13 @@ public class MASC extends EquipmentPart {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String details = super.getDetails(includeRepairDetails);
-		if(null != unit) {
+		if (null != unit) {
 			return details;
         }
         if (!details.isEmpty()) {
             details += ", ";
         }
-		if(isSupercharger()) {
+		if (isSupercharger()) {
 			return details + ", " + getEngineRating() + " rating";
 		}
 		return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";

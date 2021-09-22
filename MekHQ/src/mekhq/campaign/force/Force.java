@@ -124,8 +124,10 @@ public class Force implements Serializable {
         return camouflage;
     }
 
-    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
-        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
+    public Camouflage getCamouflageOrElse(final Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory()
+                ? ((getParentForce() == null ) ? camouflage : getParentForce().getCamouflageOrElse(camouflage))
+                : getCamouflage();
     }
 
     public void setCamouflage(Camouflage camouflage) {
@@ -180,11 +182,11 @@ public class Force implements Serializable {
         return scenarioId != -1;
     }
 
-    public Force getParentForce() {
+    public @Nullable Force getParentForce() {
         return parentForce;
     }
 
-    public void setParentForce(Force parent) {
+    public void setParentForce(final @Nullable Force parent) {
         this.parentForce = parent;
     }
 
@@ -226,18 +228,18 @@ public class Force implements Serializable {
             p = p.parentForce;
         }
 
-        var result = "";
+        StringBuilder result = new StringBuilder();
         int id = 0;
         for (int i = ancestors.size() - 1; i >= 0; i--) {
             Force ancestor = ancestors.get(i);
             id = 17 * id + ancestor.id + 1;
-            result += "\\" + ancestor.getName() + "|" + id;
+            result.append(ancestor.getName()).append("|").append(id);
+            if (!ancestor.getCamouflage().isDefault()) {
+                result.append("|").append(ancestor.getCamouflage().getCategory()).append("|").append(ancestor.getCamouflage().getFilename());
+            }
+            result.append("||");
         }
-        // Remove the backslash at the start
-        if (result.length() > 0) {
-            result = result.substring(1);
-        }
-        return result;
+        return result.toString();
     }
 
     /**

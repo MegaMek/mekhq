@@ -26,6 +26,7 @@ public class DocTableModel extends DataTableModel {
         campaign = c;
     }
 
+    @Override
     public Object getValueAt(int row, int col) {
         return getDocDesc((Person) data.get(row));
     }

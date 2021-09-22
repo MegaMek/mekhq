@@ -3,5 +3,6 @@
 	<displayableName>Orbital Defense</displayableName>
         <facilityType>OrbitalDefense</facilityType>
         <owner>Allied</owner>
+	<preventAerospace>true</preventAerospace>
         <visible>true</visible>
 </StratconFacility>

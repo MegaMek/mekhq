@@ -402,7 +402,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                             if (admin != null) {
-                                admin.awardXP(1);
+                                admin.awardXP(getCampaign(), 1);
                                 getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                             }
                         }

@@ -137,10 +137,10 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                    campaign);
+                    campaign, getContract(campaign).getEnemy());
         } else {
             addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
-                    campaign);
+                    campaign, getContract(campaign).getEmployerFaction());
         }
 
         addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));

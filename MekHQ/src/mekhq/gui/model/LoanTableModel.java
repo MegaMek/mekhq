@@ -91,19 +91,19 @@ public class LoanTableModel extends DataTableModel {
     public Object getValueAt(int row, int col) {
         Loan loan = getLoan(row);
         if (col == COL_DESC) {
-            return loan.getDescription();
+            return loan.toString();
         } else if (col == COL_COLLATERAL) {
-            return loan.getCollateralAmount().toAmountAndSymbolString();
+            return loan.determineCollateralAmount().toAmountAndSymbolString();
         } else if (col == COL_VALUE) {
-            return loan.getRemainingValue().toAmountAndSymbolString();
+            return loan.determineRemainingValue().toAmountAndSymbolString();
         } else if (col == COL_PAYMENT) {
             return loan.getPaymentAmount().toAmountAndSymbolString();
         } else if (col == COL_PRINCIPAL) {
             return loan.getPrincipal().toAmountAndSymbolString();
         } else if (col == COL_SCHEDULE) {
-            return Finances.getScheduleName(loan.getPaymentSchedule());
+            return loan.getFinancialTerm();
         } else if (col == COL_RATE) {
-            return loan.getInterestRate() + "%";
+            return loan.getRate() + "%";
         } else if (col == COL_NLEFT) {
             return loan.getRemainingPayments();
         } else if (col == COL_NEXT_PAY) {
