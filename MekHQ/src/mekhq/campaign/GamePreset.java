@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
+import mekhq.*;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,10 +39,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 
@@ -133,8 +130,7 @@ public class GamePreset implements MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        pw.println("<gamePreset version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ")
-                .getString("Application.version") + "\">");
+        pw.println("<gamePreset version=\"" + MekHqConstants.VERSION + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "title", title);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "description", description);
         if (getOptions() != null) {

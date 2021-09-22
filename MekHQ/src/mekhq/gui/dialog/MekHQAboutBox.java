@@ -85,7 +85,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
 
-        appVersionLabel.setText(mekhqProperties.getString("Application.version")); // NOI18N
+        appVersionLabel.setText(MekHqConstants.VERSION.toString());
         appVersionLabel.setName("appVersionLabel"); // NOI18N
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabel, gridBagConstraints);
