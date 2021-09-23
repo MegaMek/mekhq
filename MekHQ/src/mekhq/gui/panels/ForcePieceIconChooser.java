@@ -63,6 +63,7 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     //region Initialization
     @Override
     protected void finalizeInitialization() {
+        super.finalizeInitialization();
         getImageList().setSelectionMode(getLayer().getListSelectionMode());
     }
     //endregion Initialization
