@@ -38,8 +38,9 @@ public class UnitIconDialog extends StandardForceIconDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public UnitIconDialog(final JFrame parent, final @Nullable AbstractIcon icon) {
-        super(parent, "UnitIconDialog", "UnitIconDialog.title", new UnitIconChooser(icon));
+    public UnitIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
+        super(frame, "UnitIconDialog", "UnitIconDialog.title",
+                new UnitIconChooser(frame, icon));
     }
     //endregion Constructors
 

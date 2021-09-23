@@ -28,6 +28,7 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.trees.ForcePieceIconChooserTree;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.util.List;
@@ -39,10 +40,12 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     //endregion Variable Declarations
 
     //region Constructors
-    public ForcePieceIconChooser(final LayeredForceIconLayer layer, final @Nullable AbstractIcon icon) {
-        super(null, null, false);
+    public ForcePieceIconChooser(final JFrame frame, final LayeredForceIconLayer layer,
+                                 final @Nullable AbstractIcon icon) {
+        super(frame, "ForcePieceIconChooser" + layer.name(), new ForcePieceIconChooserTree(layer),
+                null, false);
         setLayer(layer);
-        initialize(new ForcePieceIconChooserTree(getLayer()));
+        initialize();
         setSelection(icon);
     }
     //endregion Constructors

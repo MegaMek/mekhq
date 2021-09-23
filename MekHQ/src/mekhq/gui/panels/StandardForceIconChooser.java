@@ -30,8 +30,13 @@ import javax.swing.*;
 
 public class StandardForceIconChooser extends AbstractIconChooser {
     //region Constructors
-    public StandardForceIconChooser(final @Nullable AbstractIcon icon) {
-        super(new StandardForceIconChooserTree(), icon);
+    public StandardForceIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
+        this(frame, "StandardForceIconChooser", icon);
+    }
+
+    protected StandardForceIconChooser(final JFrame frame, final String name,
+                                       final @Nullable AbstractIcon icon) {
+        super(frame, name, new StandardForceIconChooserTree(), icon);
     }
     //endregion Constructors
 

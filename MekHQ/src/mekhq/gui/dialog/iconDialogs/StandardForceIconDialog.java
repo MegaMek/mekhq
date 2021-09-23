@@ -35,14 +35,14 @@ public class StandardForceIconDialog extends AbstractIconChooserDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public StandardForceIconDialog(final JFrame parent, final @Nullable AbstractIcon icon) {
-        this(parent, "StandardForceIconDialog", "StandardForceIconDialog.title",
-                new StandardForceIconChooser(icon));
+    public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
+        this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
+                new StandardForceIconChooser(frame, icon));
     }
 
-    public StandardForceIconDialog(final JFrame parent, final String name, final String title,
+    public StandardForceIconDialog(final JFrame frame, final String name, final String title,
                                    final AbstractIconChooser chooser) {
-        super(parent, true, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
                 name, title, chooser, false);
     }
     //endregion Constructors

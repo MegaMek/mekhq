@@ -107,7 +107,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("iconSelectionPane");
 
-        setStandardForceIconChooser(new StandardForceIconChooser(getOriginalForceIcon()));
+        setStandardForceIconChooser(new StandardForceIconChooser(getFrame(), getOriginalForceIcon()));
         getTabbedPane().addTab(resources.getString("StandardIconTab.title"), getStandardForceIconChooser());
 
         setLayeredForceIconCreationPanel(new LayeredForceIconCreationPanel(getFrame(), getOriginalForceIcon(), false));

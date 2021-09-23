@@ -22,10 +22,12 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
 
+import javax.swing.*;
+
 public class UnitIconChooser extends StandardForceIconChooser {
     //region Constructors
-    public UnitIconChooser(final @Nullable AbstractIcon icon) {
-        super(icon);
+    public UnitIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
+        super(frame, "UnitIconChooser", icon);
     }
     //endregion Constructors
 
