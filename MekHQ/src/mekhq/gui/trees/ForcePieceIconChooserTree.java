@@ -32,7 +32,7 @@ public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
 
     //region Constructors
     public ForcePieceIconChooserTree(final LayeredForceIconLayer layer) {
-        super(layer.getListSelectionModel(), false);
+        super(false);
         setLayer(layer);
         setModel(createTreeModel());
     }

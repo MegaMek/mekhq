@@ -22,7 +22,9 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import mekhq.MekHQ;
+import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
@@ -35,6 +37,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
@@ -161,6 +164,8 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             file = new File(path);
         }
 
+        createForceIcon();
+
         try {
             final BufferedImage image = (BufferedImage) getForceIcon().getImage();
             ImageIO.write(image, "png", file);
@@ -170,11 +175,22 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     }
 
     public void refreshDirectory() {
+        createForceIcon();
         for (final ForcePieceIconChooser chooser : getChoosers().values()) {
+            chooser.setOriginalIcon(getForceIcon());
             chooser.refreshDirectory();
         }
-
-        // TODO : Windchild : Refresh the LayeredForceIcon based on the refreshed choosers
     }
     //endregion Button Actions
+
+    public void createForceIcon() {
+        final LayeredForceIcon icon = new LayeredForceIcon();
+        for (final Map.Entry<LayeredForceIconLayer, ForcePieceIconChooser> entry : getChoosers().entrySet()) {
+            final List<ForcePieceIcon> pieces = entry.getValue().getSelectedItems();
+            if (!pieces.isEmpty()) {
+                icon.getPieces().put(entry.getKey(), pieces);
+            }
+        }
+        setForceIcon(icon);
+    }
 }

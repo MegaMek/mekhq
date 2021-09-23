@@ -18,20 +18,22 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.ForcePieceIcon;
+import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.trees.ForcePieceIconChooserTree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.util.Enumeration;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class ForcePieceIconChooser extends StandardForceIconChooser {
+public class ForcePieceIconChooser extends AbstractIconChooser {
     //region Variable Declarations
     private LayeredForceIconLayer layer;
     //endregion Variable Declarations
@@ -55,6 +57,13 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
     }
     //endregion Getters/Setters
 
+    //region Initialization
+    @Override
+    protected void finalizeInitialization() {
+        getImageList().setSelectionMode(getLayer().getListSelectionMode());
+    }
+    //endregion Initialization
+
     @Override
     protected @Nullable AbstractDirectory getDirectory() {
         return (MHQStaticDirectoryManager.getForceIcons() == null) ? null
@@ -73,6 +82,11 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
         return (icon instanceof ForcePieceIcon) ? (ForcePieceIcon) icon : null;
     }
 
+    public List<ForcePieceIcon> getSelectedItems() {
+        return getImageList().getSelectedValuesList().stream().map(icon -> (ForcePieceIcon) icon)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void refreshDirectory() {
         MHQStaticDirectoryManager.refreshForceIcons();
@@ -85,36 +99,15 @@ public class ForcePieceIconChooser extends StandardForceIconChooser {
             return;
         }
 
-        // TODO : Windchild : Change this to handle multiselect and more from here
+        // Always start with the origin selected
+        getTreeCategories().setSelectionPath(new TreePath(
+                ((DefaultMutableTreeNode) getTreeCategories().getModel().getRoot()).getPath()));
 
-        // This cumbersome code takes the category name and transforms it into
-        // a TreePath so it can be selected in the dialog
-        // When the icon directory has changes, the previous selection might not be found
-        boolean found = false;
-        final DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTreeCategories().getModel().getRoot();
-        DefaultMutableTreeNode currentNode = root;
-        if (icon != null) {
-            for (String name : icon.getCategory().split(Pattern.quote("/"))) {
-                found = false;
-                for (Enumeration<?> children = currentNode.children(); children.hasMoreElements(); ) {
-                    DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
-                    if (name.equals(child.getUserObject())) {
-                        currentNode = child;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    break;
-                }
+        if (icon instanceof LayeredForceIcon) {
+            final List<ForcePieceIcon> forcePieceIcons = ((LayeredForceIcon) icon).getPieces().get(getLayer());
+            if ((forcePieceIcons != null) && !forcePieceIcons.isEmpty()) {
+                getImageList().setSelectedValues(forcePieceIcons.toArray(new ForcePieceIcon[]{}));
             }
-        }
-        // Select the root if the selection could not be found
-        if (found) {
-            getTreeCategories().setSelectionPath(new TreePath(currentNode.getPath()));
-            getImageList().setSelectedValue(icon, true);
-        } else {
-            getTreeCategories().setSelectionPath(new TreePath(root.getPath()));
         }
     }
 }

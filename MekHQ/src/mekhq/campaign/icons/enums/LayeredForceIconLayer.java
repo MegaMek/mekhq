@@ -51,19 +51,19 @@ public enum LayeredForceIconLayer {
     private final String toolTipText;
     private final String layerPath;
     private final String tableName;
-    private final int listSelectionModel;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+    private final int listSelectionMode;
     //endregion Variable Declarations
 
     //region Constructors
     LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
-                          final String tableName, final int listSelectionModel) {
+                          final String tableName, final int listSelectionMode) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;
         this.tableName = tableName;
-        this.listSelectionModel = listSelectionModel;
+        this.listSelectionMode = listSelectionMode;
     }
     //endregion Constructors
 
@@ -80,8 +80,8 @@ public enum LayeredForceIconLayer {
         return tableName;
     }
 
-    public int getListSelectionModel() {
-        return listSelectionModel;
+    public int getListSelectionMode() {
+        return listSelectionMode;
     }
     //endregion Getters
 

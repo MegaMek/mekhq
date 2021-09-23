@@ -33,11 +33,6 @@ public class StandardForceIconChooser extends AbstractIconChooser {
     public StandardForceIconChooser(final @Nullable AbstractIcon icon) {
         super(new StandardForceIconChooserTree(), icon);
     }
-
-    protected StandardForceIconChooser(final @Nullable JTree tree, final @Nullable AbstractIcon icon,
-                                       final boolean initialize) {
-        super(tree, icon, initialize);
-    }
     //endregion Constructors
 
     @Override

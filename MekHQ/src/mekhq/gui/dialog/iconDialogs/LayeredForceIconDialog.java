@@ -95,6 +95,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         } else if (getStandardForceIconChooser().equals(getTabbedPane().getSelectedComponent())) {
             return getStandardForceIconChooser().getSelectedItem();
         } else {
+            getLayeredForceIconCreationPanel().createForceIcon();
             return getLayeredForceIconCreationPanel().getForceIcon();
         }
     }
@@ -145,8 +146,10 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     }
     //endregion Initialization
 
+    //region Button Actions
     public void refreshDirectory(final @Nullable ActionEvent evt) {
         getStandardForceIconChooser().refreshDirectory();
         getLayeredForceIconCreationPanel().refreshDirectory();
     }
+    //endregion Button Actions
 }
