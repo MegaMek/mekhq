@@ -646,6 +646,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (int i = 1; i < forces.size(); i++) {
                 forceIds.append("|").append(forces.get(i).getId());
             }
+
             if (!multipleSelection) {
                 menuItem = new JMenuItem("Change Name...");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME + forceIds);
@@ -893,17 +894,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     menu.setEnabled(true);
                 }
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            }
 
+            menu = new JMenu("Force Icon");
+            if (!multipleSelection) {
                 menuItem = new JMenuItem("Change Force Icon...");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                menu.add(menuItem);
 
                 menuItem = new JMenuItem("Copy Force Icon");
                 menuItem.setName("miCopyForceIcon");
                 menuItem.setActionCommand(COMMAND_COPY_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                menu.add(menuItem);
             }
 
             if (gui.getCopyForceIcon() != null) {
@@ -911,14 +915,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setName("miPasteForceIcon");
                 menuItem.setActionCommand(COMMAND_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                menu.add(menuItem);
 
                 menuItem = new JMenuItem("Paste Force Icon to Force and Subforces");
                 menuItem.setName("miSubforcesPasteForceIcon");
                 menuItem.setActionCommand(COMMAND_SUBFORCES_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                menu.add(menuItem);
             }
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
             if (!multipleSelection) {
                 menuItem = new JMenuItem("Force Camouflage...");
