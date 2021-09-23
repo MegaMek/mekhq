@@ -90,6 +90,15 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     @Override
     public void refreshDirectory() {
         MHQStaticDirectoryManager.refreshForceIcons();
+        refreshTree();
+    }
+
+    /**
+     * This is separated as the general use case for refreshing is to have the force icon directory
+     * refreshed first and then followed by refreshing each individual force piece icon chooser
+     * without refreshing the actual directory.
+     */
+    public void refreshTree() {
         refreshDirectory(new ForcePieceIconChooserTree(getLayer()));
     }
 
@@ -107,6 +116,8 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
             final List<ForcePieceIcon> forcePieceIcons = ((LayeredForceIcon) icon).getPieces().get(getLayer());
             if ((forcePieceIcons != null) && !forcePieceIcons.isEmpty()) {
                 getImageList().setSelectedValues(forcePieceIcons.toArray(new ForcePieceIcon[]{}));
+            } else {
+                getImageList().clearSelection();
             }
         }
     }

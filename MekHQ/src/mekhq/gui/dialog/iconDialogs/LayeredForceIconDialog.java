@@ -149,7 +149,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //region Button Actions
     public void refreshDirectory(final @Nullable ActionEvent evt) {
         getStandardForceIconChooser().refreshDirectory();
-        getLayeredForceIconCreationPanel().refreshDirectory();
+        getLayeredForceIconCreationPanel().refreshDirectory(false);
     }
     //endregion Button Actions
 }

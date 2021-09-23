@@ -142,17 +142,17 @@ public class LayeredForceIcon extends StandardForceIcon {
     protected void writeBodyToXML(final PrintWriter pw, int indent) {
         super.writeBodyToXML(pw, indent);
 
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "map");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "map");
         for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
             if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, entry.getKey().name());
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, entry.getKey().name());
                 for (final ForcePieceIcon value : entry.getValue()) {
                     value.writeToXML(pw, indent);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, entry.getKey().name());
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, entry.getKey().name());
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "map");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "map");
     }
 
     public static LayeredForceIcon parseFromXML(final Node wn) {

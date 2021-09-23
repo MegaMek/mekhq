@@ -22,7 +22,7 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -43,7 +43,7 @@ import java.util.Map;
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
-    private final boolean includeButtons;
+    private final boolean includeRefreshButton;
 
     private JTabbedPane tabbedPane;
     private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
@@ -53,11 +53,11 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //region Constructors
     public LayeredForceIconCreationPanel(final JFrame frame,
                                          final @Nullable StandardForceIcon forceIcon,
-                                         final boolean includeButtons) {
+                                         final boolean includeRefreshButton) {
         super(frame, "LayeredForceIconCreationPanel", new GridBagLayout());
         setForceIcon((forceIcon instanceof LayeredForceIcon)
                 ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
-        this.includeButtons = includeButtons;
+        this.includeRefreshButton = includeRefreshButton;
         initialize();
     }
     //endregion Constructors
@@ -71,8 +71,8 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         this.forceIcon = forceIcon;
     }
 
-    public boolean isIncludeButtons() {
-        return includeButtons;
+    public boolean isIncludeRefreshButton() {
+        return includeRefreshButton;
     }
 
     public JTabbedPane getTabbedPane() {
@@ -108,7 +108,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = isIncludeRefreshButton() ? 4 : 3;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -123,23 +123,31 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         add(getTabbedPane(), gbc);
 
         setLblIcon(new JLabel(getForceIcon().getImageIcon()));
-        getLblIcon().setToolTipText(resources.getString("lblIcon.toolTipText"));
         getLblIcon().setName("lblIcon");
+        getLblIcon().getAccessibleContext().setAccessibleName(resources.getString("lblIcon.accessibleName"));
         gbc.gridy++;
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.SOUTH;
         add(getLblIcon(), gbc);
 
-        if (isIncludeButtons()) {
-            gbc.gridy++;
-            gbc.gridwidth = 1;
-            add(new MMButton("btnExport", resources, "Export.text",
-                    "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        add(new MMButton("btnNewIcon", resources, "btnNewIcon.text",
+                "btnNewIcon.toolTipText", evt -> newIcon()), gbc);
 
+        gbc.gridx++;
+        add(new MMButton("btnClearCurrentTab", resources, "btnClearCurrentTab.text",
+                "btnClearCurrentTab.toolTipText", evt -> clearSelectedTab()), gbc);
+
+        gbc.gridx++;
+        add(new MMButton("btnExport", resources, "Export.text",
+                "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
+
+        if (isIncludeRefreshButton()) {
             gbc.gridx++;
             add(new MMButton("btnRefreshDirectory", resources, "RefreshDirectory.text",
-                    "RefreshDirectory.toolTipText", evt -> refreshDirectory()), gbc);
+                    "RefreshDirectory.toolTipText", evt -> refreshDirectory(true)), gbc);
         }
 
         setPreferences();
@@ -153,6 +161,19 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //endregion Initialization
 
     //region Button Actions
+    public void newIcon() {
+        final LayeredForceIcon icon = new LayeredForceIcon();
+        setForceIcon(icon);
+        for (final ForcePieceIconChooser chooser : getChoosers().values()) {
+            chooser.setOriginalIcon(icon);
+            chooser.setSelection(icon);
+        }
+    }
+
+    public void clearSelectedTab() {
+        ((ForcePieceIconChooser) getTabbedPane().getSelectedComponent()).clearSelectedItems();
+    }
+
     private void exportAction() {
         File file = FileDialogs.exportLayeredForceIcon(getFrame()).orElse(null);
         if (file == null) {
@@ -174,11 +195,20 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         }
     }
 
-    public void refreshDirectory() {
+    /**
+     * @param performDirectoryRefresh whether to perform the actual refresh of the Force Icons
+     *                                directory or just handle the changes required for an already
+     *                                refreshed directory.
+     */
+    public void refreshDirectory(final boolean performDirectoryRefresh) {
+        if (performDirectoryRefresh) {
+            MHQStaticDirectoryManager.refreshForceIcons();
+        }
+
         createForceIcon();
         for (final ForcePieceIconChooser chooser : getChoosers().values()) {
             chooser.setOriginalIcon(getForceIcon());
-            chooser.refreshDirectory();
+            chooser.refreshTree();
         }
     }
     //endregion Button Actions
