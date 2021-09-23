@@ -42,7 +42,7 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     //region Constructors
     public ForcePieceIconChooser(final JFrame frame, final LayeredForceIconLayer layer,
                                  final @Nullable AbstractIcon icon) {
-        super(frame, "ForcePieceIconChooser" + layer.name(), new ForcePieceIconChooserTree(layer),
+        super(frame, layer.name() + "ForcePieceIconChooser", new ForcePieceIconChooserTree(layer),
                 null, false);
         setLayer(layer);
         initialize();
@@ -63,6 +63,10 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     //region Initialization
     @Override
     protected void finalizeInitialization() {
+        // The first two are required for the preferences to be individual based on the layer
+        getSplitPane().setName(getLayer().name() + "Pane");
+        getChkIncludeSubdirectories().setName("chkIncludeSubdirectories" + getLayer().name());
+
         super.finalizeInitialization();
         getImageList().setSelectionMode(getLayer().getListSelectionMode());
     }
