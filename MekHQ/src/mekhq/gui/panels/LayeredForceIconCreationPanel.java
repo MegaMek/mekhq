@@ -117,8 +117,13 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         getTabbedPane().setPreferredSize(new Dimension(700, 1100));
         setChoosers(new HashMap<>());
         for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
-            getChoosers().put(layer, new ForcePieceIconChooser(layer, getForceIcon()));
-            getTabbedPane().addTab(layer.toString(), getChoosers().get(layer));
+            final ForcePieceIconChooser chooser = new ForcePieceIconChooser(layer, getForceIcon());
+            chooser.getImageList().addListSelectionListener(evt -> {
+                getForceIcon().getPieces().put(layer, chooser.getSelectedItems());
+                getLblIcon().setIcon(getForceIcon().getImageIcon());
+            });
+            getChoosers().put(layer, chooser);
+            getTabbedPane().addTab(layer.toString(), chooser);
         }
         add(getTabbedPane(), gbc);
 
