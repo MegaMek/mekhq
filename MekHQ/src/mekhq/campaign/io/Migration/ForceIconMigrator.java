@@ -2433,16 +2433,52 @@ public class ForceIconMigrator {
     }
 
     private static StandardForceIcon migrateStandardFormationsClan(final StandardForceIcon icon) {
-        // TODO : Windchild : Complete me
         final LayeredForceIcon layered = new LayeredForceIcon();
         switch (icon.getFilename()) {
-            case "battlearmor.png":
+            case "Binary.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Battle Armor (Extended).png"));
-                layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
-                layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "MVO.png"));
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(04) Binary.png"));
+                return layered;
+            case "Cluster.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(08) Cluster.png"));
+                return layered;
+            case "Galaxy.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(09) Galaxy.png"));
+                return layered;
+            case "Nova.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(03) Nova.png"));
+                return layered;
+            case "Point.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(01) Point.png"));
+                return layered;
+            case "Star.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(02) Star.png"));
+                return layered;
+            case "Supernova Trinary.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(07) Supernova Trinary.png"));
+                return layered;
+            case "Supernova.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(05) Supernova.png"));
+                return layered;
+            case "Trinary.png":
+                layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                layered.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Formation/Clan/", "(06) Trinary.png"));
                 return layered;
             default:
                 return icon;
