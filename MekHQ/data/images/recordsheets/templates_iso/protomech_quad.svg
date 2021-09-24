@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN'
+          'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg contentScriptType="text/ecmascript" width="559.0" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" contentStyleType="text/css" height="149.20000000000002" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" version="1.0"
+><g style="mml-color-elements:" id="rs_template"
+  ><g transform="translate (0.966 0.966)"
+    ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 l 82.038,0.000 l 5.475,8.214 L 553.525,10.714 l 5.475,8.214 L 559.000,137.486 l -5.475,8.214 L 98.488,145.700 l -5.475,-8.214 L 7.975,137.486 l -5.475,-8.214 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+      /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 l 82.038,0.000 l 5.475,8.214 L 551.025,8.214 l 5.475,8.214 L 556.500,135.986 l -5.475,8.214 L 95.988,144.200 l -5.475,-8.214 L 5.475,135.986 l -5.475,-8.214 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+      /><g transform="translate (2.5,3.0)"
+      ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 78.038 l 4.999,7.500 l -4.999,7.500 h -78.038 Z"
+        /><text fill="#ffffff" x="7.999" id="protomechIndex" y="11.250" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal;mml-field-width:70.944" text-anchor="start"
+        >PROTOMECH #</text
+      ></g
+    ></g
+    ><g transform="translate (3.000 18.000)"
+    ><text x="3.000" y="9.586" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" textLength="15.930" lengthAdjust="spacingAndGlyphs"
+      >Type:</text
+      ><text fill="#231f20" x="22.523" id="type" y="9.586" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:67.310" text-anchor="start"
+      >Lorem Ipsum</text
+      ><text fill="#231f20" x="48.917" id="type2" y="19.173" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:43.917" text-anchor="start"
+      ></text
+      ><text x="3.000" y="19.173" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" textLength="16.411" lengthAdjust="spacingAndGlyphs"
+      >Tons:</text
+      ><text fill="#231f20" x="23.004" id="tonnage" y="19.173" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:20.912" text-anchor="start"
+      >0</text
+      ><text x="3.000" y="28.759" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" id="lblRole" textLength="15.108" lengthAdjust="spacingAndGlyphs"
+      >Role:</text
+      ><text fill="#231f20" x="21.702" id="role" y="28.759" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:68.131" text-anchor="start"
+      >Lorem Ipsum</text
+      ><text fill="#231f20" x="3.000" y="38.345" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Movement Points:</text
+      ><text fill="#231f20" x="5.000" y="47.932" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Walk:</text
+      ><text fill="#231f20" x="55.000" id="mpWalk" y="47.932" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+      ><text fill="#231f20" x="5.000" y="55.932" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Run:</text
+      ><text fill="#231f20" x="55.000" id="mpRun" y="55.932" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+      ><text fill="#231f20" x="5.000" id="lblJump" y="63.932" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Jump:</text
+      ><text fill="#231f20" x="55.000" id="mpJump" y="63.932" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+    ></g
+    ><g transform="translate (94.833 11.786)"
+    ><g
+      ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 174.192,0.000 l 5.475,8.214 L 179.667,78.905 l -5.475,8.214 L 5.475,87.119 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 166.977 l 3.749,5.625 l -3.749,5.625 h -166.977 Z"
+          /><text x="87.238" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="88.665" lengthAdjust="spacingAndGlyphs"
+          >WEAPONS INVENTORY</text
+        ></g
+      ></g
+      ><rect fill="none" x="3.000" width="173.667" id="inventory" height="71.869" y="14.250"
+    /></g
+    ><g transform="translate (278.500 11.786)"
+    ><g
+      ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 174.192,0.000 l 5.475,8.214 L 179.667,120.200 l -5.475,8.214 L 5.475,128.414 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 166.977 l 3.749,5.625 l -3.749,5.625 h -166.977 Z"
+          /><text x="87.238" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="135.352" lengthAdjust="spacingAndGlyphs"
+          >HIT LOCATIONS AND CRITICAL HITS</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="13.540" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >2D6</text
+      ><text fill="#231f20" x="24.080" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >LOCATION</text
+      ><text fill="#231f20" x="55.700" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >1st HIT</text
+      ><text fill="#231f20" x="99.617" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >2nd HIT</text
+      ><text fill="#231f20" x="143.533" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >3rd HIT</text
+      ><text fill="#231f20" x="13.540" y="35.224" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >2</text
+      ><text fill="#231f20" x="24.080" y="35.224" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Main Gun</text
+      ><path fill="#ffffff" d="M 55.700,30.939 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="64.100" y="35.224" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="42.963" lengthAdjust="spacingAndGlyphs"
+      >Main Gun Destroyed</text
+      ><text fill="#231f20" x="13.540" y="47.798" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >4,5</text
+      ><text fill="#231f20" x="13.540" y="54.798" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >9,10</text
+      ><text fill="#231f20" x="24.080" y="47.798" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Legs</text
+      ><path fill="#ffffff" d="M 55.700,43.513 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="64.100" y="47.798" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="24.702" lengthAdjust="spacingAndGlyphs"
+      >-1 Walk MP</text
+      ><path fill="#ffffff" d="M 99.617,43.513 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="108.017" y="47.798" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="29.620" lengthAdjust="spacingAndGlyphs"
+      >1/2 Walk MP</text
+      ><path fill="#c8c7c7" d="M 143.533,43.513 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="151.933" y="47.798" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="18.787" lengthAdjust="spacingAndGlyphs"
+      >No Move</text
+      ><text fill="#231f20" x="13.540" y="60.371" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >6,7,8</text
+      ><text fill="#231f20" x="24.080" y="60.371" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Torso</text
+      ><path fill="#c8c7c7" d="M 55.700,56.086 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="64.100" y="60.371" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="28.599" lengthAdjust="spacingAndGlyphs"
+      >-1 Jump MP*</text
+      ><path fill="#c8c7c7" d="M 99.617,56.086 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="108.017" y="60.371" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="33.517" lengthAdjust="spacingAndGlyphs"
+      >1/2 Jump MP*</text
+      ><path fill="#231f20" d="M 143.533,56.086 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="151.933" y="60.371" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="11.915" lengthAdjust="spacingAndGlyphs"
+      >Proto</text
+      ><text x="151.933" y="67.371" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="21.687" lengthAdjust="spacingAndGlyphs"
+      >Destroyed</text
+      ><text fill="#231f20" x="13.540" y="72.945" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >12</text
+      ><text fill="#231f20" x="24.080" y="72.945" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Head</text
+      ><path fill="#ffffff" d="M 55.700,68.660 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="64.100" y="72.945" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.167" lengthAdjust="spacingAndGlyphs"
+      >+1 to Hit</text
+      ><path fill="#c8c7c7" d="M 99.617,68.660 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="108.017" y="72.945" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.165" lengthAdjust="spacingAndGlyphs"
+      >+2 to Hit</text
+      ><text x="108.017" y="79.945" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="45.401" lengthAdjust="spacingAndGlyphs"
+      >No Long Range Shots</text
+      ><text fill="#231f20" x="3.000" y="106.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >*Torso Weapon Destroyed, Roll 1D6:</text
+      ><text fill="#231f20" x="6.000" id="torsoWeapon_0" y="113.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="63.970" id="torsoWeapon_1" y="113.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="121.940" id="torsoWeapon_2" y="113.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="6.000" id="torsoWeapon_3" y="120.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="63.970" id="torsoWeapon_4" y="120.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="121.940" id="torsoWeapon_5" y="120.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:52.700" text-anchor="start"
+      ></text
+      ><text x="6.000" y="125.414" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.000px;font-weight:bold;font-style:normal" visibility="hidden" id="magClampNote"
+      >Magnetic Clamp System destroyed on first torso critical</text
+    ></g
+    ><g transform="translate (462.167 11.786)"
+    ><g transform="translate (3.9209678061025244,0.0)"
+      ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 76.493 l 3.749,5.625 l -3.749,5.625 h -76.493 Z"
+        /><text x="41.996" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="69.539" lengthAdjust="spacingAndGlyphs"
+        >ARMOR DIAGRAM</text
+      ></g
+      ><g transform="matrix(1.027 0 0 1.027 4.923 11.250)"
+      >
+<g id="armor_diagram_protomech_quad" transform="matrix(1,0,0,-1,-488.94017,690.48224)"
+        ><g id="g2708" transform="translate(568.6331,594.4059)"
+          ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -1.387,1.502 -2.627,3.106 -3.736,4.834 -0.702,0.555 -1.436,1.067 -2.198,1.539 l -1.978,5.714 c 1.266,3.197 1.851,6.656 1.76,10.109 l -0.661,1.097 -1.099,0.88 -0.219,1.319 c -2.176,3.6 -4.444,7.112 -6.812,10.548 -0.073,1.465 0,2.923 0.216,4.374 -0.616,-1.51 -1.084,-1.559 -1.084,-1.559 0,0 -4.007,-1.335 -6.678,-1.335 0,-7.012 -32.053,-8.347 -32.053,0 -2.671,0 -6.679,1.335 -6.679,1.335 0,0 -0.434,0.038 -1.023,0.954 0.151,-1.251 0.218,-2.507 0.156,-3.769 -2.368,-3.436 -4.637,-6.948 -6.812,-10.548 l -0.219,-1.319 -1.1,-0.88 -0.66,-1.097 c -0.092,-3.453 0.493,-6.912 1.76,-10.109 L -71.097,6.373 C -71.859,5.901 -72.591,5.389 -73.295,4.834 -74.404,3.106 -75.645,1.502 -77.031,0 l -0.219,-1.098 h 2.197 l 0.221,-1.099 c 3.474,-0.249 6.88,0.27 10.107,1.538 0.753,0.517 1.561,0.927 2.424,1.228 l 0.157,-0.315 -2.594,-7.493 c -0.997,-0.619 -0.735,-1.293 -1.658,-2.017 -1.456,-2.265 -2.101,-4.369 -3.917,-6.34 l -0.288,-1.44 h 2.879 l 0.288,-1.441 c 4.548,-0.307 6.815,0.373 11.052,2.017 3.287,1.93 6.917,3.304 10.662,4.035 l 1.442,0.864 0.576,1.729 c -0.437,1.494 -1.013,2.936 -1.728,4.322 l 0.286,1.442 c -0.121,2.633 -0.404,5.183 -0.864,7.779 -0.575,0.768 -1.151,1.537 -1.727,2.306 l -0.289,2.016 c 0.217,2.147 0.6,4.255 1.153,6.341 1.944,1.493 3.695,3.243 5.185,5.186 0.45,1.362 1.122,2.611 2.018,3.746 l 1.153,0.576 1.152,-0.576 c 0.898,-1.134 1.571,-2.383 2.017,-3.746 1.491,-1.943 3.242,-3.693 5.186,-5.186 0.556,-2.085 0.938,-4.194 1.153,-6.341 L -29.294,6.017 C -29.871,5.249 -30.448,4.48 -31.023,3.711 -31.48,1.115 -31.764,-1.435 -31.888,-4.068 L -31.6,-5.51 c -0.716,-1.386 -1.294,-2.827 -1.729,-4.322 l 0.576,-1.729 1.441,-0.864 c 3.746,-0.731 7.375,-2.105 10.663,-4.035 4.237,-1.644 8.706,-2.324 13.254,-2.017 l 0.288,1.441 h 2.88 l -0.287,1.44 c -1.817,1.971 -3.443,4.074 -4.898,6.34 -0.923,0.726 -1.883,1.399 -2.881,2.017 l -2.595,7.493 0.158,0.315 c 0.863,-0.301 1.67,-0.711 2.423,-1.228 3.228,-1.268 6.634,-1.787 10.108,-1.538 l 0.22,1.099 h 2.198 z" id="path2710"
+          /></g
+          ><g id="g2712" transform="translate(568.6331,594.4059)"
+          ><path style="fill:none;stroke:#c7c8ca;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -1.387,1.502 -2.627,3.106 -3.736,4.834 -0.702,0.555 -1.436,1.067 -2.198,1.539 l -1.978,5.714 c 1.266,3.197 1.851,6.656 1.76,10.109 l -0.661,1.097 -1.099,0.88 -0.219,1.319 c -2.176,3.6 -4.444,7.112 -6.812,10.548 -0.073,1.465 0,2.923 0.216,4.374 -0.616,-1.51 -1.084,-1.559 -1.084,-1.559 0,0 -4.007,-1.335 -6.678,-1.335 0,-7.012 -32.053,-8.347 -32.053,0 -2.671,0 -6.679,1.335 -6.679,1.335 0,0 -0.434,0.038 -1.023,0.954 0.151,-1.251 0.218,-2.507 0.156,-3.769 -2.368,-3.436 -4.637,-6.948 -6.812,-10.548 l -0.219,-1.319 -1.1,-0.88 -0.66,-1.097 c -0.092,-3.453 0.493,-6.912 1.76,-10.109 L -71.097,6.373 C -71.859,5.901 -72.591,5.389 -73.295,4.834 -74.404,3.106 -75.645,1.502 -77.031,0 l -0.219,-1.098 h 2.197 l 0.221,-1.099 c 3.474,-0.249 6.88,0.27 10.107,1.538 0.753,0.517 1.561,0.927 2.424,1.228 l 0.157,-0.315 -2.594,-7.493 c -0.997,-0.619 -0.735,-1.293 -1.658,-2.017 -1.456,-2.265 -2.101,-4.369 -3.917,-6.34 l -0.288,-1.44 h 2.879 l 0.288,-1.441 c 4.548,-0.307 6.815,0.373 11.052,2.017 3.287,1.93 6.917,3.304 10.662,4.035 l 1.442,0.864 0.576,1.729 c -0.437,1.494 -1.013,2.936 -1.728,4.322 l 0.286,1.442 c -0.121,2.633 -0.404,5.183 -0.864,7.779 -0.575,0.768 -1.151,1.537 -1.727,2.306 l -0.289,2.016 c 0.217,2.147 0.6,4.255 1.153,6.341 1.944,1.493 3.695,3.243 5.185,5.186 0.45,1.362 1.122,2.611 2.018,3.746 l 1.153,0.576 1.152,-0.576 c 0.898,-1.134 1.571,-2.383 2.017,-3.746 1.491,-1.943 3.242,-3.693 5.186,-5.186 0.556,-2.085 0.938,-4.194 1.153,-6.341 L -29.294,6.017 C -29.871,5.249 -30.448,4.48 -31.023,3.711 -31.48,1.115 -31.764,-1.435 -31.888,-4.068 L -31.6,-5.51 c -0.716,-1.386 -1.294,-2.827 -1.729,-4.322 l 0.576,-1.729 1.441,-0.864 c 3.746,-0.731 7.375,-2.105 10.663,-4.035 4.237,-1.644 8.706,-2.324 13.254,-2.017 l 0.288,1.441 h 2.88 l -0.287,1.44 c -1.817,1.971 -3.443,4.074 -4.898,6.34 -0.923,0.726 -1.883,1.399 -2.881,2.017 l -2.595,7.493 0.158,0.315 c 0.863,-0.301 1.67,-0.711 2.423,-1.228 3.228,-1.268 6.634,-1.787 10.108,-1.538 l 0.22,1.099 h 2.198 z" id="path2714"
+          /></g
+          ><g id="g2716" transform="translate(560.4944,644.5001)"
+          ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c 0,2.953 -1.683,5.507 -4.139,6.772 0.097,1.612 0.182,3.361 0.251,5.275 h 0.593 l 3.294,2.835 v 4.252 l -3.294,2.835 h -0.386 c 0.01,1.24 0.016,2.52 0.015,3.855 -0.022,2.493 -2.671,6.678 -2.671,6.678 h -6.677 l -2.671,-4.006 h -9.35 l -1.336,9.349 h -8.014 l -1.336,-9.349 h -9.348 l -2.671,4.006 h -6.677 c 0,0 -1.185,-0.966 -2.671,-6.678 -0.046,-1.337 -0.08,-2.613 -0.109,-3.855 h -0.455 l -3.293,-2.835 v -4.252 l 3.293,-2.835 h 0.397 c 0.029,-1.971 0.082,-3.78 0.158,-5.432 -2.297,-1.312 -3.848,-3.78 -3.848,-6.615 0,-3.518 2.387,-6.471 5.629,-7.347 0.419,-1.457 0.844,-2.369 1.211,-2.939 0.588,-0.916 1.023,-0.953 1.023,-0.953 0,0 4.008,-1.336 6.679,-1.336 0,-8.346 32.052,-7.011 32.052,0 2.671,0 6.679,1.336 6.679,1.336 0,0 0.468,0.049 1.084,1.559 0.222,0.544 0.463,1.279 0.708,2.269 C -2.512,-6.624 0,-3.608 0,0" id="path2718"
+          /></g
+          ><g id="g2720" transform="translate(560.4944,644.5001)"
+          ><path style="fill:none;stroke:#c7c8ca;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c 0,2.953 -1.683,5.507 -4.139,6.772 0.097,1.612 0.182,3.361 0.251,5.275 h 0.593 l 3.294,2.835 v 4.252 l -3.294,2.835 h -0.386 c 0.01,1.24 0.016,2.52 0.015,3.855 -0.022,2.493 -2.671,6.678 -2.671,6.678 h -6.677 l -2.671,-4.006 h -9.35 l -1.336,9.349 h -8.014 l -1.336,-9.349 h -9.348 l -2.671,4.006 h -6.677 c 0,0 -1.185,-0.966 -2.671,-6.678 -0.046,-1.337 -0.08,-2.613 -0.109,-3.855 h -0.455 l -3.293,-2.835 v -4.252 l 3.293,-2.835 h 0.397 c 0.029,-1.971 0.082,-3.78 0.158,-5.432 -2.297,-1.312 -3.848,-3.78 -3.848,-6.615 0,-3.518 2.387,-6.471 5.629,-7.347 0.419,-1.457 0.844,-2.369 1.211,-2.939 0.588,-0.916 1.023,-0.953 1.023,-0.953 0,0 4.008,-1.336 6.679,-1.336 0,-8.346 32.052,-7.011 32.052,0 2.671,0 6.679,1.336 6.679,1.336 0,0 0.468,0.049 1.084,1.559 0.222,0.544 0.463,1.279 0.708,2.269 C -2.512,-6.624 0,-3.608 0,0 Z" id="path2722"
+          /></g
+          ><g id="shadow_MG" transform="translate(509.6985,687.7286)"
+          ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:#c7c8ca;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -3.853,0 -6.977,-3.906 -6.977,-8.721 0,-4.817 3.124,-8.72 6.977,-8.72 3.854,0 6.978,3.903 6.978,8.72 C 6.978,-3.906 3.854,0 0,0" id="path2726"
+          /></g
+          ><g id="g2728" transform="translate(537.7727,654.2096)"
+          ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 -0.957,-1.914 H -1.914 L -2.87,0 h -9.57 l -0.957,-1.914 h -0.958 L -15.312,0 l -1.914,19.141 1.914,3.828 h 1.913 l 10e-4,-3.828 5.742,1.914 5.744,-1.914 -0.002,3.828 h 2.871 l 0.957,-3.828 z" id="path2730"
+          /></g
+          ><g id="g2732" transform="translate(537.7727,654.2096)"
+          ><path style="fill:none;stroke:#c7c8ca;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 -0.957,-1.914 H -1.914 L -2.87,0 h -9.57 l -0.957,-1.914 h -0.958 L -15.312,0 l -1.914,19.141 1.914,3.828 h 1.913 l 10e-4,-3.828 5.742,1.914 5.744,-1.914 -0.002,3.828 h 2.871 l 0.957,-3.828 z" id="path2734"
+          /></g
+          ><g id="g2736" transform="translate(567.2151,595.8232)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -1.387,1.502 -2.627,3.106 -3.736,4.834 -0.702,0.555 -1.436,1.067 -2.198,1.539 l -1.978,5.714 c 1.266,3.197 1.851,6.656 1.76,10.109 l -0.661,1.097 -1.099,0.88 -0.219,1.319 c -2.176,3.6 -4.444,7.112 -6.812,10.548 -0.073,1.465 0,2.923 0.216,4.374 -0.616,-1.51 -1.084,-1.559 -1.084,-1.559 0,0 -4.007,-1.335 -6.678,-1.335 0,-7.012 -32.053,-8.347 -32.053,0 -2.671,0 -6.679,1.335 -6.679,1.335 0,0 -0.434,0.038 -1.023,0.954 0.151,-1.251 0.218,-2.507 0.156,-3.769 -2.368,-3.436 -4.637,-6.948 -6.812,-10.548 l -0.219,-1.319 -1.1,-0.88 -0.66,-1.097 c -0.092,-3.453 0.493,-6.912 1.76,-10.109 L -71.097,6.373 C -71.859,5.901 -72.591,5.389 -73.295,4.834 -74.404,3.106 -75.645,1.502 -77.031,0 l -0.219,-1.098 h 2.197 l 0.221,-1.099 c 3.474,-0.249 6.88,0.27 10.107,1.538 0.753,0.517 1.561,0.927 2.424,1.228 l 0.157,-0.315 -2.594,-7.493 c -0.997,-0.619 -0.735,-1.293 -1.658,-2.017 -1.456,-2.265 -2.101,-4.369 -3.917,-6.34 l -0.288,-1.44 h 2.879 l 0.288,-1.441 c 4.548,-0.307 6.815,0.373 11.052,2.017 3.287,1.93 6.917,3.304 10.662,4.035 l 1.442,0.864 0.576,1.729 c -0.437,1.494 -1.013,2.936 -1.728,4.322 l 0.286,1.442 c -0.121,2.633 -0.404,5.183 -0.864,7.779 -0.575,0.768 -1.151,1.537 -1.727,2.306 l -0.289,2.016 c 0.217,2.147 0.6,4.255 1.153,6.341 1.944,1.493 3.695,3.243 5.185,5.186 0.45,1.362 1.122,2.611 2.018,3.746 l 1.153,0.576 1.152,-0.576 c 0.898,-1.134 1.571,-2.383 2.017,-3.746 1.491,-1.943 3.242,-3.693 5.186,-5.186 0.556,-2.085 0.938,-4.194 1.153,-6.341 L -29.294,6.017 C -29.871,5.249 -30.448,4.48 -31.023,3.711 -31.48,1.115 -31.764,-1.435 -31.888,-4.068 L -31.6,-5.51 c -0.716,-1.386 -1.294,-2.827 -1.729,-4.322 l 0.576,-1.729 1.441,-0.864 c 3.746,-0.731 7.375,-2.105 10.663,-4.035 4.237,-1.644 8.706,-2.324 13.254,-2.017 l 0.288,1.441 h 2.88 l -0.287,1.44 c -1.817,1.971 -3.443,4.074 -4.898,6.34 -0.923,0.726 -1.883,1.399 -2.881,2.017 l -2.595,7.493 0.158,0.315 c 0.863,-0.301 1.67,-0.711 2.423,-1.228 3.228,-1.268 6.634,-1.787 10.108,-1.538 l 0.22,1.099 h 2.198 z" id="path2738"
+          /></g
+          ><g id="g2740" transform="translate(567.2151,595.8232)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -1.387,1.502 -2.627,3.106 -3.736,4.834 -0.702,0.555 -1.436,1.067 -2.198,1.539 l -1.978,5.714 c 1.266,3.197 1.851,6.656 1.76,10.109 l -0.661,1.097 -1.099,0.88 -0.219,1.319 c -2.176,3.6 -4.444,7.112 -6.812,10.548 -0.073,1.465 0,2.923 0.216,4.374 -0.616,-1.51 -1.084,-1.559 -1.084,-1.559 0,0 -4.007,-1.335 -6.678,-1.335 0,-7.012 -32.053,-8.347 -32.053,0 -2.671,0 -6.679,1.335 -6.679,1.335 0,0 -0.434,0.038 -1.023,0.954 0.151,-1.251 0.218,-2.507 0.156,-3.769 -2.368,-3.436 -4.637,-6.948 -6.812,-10.548 l -0.219,-1.319 -1.1,-0.88 -0.66,-1.097 c -0.092,-3.453 0.493,-6.912 1.76,-10.109 L -71.097,6.373 C -71.859,5.901 -72.591,5.389 -73.295,4.834 -74.404,3.106 -75.645,1.502 -77.031,0 l -0.219,-1.098 h 2.197 l 0.221,-1.099 c 3.474,-0.249 6.88,0.27 10.107,1.538 0.753,0.517 1.561,0.927 2.424,1.228 l 0.157,-0.315 -2.594,-7.493 c -0.997,-0.619 -0.735,-1.293 -1.658,-2.017 -1.456,-2.265 -2.101,-4.369 -3.917,-6.34 l -0.288,-1.44 h 2.879 l 0.288,-1.441 c 4.548,-0.307 6.815,0.373 11.052,2.017 3.287,1.93 6.917,3.304 10.662,4.035 l 1.442,0.864 0.576,1.729 c -0.437,1.494 -1.013,2.936 -1.728,4.322 l 0.286,1.442 c -0.121,2.633 -0.404,5.183 -0.864,7.779 -0.575,0.768 -1.151,1.537 -1.727,2.306 l -0.289,2.016 c 0.217,2.147 0.6,4.255 1.153,6.341 1.944,1.493 3.695,3.243 5.185,5.186 0.45,1.362 1.122,2.611 2.018,3.746 l 1.153,0.576 1.152,-0.576 c 0.898,-1.134 1.571,-2.383 2.017,-3.746 1.491,-1.943 3.242,-3.693 5.186,-5.186 0.556,-2.085 0.938,-4.194 1.153,-6.341 L -29.294,6.017 C -29.871,5.249 -30.448,4.48 -31.023,3.711 -31.48,1.115 -31.764,-1.435 -31.888,-4.068 L -31.6,-5.51 c -0.716,-1.386 -1.294,-2.827 -1.729,-4.322 l 0.576,-1.729 1.441,-0.864 c 3.746,-0.731 7.375,-2.105 10.663,-4.035 4.237,-1.644 8.706,-2.324 13.254,-2.017 l 0.288,1.441 h 2.88 l -0.287,1.44 c -1.817,1.971 -3.443,4.074 -4.898,6.34 -0.923,0.726 -1.883,1.399 -2.881,2.017 l -2.595,7.493 0.158,0.315 c 0.863,-0.301 1.67,-0.711 2.423,-1.228 3.228,-1.268 6.634,-1.787 10.108,-1.538 l 0.22,1.099 h 2.198 z" id="path2742"
+          /></g
+          ><g id="g2744" transform="translate(559.0764,645.9175)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c 0,2.953 -1.683,5.507 -4.139,6.772 0.097,1.612 0.182,3.361 0.251,5.275 h 0.593 l 3.294,2.835 v 4.252 l -3.294,2.835 h -0.386 c 0.01,1.24 0.016,2.52 0.015,3.855 -0.022,2.493 -2.671,6.678 -2.671,6.678 h -6.677 l -2.671,-4.006 h -9.35 l -1.336,9.349 h -8.014 l -1.336,-9.349 h -9.348 l -2.671,4.006 h -6.677 c 0,0 -1.185,-0.966 -2.671,-6.678 -0.046,-1.337 -0.08,-2.613 -0.109,-3.855 h -0.455 l -3.293,-2.835 v -4.252 l 3.293,-2.835 h 0.397 c 0.029,-1.971 0.082,-3.78 0.158,-5.432 -2.297,-1.312 -3.848,-3.78 -3.848,-6.615 0,-3.518 2.387,-6.471 5.629,-7.347 0.419,-1.457 0.844,-2.369 1.211,-2.939 0.588,-0.916 1.023,-0.953 1.023,-0.953 0,0 4.008,-1.336 6.679,-1.336 0,-8.346 32.052,-7.011 32.052,0 2.671,0 6.679,1.336 6.679,1.336 0,0 0.468,0.049 1.084,1.559 0.222,0.544 0.463,1.279 0.708,2.269 C -2.512,-6.624 0,-3.608 0,0" id="path2746"
+          /></g
+          ><g id="g2748" transform="translate(559.0764,645.9175)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c 0,2.953 -1.683,5.507 -4.139,6.772 0.097,1.612 0.182,3.361 0.251,5.275 h 0.593 l 3.294,2.835 v 4.252 l -3.294,2.835 h -0.386 c 0.01,1.24 0.016,2.52 0.015,3.855 -0.022,2.493 -2.671,6.678 -2.671,6.678 h -6.677 l -2.671,-4.006 h -9.35 l -1.336,9.349 h -8.014 l -1.336,-9.349 h -9.348 l -2.671,4.006 h -6.677 c 0,0 -1.185,-0.966 -2.671,-6.678 -0.046,-1.337 -0.08,-2.613 -0.109,-3.855 h -0.455 l -3.293,-2.835 v -4.252 l 3.293,-2.835 h 0.397 c 0.029,-1.971 0.082,-3.78 0.158,-5.432 -2.297,-1.312 -3.848,-3.78 -3.848,-6.615 0,-3.518 2.387,-6.471 5.629,-7.347 0.419,-1.457 0.844,-2.369 1.211,-2.939 0.588,-0.916 1.023,-0.953 1.023,-0.953 0,0 4.008,-1.336 6.679,-1.336 0,-8.346 32.052,-7.011 32.052,0 2.671,0 6.679,1.336 6.679,1.336 0,0 0.468,0.049 1.084,1.559 0.222,0.544 0.463,1.279 0.708,2.269 C -2.512,-6.624 0,-3.608 0,0 Z" id="path2750"
+          /></g
+          ><g id="armor_MG" transform="translate(508.2805,689.1461)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -3.853,0 -6.977,-3.906 -6.977,-8.721 0,-4.817 3.124,-8.72 6.977,-8.72 3.854,0 6.978,3.903 6.978,8.72 C 6.978,-3.906 3.854,0 0,0" id="path2754"
+          /></g
+          ><g id="g2756" transform="translate(536.3547,655.627)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 -0.957,-1.914 H -1.914 L -2.87,0 h -9.57 l -0.957,-1.914 h -0.958 L -15.312,0 l -1.914,19.141 1.914,3.828 h 1.913 l 10e-4,-3.828 5.742,1.914 5.744,-1.914 -0.002,3.828 h 2.871 l 0.957,-3.828 z" id="path2758"
+          /></g
+          ><g id="g2760" transform="translate(536.3547,655.627)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 -0.957,-1.914 H -1.914 L -2.87,0 h -9.57 l -0.957,-1.914 h -0.958 L -15.312,0 l -1.914,19.141 1.914,3.828 h 1.913 l 10e-4,-3.828 5.742,1.914 5.744,-1.914 -0.002,3.828 h 2.871 l 0.957,-3.828 z" id="path2762"
+          /></g
+          ><g transform="translate(0,13.000223)"
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.33199406px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text3032" transform="matrix(0.98162644,0,-0.19081282,-0.98162644,488.9417,626.3481)"
+            ><tspan x="35.990208" y="9.820631" id="tspan3028"
+              >Torso</tspan
+              ><tspan x="38.034908" y="15.885423" id="tspan3030"
+              >Legs</tspan
+            ></text
+          ></g
+          ><g transform="translate(-4.8002987,23.399537)"
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:3.58099556px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text_MG" transform="matrix(0.98162643,0,-0.19081285,-0.98162643,523.5285,662.6363)"
+            ><tspan x="0 3.6060627" y="0" id="tspan3034"
+              >Main Gun</tspan
+            ></text
+          ></g
+          ><g transform="translate(6.1999059,16.600156)"
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.33199406px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text3040" transform="matrix(0.98162644,0,-0.19081282,-0.98162644,533.5791,653.47)"
+            ><tspan x="0" y="0" id="tspan3038"
+              >Head</tspan
+            ></text
+          ></g
+          >
+           </g
+          >
+   <g fill="none" id="armorPips"
+          >
+    <g style="mml-multisection:true" id="armorPipsHD" transform="translate(39.8,17.28)"
+            ><g id="armorPipsHDSection01"
+              >
+      <rect x="-8.1" width="16.2" y="0" height="3.2" id="armorHDRow00"
+                />
+      <rect x="-8.1" width="16.2" y="1.3" height="3.2" id="armorHDRow01"
+                />
+      <rect x="-8.1" width="16.2" y="2.6" height="3.2" id="armorHDRow02"
+                />
+      </g
+                ><g id="armorPipsHDSection02"
+                >
+      <rect x="-7.5" width="15" y="7.8" height="3.2" id="armorHDRow03"
+                  />
+      <rect x="-6.9" width="13.8" y="9.1" height="3.2" id="armorHDRow04"
+                  />
+      <rect x="-6.7" width="13.4" y="10.4" height="3.2" id="armorHDRow05"
+                  />
+    </g
+                ></g
+                >
+    <g id="armorPipsT" transform="translate(39.8,35.08)"
+                >
+      <rect x="-25" width="50" y="0" height="3.2" id="armorTRow00" style="mml-gap:-8.7,8.7"
+                  />
+      <rect x="-25" width="50" y="2.6" height="3.2" id="armorTRow01"
+                  />
+      <rect x="-25" width="50" y="5.2" height="3.2" id="armorTRow03"
+                  />
+      <rect x="-25" width="50" y="7.8" height="3.2" id="armorTRow04"
+                  />
+      <rect x="-25" width="50" y="10.4" height="3.2" id="armorTRow05"
+                  />
+      <rect x="-25" width="50" y="13" height="3.2" id="armorTRow06"
+                  />
+    </g
+                  >
+    <g id="armorPipsL" transform="translate(39.8,68.58)"
+                  >
+      <rect x="-27.5" width="55" y="7.8" height="3.2" id="armorLRow00" style="mml-gap:-9,9"
+                    />
+      <rect x="-27.5" width="55" y="10.4" height="3.2" id="armorLRow01" style="mml-gap:-10,10"
+                    />
+      <rect x="-27.5" width="55" y="13" height="3.2" id="armorLRow02" style="mml-gap:-11,11"
+                    />
+      <rect x="-27.5" width="55" y="15.6" height="3.2" id="armorLRow03" style="mml-gap:-11,11"
+                    />
+      <rect x="-27.5" width="55" y="18.2" height="3.2" id="armorLRow04" style="mml-gap:-11,11"
+                    />
+      <rect x="-27.5" width="55" y="20.8" height="3.2" id="armorLRow05" style="mml-gap:-10.7,10.7"
+                    />
+      <rect x="-22" width="44" y="23.4" height="3.2" id="armorLRow06" style="mml-gap:-8.8,8.8"
+                    />
+      <rect x="-20" width="40" y="26" height="3.2" id="armorLRow07" style="mml-gap:-8.8,8.8"
+                    />
+      <rect x="-20" width="40" y="28.6" height="3.2" id="armorLRow08" style="mml-gap:-8.8,8.8"
+                    />
+    </g
+                    >
+    <g id="armorPipsMG" transform="translate(19.035,3.78)"
+                    >
+      <rect x="-1.5" width="3" y="0" height="3.2" id="armorMGRow00"
+                      />
+      <rect x="-3.1" width="6.2" y="1.3" height="3.2" id="armorMGRow01"
+                      />
+      <rect x="-3.75" width="7.5" y="2.6" height="3.2" id="armorMGRow02"
+                      />
+      <rect x="-4" width="8" y="3.9" height="3.2" id="armorMGRow03"
+                      />
+      <rect x="-3.9" width="7.8" y="5.2" height="3.2" id="armorMGRow04"
+                      />
+    </g
+                      >
+   </g
+                      >
+   <g fill="none" id="structurePips"
+                      >
+    <g id="structurePipsHD" transform="translate(39.8,22.48)"
+                        >
+      <rect x="-7.4" width="14.8" y="0" height="2.6" id="structureHDRow00"
+                          />
+    </g
+                          >
+    <g id="structurePipsT" transform="translate(39.8,50.68)"
+                          >
+      <rect x="-23.2" width="46.4" y="0" height="2.6" id="structureTRow00"
+                            />
+      <rect x="-20" width="40" y="2.6" height="2.6" id="structureTRow01"
+                            />
+    </g
+                            >
+    <g id="structurePipsL" transform="translate(39.8,68.58)"
+                            >
+      <rect x="-27.5" width="55" y="0" height="2.6" id="structureLRow00" style="mml-gap:-4,4"
+                              />
+      <rect x="-27.5" width="55" y="2.6" height="2.6" id="structureLRow01" style="mml-gap:-4.5,4.5"
+                              />
+      <rect x="-27.5" width="55" y="5.2" height="2.6" id="structureLRow02" style="mml-gap:-5.7,5.7"
+                              />
+    </g
+                              >
+    <g id="structurePipsMG" transform="translate(19.035,3.78)"
+                              >
+      <rect x="-3.3" width="6.6" y="6.5" height="2.6" id="structureMGRow00"
+                                />
+      <rect x="-2.4" width="4.8" y="7.8" height="2.6" id="structureMGRow01"
+                                />
+    </g
+                                >
+   </g
+                                >
+</g
+                                ><g transform="translate (3.9209678061025244,0.0)"
+                                ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 76.493 l 3.749,5.625 l -3.749,5.625 h -76.493 Z"
+                                  /><text x="41.996" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="69.539" lengthAdjust="spacingAndGlyphs"
+                                  >ARMOR DIAGRAM</text
+                                ></g
+                              ></g
+                              ><g transform="translate (5.000 94.691)"
+                              ><g
+                                ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 l 78.883,0.000 l 5.475,8.214 L 264.025,8.214 l 5.475,8.214 L 269.500,29.081 l -5.475,8.214 L 5.475,37.295 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+                                  /><g transform="translate (2.5,3.0)"
+                                  ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 76.883 l 3.749,5.625 l -3.749,5.625 h -76.883 Z"
+                                    /><text x="42.191" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="45.172" lengthAdjust="spacingAndGlyphs"
+                                    >PILOT DATA</text
+                                  ></g
+                                ></g
+                                ><text fill="#231f20" x="9.845" y="23.068" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+                                >Name:</text
+                                ><text fill="#231f20" x="32.073" id="pilotName0" y="23.068" style="font-family:Eurostile;font-size:6.760px;font-weight:normal;font-style:normal" text-anchor="start"
+                                >Lorem Ipsum</text
+                                ><path id="blankCrewName0" d="M 32.073,24.068 L 131.178,24.068" stroke-width="0.720" stroke-linejoin="round" stroke="#231f20"
+                                /><text x="9.845" y="34.091" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" id="gunnerySkillText0" textLength="39.172" lengthAdjust="spacingAndGlyphs"
+                                >Gunnery Skill:</text
+                                ><text fill="#231f20" x="52.392" id="gunnerySkill0" y="34.091" style="font-family:Eurostile;font-size:6.760px;font-weight:normal;font-style:normal" text-anchor="start"
+                                >0</text
+                                ><path id="blankGunnerySkill0" d="M 52.392,35.091 L 86.907,35.091" stroke-width="0.720" stroke-linejoin="round" stroke="#231f20"
+                                /><g
+                                ><path fill="none" d="M 176.903,14.488 c 0,-0.560 0.455,-1.015 1.015,-1.015 l 82.258,0 c 0.560,0 1.015,0.455, 1.015,1.015 l 0,15.970 c 0,0.560 -0.455,1.015, -1.015,1.015 l -82.258,0 c -0.560,0 -1.015,-0.455, -1.015,-1.015Z" stroke-width="1.0" stroke-linejoin="round" stroke="#231f20"
+                                  /><path fill="none" stroke-width="0.58" d="M 176.903,22.473 l 84.288,0 M 190.950,13.473 l 0,18.000  M 204.998,13.473 l 0,18.000  M 219.046,13.473 l 0,18.000  M 233.094,13.473 l 0,18.000  M 247.142,13.473 l 0,18.000" stroke-linecap="round" stroke-linejoin="miter" stroke="#231f20"
+                                  /><text fill="#231f20" x="183.926" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >1</text
+                                  ><text fill="#231f20" x="183.926" y="29.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.048" text-anchor="middle"
+                                  >3</text
+                                  ><text fill="#231f20" x="197.974" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >2</text
+                                  ><text fill="#231f20" x="197.974" y="29.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.048" text-anchor="middle"
+                                  >5</text
+                                  ><text fill="#231f20" x="212.022" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >3</text
+                                  ><text fill="#231f20" x="212.022" y="29.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.048" text-anchor="middle"
+                                  >7</text
+                                  ><text fill="#231f20" x="226.070" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >4</text
+                                  ><text fill="#231f20" x="226.070" y="29.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.048" text-anchor="middle"
+                                  >10</text
+                                  ><text fill="#231f20" x="240.118" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >5</text
+                                  ><text fill="#231f20" x="240.118" y="29.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.048" text-anchor="middle"
+                                  >11</text
+                                  ><text fill="#231f20" x="254.166" y="20.473" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                  >6</text
+                                  ><text x="254.166" y="29.473" fill="#231f20" text-anchor="middle" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" textLength="10.048" lengthAdjust="spacingAndGlyphs"
+                                  >Dead</text
+                                  ><text fill="#231f20" x="174.903" y="20.473" style="font-family:Eurostile;font-size:5.200px;font-weight:bold;font-style:normal;mml-field-width:44.463" text-anchor="end"
+                                  >Hits Taken</text
+                                  ><text fill="#231f20" x="174.903" y="29.473" style="font-family:Eurostile;font-size:5.200px;font-weight:bold;font-style:normal;mml-field-width:44.463" text-anchor="end"
+                                  >Consciousness #</text
+                                ></g
+                              ></g
+                              ><text x="96.833" y="140.200" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" textLength="9.046" lengthAdjust="spacingAndGlyphs"
+                              >BV:</text
+                              ><text fill="#231f20" x="108.973" id="bv" y="140.200" style="font-family:Eurostile;font-size:6.200px;font-weight:normal;font-style:normal" text-anchor="start"
+                              >0</text
+                              ><text x="141.750" y="140.200" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" textLength="18.711" lengthAdjust="spacingAndGlyphs"
+                              >Armor:</text
+                              ><text fill="#231f20" x="163.554" id="armorType" y="140.200" style="font-family:Eurostile;font-size:6.200px;font-weight:normal;font-style:normal" text-anchor="start"
+                              >Standard</text
+                              ><rect fill="none" x="72.833" width="20.000" id="eraIcon" height="20.000" y="72.691"
+                            /></g
+                          ></svg
+                        >
