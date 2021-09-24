@@ -1594,6 +1594,10 @@ public class Refit extends Part implements IAcquisitionWork {
             fileNameCampaign = null;
         }
 
+        if (fileNameCampaign != null) {
+            return;
+        }
+
         getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 
         try {
