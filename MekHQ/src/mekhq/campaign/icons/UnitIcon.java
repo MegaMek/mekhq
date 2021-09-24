@@ -19,6 +19,7 @@
 package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
+import megamek.utils.MegaMekXmlUtil;
 import mekhq.MekHQ;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -82,6 +83,17 @@ public class UnitIcon extends StandardForceIcon {
         writeToXML(pw, indent, XML_TAG);
     }
 
+    @Override
+    protected void writeBodyToXML(final PrintWriter pw, int indent) {
+        if (!hasDefaultCategory()) {
+            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "category", getCategory());
+        }
+
+        if (!hasDefaultFilename()) {
+            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "filename", (getFilename() == null) ? "null" : getCategory());
+        }
+    }
+
     public static UnitIcon parseFromXML(final Node wn) {
         final UnitIcon icon = new UnitIcon();
         try {
@@ -96,10 +108,6 @@ public class UnitIcon extends StandardForceIcon {
     @Override
     public void parseNodes(final NodeList nl) {
         super.parseNodes(nl);
-
-        if ("null".equalsIgnoreCase(getCategory())) {
-            setCategory(null);
-        }
 
         if ("null".equalsIgnoreCase(getFilename())) {
             setFilename(null);
