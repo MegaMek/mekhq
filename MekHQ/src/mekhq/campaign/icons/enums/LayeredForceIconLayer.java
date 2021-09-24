@@ -22,7 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
 
 import javax.swing.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -123,16 +123,7 @@ public enum LayeredForceIconLayer {
      * @return the layered force icon enum values in the order they are drawn in
      */
     public static List<LayeredForceIconLayer> getInDrawOrder() {
-        List<LayeredForceIconLayer> drawOrder = new ArrayList<>();
-        drawOrder.add(BACKGROUND);
-        drawOrder.add(FRAME);
-        drawOrder.add(TYPE);
-        drawOrder.add(FORMATION);
-        drawOrder.add(ADJUSTMENT);
-        drawOrder.add(ALPHANUMERIC);
-        drawOrder.add(SPECIAL_MODIFIER);
-        drawOrder.add(LOGO);
-        return drawOrder;
+        return Arrays.asList(BACKGROUND, FRAME, TYPE, FORMATION, ADJUSTMENT, ALPHANUMERIC, SPECIAL_MODIFIER, LOGO);
     }
 
     @Override

@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -436,8 +437,24 @@ public final class MekHQOptions {
         return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
     }
 
-    public void setNewDayMRMS(boolean value) {
+    public void setNewDayMRMS(final boolean value) {
         userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+
+    public boolean getNewDayForceIconOperationalStatus() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, false);
+    }
+
+    public void setNewDayForceIconOperationalStatus(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, value);
+    }
+
+    public ForceIconOperationalStatusStyle getNewDayForceIconOperationalStatusStyle() {
+        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MekHqConstants.NEW_DAY_NODE).get(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, ForceIconOperationalStatusStyle.BORDER.name()));
+    }
+
+    public void setNewDayForceIconOperationalStatusStyle(final ForceIconOperationalStatusStyle value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).put(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
     //endregion New Day
 

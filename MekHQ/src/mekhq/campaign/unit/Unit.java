@@ -40,6 +40,7 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
@@ -4928,6 +4929,31 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public static int getDamageState(Entity en) {
         return en.getDamageLevel(false);
+    }
+
+    /**
+     * This is used to determine the operational status of this unit as part of determining the
+     * overall operational status of a Force.
+     * @return the determined operational status
+     */
+    public LayeredForceIconOperationalStatus determineLayeredForceIconOperationalStatus() {
+        if (isMothballing() || isMothballed() || !isPresent() || isRefitting() || !isRepairable()
+                || !isFunctional()) {
+            return LayeredForceIconOperationalStatus.NOT_OPERATIONAL;
+        }
+
+        switch (getDamageState()) {
+            case Entity.DMG_NONE:
+                return LayeredForceIconOperationalStatus.FULLY_OPERATIONAL;
+            case Entity.DMG_LIGHT:
+            case Entity.DMG_MODERATE:
+                return LayeredForceIconOperationalStatus.SUBSTANTIALLY_OPERATIONAL;
+            case Entity.DMG_HEAVY:
+            case Entity.DMG_CRIPPLED:
+                return LayeredForceIconOperationalStatus.MARGINALLY_OPERATIONAL;
+            default:
+                return LayeredForceIconOperationalStatus.NOT_OPERATIONAL;
+        }
     }
 
     /**

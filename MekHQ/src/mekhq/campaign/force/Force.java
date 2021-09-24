@@ -27,8 +27,11 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.mission.Scenario;
@@ -47,6 +50,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 /**
  * This is a hierarchical object to define forces for TO&E. Each Force
@@ -391,6 +395,47 @@ public class Force implements Serializable {
         if (found) {
             subForces.remove(idx);
         }
+    }
+
+    /**
+     * This determines the proper operational status icon to use for this force and sets it.
+     * @param campaign the campaign to determine the operational status of this force using
+     * @return a list of the operational statuses for units in this force and in all of its subForces.
+     */
+    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(
+            final Campaign campaign) {
+        // First, update all subForces, collecting their unit statuses into a single list
+        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
+                .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
+                .collect(Collectors.toList());
+
+        // Then, Add the units assigned to this force
+        statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
+                .map(Unit::determineLayeredForceIconOperationalStatus)
+                .collect(Collectors.toList()));
+
+        // Can only update the icon for LayeredForceIcons, but still need to return the processed
+        // units for parent force updates
+        if (!(getForceIcon() instanceof LayeredForceIcon)) {
+            return statuses;
+        }
+
+        if (statuses.isEmpty()) {
+            // No special modifier for empty forces
+            ((LayeredForceIcon) getForceIcon()).getPieces().remove(LayeredForceIconLayer.SPECIAL_MODIFIER);
+        } else {
+            // Sum the unit status ordinals, then divide by the overall number of statuses, to get
+            // the ordinal of the force's status. Then assign the operational status to this.
+            final int index = (int) Math.round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
+            final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
+            ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
+            ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
+                            MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            status.getFilename()));
+        }
+
+        return statuses;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {

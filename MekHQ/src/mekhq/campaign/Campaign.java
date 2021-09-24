@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
@@ -3390,6 +3389,13 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    private void processNewDayForces() {
+        // Update the force icons based on the end of day unit status if desired
+        if (MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+            getForces().updateForceIconOperationalStatus(this);
+        }
+    }
+
     /**
      * @return <code>true</code> if the new day arrived
      */
@@ -3456,6 +3462,8 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
 
         processNewDayUnits();
+
+        processNewDayForces();
 
         setShoppingList(goShopping(getShoppingList()));
 
