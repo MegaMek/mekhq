@@ -669,7 +669,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
             if (!armorFound && part instanceof BaArmor) {
-                BaArmor a = (BaArmor)part;
+                BaArmor a = (BaArmor) part;
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
@@ -2168,6 +2168,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part leftFoot = null;
         Part leftLowerLeg = null;
         Part leftUpperLeg = null;
+        Part centerFoot = null;
+        Part centerLowerLeg = null;
+        Part centerUpperLeg = null;
         Part rightFrontFoot = null;
         Part rightLowerFrontLeg = null;
         Part rightUpperFrontLeg = null;
@@ -2388,6 +2391,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightUpperLeg = part;
                     } else if (loc == Mech.LOC_LLEG) {
                         leftUpperLeg = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerUpperLeg = part;
                     } else {
                         MekHQ.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
                     }
@@ -2400,6 +2405,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightLowerLeg = part;
                     } else if (loc == Mech.LOC_LLEG) {
                         leftLowerLeg = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerLowerLeg = part;
                     } else {
                         MekHQ.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
                     }
@@ -2412,6 +2419,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightFoot = part;
                     } else if (loc == Mech.LOC_LLEG) {
                         leftFoot = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerFoot = part;
                     } else {
                         MekHQ.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
                     }
@@ -2902,6 +2911,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(leftUpperLeg);
             }
 
+            if ((centerUpperLeg == null) && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG)) {
+                centerUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG, getCampaign());
+                addPart(centerUpperLeg);
+                partsToAdd.add(centerUpperLeg);
+            }
+
             if (null == rightLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG)) {
                 rightLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG, getCampaign());
                 addPart(rightLowerLeg);
@@ -2914,6 +2929,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(leftLowerLeg);
             }
 
+            if ((centerLowerLeg == null) && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG)) {
+                centerLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG, getCampaign());
+                addPart(centerLowerLeg);
+                partsToAdd.add(centerLowerLeg);
+            }
+
             if (null == rightFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RLEG)) {
                 rightFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG, getCampaign());
                 addPart(rightFoot);
@@ -2924,6 +2945,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 leftFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG, getCampaign());
                 addPart(leftFoot);
                 partsToAdd.add(leftFoot);
+            }
+
+            if ((centerFoot == null) && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_CLEG)) {
+                centerFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_CLEG, getCampaign());
+                addPart(centerFoot);
+                partsToAdd.add(centerFoot);
             }
 
             if (null == rightUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM)) {
