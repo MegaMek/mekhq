@@ -2459,11 +2459,12 @@ public class Campaign implements Serializable, ITechManager {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
 
+        addReport(target.getDesc());
+
         if (null != system) {
             target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(),
                     getCampaignOptions(), getFaction(), acquisition.getTechBase() == Part.T_CLAN);
         }
-
         report += "attempts to find " + acquisition.getAcquisitionName();
 
         //if impossible then return
@@ -5168,17 +5169,16 @@ public class Campaign implements Serializable, ITechManager {
          * contract. Don't restrict parts availability by contract if it has not started.
          */
         if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if ((c instanceof AtBContract) &&
-                        ((contract == null) ||
-                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
-                    contract = (AtBContract) c;
+            for (final AtBContract c : getActiveAtBContracts()) {
+                if ((contract == null)
+                        || (c.getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
+                    contract = c;
                 }
             }
         }
 
         // if we have a contract and it has started
-        if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
+        if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
             if (reportBuilder != null) {
                 reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType()).append(")");
             }
@@ -5188,7 +5188,7 @@ public class Campaign implements Serializable, ITechManager {
         /* If contract is still null, the unit is not in a contract. */
         final Person person = getLogisticsPerson();
         int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
-                : person.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                : person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
         int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
