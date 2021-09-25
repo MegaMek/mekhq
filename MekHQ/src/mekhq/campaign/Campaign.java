@@ -3017,6 +3017,7 @@ public class Campaign implements Serializable, ITechManager {
                 addReport("The start and end dates of " + contract.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
@@ -3059,9 +3060,9 @@ public class Campaign implements Serializable, ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (Scenario s : contract.getCurrentAtBScenarios()) {
+            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
                 if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = ((AtBScenario) s).getLanceForceId();
+                    int forceId = s.getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3127,6 +3128,13 @@ public class Campaign implements Serializable, ITechManager {
 
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
+
+            // Training Experience - Award to eligible training lances on active contracts
+            getLances().values().stream()
+                    .filter(lance -> lance.getRole().isTraining()
+                            && (lance.getContract(this) != null) && lance.isEligible(this)
+                            && lance.getContract(this).isActiveOn(getLocalDate(), true))
+                    .forEach(this::awardTrainingXP);
         }
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
@@ -3552,17 +3560,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
 
-    public void awardTrainingXP(Lance l) {
-        awardTrainingXPByMaximumRole(l);
-    }
-
     /**
-     * Awards XP to the lance based on the maximum experience level of its
-     * commanding officer and the minimum experience level of the unit's
-     * members.
+     * Awards XP to the lance based on the maximum experience level of its commanding officer and
+     * the minimum experience level of the unit's members.
      * @param l The {@link Lance} to calculate XP to award for training.
      */
-    private void awardTrainingXPByMaximumRole(Lance l) {
+    private void awardTrainingXP(final Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
