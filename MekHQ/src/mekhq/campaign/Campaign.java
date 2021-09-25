@@ -5186,7 +5186,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         /* If contract is still null, the unit is not in a contract. */
-        final Person person = findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+        final Person person = getLogisticsPerson();
         int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
                 : person.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         int modifier = experienceLevel - SkillType.EXP_REGULAR;
