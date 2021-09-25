@@ -2459,8 +2459,6 @@ public class Campaign implements Serializable, ITechManager {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
 
-        addReport(target.getDesc());
-
         if (null != system) {
             target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(),
                     getCampaignOptions(), getFaction(), acquisition.getTechBase() == Part.T_CLAN);
