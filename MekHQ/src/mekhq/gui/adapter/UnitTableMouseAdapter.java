@@ -21,19 +21,7 @@ package mekhq.gui.adapter;
 import megamek.client.ui.dialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.GunEmplacement;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Protomech;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
@@ -46,31 +34,19 @@ import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.actions.ActivateUnitAction;
-import mekhq.campaign.unit.actions.CancelMothballUnitAction;
-import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
-import mekhq.campaign.unit.actions.IUnitAction;
-import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.campaign.unit.actions.RestoreUnitAction;
-import mekhq.campaign.unit.actions.StripUnitAction;
-import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
+import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
-import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.QuirksDialog;
-import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -82,12 +58,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
@@ -301,14 +272,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            int selected = Integer.parseInt(command.split(":")[1]);
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    if ((selected > -1) && (selected < Unit.SITE_N)) {
-                        unit.setSite(selected);
-                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+            try {
+                int selected = Integer.parseInt(command.split(":")[1]);
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        if ((selected > -1) && (selected < Unit.SITE_N)) {
+                            unit.setSite(selected);
+                            MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
+                        }
                     }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -419,24 +394,28 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
-            for (Unit u : units) {
-                u.getEntity().setCamouflage(new Camouflage());
+            for (final Unit unit : units) {
+                unit.getEntity().setCamouflage(new Camouflage());
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
             }
-        } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+        } else if (command.equals(COMMAND_INDI_CAMO)) {
+            final CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
                     selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
             if (ccd.showDialog().isCancelled()) {
                 return;
             }
-            selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
-            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            for (final Unit unit : units) {
+                unit.getEntity().setCamouflage(ccd.getSelectedItem());
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            }
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             for (Unit u : units) {
                 Money refundAmount = u.getBuyCost().multipliedBy(
                         gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                        "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
+                gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
+                        gui.getCampaign().getLocalDate(), refundAmount,
+                        "refund for cancelled equipment sale");
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {
@@ -518,12 +497,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.startsWith(COMMAND_CHANGE_MAINT_MULTI)) {
-            int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
+            try {
+                int multiplier = Integer.parseInt(command.substring(COMMAND_CHANGE_MAINT_MULTI.length() + 1));
 
-            for (Unit u : units) {
-                if (!u.isSelfCrewed()) {
-                    u.setMaintenanceMultiplier(multiplier);
+                for (Unit u : units) {
+                    if (!u.isSelfCrewed()) {
+                        u.setMaintenanceMultiplier(multiplier);
+                    }
                 }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -982,7 +965,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected) {
+            if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
                 menuItem = new JMenuItem(gui.getResourceMap()
                         .getString("customizeMenu.individualCamo.text"));
                 menuItem.setActionCommand(COMMAND_INDI_CAMO);

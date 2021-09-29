@@ -1,7 +1,7 @@
 /*
  * CombatInformationCenter.java
  *
- * Copyright (C) 2019, MegaMek team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -37,14 +36,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author MKerensky
  */
 public class CombatInformationCenter extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 7069129053879581753L;
 
     private Money cost;
@@ -59,6 +53,7 @@ public class CombatInformationCenter extends Part {
         this.name = "Combat Information Center";
     }
 
+    @Override
     public CombatInformationCenter clone() {
         CombatInformationCenter clone = new CombatInformationCenter(0, cost, campaign);
         clone.copyBaseData(this);
@@ -68,9 +63,9 @@ public class CombatInformationCenter extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            hits = ((Aero)unit.getEntity()).getCICHits();
-            if(checkForDestruction
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            hits = ((Aero) unit.getEntity()).getCICHits();
+            if (checkForDestruction
                     && hits > priorHits
                     && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -83,7 +78,7 @@ public class CombatInformationCenter extends Part {
 
     @Override
     public int getBaseTime() {
-        int time = 0;
+        int time;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             time = 120;
@@ -114,7 +109,7 @@ public class CombatInformationCenter extends Part {
                 return 2;
             }
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 0;
         }
         return 1;
@@ -122,7 +117,7 @@ public class CombatInformationCenter extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setCICHits(hits);
         }
     }
@@ -130,17 +125,17 @@ public class CombatInformationCenter extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setCICHits(0);
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setCICHits(3);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setCICHits(3);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
@@ -181,7 +176,7 @@ public class CombatInformationCenter extends Part {
     }
 
     public void calculateCost() {
-        if(null != unit) {
+        if (null != unit) {
             // There's more to CIC than just Fire Control
             // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
             cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship)unit.getEntity()).getArcswGuns()));
@@ -218,7 +213,7 @@ public class CombatInformationCenter extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("cost")) {
                 cost = Money.fromXmlString(wn2.getTextContent().trim());

@@ -911,7 +911,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            if (StaticChecks.areAllForcesUndeployed(forces) && StaticChecks.areAllCombatForces(forces)) {
+            if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces)
+                    && StaticChecks.areAllCombatForces(forces)) {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
@@ -1099,9 +1100,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForSlaves()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForSlaves()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1124,9 +1131,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(true);
                 networkMenu.add(menuItem);
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForMasters()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForMasters()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1171,9 +1184,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotNC3Networked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableNC3Networks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableNC3Networks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1218,9 +1237,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotC3iNetworked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableC3iNetworks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableC3iNetworks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1284,7 +1309,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (missionMenu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(missionMenu, 30);
                     }
-                    
+
                     if (missionMenu.getItemCount() > 0) {
                         menu.add(missionMenu);
                     }

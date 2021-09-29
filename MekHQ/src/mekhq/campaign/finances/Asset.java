@@ -21,15 +21,14 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-
+import mekhq.campaign.finances.enums.FinancialTerm;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 /**
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
@@ -44,7 +43,7 @@ public class Asset implements Serializable {
 
     private String name;
     private Money value;
-    private int financialTerm;
+    private FinancialTerm financialTerm;
     private Money income;
     //endregion Variable Declarations
 
@@ -52,7 +51,7 @@ public class Asset implements Serializable {
     public Asset() {
         setName("New Asset");
         setValue(Money.zero());
-        setFinancialTerm(Finances.SCHEDULE_YEARLY);
+        setFinancialTerm(FinancialTerm.ANNUALLY);
         setIncome(Money.zero());
     }
     //endregion Constructors
@@ -74,11 +73,11 @@ public class Asset implements Serializable {
         this.value = value;
     }
 
-    public int getFinancialTerm() {
+    public FinancialTerm getFinancialTerm() {
         return financialTerm;
     }
 
-    public void setFinancialTerm(final int financialTerm) {
+    public void setFinancialTerm(final FinancialTerm financialTerm) {
         this.financialTerm = financialTerm;
     }
 
@@ -96,33 +95,33 @@ public class Asset implements Serializable {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "asset");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", getName());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", getValue().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", getIncome().toXmlString());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "asset");
     }
 
     public static Asset generateInstanceFromXML(final Node wn) {
-        final Asset retVal = new Asset();
+        final Asset asset = new Asset();
         final NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.setName(wn2.getTextContent().trim());
+                    asset.setName(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                    retVal.setValue(Money.fromXmlString(wn2.getTextContent().trim()));
+                    asset.setValue(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("financialTerm")) {
-                    retVal.setFinancialTerm(Integer.parseInt(wn2.getTextContent().trim()));
+                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                    retVal.setIncome(Money.fromXmlString(wn2.getTextContent().trim()));
+                    asset.setIncome(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    retVal.setFinancialTerm(Integer.parseInt(wn2.getTextContent().trim()));
+                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
             }
         }
-        return retVal;
+        return asset;
     }
     //endregion File I/O
 }

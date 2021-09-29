@@ -682,10 +682,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append("</daysToArrival>")
                 .append(NL);
         }
-        if (brandNew) {
+        if (!brandNew) {
+        	//The default value for Part.brandNew is true.  Only store the tag if the value is false.
+        	//The lack of tag in the save file will ALWAYS result in TRUE.
             builder.append(level1)
                 .append("<brandNew>")
-                .append(true)
+                .append(false)
                 .append("</brandNew>")
                 .append(NL);
         }

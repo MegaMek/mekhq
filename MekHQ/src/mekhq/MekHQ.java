@@ -379,7 +379,10 @@ public class MekHQ implements GameListener {
             System.out.println("Redirecting output to mekhqlog.txt");
             File logDir = new File("logs");
             if (!logDir.exists()) {
-                logDir.mkdir();
+                if (!logDir.mkdir()) {
+                    MekHQ.getLogger().error("Failed to create directory " + logDir + ", and therefore redirect the logs.");
+                    return;
+                }
             }
 
             // Note: these are not closed on purpose

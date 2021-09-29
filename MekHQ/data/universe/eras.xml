@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Each Era consists of the following fields:
+Code: The unique String code for the era.
+Name: The display name for the era.
+End: The end date for the era. This can be in the formats "yyyy-MM-dd", "yyyy-MM" (assuming first day of the month), and "yyyy" (assuming first day of the year). One era should have this value missing, which will put it as the final era. For the canon dates, these will be one year after their end date in the MUL, as that will swapover on the first day of the new era.
+Flag: The internal flags for the base eras. You can have multiple flag fields (multiple lines each with a single flag) per custom era, which isn't used in base MekHQ, but allows one to customize things.
+
+Note that internal use of this setup is minimal at best, at least as of 0.49.3.
+-->
+<eras>
+	<era>
+		<code>PSF</code>
+		<name>Pre-Spaceflight</name>
+		<end>1951</end>
+		<flag>PRE_SPACEFLIGHT</flag>
+	</era>
+	<era>
+		<code>ESF</code>
+		<name>Early Spaceflight</name>
+		<end>2005</end>
+		<flag>EARLY_SPACEFLIGHT</flag>
+	</era>
+	<era>
+		<code>AOW</code>
+		<name>Age of War</name>
+		<end>2571</end>
+		<flag>AGE_OF_WAR</flag>
+	</era>
+	<era>
+		<code>SL</code>
+		<name>Star League</name>
+		<end>2781</end>
+		<flag>STAR_LEAGUE</flag>
+	</era>
+	<era>
+		<code>ESW</code>
+		<name>Early Succession Wars</name>
+		<end>2901</end>
+		<flag>EARLY_SUCCESSION_WARS</flag>
+	</era>
+	<era>
+		<code>LSWL</code>
+		<name>Late Succession Wars - LosTech</name>
+		<end>3020</end>
+		<flag>LATE_SUCCESSION_WARS_LOSTECH</flag>
+	</era>
+	<era>
+		<code>LSWR</code>
+		<name>Late Succession Wars - Renaissance</name>
+		<end>3050</end>
+		<flag>LATE_SUCCESSION_WARS_RENAISSANCE</flag>
+	</era>
+	<era>
+		<code>CI</code>
+		<name>Clan Invasion</name>
+		<end>3062</end>
+		<flag>CLAN_INVASION</flag>
+	</era>
+	<era>
+		<code>CW</code>
+		<name>Civil War</name>
+		<end>3068</end>
+		<flag>CIVIL_WAR</flag>
+	</era>
+	<era>
+		<code>J</code>
+		<name>Jihad</name>
+		<end>3081</end>
+		<flag>JIHAD</flag>
+	</era>
+	<era>
+		<code>ER</code>
+		<name>Early Republic</name>
+		<end>3101</end>
+		<flag>EARLY_REPUBLIC</flag>
+	</era>
+	<era>
+		<code>LR</code>
+		<name>Late Republic</name>
+		<end>3131</end>
+		<flag>LATE_REPUBLIC</flag>
+	</era>
+	<era>
+		<code>DA</code>
+		<name>Dark Ages</name>
+		<end>3151</end>
+		<flag>DARK_AGES</flag>
+	</era>
+	<era>
+		<code>ILC</code>
+		<name>ilClan</name>
+		<flag>ILCLAN</flag>
+	</era>
+</eras>

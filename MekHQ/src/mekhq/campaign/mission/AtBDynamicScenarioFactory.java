@@ -29,14 +29,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.enums.SkillGeneratorType;
+import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
+import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.common.MechSummaryCache;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utils.BoardClassifier;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomSkillsGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
@@ -79,7 +83,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
@@ -300,7 +304,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         String factionCode = "";
-        int skill = 0;
+        SkillLevel skill = SkillLevel.GREEN;
         int quality = 0;
         int generatedLanceCount = 0;
         LocalDate currentDate = campaign.getLocalDate();
@@ -333,6 +337,7 @@ public class AtBDynamicScenarioFactory {
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
+        final Faction faction = Factions.getInstance().getFaction(factionCode);
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
@@ -387,7 +392,7 @@ public class AtBDynamicScenarioFactory {
             // some special cases that don't fit into the regular RAT generation mechanism
             // gun emplacements use a separate set of rats
             if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
-                generatedLance = generateTurrets(4, skill, quality, campaign);
+                generatedLance = generateTurrets(4, skill, quality, campaign, faction);
             // atb civilians use a separate rat
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 generatedLance = generateCivilianUnits(4, campaign);
@@ -494,7 +499,7 @@ public class AtBDynamicScenarioFactory {
     public static List<Entity> generateCivilianUnits(int num, Campaign campaign) {
         RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits");
         ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
-        return msl.stream().map(ms -> createEntityWithCrew("IND", RandomSkillsGenerator.L_GREEN, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
+        return msl.stream().map(ms -> createEntityWithCrew("IND", SkillLevel.GREEN, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -505,11 +510,13 @@ public class AtBDynamicScenarioFactory {
      * @param skill    The skill level of the turret operators
      * @param quality  The quality level of the turrets
      * @param campaign The campaign for which the turrets are being generated.
+     * @param faction  The faction to generate turrets for
      */
-    public static List<Entity> generateTurrets(int num, int skill, int quality, Campaign campaign) {
-        int currentYear = campaign.getGameYear();
-        List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
-        return msl.stream().map(ms -> createEntityWithCrew("IND", skill, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
+    public static List<Entity> generateTurrets(int num, SkillLevel skill, int quality, Campaign campaign, Faction faction) {
+        return campaign.getUnitGenerator().generateTurrets(num, skill, quality, campaign.getGameYear()).stream()
+                .map(ms -> createEntityWithCrew(faction, skill, campaign, ms))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -944,7 +951,8 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return A new Entity with crew.
      */
-    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    public static Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
+                                   int weightClass, Campaign campaign) {
         return getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
     }
 
@@ -952,7 +960,7 @@ public class AtBDynamicScenarioFactory {
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
      * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The RandomSkillGenerator constant that represents the skill level of the overall force.
+     * @param skill       The {@link SkillLevel} that represents the skill level of the overall force.
      * @param quality     The equipment rating of the force.
      * @param unitType    The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
@@ -961,7 +969,8 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return A new Entity with crew.
      */
-    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, boolean artillery, Campaign campaign) {
+    public static Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
+                                   int weightClass, boolean artillery, Campaign campaign) {
         MechSummary ms;
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -994,7 +1003,8 @@ public class AtBDynamicScenarioFactory {
      * @param artillery whether or not the unit generated should be artillery
      * @return Entity or null if unable to generate.
      */
-    public static Entity getTankEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
+    public static Entity getTankEntity(UnitGeneratorParameters params, SkillLevel skill,
+                                       boolean artillery, Campaign campaign) {
         MechSummary ms;
 
         // useful debugging statement that forces generation of specific units rather than random ones
@@ -1026,7 +1036,8 @@ public class AtBDynamicScenarioFactory {
      * @param artillery whether or not the unit generated should be artillery
      * @return Entity or null if unable to generate.
      */
-    public static Entity getInfantryEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
+    public static Entity getInfantryEntity(UnitGeneratorParameters params, SkillLevel skill,
+                                           boolean artillery, Campaign campaign) {
         // note that the "ARTILLERY" mission role appears mutually exclusive with the "FIELD_GUN" mission role
         if (artillery) {
             params.getMissionRoles().add(MissionRole.ARTILLERY);
@@ -1057,7 +1068,9 @@ public class AtBDynamicScenarioFactory {
      * @param skill
      * @param campaign
      */
-    private static List<Entity> fillTransport(AtBScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
+    private static List<Entity> fillTransport(AtBScenario scenario, Entity transport,
+                                              UnitGeneratorParameters params, SkillLevel skill,
+                                              Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
 
         // if we've already filled the transport, no need to do it again.
@@ -1108,7 +1121,9 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated infantry unit, or null if one cannot be generated
      */
-    private static Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity, int skill, Campaign campaign) {
+    private static Entity generateTransportedInfantryUnit(UnitGeneratorParameters params,
+                                                          double bayCapacity, SkillLevel skill,
+                                                          Campaign campaign) {
         UnitGeneratorParameters newParams = params.clone();
         newParams.setUnitType(UnitType.INFANTRY);
 
@@ -1149,7 +1164,9 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated battle armor unit, null if one cannot be generated
      */
-    private static Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity, int skill, Campaign campaign) {
+    private static Entity generateTransportedBAUnit(UnitGeneratorParameters params,
+                                                    double bayCapacity, SkillLevel skill,
+                                                    Campaign campaign) {
         UnitGeneratorParameters newParams = params.clone();
         newParams.setUnitType(UnitType.BATTLE_ARMOR);
 
@@ -1189,7 +1206,8 @@ public class AtBDynamicScenarioFactory {
      * @return transportedUnits List of units being transported
      */
     public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports,
-                                              String factionCode, int skill, int quality, Campaign campaign) {
+                                              String factionCode, SkillLevel skill, int quality,
+                                              Campaign campaign) {
         if ((transports == null) || transports.isEmpty()) {
             return new ArrayList<>();
         }
@@ -1212,7 +1230,8 @@ public class AtBDynamicScenarioFactory {
      * Worker function that generates a battle armor unit to attach to a unit of clan mechs
      */
     public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits,
-                                                 String factionCode, int skill, int quality, Campaign campaign) {
+                                                 String factionCode, SkillLevel skill, int quality,
+                                                 Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
 
         // determine if this should be a nova
@@ -1278,13 +1297,14 @@ public class AtBDynamicScenarioFactory {
      *
      * @param name Full name (chassis + model) of the entity to generate.
      * @param factionCode Faction code to use for name generation
-     * @param skill RandomSkillsGenerator.L_* constant for the average crew skill level
+     * @param skill {@link SkillLevel} for the average crew skill level
      * @param campaign The campaign instance
      * @return The newly generated Entity
      * @note This is a debugging method
      */
     @SuppressWarnings(value = "unused")
-    private static Entity getEntityByName(String name, String factionCode, int skill, Campaign campaign) {
+    private static Entity getEntityByName(String name, String factionCode, SkillLevel skill,
+                                          Campaign campaign) {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(name);
         if (mechSummary == null) {
             return null;
@@ -1295,12 +1315,23 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * @param factionCode Faction code to use for name generation
-     * @param skill RandomSkillsGenerator.L_* constant for the average crew skill level
+     * @param skill the {@link SkillLevel} for the average crew skill level
      * @param campaign The campaign instance
      * @param ms Which entity to generate
-     * @return An crewed entity
+     * @return A crewed entity
      */
-    public static Entity createEntityWithCrew(String factionCode, int skill, Campaign campaign, MechSummary ms) {
+    public static @Nullable Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MechSummary ms) {
+        return createEntityWithCrew(Factions.getInstance().getFaction(factionCode), skill, campaign, ms);
+    }
+
+    /**
+     * @param faction the Faction the crew is a part of
+     * @param skill the {@link SkillLevel} for the average crew skill level
+     * @param campaign The campaign instance
+     * @param ms Which entity to generate
+     * @return A crewed entity
+     */
+    public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, MechSummary ms) {
         Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -1312,12 +1343,10 @@ public class AtBDynamicScenarioFactory {
         en.setOwner(campaign.getPlayer());
         en.setGame(campaign.getGame());
 
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(faction.getNameGenerator());
         Gender gender = RandomGenderGenerator.generate();
-        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), factionCode);
+        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
         crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
@@ -1326,16 +1355,14 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
-        RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-        rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-        rsg.setLevel(skill);
-
+        final AbstractSkillGenerator skillGenerator = new TaharqaSkillGenerator();
+        skillGenerator.setLevel(skill);
         if (faction.isClan()) {
-            rsg.setType(RandomSkillsGenerator.T_CLAN);
+            skillGenerator.setType(SkillGeneratorType.CLAN);
         }
-        int[] skills = rsg.getRandomSkills(en);
+        int[] skills = skillGenerator.generateRandomSkills(en);
 
-        if (faction.isClan() && (Compute.d6(2) > (8 - skill + skills[0] + skills[1]))) {
+        if (faction.isClan() && (Compute.d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
             Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
                 case UnitType.MEK:
@@ -1344,7 +1371,7 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.TANK:
                 case UnitType.VTOL:
                     // The Vehicle Phenotype is unique to Clan Hell's Horses
-                    if (factionCode.equals("CHH")) {
+                    if (faction.getShortName().equals("CHH")) {
                         phenotype = Phenotype.VEHICLE;
                     }
                     break;
@@ -1363,14 +1390,14 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.JUMPSHIP:
                 case UnitType.WARSHIP:
                     // The Naval Phenotype is unique to Clan Snow Raven and the Raven Alliance
-                    if (factionCode.equals("CSR") || factionCode.equals("RA")) {
+                    if (faction.getShortName().equals("CSR") || faction.getShortName().equals("RA")) {
                         phenotype = Phenotype.NAVAL;
                     }
                     break;
             }
 
             if (phenotype != Phenotype.NONE) {
-                String bloodname = Bloodname.randomBloodname(factionCode, phenotype,
+                String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
@@ -1478,10 +1505,9 @@ public class AtBDynamicScenarioFactory {
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (useVehicles) {
                 // some specialized logic for clan opfors
-                int era = Era.getEra(campaign.getGameYear());
-
                 // if we're in the late republic or dark ages, clans no longer have the luxury of mech only stars
-                boolean clanEquipmentScarcity = era == Era.E_LATE_REPUBLIC || era == Era.E_DARK_AGES;
+                boolean clanEquipmentScarcity = campaign.getEra()
+                        .hasFlag(EraFlag.LATE_REPUBLIC, EraFlag.DARK_AGES, EraFlag.ILCLAN);
 
                 if (faction.isClan() && !clanEquipmentScarcity) {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
@@ -1710,8 +1736,9 @@ public class AtBDynamicScenarioFactory {
      * @param campaign working campaign.
      * @return Generated entity list.
      */
-    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes,
-            boolean artillery, Campaign campaign) {
+    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
+                                              List<Integer> unitTypes, boolean artillery,
+                                              Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
 
         for (int i = 0; i < unitTypes.size(); i++) {
@@ -1735,8 +1762,9 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Working campaign
      * @return List of generated entities.
      */
-    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes,
-            String weights, boolean artillery, Campaign campaign) {
+    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
+                                              List<Integer> unitTypes, String weights,
+                                              boolean artillery, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
         int unitTypeSize = unitTypes.size();
 
@@ -1822,9 +1850,13 @@ public class AtBDynamicScenarioFactory {
     public static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
         int calculatedEdge = Board.START_ANY;
 
-        // if we have a specific deployment zone OR have looped around
-        if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
+        // if we got in here without a force template somehow, just return a random start zone
+        if (forceTemplate == null) {
+            return Compute.randomInt(Board.START_CENTER);
+        // if we have a specific calculated deployment zone already
+        } else if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
             return forceTemplate.getActualDeploymentZone();
+        // if we have a chain of deployment-synced forces that forms a loop and have looped around once, avoid endless loops
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.None ||
                 Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
