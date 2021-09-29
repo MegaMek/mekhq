@@ -33,6 +33,7 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.common.MechSummaryCache;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -336,6 +337,7 @@ public class AtBDynamicScenarioFactory {
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
+        final Faction faction = Factions.getInstance().getFaction(factionCode);
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
@@ -390,7 +392,7 @@ public class AtBDynamicScenarioFactory {
             // some special cases that don't fit into the regular RAT generation mechanism
             // gun emplacements use a separate set of rats
             if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
-                generatedLance = generateTurrets(4, skill, quality, campaign);
+                generatedLance = generateTurrets(4, skill, quality, campaign, faction);
             // atb civilians use a separate rat
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 generatedLance = generateCivilianUnits(4, campaign);
@@ -508,11 +510,13 @@ public class AtBDynamicScenarioFactory {
      * @param skill    The skill level of the turret operators
      * @param quality  The quality level of the turrets
      * @param campaign The campaign for which the turrets are being generated.
+     * @param faction  The faction to generate turrets for
      */
-    public static List<Entity> generateTurrets(int num, SkillLevel skill, int quality, Campaign campaign) {
-        int currentYear = campaign.getGameYear();
-        List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
-        return msl.stream().map(ms -> createEntityWithCrew("IND", skill, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
+    public static List<Entity> generateTurrets(int num, SkillLevel skill, int quality, Campaign campaign, Faction faction) {
+        return campaign.getUnitGenerator().generateTurrets(num, skill, quality, campaign.getGameYear()).stream()
+                .map(ms -> createEntityWithCrew(faction, skill, campaign, ms))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1314,9 +1318,20 @@ public class AtBDynamicScenarioFactory {
      * @param skill the {@link SkillLevel} for the average crew skill level
      * @param campaign The campaign instance
      * @param ms Which entity to generate
-     * @return An crewed entity
+     * @return A crewed entity
      */
-    public static Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MechSummary ms) {
+    public static @Nullable Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MechSummary ms) {
+        return createEntityWithCrew(Factions.getInstance().getFaction(factionCode), skill, campaign, ms);
+    }
+
+    /**
+     * @param faction the Faction the crew is a part of
+     * @param skill the {@link SkillLevel} for the average crew skill level
+     * @param campaign The campaign instance
+     * @param ms Which entity to generate
+     * @return A crewed entity
+     */
+    public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, MechSummary ms) {
         Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -1328,12 +1343,10 @@ public class AtBDynamicScenarioFactory {
         en.setOwner(campaign.getPlayer());
         en.setGame(campaign.getGame());
 
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(faction.getNameGenerator());
         Gender gender = RandomGenderGenerator.generate();
-        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), factionCode);
+        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
         crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
@@ -1358,7 +1371,7 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.TANK:
                 case UnitType.VTOL:
                     // The Vehicle Phenotype is unique to Clan Hell's Horses
-                    if (factionCode.equals("CHH")) {
+                    if (faction.getShortName().equals("CHH")) {
                         phenotype = Phenotype.VEHICLE;
                     }
                     break;
@@ -1377,14 +1390,14 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.JUMPSHIP:
                 case UnitType.WARSHIP:
                     // The Naval Phenotype is unique to Clan Snow Raven and the Raven Alliance
-                    if (factionCode.equals("CSR") || factionCode.equals("RA")) {
+                    if (faction.getShortName().equals("CSR") || faction.getShortName().equals("RA")) {
                         phenotype = Phenotype.NAVAL;
                     }
                     break;
             }
 
             if (phenotype != Phenotype.NONE) {
-                String bloodname = Bloodname.randomBloodname(factionCode, phenotype,
+                String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
@@ -1837,9 +1850,13 @@ public class AtBDynamicScenarioFactory {
     public static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
         int calculatedEdge = Board.START_ANY;
 
-        // if we have a specific deployment zone OR have looped around
-        if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
+        // if we got in here without a force template somehow, just return a random start zone
+        if (forceTemplate == null) {
+            return Compute.randomInt(Board.START_CENTER);
+        // if we have a specific calculated deployment zone already
+        } else if (forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
             return forceTemplate.getActualDeploymentZone();
+        // if we have a chain of deployment-synced forces that forms a loop and have looped around once, avoid endless loops
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.None ||
                 Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));

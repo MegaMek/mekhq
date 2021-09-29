@@ -136,7 +136,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
         if (faction == null) {
             faction = campaign.getFaction();
-            market = UnitMarketType.EMPLOYER;
+            market = UnitMarketType.OPEN;
         }
 
         for (int i = 0; i < num; i++) {

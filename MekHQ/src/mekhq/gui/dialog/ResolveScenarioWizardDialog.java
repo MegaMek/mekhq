@@ -660,7 +660,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             ransomed.setName("ransomed");
             ransomed.getAccessibleContext().setAccessibleName(resourceMap.getString("lblRansom.text"));
             ransomed.setEnabled(!tracker.usesSalvageExchange());
-            ransomed.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
             ransomed.addItemListener(evt -> checkSalvageRights());
             ransomUnitBoxes.add(ransomed);
             gridBagConstraints.gridx = gridx++;

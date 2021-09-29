@@ -131,15 +131,16 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     public void addForce(int forceID, String templateName) {
         // if we're not supplied a template name, fall back to trying to automatically place the force
-        if(StringUtils.isEmpty(templateName)) {
+        if (StringUtils.isEmpty(templateName)) {
             addForces(forceID);
             return;
         }
 
-        super.addForces(forceID);
-
-        ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
-        playerForceTemplates.put(forceID, forceTemplate);
+        final ScenarioForceTemplate forceTemplate = template.getScenarioForces().get(templateName);
+        if (forceTemplate != null) {
+            super.addForces(forceID);
+            playerForceTemplates.put(forceID, forceTemplate);
+        }
     }
 
     public void addUnit(UUID unitID, String templateName) {
@@ -170,7 +171,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // If we've assigned at least one force
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
-        if(!getForceIDs().isEmpty() &&
+        if (!getForceIDs().isEmpty() &&
                 playerForceTemplates.containsKey(getForceIDs().get(0))) {
             return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
         }
@@ -465,24 +466,26 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((template != null) && getStatus().isCurrent()) {
             template.Serialize(pw1);
 
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "finalized", isFinalized());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "finalized", isFinalized());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
 
             if (!playerUnitSwaps.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
 
                 // note: if you update the order in which data is stored here or anything else about it
                 // double check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
-                    MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
 
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
-                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent + 2, Collections.emptyList()));
-                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
+                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAP_ELEMENT);
                 }
 
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
         }
 
@@ -500,6 +503,10 @@ public class AtBDynamicScenario extends AtBScenario {
                 template = ScenarioTemplate.Deserialize(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpforSkill")) {
+                setEffectiveOpforSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpforQuality")) {
+                setEffectiveOpforQuality(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
                 for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
                     Node swapNode = wn2.getChildNodes().item(snsIndex);

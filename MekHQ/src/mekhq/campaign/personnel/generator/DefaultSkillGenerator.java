@@ -30,6 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
+    //region Constructors
+    public DefaultSkillGenerator(final RandomSkillPreferences randomSkillPreferences) {
+        super(randomSkillPreferences);
+    }
+    //endregion Constructors
+
     @Override
     public void generateSkills(final Campaign campaign, final Person person, final int expLvl) {
         PersonnelRole primaryRole = person.getPrimaryRole();
@@ -73,10 +79,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (campaign.getCampaignOptions().useArtillery()
                 && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
-            int artyLvl = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
-            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_ARTILLERY, artyLvl, rskillPrefs.randomizeSkill(), bonus);
-            }
+            generateArtillerySkill(person, bonus);
         }
 
         // roll random secondary skill
