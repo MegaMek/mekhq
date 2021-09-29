@@ -26,6 +26,7 @@ VERSION HISTORY:
 + PR #2869: Serializing StratCon OpFor Skill and Quality
 + PR #2883: Monday Training XP Assignment on New Day instead of AtB Scenario Generation
 + PR #2889: Ransom is no longer automatically selected at 100% salvage rights
++ Issue #210: One Person will be Artillery Trained when hiring minimum complement for an artillery-armed unit
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
