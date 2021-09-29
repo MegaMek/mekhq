@@ -30,6 +30,7 @@ VERSION HISTORY:
 + Issue #2567: AtB now follows the part acquisition skill option
 + PR #2884: Briefing Room: Print Sheets now prints sheets for all units in AtB
 + Issue #2496: Maintenance Properly Includes Unofficial SPAs
++ Issue #2809: Grounded dropship scenarios will no longer feature immediately floating and crashing dropships; will start
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
