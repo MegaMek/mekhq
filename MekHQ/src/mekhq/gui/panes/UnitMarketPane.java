@@ -459,7 +459,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         final Entity entity = getSelectedEntity();
         getEntityViewPane().updateDisplayedEntity(entity);
         getEntityImagePanel().updateDisplayedEntity(entity,
-                (entity == null) ? new Camouflage() : entity.getCamouflageOrElse(getCampaign().getCamouflage()));
+                (entity == null) ? new Camouflage() : entity.getCamouflageOrElse(getCampaign().getCamouflage(), false));
     }
 
     private void filterOffers() {

@@ -2412,7 +2412,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        TargetRoll target = getTargetForAcquisition(acquisition, person);
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
 
@@ -2466,7 +2466,7 @@ public class Campaign implements Serializable, ITechManager {
             report += person.getHyperlinkedFullTitle() + " ";
         }
 
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        TargetRoll target = getTargetForAcquisition(acquisition, person);
 
         //check on funds
         if (!canPayFor(acquisition)) {
@@ -2477,7 +2477,6 @@ public class Campaign implements Serializable, ITechManager {
             target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(),
                     getCampaignOptions(), getFaction(), acquisition.getTechBase() == Part.T_CLAN);
         }
-
         report += "attempts to find " + acquisition.getAcquisitionName();
 
         //if impossible then return
@@ -3031,6 +3030,7 @@ public class Campaign implements Serializable, ITechManager {
                 addReport("The start and end dates of " + contract.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
@@ -3073,9 +3073,9 @@ public class Campaign implements Serializable, ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (Scenario s : contract.getCurrentAtBScenarios()) {
+            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
                 if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = ((AtBScenario) s).getLanceForceId();
+                    int forceId = s.getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3141,6 +3141,13 @@ public class Campaign implements Serializable, ITechManager {
 
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
+
+            // Training Experience - Award to eligible training lances on active contracts
+            getLances().values().stream()
+                    .filter(lance -> lance.getRole().isTraining()
+                            && (lance.getContract(this) != null) && lance.isEligible(this)
+                            && lance.getContract(this).isActiveOn(getLocalDate(), true))
+                    .forEach(this::awardTrainingXP);
         }
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
@@ -3554,17 +3561,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
 
-    public void awardTrainingXP(Lance l) {
-        awardTrainingXPByMaximumRole(l);
-    }
-
     /**
-     * Awards XP to the lance based on the maximum experience level of its
-     * commanding officer and the minimum experience level of the unit's
-     * members.
+     * Awards XP to the lance based on the maximum experience level of its commanding officer and
+     * the minimum experience level of the unit's members.
      * @param l The {@link Lance} to calculate XP to award for training.
      */
-    private void awardTrainingXPByMaximumRole(Lance l) {
+    private void awardTrainingXP(final Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
@@ -4968,24 +4970,27 @@ public class Campaign implements Serializable, ITechManager {
         return target;
     }
 
-    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition,
-            Person person) {
-        return getTargetForAcquisition(acquisition, person, true);
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
+        return getTargetForAcquisition(acquisition, getLogisticsPerson());
     }
 
-    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition,
-            Person person, boolean checkDaysToWait) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(
-                CampaignOptions.S_AUTO)) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS,
-                    "Automatic Success");
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
+                                              final @Nullable Person person) {
+        return getTargetForAcquisition(acquisition, person, false);
+    }
+
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
+                                              final @Nullable Person person,
+                                              final boolean checkDaysToWait) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
+
         if (null == person) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "No one on your force is capable of acquiring parts");
         }
-        Skill skill = person.getSkillForWorkingOn(
-                getCampaignOptions().getAcquisitionSkill());
+        final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
         if (null != getShoppingList().getShoppingItem(
                 acquisition.getNewEquipment())
                 && checkDaysToWait) {
@@ -5167,39 +5172,38 @@ public class Campaign implements Serializable, ITechManager {
          * contract. Don't restrict parts availability by contract if it has not started.
          */
         if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if ((c instanceof AtBContract) &&
-                        ((contract == null) ||
-                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
-                    contract = (AtBContract) c;
+            for (final AtBContract c : getActiveAtBContracts()) {
+                if ((contract == null)
+                        || (c.getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
+                    contract = c;
                 }
             }
         }
 
         // if we have a contract and it has started
-        if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
+        if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
             if (reportBuilder != null) {
-                reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
+                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType()).append(")");
             }
             return contract.getPartsAvailabilityLevel();
         }
 
         /* If contract is still null, the unit is not in a contract. */
-        Person adminLog = findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminMod = adminLogExp - SkillType.EXP_REGULAR;
+        final Person person = getLogisticsPerson();
+        int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
+                : person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
+        int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
-            reportBuilder.append(getUnitRatingMod() + "(unit rating)");
-            if (adminLog != null) {
-                reportBuilder.append(adminMod + "(" + adminLog.getFullName() +", logistics admin)");
+            reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
+            if (person != null) {
+                reportBuilder.append(modifier).append("(").append(person.getFullName()).append(", logistics admin)");
             } else {
-                reportBuilder.append(adminMod + "(no logistics admin)");
+                reportBuilder.append(modifier).append("(no logistics admin)");
             }
         }
 
-        return getUnitRatingMod() + adminMod;
+        return getUnitRatingMod() + modifier;
     }
 
     public void resetAstechMinutes() {
