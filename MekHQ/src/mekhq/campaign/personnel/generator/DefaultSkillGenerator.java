@@ -30,6 +30,11 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
+    //region Constructors
+    public DefaultSkillGenerator(final RandomSkillPreferences randomSkillPreferences) {
+        super(randomSkillPreferences);
+    }
+    //endregion Constructors
 
     @Override
     public void generateSkills(Person person, int expLvl) {
@@ -74,10 +79,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (getCampaignOptions(person).useArtillery()
                 && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
-            int artyLvl = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
-            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_ARTILLERY, artyLvl, rskillPrefs.randomizeSkill(), bonus);
-            }
+            generateArtillerySkill(person, bonus);
         }
 
         // roll random secondary skill

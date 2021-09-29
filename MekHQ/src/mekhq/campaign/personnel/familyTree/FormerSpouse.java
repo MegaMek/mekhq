@@ -108,11 +108,11 @@ public class FormerSpouse implements Serializable {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouse");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "id", formerSpouse.getId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", date);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "reason", reason.name());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouse");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "formerSpouse");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", getFormerSpouse().getId());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "reason", getReason().name());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "formerSpouse");
     }
 
     public static FormerSpouse generateInstanceFromXML(Node wn) {
