@@ -642,37 +642,37 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return missingParts;
         }
         boolean armorFound = false;
-        for (Part part: parts) {
-            if (part instanceof MissingPart && part.needsFixing() && null == ((MissingPart)part).findReplacement(false)) {
-                missingParts.add((MissingPart)part);
+        for (Part part : parts) {
+            if (part instanceof MissingPart && part.needsFixing() && null == ((MissingPart) part).findReplacement(false)) {
+                missingParts.add((MissingPart) part);
             }
             //we need to check for armor as well, but this one is funny because we dont want to
             //check per location really, since armor can be used anywhere. So stop after we reach
             //the first Armor needing replacement
             //TODO: we need to adjust for patchwork armor, which can have different armor types by location
             if (!armorFound && part instanceof Armor) {
-                Armor a = (Armor)part;
+                Armor a = (Armor) part;
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
             if (!armorFound && part instanceof ProtomekArmor) {
-                ProtomekArmor a = (ProtomekArmor)part;
+                ProtomekArmor a = (ProtomekArmor) part;
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
             if (!armorFound && part instanceof BaArmor) {
-                BaArmor a = (BaArmor)part;
+                BaArmor a = (BaArmor) part;
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
-            if (part instanceof AmmoBin && !((AmmoBin)part).isEnoughSpareAmmoAvailable()) {
-                missingParts.add((AmmoBin)part);
+            if (part instanceof AmmoBin && !((AmmoBin) part).isEnoughSpareAmmoAvailable()) {
+                missingParts.add((AmmoBin) part);
             }
         }
 
@@ -683,19 +683,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Money value = Money.zero();
         for (Part part : parts) {
             if (part instanceof MissingAmmoBin) {
-                AmmoBin newBin = (AmmoBin) ((MissingAmmoBin)part).getNewEquipment();
+                AmmoBin newBin = (AmmoBin) ((MissingAmmoBin) part).getNewEquipment();
                 value = value.plus(newBin.getValueNeeded());
             }
             if (part instanceof MissingPart) {
-                Part newPart = (Part)((MissingPart)part).getNewEquipment();
+                Part newPart = (Part) ((MissingPart) part).getNewEquipment();
                 newPart.setBrandNew(!getCampaign().getCampaignOptions().useBLCSaleValue());
                 value = value.plus(newPart.getActualValue());
             }
             else if (part instanceof AmmoBin) {
-                value = value.plus(((AmmoBin)part).getValueNeeded());
+                value = value.plus(((AmmoBin) part).getValueNeeded());
             }
             else if (part instanceof Armor) {
-                value = value.plus(((Armor)part).getValueNeeded());
+                value = value.plus(((Armor) part).getValueNeeded());
             }
         }
         return value;
@@ -835,7 +835,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //a non-full strength BA unit, they can salvage the suits that are unmanned and then they can deploy
         //it
         if (entity instanceof BattleArmor) {
-            for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+            for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
                 if (entity.getInternal(i) == 0) {
                     return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
                 }
@@ -929,7 +929,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int usedHits = 0;
         for (int loc = 0; loc < getEntity().locations(); loc++) {
             if (neededHits > usedHits) {
-                usedHits += damageSystem(type, equipmentNum, loc, neededHits-usedHits);
+                usedHits += damageSystem(type, equipmentNum, loc, neededHits - usedHits);
             }
         }
     }
@@ -2133,7 +2133,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * parts
      */
     public void initializeParts(boolean addParts) {
-
         int erating = 0;
         int builtInHeatSinks = 0;
         if (!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
@@ -2165,6 +2164,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part leftFoot = null;
         Part leftLowerLeg = null;
         Part leftUpperLeg = null;
+        Part centerFoot = null;
+        Part centerLowerLeg = null;
+        Part centerUpperLeg = null;
         Part rightFrontFoot = null;
         Part rightLowerFrontLeg = null;
         Part rightUpperFrontLeg = null;
@@ -2218,7 +2220,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (part instanceof MekGyro || part instanceof MissingMekGyro) {
                 gyro = part;
             } else if (part instanceof EnginePart || part instanceof MissingEnginePart) {
-                //reverse compatibility check, spaceships get different engines
+                // reverse compatibility check, spaceships get different engines
                 if (!(entity instanceof SmallCraft || entity instanceof Jumpship)) {
                     engine = part;
                 }
@@ -2311,17 +2313,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof AmmoBin) {
-                ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
+                ammoParts.put(((AmmoBin) part).getEquipmentNum(), part);
             } else if (part instanceof MissingAmmoBin) {
-                ammoParts.put(((MissingAmmoBin)part).getEquipmentNum(), part);
+                ammoParts.put(((MissingAmmoBin) part).getEquipmentNum(), part);
             } else if (part instanceof HeatSink) {
-                heatSinks.put(((HeatSink)part).getEquipmentNum(), part);
+                heatSinks.put(((HeatSink) part).getEquipmentNum(), part);
             } else if (part instanceof MissingHeatSink) {
-                heatSinks.put(((MissingHeatSink)part).getEquipmentNum(), part);
+                heatSinks.put(((MissingHeatSink) part).getEquipmentNum(), part);
             } else if (part instanceof JumpJet) {
-                jumpJets.put(((JumpJet)part).getEquipmentNum(), part);
+                jumpJets.put(((JumpJet) part).getEquipmentNum(), part);
             } else if (part instanceof MissingJumpJet) {
-                jumpJets.put(((MissingJumpJet)part).getEquipmentNum(), part);
+                jumpJets.put(((MissingJumpJet) part).getEquipmentNum(), part);
             }  else if (part instanceof BattleArmorEquipmentPart) {
                 if (!(entity instanceof BattleArmor)) {
                     partsToRemove.add(part);
@@ -2345,18 +2347,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     baEquipParts.put(((MissingBattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
             } else if (part instanceof EquipmentPart) {
-                equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
+                equipParts.put(((EquipmentPart) part).getEquipmentNum(), part);
             } else if (part instanceof MissingEquipmentPart) {
-                equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
+                equipParts.put(((MissingEquipmentPart) part).getEquipmentNum(), part);
             } else if (part instanceof MekActuator || part instanceof MissingMekActuator) {
                 int type = -1;
                 int loc = -1;
                 if (part instanceof MekActuator) {
-                    type = ((MekActuator)part).getType();
-                    loc = ((MekActuator)part).getLocation();
+                    type = ((MekActuator) part).getType();
+                    loc = ((MekActuator) part).getLocation();
                 } else {
-                    type = ((MissingMekActuator)part).getType();
-                    loc = ((MissingMekActuator)part).getLocation();
+                    type = ((MissingMekActuator) part).getType();
+                    loc = ((MissingMekActuator) part).getLocation();
                 }
                 if (type == Mech.ACTUATOR_UPPER_ARM) {
                     if (loc == Mech.LOC_RARM) {
@@ -2383,8 +2385,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightUpperFrontLeg = part;
                     } else if (loc == Mech.LOC_RLEG) {
                         rightUpperLeg = part;
-                    } else {
+                    } else if (loc == Mech.LOC_LLEG) {
                         leftUpperLeg = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerUpperLeg = part;
+                    } else {
+                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_LOWER_LEG) {
                     if (loc == Mech.LOC_LARM) {
@@ -2393,8 +2399,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightLowerFrontLeg = part;
                     } else if (loc == Mech.LOC_RLEG) {
                         rightLowerLeg = part;
-                    } else {
+                    } else if (loc == Mech.LOC_LLEG) {
                         leftLowerLeg = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerLowerLeg = part;
+                    } else {
+                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_FOOT) {
                     if (loc == Mech.LOC_LARM) {
@@ -2403,37 +2413,41 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         rightFrontFoot = part;
                     } else if (loc == Mech.LOC_RLEG) {
                         rightFoot = part;
-                    } else {
+                    } else if (loc == Mech.LOC_LLEG) {
                         leftFoot = part;
+                    } else if (loc == Mech.LOC_CLEG) {
+                        centerFoot = part;
+                    } else {
+                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
                     }
                 }
             } else if (part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
                 qvGear = part;
             } else if (part instanceof Avionics || part instanceof MissingAvionics) {
                 avionics = part;
-            //Don't initialize FCS for JS/WS/SS, use CIC for these instead
+            // Don't initialize FCS for JS/WS/SS, use CIC for these instead
             } else if (part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
                 fcs = part;
-                //for reverse compatability, calculate costs
+                // for reverse compatibility, calculate costs
                 if (part instanceof FireControlSystem) {
-                    ((FireControlSystem)fcs).calculateCost();
+                    ((FireControlSystem) fcs).calculateCost();
                 }
                 // If a JS/WS/SS already has an FCS, remove it
                 if (entity instanceof Jumpship) {
                     partsToRemove.add(part);
                 }
-            //Don't initialize CIC for any ASF/SC/DS, use FCS for these instead
+            // Don't initialize CIC for any ASF/SC/DS, use FCS for these instead
             } else if ((part instanceof CombatInformationCenter || part instanceof MissingCIC)
                     && (entity instanceof Jumpship)) {
                 cic = part;
-                //for reverse compatability, calculate costs
+                // for reverse compatibility, calculate costs
                 if (part instanceof CombatInformationCenter) {
                     ((CombatInformationCenter)cic).calculateCost();
                 }
-            //Only Jumpships and Warships have these
+            // Only JumpShips and WarShips have these
             } else if ((part instanceof LFBattery || part instanceof MissingLFBattery)
                     && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)
-                            && ((Jumpship)entity).hasLF())) {
+                            && ((Jumpship) entity).hasLF())) {
                 lfBattery = part;
             } else if ((part instanceof KFHeliumTank || part instanceof MissingKFHeliumTank)
                     && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
@@ -2450,8 +2464,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if ((part instanceof KFDriveCoil || part instanceof MissingKFDriveCoil)
                     && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
                 driveCoil = part;
-            //For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
-            //of individual heatsink parts.
+            // For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
+            // of individual heatsink parts.
             } else if (part instanceof SpacecraftCoolingSystem
                     && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 coolingSystem = part;
@@ -2468,7 +2482,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (entity instanceof SmallCraft || entity instanceof Jumpship) {
                     partsToRemove.add(part);
                 } else if (entity.getEngine().isFusion() && builtInHeatSinks > 0) {
-                    //Don't add parts for the 10 heatsinks included with a fusion engine
+                    // Don't add parts for the 10 heatsinks included with a fusion engine
                     partsToRemove.add(part);
                     builtInHeatSinks--;
                 } else {
@@ -2524,10 +2538,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         for (Part part : partsToRemove) {
             removePart(part);
         }
-        //now check to see what is null
+        // now check to see what is null
         for (int i = 0; i < locations.length; i++) {
             if (entity.getOInternal(i) == IArmorState.ARMOR_NA) {
-                //this is not a valid location, so we should skip it
+                // this is not a valid location, so we should skip it
                 continue;
             }
             if (null == locations[i]) {
@@ -2586,7 +2600,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         partsToAdd.add(tankLocation);
                     }
                 } else if ((entity instanceof BattleArmor) && (i != 0) && (i <= ((BattleArmor) entity).getSquadSize())) {
-                    BattleArmorSuit baSuit = new BattleArmorSuit((BattleArmor)entity, i, getCampaign());
+                    BattleArmorSuit baSuit = new BattleArmorSuit((BattleArmor) entity, i, getCampaign());
                     addPart(baSuit);
                     partsToAdd.add(baSuit);
                 }
@@ -2843,7 +2857,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(sensor);
             }
             if (null == cockpit) {
-                cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType(), entity.isClan(), getCampaign());
+                cockpit = new MekCockpit((int) entity.getWeight(), ((Mech) entity).getCockpitType(), entity.isClan(), getCampaign());
                 addPart(cockpit);
                 partsToAdd.add(cockpit);
             }
@@ -2862,51 +2876,79 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(rightLowerArm);
                 partsToAdd.add(rightLowerArm);
             }
+
             if (null == leftLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
                 leftLowerArm = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM, getCampaign());
                 addPart(leftLowerArm);
                 partsToAdd.add(leftLowerArm);
             }
+
             if (null == rightHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
                 rightHand = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_RARM, getCampaign());
                 addPart(rightHand);
                 partsToAdd.add(rightHand);
             }
+
             if (null == leftHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
                 leftHand = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_LARM, getCampaign());
                 addPart(leftHand);
                 partsToAdd.add(leftHand);
             }
+
             if (null == rightUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG)) {
                 rightUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG, getCampaign());
                 addPart(rightUpperLeg);
                 partsToAdd.add(rightUpperLeg);
             }
+
             if (null == leftUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG)) {
                 leftUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG, getCampaign());
                 addPart(leftUpperLeg);
                 partsToAdd.add(leftUpperLeg);
             }
+
+            if ((centerUpperLeg == null) && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG)) {
+                centerUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG, getCampaign());
+                addPart(centerUpperLeg);
+                partsToAdd.add(centerUpperLeg);
+            }
+
             if (null == rightLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG)) {
                 rightLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG, getCampaign());
                 addPart(rightLowerLeg);
                 partsToAdd.add(rightLowerLeg);
             }
+
             if (null == leftLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG)) {
-                leftLowerLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG, getCampaign());
+                leftLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG, getCampaign());
                 addPart(leftLowerLeg);
                 partsToAdd.add(leftLowerLeg);
             }
+
+            if ((centerLowerLeg == null) && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG)) {
+                centerLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG, getCampaign());
+                addPart(centerLowerLeg);
+                partsToAdd.add(centerLowerLeg);
+            }
+
             if (null == rightFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RLEG)) {
                 rightFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG, getCampaign());
                 addPart(rightFoot);
                 partsToAdd.add(rightFoot);
             }
+
             if (null == leftFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LLEG)) {
                 leftFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG, getCampaign());
                 addPart(leftFoot);
                 partsToAdd.add(leftFoot);
             }
+
+            if ((centerFoot == null) && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_CLEG)) {
+                centerFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_CLEG, getCampaign());
+                addPart(centerFoot);
+                partsToAdd.add(centerFoot);
+            }
+
             if (null == rightUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM)) {
                 rightUpperFrontLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM, getCampaign());
                 addPart(rightUpperFrontLeg);
@@ -2961,48 +3003,48 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 ((CombatInformationCenter)cic).calculateCost();
             }
             if (null == driveCoil && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                driveCoil = new KFDriveCoil((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                driveCoil = new KFDriveCoil((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(driveCoil);
                 partsToAdd.add(driveCoil);
             }
             if (null == driveController && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                driveController = new KFDriveController((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                driveController = new KFDriveController((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(driveController);
                 partsToAdd.add(driveController);
             }
             if (null == fieldInitiator && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                fieldInitiator = new KFFieldInitiator((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                fieldInitiator = new KFFieldInitiator((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(fieldInitiator);
                 partsToAdd.add(fieldInitiator);
             }
             if (null == chargingSystem && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                chargingSystem = new KFChargingSystem((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                chargingSystem = new KFChargingSystem((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(chargingSystem);
                 partsToAdd.add(chargingSystem);
             }
             if (null == heliumTank && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                heliumTank = new KFHeliumTank((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                heliumTank = new KFHeliumTank((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(heliumTank);
                 partsToAdd.add(heliumTank);
             }
             if (null == lfBattery
                     && (entity instanceof Jumpship) && !(entity instanceof SpaceStation) && ((Jumpship) entity).hasLF()) {
-                lfBattery = new LFBattery((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                lfBattery = new LFBattery((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(lfBattery);
                 partsToAdd.add(lfBattery);
             }
             if (null == fcs && !(entity instanceof Jumpship)) {
-                fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
+                fcs = new FireControlSystem((int) entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
             }
             if (null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
-                int sinkType = ((Aero)entity).getHeatType();
+                int sinkType = ((Aero) entity).getHeatType();
                 if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
                     sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
                 }
-                coolingSystem = new SpacecraftCoolingSystem((int)entity.getWeight(), ((Aero)entity).getOHeatSinks(), sinkType, getCampaign());
+                coolingSystem = new SpacecraftCoolingSystem((int) entity.getWeight(), ((Aero) entity).getOHeatSinks(), sinkType, getCampaign());
                 addPart(coolingSystem);
                 partsToAdd.add(coolingSystem);
             }
@@ -3036,7 +3078,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             if (jumpCollars.isEmpty() && entity instanceof Jumpship) {
                 for (DockingCollar collar : entity.getDockingCollars()) {
-                    Part collarPart = new JumpshipDockingCollar (0, collar.getCollarNumber(), getCampaign(), ((Jumpship)entity).getDockingCollarType());
+                    Part collarPart = new JumpshipDockingCollar (0, collar.getCollarNumber(), getCampaign(), ((Jumpship) entity).getDockingCollarType());
                     jumpCollars.put(collar.getCollarNumber(), collarPart);
                     addPart(collarPart);
                     partsToAdd.add(collarPart);
@@ -3045,7 +3087,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (gravDecks.isEmpty() && entity instanceof Jumpship) {
                 for (int deck : ((Jumpship) entity).getGravDecks()) {
                     int deckNumber = ((Jumpship) entity).getGravDecks().indexOf(deck);
-                    //Default to standard size
+                    // Default to standard size
                     int deckType = GravDeck.GRAV_DECK_TYPE_STANDARD;
                     if (deck > Jumpship.GRAV_DECK_STANDARD_MAX && deck <= Jumpship.GRAV_DECK_LARGE_MAX) {
                         deckType = GravDeck.GRAV_DECK_TYPE_LARGE;
@@ -3059,14 +3101,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
 
-            //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
+            // Only add heatsink parts to fighters. Larger craft get a cooling system instead.
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
-                int hsinks = ((Aero)entity).getOHeatSinks()
+                int hsinks = ((Aero) entity).getOHeatSinks()
                         - aeroHeatSinks.size()
                         //Ignore the 10 free heatsinks we took out for fusion powered fighters
                         - ((entity.getEngine() != null && entity.getEngine().isFusion()) ? 10 : 0);
-                int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
-                int sinkType = ((Aero)entity).getHeatType();
+                int podhsinks = ((Aero) entity).getPodHeatSinks() - podAeroHeatSinks;
+                int sinkType = ((Aero) entity).getHeatType();
                 if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
                     sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
                 }
@@ -3074,14 +3116,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // add busted heat sinks even if they're "engine free" so they can be repaired
                 if (hsinks == 0) {
                     for (int x = 0; x < ((Aero) entity).getHeatSinkHits(); x++) {
-                        MissingAeroHeatSink aHeatSink = new MissingAeroHeatSink((int)entity.getWeight(),
+                        MissingAeroHeatSink aHeatSink = new MissingAeroHeatSink((int) entity.getWeight(),
                                 sinkType, false, getCampaign());
                         addPart(aHeatSink);
                         partsToAdd.add(aHeatSink);
                     }
                 } else {
                     while (hsinks > 0) {
-                        AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                        AeroHeatSink aHeatSink = new AeroHeatSink((int) entity.getWeight(),
                                 sinkType, podhsinks > 0, getCampaign());
                         addPart(aHeatSink);
                         partsToAdd.add(aHeatSink);
@@ -3107,7 +3149,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
          }
         if (entity instanceof Tank) {
             if (null == motiveSystem) {
-                motiveSystem = new MotiveSystem((int)entity.getWeight(), getCampaign());
+                motiveSystem = new MotiveSystem((int) entity.getWeight(), getCampaign());
                 addPart(motiveSystem);
                 partsToAdd.add(motiveSystem);
             }
@@ -3116,7 +3158,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
-            if (!(entity instanceof VTOL) && !((Tank)entity).hasNoTurret() && null == turretLock) {
+            if (!(entity instanceof VTOL) && !((Tank) entity).hasNoTurret() && null == turretLock) {
                 turretLock = new TurretLock(getCampaign());
                 addPart(turretLock);
                 partsToAdd.add(turretLock);
@@ -3125,18 +3167,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (entity instanceof Protomech) {
             if (!entity.entityIsQuad()) {
                 if (null == protoLeftArmActuator) {
-                    protoLeftArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_LARM, getCampaign());
+                    protoLeftArmActuator = new ProtomekArmActuator((int) entity.getWeight(),Protomech.LOC_LARM, getCampaign());
                     addPart(protoLeftArmActuator);
                     partsToAdd.add(protoLeftArmActuator);
                 }
                 if (null == protoRightArmActuator) {
-                    protoRightArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_RARM, getCampaign());
+                    protoRightArmActuator = new ProtomekArmActuator((int) entity.getWeight(),Protomech.LOC_RARM, getCampaign());
                     addPart(protoRightArmActuator);
                     partsToAdd.add(protoRightArmActuator);
                 }
             }
             if (null == protoLegsActuator) {
-                protoLegsActuator = new ProtomekLegActuator((int)entity.getWeight(), getCampaign());
+                protoLegsActuator = new ProtomekLegActuator((int) entity.getWeight(), getCampaign());
                 addPart(protoLegsActuator);
                 partsToAdd.add(protoLegsActuator);
             }
@@ -3147,7 +3189,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while (jj > 0) {
-                ProtomekJumpJet protoJJ = new ProtomekJumpJet((int)entity.getWeight(), getCampaign());
+                ProtomekJumpJet protoJJ = new ProtomekJumpJet((int) entity.getWeight(), getCampaign());
                 addPart(protoJJ);
                 partsToAdd.add(protoJJ);
                 jj--;
@@ -3190,7 +3232,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             InfantryWeapon primaryType = ((Infantry) entity).getPrimaryWeapon();
             InfantryWeapon secondaryType = ((Infantry) entity).getSecondaryWeapon();
             if ((null == primaryW) && (null != primaryType)) {
-                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryN()) * ((Infantry)entity).getSquadN();
+                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryN()) * ((Infantry) entity).getSquadN();
                 while (number > 0) {
                     primaryW = new InfantryWeaponPart((int) entity.getWeight(), primaryType, -1, getCampaign(), true);
                     addPart(primaryW);
@@ -3211,7 +3253,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         if (getEntity() instanceof LandAirMech) {
             if (null == avionics) {
-                avionics = new Avionics((int)entity.getWeight(), getCampaign());
+                avionics = new Avionics((int) entity.getWeight(), getCampaign());
                 addPart(avionics);
                 partsToAdd.add(avionics);
             }

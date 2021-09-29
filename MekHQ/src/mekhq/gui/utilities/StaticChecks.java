@@ -18,12 +18,14 @@
  */
 package mekhq.gui.utilities;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.common.UnitType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
@@ -31,8 +33,10 @@ import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
-    public static boolean areAllForcesUndeployed(Vector<Force> forces) {
-        return forces.stream().noneMatch(Force::isDeployed);
+    public static boolean areAllForcesUndeployed(final Campaign campaign, final List<Force> forces) {
+        return forces.stream().noneMatch(Force::isDeployed)
+                && forces.stream().flatMap(force -> force.getAllUnits(true).stream())
+                        .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
     public static boolean areAllCombatForces(Vector<Force> forces) {
