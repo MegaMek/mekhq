@@ -203,11 +203,6 @@ public class AtBScenarioFactory {
                         continue;
                     }
 
-                    // Assign training experience
-                    if (lance.getRole().isTraining()) {
-                        c.awardTrainingXP(lance);
-                    }
-
                     // Don't generate scenarios for contracts with morale below the morale limit of Low
                     if (contract.getMoraleLevel().isVeryLow() || contract.getMoraleLevel().isRout()) {
                         continue;

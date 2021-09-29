@@ -396,17 +396,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
-            for (Unit u : units) {
-                u.getEntity().setCamouflage(new Camouflage());
+            for (final Unit unit : units) {
+                unit.getEntity().setCamouflage(new Camouflage());
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
             }
-        } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+        } else if (command.equals(COMMAND_INDI_CAMO)) {
+            final CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
                     selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
             if (ccd.showDialog().isCancelled()) {
                 return;
             }
-            selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
-            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            for (final Unit unit : units) {
+                unit.getEntity().setCamouflage(ccd.getSelectedItem());
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            }
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             for (Unit u : units) {
                 Money refundAmount = u.getBuyCost().multipliedBy(
@@ -964,7 +967,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected) {
+            if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
                 menuItem = new JMenuItem(gui.getResourceMap()
                         .getString("customizeMenu.individualCamo.text"));
                 menuItem.setActionCommand(COMMAND_INDI_CAMO);

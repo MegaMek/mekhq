@@ -61,6 +61,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;

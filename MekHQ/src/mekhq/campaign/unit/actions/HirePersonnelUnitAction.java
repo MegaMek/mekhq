@@ -21,10 +21,15 @@
 package mekhq.campaign.unit.actions;
 
 import megamek.common.*;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.unit.Unit;
+
+import java.util.List;
 
 /**
  * Hires a full complement of personnel for a unit.
@@ -144,8 +149,19 @@ public class HirePersonnelUnitAction implements IUnitAction {
             unit.setTechOfficer(p);
         }
 
+        // Ensure we generate at least one person with the artillery skill if using that skill and
+        // the unit has an artillery weapon
+        if (campaign.getCampaignOptions().useArtillery() && (unit.getEntity() != null)
+                && unit.getEntity().getWeaponList().stream()
+                        .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
+                                && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
+            final List<Person> gunners = unit.getGunners();
+            if (!gunners.isEmpty() && gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
+                new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(Utilities.getRandomItem(gunners));
+            }
+        }
+
         unit.resetPilotAndEntity();
         unit.runDiagnostic(false);
     }
-
 }

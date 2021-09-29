@@ -55,7 +55,7 @@ public class StratconTab extends CampaignGuiTab {
     private static final String OBJECTIVE_FAILED = "x";
     private static final String OBJECTIVE_COMPLETED = "&#10003;";
     private static final String OBJECTIVE_IN_PROGRESS = "o";
-    
+
     private StratconPanel stratconPanel;
     private JPanel infoPanel;
     private JComboBox<TrackDropdownItem> cboCurrentTrack;
@@ -66,7 +66,7 @@ public class StratconTab extends CampaignGuiTab {
     private boolean objectivesCollapsed = true;
 
     CampaignManagementDialog cmd;
-    
+
     /**
      * Creates an instance of the StratconTab.
      */
@@ -88,7 +88,7 @@ public class StratconTab extends CampaignGuiTab {
         campaignStatusText = new JLabel();
         campaignStatusText.setHorizontalAlignment(SwingConstants.LEFT);
         campaignStatusText.setVerticalAlignment(SwingConstants.TOP);
-        
+
         objectiveStatusText = new JLabel();
         objectiveStatusText.setHorizontalAlignment(SwingConstants.LEFT);
         objectiveStatusText.setVerticalAlignment(SwingConstants.TOP);
@@ -129,7 +129,7 @@ public class StratconTab extends CampaignGuiTab {
 
         infoPanel.add(new JLabel("Current Campaign Status:"));
         infoPanel.add(campaignStatusText);
-        
+
         JButton btnManageCampaignState = new JButton("Manage SP/VP");
         btnManageCampaignState.setHorizontalAlignment(SwingConstants.LEFT);
         btnManageCampaignState.setVerticalAlignment(SwingConstants.TOP);
@@ -325,17 +325,17 @@ public class StratconTab extends CampaignGuiTab {
                 boolean objectiveFailed = objective.isObjectiveFailed(track);
 
                 // special case: allied facilities can get lost at any point in time
-                if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) && 
+                if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) &&
                         !campaignState.allowEarlyVictory()) {
                     sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='green'>").append(OBJECTIVE_COMPLETED);                    
+                    sb.append("<span color='green'>").append(OBJECTIVE_COMPLETED);
                 } else if (objectiveFailed) {
                     sb.append("<span color='red'>").append(OBJECTIVE_FAILED);
                 } else {
                     sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
                 }
-                
+
                 sb.append(" ");
 
                 if (!coordsRevealed && displayCoordinateData) {
@@ -354,7 +354,7 @@ public class StratconTab extends CampaignGuiTab {
                     case AlliedFacilityControl:
                         sb.append(coordsRevealed ? "M" : "m")
                             .append("aintain control of designated facility");
-                        
+
                         if (!campaignState.allowEarlyVictory()) {
                             sb.append(" until " + campaignState.getContract().getEndingDate());
                         }
@@ -380,7 +380,7 @@ public class StratconTab extends CampaignGuiTab {
         // special case text reminding player to complete required scenarios
         if (!campaignState.getContract().getCommandRights().isIndependent()) {
             boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
-            
+
             if (contractIsActive) {
                 sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);
             } else if (campaignState.getVictoryPoints() > 0) {
@@ -431,9 +431,12 @@ public class StratconTab extends CampaignGuiTab {
             stratconPanel.setVisible(false);
         }
     }
-    
+
     private void showCampaignStateManagement(ActionEvent e) {
         TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        if (selectedTrack == null) {
+            return;
+        }
         cmd.display(selectedTrack.contract.getStratconCampaignState(), selectedTrack.track, getCampaign().isGM());
         cmd.setModalityType(ModalityType.APPLICATION_MODAL);
         cmd.setVisible(true);
