@@ -334,19 +334,19 @@ public class Loan implements Serializable {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "loan");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "institution", getInstitution());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "referenceNumber", getReferenceNumber());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "principal", getPrincipal().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "rate", getRate());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "years", getYears());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "collateral", getCollateral());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "remainingPayments", getRemainingPayments());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "paymentAmount", getPaymentAmount().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "nextPayment", getNextPayment());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "overdue", isOverdue());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "loan");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loan");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rate", getRate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "years", getYears());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loan");
     }
 
     public static Loan generateInstanceFromXML(final Node wn) {
