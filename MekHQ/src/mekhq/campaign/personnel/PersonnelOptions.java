@@ -49,6 +49,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
+    public static final String TECH_MAINTAINER = "tech_maintainer";
 
     @Override
     public void initialize() {
@@ -92,6 +93,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_INTERNAL_SPECIALIST, false);
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
+        addOption(l3a, TECH_MAINTAINER, false);
 
         addOption(edge, EDGE_MEDICAL, false);
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);

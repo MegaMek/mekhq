@@ -999,6 +999,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
+
+            if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
+                mods.addModifier(1, "Maintainer");
+            }
         }
 
         return getQualityMods(mods, tech);
@@ -1048,6 +1052,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
                     || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
+            }
+
+            if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
+                mods.addModifier(-1, "Maintainer");
             }
         }
 
