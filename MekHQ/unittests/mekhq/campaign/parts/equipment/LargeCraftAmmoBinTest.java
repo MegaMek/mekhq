@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -144,6 +145,7 @@ public class LargeCraftAmmoBinTest {
 
         // Setup the unit for the ammo bin
         Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(UUID.randomUUID());
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
         Mounted bay = mock(Mounted.class);
