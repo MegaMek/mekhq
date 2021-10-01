@@ -27,7 +27,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
