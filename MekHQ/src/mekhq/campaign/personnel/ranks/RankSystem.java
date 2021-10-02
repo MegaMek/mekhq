@@ -20,8 +20,9 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import org.w3c.dom.Element;
@@ -174,7 +175,7 @@ public class RankSystem implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<individualRankSystem version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version") + "\">");
+            pw.println("<individualRankSystem version=\"" + MekHqConstants.VERSION + "\">");
             writeToXML(pw, 1, true);
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
         } catch (Exception e) {

@@ -72,10 +72,15 @@ public class MissingBayDoor extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
+
+            // Calling 'remove()' has the side effect of setting this.parentPart to null.
+            // Issue #2878 - Missing Bay Door on reload.
+            Part parentReference = parentPart;
             remove(false);
-            if (null != parentPart) {
-                parentPart.addChildPart(actualReplacement);
-                parentPart.updateConditionFromPart();
+            
+            if (null != parentReference) {
+                parentReference.addChildPart(actualReplacement);
+                parentReference.updateConditionFromPart();
             }
         }
     }

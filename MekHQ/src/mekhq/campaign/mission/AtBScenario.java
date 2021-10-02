@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
@@ -465,7 +466,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 "Cliffs", "Mountain-medium", "Mountain-high"} //mountains
         };
 
-        map = maps[terrainType][Compute.d6() - 1];
+        int actualTerrainType = terrainType;
+
+        // we want to make sure the terrain type we pick is in bounds,
+        if ((terrainType < 0) || (terrainType >= maps.length)) {
+            actualTerrainType = Compute.randomInt(maps.length);
+        }
+
+        map = maps[actualTerrainType][Compute.d6() - 1];
     }
 
     public boolean canRerollTerrain() {
@@ -2026,6 +2034,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public Entity getEntity(UUID id) {
         return entityIds.get(id);
+    }
+
+    public List<BotForce> getBotForces() {
+        return botForces;
     }
 
     public void addBotForce(BotForce botForce) {
