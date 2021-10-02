@@ -55,7 +55,7 @@ import megamek.common.SmallCraft;
 import megamek.common.WeaponType;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
@@ -501,7 +501,7 @@ public class EquipmentPartTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the EquipmentPart
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof EquipmentPart);
 

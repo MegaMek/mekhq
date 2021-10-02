@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;

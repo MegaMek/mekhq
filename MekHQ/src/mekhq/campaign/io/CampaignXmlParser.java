@@ -42,7 +42,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
@@ -161,7 +161,7 @@ public class CampaignXmlParser {
         // Stupid weird parsing of XML. At least this cleans it up.
         campaignEle.normalize();
 
-        Version version = new Version(campaignEle.getAttribute("version"));
+        final Version version = new Version(campaignEle.getAttribute("version"));
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -1321,8 +1321,7 @@ public class CampaignXmlParser {
 
             // Fixup LargeCraftAmmoBins from old versions
             if ((prt.getUnit() != null) && (prt.getUnit().getEntity() != null)
-                    && ((version.getMinorVersion() < 43)
-                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
+                    && version.isLowerThan("0.43.5")
                     && ((prt instanceof AmmoBin) || (prt instanceof MissingAmmoBin))) {
                 if (prt.getUnit().getEntity().usesWeaponBays()) {
                     Mounted ammo;
@@ -1477,7 +1476,7 @@ public class CampaignXmlParser {
                 }
             }
 
-            // old versions didnt distinguish tank engines
+            // old versions didn't distinguish tank engines
             if ((prt instanceof EnginePart) && prt.getName().contains("Vehicle")) {
                 boolean isHover = null != u
                         && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
@@ -1499,9 +1498,7 @@ public class CampaignXmlParser {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 
-            if ((version.getMajorVersion() == 0)
-                    && ((version.getMinorVersion() < 44)
-                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 7)))) {
+            if (version.isLowerThan("0.44.0")) {
                 if ((prt instanceof MekLocation)
                         && (((MekLocation) prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
                     if (null != u) {

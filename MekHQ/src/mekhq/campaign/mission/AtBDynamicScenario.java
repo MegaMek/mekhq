@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.common.enums.SkillLevel;
-import mekhq.Version;
+import megamek.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
