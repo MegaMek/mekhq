@@ -20,7 +20,7 @@ package mekhq.service;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
