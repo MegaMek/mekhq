@@ -26,7 +26,7 @@ import java.io.Serializable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;

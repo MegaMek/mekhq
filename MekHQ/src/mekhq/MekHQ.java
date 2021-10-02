@@ -345,7 +345,7 @@ public class MekHQ implements GameListener {
 
         StringBuilder msg = new StringBuilder();
         msg.append("\t").append(resourceMap.getString("Application.name")).append(" ")
-                .append(resourceMap.getString("Application.version"));
+                .append(MekHqConstants.VERSION);
         if (TIMESTAMP > 0) {
             msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP));
         }

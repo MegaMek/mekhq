@@ -18,20 +18,21 @@
  */
 package mekhq.campaign;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.utils.MegaMekXmlUtil;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -42,15 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.swing.*;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
@@ -305,16 +298,15 @@ public class CampaignPreset implements Serializable {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        pw.println("<campaignPreset version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ")
-                .getString("Application.version") + "\">");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, ++indent, "title", toString());
+        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MekHQOptions.VERSION);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
         //region Startup
         if (getDate() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", getDate());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
         }
 
         if (getFaction() != null) {
@@ -329,7 +321,7 @@ public class CampaignPreset implements Serializable {
         if (getRankSystem() != null) {
             getRankSystem().writeToXML(pw, indent, false);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "contractCount", getContractCount());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
         //endregion Startup
 
         //region Continuous
@@ -346,25 +338,25 @@ public class CampaignPreset implements Serializable {
         }
 
         if (!getSkills().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "skillTypes");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
                     type.writeToXml(pw, indent);
                 }
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "skillTypes");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         }
 
         if (!getSpecialAbilities().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "specialAbilities");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
                 getSpecialAbilities().get(key).writeToXml(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }
         //endregion Continuous
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "campaignPreset");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
     }
 
     public static List<CampaignPreset> loadCampaignPresetsFromDirectory(final @Nullable File directory) {
@@ -402,8 +394,7 @@ public class CampaignPreset implements Serializable {
 
         // Legacy Parsing method for any presets created before 0.47.11, as they did not include a version
         final String versionString = element.getAttribute("version");
-        Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
-
+        final Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
         return parseFromXML(element.getChildNodes(), version);
     }
 

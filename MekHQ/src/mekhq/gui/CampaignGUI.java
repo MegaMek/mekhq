@@ -22,6 +22,7 @@
 package mekhq.gui;
 
 import chat.ChatClient;
+import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -32,11 +33,10 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.*;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignController;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.*;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -46,6 +46,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1959,7 +1960,7 @@ public class CampaignGUI extends JPanel {
             // Stupid weird parsing of XML. At least this cleans it up.
             personnelEle.normalize();
 
-            Version version = new Version(personnelEle.getAttribute("version"));
+            final Version version = new Version(personnelEle.getAttribute("version"));
 
             // we need to iterate through three times, the first time to collect
             // any custom units that might not be written yet
@@ -2022,7 +2023,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    //TODO: disable if not using personnel tab
+    // TODO: disable if not using personnel tab
     private void savePersonFile() {
         File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
@@ -2063,9 +2064,8 @@ public class CampaignGUI extends JPanel {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // Start the XML root.
-            pw.println("<personnel version=\"" + resourceMap.getString("Application.version") + "\">");
+            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
@@ -2103,7 +2103,7 @@ public class CampaignGUI extends JPanel {
     protected void loadPartsFile() {
         Optional<File> maybeFile = FileDialogs.openParts(frame);
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -2132,7 +2132,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
@@ -2165,7 +2165,7 @@ public class CampaignGUI extends JPanel {
     private void savePartsFile() {
         Optional<File> maybeFile = FileDialogs.saveParts(frame, getCampaign());
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -2208,9 +2208,8 @@ public class CampaignGUI extends JPanel {
                 // File header
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
                 // Start the XML root.
-                pw.println("<parts version=\"" + resourceMap.getString("Application.version") + "\">");
+                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
