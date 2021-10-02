@@ -830,7 +830,7 @@ public class PartsStoreDialog extends JDialog {
                         shoppingItem = (IAcquisitionWork)part;
                     }
                     if (null != shoppingItem) {
-                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson());
+                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true);
                         targetProxy = new TargetProxy(target);
                     }
                     else {

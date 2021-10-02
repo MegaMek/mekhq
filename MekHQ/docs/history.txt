@@ -17,6 +17,22 @@ VERSION HISTORY:
 + PR #2862: Removing Useless Shares Sorter
 + Issue #2865: Specialist Infantry Salary Multiplier
 + PR #2844: AbstractIcon: Force Camouflage: Layering and Properly Sending to MegaMek
++ Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder. 
++ Issue #2873: Part doesn't serlialize brandNew flag
++ Issue #2878: Prevent dropship bay doors from continuously breaking down when loading saves
++ Issue #1236: Adding full support for Tripod 'Mechs
++ Issue #1420: Can No Longer Deploy a Person Multiple Times
++ Issue #2867: Making the default unit market type the Open market instead of the Employer Market
++ PR #2869: Serializing StratCon OpFor Skill and Quality
++ PR #2883: Monday Training XP Assignment on New Day instead of AtB Scenario Generation
++ PR #2889: Ransom is no longer automatically selected at 100% salvage rights
++ Issue #210: One Person will be Artillery Trained when hiring minimum complement for an artillery-armed unit
++ Issue #2567: AtB now follows the part acquisition skill option
++ PR #2884: Briefing Room: Print Sheets now prints sheets for all units in AtB
++ Issue #2496: Maintenance Properly Includes Unofficial SPAs
++ Issue #2809: Grounded dropship scenarios will no longer feature immediately floating and crashing dropships; will start
++ PR #2891: Maintainer Unofficial SPA
++ PR #2880: Standardized Suite Version Tracking
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
