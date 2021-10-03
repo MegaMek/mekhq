@@ -19,7 +19,7 @@
 package mekhq.campaign.market.unitMarket;
 
 import megamek.common.annotations.Nullable;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;

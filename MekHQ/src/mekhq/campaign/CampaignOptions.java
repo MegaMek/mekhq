@@ -19,12 +19,12 @@
  */
 package mekhq.campaign;
 
+import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;

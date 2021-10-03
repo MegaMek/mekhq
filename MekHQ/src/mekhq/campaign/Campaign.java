@@ -4036,9 +4036,8 @@ public class Campaign implements Serializable, ITechManager {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
         // Start the XML root.
-        pw1.println("<campaign version=\"" + resourceMap.getString("Application.version") + "\">");
+        pw1.println("<campaign version=\"" + MekHqConstants.VERSION + "\">");
 
         //region Basic Campaign Info
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "info");
