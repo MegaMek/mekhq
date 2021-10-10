@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -1892,7 +1893,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public List<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, true, false);
+        return getTechs(noZeroMinute, null, false);
     }
 
     /**
@@ -1901,49 +1902,53 @@ public class Campaign implements Serializable, ITechManager {
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
      * @param firstTechId The ID of the tech that should appear first in the list (assuming
      *                    active and satisfies the noZeroMinute argument)
-     * @param sorted If TRUE, then return the list sorted from worst to best
      * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
+    public List<Person> getTechs(final boolean noZeroMinute, final @Nullable UUID firstTechId,
+                                 final boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
 
         // Get the first tech.
         Person firstTech = getPerson(firstTechId);
         if ((firstTech != null) && firstTech.isTech() && firstTech.getStatus().isActive()
-                && (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
+                && (!noZeroMinute || (firstTech.getMinutesLeft() > 0))) {
             techs.add(firstTech);
         }
 
-        for (Person p : getActivePersonnel()) {
-            if (p.isTech() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
-                techs.add(p);
+        for (final Person person : getActivePersonnel()) {
+            if (person.isTech() && !person.equals(firstTech)
+                    && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
+                techs.add(person);
             }
         }
         // also need to loop through and collect engineers on self-crewed vessels
-        for (Unit u : getUnits()) {
-            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && (null != u.getEngineer())) {
-                techs.add(u.getEngineer());
+        for (final Unit unit : getUnits()) {
+            if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) && (unit.getEngineer() != null)) {
+                techs.add(unit.getEngineer());
             }
         }
 
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want
         // elites first
-        if (sorted) {
-            Comparator<Person> techSorter = Comparator.comparingInt(person ->
-                    person.getExperienceLevel(!person.getPrimaryRole().isTech()
-                            && person.getSecondaryRole().isTechSecondary()));
+        Comparator<Person> techSorter = Comparator.comparingInt(person ->
+                person.getExperienceLevel(!person.getPrimaryRole().isTech()
+                        && person.getSecondaryRole().isTechSecondary()));
 
-            if (eliteFirst) {
-                techSorter = techSorter.reversed().thenComparing(Comparator
-                        .comparingInt(Person::getDailyAvailableTechTime).reversed());
-            } else {
-                techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
-            }
-
-            techs.sort(techSorter);
+        if (eliteFirst) {
+            techSorter = techSorter.reversed().thenComparing(Comparator
+                    .comparingInt(Person::getDailyAvailableTechTime).reversed());
+        } else {
+            techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
         }
 
+        techSorter = techSorter.thenComparing(new PersonTitleSorter());
+
+        if (firstTechId == null) {
+            techs.sort(techSorter);
+        } else if (techs.size() > 1) {
+            techs.subList(1, techs.size()).sort(techSorter);
+        }
         return techs;
     }
 
