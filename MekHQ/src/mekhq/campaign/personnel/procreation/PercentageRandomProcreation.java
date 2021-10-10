@@ -31,7 +31,7 @@ public class PercentageRandomProcreation extends AbstractProcreation {
 
     //region Constructors
     public PercentageRandomProcreation(final CampaignOptions options) {
-        super(RandomProcreationMethod.PERCENTAGE, options.isUseRelationshiplessRandomProcreation());
+        super(RandomProcreationMethod.PERCENTAGE, options);
         setPercentage(options.getPercentageRandomProcreationRelationshipChance());
         setRelationshiplessPercentage(options.getPercentageRandomProcreationRelationshiplessChance());
     }

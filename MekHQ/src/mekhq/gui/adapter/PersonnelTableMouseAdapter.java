@@ -510,9 +510,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         .filter(person -> (gui.getCampaign().getProcreation().canProcreate(
                                 gui.getCampaign().getLocalDate(), person, false) != null))
                         .forEach(person -> {
-                    gui.getCampaign().getProcreation().addPregnancy(gui.getCampaign(),
-                            gui.getCampaign().getLocalDate(), person);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                            gui.getCampaign().getProcreation().addPregnancy(
+                                    gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
+                            MekHQ.triggerEvent(new PersonChangedEvent(person));
                 });
                 break;
             }

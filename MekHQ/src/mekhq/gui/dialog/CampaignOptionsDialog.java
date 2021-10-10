@@ -271,6 +271,8 @@ public class CampaignOptionsDialog extends JDialog {
 
     // Procreation
     private JCheckBox chkUseManualProcreation;
+    private JCheckBox chkUseClannerProcreation;
+    private JCheckBox chkUsePrisonerProcreation;
     private JSpinner spnMultiplePregnancyOccurrences;
     private MMComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
@@ -4334,6 +4336,14 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseManualProcreation.setToolTipText(resources.getString("chkUseManualProcreation.toolTipText"));
         chkUseManualProcreation.setName("chkUseManualProcreation");
 
+        chkUseClannerProcreation = new JCheckBox(resources.getString("chkUseClannerProcreation.text"));
+        chkUseClannerProcreation.setToolTipText(resources.getString("chkUseClannerProcreation.toolTipText"));
+        chkUseClannerProcreation.setName("chkUseClannerProcreation");
+
+        chkUsePrisonerProcreation = new JCheckBox(resources.getString("chkUsePrisonerProcreation.text"));
+        chkUsePrisonerProcreation.setToolTipText(resources.getString("chkUsePrisonerProcreation.toolTipText"));
+        chkUsePrisonerProcreation.setName("chkUsePrisonerProcreation");
+
         final JLabel lblMultiplePregnancyOccurrences = new JLabel(resources.getString("lblMultiplePregnancyOccurrences.text"));
         lblMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
         lblMultiplePregnancyOccurrences.setName("lblMultiplePregnancyOccurrences");
@@ -4404,6 +4414,8 @@ public class CampaignOptionsDialog extends JDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblMultiplePregnancyOccurrences)
                                 .addComponent(spnMultiplePregnancyOccurrences)
@@ -4422,6 +4434,8 @@ public class CampaignOptionsDialog extends JDialog {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMultiplePregnancyOccurrences)
                                 .addComponent(spnMultiplePregnancyOccurrences)
@@ -5364,6 +5378,8 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Procreation
         chkUseManualProcreation.setSelected(options.isUseManualProcreation());
+        chkUseClannerProcreation.setSelected(options.isUseClannerProcreation());
+        chkUsePrisonerProcreation.setSelected(options.isUsePrisonerProcreation());
         spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
@@ -5957,6 +5973,8 @@ public class CampaignOptionsDialog extends JDialog {
 
             // Procreation
             options.setUseManualProcreation(chkUseManualProcreation.isSelected());
+            options.setUseClannerProcreation(chkUseClannerProcreation.isSelected());
+            options.setUsePrisonerProcreation(chkUsePrisonerProcreation.isSelected());
             options.setMultiplePregnancyOccurrences((Integer) spnMultiplePregnancyOccurrences.getValue());
             options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedItem());
             options.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());

@@ -236,6 +236,8 @@ public class CampaignOptions implements Serializable {
 
     // Procreation
     private boolean useManualProcreation;
+    private boolean useClannerProcreation;
+    private boolean usePrisonerProcreation;
     private int multiplePregnancyOccurrences;
     private BabySurnameStyle babySurnameStyle;
     private boolean assignNonPrisonerBabiesFounderTag;
@@ -649,7 +651,9 @@ public class CampaignOptions implements Serializable {
         setChanceRandomSameSexMarriages(0.00002);
 
         // Procreation
-        setUseManualProcreation(false);
+        setUseManualProcreation(true);
+        setUseClannerProcreation(false);
+        setUsePrisonerProcreation(true);
         setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
@@ -1596,6 +1600,22 @@ public class CampaignOptions implements Serializable {
 
     public void setUseManualProcreation(final boolean useManualProcreation) {
         this.useManualProcreation = useManualProcreation;
+    }
+
+    public boolean isUseClannerProcreation() {
+        return useClannerProcreation;
+    }
+
+    public void setUseClannerProcreation(final boolean useClannerProcreation) {
+        this.useClannerProcreation = useClannerProcreation;
+    }
+
+    public boolean isUsePrisonerProcreation() {
+        return usePrisonerProcreation;
+    }
+
+    public void setUsePrisonerProcreation(final boolean usePrisonerProcreation) {
+        this.usePrisonerProcreation = usePrisonerProcreation;
     }
 
     /**
@@ -3391,6 +3411,8 @@ public class CampaignOptions implements Serializable {
 
         //region Procreation
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerProcreation", isUseClannerProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
@@ -3942,6 +3964,10 @@ public class CampaignOptions implements Serializable {
                 //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
                     retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerProcreation")) {
+                    retVal.setUseClannerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerProcreation")) {
+                    retVal.setUsePrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiplePregnancyOccurrences")) {
                     retVal.setMultiplePregnancyOccurrences(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {

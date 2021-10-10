@@ -18,6 +18,8 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import megamek.common.options.GameOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
@@ -25,8 +27,8 @@ import java.time.LocalDate;
 
 public class DisabledRandomProcreation extends AbstractProcreation {
     //region Constructors
-    public DisabledRandomProcreation() {
-        super(RandomProcreationMethod.NONE, false);
+    public DisabledRandomProcreation(final CampaignOptions options) {
+        super(RandomProcreationMethod.NONE, options);
     }
     //endregion Constructors
 

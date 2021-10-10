@@ -24,6 +24,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
@@ -41,6 +42,8 @@ import java.util.UUID;
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
+    private boolean useClannerProcreation;
+    private boolean usePrisonerProcreation;
     private boolean useRelationshiplessProcreation;
 
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
@@ -50,16 +53,33 @@ public abstract class AbstractProcreation {
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractProcreation(final RandomProcreationMethod method,
-                                  final boolean useRelationshiplessProcreation) {
+    protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseRelationshiplessProcreation(useRelationshiplessProcreation);
+        setUseClannerProcreation(options.isUseClannerProcreation());
+        setUsePrisonerProcreation(options.isUsePrisonerProcreation());
+        setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
     }
     //endregion Constructors
 
     //region Getters/Setters
     public RandomProcreationMethod getMethod() {
         return method;
+    }
+
+    public boolean isUseClannerProcreation() {
+        return useClannerProcreation;
+    }
+
+    public void setUseClannerProcreation(final boolean useClannerProcreation) {
+        this.useClannerProcreation = useClannerProcreation;
+    }
+
+    public boolean isUsePrisonerProcreation() {
+        return usePrisonerProcreation;
+    }
+
+    public void setUsePrisonerProcreation(final boolean usePrisonerProcreation) {
+        this.usePrisonerProcreation = usePrisonerProcreation;
     }
 
     public boolean isUseRelationshiplessProcreation() {
@@ -92,6 +112,10 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Gender.text");
         } else if (!person.isTryingToConceive()) {
             return resources.getString("cannotProcreate.NotTryingForABaby.text");
+        } else if (!isUseClannerProcreation() && person.isClanner()) {
+            return resources.getString("cannotProcreate.Clanner.text");
+        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+            return resources.getString("cannotProcreate.Prisoner.text");
         } else if (person.isPregnant()) {
             return resources.getString("cannotProcreate.AlreadyPregnant.text");
         } else if (person.isDeployed()) {
@@ -106,6 +130,13 @@ public abstract class AbstractProcreation {
             } else if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
                     return resources.getString("cannotProcreate.FemaleSpouse.text");
+                } else if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
+                    return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
+                } else if (!isUseClannerProcreation() && person.getGenealogy().getSpouse().isClanner()) {
+                    return resources.getString("cannotProcreate.ClannerSpouse.text");
+                } else if (!isUsePrisonerProcreation()
+                        && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
                 } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
                     return resources.getString("cannotProcreate.MIASpouse.text");
                 } else if (person.getGenealogy().getSpouse().isDeployed()) {

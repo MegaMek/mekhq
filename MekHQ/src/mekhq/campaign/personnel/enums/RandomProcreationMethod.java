@@ -67,7 +67,7 @@ public enum RandomProcreationMethod {
                 return new PercentageRandomProcreation(options);
             case NONE:
             default:
-                return new DisabledRandomProcreation();
+                return new DisabledRandomProcreation(options);
         }
     }
 
