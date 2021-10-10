@@ -20,7 +20,7 @@ package mekhq.campaign.io.Migration;
 
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
-import mekhq.Version;
+import megamek.Version;
 
 /**
  * This migrates Camouflage from SeaBee's Pack to Deadborder's Pack.

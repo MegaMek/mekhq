@@ -23,8 +23,9 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import org.w3c.dom.Document;
@@ -109,7 +110,7 @@ public class Ranks {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<rankSystems version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version") + "\">");
+            pw.println("<rankSystems version=\"" + MekHqConstants.VERSION + "\">");
             for (final RankSystem rankSystem : rankSystems) {
                 rankSystem.writeToXML(pw, 1, true);
             }

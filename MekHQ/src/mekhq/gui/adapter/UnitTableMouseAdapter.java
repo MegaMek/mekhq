@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,6 +46,8 @@ import mekhq.gui.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
+import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
@@ -168,9 +170,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         Unit selectedUnit = units[0];
 
         if (command.equals(COMMAND_MAINTENANCE_REPORT)) { // Single Unit only
-            gui.showMaintenanceReport(selectedUnit.getId());
+            new MaintenanceReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
-            gui.showUnitCostReport(selectedUnit.getId());
+            new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
             int q;
             Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this probably shouldn't be inline
