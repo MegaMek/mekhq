@@ -22,6 +22,8 @@
 package mekhq.gui;
 
 import mekhq.MekHQ;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -78,7 +80,12 @@ public class ReportHyperlinkListener implements HyperlinkListener {
             } else if (evt.getDescription().startsWith(MAINTENANCE)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
-                    campaignGUI.showMaintenanceReport(id);
+                    final Unit unit = campaignGUI.getCampaign().getUnit(id);
+                    if (unit == null) {
+                        MekHQ.getLogger().error("Unit id determination failure for " + id);
+                        return;
+                    }
+                    new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
                 } catch (Exception e) {
                     MekHQ.getLogger().error(e);
                 }

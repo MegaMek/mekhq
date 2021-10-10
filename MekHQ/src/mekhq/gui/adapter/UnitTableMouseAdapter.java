@@ -47,6 +47,8 @@ import mekhq.gui.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
+import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -189,9 +191,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_MAINTENANCE_REPORT)) { // Single Unit only
-            gui.showMaintenanceReport(selectedUnit.getId());
+            new MaintenanceReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
-            gui.showUnitCostReport(selectedUnit.getId());
+            new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.contains(COMMAND_ASSIGN_TECH)) {
             Person tech = gui.getCampaign().getPerson(UUID.fromString(command.split(":")[1]));
             if (tech != null) {

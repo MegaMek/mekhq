@@ -1,7 +1,8 @@
 /*
  * Report.java
  *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,34 +21,30 @@
  */
 package mekhq.campaign.report;
 
-import javax.swing.JTextPane;
-
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
+
+import java.util.ResourceBundle;
 
 /**
  * @author Jay Lawson
  */
-public abstract class Report {
+public abstract class AbstractReport {
+    //region Variable Declarations
+    private final Campaign campaign;
 
-    private Campaign campaign;
+    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports", new EncodeControl());
+    //endregion Variable Declarations
 
-    public Report(Campaign c) {
-        this.campaign = c;
+    //region Constructors
+    public AbstractReport(final Campaign campaign) {
+        this.campaign = campaign;
     }
+    //endregion Constructors
 
+    //region Getters
     protected Campaign getCampaign() {
         return campaign;
     }
-
-    protected Hangar getHangar() {
-        return getCampaign().getHangar();
-    }
-
-    //using JTextPane here allows for more flexibility in terms of
-    //what these reports look like
-    public abstract JTextPane getReport();
-
-    public abstract String getTitle();
-
+    //endregion Getters
 }
