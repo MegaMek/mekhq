@@ -31,7 +31,7 @@ public class PercentageRandomMarriage extends AbstractMarriage {
 
     //region Constructors
     public PercentageRandomMarriage(final CampaignOptions options) {
-        super(RandomMarriageMethod.PERCENTAGE, options.isUseRandomSameSexMarriages());
+        super(RandomMarriageMethod.PERCENTAGE, options);
         setPercentage(options.getPercentageRandomMarriageChance());
         setSameSexPercentage(options.getPercentageRandomMarriageSameSexChance());
     }

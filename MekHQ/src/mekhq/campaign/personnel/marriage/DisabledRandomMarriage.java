@@ -18,13 +18,14 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class DisabledRandomMarriage extends AbstractMarriage {
     //region Constructors
-    public DisabledRandomMarriage() {
-        super(RandomMarriageMethod.NONE, false);
+    public DisabledRandomMarriage(final CampaignOptions options) {
+        super(RandomMarriageMethod.NONE, options);
     }
     //endregion Constructors
 

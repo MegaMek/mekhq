@@ -222,12 +222,16 @@ public class CampaignOptions implements Serializable {
 
     // Marriage
     private boolean useManualMarriages;
+    private boolean useClannerMarriages;
+    private boolean usePrisonerMarriages;
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChanges;
     private Map<MarriageSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
     private boolean useRandomSameSexMarriages;
+    private boolean useRandomClannerMarriages;
+    private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private double percentageRandomMarriageChance;
     private double percentageRandomMarriageSameSexChance;
@@ -619,6 +623,8 @@ public class CampaignOptions implements Serializable {
 
         // Marriage
         setUseManualMarriages(true);
+        setUseClannerMarriages(false);
+        setUsePrisonerMarriages(true);
         setMinimumMarriageAge(16);
         setCheckMutualAncestorsDepth(4);
         setLogMarriageNameChanges(false);
@@ -638,6 +644,8 @@ public class CampaignOptions implements Serializable {
         getMarriageSurnameWeights().put(MarriageSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
         setUseRandomSameSexMarriages(false);
+        setUseRandomClannerMarriages(false);
+        setUseRandomPrisonerMarriages(true);
         setRandomMarriageAgeRange(10);
         setPercentageRandomMarriageChance(0.00025);
         setPercentageRandomMarriageSameSexChance(0.00002);
@@ -1426,6 +1434,22 @@ public class CampaignOptions implements Serializable {
         this.useManualMarriages = useManualMarriages;
     }
 
+    public boolean isUseClannerMarriages() {
+        return useClannerMarriages;
+    }
+
+    public void setUseClannerMarriages(final boolean useClannerMarriages) {
+        this.useClannerMarriages = useClannerMarriages;
+    }
+
+    public boolean isUsePrisonerMarriages() {
+        return usePrisonerMarriages;
+    }
+
+    public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
+        this.usePrisonerMarriages = usePrisonerMarriages;
+    }
+
     /**
      * @return the minimum age a person can get married at
      */
@@ -1504,6 +1528,22 @@ public class CampaignOptions implements Serializable {
      */
     public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
+    }
+
+    public boolean isUseRandomClannerMarriages() {
+        return useRandomClannerMarriages;
+    }
+
+    public void setUseRandomClannerMarriages(final boolean useRandomClannerMarriages) {
+        this.useRandomClannerMarriages = useRandomClannerMarriages;
+    }
+
+    public boolean isUseRandomPrisonerMarriages() {
+        return useRandomPrisonerMarriages;
+    }
+
+    public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
+        this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
     }
 
     /**
@@ -3311,16 +3351,20 @@ public class CampaignOptions implements Serializable {
 
         //region Marriage
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualMarriages", isUseManualMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerMarriages", isUseClannerMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "marriageSurnameWeights");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "marriageSurnameWeights");
         for (final Map.Entry<MarriageSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "marriageSurnameWeights");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "marriageSurnameWeights");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerMarriages", isUseRandomClannerMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageChance", getPercentageRandomMarriageChance());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
@@ -3843,6 +3887,10 @@ public class CampaignOptions implements Serializable {
                 //region Marriage
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
                     retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerMarriages")) {
+                    retVal.setUseClannerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerMarriages")) {
+                    retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
                     retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
@@ -3867,6 +3915,10 @@ public class CampaignOptions implements Serializable {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                     retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) {
+                    retVal.setUseRandomClannerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerMarriages")) {
+                    retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageChance")) {

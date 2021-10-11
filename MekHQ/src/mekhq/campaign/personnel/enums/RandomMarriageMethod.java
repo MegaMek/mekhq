@@ -67,7 +67,7 @@ public enum RandomMarriageMethod {
                 return new PercentageRandomMarriage(options);
             case NONE:
             default:
-                return new DisabledRandomMarriage();
+                return new DisabledRandomMarriage(options);
         }
     }
 

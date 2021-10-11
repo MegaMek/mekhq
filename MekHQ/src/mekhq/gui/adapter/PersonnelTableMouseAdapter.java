@@ -1191,9 +1191,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (oneSelected && person.getStatus().isActive()) {
             if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    && gui.getCampaign().getMarriage().oldEnoughToMarry(gui.getCampaign(),
-                            gui.getCampaign().getLocalDate(), person)
-                    && !person.getGenealogy().hasSpouse()) {
+                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
+                            gui.getCampaign().getLocalDate(), person, false) != null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1201,39 +1200,42 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 LocalDate today = gui.getCampaign().getLocalDate();
 
-                List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
-                personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
+                // Get all safe potential spouses sorted by age and then by surname
+                final List<Person> personnel = gui.getCampaign().getPersonnel().stream()
+                        .filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(
+                                gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
+                                potentialSpouse, false))
+                        .sorted(Comparator.comparing((Person p) -> p.getAge(today))
+                                .thenComparing(Person::getSurname))
+                        .collect(Collectors.toList());
 
                 for (final Person potentialSpouse : personnel) {
-                    if (gui.getCampaign().getMarriage().safeSpouse(
-                            gui.getCampaign(), gui.getCampaign().getLocalDate(), person, potentialSpouse)) {
-                        final String status;
-                        if (potentialSpouse.getPrisonerStatus().isBondsman()) {
-                            status = String.format(resources.getString("marriageBondsmanDesc.format"),
-                                    potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                    potentialSpouse.getRoleDesc());
-                        } else if (potentialSpouse.getPrisonerStatus().isPrisoner()) {
-                            status = String.format(resources.getString("marriagePrisonerDesc.format"),
-                                    potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                    potentialSpouse.getRoleDesc());
-                        } else {
-                            status = String.format(resources.getString("marriagePartnerDesc.format"),
-                                    potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                    potentialSpouse.getRoleDesc());
-                        }
+                    final String status;
+                    if (potentialSpouse.getPrisonerStatus().isBondsman()) {
+                        status = String.format(resources.getString("marriageBondsmanDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    } else if (potentialSpouse.getPrisonerStatus().isPrisoner()) {
+                        status = String.format(resources.getString("marriagePrisonerDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    } else {
+                        status = String.format(resources.getString("marriagePartnerDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    }
 
-                        spouseMenu = new JMenu(status);
+                    spouseMenu = new JMenu(status);
 
-                        for (final MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
-                            spouseMenu.add(newMenuItem(style.getDropDownText(),
-                                    makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
-                        }
+                    for (final MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
+                        spouseMenu.add(newMenuItem(style.getDropDownText(),
+                                makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
+                    }
 
-                        if (potentialSpouse.getGender().isMale()) {
-                            maleMenu.add(spouseMenu);
-                        } else {
-                            femaleMenu.add(spouseMenu);
-                        }
+                    if (potentialSpouse.getGender().isMale()) {
+                        maleMenu.add(spouseMenu);
+                    } else {
+                        femaleMenu.add(spouseMenu);
                     }
                 }
 
