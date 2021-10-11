@@ -306,12 +306,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
-                for (Person person : people) {
-                    if (person.getGenealogy().hasSpouse()) {
-                        Divorce.valueOf(data[1]).divorce(person, gui.getCampaign());
-                    }
-                }
-                break;
+                Stream.of(people)
+                        .filter(person -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)
+                        .forEach(person -> gui.getCampaign().getDivorce().divorce(gui.getCampaign(),
+                                gui.getCampaign().getLocalDate(), person,
+                                DivorceSurnameStyle.valueOf(data[1])));
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
@@ -1246,19 +1245,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
+        }
 
-            if (person.getGenealogy().hasSpouse()) {
-                menu = new JMenu(resources.getString("removeSpouse.text"));
+        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
+            menu = new JMenu(resources.getString("removeSpouse.text"));
 
-                for (Divorce divorceType : Divorce.values()) {
-                    JMenuItem divorceMenu = new JMenuItem(divorceType.toString());
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, divorceType.name()));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
-                }
-
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            for (final DivorceSurnameStyle style : DivorceSurnameStyle.values()) {
+                JMenuItem divorceMenu = new JMenuItem(style.toString());
+                divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, style.name()));
+                divorceMenu.addActionListener(this);
+                menu.add(divorceMenu);
             }
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
         //region Awards Menu

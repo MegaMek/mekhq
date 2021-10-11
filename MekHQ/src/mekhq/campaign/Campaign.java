@@ -50,6 +50,8 @@ import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.divorce.AbstractDivorce;
+import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -264,6 +266,9 @@ public class Campaign implements Serializable, ITechManager {
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
+
+    private transient AbstractDivorce divorce;
+
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -323,6 +328,7 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -475,6 +481,16 @@ public class Campaign implements Serializable, ITechManager {
         this.unitMarket = unitMarket;
     }
     //endregion Markets
+
+    //region Personnel Modules
+    public AbstractDivorce getDivorce() {
+        return divorce;
+    }
+
+    public void setDivorce(final AbstractDivorce divorce) {
+        this.divorce = divorce;
+    }
+    //endregion Personnel Modules
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -3278,6 +3294,9 @@ public class Campaign implements Serializable, ITechManager {
                     p.procreate(this);
                 }
             }
+
+            // Divorce
+            getDivorce().processNewDay(this, getLocalDate(), p);
         }
     }
 

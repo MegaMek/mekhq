@@ -51,7 +51,9 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -1379,14 +1381,20 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuOptionsActionPerformed(final ActionEvent evt) {
+        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
+        // We need to handle it like this for now, as the options above get written to currently
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
         boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
+        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
+
+        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
+
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                 getCampaign().initTimeInService();
@@ -1414,6 +1422,17 @@ public class CampaignGUI extends JPanel {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setRetirement(null);
                 }
+            }
+        }
+
+        if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
+            getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
+        } else {
+            if (getCampaign().getDivorce().getMethod().isPercentage()) {
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomDivorceOppositeSexChance());
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setSameSexPercentage(
+                        newOptions.getPercentageRandomDivorceSameSexChance());
             }
         }
 

@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -53,20 +54,14 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
+import mekhq.gui.baseComponents.JDisableablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -89,14 +84,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -279,6 +268,17 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner[] spnMarriageSurnameWeights;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
+
+    // Divorce
+    private JCheckBox chkUseManualDivorce;
+    private Map<DivorceSurnameStyle, JSpinner> spnDivorceSurnameWeights;
+    private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
+    private JCheckBox chkUseRandomOppositeSexDivorce;
+    private JCheckBox chkUseRandomSameSexDivorce;
+    private JLabel lblPercentageRandomDivorceOppositeSexChance;
+    private JSpinner spnPercentageRandomDivorceOppositeSexChance;
+    private JLabel lblPercentageRandomDivorceSameSexChance;
+    private JSpinner spnPercentageRandomDivorceSameSexChance;
 
     // Procreation
     private JCheckBox chkUseProcreation;
@@ -3390,11 +3390,13 @@ public class CampaignOptionsDialog extends JDialog {
         personnelPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
-        personnelPanel.add(createProcreationPanel(), gbc);
+        personnelPanel.add(createDivorcePanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
+        personnelPanel.add(createProcreationPanel(), gbc);
+
+        gbc.gridx++;
         personnelPanel.add(createDeathPanel(), gbc);
 
         JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
@@ -4334,6 +4336,234 @@ public class CampaignOptionsDialog extends JDialog {
         return panel;
     }
 
+    private JPanel createDivorcePanel() {
+        // Create Panel Components
+        chkUseManualDivorce = new JCheckBox(resources.getString("chkUseManualDivorce.text"));
+        chkUseManualDivorce.setToolTipText(resources.getString("chkUseManualDivorce.toolTipText"));
+        chkUseManualDivorce.setName("chkUseManualDivorce");
+
+        final JPanel divorceSurnameWeightsPanel = createDivorceSurnameWeightsPanel();
+
+        final JPanel randomDivorcePanel = createRandomDivorcePanel();
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("divorcePanel.title")));
+        panel.setName("divorcePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(divorceSurnameWeightsPanel)
+                        .addComponent(randomDivorcePanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(divorceSurnameWeightsPanel)
+                        .addComponent(randomDivorcePanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createDivorceSurnameWeightsPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 4));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("divorceSurnameWeightsPanel.title")));
+        panel.setToolTipText(resources.getString("divorceSurnameWeightsPanel.toolTipText"));
+        panel.setName("divorceSurnameWeightsPanel");
+
+        spnDivorceSurnameWeights = new HashMap<>();
+        for (final DivorceSurnameStyle style : DivorceSurnameStyle.values()) {
+            if (style.isWeighted()) {
+                continue;
+            }
+            final JLabel label = new JLabel(style.toString());
+            label.setToolTipText(style.getToolTipText());
+            label.setName("lbl" + style);
+            panel.add(label);
+
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.1));
+            spinner.setToolTipText(style.getToolTipText());
+            spinner.setName("spn" + style);
+            spnDivorceSurnameWeights.put(style, spinner);
+            panel.add(spinner);
+
+            label.setLabelFor(spinner);
+        }
+
+        return panel;
+    }
+
+    private JPanel createRandomDivorcePanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel percentageRandomDivorcePanel = new JDisableablePanel("percentageRandomDivorcePanel");
+
+        // Create Panel Components
+        final JLabel lblRandomDivorceMethod = new JLabel(resources.getString("lblRandomDivorceMethod.text"));
+        lblRandomDivorceMethod.setToolTipText(resources.getString("lblRandomDivorceMethod.toolTipText"));
+        lblRandomDivorceMethod.setName("lblRandomDivorceMethod");
+
+        comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
+        comboRandomDivorceMethod.setToolTipText(resources.getString("lblRandomDivorceMethod.toolTipText"));
+        comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDivorceMethod) {
+                    list.setToolTipText(((RandomDivorceMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomDivorceMethod.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            final boolean oppositeSexEnabled = enabled && chkUseRandomOppositeSexDivorce.isSelected();
+            final boolean sameSexEnabled = enabled && chkUseRandomSameSexDivorce.isSelected();
+            final boolean percentageEnabled = method.isPercentage();
+            chkUseRandomOppositeSexDivorce.setEnabled(enabled);
+            chkUseRandomSameSexDivorce.setEnabled(enabled);
+            percentageRandomDivorcePanel.setEnabled(percentageEnabled);
+            lblPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
+            spnPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
+            lblPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+            spnPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+        });
+
+        chkUseRandomOppositeSexDivorce = new JCheckBox(resources.getString("chkUseRandomOppositeSexDivorce.text"));
+        chkUseRandomOppositeSexDivorce.setToolTipText(resources.getString("chkUseRandomOppositeSexDivorce.toolTipText"));
+        chkUseRandomOppositeSexDivorce.setName("chkUseRandomOppositeSexDivorce");
+        chkUseRandomOppositeSexDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean selected = chkUseRandomOppositeSexDivorce.isEnabled()
+                    && chkUseRandomOppositeSexDivorce.isSelected();
+            final boolean percentageEnabled = selected && method.isPercentage();
+            lblPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
+            spnPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
+        });
+
+        chkUseRandomSameSexDivorce = new JCheckBox(resources.getString("chkUseRandomSameSexDivorce.text"));
+        chkUseRandomSameSexDivorce.setToolTipText(resources.getString("chkUseRandomSameSexDivorce.toolTipText"));
+        chkUseRandomSameSexDivorce.setName("chkUseRandomSameSexDivorce");
+        chkUseRandomSameSexDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean selected = chkUseRandomSameSexDivorce.isEnabled()
+                    && chkUseRandomSameSexDivorce.isSelected();
+            final boolean percentageEnabled = selected && method.isPercentage();
+            lblPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
+            spnPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
+        });
+
+        createPercentageRandomDivorcePanel(percentageRandomDivorcePanel);
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomDivorceMethod.setLabelFor(comboRandomDivorceMethod);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDivorcePanel.title")));
+        panel.setName("randomDivorcePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomDivorceMethod)
+                                .addComponent(comboRandomDivorceMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRandomOppositeSexDivorce)
+                        .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(percentageRandomDivorcePanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomDivorceMethod)
+                                .addComponent(comboRandomDivorceMethod))
+                        .addComponent(chkUseRandomOppositeSexDivorce)
+                        .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(percentageRandomDivorcePanel)
+        );
+
+        return panel;
+    }
+
+    private void createPercentageRandomDivorcePanel(final JPanel panel) {
+        // Create Panel Components
+        lblPercentageRandomDivorceOppositeSexChance = new JLabel(resources.getString("lblPercentageRandomDivorceOppositeSexChance.text"));
+        lblPercentageRandomDivorceOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
+        lblPercentageRandomDivorceOppositeSexChance.setName("lblPercentageRandomDivorceOppositeSexChance");
+
+        spnPercentageRandomDivorceOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
+        spnPercentageRandomDivorceOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
+        spnPercentageRandomDivorceOppositeSexChance.setName("spnPercentageRandomDivorceOppositeSexChance");
+        spnPercentageRandomDivorceOppositeSexChance.setEditor(new JSpinner.NumberEditor(spnPercentageRandomDivorceOppositeSexChance, "0.00000"));
+
+        lblPercentageRandomDivorceSameSexChance = new JLabel(resources.getString("lblPercentageRandomDivorceSameSexChance.text"));
+        lblPercentageRandomDivorceSameSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
+        lblPercentageRandomDivorceSameSexChance.setName("lblPercentageRandomDivorceSameSexChance");
+
+        spnPercentageRandomDivorceSameSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
+        spnPercentageRandomDivorceSameSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
+        spnPercentageRandomDivorceSameSexChance.setName("spnPercentageRandomDivorceSameSexChance");
+        spnPercentageRandomDivorceSameSexChance.setEditor(new JSpinner.NumberEditor(spnPercentageRandomDivorceSameSexChance, "0.00000"));
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomDivorceOppositeSexChance.setLabelFor(spnPercentageRandomDivorceOppositeSexChance);
+        lblPercentageRandomDivorceSameSexChance.setLabelFor(spnPercentageRandomDivorceSameSexChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDivorcePanel.title")));
+        panel.setToolTipText(RandomDivorceMethod.PERCENTAGE.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
+                                .addComponent(spnPercentageRandomDivorceOppositeSexChance, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDivorceSameSexChance)
+                                .addComponent(spnPercentageRandomDivorceSameSexChance, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
+                                .addComponent(spnPercentageRandomDivorceOppositeSexChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDivorceSameSexChance)
+                                .addComponent(spnPercentageRandomDivorceSameSexChance))
+        );
+    }
+
     private JPanel createProcreationPanel() {
         // Initialize Labels Used in ActionListeners
         JLabel lblChanceProcreation = new JLabel();
@@ -5254,6 +5484,30 @@ public class CampaignOptionsDialog extends JDialog {
         }
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
+        // Divorce
+        chkUseManualDivorce.setSelected(options.isUseManualDivorce());
+        for (final Map.Entry<DivorceSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+            entry.getValue().setValue(options.getDivorceSurnameWeights().get(entry.getKey()) / 10.0);
+        }
+        comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
+        if (chkUseRandomOppositeSexDivorce.isSelected() != options.isUseRandomOppositeSexDivorce()) {
+            if (chkUseRandomOppositeSexDivorce.isEnabled()) {
+                chkUseRandomOppositeSexDivorce.doClick();
+            } else {
+                chkUseRandomOppositeSexDivorce.setSelected(options.isUseRandomOppositeSexDivorce());
+            }
+        }
+
+        if (chkUseRandomSameSexDivorce.isSelected() != options.isUseRandomSameSexDivorce()) {
+            if (chkUseRandomSameSexDivorce.isEnabled()) {
+                chkUseRandomSameSexDivorce.doClick();
+            } else {
+                chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
+            }
+        }
+        spnPercentageRandomDivorceOppositeSexChance.setValue(options.getPercentageRandomDivorceOppositeSexChance() * 100.0);
+        spnPercentageRandomDivorceSameSexChance.setValue(options.getPercentageRandomDivorceSameSexChance() * 100.0);
+
         // Procreation
         if (chkUseProcreation.isSelected() != options.useProcreation()) {
             chkUseProcreation.doClick();
@@ -5844,6 +6098,17 @@ public class CampaignOptionsDialog extends JDialog {
             }
             options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
             options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
+
+            // Divorce
+            options.setUseManualDivorce(chkUseManualDivorce.isSelected());
+            for (final Map.Entry<DivorceSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+                options.getDivorceSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
+            }
+            options.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());
+            options.setUseRandomOppositeSexDivorce(chkUseRandomOppositeSexDivorce.isSelected());
+            options.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
+            options.setPercentageRandomDivorceOppositeSexChance((Double) spnPercentageRandomDivorceOppositeSexChance.getValue() / 100.0);
+            options.setPercentageRandomDivorceSameSexChance((Double) spnPercentageRandomDivorceSameSexChance.getValue() / 100.0);
 
             // Procreation
             options.setUseProcreation(chkUseProcreation.isSelected());

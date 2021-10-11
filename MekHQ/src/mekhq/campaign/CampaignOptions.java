@@ -21,9 +21,7 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import megamek.Version;
 import mekhq.campaign.mission.enums.AtBLanceRole;
@@ -31,10 +29,7 @@ import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -47,10 +42,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -241,6 +232,15 @@ public class CampaignOptions implements Serializable {
     private int marriageAgeRange;
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
+
+    // Divorce
+    private boolean useManualDivorce;
+    private Map<DivorceSurnameStyle, Integer> divorceSurnameWeights;
+    private RandomDivorceMethod randomDivorceMethod;
+    private boolean useRandomOppositeSexDivorce;
+    private boolean useRandomSameSexDivorce;
+    private double percentageRandomDivorceOppositeSexChance;
+    private double percentageRandomDivorceSameSexChance;
 
     // Procreation
     private boolean useProcreation;
@@ -651,6 +651,19 @@ public class CampaignOptions implements Serializable {
         setMarriageAgeRange(10);
         setUseRandomSameSexMarriages(false);
         setChanceRandomSameSexMarriages(0.00002);
+
+        // Divorce
+        setUseManualDivorce(true);
+        setDivorceSurnameWeights(new HashMap<>());
+        getDivorceSurnameWeights().put(DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(DivorceSurnameStyle.SPOUSE_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(DivorceSurnameStyle.BOTH_CHANGE_SURNAME, 30);
+        getDivorceSurnameWeights().put(DivorceSurnameStyle.BOTH_KEEP_SURNAME, 50);
+        setRandomDivorceMethod(RandomDivorceMethod.NONE);
+        setUseRandomOppositeSexDivorce(true);
+        setUseRandomSameSexDivorce(true);
+        setPercentageRandomDivorceOppositeSexChance(0.000001);
+        setPercentageRandomDivorceSameSexChance(0.000001);
 
         // Procreation
         setUseProcreation(false);
@@ -1588,6 +1601,64 @@ public class CampaignOptions implements Serializable {
         this.chanceRandomSameSexMarriages = chanceRandomSameSexMarriages;
     }
     //endregion Marriage
+
+    //region Divorce
+    public boolean isUseManualDivorce() {
+        return useManualDivorce;
+    }
+
+    public void setUseManualDivorce(final boolean useManualDivorce) {
+        this.useManualDivorce = useManualDivorce;
+    }
+
+    public Map<DivorceSurnameStyle, Integer> getDivorceSurnameWeights() {
+        return divorceSurnameWeights;
+    }
+
+    public void setDivorceSurnameWeights(final Map<DivorceSurnameStyle, Integer> divorceSurnameWeights) {
+        this.divorceSurnameWeights = divorceSurnameWeights;
+    }
+
+    public RandomDivorceMethod getRandomDivorceMethod() {
+        return randomDivorceMethod;
+    }
+
+    public void setRandomDivorceMethod(final RandomDivorceMethod randomDivorceMethod) {
+        this.randomDivorceMethod = randomDivorceMethod;
+    }
+
+    public boolean isUseRandomOppositeSexDivorce() {
+        return useRandomOppositeSexDivorce;
+    }
+
+    public void setUseRandomOppositeSexDivorce(final boolean useRandomOppositeSexDivorce) {
+        this.useRandomOppositeSexDivorce = useRandomOppositeSexDivorce;
+    }
+
+    public boolean isUseRandomSameSexDivorce() {
+        return useRandomSameSexDivorce;
+    }
+
+    public void setUseRandomSameSexDivorce(final boolean useRandomSameSexDivorce) {
+        this.useRandomSameSexDivorce = useRandomSameSexDivorce;
+    }
+
+    public double getPercentageRandomDivorceOppositeSexChance() {
+        return percentageRandomDivorceOppositeSexChance;
+    }
+
+    public void setPercentageRandomDivorceOppositeSexChance(final double percentageRandomDivorceOppositeSexChance) {
+        this.percentageRandomDivorceOppositeSexChance = percentageRandomDivorceOppositeSexChance;
+    }
+
+    public double getPercentageRandomDivorceSameSexChance() {
+        return percentageRandomDivorceSameSexChance;
+    }
+
+    public void setPercentageRandomDivorceSameSexChance(final double percentageRandomDivorceSameSexChance) {
+        this.percentageRandomDivorceSameSexChance = percentageRandomDivorceSameSexChance;
+    }
+    //endregion Divorce
 
     //region Procreation
     /**
@@ -3356,6 +3427,20 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
         //endregion Marriage
 
+        //region Divorce
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualDivorce", isUseManualDivorce());
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "divorceSurnameWeights");
+        for (final Map.Entry<DivorceSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "divorceSurnameWeights");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
+        //endregion Divorce
+
         //region Procreation
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreation", useProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreation", getChanceProcreation());
@@ -3901,6 +3986,35 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
                     retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Marriage
+
+                //region Divorce
+                } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
+                    retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("divorceSurnameWeights")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getDivorceSurnameWeights().put(
+                                DivorceSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                Integer.parseInt(wn3.getTextContent().trim()));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
+                    retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomOppositeSexDivorce")) {
+                    retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexDivorce")) {
+                    retVal.setUseRandomSameSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceOppositeSexChance")) {
+                    retVal.setPercentageRandomDivorceOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceSameSexChance")) {
+                    retVal.setPercentageRandomDivorceSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Divorce
 
                 //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.1 removal
