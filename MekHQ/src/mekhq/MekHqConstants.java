@@ -27,6 +27,11 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
     public static final int ASTECH_TEAM_SIZE = 6;
 
+    //region GUI Constants
+    public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
+    public static final int BASE_SCROLLER_THRESHOLD = 20;
+    //endregion GUI Constants
+
     //region MekHQ Options
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
@@ -138,6 +143,7 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";

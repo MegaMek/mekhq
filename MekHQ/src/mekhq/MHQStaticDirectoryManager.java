@@ -22,6 +22,7 @@ import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
+import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.campaign.force.Force;
@@ -36,11 +37,12 @@ import java.util.Vector;
 
 public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Variable Declarations
-    private static DirectoryItems forceIconDirectory;
-    private static DirectoryItems awardIconDirectory;
+    private static AbstractDirectory forceIconDirectory;
+    private static AbstractDirectory awardIconDirectory;
 
-    // Re-parsing Prevention Variables: The are True at startup and when the specified directory
-    // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's an error.
+    // Re-parsing Prevention Variables: They are True at startup and when the specified directory
+    // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's
+    // an error.
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
     //endregion Variable Declarations
@@ -53,7 +55,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
 
     //region Initialization
     /**
-     * This initialized all of the directories under this manager
+     * This initializes all of the directories under this manager
      */
     public static void initialize() {
         MMStaticDirectoryManager.initialize();
@@ -72,8 +74,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
             parseForceIconDirectory = false;
             try {
-                forceIconDirectory = new DirectoryItems(new File("data/images/force"),
-                        "", new ImageFileFactory());
+                forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : remove inline file path
+                        new ImageFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the force icon directory!", e);
             }
@@ -91,8 +93,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseAwardIconDirectory to false to avoid parsing repeatedly when something fails
             parseAwardIconDirectory = false;
             try {
-                awardIconDirectory = new DirectoryItems(new File("data/images/awards"),
-                        "", new AwardFileFactory());
+                awardIconDirectory = new DirectoryItems(new File("data/images/awards"), // TODO : remove inline file path
+                        new AwardFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the award icon directory!", e);
             }
@@ -102,52 +104,49 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
 
     //region Getters
     /**
-     * Returns a DirectoryItems object containing all force icon filenames
-     * found in MekHQ's force icon folder.
-     * @return a DirectoryItems object with the force icon folders and filenames.
+     * Returns an AbstractDirectory object containing all force icon filenames found in MekHQ's
+     * force icon folder.
+     * @return an AbstractDirectory object with the force icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable DirectoryItems getForceIcons() {
+    public static @Nullable AbstractDirectory getForceIcons() {
         initializeForceIcons();
         return forceIconDirectory;
     }
 
     /**
-     * Returns a DirectoryItems object containing all award icon filenames
-     * found in MekHQ's award icon folder.
-     * @return a DirectoryItems object with the award icon folders and filenames.
+     * Returns an AbstractDirectory object containing all award icon filenames found in MekHQ's
+     * award icon folder.
+     * @return an AbstractDirectory object with the award icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable DirectoryItems getAwardIcons() {
+    public static @Nullable AbstractDirectory getAwardIcons() {
         initializeAwardIcons();
         return awardIconDirectory;
     }
-
     //endregion Getters
 
     //region Refreshers
     /**
-     * Re-reads MekHQ's force icon folder and returns the updated
-     * DirectoryItems object. This will update the DirectoryItems object
-     * with changes to the force icons (like added image files and folders)
-     * while MekHQ is running.
+     * Re-reads MekHQ's force icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the force icons (like added image
+     * files and folders) while MekHQ is running.
      *
      * @see #getForceIcons()
      */
-    public static DirectoryItems refreshForceIcons() {
+    public static AbstractDirectory refreshForceIcons() {
         parseForceIconDirectory = true;
         return getForceIcons();
     }
 
     /**
-     * Re-reads MekHQ's award icon folder and returns the updated
-     * DirectoryItems object. This will update the DirectoryItems object
-     * with changes to the award icons (like added image files and folders)
-     * while MekHQ is running.
+     * Re-reads MekHQ's award icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the award icons (like added image
+     * files and folders) while MekHQ is running.
      *
      * @see #getAwardIcons()
      */
-    public static DirectoryItems refreshAwardIcons() {
+    public static AbstractDirectory refreshAwardIcons() {
         parseAwardIconDirectory = true;
         return getAwardIcons();
     }
