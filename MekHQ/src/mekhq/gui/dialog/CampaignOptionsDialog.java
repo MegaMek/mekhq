@@ -282,6 +282,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkLogProcreation;
     private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
     private JCheckBox chkUseRelationshiplessRandomProcreation;
+    private JCheckBox chkUseRandomClannerProcreation;
+    private JCheckBox chkUseRandomPrisonerProcreation;
     private JSpinner spnPercentageRandomProcreationRelationshipChance;
     private JLabel lblPercentageRandomProcreationRelationshiplessChance;
     private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
@@ -4506,6 +4508,14 @@ public class CampaignOptionsDialog extends JDialog {
             spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
         });
 
+        chkUseRandomClannerProcreation = new JCheckBox(resources.getString("chkUseRandomClannerProcreation.text"));
+        chkUseRandomClannerProcreation.setToolTipText(resources.getString("chkUseRandomClannerProcreation.toolTipText"));
+        chkUseRandomClannerProcreation.setName("chkUseRandomClannerProcreation");
+
+        chkUseRandomPrisonerProcreation = new JCheckBox(resources.getString("chkUseRandomPrisonerProcreation.text"));
+        chkUseRandomPrisonerProcreation.setToolTipText(resources.getString("chkUseRandomPrisonerProcreation.toolTipText"));
+        chkUseRandomPrisonerProcreation.setName("chkUseRandomPrisonerProcreation");
+
         createPercentageRandomProcreationPanel(percentageRandomProcreationPanel);
 
         // Programmatically Assign Accessibility Labels
@@ -4527,6 +4537,8 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(lblRandomProcreationMethod)
                                 .addComponent(comboRandomProcreationMethod, GroupLayout.Alignment.LEADING))
                         .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
                         .addComponent(percentageRandomProcreationPanel)
         );
 
@@ -4536,6 +4548,8 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(lblRandomProcreationMethod)
                                 .addComponent(comboRandomProcreationMethod))
                         .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
                         .addComponent(percentageRandomProcreationPanel)
         );
 
@@ -5395,6 +5409,8 @@ public class CampaignOptionsDialog extends JDialog {
                 chkUseRelationshiplessRandomProcreation.setSelected(options.isUseRelationshiplessRandomProcreation());
             }
         }
+        chkUseRandomClannerProcreation.setSelected(options.isUseRandomClannerProcreation());
+        chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
         spnPercentageRandomProcreationRelationshipChance.setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
         spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
 
@@ -5984,6 +6000,8 @@ public class CampaignOptionsDialog extends JDialog {
             options.setLogProcreation(chkLogProcreation.isSelected());
             options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
             options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
+            options.setUseRandomClannerProcreation(chkUseRandomClannerProcreation.isSelected());
+            options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
             options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
             options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
 

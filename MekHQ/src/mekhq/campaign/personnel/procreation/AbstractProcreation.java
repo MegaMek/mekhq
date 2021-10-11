@@ -45,6 +45,8 @@ public abstract class AbstractProcreation {
     private boolean useClannerProcreation;
     private boolean usePrisonerProcreation;
     private boolean useRelationshiplessProcreation;
+    private boolean useRandomClannerProcreation;
+    private boolean useRandomPrisonerProcreation;
 
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
@@ -58,6 +60,8 @@ public abstract class AbstractProcreation {
         setUseClannerProcreation(options.isUseClannerProcreation());
         setUsePrisonerProcreation(options.isUsePrisonerProcreation());
         setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
+        setUseRandomClannerProcreation(options.isUseRandomClannerProcreation());
+        setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
     }
     //endregion Constructors
 
@@ -89,108 +93,25 @@ public abstract class AbstractProcreation {
     public void setUseRelationshiplessProcreation(final boolean useRelationshiplessProcreation) {
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
+
+    public boolean isUseRandomClannerProcreation() {
+        return useRandomClannerProcreation;
+    }
+
+    public void setUseRandomClannerProcreation(final boolean useRandomClannerProcreation) {
+        this.useRandomClannerProcreation = useRandomClannerProcreation;
+    }
+
+    public boolean isUseRandomPrisonerProcreation() {
+        return useRandomPrisonerProcreation;
+    }
+
+    public void setUseRandomPrisonerProcreation(final boolean useRandomPrisonerProcreation) {
+        this.useRandomPrisonerProcreation = useRandomPrisonerProcreation;
+    }
     //endregion Getters/Setters
 
     //region Determination Methods
-    public int determinePregnancyWeek(final LocalDate today, final Person person) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(person.getExpectedDueDate()
-                .minus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS), today));
-    }
-    //endregion Determination Methods
-
-    /**
-     * This is used to determine if a person can procreate
-     * @param today the current date
-     * @param person the person to determine for
-     * @param randomProcreation if this is for random procreation or manual procreation
-     * @return null if they can, otherwise the reason why they cannot
-     */
-    public @Nullable String canProcreate(final LocalDate today, final Person person,
-                                         final boolean randomProcreation) {
-        if (person.getGender().isMale()) {
-            return resources.getString("cannotProcreate.Gender.text");
-        } else if (!person.isTryingToConceive()) {
-            return resources.getString("cannotProcreate.NotTryingForABaby.text");
-        } else if (!isUseClannerProcreation() && person.isClanner()) {
-            return resources.getString("cannotProcreate.Clanner.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
-        } else if (person.isPregnant()) {
-            return resources.getString("cannotProcreate.AlreadyPregnant.text");
-        } else if (person.isDeployed()) {
-            return resources.getString("cannotProcreate.Deployed.text");
-        } else if (person.isChild(today)) {
-            return resources.getString("cannotProcreate.Child.text");
-        } else if (person.getAge(today) >= 51) {
-            return resources.getString("cannotProcreate.TooOld.text");
-        } else if (randomProcreation) {
-            if (!person.getGenealogy().hasSpouse() && !isUseRelationshiplessProcreation()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (person.getGenealogy().hasSpouse()) {
-                if (person.getGenealogy().getSpouse().getGender().isFemale()) {
-                    return resources.getString("cannotProcreate.FemaleSpouse.text");
-                } else if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
-                    return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
-                } else if (!isUseClannerProcreation() && person.getGenealogy().getSpouse().isClanner()) {
-                    return resources.getString("cannotProcreate.ClannerSpouse.text");
-                } else if (!isUsePrisonerProcreation()
-                        && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
-                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
-                } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
-                    return resources.getString("cannotProcreate.MIASpouse.text");
-                } else if (person.getGenealogy().getSpouse().isDeployed()) {
-                    return resources.getString("cannotProcreate.DeployedSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isChild(today)) {
-                    return resources.getString("cannotProcreate.ChildSpouse.text");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * This method is how a person becomes pregnant.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     * @param mother the newly pregnant mother
-     */
-    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother) {
-        addPregnancy(campaign, today, mother, determineNumberOfBabies(
-                campaign.getCampaignOptions().getMultiplePregnancyOccurrences()));
-    }
-
-    /**
-     * This method is how a person becomes pregnant with the specified number of children. They have
-     * their due date set and the parentage of the pregnancy determined.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     * @param mother the newly pregnant mother
-     * @param size the number of children the mother is having
-     */
-    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size) {
-        if (size < 1) {
-            return;
-        }
-
-        mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
-        mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
-        mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
-                ? mother.getGenealogy().getSpouse().getId().toString() : null);
-
-        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
-        campaign.addReport(String.format(resources.getString("babyConceived.report"),
-                mother.getHyperlinkedName(), babyAmount).trim());
-        if (campaign.getCampaignOptions().isLogProcreation()) {
-            MedicalLogger.hasConceived(mother, today, babyAmount);
-            if (mother.getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(), mother.getFullName(), today, babyAmount);
-            }
-        }
-    }
-
     /**
      * This method determines the number of babies a person will give birth to.
      * @param multiplePregnancyChance the chance to have each baby after the first
@@ -224,6 +145,120 @@ public abstract class AbstractProcreation {
     }
 
     /**
+     * This determines the current week of the pregnancy
+     * @param today the current date
+     * @param person the pregnant person
+     * @return the current week of their pregnancy
+     */
+    public int determinePregnancyWeek(final LocalDate today, final Person person) {
+        return Math.toIntExact(ChronoUnit.WEEKS.between(person.getExpectedDueDate()
+                .minus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
+                .plus(1, ChronoUnit.DAYS), today));
+    }
+    //endregion Determination Methods
+
+    /**
+     * This is used to determine if a person can procreate
+     * @param today the current date
+     * @param person the person to determine for
+     * @param randomProcreation if this is for random procreation or manual procreation
+     * @return null if they can, otherwise the reason why they cannot
+     */
+    public @Nullable String canProcreate(final LocalDate today, final Person person,
+                                         final boolean randomProcreation) {
+        if (person.getGender().isMale()) {
+            return resources.getString("cannotProcreate.Gender.text");
+        } else if (!person.isTryingToConceive()) {
+            return resources.getString("cannotProcreate.NotTryingForABaby.text");
+        } else if (person.isPregnant()) {
+            return resources.getString("cannotProcreate.AlreadyPregnant.text");
+        } else if (!person.getStatus().isActive()) {
+            return resources.getString("cannotProcreate.Inactive.text");
+        } else if (person.isDeployed()) {
+            return resources.getString("cannotProcreate.Deployed.text");
+        } else if (person.isChild(today)) {
+            return resources.getString("cannotProcreate.Child.text");
+        } else if (person.getAge(today) >= 51) {
+            return resources.getString("cannotProcreate.TooOld.text");
+        } else if (!isUseClannerProcreation() && person.isClanner()) {
+            return resources.getString("cannotProcreate.Clanner.text");
+        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+            return resources.getString("cannotProcreate.Prisoner.text");
+        } else if (randomProcreation) {
+            if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
+                return resources.getString("cannotProcreate.NoSpouse.text");
+            } else if (!isUseRandomClannerProcreation() && person.isClanner()) {
+                return resources.getString("cannotProcreate.RandomClanner.text");
+            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+                return resources.getString("cannotProcreate.RandomPrisoner.text");
+            } else if (person.getGenealogy().hasSpouse()) {
+                if (person.getGenealogy().getSpouse().getGender().isFemale()) {
+                    return resources.getString("cannotProcreate.FemaleSpouse.text");
+                } else if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
+                    return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
+                } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
+                    return resources.getString("cannotProcreate.InactiveSpouse.text");
+                } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanner()) {
+                    return resources.getString("cannotProcreate.ClannerSpouse.text");
+                } else if (!isUseRandomPrisonerProcreation()
+                        && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
+                } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
+                    return resources.getString("cannotProcreate.MIASpouse.text");
+                } else if (person.getGenealogy().getSpouse().isDeployed()) {
+                    return resources.getString("cannotProcreate.DeployedSpouse.text");
+                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                    return resources.getString("cannotProcreate.ChildSpouse.text");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method is how a person becomes pregnant.
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     * @param mother the newly pregnant mother
+     */
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother) {
+        addPregnancy(campaign, today, mother, determineNumberOfBabies(
+                campaign.getCampaignOptions().getMultiplePregnancyOccurrences()));
+    }
+
+    /**
+     * This method is how a person becomes pregnant with the specified number of children. They have
+     * their due date set and the parentage of the pregnancy determined.
+     *
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     * @param mother the newly pregnant mother
+     * @param size the number of children the mother is having
+     */
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size) {
+        if (size < 1) {
+            return;
+        }
+
+        mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
+        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
+        mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
+        mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
+                ? mother.getGenealogy().getSpouse().getId().toString() : null);
+
+        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
+        campaign.addReport(String.format(resources.getString("babyConceived.report"),
+                mother.getHyperlinkedName(), babyAmount).trim());
+        if (campaign.getCampaignOptions().isLogProcreation()) {
+            MedicalLogger.hasConceived(mother, today, babyAmount);
+            if (mother.getGenealogy().hasSpouse()) {
+                PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(), mother.getFullName(), today, babyAmount);
+            }
+        }
+    }
+
+    /**
      * Removes a pregnancy and clears all related data from the provided person
      * @param person the person to clear the pregnancy data for
      */
@@ -235,7 +270,9 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * This method is how a mother gives birth to a number of babies and have them added to the campaign
+     * This method is how a mother gives birth to a number of babies and has them added to the
+     * campaign.
+     *
      * @param campaign the campaign to add the baby in question to
      * @param today today's date
      * @param mother the mother giving birth
@@ -333,7 +370,6 @@ public abstract class AbstractProcreation {
     //region Random Procreation
     /**
      * Determines if a non-pregnant female person procreates on a given day
-     *
      * @param today the current day
      * @param person the person in question
      * @return true if they do, otherwise false

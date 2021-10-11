@@ -247,6 +247,8 @@ public class CampaignOptions implements Serializable {
     private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
     private boolean useRelationshiplessRandomProcreation;
+    private boolean useRandomClannerProcreation;
+    private boolean useRandomPrisonerProcreation;
     private double percentageRandomProcreationRelationshipChance;
     private double percentageRandomProcreationRelationshiplessChance;
 
@@ -663,6 +665,8 @@ public class CampaignOptions implements Serializable {
         setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
         setUseRelationshiplessRandomProcreation(false);
+        setUseRandomClannerProcreation(false);
+        setUseRandomPrisonerProcreation(true);
         setPercentageRandomProcreationRelationshipChance(0.0005);
         setPercentageRandomProcreationRelationshiplessChance(0.00005);
 
@@ -1725,6 +1729,22 @@ public class CampaignOptions implements Serializable {
      */
     public void setUseRelationshiplessRandomProcreation(final boolean useRelationshiplessRandomProcreation) {
         this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
+    }
+
+    public boolean isUseRandomClannerProcreation() {
+        return useRandomClannerProcreation;
+    }
+
+    public void setUseRandomClannerProcreation(final boolean useRandomClannerProcreation) {
+        this.useRandomClannerProcreation = useRandomClannerProcreation;
+    }
+
+    public boolean isUseRandomPrisonerProcreation() {
+        return useRandomPrisonerProcreation;
+    }
+
+    public void setUseRandomPrisonerProcreation(final boolean useRandomPrisonerProcreation) {
+        this.useRandomPrisonerProcreation = useRandomPrisonerProcreation;
     }
 
     /**
@@ -3422,6 +3442,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logProcreation", isLogProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerProcreation", isUseRandomClannerProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
         //endregion Procreation
@@ -3986,6 +4008,10 @@ public class CampaignOptions implements Serializable {
                     retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
                     retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerProcreation")) {
+                    retVal.setUseRandomClannerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerProcreation")) {
+                    retVal.setUseRandomPrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshipChance")) {
                     retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshiplessChance")) {
