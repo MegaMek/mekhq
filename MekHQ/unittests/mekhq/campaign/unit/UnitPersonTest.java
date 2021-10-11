@@ -248,7 +248,7 @@ public class UnitPersonTest {
         assertTrue(unit.isDriver(mockDriver));
 
         // Make sure we're part of the crew!
-        ArrayList<Person> crew = unit.getCrew();
+        List<Person> crew = unit.getCrew();
         assertFalse(crew.isEmpty());
         assertEquals(1, crew.size());
         assertTrue(crew.contains(mockDriver));
@@ -306,7 +306,7 @@ public class UnitPersonTest {
         assertTrue(unit.isGunner(mockGunner));
 
         // Make sure we're part of the crew!
-        ArrayList<Person> crew = unit.getCrew();
+        List<Person> crew = unit.getCrew();
         assertFalse(crew.isEmpty());
         assertEquals(1, crew.size());
         assertTrue(crew.contains(mockGunner));
@@ -360,7 +360,7 @@ public class UnitPersonTest {
         assertTrue(vesselCrew.contains(mockVesselCrew));
 
         // Make sure we're part of the crew!
-        ArrayList<Person> crew = unit.getCrew();
+        List<Person> crew = unit.getCrew();
         assertFalse(crew.isEmpty());
         assertEquals(1, crew.size());
         assertTrue(crew.contains(mockVesselCrew));
@@ -410,7 +410,7 @@ public class UnitPersonTest {
         assertTrue(unit.isTechOfficer(mockTechOfficer));
 
         // Make sure we're part of the crew!
-        ArrayList<Person> crew = unit.getCrew();
+        List<Person> crew = unit.getCrew();
         assertFalse(crew.isEmpty());
         assertEquals(1, crew.size());
         assertTrue(crew.contains(mockTechOfficer));
@@ -463,7 +463,7 @@ public class UnitPersonTest {
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Make sure we're part of the crew!
-        ArrayList<Person> crew = unit.getCrew();
+        List<Person> crew = unit.getCrew();
         assertFalse(crew.isEmpty());
         assertEquals(1, crew.size());
         assertTrue(crew.contains(mockNavigator));

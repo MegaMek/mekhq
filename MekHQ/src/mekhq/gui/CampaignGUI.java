@@ -1606,7 +1606,7 @@ public class CampaignGUI extends JPanel {
             List<String> techList = new ArrayList<>();
             String skillLvl;
 
-            List<Person> techs = getCampaign().getTechs(false, null, true, true);
+            List<Person> techs = getCampaign().getTechs(false, null, true);
             int lastRightTech = 0;
 
             for (Person tech : techs) {
