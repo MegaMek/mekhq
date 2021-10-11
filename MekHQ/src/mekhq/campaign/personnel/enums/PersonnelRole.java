@@ -262,9 +262,28 @@ public enum PersonnelRole {
         return isMechWarrior() || isLAMPilot();
     }
 
+    public boolean isAerospaceGrouping() {
+        return isLAMPilot() || isAerospacePilot();
+    }
+
+    public boolean isConventionalAirGrouping() {
+        return isAerospaceGrouping() || isConventionalAircraftPilot();
+    }
+
+    public boolean isGroundVehicleCrew() {
+        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrew();
+    }
+
+    public boolean isNavalVehicleCrew() {
+        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrew();
+    }
+
+    public boolean isVTOLCrew() {
+        return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
+    }
+
     public boolean isVehicleCrewmember() {
-        return isGroundVehicleDriver() || isNavalVehicleDriver() || isVTOLPilot()
-                || isVehicleGunner() || isVehicleCrew();
+        return isGroundVehicleCrew() || isNavalVehicleDriver() || isVTOLPilot();
     }
 
     public boolean isSoldierOrBattleArmour() {

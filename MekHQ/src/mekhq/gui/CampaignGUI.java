@@ -22,48 +22,26 @@
 package mekhq.gui;
 
 import chat.ChatClient;
+import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MechSummaryCache;
-import megamek.common.TechConstants;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.MekHqConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.event.AssetEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.DayEndingEvent;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.LoanEvent;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionEvent;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonEvent;
-import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -79,46 +57,13 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
-import mekhq.campaign.report.RatingReport;
-import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.BatchXPDialog;
-import mekhq.gui.dialog.CampaignExportWizard;
-import mekhq.gui.dialog.CampaignOptionsDialog;
-import mekhq.gui.dialog.ContractMarketDialog;
-import mekhq.gui.dialog.DataLoadingDialog;
-import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.HireBulkPersonnelDialog;
-import mekhq.gui.dialog.HistoricalDailyReportDialog;
-import mekhq.gui.dialog.nagDialogs.InsufficientAstechTimeNagDialog;
-import mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog;
-import mekhq.gui.dialog.nagDialogs.InsufficientMedicsNagDialog;
-import mekhq.gui.dialog.MaintenanceReportDialog;
-import mekhq.gui.dialog.MassMothballDialog;
-import mekhq.gui.dialog.MekHQAboutBox;
-import mekhq.gui.dialog.MekHQUnitSelectorDialog;
-import mekhq.gui.dialog.MekHqOptionsDialog;
-import mekhq.gui.dialog.MercRosterDialog;
-import mekhq.gui.dialog.NewRecruitDialog;
-import mekhq.gui.dialog.NewsReportDialog;
-import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
-import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.PersonnelMarketDialog;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.RefitNameDialog;
-import mekhq.gui.dialog.ReportDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
-import mekhq.gui.dialog.ShipSearchDialog;
-import mekhq.gui.dialog.nagDialogs.ShortDeploymentNagDialog;
-import mekhq.gui.dialog.UnitCostReportDialog;
-import mekhq.gui.dialog.UnitMarketDialog;
-import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
-import mekhq.gui.dialog.nagDialogs.UnresolvedStratConContactsNagDialog;
+import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.nagDialogs.*;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import org.w3c.dom.Document;
@@ -134,28 +79,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -996,27 +925,32 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
-        miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
+        miDragoonsRating.addActionListener(evt ->
+                new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
         miPersonnelReport.setMnemonic(KeyEvent.VK_P);
-        miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
+        miPersonnelReport.addActionListener(evt ->
+                new PersonnelReportDialog(getFrame(), new PersonnelReport(getCampaign())).setVisible(true));
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text"));
         miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
-        miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
+        miHangarBreakdown.addActionListener(evt ->
+                new HangarReportDialog(getFrame(), new HangarReport(getCampaign())).setVisible(true));
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text"));
         miTransportReport.setMnemonic(KeyEvent.VK_T);
-        miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
+        miTransportReport.addActionListener(evt ->
+                new TransportReportDialog(getFrame(), new TransportReport(getCampaign())).setVisible(true));
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text"));
         miCargoReport.setMnemonic(KeyEvent.VK_C);
-        miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
+        miCargoReport.addActionListener(evt ->
+                new CargoReportDialog(getFrame(), new CargoReport(getCampaign())).setVisible(true));
         menuReports.add(miCargoReport);
 
         menuBar.add(menuReports);
@@ -1638,7 +1572,7 @@ public class CampaignGUI extends JPanel {
             List<String> techList = new ArrayList<>();
             String skillLvl;
 
-            List<Person> techs = getCampaign().getTechs(false, null, true, true);
+            List<Person> techs = getCampaign().getTechs(false, null, true);
             int lastRightTech = 0;
 
             for (Person tech : techs) {
@@ -1728,36 +1662,6 @@ public class CampaignGUI extends JPanel {
         if (hasTab(GuiTabType.MEKLAB)) {
             ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
         }
-    }
-
-    public void showReport(Report report) {
-        ReportDialog rd = new ReportDialog(getFrame(), report);
-        rd.pack();
-        rd.setVisible(true);
-    }
-
-    public void showMaintenanceReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
-        mrd.setVisible(true);
-    }
-
-    public void showUnitCostReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
-        mrd.setVisible(true);
     }
 
     /**
@@ -2023,7 +1927,7 @@ public class CampaignGUI extends JPanel {
             // Stupid weird parsing of XML. At least this cleans it up.
             personnelEle.normalize();
 
-            Version version = new Version(personnelEle.getAttribute("version"));
+            final Version version = new Version(personnelEle.getAttribute("version"));
 
             // we need to iterate through three times, the first time to collect
             // any custom units that might not be written yet
@@ -2127,9 +2031,8 @@ public class CampaignGUI extends JPanel {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // Start the XML root.
-            pw.println("<personnel version=\"" + resourceMap.getString("Application.version") + "\">");
+            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
@@ -2185,10 +2088,9 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<options version=\"" + resourceMap.getString("Application.version") + "\">");
+            pw.println("<options version=\"" + MekHqConstants.VERSION + "\">");
             // Start the XML root.
             getCampaign().getCampaignOptions().writeToXml(pw, 1);
             pw.println("\t<skillTypes>");
@@ -2255,7 +2157,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
@@ -2317,7 +2219,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         CampaignOptions options = null;
         RandomSkillPreferences rsp = null;
@@ -2448,9 +2350,8 @@ public class CampaignGUI extends JPanel {
                 // File header
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
                 // Start the XML root.
-                pw.println("<parts version=\"" + resourceMap.getString("Application.version") + "\">");
+                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {

@@ -39,7 +39,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;

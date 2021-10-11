@@ -31,7 +31,7 @@ import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;

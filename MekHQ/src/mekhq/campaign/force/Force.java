@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
