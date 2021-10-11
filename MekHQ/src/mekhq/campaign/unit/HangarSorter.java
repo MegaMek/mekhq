@@ -88,7 +88,7 @@ public class HangarSorter {
      * This sorts a stream of units, sorted alphabetically and potentially by other methods
      * @return a stream with the applicable sort format
      */
-    private Stream<Unit> sort(Stream<Unit> units) {
+    public Stream<Unit> sort(final Stream<Unit> units) {
         Stream<Unit> stream = units.sorted(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
 
         if (weightClassSorted || weightSorted || unitTypeSorted) {
