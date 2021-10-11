@@ -288,35 +288,6 @@ public class StaticChecks {
                 && (!isTank || (u.getEntity().getWeightClass() == weightClass))));
     }
 
-    public static boolean areAllSoldiers(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isSoldier());
-    }
-
-    public static boolean areAllBattleArmor(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isBattleArmour());
-    }
-
-    public static boolean areAllVehicleGunners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVehicleGunner());
-    }
-
-    public static boolean areAllVesselGunners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselGunner());
-    }
-
-    public static boolean areAllVesselCrew(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselCrew()
-                || p.getPrimaryRole().isVehicleCrew());
-    }
-
-    public static boolean areAllVesselPilots(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselPilot());
-    }
-
-    public static boolean areAllVesselNavigators(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrimaryRole().isVesselNavigator());
-    }
-
     public static boolean areAllActive(Person... people) {
         return Stream.of(people).allMatch(p -> p.getStatus().isActive());
     }
