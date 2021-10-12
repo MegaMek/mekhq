@@ -310,7 +310,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         .filter(person -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)
                         .forEach(person -> gui.getCampaign().getDivorce().divorce(gui.getCampaign(),
                                 gui.getCampaign().getLocalDate(), person,
-                                DivorceSurnameStyle.valueOf(data[1])));
+                                SplittingSurnameStyle.valueOf(data[1])));
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
@@ -1251,7 +1251,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
-            for (final DivorceSurnameStyle style : DivorceSurnameStyle.values()) {
+            for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
                 JMenuItem divorceMenu = new JMenuItem(style.toString());
                 divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, style.name()));
                 divorceMenu.addActionListener(this);

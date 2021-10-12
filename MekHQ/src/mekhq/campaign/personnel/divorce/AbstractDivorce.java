@@ -26,7 +26,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.DivorceSurnameStyle;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
@@ -40,6 +40,7 @@ import java.util.ResourceBundle;
  * divorce on a given day.
  *
  * TODO : Decouple widowing, which should be part of the death module instead.
+ * TODO : Clanner and Prisoner Divorce options, both manual and random
  */
 public abstract class AbstractDivorce {
     //region Variable Declarations
@@ -113,7 +114,7 @@ public abstract class AbstractDivorce {
      */
     public void widowed(final Campaign campaign, final LocalDate today, final Person person) {
         divorce(campaign, today, person, campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                ? DivorceSurnameStyle.BOTH_KEEP_SURNAME : DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME);
+                ? SplittingSurnameStyle.BOTH_KEEP_SURNAME : SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME);
     }
 
     /**
@@ -125,7 +126,7 @@ public abstract class AbstractDivorce {
      *              the divorce
      */
     public void divorce(final Campaign campaign, final LocalDate today, final Person origin,
-                        final DivorceSurnameStyle style) {
+                        final SplittingSurnameStyle style) {
         final Person spouse = origin.getGenealogy().getSpouse();
 
         style.apply(campaign, origin, spouse);
@@ -186,7 +187,7 @@ public abstract class AbstractDivorce {
 
         final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
         if ((!sameSex && randomOppositeSexDivorce(person)) || (sameSex && randomSameSexDivorce(person))) {
-            divorce(campaign, today, person, DivorceSurnameStyle.WEIGHTED);
+            divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
         }
     }
 

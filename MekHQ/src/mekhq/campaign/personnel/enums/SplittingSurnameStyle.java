@@ -20,30 +20,33 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
+import javax.swing.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public enum DivorceSurnameStyle {
+public enum SplittingSurnameStyle {
     //region Enum Declarations
-    ORIGIN_CHANGES_SURNAME("DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME.text", "DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText", "DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
-    SPOUSE_CHANGES_SURNAME("DivorceSurnameStyle.SPOUSE_CHANGES_SURNAME.text", "DivorceSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText", "DivorceSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
-    BOTH_CHANGE_SURNAME("DivorceSurnameStyle.BOTH_CHANGE_SURNAME.text", "DivorceSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText", "DivorceSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
-    BOTH_KEEP_SURNAME("DivorceSurnameStyle.BOTH_KEEP_SURNAME.text", "DivorceSurnameStyle.BOTH_KEEP_SURNAME.toolTipText", "DivorceSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
-    WEIGHTED("DivorceSurnameStyle.WEIGHTED.text", "DivorceSurnameStyle.WEIGHTED.toolTipText", "DivorceSurnameStyle.WEIGHTED.dropDownText");
+    ORIGIN_CHANGES_SURNAME("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.text", "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText", "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
+    SPOUSE_CHANGES_SURNAME("SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.text", "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText", "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
+    BOTH_CHANGE_SURNAME("SplittingSurnameStyle.BOTH_CHANGE_SURNAME.text", "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText", "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
+    BOTH_KEEP_SURNAME("SplittingSurnameStyle.BOTH_KEEP_SURNAME.text", "SplittingSurnameStyle.BOTH_KEEP_SURNAME.toolTipText", "SplittingSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
+    WEIGHTED("SplittingSurnameStyle.WEIGHTED.text", "SplittingSurnameStyle.WEIGHTED.toolTipText", "SplittingSurnameStyle.WEIGHTED.dropDownText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    DivorceSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+    SplittingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -89,7 +92,7 @@ public enum DivorceSurnameStyle {
      * @param spouse the origin person's former spouse
      */
     public void apply(final Campaign campaign, final Person origin, final Person spouse) {
-        final DivorceSurnameStyle surnameStyle = isWeighted()
+        final SplittingSurnameStyle surnameStyle = isWeighted()
                 ? createWeightedSurnameMap(campaign.getCampaignOptions().getDivorceSurnameWeights()).randomItem()
                 : this;
 
@@ -113,16 +116,28 @@ public enum DivorceSurnameStyle {
                     spouse.setSurname(spouse.getMaidenName());
                 }
                 break;
+            case WEIGHTED: // Should be impossible by design, so we print the stacktrace
+                final String message = String.format(resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.text"),
+                        origin.getFullTitle(), spouse.getFullTitle());
+                // We want the full stacktrace, as otherwise how this could happen is bloody painful to track down.
+                MekHQ.getLogger().error(message, new Exception());
+                JOptionPane.showMessageDialog(null, message,
+                        resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.title"), JOptionPane.ERROR_MESSAGE);
+                return;
             case BOTH_KEEP_SURNAME:
             default:
                 break;
         }
     }
 
-    private WeightedIntMap<DivorceSurnameStyle> createWeightedSurnameMap(
-            final Map<DivorceSurnameStyle, Integer> weights) {
-        final WeightedIntMap<DivorceSurnameStyle> map = new WeightedIntMap<>();
-        for (final DivorceSurnameStyle style : DivorceSurnameStyle.values()) {
+    /**
+     * @param weights the weights to use in creating the weighted surname map
+     * @return the created weighted surname map
+     */
+    private WeightedIntMap<SplittingSurnameStyle> createWeightedSurnameMap(
+            final Map<SplittingSurnameStyle, Integer> weights) {
+        final WeightedIntMap<SplittingSurnameStyle> map = new WeightedIntMap<>();
+        for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
             if (style.isWeighted()) {
                 continue;
             }

@@ -271,7 +271,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     // Divorce
     private JCheckBox chkUseManualDivorce;
-    private Map<DivorceSurnameStyle, JSpinner> spnDivorceSurnameWeights;
+    private Map<SplittingSurnameStyle, JSpinner> spnDivorceSurnameWeights;
     private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
     private JCheckBox chkUseRandomOppositeSexDivorce;
     private JCheckBox chkUseRandomSameSexDivorce;
@@ -4380,7 +4380,7 @@ public class CampaignOptionsDialog extends JDialog {
         panel.setName("divorceSurnameWeightsPanel");
 
         spnDivorceSurnameWeights = new HashMap<>();
-        for (final DivorceSurnameStyle style : DivorceSurnameStyle.values()) {
+        for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
             if (style.isWeighted()) {
                 continue;
             }
@@ -5486,7 +5486,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Divorce
         chkUseManualDivorce.setSelected(options.isUseManualDivorce());
-        for (final Map.Entry<DivorceSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+        for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
             entry.getValue().setValue(options.getDivorceSurnameWeights().get(entry.getKey()) / 10.0);
         }
         comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
@@ -6101,7 +6101,7 @@ public class CampaignOptionsDialog extends JDialog {
 
             // Divorce
             options.setUseManualDivorce(chkUseManualDivorce.isSelected());
-            for (final Map.Entry<DivorceSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+            for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
                 options.getDivorceSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
             }
             options.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());

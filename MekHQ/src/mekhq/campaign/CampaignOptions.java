@@ -235,7 +235,7 @@ public class CampaignOptions implements Serializable {
 
     // Divorce
     private boolean useManualDivorce;
-    private Map<DivorceSurnameStyle, Integer> divorceSurnameWeights;
+    private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
     private RandomDivorceMethod randomDivorceMethod;
     private boolean useRandomOppositeSexDivorce;
     private boolean useRandomSameSexDivorce;
@@ -655,10 +655,10 @@ public class CampaignOptions implements Serializable {
         // Divorce
         setUseManualDivorce(true);
         setDivorceSurnameWeights(new HashMap<>());
-        getDivorceSurnameWeights().put(DivorceSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
-        getDivorceSurnameWeights().put(DivorceSurnameStyle.SPOUSE_CHANGES_SURNAME, 10);
-        getDivorceSurnameWeights().put(DivorceSurnameStyle.BOTH_CHANGE_SURNAME, 30);
-        getDivorceSurnameWeights().put(DivorceSurnameStyle.BOTH_KEEP_SURNAME, 50);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_CHANGE_SURNAME, 30);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_KEEP_SURNAME, 50);
         setRandomDivorceMethod(RandomDivorceMethod.NONE);
         setUseRandomOppositeSexDivorce(true);
         setUseRandomSameSexDivorce(true);
@@ -1611,11 +1611,11 @@ public class CampaignOptions implements Serializable {
         this.useManualDivorce = useManualDivorce;
     }
 
-    public Map<DivorceSurnameStyle, Integer> getDivorceSurnameWeights() {
+    public Map<SplittingSurnameStyle, Integer> getDivorceSurnameWeights() {
         return divorceSurnameWeights;
     }
 
-    public void setDivorceSurnameWeights(final Map<DivorceSurnameStyle, Integer> divorceSurnameWeights) {
+    public void setDivorceSurnameWeights(final Map<SplittingSurnameStyle, Integer> divorceSurnameWeights) {
         this.divorceSurnameWeights = divorceSurnameWeights;
     }
 
@@ -3430,7 +3430,7 @@ public class CampaignOptions implements Serializable {
         //region Divorce
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualDivorce", isUseManualDivorce());
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "divorceSurnameWeights");
-        for (final Map.Entry<DivorceSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
+        for (final Map.Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "divorceSurnameWeights");
@@ -4001,7 +4001,7 @@ public class CampaignOptions implements Serializable {
                             continue;
                         }
                         retVal.getDivorceSurnameWeights().put(
-                                DivorceSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
                                 Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
