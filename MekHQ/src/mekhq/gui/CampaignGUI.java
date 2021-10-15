@@ -1455,6 +1455,8 @@ public class CampaignGUI extends JPanel {
             getCampaign().getProcreation().setUseClannerProcreation(newOptions.isUseClannerProcreation());
             getCampaign().getProcreation().setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
             getCampaign().getProcreation().setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
+            getCampaign().getProcreation().setUseRandomClannerProcreation(newOptions.isUseRandomClannerProcreation());
+            getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
             if (getCampaign().getProcreation().getMethod().isPercentage()) {
                 ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
                         newOptions.getPercentageRandomProcreationRelationshipChance());

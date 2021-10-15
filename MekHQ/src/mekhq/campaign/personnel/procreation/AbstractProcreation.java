@@ -39,6 +39,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+/**
+ * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the common logic for
+ * procreation, and is implemented by classes defining how to determine if a female person will randomly procreate on a
+ * given day.
+ */
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
