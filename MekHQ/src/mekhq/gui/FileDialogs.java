@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;
@@ -133,36 +134,13 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> openCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Campaign Options",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue());
-
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
-        return value;
-    }
-
-    /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> saveCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Campaign Options as Presets",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue(),
-                "myoptions.xml");
-
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
-        return value;
+    public static Optional<File> saveCampaignPreset(final JFrame frame, final CampaignPreset preset) {
+        return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
+                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
     }
 
     /**
