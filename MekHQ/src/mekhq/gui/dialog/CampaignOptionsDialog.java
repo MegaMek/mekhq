@@ -4282,10 +4282,24 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseClannerProcreation = new JCheckBox(resources.getString("chkUseClannerProcreation.text"));
         chkUseClannerProcreation.setToolTipText(resources.getString("chkUseClannerProcreation.toolTipText"));
         chkUseClannerProcreation.setName("chkUseClannerProcreation");
+        chkUseClannerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerProcreation.setEnabled(!method.isNone() && chkUseClannerProcreation.isSelected());
+        });
 
         chkUsePrisonerProcreation = new JCheckBox(resources.getString("chkUsePrisonerProcreation.text"));
         chkUsePrisonerProcreation.setToolTipText(resources.getString("chkUsePrisonerProcreation.toolTipText"));
         chkUsePrisonerProcreation.setName("chkUsePrisonerProcreation");
+        chkUsePrisonerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerProcreation.setEnabled(!method.isNone() && chkUsePrisonerProcreation.isSelected());
+        });
 
         final JLabel lblMultiplePregnancyOccurrences = new JLabel(resources.getString("lblMultiplePregnancyOccurrences.text"));
         lblMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
@@ -4429,6 +4443,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             final boolean percentageEnabled = method.isPercentage();
             final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
             chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
+            chkUseRandomClannerProcreation.setEnabled(enabled && chkUseClannerProcreation.isSelected());
+            chkUseRandomPrisonerProcreation.setEnabled(enabled && chkUsePrisonerProcreation.isSelected());
             percentageRandomProcreationPanel.setEnabled(percentageEnabled);
             lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
             spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);

@@ -294,7 +294,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
                         .filter(person -> (gui.getCampaign().getProcreation().canProcreate(
-                                gui.getCampaign().getLocalDate(), person, false) != null))
+                                gui.getCampaign().getLocalDate(), person, false) == null))
                         .forEach(person -> {
                             gui.getCampaign().getProcreation().addPregnancy(
                                     gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
@@ -2176,7 +2176,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
-                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) != null)) {
+                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
