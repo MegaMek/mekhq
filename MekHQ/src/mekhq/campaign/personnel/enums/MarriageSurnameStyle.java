@@ -134,6 +134,7 @@ public enum MarriageSurnameStyle {
         return this == WEIGHTED;
     }
     //endregion Boolean Comparison Methods
+
     /**
      * This applies the surname changes that occur during a marriage
      * @param campaign the campaign to use in processing

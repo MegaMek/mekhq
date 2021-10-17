@@ -1603,7 +1603,7 @@ public class Person implements Serializable {
             }
 
             if (!isMarriageable()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageable", false);
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "marriageable", false);
             }
 
             if (!isTryingToConceive()) {

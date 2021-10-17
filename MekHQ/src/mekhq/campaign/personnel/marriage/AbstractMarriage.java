@@ -64,7 +64,7 @@ public abstract class AbstractMarriage {
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public RandomMarriageMethod getMethod() {
         return method;
     }
@@ -108,7 +108,7 @@ public abstract class AbstractMarriage {
     public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
         this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
     }
-    //endregion Getters
+    //endregion Getters/Setters
 
     /**
      * This is used to determine if a person can marry
@@ -180,7 +180,7 @@ public abstract class AbstractMarriage {
      * This marries two people that are part of the same campaign together on the given date.
      * @param campaign the campaign the two people are a part of
      * @param today the current date
-     * @param origin the origin person being marriage
+     * @param origin the origin person being married
      * @param spouse the person's spouse, which can be null if no marriage is to occur
      * @param surnameStyle the style for how the two people's surnames will change as part of the marriage
      */
@@ -221,8 +221,6 @@ public abstract class AbstractMarriage {
      * @param person the person to process
      */
     public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
-        // Don't attempt to generate if someone isn't marriageable, has a spouse, isn't old enough
-        // to marry, is actively deployed
         if (canMarry(campaign, today, person, true) != null) {
             return;
         }
