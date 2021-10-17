@@ -4069,10 +4069,24 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseClannerMarriages = new JCheckBox(resources.getString("chkUseClannerMarriages.text"));
         chkUseClannerMarriages.setToolTipText(resources.getString("chkUseClannerMarriages.toolTipText"));
         chkUseClannerMarriages.setName("chkUseClannerMarriages");
+        chkUseClannerMarriages.addActionListener(evt -> {
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerMarriages.setEnabled(!method.isNone() && chkUseClannerMarriages.isSelected());
+        });
 
         chkUsePrisonerMarriages = new JCheckBox(resources.getString("chkUsePrisonerMarriages.text"));
         chkUsePrisonerMarriages.setToolTipText(resources.getString("chkUsePrisonerMarriages.toolTipText"));
         chkUsePrisonerMarriages.setName("chkUsePrisonerMarriages");
+        chkUsePrisonerMarriages.addActionListener(evt -> {
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerMarriages.setEnabled(!method.isNone() && chkUsePrisonerMarriages.isSelected());
+        });
 
         final JLabel lblMinimumMarriageAge = new JLabel(resources.getString("lblMinimumMarriageAge.text"));
         lblMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
@@ -4160,12 +4174,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
             final JLabel label = new JLabel(style.toString());
             label.setToolTipText(style.getToolTipText());
-            label.setName("lbl" + style.toString());
+            label.setName("lbl" + style);
             panel.add(label);
 
             final JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.1));
             spinner.setToolTipText(style.getToolTipText());
-            spinner.setName("spn" + style.toString());
+            spinner.setName("spn" + style);
             spnMarriageSurnameWeights.put(style, spinner);
             panel.add(spinner);
 
@@ -4208,6 +4222,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             final boolean sameSexEnabled = enabled && chkUseRandomSameSexMarriages.isSelected();
             final boolean percentageEnabled = method.isPercentage();
             chkUseRandomSameSexMarriages.setEnabled(enabled);
+            chkUseRandomClannerMarriages.setEnabled(enabled && chkUseClannerMarriages.isSelected());
+            chkUseRandomPrisonerMarriages.setEnabled(enabled && chkUsePrisonerMarriages.isSelected());
             lblRandomMarriageAgeRange.setEnabled(enabled);
             spnRandomMarriageAgeRange.setEnabled(enabled);
             percentageRandomMarriagePanel.setEnabled(percentageEnabled);

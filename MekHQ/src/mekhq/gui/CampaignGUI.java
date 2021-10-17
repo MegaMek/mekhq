@@ -1447,7 +1447,11 @@ public class CampaignGUI extends JPanel {
         if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
             getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
         } else {
+            getCampaign().getMarriage().setUseClannerMarriages(newOptions.isUseClannerMarriages());
+            getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
             getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
+            getCampaign().getMarriage().setUseRandomClannerMarriages(newOptions.isUseRandomClannerMarriages());
+            getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
             if (getCampaign().getMarriage().getMethod().isPercentage()) {
                 ((PercentageRandomMarriage) getCampaign().getMarriage()).setPercentage(
                         newOptions.getPercentageRandomMarriageChance());

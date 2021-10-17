@@ -1192,7 +1192,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (oneSelected && person.getStatus().isActive()) {
             if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
                     && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
-                            gui.getCampaign().getLocalDate(), person, false) != null)) {
+                            gui.getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1727,13 +1727,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
-            cbMenuItem.setName("cbMarriageable");
-            cbMenuItem.setSelected(person.isMarriageable());
-            cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone()) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
+                cbMenuItem.setName("cbMarriageable");
+                cbMenuItem.setSelected(person.isMarriageable());
+                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
 
             if (gui.getCampaign().getCampaignOptions().useProcreation()
                     && person.getGender().isFemale()) {
@@ -1917,7 +1920,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             menu = new JMenu(resources.getString("specialFlags.text"));
-            if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
+            if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
+                    && StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
                 cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
                 cbMenuItem.setSelected(selected[0].isMarriageable());
