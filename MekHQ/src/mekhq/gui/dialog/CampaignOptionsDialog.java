@@ -20,13 +20,16 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.enums.DialogResult;
+import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
@@ -37,12 +40,10 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.GamePreset;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -51,18 +52,19 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -78,11 +80,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -90,16 +87,16 @@ import java.util.List;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CampaignOptionsDialog extends JDialog {
+public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 1935043247792962964L;
 
     //region General Variables (ones not relating to a specific tab)
-    private Campaign campaign;
+    private final Campaign campaign;
+    private final boolean startup;
     private CampaignOptions options;
     private RandomSkillPreferences rSkillPrefs;
     private LocalDate date;
-    private JFrame frame;
     private Camouflage camouflage;
     private PlayerColour colour;
     private String iconCategory;
@@ -109,22 +106,14 @@ public class CampaignOptionsDialog extends JDialog {
     private Hashtable<String, JSpinner> hashRegSkill;
     private Hashtable<String, JSpinner> hashVetSkill;
     private Hashtable<String, JSpinner> hashEliteSkill;
-    private boolean cancelled;
-    //endregion General Variables (ones not relating to a specific tab)
 
-    //region Shared UI Variables
-    private JTabbedPane tabOptions;
-    private JButton btnOkay;
-    private JButton btnSave;
-    private JButton btnLoad;
-    private JButton btnCancel;
-    //endregion Shared UI Variables
+    private JTabbedPane optionsPane;
+    //endregion General Variables (ones not relating to a specific tab)
 
     //region General Tab
     private JPanel panGeneral;
     private JTextField txtName;
-    private JComboBox<String> comboFaction;
-    private SortedComboBoxModel<String> factionModel;
+    private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
@@ -499,15 +488,14 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
     //endregion Against the Bot Tab
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
     //endregion Variable Declarations
 
-    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.campaign = c;
-        //this is a hack but I have no idea what is going on here
-        this.frame = parent;
+    //region Constructors
+    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()),
+                "CampaignOptionsDialog", "CampaignOptionsDialog.title");
+        this.campaign = campaign;
+        this.startup = startup;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
@@ -518,30 +506,41 @@ public class CampaignOptionsDialog extends JDialog {
         hashRegSkill = new Hashtable<>();
         hashVetSkill = new Hashtable<>();
         hashEliteSkill = new Hashtable<>();
-        cancelled = false;
 
-        initComponents();
-        setOptions(c.getCampaignOptions(), c.getRandomSkillPreferences());
+        initialize();
+        setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
         btnCamo.setIcon(camouflage.getImageIcon());
         setForceIcon();
-        setLocationRelativeTo(parent);
+    }
+    //endregion Constructors
 
-        setUserPreferences();
+    //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
     }
 
+    public boolean isStartup() {
+        return startup;
+    }
+
+    public JTabbedPane getOptionsPane() {
+        return optionsPane;
+    }
+
+    public void setOptionsPane(final JTabbedPane optionsPane) {
+        this.optionsPane = optionsPane;
+    }
+    //endregion Getters/Setters
+
     //region Initialization
-    /**
-     * This method is called from within the constructor to initialize the form.
-     */
-    private void initComponents() {
+    //region Center Pane
+    @Override
+    protected Container createCenterPane() {
         //region Variable Declaration and Initialisation
-        tabOptions = new JTabbedPane();
         comboFactionNames = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         panRepair = new JPanel();
         panSupplies = new JPanel();
-        //region Finances Tab
-        JPanel panFinances = new JPanel();
         panMercenary = new JPanel();
         panNameGen = new JPanel();
         panXP = new JPanel();
@@ -578,8 +577,6 @@ public class CampaignOptionsDialog extends JDialog {
         factionIntroDateBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
         choiceTechLevel = new JComboBox<>();
-        btnLoad = new JButton();
-        btnCancel = new JButton();
 
         usePlanetaryAcquisitions = new JCheckBox();
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
@@ -602,12 +599,9 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Variable Declaration and Initialisation
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form");
-        setTitle(resourceMap.getString("title.text"));
-        getContentPane().setLayout(new GridBagLayout());
 
-        tabOptions.setName("tabOptions");
+        setOptionsPane(new JTabbedPane());
+        getOptionsPane().setName("optionsPane");
 
         //region General Tab
         panGeneral = new JPanel(new GridBagLayout());
@@ -634,16 +628,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblFaction, gridBagConstraints);
 
-        factionModel = new SortedComboBoxModel<>();
-        for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
-            if (faction.validIn(date.getYear())) {
-                factionModel.addElement(faction.getFullName(date.getYear()));
-            }
-        }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
-        comboFaction = new JComboBox<>();
-        comboFaction.setName("comboFaction");
-        comboFaction.setModel(factionModel);
+        final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
+        factionModel.addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
+        comboFaction = new MMComboBox<>("comboFaction", factionModel);
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), date));
         comboFaction.setMinimumSize(new Dimension(400, 30));
         comboFaction.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints.gridx = gridx--;
@@ -724,7 +713,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral);
+        getOptionsPane().addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral);
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -958,7 +947,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair);
+        getOptionsPane().addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair);
         //endregion Repair and Maintenance Tab
 
         //region Supplies and Acquisition Tab
@@ -1316,7 +1305,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies);
+        getOptionsPane().addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies);
         //endregion Supplies and Acquisition Tab
 
         //region Tech Limits Tab
@@ -1450,14 +1439,15 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech);
+        getOptionsPane().addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech);
         //endregion Tech Limits Tab
 
         //region Personnel Tab
-        tabOptions.addTab(resourceMap.getString("personnelPanel.title"), createPersonnelTab());
+        getOptionsPane().addTab(resourceMap.getString("personnelPanel.title"), createPersonnelTab());
         //endregion Personnel Tab
 
         //region Finances Tab
+        JPanel panFinances = new JPanel();
         panFinances.setName("panFinances");
         panFinances.setLayout(new GridBagLayout());
         gridy = 0;
@@ -1666,7 +1656,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances);
+        getOptionsPane().addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances);
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -1786,7 +1776,7 @@ public class CampaignOptionsDialog extends JDialog {
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
 
-        tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary);
+        getOptionsPane().addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary);
         //endregion Mercenary Tab
 
         //region XP Tab
@@ -2088,7 +2078,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(scrXP, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP);
+        getOptionsPane().addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP);
         //endregion XP Tab
 
         //region Skill Tab
@@ -2174,7 +2164,7 @@ public class CampaignOptionsDialog extends JDialog {
         JScrollPane scrSkill = new JScrollPane(panSkill);
         scrSkill.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        tabOptions.addTab(resourceMap.getString("panSkill.TabConstraints.tabTitle"), scrSkill);
+        getOptionsPane().addTab(resourceMap.getString("panSkill.TabConstraints.tabTitle"), scrSkill);
         //endregion Skills Tab
 
         //region Special Abilities Tab
@@ -2196,7 +2186,7 @@ public class CampaignOptionsDialog extends JDialog {
         JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
         scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        tabOptions.addTab("Special Abilities", scrSPA);
+        getOptionsPane().addTab("Special Abilities", scrSPA);
         //endregion Special Abilities Tab
 
         //region Skill Randomization Tab
@@ -2462,11 +2452,11 @@ public class CampaignOptionsDialog extends JDialog {
         JScrollPane scrRandomSkill = new JScrollPane(panRandomSkill);
         scrRandomSkill.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        tabOptions.addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill);
+        getOptionsPane().addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill);
         //endregion Skill Randomization Tab
 
         //region Rank Systems Tab
-        tabOptions.addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab(frame, campaign));
+        getOptionsPane().addTab(resourceMap.getString("rankSystemsPanel.title"), createRankSystemsTab(getFrame(), campaign));
         //endregion Rank Systems Tab
 
         //region Name and Portrait Generation Tab
@@ -2608,11 +2598,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen);
+        getOptionsPane().addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen);
         //endregion Name and Portrait Generation Tab
 
         //region Markets Tab
-        tabOptions.addTab(resourceMap.getString("marketsPanel.title"), createMarketsTab());
+        getOptionsPane().addTab(resourceMap.getString("marketsPanel.title"), createMarketsTab());
         //endregion Markets Tab
 
         //region Against the Bot Tab
@@ -3282,67 +3272,17 @@ public class CampaignOptionsDialog extends JDialog {
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new java.awt.Dimension(500, 410));
 
-        tabOptions.addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
+        getOptionsPane().addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
         enableAtBComponents(panAtB, chkUseAtB.isSelected());
         enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected() && btnStaticRATs.isSelected());
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
             scrAtB.getVerticalScrollBar().setValue(0);
         });
         //endregion Against the Bot Tab
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(tabOptions, gridBagConstraints);
-
-        btnOkay = new JButton(resourceMap.getString("btnOkay.text"));
-        btnOkay.setName("btnOkay");
-        btnOkay.addActionListener(evt -> btnOkayActionPerformed());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 0.25;
-        getContentPane().add(btnOkay, gridBagConstraints);
-
-        btnSave = new JButton(resourceMap.getString("btnSave.text"));
-        btnSave.setName("btnSave");
-        btnSave.addActionListener(evt -> btnSaveActionPerformed());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.weightx = 0.25;
-        getContentPane().add(btnSave, gridBagConstraints);
-
-        btnLoad.setText(resourceMap.getString("btnLoad.text"));
-        btnLoad.setName("btnLoad");
-        btnLoad.addActionListener(evt -> btnLoadActionPerformed());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.weightx = 0.25;
-        getContentPane().add(btnLoad, gridBagConstraints);
-
-        btnCancel.setText(resourceMap.getString("btnCancel.text"));
-        btnCancel.setName("btnCancel");
-        btnCancel.addActionListener(this::btnCancelActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 0.25;
-        getContentPane().add(btnCancel, gridBagConstraints);
-
-        pack();
+        return getOptionsPane();
     }
 
     //region Personnel Tab
@@ -5106,34 +5046,83 @@ public class CampaignOptionsDialog extends JDialog {
         return panel;
     }
     //endregion Markets Tab
+    //endregion Center Pane
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
-        setName("CampaignOptionsDialog");
-        preferences.manage(new JWindowPreference(this));
+    @Override
+    protected JPanel createButtonPanel() {
+        final JPanel panel = new JPanel(new GridLayout(1, 0));
+
+        panel.add(new MMButton("btnOkay", resources, "btnOkay.text", null,
+                this::okButtonActionPerformed));
+
+        panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text",
+                "btnSavePreset.toolTipText", evt -> btnSaveActionPerformed()));
+
+        panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text",
+                "btnLoadPreset.toolTipText", evt -> {
+            final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
+            if (presetSelectionDialog.showDialog().isConfirmed()) {
+                applyPreset(presetSelectionDialog.getSelectedPreset());
+            }
+        }));
+
+        panel.add(new MMButton("btnCancel", resources, "btnCancel.text", null,
+                this::cancelActionPerformed));
+
+        return panel;
     }
 
-    public void applyPreset(GamePreset gamePreset) {
+    @Override
+    protected void setCustomPreferences(final PreferencesNode preferences) {
+        super.setCustomPreferences(preferences);
+        preferences.manage(new JTabbedPanePreference(getOptionsPane()));
+    }
+
+    public void applyPreset(final @Nullable CampaignPreset preset) {
+        if (preset == null) {
+            return;
+        }
+
+        if (isStartup()) {
+            if (preset.getDate() != null) {
+                setDate(preset.getDate());
+            }
+
+            if (preset.getFaction() != null) {
+                comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
+            }
+
+            if (preset.getRankSystem() != null) {
+                if (preset.getRankSystem().getType().isCampaign()) {
+                    rankSystemsPane.getRankSystemModel().addElement(preset.getRankSystem());
+                }
+                rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
+            }
+        }
+
         // Handle CampaignOptions and RandomSkillPreferences
-        setOptions(gamePreset.getOptions(), gamePreset.getRandomSkillPreferences());
+        if (preset.getCampaignOptions() != null) {
+            setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
+        }
 
         // Handle SPAs
-        tempSPA = (gamePreset.getSpecialAbilities() != null) ? gamePreset.getSpecialAbilities() : new Hashtable<>();
-        recreateSPAPanel(!getUnusedSPA().isEmpty());
+        if (!preset.getSpecialAbilities().isEmpty()) {
+            tempSPA = preset.getSpecialAbilities();
+            recreateSPAPanel(!getUnusedSPA().isEmpty());
+        }
 
-        if (gamePreset.getSkillHash() != null) {
+        if (!preset.getSkills().isEmpty()) {
             // Overwriting XP Table
-            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(gamePreset.getSkillHash()), TABLE_XP_COLUMN_NAMES));
+            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(preset.getSkills()), TABLE_XP_COLUMN_NAMES));
             ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
 
             // Overwriting Skill List
-            for (String skillName : SkillType.getSkillList()) {
-                SkillType skillType = gamePreset.getSkillHash().get(skillName);
-
-                JSpinner spnTarget = hashSkillTargets.get(skillName);
+            for (final String skillName : SkillType.getSkillList()) {
+                final JSpinner spnTarget = hashSkillTargets.get(skillName);
                 if (spnTarget == null) {
                     continue;
                 }
+                final SkillType skillType = preset.getSkills().get(skillName);
 
                 spnTarget.setValue(skillType.getTarget());
                 hashGreenSkill.get(skillName).setValue(skillType.getGreenLevel());
@@ -5144,7 +5133,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    public void setOptions(CampaignOptions options, RandomSkillPreferences randomSkillPreferences) {
+    public void setOptions(@Nullable CampaignOptions options,
+                           @Nullable RandomSkillPreferences randomSkillPreferences) {
         // Use the provided options and preferences when possible, but flip if they are null to be safe
         if (options != null) {
             this.options = options;
@@ -5596,87 +5586,13 @@ public class CampaignOptionsDialog extends JDialog {
     }
     //endregion Initialization
 
-    private void btnLoadActionPerformed() {
-        List<GamePreset> presets = GamePreset.getGamePresetsIn();
-
-        if (!presets.isEmpty()) {
-            ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
-            cgpd.setVisible(true);
-            if (!cgpd.wasCancelled() && (cgpd.getSelectedPreset() != null)) {
-                applyPreset(cgpd.getSelectedPreset());
-            }
-        }
-    }
-
-    private void btnSaveActionPerformed() {
-        if (txtName.getText().length() == 0) {
-            return;
-        }
-        GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true,
-                "Enter a title", "Enter description of preset");
-        gpdd.setVisible(true);
-        if (!gpdd.wasChanged()) {
-            return;
-        }
-
-        MekHQ.getLogger().info("Saving campaign options...");
-        // Choose a file...
-        Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
-
-        if (!maybeFile.isPresent()) {
-            return;
-        }
-
-        File file = maybeFile.get();
-
-        String path = file.getPath();
-        if (!path.endsWith(".xml")) {
-            path += ".xml";
-            file = new File(path);
-        }
-
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
-
-        updateOptions();
-        GamePreset preset = new GamePreset(gpdd.getTitle(), gpdd.getDesc(), options, rSkillPrefs,
-                SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
-
-        // Then save it out to that file.
-        try (FileOutputStream fos = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-            preset.writeToXml(pw, 1);
-            pw.flush();
-            MekHQ.getLogger().info("Campaign options saved to " + file);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
-            JOptionPane.showMessageDialog(null,
-                    "Whoops, for some reason the game presets could not be saved",
-                    "Could not save presets", JOptionPane.ERROR_MESSAGE);
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-            }
-        }
-        if (backupFile.exists()) {
-            backupFile.delete();
-        }
-
-        this.setVisible(false);
-    }
-
     private void updateOptions() {
         try {
             campaign.setName(txtName.getText());
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-            campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
-                    (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
+            campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
             if (null != comboFactionNames.getSelectedItem()) {
                 RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
             }
@@ -6046,17 +5962,42 @@ public class CampaignOptionsDialog extends JDialog {
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void btnOkayActionPerformed() {
-        if (txtName.getText().length() > 0) {
+    @Override
+    protected void okButtonActionPerformed(final ActionEvent evt) {
+        if (!txtName.getText().isBlank()) {
             updateOptions();
-            this.setVisible(false);
+            setResult(DialogResult.CONFIRMED);
+            setVisible(false);
         }
+    }
+
+    private void btnSaveActionPerformed() {
+        if (txtName.getText().isBlank()) {
+            return;
+        }
+        updateOptions();
+        setResult(DialogResult.CONFIRMED);
+
+        final CreateCampaignPresetDialog createCampaignPresetDialog
+                = new CreateCampaignPresetDialog(getFrame(), getCampaign(), null);
+        if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+            setVisible(false);
+            return;
+        }
+        final CampaignPreset preset = createCampaignPresetDialog.getPreset();
+        if (preset == null) {
+            setVisible(false);
+            return;
+        }
+        preset.writeToFile(getFrame(),
+                FileDialogs.saveCampaignPreset(getFrame(), preset).orElse(null));
+        setVisible(false);
     }
 
     private void updateXPCosts() {
@@ -6093,36 +6034,32 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-
-    private void btnCancelActionPerformed(ActionEvent evt) {
-        cancelled = true;
-        this.setVisible(false);
-    }
-
-    public boolean wasCancelled() {
-        return cancelled;
-    }
-
     private void btnDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
+        DateChooser dc = new DateChooser(getFrame(), date);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
-            factionModel = new SortedComboBoxModel<>();
-            for (final Faction faction : Factions.getInstance().getChoosableFactions()) {
-                if (faction.validIn(date.getYear())) {
-                    factionModel.addElement(faction.getFullName(date.getYear()));
-                }
-            }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
-            comboFaction.setModel(factionModel);
+            setDate(dc.getDate());
         }
     }
 
+    private void setDate(final @Nullable LocalDate date) {
+        if (date == null) {
+            return;
+        }
+
+        this.date = date;
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+
+        final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
+        comboFaction.removeAllItems();
+        ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
+        comboFaction.setSelectedItem(factionDisplay);
+    }
+
     private void btnIconActionPerformed(ActionEvent evt) {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName,
+        ImageChoiceDialog pcd = new ImageChoiceDialog(getFrame(), true, iconCategory, iconFileName,
                 MHQStaticDirectoryManager.getForceIcons());
         pcd.setVisible(true);
         if (pcd.isChanged()) {
@@ -6133,7 +6070,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChooserDialog ccd = new CamoChooserDialog(frame, camouflage);
+        CamoChooserDialog ccd = new CamoChooserDialog(getFrame(), camouflage);
         if (ccd.showDialog().isConfirmed()) {
             camouflage = ccd.getSelectedItem();
             btnCamo.setIcon(camouflage.getImageIcon());
@@ -6172,7 +6109,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnAddSPA() {
-        SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(this.frame, getUnusedSPA(), getCurrentSPA());
+        SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(getFrame(), getUnusedSPA(), getCurrentSPA());
         suad.setVisible(true);
 
         recreateSPAPanel(!getUnusedSPA().isEmpty());
