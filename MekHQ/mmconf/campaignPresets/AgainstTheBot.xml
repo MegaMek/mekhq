@@ -2,6 +2,8 @@
 <gamePreset version="0.49.1-SNAPSHOT">
 	<title>Official AtB Options</title>
 	<description>(Release 2) These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
+	<date>3025-01-01</date>
+	<faction>MERC</faction>
 	<campaignOptions>
 		<manualUnitRatingModifier>0</manualUnitRatingModifier>
 		<logMaintenance>false</logMaintenance>
