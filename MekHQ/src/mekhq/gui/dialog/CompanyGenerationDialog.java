@@ -30,7 +30,6 @@ import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGener
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationPersonTracker;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 
 import javax.swing.*;
@@ -40,7 +39,6 @@ import java.util.List;
 public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private Campaign campaign;
-    private CompanyGenerationPanelType currentPanelType;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
     //endregion Variable Declarations
 
@@ -48,7 +46,6 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "CompanyGenerationDialog", "CompanyGenerationDialog.title");
         setCampaign(campaign);
-        setCurrentPanelType(CompanyGenerationPanelType.OPTIONS);
         initialize();
     }
     //endregion Constructors
@@ -62,14 +59,6 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
         this.campaign = campaign;
     }
 
-    public CompanyGenerationPanelType getCurrentPanelType() {
-        return currentPanelType;
-    }
-
-    public void setCurrentPanelType(final CompanyGenerationPanelType currentPanelType) {
-        this.currentPanelType = currentPanelType;
-    }
-
     public CompanyGenerationOptionsPanel getCompanyGenerationOptionsPanel() {
         return companyGenerationOptionsPanel;
     }
@@ -80,47 +69,14 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
     //endregion Getters/Setters
 
     //region Initialization
-    /**
-     * @return the center pane
-     */
     @Override
     protected Container createCenterPane() {
-        switch (getCurrentPanelType()) {
-            case PERSONNEL:
-            case UNITS:
-            case UNIT:
-            case SPARES:
-            case CONTRACTS:
-            case FINANCES:
-            case OVERVIEW:
-            case OPTIONS:
-            default:
-                return new JScrollPane(initializeCompanyGenerationOptionsPanel(getCampaign()));
-        }
-    }
-
-    private JPanel initializeCompanyGenerationOptionsPanel(final Campaign campaign) {
-        setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), campaign));
-        return getCompanyGenerationOptionsPanel();
+        setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign()));
+        return new JScrollPane(getCompanyGenerationOptionsPanel());
     }
 
     @Override
     protected JPanel createButtonPanel() {
-        switch (getCurrentPanelType()) {
-            case PERSONNEL:
-            case UNITS:
-            case UNIT:
-            case SPARES:
-            case CONTRACTS:
-            case FINANCES:
-            case OVERVIEW:
-            case OPTIONS:
-            default:
-                return initializeCompanyGenerationOptionsButtonPanel();
-        }
-    }
-
-    private JPanel initializeCompanyGenerationOptionsButtonPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 3));
 
         JButton cancelButton = new JButton(resources.getString("Cancel.text"));
