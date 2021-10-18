@@ -1252,7 +1252,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
             for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
-                JMenuItem divorceMenu = new JMenuItem(style.toString());
+                JMenuItem divorceMenu = new JMenuItem(style.getDropDownText());
                 divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, style.name()));
                 divorceMenu.addActionListener(this);
                 menu.add(divorceMenu);

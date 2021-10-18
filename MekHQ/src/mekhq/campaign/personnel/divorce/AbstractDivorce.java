@@ -140,7 +140,7 @@ public abstract class AbstractDivorce {
         } else if (randomDivorce) {
             if (!isUseRandomClannerDivorce() && person.isClanner()) {
                 return resources.getString("cannotDivorce.RandomClanner.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().isClanner()) {
+            } else if (!isUseRandomClannerDivorce() && person.getGenealogy().getSpouse().isClanner()) {
                 return resources.getString("cannotDivorce.RandomClannerSpouse.text");
             } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
