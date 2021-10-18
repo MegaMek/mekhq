@@ -88,6 +88,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_COMMANDER = "COMMANDER";
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
     private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
+    private static final String CMD_DIVORCEABLE = "DIVORCEABLE";
     private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
@@ -836,6 +837,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
+                break;
+            }
+            case CMD_DIVORCEABLE: {
+                final boolean divorceable = !people[0].isDivorceable();
+                Stream.of(people).filter(person -> person.getGenealogy().hasSpouse())
+                        .forEach(person -> person.setDivorceable(divorceable));
                 break;
             }
             case CMD_FOUNDER: {
@@ -1741,6 +1748,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(cbMenuItem);
             }
 
+            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
+                    && person.getGenealogy().hasSpouse()) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
+                cbMenuItem.setName("cbDivorceable");
+                cbMenuItem.setSelected(person.isDivorceable());
+                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
+
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("founder.text"));
             cbMenuItem.setSelected(person.isFounder());
             cbMenuItem.setActionCommand(CMD_FOUNDER);
@@ -1929,6 +1948,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
                 cbMenuItem.setSelected(selected[0].isTryingToConceive());
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
+
+            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
+                    && Stream.of(selected).filter(p -> p.getGenealogy().hasSpouse()).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
+                cbMenuItem.setSelected(selected[0].isDivorceable());
+                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }

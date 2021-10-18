@@ -224,6 +224,10 @@ public class Person implements Serializable {
     private UUID originalUnitId;
     //endregion Against the Bot
 
+    //region Flags
+    private boolean divorceable;
+    //endregion Flags
+
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
@@ -366,6 +370,7 @@ public class Person implements Serializable {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
+        setDivorceable(true);
         extraData = new ExtraData();
 
         // Initialize Data based on these settings
@@ -1558,6 +1563,16 @@ public class Person implements Serializable {
         this.biography = s;
     }
 
+    //region Flags
+    public boolean isDivorceable() {
+        return divorceable;
+    }
+
+    public void setDivorceable(final boolean divorceable) {
+        this.divorceable = divorceable;
+    }
+    //endregion Flags
+
     public ExtraData getExtraData() {
         return extraData;
     }
@@ -1792,6 +1807,13 @@ public class Person implements Serializable {
             if (acquisitions != 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitions", acquisitions);
             }
+
+            //region Personnel Flags
+            if (!isDivorceable()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", isDivorceable());
+            }
+            //endregion Personnel Flags
+
             if (!extraData.isEmpty()) {
                 extraData.writeToXml(pw1);
             }
@@ -2083,6 +2105,8 @@ public class Person implements Serializable {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
+                    retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3

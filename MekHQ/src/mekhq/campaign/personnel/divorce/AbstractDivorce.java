@@ -129,6 +129,10 @@ public abstract class AbstractDivorce {
     public @Nullable String canDivorce(final Person person, final boolean randomDivorce) {
         if (!person.getGenealogy().hasSpouse()) {
             return resources.getString("cannotDivorce.NotMarried.text");
+        } else if (!person.isDivorceable()) {
+            return resources.getString("cannotDivorce.NotDivorceable.text");
+        } else if (!person.getGenealogy().getSpouse().isDivorceable()) {
+            return resources.getString("cannotDivorce.SpouseNotDivorceable.text");
         } else if (!isUseClannerDivorce() && person.isClanner()) {
             return resources.getString("cannotDivorce.Clanner.text");
         } else if (!isUseClannerDivorce() && person.getGenealogy().getSpouse().isClanner()) {
