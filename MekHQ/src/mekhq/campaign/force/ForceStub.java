@@ -195,9 +195,7 @@ public class ForceStub implements Serializable {
                             continue;
 
                         if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(ForceStub.class, "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -212,9 +210,7 @@ public class ForceStub implements Serializable {
                             continue;
 
                         if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(ForceStub.class, "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -223,10 +219,7 @@ public class ForceStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(ForceStub.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

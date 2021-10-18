@@ -1,8 +1,8 @@
 /*
  * Money.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019 - Vicente Cartas Espinel <vicente.cartas at outlook.com>. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +23,7 @@ package mekhq.campaign.finances;
 
 import org.joda.money.BigMoney;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -33,7 +34,8 @@ import java.util.List;
  *
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
  */
-public class Money implements Comparable<Money> {
+public class Money implements Comparable<Money>, Serializable {
+    private static final long serialVersionUID = 2018272535276369842L;
     private BigMoney wrapped;
 
     private Money(BigMoney money) {
@@ -59,10 +61,6 @@ public class Money implements Comparable<Money> {
 
     public static Money zero() {
         return zero(CurrencyManager.getInstance().getDefaultCurrency());
-    }
-
-    public static Money fromXmlString(String xmlData) {
-        return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
     }
 
     public boolean isZero() {
@@ -149,10 +147,6 @@ public class Money implements Comparable<Money> {
         return new Money(getWrapped().dividedBy(money.getWrapped().getAmount(), RoundingMode.HALF_EVEN));
     }
 
-    public String toXmlString() {
-        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
-    }
-
     public String toAmountString() {
         return CurrencyManager.getInstance().getUiAmountPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
@@ -164,6 +158,16 @@ public class Money implements Comparable<Money> {
     public String toAmountAndNameString() {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
+
+    //region File I/O
+    public String toXmlString() {
+        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+    }
+
+    public static Money fromXmlString(String xmlData) {
+        return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {

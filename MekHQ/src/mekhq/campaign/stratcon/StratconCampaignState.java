@@ -54,6 +54,7 @@ public class StratconCampaignState {
     private int supportPoints;
     private int victoryPoints;
     private String briefingText;
+    private boolean allowEarlyVictory;
     
     // these are applied to any scenario generated in the campaign; use sparingly
     private List<String> globalScenarioModifiers = new ArrayList<>(); 
@@ -130,6 +131,14 @@ public class StratconCampaignState {
 
     public void setBriefingText(String briefingText) {
         this.briefingText = briefingText;
+    }
+
+    public boolean allowEarlyVictory() {
+        return allowEarlyVictory;
+    }
+
+    public void setAllowEarlyVictory(boolean allowEarlyVictory) {
+        this.allowEarlyVictory = allowEarlyVictory;
     }
 
     public List<String> getGlobalScenarioModifiers() {

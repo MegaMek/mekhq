@@ -20,13 +20,6 @@
  */
 package mekhq.campaign;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import megamek.client.Client;
 import megamek.common.*;
 import megamek.common.event.GameVictoryEvent;
@@ -36,15 +29,9 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -55,6 +42,13 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -148,7 +142,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -180,7 +174,7 @@ public class ResolveScenarioTracker {
 
         for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -263,7 +257,7 @@ public class ResolveScenarioTracker {
         // Utterly destroyed entities
         for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -296,7 +290,7 @@ public class ResolveScenarioTracker {
         //add retreated units
         for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -329,7 +323,7 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = victoryEvent.getGraveyardEntities();
         while (wrecks.hasMoreElements()) {
             Entity e = wrecks.nextElement();
-            if (e.getSubEntities().isPresent()) {
+            if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
@@ -480,7 +474,7 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            MekHQ.getLogger().error(this,
+                            MekHQ.getLogger().error(
                                     "A null person status was found for person id " + p.getId().toString()
                                     + " when trying to assign kills");
                             continue;
@@ -690,7 +684,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    MekHQ.getLogger().error(this, "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    MekHQ.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
                     continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
@@ -1055,12 +1049,12 @@ public class ResolveScenarioTracker {
                 // Read a Vector from the file.
                 parser.parse(listStream);
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(this, parser.getWarningMessage());
+                MekHQ.getLogger().warning(parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();
@@ -1387,7 +1381,7 @@ public class ResolveScenarioTracker {
             }
 
             if (status.wasDeployed()) {
-                person.awardXP(status.getXP());
+                person.awardXP(campaign, status.getXP());
                 ServiceLogger.participatedInMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
@@ -1399,10 +1393,7 @@ public class ResolveScenarioTracker {
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), PersonnelStatus.KIA, getCampaign().getLocalDate());
                 if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
-                    campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, campaign.getCampaignOptions().getUseShareSystem()
-                                    ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
-                                    : 0,
+                    campaign.getRetirementDefectionTracker().removeFromCampaign(person, true,
                             campaign, (AtBContract) mission);
                 }
             }
@@ -1412,7 +1403,7 @@ public class ResolveScenarioTracker {
             }
 
             if (status.toRemove()) {
-                campaign.removePerson(pid, false);
+                campaign.removePerson(person, false);
             }
         }
 
@@ -1436,7 +1427,7 @@ public class ResolveScenarioTracker {
                 if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
                         && isAtBContract) {
                     // Are they actually a defector?
-                    if (Compute.d6(2) >= (10 + ((AtBContract) mission).getEnemySkill() - getCampaign().getUnitRatingAsInteger())) {
+                    if (Compute.d6(2) >= (8 + ((AtBContract) mission).getEnemySkill().ordinal() - getCampaign().getUnitRatingAsInteger())) {
                         prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
                     }
                 }
@@ -1449,7 +1440,7 @@ public class ResolveScenarioTracker {
             } else {
                 continue;
             }
-            person.awardXP(status.getXP());
+            person.awardXP(campaign, status.getXP());
             if (status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
@@ -1466,8 +1457,8 @@ public class ResolveScenarioTracker {
         }
 
         if (prisonerRansoms.isGreaterThan(Money.zero())) {
-            getCampaign().getFinances().credit(prisonerRansoms, Transaction.C_RANSOM,
-                    "Prisoner ransoms for " + getScenario().getName(), getCampaign().getLocalDate());
+            getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getLocalDate(),
+                    prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
             getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
                     + " has been credited to your account for prisoner ransoms following "
                     + getScenario().getName() + ".");
@@ -1491,8 +1482,9 @@ public class ResolveScenarioTracker {
                 //missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
-                    campaign.getFinances().credit(value, Transaction.C_BLC,
-                            "Battle loss compensation for " + unit.getName(), campaign.getLocalDate());
+                    campaign.getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
+                            getCampaign().getLocalDate(), value,
+                            "Battle loss compensation for " + unit.getName());
                     campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for "
                             + unit.getName() + " has been credited to your account.");
                 }
@@ -1535,9 +1527,9 @@ public class ResolveScenarioTracker {
                 blcValue = blcValue.plus(repairBLC);
                 if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
-                    campaign.getFinances().credit(finalValue, Transaction.C_BLC,
-                            blcString.substring(0, 1).toUpperCase() + blcString.substring(1),
-                            campaign.getLocalDate());
+                    getCampaign().getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
+                            getCampaign().getLocalDate(), finalValue,
+                            blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
                     campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
                 }
             }
@@ -1565,8 +1557,8 @@ public class ResolveScenarioTracker {
             }
 
             if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances().credit(unitRansoms, Transaction.C_SALVAGE,
-                        "Unit ransoms for " + getScenario().getName(), getCampaign().getLocalDate());
+                getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
+                        unitRansoms, "Unit ransoms for " + getScenario().getName());
                 getCampaign().addReport(unitRansoms.toAmountAndNameString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
@@ -1583,8 +1575,8 @@ public class ResolveScenarioTracker {
             }
             if (((Contract) mission).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "Salvage exchange for "
-                        + scenario.getName(),  campaign.getLocalDate());
+                campaign.getFinances().credit(TransactionType.SALVAGE_EXCHANGE, getCampaign().getLocalDate(),
+                        value, "Salvage exchange for " + scenario.getName());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract) mission).addSalvageByEmployer(value);
@@ -1918,7 +1910,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
         }

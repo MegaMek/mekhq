@@ -18,18 +18,8 @@
  */
 package mekhq.module.atb;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
@@ -38,7 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -46,7 +36,10 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitGeneratorParameters;
+
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -70,8 +63,8 @@ public class AtBEventProcessor {
         // TODO: move code from Campaign here
         if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
                 && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", ev.getCampaign().getLocalDate())) {
+            if (ev.getCampaign().getFinances().debit(TransactionType.RECRUITMENT,
+                    ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
@@ -145,8 +138,8 @@ public class AtBEventProcessor {
     }
 
     private void addRecruitUnit(Person p) {
-        UnitGeneratorParameters params = new UnitGeneratorParameters();
-
+        final Collection<EntityMovementMode> movementModes = new ArrayList<>();
+        final Collection<MissionRole> missionRoles = new ArrayList<>();
         int unitType;
         switch (p.getPrimaryRole()) {
             case MECHWARRIOR:
@@ -168,8 +161,8 @@ public class AtBEventProcessor {
                 unitType = UnitType.INFANTRY;
                 // infantry will have a 1/3 chance of being field guns
                 if (Compute.d6() <= 2) {
-                    params.getMissionRoles().add(MissionRole.FIELD_GUN);
-                    params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    missionRoles.add(MissionRole.FIELD_GUN);
                 }
                 break;
             default:
@@ -192,17 +185,10 @@ public class AtBEventProcessor {
                 weight = EntityWeightClass.WEIGHT_HEAVY;
             }
         }
+        final String faction = getRecruitFaction(campaign);
+        MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
+                IUnitRating.DRAGOON_F, movementModes, missionRoles);
         Entity en;
-
-        String faction = getRecruitFaction(campaign);
-
-        params.setFaction(faction);
-        params.setUnitType(unitType);
-        params.setWeightClass(weight);
-        params.setYear(campaign.getGameYear());
-        params.setQuality(IUnitRating.DRAGOON_F);
-
-        MechSummary ms = campaign.getUnitGenerator().generate(params);
         if (null != ms) {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");

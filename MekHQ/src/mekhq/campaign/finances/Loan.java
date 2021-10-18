@@ -1,8 +1,8 @@
 /*
  * Loan.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,388 +21,258 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.Compute;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.campaign.finances.enums.FinancialTerm;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
-import java.time.DayOfWeek;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Compute;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 /**
+ * TODO : Update loan baseline based on latest Campaign Operations Rules
+ * TODO : Move MADE_UP_INSTITUTIONS to data
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Loan implements MekHqXmlSerializable {
-    // If you add more Canon institutions, please add them at the beginning and change the next line.
-    // The first four of these are Canon, the rest are made up.
-    private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
-        "Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "ComStar Reserve", "Federated Employees Union",
-        "Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
-        "Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
-        "Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
-        "Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
-        "Andurien First National Bank");
+public class Loan implements Serializable {
+    //region Variable Declarations
+    private static final long serialVersionUID = -1120267466243022054L;
 
     private String institution;
-    private String refNumber;
+    private String referenceNumber;
     private Money principal;
     private int rate;
-    private LocalDate nextPayment;
     private int years;
-    private int schedule;
+    private FinancialTerm financialTerm;
     private int collateral;
-    private int nPayments;
-    private Money payAmount;
-    private Money collateralValue;
+    private int remainingPayments;
+    private Money paymentAmount;
+    private LocalDate nextPayment;
     private boolean overdue;
 
+    // TODO : I shouldn't be inline but instead part of a data file
+    private static final List<String> MADE_UP_INSTITUTIONS = Arrays.asList(
+            "Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
+            "Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */,
+            "ComStar Reserve", "Federated Employees Union", "Bank of Oriente",
+            "New Avalon Interstellar Bank", "Federated Boeing Credit Union",
+            "First Commonwealth Bank", "Donegal Bank and Trust", "Defiance Industries Credit Union",
+            "Superior Bank of Sarna", "St. Ives Bank and Trust", "Luthien Bank of the Dragon",
+            "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
+            "Concordat Bank and Trust", "Outworlds Alliance National Bank",
+            "Hegemony Bank and Trust", "Andurien First National Bank");
+    //endregion Variable Declarations
+
+    //region Constructors
     public Loan() {
         //don't do anything, this is for loading
     }
 
-    public Loan(Money p, int r, int c, int y, int s, LocalDate today) {
-        this(p, r, c, y, s, today, Utilities.getRandomItem(madeUpInstitutions), randomRefNumber());
+    public Loan(final Money principal, final int rate, final int years,
+                final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
+        this(Utilities.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
+                years, financialTerm, collateral, today);
     }
 
-    public Loan(Money p, int r, int c, int y, int s, LocalDate today, String i, String ref) {
-        this.principal = p;
-        this.rate = r;
-        this.collateral = c;
-        this.years = y;
-        this.schedule = s;
-        nextPayment = today;
-        setFirstPaymentDate();
+    public Loan(final String institution, final String referenceNumber, final Money principal,
+                final int rate, final int years, final FinancialTerm financialTerm,
+                final int collateral, final LocalDate today) {
+        setInstitution(institution);
+        setReferenceNumber(referenceNumber);
+        setPrincipal(principal);
+        setRate(rate);
+        setYears(years);
+        setFinancialTerm(financialTerm);
+        setCollateral(collateral);
+        setNextPayment(getFinancialTerm().nextValidDate(today));
+        setOverdue(false);
+
         calculateAmortization();
-        institution = i;
-        refNumber = ref;
-        overdue = false;
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public String getInstitution() {
+        return institution;
     }
 
-    public void setFirstPaymentDate() {
-        //We are going to assume a standard grace period, so you have to go
-        //through the first full time length (not partial) before your first
-        //payment
-
-        // First, we need to increase the number of days by one
-        nextPayment = nextPayment.plusDays(1);
-
-        // Finally, we use that and the schedule type to determine the length including the grace period
-        switch (schedule) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                nextPayment = nextPayment.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).plusWeeks(2);
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                if (nextPayment.getDayOfMonth() != 1) {
-                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextMonth());
-                }
-                nextPayment = nextPayment.plusMonths(1);
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                if (nextPayment.getDayOfMonth() != 1) {
-                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextMonth());
-                }
-                nextPayment = nextPayment.plusMonths(3);
-                break;
-            case Finances.SCHEDULE_YEARLY:
-                if (nextPayment.getDayOfYear() != 1) {
-                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextYear());
-                }
-                nextPayment = nextPayment.plusYears(1);
-                break;
-        }
+    public void setInstitution(final String institution) {
+        this.institution = institution;
     }
 
-    public void calculateAmortization() {
-        //figure out actual rate from APR
-        int denom = 1;
-        switch (schedule) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                denom = 26;
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                denom = 12;
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                denom = 4;
-                break;
-            case Finances.SCHEDULE_YEARLY:
-                denom = 1;
-                break;
-        }
-        double r = ((double) rate / 100.0) / denom;
-        nPayments = years * denom;
-        payAmount = principal.multipliedBy(r * Math.pow(1 + r, nPayments)).dividedBy(Math.pow(1 + r, nPayments) - 1);
-        collateralValue = principal.multipliedBy(collateral).dividedBy(100);
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(final String referenceNumber) {
+        this.referenceNumber = referenceNumber;
     }
 
     public Money getPrincipal() {
         return principal;
     }
 
-    public void setPrincipal(Money principal) {
+    public void setPrincipal(final Money principal) {
         this.principal = principal;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(String s) {
-        this.institution = s;
-    }
-
-    public String getRefNumber() {
-        return refNumber;
-    }
-
-    public void setRefNumber(String s) {
-        this.refNumber = s;
-    }
-
-    public boolean isOverdue() {
-        return overdue;
-    }
-
-    public void setOverdue(boolean b) {
-        overdue = b;
     }
 
     public int getRate() {
         return rate;
     }
 
-    public void setRate(int rate) {
+    public void setRate(final int rate) {
         this.rate = rate;
-    }
-
-    public int getInterestRate() {
-        return rate;
-    }
-
-    public boolean checkLoanPayment(LocalDate today) {
-        return (today.equals(nextPayment) || (today.isAfter(nextPayment)) && (nPayments > 0));
-    }
-
-    public Money getPaymentAmount() {
-        return payAmount;
-    }
-
-    public Money getRemainingValue() {
-        return payAmount.multipliedBy(nPayments);
-    }
-
-    public void paidLoan() {
-        switch (schedule) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                setNextPayment(getNextPayment().plusWeeks(2));
-                break;
-            case Finances.SCHEDULE_MONTHLY:
-                setNextPayment(getNextPayment().plusMonths(1));
-                break;
-            case Finances.SCHEDULE_QUARTERLY:
-                setNextPayment(getNextPayment().plusMonths(3));
-                break;
-            case Finances.SCHEDULE_YEARLY:
-                setNextPayment(getNextPayment().plusYears(1));
-                break;
-        }
-        nPayments--;
-        overdue = false;
-    }
-
-    public int getRemainingPayments() {
-        return nPayments;
-    }
-
-    public String getDescription() {
-        return institution + " " + refNumber;
-    }
-
-    public LocalDate getNextPayment() {
-        return nextPayment;
-    }
-
-    public void setNextPayment(LocalDate nextPayment) {
-        this.nextPayment = nextPayment;
-    }
-
-    public int getPaymentSchedule() {
-        return schedule;
-    }
-
-    public int getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(int schedule) {
-        this.schedule = schedule;
-    }
-
-    public int getCollateralPercent() {
-        return collateral;
-    }
-
-    public int getCollateral() {
-        return collateral;
-    }
-
-    public void setCollateral(int collateral) {
-        this.collateral = collateral;
-    }
-
-    public int getnPayments() {
-        return nPayments;
-    }
-
-    public void setnPayments(int nPayments) {
-        this.nPayments = nPayments;
-    }
-
-    public Money getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(Money payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public Money getCollateralAmount() {
-        return collateralValue;
-    }
-
-    public Money getCollateralValue() {
-        return collateralValue;
-    }
-
-    public void setCollateralValue(Money collateralValue) {
-        this.collateralValue = collateralValue;
-    }
-
-    public static List<String> getMadeupInstitutions() {
-        return madeUpInstitutions;
     }
 
     public int getYears() {
         return years;
     }
 
-    public void setYears(int years) {
+    public void setYears(final int years) {
         this.years = years;
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "loan");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "institution", institution);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "refNumber", refNumber);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "principal", principal.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rate", rate);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "years", years);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "schedule", schedule);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "collateral", collateral);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nPayments", nPayments);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payAmount", payAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "collateralValue", collateralValue.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overdue", overdue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nextPayment",
-                MekHqXmlUtil.saveFormattedDate(getNextPayment()));
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "loan");
+    public FinancialTerm getFinancialTerm() {
+        return financialTerm;
     }
 
-    public static Loan generateInstanceFromXML(Node wn) {
-        Loan retVal = new Loan();
-
-        NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("institution")) {
-                retVal.institution = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) {
-                retVal.refNumber = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
-                retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
-                retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
-                retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
-                retVal.rate = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
-                retVal.years = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
-                retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collateral")) {
-                retVal.collateral = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) {
-                retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                retVal.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
-                retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-        }
-        return retVal;
+    public void setFinancialTerm(final FinancialTerm financialTerm) {
+        this.financialTerm = financialTerm;
     }
 
-    public static Loan getBaseLoanFor(int rating, LocalDate date) {
-        //we are going to treat the score from StellarOps the same as dragoons score
-        //TODO: pirates and government forces
+    public int getCollateral() {
+        return collateral;
+    }
+
+    public void setCollateral(final int collateral) {
+        this.collateral = collateral;
+    }
+
+    public int getRemainingPayments() {
+        return remainingPayments;
+    }
+
+    public void setRemainingPayments(final int remainingPayments) {
+        this.remainingPayments = remainingPayments;
+    }
+
+    public Money getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public void setPaymentAmount(final Money paymentAmount) {
+        this.paymentAmount = paymentAmount;
+    }
+
+    public LocalDate getNextPayment() {
+        return nextPayment;
+    }
+
+    public void setNextPayment(final LocalDate nextPayment) {
+        this.nextPayment = nextPayment;
+    }
+
+    public boolean isOverdue() {
+        return overdue;
+    }
+
+    public void setOverdue(final boolean overdue) {
+        this.overdue = overdue;
+    }
+    //endregion Getters/Setters
+
+    //region Determination Methods
+    public Money determineCollateralAmount() {
+        return getPrincipal().multipliedBy(getCollateral()).dividedBy(100);
+    }
+
+    public Money determineRemainingValue() {
+        return getPaymentAmount().multipliedBy(getRemainingPayments());
+    }
+    //endregion Determination Methods
+
+    public void calculateAmortization() {
+        // figure out actual rate from APR
+        final double paymentsPerYear = getFinancialTerm().determineYearlyDenominator();
+        final int numberOfPayments = (int) Math.ceil(getYears() * paymentsPerYear);
+        final double periodicRate = (getRate() / 100.0) / paymentsPerYear;
+
+        setRemainingPayments(numberOfPayments);
+        setPaymentAmount(getPrincipal()
+                .multipliedBy(periodicRate * Math.pow(1 + periodicRate, numberOfPayments))
+                .dividedBy(Math.pow(1 + periodicRate, numberOfPayments) - 1));
+    }
+
+    public void paidLoan() {
+        setNextPayment(getFinancialTerm().nextValidDate(getNextPayment()));
+        setRemainingPayments(getRemainingPayments() - 1);
+        setOverdue(false);
+    }
+
+    public boolean checkLoanPayment(final LocalDate today) {
+        return today.equals(getNextPayment())
+                || (today.isAfter(getNextPayment())) && (getRemainingPayments() > 0);
+    }
+
+    public static Loan getBaseLoan(final int rating, final LocalDate date) {
+        // we are going to treat the score from StellarOps the same as dragoons score
+        // TODO: pirates and government forces
         if (rating <= 0) {
-            return new Loan(Money.of(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, date);
+            return new Loan(Money.of(10000000), 35, 1, FinancialTerm.MONTHLY, 80, date);
         } else if (rating < 5) {
-            return new Loan(Money.of(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, date);
+            return new Loan(Money.of(10000000), 20, 1, FinancialTerm.MONTHLY, 60, date);
         } else if (rating < 10) {
-            return new Loan(Money.of(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, date);
+            return new Loan(Money.of(10000000), 15, 2, FinancialTerm.MONTHLY, 40, date);
         } else if (rating < 14) {
-            return new Loan(Money.of(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, date);
+            return new Loan(Money.of(10000000), 10, 3, FinancialTerm.MONTHLY, 25, date);
         } else {
-            return new Loan(Money.of(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, date);
+            return new Loan(Money.of(10000000), 7, 5, FinancialTerm.MONTHLY, 15, date);
         }
     }
 
-    /* These two bracket methods below return a 3=length integer array
+    /*
+     * These two bracket methods below return a 3=length integer array
      * of (minimum, starting, maximum). They are based on the StellarOps beta,
      * but since that document doesn't have minimum collateral amounts, we
      * just make up some numbers there (note that the minimum collateral also
      * determines the maximum interest)
      */
-    public static int[] getInterestBracket(int rating) {
+    public static int[] getInterestBracket(final int rating) {
         if (rating <= 0) {
-            return new int[]{15,35,75};
+            return new int[]{15, 35, 75};
         } else if (rating < 5) {
-            return new int[]{10,20,60};
+            return new int[]{10, 20, 60};
         } else if (rating < 10) {
-            return new int[]{5,15,35};
+            return new int[]{5, 15, 35};
         } else if (rating < 14) {
-            return new int[]{5,10,25};
+            return new int[]{5, 10, 25};
         } else {
-            return new int[]{4,7,17};
+            return new int[]{4, 7, 17};
         }
     }
 
-    public static int[] getCollateralBracket(int rating) {
+    public static int[] getCollateralBracket(final int rating) {
         if (rating <= 0) {
-            return new int[]{60,80,380};
+            return new int[]{60, 80, 380};
         } else if (rating < 5) {
-            return new int[]{40,60,210};
+            return new int[]{40, 60, 210};
         } else if (rating < 10) {
-            return new int[]{20,40,140};
+            return new int[]{20, 40, 140};
         } else if (rating < 14) {
-            return new int[]{10,25,75};
+            return new int[]{10, 25, 75};
         } else {
-            return new int[]{5,15,35};
+            return new int[]{5, 15, 35};
         }
     }
 
-    public static int getMaxYears(int rating) {
+    public static int getMaxYears(final int rating) {
         if (rating < 5) {
             return 1;
         } else if (rating < 9) {
@@ -414,91 +284,149 @@ public class Loan implements MekHqXmlSerializable {
         }
     }
 
-    public static int getCollateralIncrement(boolean interestPositive, int rating) {
+    public static int getCollateralIncrement(final int rating, final boolean interestPositive) {
         if (rating < 5) {
-            if (interestPositive) {
-                return 2;
-            } else {
-                return 15;
-            }
+            return interestPositive ? 2 : 15;
         } else {
-            if (interestPositive) {
-                return 1;
-            } else {
-                return 10;
-            }
+            return interestPositive ? 1 : 10;
         }
     }
 
-    public static int recalculateCollateralFromInterest(int interest, int rating) {
-        int interestDiff = interest - getInterestBracket(rating)[1];
+    public static int recalculateCollateralFromInterest(final int rating, final int interest) {
+        final int interestDiff = interest - getInterestBracket(rating)[1];
         if (interestDiff < 0) {
-            return getCollateralBracket(rating)[1] + (Math.abs(interestDiff) * getCollateralIncrement(false, rating));
+            return getCollateralBracket(rating)[1] + (Math.abs(interestDiff) * getCollateralIncrement(rating, false));
         } else {
-            return getCollateralBracket(rating)[1] - (interestDiff/getCollateralIncrement(true, rating));
+            return getCollateralBracket(rating)[1] - (interestDiff / getCollateralIncrement(rating, true));
         }
     }
 
-    public static int recalculateInterestFromCollateral(int collateral, int rating) {
-        int collateralDiff = collateral - getCollateralBracket(rating)[1];
+    public static int recalculateInterestFromCollateral(final int rating, final int collateral) {
+        final int collateralDiff = collateral - getCollateralBracket(rating)[1];
         if (collateralDiff < 0) {
-            return getInterestBracket(rating)[1] + (getCollateralIncrement(true, rating) * Math.abs(collateralDiff));
+            return getInterestBracket(rating)[1] + (getCollateralIncrement(rating, true) * Math.abs(collateralDiff));
         } else {
-            return getInterestBracket(rating)[1] - (collateralDiff/getCollateralIncrement(false, rating));
+            return getInterestBracket(rating)[1] - (collateralDiff / getCollateralIncrement(rating, false));
         }
 
     }
 
-    public static String randomRefNumber() {
+    public static String randomReferenceNumber() {
         int length = Compute.randomInt(5) + 6;
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         int nSinceSlash = 2;
         while (length > 0) {
             if (Compute.randomInt(9) < 3) {
-                buffer.append((char) (Compute.randomInt(26) + 'A'));
+                stringBuilder.append((char) (Compute.randomInt(26) + 'A'));
             } else {
-                buffer.append(Compute.randomInt(9));
+                stringBuilder.append(Compute.randomInt(9));
             }
             length--;
             nSinceSlash++;
             //Check for a random slash
             if ((length > 0) && (Compute.randomInt(9) < 3) && (nSinceSlash >= 3)) {
-                buffer.append("-");
+                stringBuilder.append("-");
                 nSinceSlash = 0;
             }
         }
-        return buffer.toString();
+        return stringBuilder.toString();
+    }
+
+    //region File I/O
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loan");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rate", getRate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "years", getYears());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loan");
+    }
+
+    public static Loan generateInstanceFromXML(final Node wn) {
+        final Loan loan = new Loan();
+        final NodeList nl = wn.getChildNodes();
+        for (int x = 0; x < nl.getLength(); x++) {
+            final Node wn2 = nl.item(x);
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("institution")) {
+                    loan.setInstitution(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("referenceNumber")) {
+                    loan.setReferenceNumber(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
+                    loan.setPrincipal(Money.fromXmlString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
+                    loan.setRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
+                    loan.setYears(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("financialTerm")) {
+                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("collateral")) {
+                    loan.setCollateral(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("remainingPayments")) {
+                    loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("paymentAmount")) {
+                    loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
+                    loan.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
+                    loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) { // Legacy - 0.49.3 Removal
+                    loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) { // Legacy - 0.49.3 Removal
+                    loan.setReferenceNumber(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
+                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) { // Legacy - 0.49.3 Removal
+                    loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
+        return loan;
+    }
+    //endregion File I/O
+
+    @Override
+    public String toString() {
+        return getInstitution() + " " + getReferenceNumber();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Loan)) {
+    public boolean equals(final Object other) {
+        if (other == null) {
+            return false;
+        } else if (this == other) {
+            return true;
+        } else if (other instanceof Loan) {
+            final Loan loan = (Loan) other;
+            return getInstitution().equals(loan.getInstitution())
+                    && getReferenceNumber().equals(loan.getReferenceNumber())
+                    && getPrincipal().equals(loan.getPrincipal())
+                    && (getRate() == loan.getRate())
+                    && (getYears() == loan.getYears())
+                    && (getFinancialTerm() == loan.getFinancialTerm())
+                    && (getCollateral() == loan.getCollateral())
+                    && (getRemainingPayments() == loan.getRemainingPayments())
+                    && getPaymentAmount().equals(loan.getPaymentAmount())
+                    && getNextPayment().isEqual(loan.getNextPayment())
+                    && (isOverdue() == loan.isOverdue());
+        } else {
             return false;
         }
-        Loan loan = (Loan) obj;
-        return this.getDescription().equals(loan.getDescription())
-                && this.getInterestRate() == loan.getInterestRate()
-                && this.getCollateralAmount().equals(loan.getCollateralAmount())
-                && this.getCollateralPercent() == loan.getCollateralPercent()
-                && this.getNextPayment().equals(loan.getNextPayment())
-                && this.getYears() == loan.getYears()
-                && this.getPrincipal().equals(loan.getPrincipal())
-                && this.getPaymentSchedule() == loan.getPaymentSchedule()
-                && this.getRemainingPayments() == loan.getRemainingPayments()
-                && this.getRemainingValue().equals(loan.getRemainingValue());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getDescription(),
-                getInterestRate(),
-                getCollateralAmount(),
-                getCollateralPercent(),
-                getNextPayment(),
-                getYears(),
-                getPrincipal(),
-                getPaymentSchedule(),
-                getRemainingPayments(),
-                getRemainingValue());
+        return Objects.hash(getInstitution(), getReferenceNumber(), getPrincipal(), getRate(),
+                getYears(), getFinancialTerm(), getCollateral(), getRemainingPayments(),
+                getPaymentAmount(), getNextPayment(), isOverdue());
     }
 }

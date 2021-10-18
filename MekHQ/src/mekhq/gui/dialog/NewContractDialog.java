@@ -20,33 +20,28 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemListener;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -684,15 +679,15 @@ public class NewContractDialog extends JDialog {
         contract.setType(txtType.getText());
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
-        campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
-                "Advance monies for " + contract.getName(), campaign.getLocalDate());
+        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+                contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
 
         campaign.addMission(contract);
 
         // Negotiator XP
         Person negotiator = (Person) cboNegotiator.getSelectedItem();
         if ((negotiator != null) && (campaign.getCampaignOptions().getContractNegotiationXP() > 0)) {
-            negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
+            negotiator.awardXP(campaign, campaign.getCampaignOptions().getContractNegotiationXP());
         }
 
         this.setVisible(false);

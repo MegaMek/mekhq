@@ -73,13 +73,13 @@ import mekhq.MekHQ;
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
  * </pre>
  */
-@XmlRootElement(name="extraData")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "extraData")
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class ExtraData {
     private static final Marshaller marshaller;
     private static final Unmarshaller unmarshaller;
     static {
-        Marshaller m = null;;
+        Marshaller m = null;
         Unmarshaller u = null;
         try {
             JAXBContext context = JAXBContext.newInstance(ExtraData.class);
@@ -88,7 +88,7 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
         } catch(Exception ex) {
-            MekHQ.getLogger().error(ExtraData.class, "<init>", ex);
+            MekHQ.getLogger().error(ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -102,20 +102,41 @@ public class ExtraData {
         });
         ADAPTERS.put(Integer.class, new StringAdapter<Integer>() {
             @Override
-            public Integer adapt(String str) { return Integer.valueOf(str); }
+            public Integer adapt(String str) {
+                try {
+                    return Integer.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return 0;
+                }
+            }
         });
         ADAPTERS.put(Double.class, new StringAdapter<Double>() {
             @Override
-            public Double adapt(String str) { return Double.valueOf(str); }
+            public Double adapt(String str) {
+                try {
+                    return Double.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return 0.0;
+                }
+            }
         });
         ADAPTERS.put(Boolean.class, new StringAdapter<Boolean>() {
             @Override
-            public Boolean adapt(String str) { return Boolean.valueOf(str); }
+            public Boolean adapt(String str) {
+                try {
+                    return Boolean.valueOf(str);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                    return false;
+                }
+            }
         });
     }
 
-    @XmlElement(name="map")
-    @XmlJavaTypeAdapter(JAXBValueAdapter.class)
+    @XmlElement(name = "map")
+    @XmlJavaTypeAdapter(value = JAXBValueAdapter.class)
     private Map<Class<?>, Map<String, Object>> values = new HashMap<>();
 
     private Map<String, Object> getOrCreateClassMap(Class<?> cls) {
@@ -128,7 +149,7 @@ public class ExtraData {
      * @return The previous value if there was one.
      */
     public <T> T set(Key<T> key, T value) {
-        if(null == key) {
+        if (null == key) {
             return null;
         }
         Map<String, Object> map = getOrCreateClassMap(key.type);
@@ -141,11 +162,11 @@ public class ExtraData {
      * @return The previous value if there was one.
      */
     public <T> T setString(Key<T> key, String value) {
-        if(null == key) {
+        if (null == key) {
             return null;
         }
         // Prevent unneeded loops and lookups for straight strings
-        if(key.type == String.class) {
+        if (key.type == String.class) {
             Map<String, Object> map = getOrCreateClassMap(key.type);
             return key.type.cast(map.put(key.name, value));
         }
@@ -156,7 +177,7 @@ public class ExtraData {
      * @return the value associated with the given key, or <code>null</code> if there isn't one
      */
     public <T> T get(Key<T> key) {
-        if(!values.containsKey(key.type)) {
+        if (!values.containsKey(key.type)) {
             return null;
         }
         return key.type.cast(values.get(key.type).get(key.name));
@@ -187,35 +208,30 @@ public class ExtraData {
     public void writeToXml(Writer writer) {
         try {
             marshaller.marshal(this, writer);
-        } catch(JAXBException e) {
-            MekHQ.getLogger().error(getClass(), "writeToXml(Writer)", e);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 
     public void writeToXml(OutputStream os) {
         try {
             marshaller.marshal(this, os);
-        } catch(JAXBException e) {
-            MekHQ.getLogger().error(getClass(), "writeToXml(OutputStream)", e);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 
     public static ExtraData createFromXml(Node wn) {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
-        } catch(JAXBException e) {
-            MekHQ.getLogger().error(ExtraData.class, "createFromXml(Node)", e);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(e);
             return null;
         }
     }
 
     private static Map<String, Object> getOrCreateClassMap(Map<Class<?>, Map<String, Object>> baseMap, Class<?> cls) {
-        Map<String, Object> map = baseMap.get(cls);
-        if(null == map) {
-            map = new HashMap<>();
-            baseMap.put(cls, map);
-        }
-        return map;
+        return baseMap.computeIfAbsent(cls, k -> new HashMap<>());
     }
 
     // XML marshalling/unmarshalling support classes and methods
@@ -225,27 +241,27 @@ public class ExtraData {
      * Already existing adapters are not overwritten.
      */
     public static <T> void registerAdapter(Class<T> cls, StringAdapter<T> adapter) {
-        if((null != cls) && (null != adapter) && !ADAPTERS.containsKey(cls)) {
+        if ((null != cls) && (null != adapter) && !ADAPTERS.containsKey(cls)) {
             ADAPTERS.put(cls, adapter);
         }
     }
 
     private static <T> T adapt(Class<T> cls, String val) {
-        if(!ADAPTERS.containsKey(cls)) {
+        if (!ADAPTERS.containsKey(cls)) {
             return null;
         }
         try {
             return cls.cast(ADAPTERS.get(cls).adapt(val));
-        } catch(ClassCastException cce) {
+        } catch (ClassCastException ignored) {
             return null;
         }
     }
 
     private static <T> String toString(T val) {
-        if(null == val) {
+        if (null == val) {
             return null;
         }
-        if(!ADAPTERS.containsKey(val.getClass())) {
+        if (!ADAPTERS.containsKey(val.getClass())) {
             return val.toString();
         }
         @SuppressWarnings("unchecked")
@@ -375,10 +391,10 @@ public class ExtraData {
 
         @Override
         public boolean equals(Object object) {
-            if(this == object) {
+            if (this == object) {
                 return true;
             }
-            if((null == object) || (getClass() != object.getClass())) {
+            if ((null == object) || (getClass() != object.getClass())) {
                 return false;
             }
             @SuppressWarnings("unchecked")

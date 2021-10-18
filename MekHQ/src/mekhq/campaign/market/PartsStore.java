@@ -512,9 +512,9 @@ public class PartsStore implements Serializable {
     }
 
     private void stockMekLocations(Campaign c) {
-        for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
-            for(int ton = 20; ton <= 100; ton=ton+5) {
-                for(int type = 0; type < EquipmentType.structureNames.length; type++) {
+        for (int loc = Mech.LOC_HEAD; loc <= Mech.LOC_CLEG; loc++) {
+            for (int ton = 20; ton <= 100; ton = ton + 5) {
+                for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
                     // The only structure that differs between IS and Clan versions is Endo-Steel
                     if (EquipmentType.T_STRUCTURE_ENDO_STEEL == type) {

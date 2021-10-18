@@ -49,6 +49,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
+    public static final String TECH_MAINTAINER = "tech_maintainer";
 
     @Override
     public void initialize() {
@@ -70,18 +71,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find L3Advantage group");
+            MekHQ.getLogger().warning("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find edge group");
+            MekHQ.getLogger().warning("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find augmentation (MD) group");
+            MekHQ.getLogger().warning("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 
@@ -92,6 +93,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_INTERNAL_SPECIALIST, false);
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
+        addOption(l3a, TECH_MAINTAINER, false);
 
         addOption(edge, EDGE_MEDICAL, false);
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);

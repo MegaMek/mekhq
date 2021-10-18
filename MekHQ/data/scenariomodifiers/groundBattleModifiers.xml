@@ -29,6 +29,9 @@
 			LocalGarrisonTurrets.xml
 		</modifier>
 		<modifier>
+			LocalGarrisonBoats.xml
+		</modifier>
+		<modifier>
 			EnemyTurrets.xml
 		</modifier>
 		<modifier>
@@ -42,6 +45,9 @@
 		</modifier>
 		<modifier>
 			GoodEquipment.xml
+		</modifier>
+		<modifier>
+			HostileBVBudgetIncrease.xml
 		</modifier>
 		<!--modifier> 
 			Need ability to allow player to specifically deploy dropships

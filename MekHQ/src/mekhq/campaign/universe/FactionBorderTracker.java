@@ -468,7 +468,7 @@ public class FactionBorderTracker {
             }
             lastUpdate = now;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "recalculate()", ex.getMessage());
+            MekHQ.getLogger().error(ex);
         } finally {
             invalid = false;
             notify();

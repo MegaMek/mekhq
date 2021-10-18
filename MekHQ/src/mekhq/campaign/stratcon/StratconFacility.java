@@ -57,6 +57,10 @@ public class StratconFacility implements Cloneable {
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private String capturedDefinition;
+    private boolean revealTrack;
+    private int scenarioOddsModifier;
+    private int weeklySPModifier;
+    private boolean preventAerospace;
     //TODO: post-MVP
     //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
@@ -77,7 +81,25 @@ public class StratconFacility implements Cloneable {
         clone.sharedModifiers = new ArrayList<>(sharedModifiers);
         clone.localModifiers = new ArrayList<>(localModifiers);
         clone.setCapturedDefinition(capturedDefinition); 
+        clone.revealTrack = revealTrack;
+        clone.scenarioOddsModifier = scenarioOddsModifier;
+        clone.weeklySPModifier = weeklySPModifier;
+        clone.preventAerospace = preventAerospace;
         return clone;
+    }
+    
+    /**
+     * Copies data from the source facility to here. Does not copy transient or cosmetic data.
+     */
+    public void copyRulesDataFrom(StratconFacility facility) {
+        setCapturedDefinition(facility.getCapturedDefinition());
+        setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
+        setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
+        setOwner(facility.getOwner());
+        setRevealTrack(facility.getRevealTrack());
+        setScenarioOddsModifier(facility.getScenarioOddsModifier());
+        setWeeklySPModifier(facility.getWeeklySPModifier());
+        setPreventAerospace(facility.preventAerospace());
     }
     
     public ForceAlignment getOwner() {
@@ -186,12 +208,36 @@ public class StratconFacility implements Cloneable {
         this.capturedDefinition = capturedDefinition;
     }
 
+    public boolean getRevealTrack() {
+        return revealTrack;
+    }
+
+    public void setRevealTrack(boolean revealTrack) {
+        this.revealTrack = revealTrack;
+    }
+
+    public int getScenarioOddsModifier() {
+        return scenarioOddsModifier;
+    }
+
+    public void setScenarioOddsModifier(int scenarioOddsModifier) {
+        this.scenarioOddsModifier = scenarioOddsModifier;
+    }
+
+    public int getWeeklySPModifier() {
+        return weeklySPModifier;
+    }
+
+    public void setWeeklySPModifier(int weeklySPModifier) {
+        this.weeklySPModifier = weeklySPModifier;
+    }
+
     /**
      * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility deserialize(String fileName) {
-        StratconFacility resultingManifest = null;
+        StratconFacility resultingFacility = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
             MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
@@ -203,13 +249,21 @@ public class StratconFacility implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
-                JAXBElement<StratconFacility> manifestElement = um.unmarshal(inputSource, StratconFacility.class);
-                resultingManifest = manifestElement.getValue();
+                JAXBElement<StratconFacility> facilityElement = um.unmarshal(inputSource, StratconFacility.class);
+                resultingFacility = facilityElement.getValue();
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
         }
 
-        return resultingManifest;
+        return resultingFacility;
+    }
+
+    public boolean preventAerospace() {
+        return preventAerospace;
+    }
+
+    public void setPreventAerospace(boolean preventAerospace) {
+        this.preventAerospace = preventAerospace;
     }
 }

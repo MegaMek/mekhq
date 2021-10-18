@@ -24,11 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
@@ -38,6 +34,7 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.IAero;
 import megamek.common.MapSettings;
 import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
@@ -45,7 +42,6 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
@@ -59,7 +55,7 @@ import mekhq.campaign.unit.Unit;
  */
 public class AtBGameThread extends GameThread {
 
-    AtBScenario scenario;
+    private final AtBScenario scenario;
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario) {
@@ -69,7 +65,7 @@ public class AtBGameThread extends GameThread {
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario, boolean started) {
         super(name, password, c, app, units, started);
-        this.scenario = scenario;
+        this.scenario = Objects.requireNonNull(scenario);
     }
 
     // String tokens for dialog boxes used for transport loading
@@ -77,6 +73,8 @@ public class AtBGameThread extends GameThread {
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
     private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+
+    public static final int CLIENT_RETRY_COUNT = 1000;
 
 
     @Override
@@ -108,7 +106,7 @@ public class AtBGameThread extends GameThread {
 
             // if game is running, shouldn't do the following, so detect the
             // phase
-            for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            for (int i = 0; (i < CLIENT_RETRY_COUNT) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
                 MekHQ.getLogger().error("Thread in unknown stage");
             }
@@ -126,11 +124,21 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
+                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+                mapSettings.setMapSize(1, 1); 
+                mapSettings.getBoardsSelectedVector().clear();
+                
 
                 // if the scenario is taking place in space, do space settings instead
-                if ((scenario != null) &&
-                        scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                } else if (scenario.isUsingFixedMap()) {
+                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                    
+                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
                     try (InputStream is = new FileInputStream(mapgenFile)) {
@@ -142,12 +150,13 @@ public class AtBGameThread extends GameThread {
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
+                    
+                    // duplicate code, but getting a new instance of map settings resets the size parameters
+                    mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+                    mapSettings.setMapSize(1, 1); 
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 }
-
-                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1,  1);
-                mapSettings.getBoardsSelectedVector().clear();
-                mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
@@ -166,7 +175,6 @@ public class AtBGameThread extends GameThread {
 
                 //minefields
                 client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
-                client.getLocalPlayer().setNbrMFCommand(scenario.getNumPlayerMinefields(Minefield.TYPE_COMMAND_DETONATED));
                 client.getLocalPlayer().setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
                 client.getLocalPlayer().setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
                 client.getLocalPlayer().setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
@@ -237,6 +245,16 @@ public class AtBGameThread extends GameThread {
                         entity.setForceString(force.getFullMMName());
                     }
                     entities.add(entity);
+
+                    // if we've swapped this entity in for a bot-controlled unit, copy the bot controlled unit's
+                    // deployment parameters to this entity.
+                    if ((scenario instanceof AtBDynamicScenario) &&
+                            ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
+                                containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
+                        Entity benchedEntity = ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
+                                get(UUID.fromString(entity.getExternalIdAsString())).entity;
+                        copyDeploymentParameters(benchedEntity, entity);
+                    }
                 }
                 client.sendAddEntity(entities);
 
@@ -319,9 +337,7 @@ public class AtBGameThread extends GameThread {
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
-                    if (scenario != null) {
-                        AtBDynamicScenarioFactory.loadTransports(scenario, botClient);
-                    }
+                    loadTransports(scenario, botClient, bf);
                 }
 
                 // All player and bot units have been added to the lobby
@@ -422,6 +438,70 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+        }
+    }
+
+    /**
+     * Handles loading transported units onto their transports once a megamek scenario has actually started;
+     */
+    private void loadTransports(AtBScenario scenario, Client client, BotForce botForce) {
+        Map<String, Integer> idMap = new HashMap<>();
+
+        // here we have to make sure that the server has loaded all the entities
+        // and sent the back to the client (which is the only way we know the former)
+        // before we attempt to load transports.
+        int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        int retryCount = 0;
+        while ((entityCount != botForce.getEntityList().size()) &&
+                (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
+            try {
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+            } catch (Exception ignored) {
+
+            }
+
+            retryCount++;
+            entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
+        }
+
+        List<Entity> clientEntities = client.getEntitiesVector();
+        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
+        for (Entity entity : clientEntities) {
+            if (entity.getOwnerId() == client.getLocalPlayerNumber()) {
+                idMap.put(entity.getExternalIdAsString(), entity.getId());
+            }
+        }
+
+        for (Entity potentialTransport : clientEntities) {
+            if ((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) &&
+                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                for (String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+
+                    // if the game contains the potential cargo unit
+                    // and the potential transport can actually load it, send the load command to the server
+                    if ((cargo != null) &&
+                            idMap.containsKey(cargo.getExternalIdAsString()) &&
+                            potentialTransport.canLoad(cargo, false)) {
+                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()),
+                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Utility function to copy some deployment parameters between source and destination entities
+     */
+    private void copyDeploymentParameters(Entity source, Entity destination) {
+        destination.setDeployRound(source.getDeployRound());
+        destination.setStartingPos(source.getStartingPos(false));
+        destination.setAltitude(source.getAltitude());
+        destination.setElevation(source.getElevation());
+        
+        if (destination.isAirborne() && (destination.getAltitude() == 0)) {
+            ((IAero) destination).land();
         }
     }
 }

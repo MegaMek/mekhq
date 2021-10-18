@@ -36,7 +36,7 @@ public enum PersonnelFilter {
     ACTIVE("PersonnelFilter.ACTIVE.text", "PersonnelFilter.ACTIVE.toolTipText"),
     COMBAT("PersonnelFilter.COMBAT.text", "PersonnelFilter.COMBAT.toolTipText"),
     SUPPORT("PersonnelFilter.SUPPORT.text", "PersonnelFilter.SUPPORT.toolTipText"),
-    MECHWARRIORS("PersonnelFilter.MECHWARRIORS.text", "PersonnelFilter.MECHWARRIORS.toolTipText"),
+    MECHWARRIORS("PersonnelFilter.MECHWARRIORS.text", "PersonnelFilter.MECHWARRIORS.toolTipText", true, false),
     MECHWARRIOR("PersonnelFilter.MECHWARRIOR.text", "PersonnelFilter.MECHWARRIOR.toolTipText", false, true),
     LAM_PILOT("PersonnelFilter.LAM_PILOT.text", "PersonnelFilter.LAM_PILOT.toolTipText", false, true),
     VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", "PersonnelFilter.VEHICLE_CREWMEMBER.toolTipText", true, false),

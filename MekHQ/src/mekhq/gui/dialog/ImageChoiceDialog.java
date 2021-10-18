@@ -18,40 +18,29 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
+import megamek.common.util.fileUtils.AbstractDirectory;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
+import mekhq.campaign.force.Force;
+import mekhq.gui.enums.LayeredForceIcon;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.WindowConstants;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.icons.AbstractIcon;
-import megamek.common.util.fileUtils.DirectoryItems;
-import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.campaign.force.Force;
-import mekhq.gui.enums.LayeredForceIcon;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
-import megamek.client.ui.preferences.PreferencesNode;
+import java.util.*;
 
 /**
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -66,7 +55,7 @@ public class ImageChoiceDialog extends JDialog {
     /**
      * The categorized image patterns.
      */
-    private DirectoryItems imageItems;
+    private AbstractDirectory imageItems;
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
@@ -89,12 +78,12 @@ public class ImageChoiceDialog extends JDialog {
 
     //region Constructors
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
-                             DirectoryItems items) {
+                             AbstractDirectory items) {
         this(parent, modal, category, filename, null, items, false);
     }
 
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
-                             LinkedHashMap<String, Vector<String>> iconMap, DirectoryItems items,
+                             LinkedHashMap<String, Vector<String>> iconMap, AbstractDirectory items,
                              boolean force) {
         super(parent, modal);
         this.category = category;
@@ -136,15 +125,16 @@ public class ImageChoiceDialog extends JDialog {
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         String match = null;
         categoryModel.addElement(AbstractIcon.ROOT_CATEGORY);
-        Iterator<String> names = (imageItems != null)
-                ? imageItems.getCategoryNames() : Collections.emptyIterator();
-        while (names.hasNext()) {
-            String name = names.next();
-            if (!"".equals(name)) {
-                categoryModel.addElement(name);
-                if (category.equals(name)) {
-                    match = name;
-                }
+        final List<String> names = (imageItems == null) ? new ArrayList<>()
+                : imageItems.getNonEmptyCategoryPaths();
+        for (final String name : names) {
+            if (StringUtil.isNullOrEmpty(name)) {
+                continue;
+            }
+
+            categoryModel.addElement(name);
+            if (category.equals(name)) {
+                match = name;
             }
         }
         categoryModel.setSelectedItem((match != null) ? match : AbstractIcon.ROOT_CATEGORY);
@@ -518,7 +508,7 @@ public class ImageChoiceDialog extends JDialog {
         public class Renderer extends ImagePanel implements TableCellRenderer {
             private static final long serialVersionUID = -6025788865509594987L;
 
-            public Renderer(DirectoryItems images) {
+            public Renderer(AbstractDirectory images) {
                 super(images);
             }
 
@@ -553,10 +543,10 @@ public class ImageChoiceDialog extends JDialog {
 
     public class ImagePanel extends JPanel {
         private static final long serialVersionUID = -3724175393116586310L;
-        private DirectoryItems items;
+        private AbstractDirectory items;
         private JLabel lblImage;
 
-        public ImagePanel(DirectoryItems items) {
+        public ImagePanel(AbstractDirectory items) {
             this.items = items;
             initComponents();
         }

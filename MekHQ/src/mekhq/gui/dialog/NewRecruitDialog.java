@@ -16,7 +16,6 @@
 package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.dialogs.AbstractIconChooserDialog;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -226,7 +225,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void choosePortrait() {
-        AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(hqView.getFrame(), person.getPortrait());
+        final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(hqView.getFrame(), person.getPortrait());
         if (portraitDialog.showDialog().isConfirmed()) {
             person.setPortrait(portraitDialog.getSelectedItem());
             refreshView();

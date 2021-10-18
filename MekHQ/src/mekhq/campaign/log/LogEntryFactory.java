@@ -74,8 +74,6 @@ public class LogEntryFactory {
      * @return log entry
      */
     public LogEntry generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)";
-
         LocalDate date = null;
         String desc = null;
         LogEntryType type = null;
@@ -99,7 +97,7 @@ public class LogEntryFactory {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return null;
         }
 

@@ -19,38 +19,38 @@
 package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.GamePreset;
+import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.panels.CampaignPresetSelectionPanel;
+import mekhq.gui.panes.CampaignPresetPane;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private CampaignPresetSelectionPanel presetSelectionPanel;
+    private CampaignPresetPane presetSelectionPanel;
     //endregion Variable Declarations
 
     //region Constructors
-    protected CampaignPresetSelectionDialog(final JFrame parent) {
+    public CampaignPresetSelectionDialog(final JFrame parent) {
         super(parent, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
         initialize();
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public CampaignPresetSelectionPanel getPresetSelectionPanel() {
+    public CampaignPresetPane getPresetSelectionPanel() {
         return presetSelectionPanel;
     }
 
-    public void setPresetSelectionPanel(final CampaignPresetSelectionPanel presetSelectionPanel) {
+    public void setPresetSelectionPanel(final CampaignPresetPane presetSelectionPanel) {
         this.presetSelectionPanel = presetSelectionPanel;
     }
 
     /**
      * @return the selected preset, or null if the dialog was cancelled or no preset was selected
      */
-    public @Nullable GamePreset getSelectedPreset() {
+    public @Nullable CampaignPreset getSelectedPreset() {
         return getResult().isConfirmed() ? getPresetSelectionPanel().getSelectedPreset() : null;
     }
     //endregion Getters/Setters
@@ -58,7 +58,7 @@ public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setPresetSelectionPanel(new CampaignPresetSelectionPanel());
+        setPresetSelectionPanel(new CampaignPresetPane(getFrame()));
         return getPresetSelectionPanel();
     }
     //endregion Initialization

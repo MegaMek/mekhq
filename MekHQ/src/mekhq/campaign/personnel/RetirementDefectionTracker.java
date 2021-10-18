@@ -20,25 +20,6 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
-
-import mekhq.campaign.finances.FinancialReport;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Profession;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
@@ -48,7 +29,19 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.FinancialReport;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -261,7 +254,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param shareValue	The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign
      */
-    public void rollRetirement(AtBContract contract, HashMap<UUID, TargetRoll> targets, Money shareValue, Campaign campaign) {
+    public void rollRetirement(AtBContract contract, HashMap<UUID, TargetRoll> targets,
+                               Money shareValue, Campaign campaign) {
         if (null != contract && !unresolvedPersonnel.containsKey(contract.getId())) {
             unresolvedPersonnel.put(contract.getId(), new HashSet<>());
         }
@@ -293,13 +287,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      *
      * @param person	The person to be removed from the campaign
      * @param killed	True if killed in battle, false if sacked
-     * @param shares	The number of shares controlled by person
      * @param campaign
      * @param contract	If not null, the payout must be resolved before the
      * 					contract can be resolved.
      * @return			true if the person is due a payout; otherwise false
      */
-    public boolean removeFromCampaign(Person person, boolean killed, int shares, Campaign campaign,
+    public boolean removeFromCampaign(Person person, boolean killed, Campaign campaign,
                                       AtBContract contract) {
         /* Payouts to Infantry/Battle armor platoons/squads/points are
          * handled as a unit in the AtB rules, so we're just going to ignore
@@ -337,25 +330,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * Worker function that clears out any orphan retirement/defection records
      */
     public void cleanupOrphans(Campaign campaign) {
-        Iterator<UUID> payoutIterator = payouts.keySet().iterator();
-
-        while (payoutIterator.hasNext()) {
-            UUID personID = payoutIterator.next();
-            if (campaign.getPerson(personID) == null) {
-                payoutIterator.remove();
-            }
-        }
+        payouts.keySet().removeIf(personID -> campaign.getPerson(personID) == null);
 
         for (int contractID : unresolvedPersonnel.keySet()) {
-            Iterator<UUID> personIterator = unresolvedPersonnel.get(contractID).iterator();
-
-            while (personIterator.hasNext()) {
-                UUID personID = personIterator.next();
-
-                if (campaign.getPerson(personID) == null) {
-                    personIterator.remove();
-                }
-            }
+            unresolvedPersonnel.get(contractID).removeIf(personID -> campaign.getPerson(personID) == null);
         }
     }
 
@@ -580,7 +558,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         }
     }
 
-    private String createCsv(Collection<? extends Object> coll) {
+    private String createCsv(Collection<?> coll) {
         return StringUtils.join(coll, ",");
     }
 
@@ -636,8 +614,6 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
-
         RetirementDefectionTracker retVal = null;
 
         try {

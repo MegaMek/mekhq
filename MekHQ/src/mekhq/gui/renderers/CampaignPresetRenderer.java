@@ -18,81 +18,38 @@
  */
 package mekhq.gui.renderers;
 
-import mekhq.campaign.GamePreset;
+import mekhq.campaign.CampaignPreset;
+import mekhq.gui.panels.CampaignPresetPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<GamePreset> {
-    //region Variable Declarations
-    private JLabel lblTitle;
-    private JTextArea description;
-    //endregion Variable Declarations
-
+public class CampaignPresetRenderer extends CampaignPresetPanel implements ListCellRenderer<CampaignPreset> {
     //region Constructors
-    public CampaignPresetRenderer() {
-        initialize();
+    public CampaignPresetRenderer(final JFrame frame) {
+        super(frame, null, null);
     }
     //endregion Constructors
 
-    //region Getters/Setters
-    public JLabel getLblTitle() {
-        return lblTitle;
-    }
-
-    public void setLblTitle(final JLabel lblTitle) {
-        this.lblTitle = lblTitle;
-    }
-
-    public JTextArea getDescription() {
-        return description;
-    }
-
-    public void setDescription(final JTextArea description) {
-        this.description = description;
-    }
-    //endregion Getters/Setters
-
-    //region Initialization
-    private void initialize() {
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createLineBorder(Color.BLACK, 2)));
-        setName("CampaignPreset");
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        setLblTitle(new JLabel());
-        getLblTitle().setName("lblTitle");
-        getLblTitle().setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(getLblTitle());
-
-        setDescription(new JTextArea());
-        getDescription().setName("description");
-        getDescription().setEditable(false);
-        getDescription().setLineWrap(true);
-        getDescription().setWrapStyleWord(true);
-        add(getDescription());
-    }
-    //endregion Initialization
-
     @Override
-    public Component getListCellRendererComponent(final JList<? extends GamePreset> list,
-                                                  final GamePreset value, final int index,
+    public Component getListCellRendererComponent(final JList<? extends CampaignPreset> list,
+                                                  final CampaignPreset value, final int index,
                                                   final boolean isSelected,
                                                   final boolean cellHasFocus) {
-        // JTextArea::setForeground and JTextArea::setBackground don't work properly with the default
-        // return, but by recreating the colour it works properly
-        final Color foreground = new Color(UIManager.getColor(isSelected
-                ? "Table.selectionForeground" : "Table.foreground").getRGB());
-        final Color background = new Color(UIManager.getColor(isSelected
-                ? "Table.selectionBackground" : "Table.background").getRGB());
+        // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
+        // default return, but by recreating the colour it works properly
+        final Color foreground = new Color((isSelected
+                ? list.getSelectionForeground() : list.getForeground()).getRGB());
+        final Color background = new Color((isSelected
+                ? list.getSelectionBackground() : list.getBackground()).getRGB());
         setForeground(foreground);
         setBackground(background);
-        getDescription().setForeground(foreground);
-        getDescription().setBackground(background);
 
-        getLblTitle().setText(value.getTitle());
-        getDescription().setText(value.getDescription());
+        getTxtDescription().setForeground(foreground);
+        getTxtDescription().setBackground(background);
+
+        updateFromPreset(value);
+        this.revalidate();
 
         return this;
     }

@@ -41,6 +41,7 @@ import java.util.List;
 public class AdvanceDaysDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private final CampaignGUI gui;
+    private boolean running;
 
     private JSpinner spnDays;
     private JButton btnStartAdvancement;
@@ -64,6 +65,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     //region Getters/Setters
     public CampaignGUI getGUI() {
         return gui;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(final boolean running) {
+        this.running = running;
     }
 
     public JSpinner getSpnDays() {
@@ -146,6 +155,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         final JPanel advanceDaysDurationPanel = createDurationPanel();
 
         setDailyLogPanel(new DailyReportLogPanel(getGUI()));
+        getDailyLogPanel().refreshLog(gui.getCommandCenterTab().getPanLog().getLogText());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -274,27 +284,31 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
             days = 1;
         }
 
-        setModal(true);
-
+        setRunning(true);
         boolean firstDay = true;
         final List<String> reports = new ArrayList<>();
         for (; days > 0; days--) {
-            if (!getGUI().getCampaign().newDay()) {
+            try {
+                if (!getGUI().getCampaign().newDay()) {
+                    break;
+                }
+
+                final String report = getGUI().getCampaign().getCurrentReportHTML();
+                if (firstDay) {
+                    getDailyLogPanel().refreshLog(report);
+                    firstDay = false;
+                } else {
+                    reports.add(resources.getString("HR.text"));
+                    reports.add(report);
+                }
+                getGUI().getCampaign().fetchAndClearNewReports();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
                 break;
             }
-
-            final String report = getGUI().getCampaign().getCurrentReportHTML();
-            if (firstDay) {
-                getDailyLogPanel().refreshLog(report);
-                firstDay = false;
-            } else {
-                reports.add(resources.getString("HR.text"));
-                reports.add(report);
-            }
-            getGUI().getCampaign().fetchAndClearNewReports();
         }
 
-        setModal(false);
+        setRunning(false);
         getDailyLogPanel().appendLog(reports);
 
         // We couldn't advance all days for some reason,
@@ -310,7 +324,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
 
     @Subscribe(priority = 1)
     public void reportOverride(final ReportEvent evt) {
-        if (isModal()) {
+        if (isRunning()) {
             evt.cancel();
         } else {
             getDailyLogPanel().refreshLog(getGUI().getCampaign().getCurrentReportHTML());

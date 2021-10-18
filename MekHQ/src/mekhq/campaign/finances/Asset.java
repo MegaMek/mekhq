@@ -1,7 +1,8 @@
 /*
  * Asset.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,92 +21,107 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHqXmlSerializable;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-
+import mekhq.campaign.finances.enums.FinancialTerm;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.PrintWriter;
+import java.io.Serializable;
+
 /**
- * An asset is a fake pre-existing asset that a user can enter in order to increase loan
- * collateral and get bigger loans - it is generally for mercenary campaigns that are just starting out
- * Assets can also generate income on a schedule
+ * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
+ * generate income on a schedule. It can also be used increase loan collateral and thus get bigger
+ * loans.
  * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Windchild (modern version)
  */
-public class Asset implements MekHqXmlSerializable {
+public class Asset implements Serializable {
+    //region Variable Declarations
+    private static final long serialVersionUID = -7071958800358172014L;
+
     private String name;
     private Money value;
-    //lets only allow monthly and yearly and pay at the first of each
-    private int schedule;
+    private FinancialTerm financialTerm;
     private Money income;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Asset() {
-        name = "New Asset";
-        value = Money.zero();
-        schedule = Finances.SCHEDULE_YEARLY;
-        income = Money.zero();
+        setName("New Asset");
+        setValue(Money.zero());
+        setFinancialTerm(FinancialTerm.ANNUALLY);
+        setIncome(Money.zero());
     }
+    //endregion Constructors
 
+    //region Getters/Setters
     public String getName() {
         return name;
     }
 
-    public void setName(String s) {
-        name = s;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public Money getValue() {
         return value;
     }
 
-    public void setValue(Money l) {
-        value = l;
+    public void setValue(final Money value) {
+        this.value = value;
     }
 
-    public int getSchedule() {
-        return schedule;
+    public FinancialTerm getFinancialTerm() {
+        return financialTerm;
     }
 
-    public void setSchedule(int s) {
-        schedule = s;
+    public void setFinancialTerm(final FinancialTerm financialTerm) {
+        this.financialTerm = financialTerm;
     }
 
     public Money getIncome() {
         return income;
     }
 
-    public void setIncome(Money l) {
-        income = l;
+    public void setIncome(final Money income) {
+        this.income = income;
+    }
+    //region Getters/Setters
+
+    //region File I/O
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "asset");
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", getName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", getValue().toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", getIncome().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "asset");
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "asset");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "value", value.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "schedule", schedule);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "income", income.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "asset");
-    }
-
-    public static Asset generateInstanceFromXML(Node wn) {
-        Asset retVal = new Asset();
-
-        NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                retVal.name = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                retVal.value = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                retVal.income = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
-                retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
+    public static Asset generateInstanceFromXML(final Node wn) {
+        final Asset asset = new Asset();
+        final NodeList nl = wn.getChildNodes();
+        for (int x = 0; x < nl.getLength(); x++) {
+            final Node wn2 = nl.item(x);
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("name")) {
+                    asset.setName(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
+                    asset.setValue(Money.fromXmlString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("financialTerm")) {
+                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
+                    asset.setIncome(Money.fromXmlString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
+                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
-        return retVal;
+        return asset;
     }
+    //endregion File I/O
 }

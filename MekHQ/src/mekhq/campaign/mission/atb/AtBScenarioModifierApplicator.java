@@ -21,7 +21,9 @@ package mekhq.campaign.mission.atb;
 
 import java.util.UUID;
 
-import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.enums.SkillGeneratorType;
+import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
+import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -29,6 +31,8 @@ import megamek.common.EntityWeightClass;
 import megamek.common.HitData;
 import megamek.common.Mounted;
 import megamek.common.ToHitData;
+import megamek.common.enums.SkillLevel;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -74,7 +78,7 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn(), scenario);
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario);
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
 
         // at this point, we have to re-translate the scenario objectives
@@ -87,7 +91,7 @@ public class AtBScenarioModifierApplicator {
      */
     private static void preAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
         if (scenario.getTemplate() != null) {
-            scenario.getTemplate().scenarioForces.put(forceToApply.getForceName(), forceToApply);
+            scenario.getTemplate().getScenarioForces().put(forceToApply.getForceName(), forceToApply);
         }
     }
 
@@ -99,7 +103,7 @@ public class AtBScenarioModifierApplicator {
         if (scenario.getNumBots() == 0) {
             return;
         }
-        
+
         int actualUnitsToRemove = unitRemovalCount;
 
         if (unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
@@ -117,7 +121,7 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            
+
             // only remove units from a bot force if it's on the affected team
             // AND if it has any units to remove
             if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
@@ -178,18 +182,16 @@ public class AtBScenarioModifierApplicator {
      */
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
-        // we want a number between 0 (which indicates "Green") and 3 ("Elite"), inclusive. Anything outside those bounds is
-        // meaningless within the context of the skill generator
-        int adjustedSkill = Math.min(RandomSkillsGenerator.L_ELITE,
-                Math.max(RandomSkillsGenerator.L_GREEN, scenario.getEffectiveOpforSkill() + skillAdjustment));
+        // We want a non-none Skill Level
+        final SkillLevel adjustedSkill = SkillLevel.values()[Math.min(SkillLevel.HEROIC.ordinal(),
+                Math.max(SkillLevel.ULTRA_GREEN.ordinal(), scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment))];
 
         // fire up a skill generator set to the appropriate skill model
-        RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-        rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-        rsg.setLevel(adjustedSkill);
+        final AbstractSkillGenerator abstractSkillGenerator = new TaharqaSkillGenerator();
+        abstractSkillGenerator.setLevel(adjustedSkill);
 
         if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {
-            rsg.setType(RandomSkillsGenerator.T_CLAN);
+            abstractSkillGenerator.setType(SkillGeneratorType.CLAN);
         }
 
         // now go through all the opfor entities currently in the scenario
@@ -198,8 +200,7 @@ public class AtBScenarioModifierApplicator {
             BotForce bf = scenario.getBotForce(x);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
                 for (Entity en : bf.getEntityList()) {
-                    int[] skills = rsg.getRandomSkills(en);
-
+                    int[] skills = abstractSkillGenerator.generateRandomSkills(en);
                     en.getCrew().setGunnery(skills[0]);
                     en.getCrew().setPiloting(skills[1]);
                 }
@@ -240,6 +241,12 @@ public class AtBScenarioModifierApplicator {
 
                 if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
+
+                    // Prevent Hidden Units from Causing Issues if Disabled
+                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+                        continue;
+                    }
+
                     Force playerForce = campaign.getForce(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep at least one visible
@@ -269,6 +276,11 @@ public class AtBScenarioModifierApplicator {
 
                 if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
+
+                    // Prevent Hidden Units from Causing Issues if Disabled
+                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+                        continue;
+                    }
 
                     int maxHiddenUnits = currentBotForce.getEntityList().size() / 2;
                     int numHiddenUnits = 0;
@@ -334,12 +346,23 @@ public class AtBScenarioModifierApplicator {
             scenario.getScenarioObjectives().add(actualObjective);
         }
     }
-    
+
     /**
      * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
      */
     public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
-        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(), 
+        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(),
                 (Boolean) goodEvent));
+    }
+    
+    /**
+     * Applies a flat reduction to the reinforcement arrival times, either of player/allied forces or hostile forces.
+     */
+    public static void applyReinforcementDelayReduction(AtBDynamicScenario scenario, ForceAlignment recipient, int value) {
+        if (recipient == ForceAlignment.Allied) {
+            scenario.setFriendlyReinforcementDelayReduction(value);
+        } else if (recipient == ForceAlignment.Opposing) {
+            scenario.setHostileReinforcementDelayReduction(value);
+        }
     }
 }

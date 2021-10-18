@@ -660,7 +660,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             ransomed.setName("ransomed");
             ransomed.getAccessibleContext().setAccessibleName(resourceMap.getString("lblRansom.text"));
             ransomed.setEnabled(!tracker.usesSalvageExchange());
-            ransomed.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
             ransomed.addItemListener(evt -> checkSalvageRights());
             ransomUnitBoxes.add(ransomed);
             gridBagConstraints.gridx = gridx++;
@@ -1698,10 +1697,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
                 : tracker.getCampaign().getPerson(status.getId());
         if (person == null) {
-            MekHQ.getLogger().error(getClass(), "showPerson",
-                    "Failed to show person after selecting view personnel for a "
-                            + (isPrisoner ? "Prisoner" : "member of the force") +
-                            " because the person could not be found.");
+            MekHQ.getLogger().error("Failed to show person after selecting view personnel for a "
+                    + (isPrisoner ? "Prisoner" : "member of the force") +
+                    " because the person could not be found.");
             return;
         }
         PersonViewPanel personViewPanel = new PersonViewPanel(person, tracker.getCampaign(),

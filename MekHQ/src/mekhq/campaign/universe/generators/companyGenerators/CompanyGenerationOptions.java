@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;

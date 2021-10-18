@@ -19,7 +19,7 @@
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
 		</deploymentZones>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
@@ -27,9 +27,6 @@
 		<generationMethod>3</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
-		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>

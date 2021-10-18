@@ -41,7 +41,6 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -51,7 +50,7 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -185,7 +184,7 @@ public class Person implements Serializable {
     //endregion Name
 
     private Gender gender;
-    private AbstractIcon portrait;
+    private Portrait portrait;
 
     private PersonnelRole primaryRole;
     private PersonnelRole secondaryRole;
@@ -208,6 +207,7 @@ public class Person implements Serializable {
 
     private PersonnelStatus status;
     private int xp;
+    private int totalXPEarnings;
     private int acquisitions;
     private Money salary;
     private Money totalEarnings;
@@ -361,6 +361,8 @@ public class Person implements Serializable {
         secondaryRole = PersonnelRole.NONE;
         primaryDesignator = ROMDesignation.NONE;
         secondaryDesignator = ROMDesignation.NONE;
+        setBirthday(LocalDate.now());
+
         commander = false;
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
@@ -374,7 +376,8 @@ public class Person implements Serializable {
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
-        xp = 0;
+        setXPDirect(0);
+        setTotalXPEarnings(0);
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
         setRankSystemDirect((campaign == null) ? null : campaign.getRankSystem());
@@ -391,7 +394,6 @@ public class Person implements Serializable {
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
-        birthday = null;
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
@@ -769,22 +771,13 @@ public class Person implements Serializable {
     }
     //endregion Names
 
-    //region Portrait
-    public AbstractIcon getPortrait() {
+    public Portrait getPortrait() {
         return portrait;
     }
 
-    public void setPortrait(AbstractIcon portrait) {
-        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+    public void setPortrait(final Portrait portrait) {
+        assert (portrait != null) : "Illegal assignment: cannot have a null Portrait for a Portrait";
         this.portrait = Objects.requireNonNull(portrait);
-    }
-
-    public String getPortraitCategory() {
-        return getPortrait().getCategory();
-    }
-
-    public String getPortraitFileName() {
-        return getPortrait().getFilename();
     }
 
     //region Personnel Roles
@@ -1530,12 +1523,38 @@ public class Person implements Serializable {
         return xp;
     }
 
-    public void setXP(int xp) {
+    public void awardXP(final Campaign campaign, final int xp) {
+        this.xp += xp;
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
+            changeTotalXPEarnings(xp);
+        }
+    }
+
+    public void spendXP(final int xp) {
+        this.xp -= xp;
+    }
+
+    public void setXP(final Campaign campaign, final int xp) {
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
+            changeTotalXPEarnings(xp - getXP());
+        }
+        setXPDirect(xp);
+    }
+
+    private void setXPDirect(final int xp) {
         this.xp = xp;
     }
 
-    public void awardXP(int xp) {
-        this.xp += xp;
+    public int getTotalXPEarnings() {
+        return totalXPEarnings;
+    }
+
+    public void changeTotalXPEarnings(final int xp) {
+        setTotalXPEarnings(getTotalXPEarnings() + xp);
+    }
+
+    public void setTotalXPEarnings(final int totalXPEarnings) {
+        this.totalXPEarnings = totalXPEarnings;
     }
     //endregion Experience
 
@@ -1672,8 +1691,14 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
             getPortrait().writeToXML(pw1, indent + 1);
-            // Always save the current XP
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
+            if (getXP() != 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", getXP());
+            }
+
+            if (getTotalXPEarnings() != 0) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "totalXPEarnings", getTotalXPEarnings());
+            }
+
             if (daysToWaitForHealing != 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
@@ -1918,7 +1943,9 @@ public class Person implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    retVal.xp = Integer.parseInt(wn2.getTextContent());
+                    retVal.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("totalXPEarnings")) {
+                    retVal.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
                     retVal.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
@@ -2194,18 +2221,32 @@ public class Person implements Serializable {
         // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(false)));
-        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
-            primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (getPrimaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            }
+
+            if ((getUnit() != null) && getUnit().isConventionalInfantry()
+                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            }
         }
 
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
         secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(true)));
-        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
-            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (getSecondaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            }
+
+            if ((getUnit() != null) && getUnit().isConventionalInfantry()
+                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            }
         }
 
-        //TODO: distinguish DropShip, JumpShip, and WarShip crew
-        //TODO: Add era mod to salary calc..
+        // TODO: distinguish DropShip, JumpShip, and WarShip crew
+        // TODO: Add era mod to salary calc..
         return primaryBase.plus(secondaryBase)
                 .multipliedBy(getRank().isOfficer()
                         ? campaign.getCampaignOptions().getSalaryCommissionMultiplier()
@@ -2327,7 +2368,7 @@ public class Person implements Serializable {
         }
 
         if (getRankSystem().isUseROMDesignation()) {
-            rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
+            rankName += ROMDesignation.getComStarBranchDesignation(this);
         }
 
         // Rank Level Modifications
@@ -2583,7 +2624,7 @@ public class Person implements Serializable {
     }
 
     public String getHTMLTitle() {
-        return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getFullTitle());
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
     }
 
     public String getFullTitle() {
@@ -2866,7 +2907,7 @@ public class Person implements Serializable {
         }
     }
 
-    public void changeEdge(int amount) {
+    public void changeEdge(final int amount) {
         setEdge(Math.max(getEdge() + amount, 0));
     }
 
@@ -2945,10 +2986,8 @@ public class Person implements Serializable {
                 edgett.append(ability.getDescription()).append("<br>");
             }
         }
-        if (edgett.toString().equals("")) {
-            return "No triggers set";
-        }
-        return "<html>" + edgett + "</html>";
+
+        return edgett.toString().isBlank() ? "No triggers set" : "<html>" + edgett + "</html>";
     }
     //endregion edge
 
@@ -3173,8 +3212,8 @@ public class Person implements Serializable {
     }
 
     public boolean isTaskOvertime(IPartWork partWork) {
-        return partWork.getTimeLeft() > getMinutesLeft()
-               && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
+        return (partWork.getTimeLeft() > getMinutesLeft())
+               && (getOvertimeLeft() > 0);
     }
 
     public Skill getSkillForWorkingOn(IPartWork part) {

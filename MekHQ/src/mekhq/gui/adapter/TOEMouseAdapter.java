@@ -265,7 +265,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         }
-                        if (!cantTech.equals("")) {
+
+                        if (!cantTech.isBlank()) {
                             cantTech += "You will need to assign a tech manually.";
                             JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                         }
@@ -910,16 +911,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            if (StaticChecks.areAllForcesUndeployed(forces) && StaticChecks.areAllCombatForces(forces)) {
+            if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces)
+                    && StaticChecks.areAllCombatForces(forces)) {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
                 for (final Mission mission : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
-                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                        if (scenario.isCloaked()
+                                || (gui.getCampaign().getCampaignOptions().getUseAtB()
                                 && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign())) {
+                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign()))) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
@@ -1097,9 +1100,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForSlaves()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForSlaves()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1122,9 +1131,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(true);
                 networkMenu.add(menuItem);
                 availMenu = new JMenu("Slave to");
-                for (String[] network : gui.getCampaign()
-                        .getAvailableC3MastersForMasters()) {
-                    int nodesFree = Integer.parseInt(network[1]);
+                for (String[] network : gui.getCampaign().getAvailableC3MastersForMasters()) {
+                    final int nodesFree;
+                    try {
+                        nodesFree = Integer.parseInt(network[1]);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(e);
+                        continue;
+                    }
+
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": "
                                 + network[1] + " nodes free");
@@ -1169,9 +1184,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotNC3Networked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableNC3Networks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableNC3Networks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1216,9 +1237,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (StaticChecks.areAllUnitsNotC3iNetworked(units)) {
                     availMenu = new JMenu("Add to network");
-                    for (String[] network : gui.getCampaign()
-                            .getAvailableC3iNetworks()) {
-                        int nodesFree = Integer.parseInt(network[1]);
+                    for (String[] network : gui.getCampaign().getAvailableC3iNetworks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(e);
+                            continue;
+                        }
+
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": "
                                     + network[1] + " nodes free");
@@ -1267,9 +1294,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 for (final Mission mission : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
-                        if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                        if (scenario.isCloaked() ||
+                                (gui.getCampaign().getCampaignOptions().getUseAtB()
                                 && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign())) {
+                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign()))) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
@@ -1281,7 +1309,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (missionMenu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(missionMenu, 30);
                     }
-                    menu.add(missionMenu);
+
+                    if (missionMenu.getItemCount() > 0) {
+                        menu.add(missionMenu);
+                    }
                 }
                 // Scroll bar in case the list is too long for one screen
                 if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {

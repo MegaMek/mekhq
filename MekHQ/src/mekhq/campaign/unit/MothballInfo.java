@@ -23,7 +23,6 @@ package mekhq.campaign.unit;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -32,7 +31,7 @@ import org.w3c.dom.NodeList;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 

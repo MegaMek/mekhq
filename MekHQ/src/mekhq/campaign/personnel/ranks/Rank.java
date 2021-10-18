@@ -22,7 +22,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.personnel.enums.Profession;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -126,13 +126,15 @@ public class Rank implements Serializable {
         setRankLevels(new HashMap<>());
         for (final Profession profession : Profession.values()) {
             String name = (names.length > profession.ordinal()) ? names[profession.ordinal()] : "-";
-            final int level;
+            int level = 1;
             if (name.matches(".+:\\d+\\s*$")) {
                 final String[] split = name.split(":");
                 name = split[0];
-                level = Integer.parseInt(split[1].trim());
-            } else {
-                level = 1;
+                try {
+                    level = Integer.parseInt(split[1].trim());
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
             }
             getRankNames().put(profession, name);
             getRankLevels().put(profession, level);

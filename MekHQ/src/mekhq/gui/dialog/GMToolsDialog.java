@@ -672,6 +672,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JButton btnRollRAT = new MMButton("btnRollRAT", resources, "btnRollRAT.text",
                 "btnRollRAT.toolTipText", evt -> setLastRolledUnit(performRATRoll()));
         gbc.gridx = getGUI().getCampaign().isGM() ? maxGridX - 1 : maxGridX;
+        gbc.gridwidth = 1;
         panel.add(btnRollRAT, gbc);
 
         if (getGUI().getCampaign().isGM()) {

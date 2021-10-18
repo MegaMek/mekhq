@@ -1,11 +1,96 @@
 VERSION HISTORY:
 ----------------
-0.49.2-SNAPSHOT
+0.49.4-SNAPSHOT
++ Issue #274: Moving Era Definitions to Data
++ PR #2793: Expanded Finances Transaction Types
++ Issue #2798: Adding Total XP Earnings Tracking
++ PR #2818: ReportHyperlinkListener Parsing Bugfixes
++ Issue #2825: Individual Camouflage Bulk Assignment from Same Original Camouflage
++ Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
++ Issue #2838: Turrets now generate with the proper faction and thus names
++ Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
++ Issue #2747: Fixing StratOps Scenario Template Path Capitalization
++ PR #2847: Preventing Null Force Template Addition
++ PR #2849, 2846: Addressed multiple errors resulting in failure to generate aerospace scenarios
++ PR #2860: Unit Market properly initializes for new campaigns
++ PR #2861: StratCon Tab NPE
++ PR #2862: Removing Useless Shares Sorter
++ Issue #2865: Specialist Infantry Salary Multiplier
++ PR #2844: AbstractIcon: Force Camouflage: Layering and Properly Sending to MegaMek
++ Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder. 
++ Issue #2873: Part doesn't serlialize brandNew flag
++ Issue #2878: Prevent dropship bay doors from continuously breaking down when loading saves
++ Issue #1236: Adding full support for Tripod 'Mechs
++ Issue #1420: Can No Longer Deploy a Person Multiple Times
++ Issue #2867: Making the default unit market type the Open market instead of the Employer Market
++ PR #2869: Serializing StratCon OpFor Skill and Quality
++ PR #2883: Monday Training XP Assignment on New Day instead of AtB Scenario Generation
++ PR #2889: Ransom is no longer automatically selected at 100% salvage rights
++ Issue #210: One Person will be Artillery Trained when hiring minimum complement for an artillery-armed unit
++ Issue #2567: AtB now follows the part acquisition skill option
++ PR #2884: Briefing Room: Print Sheets now prints sheets for all units in AtB
++ Issue #2496: Maintenance Properly Includes Unofficial SPAs
++ Issue #2809: Grounded dropship scenarios will no longer feature immediately floating and crashing dropships; will start
++ PR #2891: Maintainer Unofficial SPA
++ PR #2880: Standardized Suite Version Tracking
++ Issue #1793: Reports: AbstractDialog Swapover, GUI Code Isolation, Preference Bugfixes, and Code Standardization
++ Issues #1092, #1105, #1950, and #2695: Person/Tech to Unit and Unit to Person/Tech Assignment Menu Standardization
++ PR #2855: New Campaign Project: Campaign Preset Rework
+
+0.49.3 (2021-08-23 2000 UTC)
++ Issue #2679: Correctly show and apply overtime mod to multi-day rolls
++ Issue #2709: Two Scenario Date NPEs
++ Issue #2685: Preventing NPE when loading scenario save games
++ Issue #2609: Show which parts are blocking repairs
++ Issue #2707: Preventing text wrap in the person title JTable usages
++ PR #2718: Fixing Bulk Refit Complete/Cancel
++ Issue #2717: Advance Days Dialog no longer based on modality
++ PR #2716, 2727: StratCon - player dropships will now be pulled into dropship defense scenarios;
+	more abstractly: capability to substitute player units for bot units in designated scenario force templates
+	prevent "regenerate bot forces" button from displaying when editing completed scenarios
+	allow contract completion for scenarios with remaining "fixed" objectives (useful for when the enemy morale goes to rout or you win a base of operations attack)
+	explicitly show that objectives in defensive contracts must be held until contract completion	
+    	fix clicked hex detection on StratCon map when viewing anything other than top left corner when map doesn't fit on single screen (smaller resolutions/bigger maps)
+    	added scroll pane to info panel in case it has more data than can be displayed (important on smaller resolutions)
+    	do not un-deploy force from track if it's assigned to a scenario on the track until the scenario is resolved one way or another
++ Issue #251: Force Generator Unit Generation Empty Unit Table Parent Faction Fallback
++ Issue #2736: Fixing Alternative Faction Code Generation by using correct ArrayList type
++ PR #2744: Mass Mothball Dialog: Fixing IndexOutOfBoundsException with no techs for a unit type
++ PR #2745: Fixing Two AtB Scenario View Panel NPEs
++ PR #2725: StratCon campaign state management: GM Tool to add VP/SP; Ability to convert VP to SP manually; Ability to convert SP to bonus parts; GM mode viewing of current track's "scenario spawn odds".
++ PR #2751: Fixing Astech Divide By Zero Errors
++ PR #2756, 2802: StratCon
+	- Fix incorrect bot configuration in pursuit scenario that would cause it to bee-line for the opposite edge
+	- When objective scenarios move, they will take their objectives with them
+	- Strategic objective display improvement - colorcoding and symbols to indicate in-progress/complete/failed.
+	- Prevent phantom scenarios from showing up in TO&E deploy menu for both forces and individual units
+	- Removing a force that's assigned to a StratCon track will no longer cause the strategic map to fail to render
++ Issue #1098: Fixing Repair Tab Tech Order Options
++ PR #2478: Markets Tab and AbstractUnitMarket
++ Issue #2558: Adding Custom Messages for Dependant Joining/Departing the Force
++ Issue #1767: Adding Campaign Messages when gaining SPAs/Edge and Personnel Log Options for gaining Skills/SPAs/Edge
++ Issue #2771: Fixing Missing Current Daily Log on AdvanceDaysDialog Creation
++ PR #2769: New StratCon feature - sometimes (with configurable frequency), the generated maps will be replaced by a similarly sized user-made fixed map instead.
++ PR #2775: Finances Tab: Price Multipliers Panel Cleanup and Expansion
++ PR #2760: Rank fixes and improvements from HB: Major Periphery States
++ PR #2796: AtB/StratCon: Preventing Hidden Units With Option Disabled
++ Issue #2790: Fixing Null Birthday
++ Issue #2779: Can now cancel a bulk part purchase
++ PR #2788: Stratcon Facility Implementations
++ Issue #2816: Fixing Two AtB Morale ArrayIndexOutOfBoundsExceptions that break on New Day
++ PR #2821: StratCon Scenario Generation New Day NPE Prevention
++ Issue #2786: CustomizePersonDialog Phenotype and Gender ComboBox bugfixes
++ Issue #2754: Properly clearing Hidden, Narc, and iNarc Flags during scenario resolution
++ PR #2828: Fixing AtB Lance Role Sorting and Improving Mission Name Sorting
++ Issue #1042: Fixing Client Button Setting and MegaMek Preferences Not Saving from MekHQ
++ Issue #2807: Removing EquipmentParts whose EquipmentTypes fail to parse
+
+0.49.2 (2021-06-19 2330 UTC)
 + Issue #2620: Adding Missing Leadership Column in Personnel Tab
 + Issue #2625: Properly Clear Tech Units on Person removal/retirement
 + PR #2617: Contract Command Rights Enum and Tool Tips
 + PR #2637: Personnel Names
-+ PR #2651, #2688: Various StratCon fixes:
++ PR #2651, #2688, #2698, #2701, #2702: Various StratCon fixes:
   - Updated arrival altitude for aerospace fighter reinforcement modifiers (they were showing up on the ground)
   - Standardized "recon" type scenarios to have the same criteria as Tukayyid scenarios
   - Various briefing text clarifications
@@ -13,9 +98,13 @@ VERSION HISTORY:
   - On Integrated command, don't immediately and incorrectly undeploy lances after generating scenarios
   - Adjusted manual force deployment rules (unlimited stacking on allied facilities, one per hex otherwise, no manual deployment under integrated command)
   - Tighten up reinforcement restrictions (can't deploy units that can't actually deploy; can't double deploy units; can now only deploy fight lances or have to use a support point/VP)
-  - VTOLs no longer start on the ground in certain situations
+  - VTOLs no longer start on the ground in certain situations, for real
   - Removed extraneous "recon turrets" modifier span for recon raid contracts
   - Tighten up strategic objective generation; correct objective coordinate display
+  - Removed extraneous references to contract score in some scenario modifiers; water-naval units may rarely make an appearance
+  - More robust transport loading code
+  - Bot now has access to Arrow IV external ordnance, won't load 20 TAG pods on a single fighter.
+  - Prevent double deployment of units and forces to individual scenarios
 + PR #2656: Cleaning up a few erroneous Campaign GUI properties
 + PR #2655: Ensuring BotForce has a Valid Base Camouflage
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
@@ -42,6 +131,9 @@ VERSION HISTORY:
 + Issues #2116 and #2589: Improving Rank and Title Sorting
 + PR #2694: Hangar Tab: Maintenance Colour No Longer Shows with Maintenance Disabled
 + PR #2693: GM Tools Dialog Rewrite
++ PR #2422: Improve simple accessibility faults
++ Issue #2703: Defend against parts without campaigns after Refit
++ Issue #2687: Fix error refitting dropship transport bays
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names

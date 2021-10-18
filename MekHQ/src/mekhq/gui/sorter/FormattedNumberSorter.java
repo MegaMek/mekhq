@@ -2,6 +2,7 @@ package mekhq.gui.sorter;
 
 import mekhq.MekHQ;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Comparator;
@@ -10,8 +11,9 @@ import java.util.Comparator;
  * A comparator for numbers that have been formatted with DecimalFormat
  * @author Jay Lawson
  */
-public class FormattedNumberSorter implements Comparator<String> {
-    private static final String PLUS_SIGN = "+"; //$NON-NLS-1$
+public class FormattedNumberSorter implements Comparator<String>, Serializable {
+    private static final long serialVersionUID = -7891209454957499554L;
+    private static final String PLUS_SIGN = "+";
     private static final DecimalFormat FORMAT = new DecimalFormat();
 
     @Override
@@ -38,13 +40,13 @@ public class FormattedNumberSorter implements Comparator<String> {
         try {
             l0 = FORMAT.parse(s0).longValue();
         } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "compare", e);
+            MekHQ.getLogger().error(e);
         }
         long l1 = 0;
         try {
             l1 = FORMAT.parse(s1).longValue();
         } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "compare", e);
+            MekHQ.getLogger().error(e);
         }
         return Long.compare(l0, l1);
     }

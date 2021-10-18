@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved
-=======
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
->>>>>>> upstream/master
  *
  * This file is part of MekHQ.
  *

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.universe;
 
 import java.util.Collections;
@@ -9,6 +27,7 @@ import java.util.TreeSet;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.MechSummary;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -16,9 +35,8 @@ import mekhq.campaign.rating.IUnitRating;
  * Base class for unit generators containing common functionality.
  * Currently, only turret-related code.
  * @author NickAragua
- *
  */
-public abstract class AbstractUnitGenerator {
+public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private Map<Integer, String> ratRatingMappings = null;
     private TreeSet<Integer> turretRatYears = new TreeSet<>();
     private Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
@@ -48,7 +66,8 @@ public abstract class AbstractUnitGenerator {
      * @param currentYear The current year
      * @return List of turrets
      */
-    public List<MechSummary> generateTurrets(int num, int skill, int quality, int currentYear) {
+    @Override
+    public List<MechSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
         int ratYear;
 
         // less dirty hack
@@ -80,10 +99,10 @@ public abstract class AbstractUnitGenerator {
         // RAT for the current or previous year, use the earliest available.
         // If there are no turret RATs, return an empty list
         if (turretRatYears.isEmpty()) {
-            MekHQ.getLogger().warning(this, "No turret RATs found.");
+            MekHQ.getLogger().warning("No turret RATs found.");
             return Collections.emptyList();
         } else if (currentYear < turretRatYears.first()) {
-            MekHQ.getLogger().warning(this, "Earliest turret RAT is later than campaign year.");
+            MekHQ.getLogger().warning("Earliest turret RAT is later than campaign year.");
             ratYear = turretRatYears.first();
         } else {
             ratYear = turretRatYears.floor(currentYear);

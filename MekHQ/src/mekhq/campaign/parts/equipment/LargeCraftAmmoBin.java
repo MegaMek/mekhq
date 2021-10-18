@@ -185,13 +185,17 @@ public class LargeCraftAmmoBin extends AmmoBin {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            // CAW: campaigns prior to 0.47.15 stored `size` in `capacity`
-            if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
-                size = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
-                bayEqNum = Integer.parseInt(wn2.getTextContent());
+            try {
+                // CAW: campaigns prior to 0.47.15 stored `size` in `capacity`
+                if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
+                    size = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
+                    bayEqNum = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -321,7 +325,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return getClass().equals(part.getClass())
+        return (getClass() == part.getClass())
                 && getType().isCompatibleWith(((AmmoBin) part).getType());
     }
 
