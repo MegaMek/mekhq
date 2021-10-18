@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN'
+          'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg contentScriptType="text/ecmascript" width="559.0" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" contentStyleType="text/css" height="400.0" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" version="1.0"
+><g style="mml-color-elements:" id="rs_template"
+  ><text font-size="5.7px" transform="translate (279.5 400.0)" fill="#231f20" text-anchor="middle" font-family="Eurostile" id="footer" font-weight="bold"
+    ><tspan lengthAdjust="spacingAndGlyphs" x="0.0" id="tspanCopyright" y="-7.000" textLength="531.050"
+      >© %d The Topps Company, Inc. Classic BattleTech, BattleTech, 'Mech and BattleMech are trademarks of The Topps Company, Inc. All rights reserved.</tspan
+      ><tspan lengthAdjust="spacingAndGlyphs" x="0.0" y="0" textLength="503.100"
+      >Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Production, LLC. Permission to photocopy for personal use.</tspan
+    ></text
+    ><g transform="translate (0.000 3.000)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 309.655,2.500 l 5.475,8.214 L 315.130,217.500 l -7.845,7.600 L 10.345,225.100 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 308.155,0.000 l 5.475,8.214 L 313.630,216.000 l -7.845,7.600 L 7.845,223.600 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 297.940 l 4.999,7.500 l -4.999,7.500 h -297.940 Z"
+          /><text x="153.969" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="180.295" lengthAdjust="spacingAndGlyphs"
+          >VTOL COMBAT VEHICLE HIT LOCATION</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="170.847" y="25.000" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >ATTACK DIRECTION</text
+      ><g transform="translate (0.000 32.000)"
+      ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="93.189" y="0.000"
+          >FRONT</tspan
+          ><tspan x="170.847" y="0.000"
+          >REAR</tspan
+          ><tspan x="248.504" y="0.000"
+          >SIDES</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="31.063" y="7.000"
+          >2*</tspan
+          ><tspan x="31.063" y="14.000"
+          >3</tspan
+          ><tspan x="31.063" y="21.000"
+          >4</tspan
+          ><tspan x="31.063" y="28.000"
+          >5</tspan
+          ><tspan x="31.063" y="35.000"
+          >6</tspan
+          ><tspan x="31.063" y="42.000"
+          >7</tspan
+          ><tspan x="31.063" y="49.000"
+          >8</tspan
+          ><tspan x="31.063" y="56.000"
+          >9</tspan
+          ><tspan x="31.063" y="63.000"
+          >10</tspan
+          ><tspan x="31.063" y="70.000"
+          >11</tspan
+          ><tspan x="31.063" y="77.000"
+          >12*</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="93.189" y="7.000"
+          >Front (critical)</tspan
+          ><tspan x="170.847" y="7.000"
+          >Rear (critical)</tspan
+          ><tspan x="248.504" y="7.000"
+          >Side (critical)</tspan
+          ><tspan x="93.189" y="14.000"
+          >Rotors†</tspan
+          ><tspan x="170.847" y="14.000"
+          >Rotors†</tspan
+          ><tspan x="248.504" y="14.000"
+          >Rotors†</tspan
+          ><tspan x="93.189" y="21.000"
+          >Turret‡</tspan
+          ><tspan x="170.847" y="21.000"
+          >Turret‡</tspan
+          ><tspan x="248.504" y="21.000"
+          >Turret‡</tspan
+          ><tspan x="93.189" y="28.000"
+          >Right Side†</tspan
+          ><tspan x="170.847" y="28.000"
+          >Left Side†</tspan
+          ><tspan x="248.504" y="28.000"
+          >Front†</tspan
+          ><tspan x="93.189" y="35.000"
+          >Front</tspan
+          ><tspan x="170.847" y="35.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="35.000"
+          >Side</tspan
+          ><tspan x="93.189" y="42.000"
+          >Front</tspan
+          ><tspan x="170.847" y="42.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="42.000"
+          >Side</tspan
+          ><tspan x="93.189" y="49.000"
+          >Front</tspan
+          ><tspan x="170.847" y="49.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="49.000"
+          >Side (critical)*</tspan
+          ><tspan x="93.189" y="56.000"
+          >Left Side</tspan
+          ><tspan x="170.847" y="56.000"
+          >Right Side</tspan
+          ><tspan x="248.504" y="56.000"
+          >Rear</tspan
+          ><tspan x="93.189" y="63.000"
+          >Rotors†</tspan
+          ><tspan x="170.847" y="63.000"
+          >Rotors†</tspan
+          ><tspan x="248.504" y="63.000"
+          >Rotors†</tspan
+          ><tspan x="93.189" y="70.000"
+          >Rotors†</tspan
+          ><tspan x="170.847" y="70.000"
+          >Rotors†</tspan
+          ><tspan x="248.504" y="70.000"
+          >Rotors†</tspan
+          ><tspan x="93.189" y="77.000"
+          >Rotors (critical)*†</tspan
+          ><tspan x="170.847" y="77.000"
+          >Rotors (critical)*†</tspan
+          ><tspan x="248.504" y="77.000"
+          >Rotors (critical)*†</tspan
+        ></text
+      ></g
+      ><g transform="translate(0,140.600)"
+      ><text x="6.000" y="7.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >*A result of 2 or 12 (or an 8 if the attack strikes the side) may inflict a critical hit on the VTOL. For each such attack, apply</text
+        ><text x="6.000" y="14.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >damage normally to the armor in that section. The attacking player then immediately rolls once on the VTOL Combat Vehicle</text
+        ><text fill="#231f20" x="6.000" y="21.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal;mml-field-width:16892.987" text-anchor="start"
+        >Critical Hits Table, below.</text
+        ><text x="6.000" y="28.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="40999.938" lengthAdjust="spacingAndGlyphs"
+        >† Damage Value / 10 (round up); see Rotor Hits, p. 197, </text
+        ><text x="41005.938" y="28.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:italic" textLength="11274.857" lengthAdjust="spacingAndGlyphs"
+        >Total Warfare.</text
+        ><text x="52280.795" y="28.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="33006.181" lengthAdjust="spacingAndGlyphs"
+        > Additionally, damage to rotors slows down the</text
+        ><text x="6.000" y="35.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >VTOL. Each hit reduces the VTOL’s Cruising MP by 1, meaning that the controlling player must also recalculate Flank MP;</text
+        ><text x="6.000" y="42.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >multiply the new Cruising MP by 1.5 and round up. As with all damage, such movement penalties do not apply until the end</text
+        ><text fill="#231f20" x="6.000" y="49.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal;mml-field-width:2953591.811" text-anchor="start"
+        >of the phase in which the damage occurred.</text
+        ><text x="6.000" y="56.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >‡ A result of 2 or 12 (or an 8 if the attack strikes the side) may inflict a critical hit on the VTOL. For each such attack, apply</text
+        ><text x="6.000" y="63.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >damage normally to the armor in that section. The attacking player then immediately rolls once on the VTOL Combat Vehicle</text
+        ><text fill="#231f20" x="6.000" y="70.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal;mml-field-width:16934.482" text-anchor="start"
+        >Critical Hits Table, below.</text
+      ></g
+    ></g
+    ><g transform="translate (321.630 3.000)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 228.395,2.500 l 5.475,8.214 L 233.870,123.060 l -7.845,7.600 L 10.345,130.660 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 226.895,0.000 l 5.475,8.214 L 232.370,121.560 l -7.845,7.600 L 7.845,129.160 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 216.680 l 4.999,7.500 l -4.999,7.500 h -216.680 Z"
+          /><text x="113.339" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="115.026" lengthAdjust="spacingAndGlyphs"
+          >VTOL ELEVATION TRACK</text
+        ></g
+      ></g
+      ><path fill="none" d="M 4.500,30.431 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 220.740,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,30.718 c 0,0.726 -0.589,1.315, -1.315,1.315 l -220.740,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="1.0" stroke-linejoin="round" stroke="#231f20"
+      /><path fill="none" stroke-width="0.58" d="M 4.500,45.790 h223.370 M 49.174,29.116 v33.348  M 60.787,29.116 v33.348  M 72.400,29.116 v33.348  M 84.013,29.116 v33.348  M 95.626,29.116 v33.348  M 107.239,29.116 v33.348  M 118.852,29.116 v33.348  M 130.465,29.116 v33.348  M 142.079,29.116 v33.348  M 153.692,29.116 v33.348  M 165.305,29.116 v33.348  M 176.918,29.116 v33.348  M 188.531,29.116 v33.348  M 200.144,29.116 v33.348  M 211.757,29.116 v33.348" stroke-linecap="round" stroke-linejoin="miter" stroke="#231f20"
+      /><text fill="#231f20" x="7.500" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Turn</text
+      ><text fill="#231f20" x="7.500" y="57.464" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Elevation</text
+      ><text fill="#231f20" x="54.981" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >1</text
+      ><text fill="#231f20" x="66.594" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >2</text
+      ><text fill="#231f20" x="78.207" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >3</text
+      ><text fill="#231f20" x="89.820" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >4</text
+      ><text fill="#231f20" x="101.433" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >5</text
+      ><text fill="#231f20" x="113.046" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >6</text
+      ><text fill="#231f20" x="124.659" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >7</text
+      ><text fill="#231f20" x="136.272" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >8</text
+      ><text fill="#231f20" x="147.885" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >9</text
+      ><text fill="#231f20" x="159.498" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >10</text
+      ><text fill="#231f20" x="171.111" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >11</text
+      ><text fill="#231f20" x="182.724" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >12</text
+      ><text fill="#231f20" x="194.337" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >13</text
+      ><text fill="#231f20" x="205.950" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >14</text
+      ><text fill="#231f20" x="217.563" y="40.790" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >15</text
+      ><path fill="none" d="M 4.500,80.453 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 220.740,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,30.718 c 0,0.726 -0.589,1.315, -1.315,1.315 l -220.740,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="1.0" stroke-linejoin="round" stroke="#231f20"
+      /><path fill="none" stroke-width="0.58" d="M 4.500,95.812 h223.370 M 49.174,79.138 v33.348  M 60.787,79.138 v33.348  M 72.400,79.138 v33.348  M 84.013,79.138 v33.348  M 95.626,79.138 v33.348  M 107.239,79.138 v33.348  M 118.852,79.138 v33.348  M 130.465,79.138 v33.348  M 142.079,79.138 v33.348  M 153.692,79.138 v33.348  M 165.305,79.138 v33.348  M 176.918,79.138 v33.348  M 188.531,79.138 v33.348  M 200.144,79.138 v33.348  M 211.757,79.138 v33.348" stroke-linecap="round" stroke-linejoin="miter" stroke="#231f20"
+      /><text fill="#231f20" x="7.500" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Turn</text
+      ><text fill="#231f20" x="7.500" y="107.486" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Elevation</text
+      ><text fill="#231f20" x="54.981" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >16</text
+      ><text fill="#231f20" x="66.594" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >17</text
+      ><text fill="#231f20" x="78.207" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >18</text
+      ><text fill="#231f20" x="89.820" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >19</text
+      ><text fill="#231f20" x="101.433" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >20</text
+      ><text fill="#231f20" x="113.046" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >21</text
+      ><text fill="#231f20" x="124.659" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >22</text
+      ><text fill="#231f20" x="136.272" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >23</text
+      ><text fill="#231f20" x="147.885" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >24</text
+      ><text fill="#231f20" x="159.498" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >25</text
+      ><text fill="#231f20" x="171.111" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >26</text
+      ><text fill="#231f20" x="182.724" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >27</text
+      ><text fill="#231f20" x="194.337" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >28</text
+      ><text fill="#231f20" x="205.950" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >29</text
+      ><text fill="#231f20" x="217.563" y="90.812" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >30</text
+    ></g
+    ><g transform="translate (321.630 137.160)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 228.395,2.500 l 5.475,8.214 L 233.870,80.340 l -7.845,7.600 L 10.345,87.940 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 226.895,0.000 l 5.475,8.214 L 232.370,78.840 l -7.845,7.600 L 7.845,86.440 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 216.680 l 4.999,7.500 l -4.999,7.500 h -216.680 Z"
+          /><text x="113.339" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="196.076" lengthAdjust="spacingAndGlyphs"
+          >PHYSICAL ATTACKS AGAINST VTOLS TABLE</text
+        ></g
+      ></g
+      ><g transform="translate (3.000 34.720)"
+      ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="160.559" y="0.000"
+          >TYPES OF PHYSICAL ATTACKS ALLOWED</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="38.993" y="0.000"
+          >DIFFERENCE IN LEVELS</tspan
+          ><tspan x="38.993" y="7.000"
+          >-1 or lower</tspan
+          ><tspan x="38.993" y="14.000"
+          >0</tspan
+          ><tspan x="38.993" y="21.000"
+          >1-2</tspan
+          ><tspan x="38.993" y="28.000"
+          >3</tspan
+          ><tspan x="38.993" y="35.000"
+          >4+</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="160.559" y="7.000"
+          >None</tspan
+          ><tspan x="160.559" y="14.000"
+          >All except Punch</tspan
+          ><tspan x="160.559" y="21.000"
+          >All except Kick</tspan
+          ><tspan x="160.559" y="28.000"
+          >Club and Physical Weapons Only</tspan
+          ><tspan x="160.559" y="35.000"
+          >None</tspan
+        ></text
+      ></g
+    ></g
+    ><g transform="translate (0.000 234.600)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 550.025,2.500 l 5.475,8.214 L 555.500,140.300 l -7.845,7.600 L 10.345,147.900 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 548.525,0.000 l 5.475,8.214 L 554.000,138.800 l -7.845,7.600 L 7.845,146.400 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 538.310 l 4.999,7.500 l -4.999,7.500 h -538.310 Z"
+          /><text x="274.154" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="213.815" lengthAdjust="spacingAndGlyphs"
+          >VTOL COMBAT VEHICLE CRITICAL HITS TABLE</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="297.540" y="26.000" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >LOCATION HIT</text
+      ><g transform="translate (0.000 34.000)"
+      ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal"
+        ><tspan x="115.710" y="0.000"
+          >FRONT</tspan
+          ><tspan x="192.850" y="0.000"
+          >SIDE</tspan
+          ><tspan x="292.030" y="0.000"
+          >REAR</tspan
+          ><tspan x="391.210" y="0.000"
+          >ROTORS</tspan
+          ><tspan x="468.350" y="0.000"
+          >TURRET</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal"
+        ><tspan x="55.100" y="8.000"
+          >2-5</tspan
+          ><tspan x="55.100" y="16.000"
+          >6</tspan
+          ><tspan x="55.100" y="24.000"
+          >7</tspan
+          ><tspan x="55.100" y="32.000"
+          >8</tspan
+          ><tspan x="55.100" y="40.000"
+          >9</tspan
+          ><tspan x="55.100" y="48.000"
+          >10</tspan
+          ><tspan x="55.100" y="56.000"
+          >11</tspan
+          ><tspan x="55.100" y="64.000"
+          >12</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal"
+        ><tspan x="115.710" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="192.850" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="292.030" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="391.210" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="468.350" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="115.710" y="16.000"
+          >Copilot Hit</tspan
+          ><tspan x="192.850" y="16.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="292.030" y="16.000"
+          >Cargo/Infantry Hit</tspan
+          ><tspan x="391.210" y="16.000"
+          >Rotor Damage</tspan
+          ><tspan x="468.350" y="16.000"
+          >Stabilizer</tspan
+          ><tspan x="115.710" y="24.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="192.850" y="24.000"
+          >Cargo/Infantry Hit</tspan
+          ><tspan x="292.030" y="24.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="391.210" y="24.000"
+          >Rotor Damage</tspan
+          ><tspan x="468.350" y="24.000"
+          >Turret Jam</tspan
+          ><tspan x="115.710" y="32.000"
+          >Stabilizer</tspan
+          ><tspan x="192.850" y="32.000"
+          >Stabilizer</tspan
+          ><tspan x="292.030" y="32.000"
+          >Stabilizer</tspan
+          ><tspan x="391.210" y="32.000"
+          >Rotor Damage</tspan
+          ><tspan x="468.350" y="32.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="115.710" y="40.000"
+          >Sensors</tspan
+          ><tspan x="192.850" y="40.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="292.030" y="40.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="391.210" y="40.000"
+          >Flight Stabilizer Hit</tspan
+          ><tspan x="468.350" y="40.000"
+          >Turret Locks</tspan
+          ><tspan x="115.710" y="48.000"
+          >Pilot Hit</tspan
+          ><tspan x="192.850" y="48.000"
+          >Engine Hit</tspan
+          ><tspan x="292.030" y="48.000"
+          >Sensors</tspan
+          ><tspan x="391.210" y="48.000"
+          >Flight Stabilizer Hit</tspan
+          ><tspan x="468.350" y="48.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="115.710" y="56.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="192.850" y="56.000"
+          >RotorsDestroyed</tspan
+          ><tspan x="292.030" y="56.000"
+          >Ammunition**</tspan
+          ><tspan x="391.210" y="56.000"
+          >Engine Hit</tspan
+          ><tspan x="468.350" y="56.000"
+          >Ammunition**</tspan
+          ><tspan x="115.710" y="64.000"
+          >Crew Killed</tspan
+          ><tspan x="192.850" y="64.000"
+          >Fuel Tank*</tspan
+          ><tspan x="292.030" y="64.000"
+          >Fuel Tank*</tspan
+          ><tspan x="391.210" y="64.000"
+          >RotorsDestroyed</tspan
+          ><tspan x="468.350" y="64.000"
+          >Turret Blown Off</tspan
+        ></text
+      ></g
+      ><text fill="#231f20" x="55.100" y="113.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" text-anchor="start"
+      >*Only if the VTOL has an ICE engine. For VTOLs with fusion engines, treat this result as Engine Hit.</text
+      ><text fill="#231f20" x="55.100" y="120.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" text-anchor="start"
+      >** If the VTOL carries no ammunition, treat this result as Weapon Destroyed.</text
+    ></g
+  ></g
+></svg
+>

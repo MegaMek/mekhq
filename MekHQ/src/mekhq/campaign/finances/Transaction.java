@@ -112,12 +112,12 @@ public class Transaction implements Serializable {
 
     //region File I/O
     protected void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "transaction");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", getType().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "date", getDate());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "amount", getAmount().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "description", getDescription());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "transaction");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transaction");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", getType().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transaction");
     }
 
     public static Transaction generateInstanceFromXML(final Node wn) {

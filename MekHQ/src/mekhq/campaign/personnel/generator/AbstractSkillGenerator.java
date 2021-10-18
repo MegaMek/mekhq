@@ -34,7 +34,11 @@ import mekhq.campaign.personnel.enums.Phenotype;
  */
 public abstract class AbstractSkillGenerator {
 
-    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private RandomSkillPreferences rskillPrefs;
+
+    protected AbstractSkillGenerator(final RandomSkillPreferences randomSkillPreferences) {
+        this.rskillPrefs = randomSkillPreferences;
+    }
 
     /**
      * Gets the {@link RandomSkillPreferences}.
@@ -160,6 +164,17 @@ public abstract class AbstractSkillGenerator {
                 break;
             default:
                 break;
+        }
+    }
+
+    public void generateArtillerySkill(final Person person) {
+        generateArtillerySkill(person, getPhenotypeBonus(person));
+    }
+
+    protected void generateArtillerySkill(final Person person, final int bonus) {
+        final int experienceLevel = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
+        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
+            addSkill(person, SkillType.S_ARTILLERY, experienceLevel, rskillPrefs.randomizeSkill(), bonus);
         }
     }
 

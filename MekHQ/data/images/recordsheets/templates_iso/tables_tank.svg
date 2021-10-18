@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN'
+          'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg contentScriptType="text/ecmascript" width="559.0" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" contentStyleType="text/css" height="400.0" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" version="1.0"
+><g style="mml-color-elements:" id="rs_template"
+  ><text font-size="5.7px" transform="translate (279.5 400.0)" fill="#231f20" text-anchor="middle" font-family="Eurostile" id="footer" font-weight="bold"
+    ><tspan lengthAdjust="spacingAndGlyphs" x="0.0" id="tspanCopyright" y="-7.000" textLength="531.050"
+      >© %d The Topps Company, Inc. Classic BattleTech, BattleTech, 'Mech and BattleMech are trademarks of The Topps Company, Inc. All rights reserved.</tspan
+      ><tspan lengthAdjust="spacingAndGlyphs" x="0.0" y="0" textLength="503.100"
+      >Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Production, LLC. Permission to photocopy for personal use.</tspan
+    ></text
+    ><g transform="translate (0.000 3.000)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 309.655,2.500 l 5.475,8.214 L 315.130,217.500 l -7.845,7.600 L 10.345,225.100 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 308.155,0.000 l 5.475,8.214 L 313.630,216.000 l -7.845,7.600 L 7.845,223.600 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 297.940 l 4.999,7.500 l -4.999,7.500 h -297.940 Z"
+          /><text x="153.969" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="198.545" lengthAdjust="spacingAndGlyphs"
+          >GROUND COMBAT VEHICLE HIT LOCATION</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="170.847" y="25.000" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >ATTACK DIRECTION</text
+      ><g transform="translate (0.000 32.000)"
+      ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="93.189" y="0.000"
+          >FRONT</tspan
+          ><tspan x="170.847" y="0.000"
+          >REAR</tspan
+          ><tspan x="248.504" y="0.000"
+          >SIDES</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="31.063" y="7.000"
+          >2*</tspan
+          ><tspan x="31.063" y="14.000"
+          >3</tspan
+          ><tspan x="31.063" y="21.000"
+          >4</tspan
+          ><tspan x="31.063" y="28.000"
+          >5</tspan
+          ><tspan x="31.063" y="35.000"
+          >6</tspan
+          ><tspan x="31.063" y="42.000"
+          >7</tspan
+          ><tspan x="31.063" y="49.000"
+          >8</tspan
+          ><tspan x="31.063" y="56.000"
+          >9</tspan
+          ><tspan x="31.063" y="63.000"
+          >10</tspan
+          ><tspan x="31.063" y="70.000"
+          >11</tspan
+          ><tspan x="31.063" y="77.000"
+          >12*</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="93.189" y="7.000"
+          >Front (critical)</tspan
+          ><tspan x="170.847" y="7.000"
+          >Rear (critical)</tspan
+          ><tspan x="248.504" y="7.000"
+          >Side (critical)</tspan
+          ><tspan x="93.189" y="14.000"
+          >Front†</tspan
+          ><tspan x="170.847" y="14.000"
+          >Rear†</tspan
+          ><tspan x="248.504" y="14.000"
+          >Side†</tspan
+          ><tspan x="93.189" y="21.000"
+          >Front†</tspan
+          ><tspan x="170.847" y="21.000"
+          >Rear†</tspan
+          ><tspan x="248.504" y="21.000"
+          >Side†</tspan
+          ><tspan x="93.189" y="28.000"
+          >Right Side†</tspan
+          ><tspan x="170.847" y="28.000"
+          >Left Side†</tspan
+          ><tspan x="248.504" y="28.000"
+          >Front†</tspan
+          ><tspan x="93.189" y="35.000"
+          >Front</tspan
+          ><tspan x="170.847" y="35.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="35.000"
+          >Side</tspan
+          ><tspan x="93.189" y="42.000"
+          >Front</tspan
+          ><tspan x="170.847" y="42.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="42.000"
+          >Side</tspan
+          ><tspan x="93.189" y="49.000"
+          >Front</tspan
+          ><tspan x="170.847" y="49.000"
+          >Rear</tspan
+          ><tspan x="248.504" y="49.000"
+          >Side (critical)*</tspan
+          ><tspan x="93.189" y="56.000"
+          >Left Side†</tspan
+          ><tspan x="170.847" y="56.000"
+          >Right Side†</tspan
+          ><tspan x="248.504" y="56.000"
+          >Rear†</tspan
+          ><tspan x="93.189" y="63.000"
+          >Turret</tspan
+          ><tspan x="170.847" y="63.000"
+          >Turret</tspan
+          ><tspan x="248.504" y="63.000"
+          >Turret</tspan
+          ><tspan x="93.189" y="70.000"
+          >Turret</tspan
+          ><tspan x="170.847" y="70.000"
+          >Turret</tspan
+          ><tspan x="248.504" y="70.000"
+          >Turret</tspan
+          ><tspan x="93.189" y="77.000"
+          >Turret (critical)</tspan
+          ><tspan x="170.847" y="77.000"
+          >Turret (critical)</tspan
+          ><tspan x="248.504" y="77.000"
+          >Turret (critical)</tspan
+        ></text
+      ></g
+      ><g transform="translate(0,140.600)"
+      ><text x="6.000" y="7.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >* A result of 2 or 12 (or an 8 if the attack strikes the side) may inflict a critical hit on the vehicle. For each result of 2 or</text
+        ><text x="6.000" y="14.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >12 (or 8 for side attacks), apply damage normally to the armor in that section. The attacking player then automatically rolls</text
+        ><text x="6.000" y="21.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="200.326" lengthAdjust="spacingAndGlyphs"
+        >once on the Ground Combat Vehicle Critical Hits Table below (see Combat, p. 192, in </text
+        ><text x="206.326" y="21.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:italic" textLength="33.425" lengthAdjust="spacingAndGlyphs"
+        >Total Warfare</text
+        ><text x="242.595" y="21.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="53.281" lengthAdjust="spacingAndGlyphs"
+        > for more information).</text
+        ><text x="6.000" y="28.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >A result of 12 on the Ground Combat Vehicles Hit Location Table may inflict critical hit against the turret; if the vehicle has</text
+        ><text fill="#231f20" x="6.000" y="35.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal;mml-field-width:67827.500" text-anchor="start"
+        >no turret, a 12 indicates the chance of a critical hit on the side corresponding to the attack direction.</text
+        ><text x="6.000" y="42.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >† The vehicle may suffer motive system damage even if its armor remains intact. Apply damage normally to the armor in</text
+        ><text x="6.000" y="49.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >that section, but the attacking player also rolls once on the Motive System Damage Table at right (see Combat, p. 192, in</text
+        ><text x="6.000" y="56.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:italic" textLength="33.425" lengthAdjust="spacingAndGlyphs"
+        >Total Warfare</text
+        ><text x="42.269" y="56.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="53.281" lengthAdjust="spacingAndGlyphs"
+        > for more information).</text
+        ><text x="6.000" y="63.000" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" textLength="301.630" lengthAdjust="spacingAndGlyphs"
+        >§ Side hits strike the side as indicated by the attack direction. For example, if an attack hits the right side, all Side results</text
+        ><text fill="#231f20" x="6.000" y="70.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal;mml-field-width:69736.813" text-anchor="start"
+        >strike the right side armor. If the vehicle has no turret, a turret hit strikes the armor on the side attacked.</text
+      ></g
+    ></g
+    ><g transform="translate (321.630 3.000)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 228.395,2.500 l 5.475,8.214 L 233.870,217.500 l -7.845,7.600 L 10.345,225.100 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 226.895,0.000 l 5.475,8.214 L 232.370,216.000 l -7.845,7.600 L 7.845,223.600 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 216.680 l 4.999,7.500 l -4.999,7.500 h -216.680 Z"
+          /><text x="113.339" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="157.417" lengthAdjust="spacingAndGlyphs"
+          >MOTIVE SYSTEM DAMAGE TABLE</text
+        ></g
+      ></g
+      ><g transform="translate (0.000 25.000)"
+      ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="61.930" y="0.000"
+          >EFFECT*</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="34.405" y="0.000"
+          >2D6 ROLL</tspan
+          ><tspan x="34.405" y="7.000"
+          >2-5</tspan
+          ><tspan x="34.405" y="14.000"
+          >6-7</tspan
+          ><tspan x="34.405" y="21.000"
+          >8-9</tspan
+          ><tspan x="34.405" y="35.000"
+          >10-11</tspan
+          ><tspan x="34.405" y="49.000"
+          >12</tspan
+        ></text
+        ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="61.930" y="7.000"
+          >No Effect</tspan
+          ><tspan x="61.930" y="14.000"
+          >Minor damage; +1 modifier to all Driving Skill Rolls</tspan
+          ><tspan x="61.930" y="21.000"
+          >Moderate damage; -1 Cruising MP, +2 modifier to all</tspan
+          ><tspan x="61.930" y="28.000"
+          >Driving Skill Rolls</tspan
+          ><tspan x="61.930" y="35.000"
+          >Heavy damage; only half Cruising MP (round fractions up),</tspan
+          ><tspan x="61.930" y="42.000"
+          >+3 modifier to all Driving Skill Rolls</tspan
+          ><tspan x="61.930" y="49.000"
+          >Major damage; no movement for the rest of the game</tspan
+          ><tspan x="61.930" y="56.000"
+          >Vehicle is immobile.</tspan
+        ></text
+      ></g
+      ><g transform="translate (0.000 95.000)"
+      ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="11.469" y="0.000"
+          >Attack Direction Modifier:</tspan
+        ></text
+        ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="11.469" y="7.000"
+          >Hit from rear</tspan
+          ><tspan x="86.014" y="7.000"
+          >+1</tspan
+          ><tspan x="11.469" y="14.000"
+          >Hit from the sides</tspan
+          ><tspan x="86.014" y="14.000"
+          >+2</tspan
+        ></text
+      ></g
+      ><g transform="translate (114.685 95.000)"
+      ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal"
+        ><tspan x="11.469" y="0.000"
+          >Vehicle Type Modifier:</tspan
+        ></text
+        ><text text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal"
+        ><tspan x="11.469" y="7.000"
+          >Tracked, Naval</tspan
+          ><tspan x="86.014" y="7.000"
+          >+0</tspan
+          ><tspan x="11.469" y="14.000"
+          >Wheeled</tspan
+          ><tspan x="86.014" y="14.000"
+          >+2</tspan
+          ><tspan x="11.469" y="21.000"
+          >Hovercraft, Hydrofoil</tspan
+          ><tspan x="86.014" y="21.000"
+          >+3</tspan
+          ><tspan x="11.469" y="28.000"
+          >WiGE</tspan
+          ><tspan x="86.014" y="28.000"
+          >+4</tspan
+        ></text
+      ></g
+      ><text x="6.000" y="131.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >*All movement and Driving Skill Roll penalties are cumulative. However, each Driving Skill Roll</text
+      ><text x="6.000" y="136.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >modifier can only be applied once. For example, if a roll of 6-7 is made for a vehicle, inflicting</text
+      ><text x="6.000" y="141.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >a +1 modifier, that is the only time that particular +1 can be applied; a subsequent roll of 6-7</text
+      ><text x="6.000" y="146.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >has no additional effect. This means the maximum Driving Skill Roll modifier that can be</text
+      ><text x="6.000" y="151.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >inflicted from the Motive System Damage Table is +6. If a unit’s Cruising MP is reduced</text
+      ><text x="6.000" y="156.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >to 0, it cannot move for the rest of the game, but is not considered an immobile target. In</text
+      ><text x="6.000" y="161.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >addition, all motive system damage takes effect at the end of the phase in which the damage</text
+      ><text x="6.000" y="166.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >occurred. For example, if two units are attacking the same Combat Vehicle during the</text
+      ><text x="6.000" y="171.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >Weapon Attack Phase and the frst unit inflicts motive system damage and rolls a 12, the -4</text
+      ><text x="6.000" y="176.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >immobile target modifier would not apply for the second unit. However, the -4 modifier would</text
+      ><text x="6.000" y="181.500" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal" textLength="220.370" lengthAdjust="spacingAndGlyphs"
+      >take effect during the Physical Attack Phase. If a hover vehicle is rendered immobile while</text
+      ><text fill="#231f20" x="6.000" y="186.500" style="font-family:Eurostile;font-size:4.800px;font-weight:normal;font-style:normal;mml-field-width:21594.053" text-anchor="start"
+      >over a Depth 1 or deeper water hex, it sinks and is destroyed.</text
+    ></g
+    ><g transform="translate (0.000 234.600)"
+    ><g
+      ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 L 550.025,2.500 l 5.475,8.214 L 555.500,140.300 l -7.845,7.600 L 10.345,147.900 l -7.845,-7.600 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+        /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 548.525,0.000 l 5.475,8.214 L 554.000,138.800 l -7.845,7.600 L 7.845,146.400 l -7.845,-7.600 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 538.310 l 4.999,7.500 l -4.999,7.500 h -538.310 Z"
+          /><text x="274.154" y="11.250" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal" textLength="213.991" lengthAdjust="spacingAndGlyphs"
+          >GROUND COMBAT VEHICLE CRITICALS TABLE</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="297.540" y="26.000" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >LOCATION HIT</text
+      ><g transform="translate (0.000 34.000)"
+      ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal"
+        ><tspan x="148.770" y="0.000"
+          >FRONT</tspan
+          ><tspan x="247.950" y="0.000"
+          >SIDE</tspan
+          ><tspan x="347.130" y="0.000"
+          >REAR</tspan
+          ><tspan x="446.310" y="0.000"
+          >TURRET</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal"
+        ><tspan x="82.650" y="8.000"
+          >2-5</tspan
+          ><tspan x="82.650" y="16.000"
+          >6</tspan
+          ><tspan x="82.650" y="24.000"
+          >7</tspan
+          ><tspan x="82.650" y="32.000"
+          >8</tspan
+          ><tspan x="82.650" y="40.000"
+          >9</tspan
+          ><tspan x="82.650" y="48.000"
+          >10</tspan
+          ><tspan x="82.650" y="56.000"
+          >11</tspan
+          ><tspan x="82.650" y="64.000"
+          >12</tspan
+        ></text
+        ><text text-anchor="middle" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal"
+        ><tspan x="148.770" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="247.950" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="347.130" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="446.310" y="8.000"
+          >No Critical Hit</tspan
+          ><tspan x="148.770" y="16.000"
+          >Driver Hit</tspan
+          ><tspan x="247.950" y="16.000"
+          >Cargo/Infantry Hit</tspan
+          ><tspan x="347.130" y="16.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="446.310" y="16.000"
+          >Stabilizer</tspan
+          ><tspan x="148.770" y="24.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="247.950" y="24.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="347.130" y="24.000"
+          >Cargo/Infantry Hit</tspan
+          ><tspan x="446.310" y="24.000"
+          >Turret Jam</tspan
+          ><tspan x="148.770" y="32.000"
+          >Stabilizer</tspan
+          ><tspan x="247.950" y="32.000"
+          >Crew Stunned</tspan
+          ><tspan x="347.130" y="32.000"
+          >Stabilizer</tspan
+          ><tspan x="446.310" y="32.000"
+          >Weapon Malfunction</tspan
+          ><tspan x="148.770" y="40.000"
+          >Sensors</tspan
+          ><tspan x="247.950" y="40.000"
+          >Stabilizer</tspan
+          ><tspan x="347.130" y="40.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="446.310" y="40.000"
+          >Turret Locks</tspan
+          ><tspan x="148.770" y="48.000"
+          >Commander Hit</tspan
+          ><tspan x="247.950" y="48.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="347.130" y="48.000"
+          >Engine Hit</tspan
+          ><tspan x="446.310" y="48.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="148.770" y="56.000"
+          >Weapon Destroyed</tspan
+          ><tspan x="247.950" y="56.000"
+          >Engine Hit</tspan
+          ><tspan x="347.130" y="56.000"
+          >Ammunition**</tspan
+          ><tspan x="446.310" y="56.000"
+          >Ammunition**</tspan
+          ><tspan x="148.770" y="64.000"
+          >Crew Killed</tspan
+          ><tspan x="247.950" y="64.000"
+          >Fuel Tank*</tspan
+          ><tspan x="347.130" y="64.000"
+          >Fuel Tank*</tspan
+          ><tspan x="446.310" y="64.000"
+          >Turret Blown Off</tspan
+        ></text
+      ></g
+      ><text fill="#231f20" x="55.100" y="113.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" text-anchor="start"
+      >*If Combat Vehicle has ICE engine only. If Combat Vehicle has a fusion engine, treat this result as Engine Hit.</text
+      ><text fill="#231f20" x="55.100" y="120.000" style="font-family:Eurostile;font-size:5.700px;font-weight:normal;font-style:normal" text-anchor="start"
+      >** If Combat Vehicle carries no ammunition, treat this result as Weapon Destroyed.</text
+    ></g
+  ></g
+></svg
+>
