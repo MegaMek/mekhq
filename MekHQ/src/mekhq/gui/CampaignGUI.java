@@ -1446,6 +1446,12 @@ public class CampaignGUI extends JPanel {
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
             getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
         } else {
+            getCampaign().getDivorce().setUseClannerDivorce(newOptions.isUseClannerDivorce());
+            getCampaign().getDivorce().setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
+            getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
+            getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
+            getCampaign().getDivorce().setUseRandomClannerDivorce(newOptions.isUseRandomClannerDivorce());
+            getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
             if (getCampaign().getDivorce().getMethod().isPercentage()) {
                 ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
                         newOptions.getPercentageRandomDivorceOppositeSexChance());
