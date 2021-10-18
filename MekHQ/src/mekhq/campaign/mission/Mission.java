@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -189,7 +189,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
     public boolean hasPendingScenarios() {
         // scenarios that are pending, but have not been revealed don't count
-        return getScenarios().stream().anyMatch(scenario -> 
+        return getScenarios().stream().anyMatch(scenario ->
             (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
     //endregion Scenarios

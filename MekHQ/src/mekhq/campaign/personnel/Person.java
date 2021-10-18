@@ -50,7 +50,7 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -2231,18 +2231,32 @@ public class Person implements Serializable {
         // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(false)));
-        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
-            primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (getPrimaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            }
+
+            if ((getUnit() != null) && getUnit().isConventionalInfantry()
+                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            }
         }
 
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
         secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(true)));
-        if (getPrimaryRole().isSoldierOrBattleArmour() && hasSkill(SkillType.S_ANTI_MECH)) {
-            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (getSecondaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            }
+
+            if ((getUnit() != null) && getUnit().isConventionalInfantry()
+                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            }
         }
 
-        //TODO: distinguish DropShip, JumpShip, and WarShip crew
-        //TODO: Add era mod to salary calc..
+        // TODO: distinguish DropShip, JumpShip, and WarShip crew
+        // TODO: Add era mod to salary calc..
         return primaryBase.plus(secondaryBase)
                 .multipliedBy(getRank().isOfficer()
                         ? campaign.getCampaignOptions().getSalaryCommissionMultiplier()

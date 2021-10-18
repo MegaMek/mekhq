@@ -101,7 +101,6 @@ public class MekHQ implements GameListener {
     // debug/informational.
     public static int VERBOSITY_LEVEL = 5;
     public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-    public static final String PRESET_DIR = "./mmconf/mhqPresets/";
     public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
 
     private static final EventBus EVENT_BUS = new EventBus();
@@ -114,7 +113,6 @@ public class MekHQ implements GameListener {
 
     // Directory options
     private static ObservableString personnelDirectory;
-    private static ObservableString campaignOptionsDirectory;
     private static ObservableString partsDirectory;
     private static ObservableString planetsDirectory;
     private static ObservableString starMapsDirectory;
@@ -202,10 +200,6 @@ public class MekHQ implements GameListener {
         return personnelDirectory;
     }
 
-    public static ObservableString getCampaignOptionsDirectory() {
-        return campaignOptionsDirectory;
-    }
-
     public static ObservableString getPartsDirectory() {
         return partsDirectory;
     }
@@ -274,9 +268,6 @@ public class MekHQ implements GameListener {
 
         personnelDirectory = new ObservableString("personnelDirectory", ".");
         preferences.manage(new StringPreference(personnelDirectory));
-
-        campaignOptionsDirectory = new ObservableString("campaignOptionsDirectory", ".");
-        preferences.manage(new StringPreference(campaignOptionsDirectory));
 
         partsDirectory = new ObservableString("partsDirectory", ".");
         preferences.manage(new StringPreference(partsDirectory));
@@ -354,7 +345,7 @@ public class MekHQ implements GameListener {
 
         StringBuilder msg = new StringBuilder();
         msg.append("\t").append(resourceMap.getString("Application.name")).append(" ")
-                .append(resourceMap.getString("Application.version"));
+                .append(MekHqConstants.VERSION);
         if (TIMESTAMP > 0) {
             msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP));
         }

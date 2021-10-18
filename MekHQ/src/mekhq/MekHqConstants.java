@@ -20,11 +20,17 @@
  */
 package mekhq;
 
-public final class MekHqConstants {
+import megamek.SuiteConstants;
+
+public final class MekHqConstants extends SuiteConstants {
     // This is used in creating the name of save files, e.g. the MekHQ campaign file
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
-    public static final int MAXIMUM_D6_VALUE = 6;
     public static final int ASTECH_TEAM_SIZE = 6;
+
+    //region GUI Constants
+    public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
+    public static final int BASE_SCROLLER_THRESHOLD = 20;
+    //endregion GUI Constants
 
     //region MekHQ Options
     //region Display
@@ -139,12 +145,15 @@ public final class MekHqConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
+    public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
+    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
 
     //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";

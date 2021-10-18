@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.SuiteConstants;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
-public final class MekHQOptions {
+public final class MekHQOptions extends SuiteConstants {
     //region Variable Declarations
     private static final Preferences userPreferences = Preferences.userRoot();
     //endregion Variable Declarations

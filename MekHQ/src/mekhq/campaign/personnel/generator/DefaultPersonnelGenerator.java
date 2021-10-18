@@ -93,8 +93,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         generateBirthday(campaign, person, expLvl, person.isClanner()
                 && person.getPhenotype() != Phenotype.NONE);
 
-        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator();
-        skillGenerator.setSkillPreferences(getSkillPreferences());
+        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(person, expLvl);
 
         AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
