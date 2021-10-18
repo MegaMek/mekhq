@@ -101,7 +101,7 @@ public class LoanTableModel extends DataTableModel {
         } else if (col == COL_PRINCIPAL) {
             return loan.getPrincipal().toAmountAndSymbolString();
         } else if (col == COL_SCHEDULE) {
-            return Finances.getScheduleName(loan.getFinancialTerm());
+            return loan.getFinancialTerm();
         } else if (col == COL_RATE) {
             return loan.getRate() + "%";
         } else if (col == COL_NLEFT) {

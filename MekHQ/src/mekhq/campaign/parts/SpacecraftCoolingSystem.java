@@ -1,7 +1,7 @@
 /*
  * SpacecraftCoolingSystem.java
  *
- * Copyright (C) 2019, MegaMek team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,10 +49,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -5530683467894875423L;
 
     private int sinkType;
@@ -72,11 +68,12 @@ public class SpacecraftCoolingSystem extends Part {
         this.totalSinks = totalSinks;
         this.sinkType = sinkType;
         if (sinkType == Aero.HEAT_DOUBLE && unit != null && unit.isClan()) {
-            sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+            this.sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
         }
         this.sinksNeeded = 0;
     }
 
+    @Override
     public SpacecraftCoolingSystem clone() {
         SpacecraftCoolingSystem clone = new SpacecraftCoolingSystem(0, totalSinks, sinkType, campaign);
         clone.copyBaseData(this);
@@ -98,7 +95,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             totalSinks = ((Aero) unit.getEntity()).getOHeatSinks();
             currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
             setEngineHeatSinks();
@@ -116,7 +113,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return -2;
         }
         return -1;
@@ -124,8 +121,8 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setHeatSinks(currentSinks);
         }
 
     }
@@ -137,7 +134,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public String succeed() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             remove(true);
             return " <font color='green'><b> salvaged.</b></font>";
         } else {
@@ -148,7 +145,6 @@ public class SpacecraftCoolingSystem extends Part {
 
     /**
      * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds them to the cooling system
-     *
      */
     public void replaceHeatSinks() {
         if (unit != null && unit.getEntity() instanceof Aero) {
@@ -157,7 +153,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
            if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
+                ((Aero)unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
            }
         }
         updateConditionFromEntity(false);
@@ -195,7 +191,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
             //How many sinks are we trying to remove? It'll be between 0 and 50.
             int sinkBatch = Math.max(0, Math.min((currentSinks - engineSinks), 50));
-            if(!salvage) {
+            if (!salvage) {
                 //Scrapping. Shouldn't be able to get here, but don't do anything just in case.
             } else if (null != spare) {
                 //Add some to our spare stocks, but make sure we don't pull them out of the engine
@@ -206,7 +202,7 @@ public class SpacecraftCoolingSystem extends Part {
                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
                campaign.getQuartermaster().addPart(spareHeatSink, 0);
            }
-           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
+           ((Aero) unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }
@@ -294,14 +290,18 @@ public class SpacecraftCoolingSystem extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
-                sinkType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {
-                sinksNeeded = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("currentSinks")) {
-                currentSinks = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
+                    sinkType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {
+                    sinksNeeded = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("currentSinks")) {
+                    currentSinks = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

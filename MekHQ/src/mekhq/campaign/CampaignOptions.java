@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -193,6 +193,7 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInRankDisplayFormat;
     private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
+    private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
 
     // Medical
@@ -225,6 +226,7 @@ public class CampaignOptions implements Serializable {
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
+    private double salarySpecialistInfantryMultiplier;
     private double[] salaryXPMultipliers;
     private Money[] roleBaseSalaries;
 
@@ -554,6 +556,7 @@ public class CampaignOptions implements Serializable {
         setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
         setUseRetirementDateTracking(false);
         setTrackTotalEarnings(false);
+        setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
 
         // Medical
@@ -586,6 +589,7 @@ public class CampaignOptions implements Serializable {
         setSalaryCommissionMultiplier(1.2);
         setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
+        setSalarySpecialistInfantryMultiplier(1.0);
         setSalaryXPMultipliers(new double[5]);
         setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
         setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
@@ -1111,7 +1115,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to track the total earnings of personnel
      */
-    public boolean trackTotalEarnings() {
+    public boolean isTrackTotalEarnings() {
         return trackTotalEarnings;
     }
 
@@ -1120,6 +1124,21 @@ public class CampaignOptions implements Serializable {
      */
     public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
+    }
+
+    /**
+     * @return whether or not to track the total experience earnings of personnel
+     */
+    public boolean isTrackTotalXPEarnings() {
+        return trackTotalXPEarnings;
+    }
+
+    /**
+     * @param trackTotalXPEarnings the new value for whether or not to track total experience
+     *                             earnings for personnel
+     */
+    public void setTrackTotalXPEarnings(final boolean trackTotalXPEarnings) {
+        this.trackTotalXPEarnings = trackTotalXPEarnings;
     }
 
     /**
@@ -1356,6 +1375,14 @@ public class CampaignOptions implements Serializable {
 
     public void setSalaryAntiMekMultiplier(final double salaryAntiMekMultiplier) {
         this.salaryAntiMekMultiplier = salaryAntiMekMultiplier;
+    }
+
+    public double getSalarySpecialistInfantryMultiplier() {
+        return salarySpecialistInfantryMultiplier;
+    }
+
+    public void setSalarySpecialistInfantryMultiplier(final double salarySpecialistInfantryMultiplier) {
+        this.salarySpecialistInfantryMultiplier = salarySpecialistInfantryMultiplier;
     }
 
     public double[] getSalaryXPMultipliers() {
@@ -3272,7 +3299,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
         //endregion Expanded Personnel Information
 
@@ -3310,6 +3338,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
@@ -3751,6 +3780,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                     retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalXPEarnings")) {
+                    retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
                     retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
                 //endregion Expanded Personnel Information
@@ -3821,6 +3852,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
+                    retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {

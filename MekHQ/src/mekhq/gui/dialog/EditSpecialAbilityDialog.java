@@ -34,7 +34,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class EditSpecialAbilityDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
@@ -287,14 +287,12 @@ public class EditSpecialAbilityDialog extends JDialog {
         panSkill.add(new JLabel("<html><b>Prerequisite Skillsets</b></html>"), gridBagConstraints);
 
         btnAddSkillPrereq = new javax.swing.JButton("Add Skill Prereq");
-        btnAddSkillPrereq.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
-            	nspd.setVisible(true);
-            	if(!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
-                	prereqSkills.add(nspd.getPrereq());
-                	refreshGUI();
-                }
+        btnAddSkillPrereq.addActionListener(evt -> {
+            EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
+            nspd.setVisible(true);
+            if (!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
+                prereqSkills.add(nspd.getPrereq());
+                refreshGUI();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -307,11 +305,9 @@ public class EditSpecialAbilityDialog extends JDialog {
         panSkill.add(btnAddSkillPrereq, gridBagConstraints);
 
         btnClearPrereqSkills = new javax.swing.JButton("Clear Skill Prereqs");
-        btnClearPrereqSkills.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                prereqSkills = new Vector<SkillPrereq>();
-                refreshGUI();
-            }
+        btnClearPrereqSkills.addActionListener(evt -> {
+            prereqSkills = new Vector<>();
+            refreshGUI();
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

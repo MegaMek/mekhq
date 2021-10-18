@@ -18,21 +18,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Asset;
-import mekhq.campaign.finances.Finances;
-import megamek.client.ui.preferences.JWindowPreference;
+import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.gui.utilities.JMoneyTextField;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -48,7 +47,7 @@ public class EditAssetDialog extends JDialog {
     private JTextField txtName;
     private JMoneyTextField assetValueField;
     private JMoneyTextField assetIncomeField;
-    private JComboBox<String> choiceSchedule;
+    private MMComboBox<FinancialTerm> choiceSchedule;
     boolean cancelled;
 
     public EditAssetDialog(Frame parent, Asset a) {
@@ -141,14 +140,8 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
-        scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_MONTHLY));
-        scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
-        choiceSchedule = new JComboBox<>(scheduleModel);
-        choiceSchedule.setSelectedIndex(0);
-        if(asset.getFinancialTerm() == Finances.SCHEDULE_YEARLY) {
-            choiceSchedule.setSelectedIndex(1);
-        }
+        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.getValidAssetTerms());
+        choiceSchedule.setSelectedItem(asset.getFinancialTerm());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -207,12 +200,9 @@ public class EditAssetDialog extends JDialog {
         } catch(Exception ignored) {
 
         }
-        if(choiceSchedule.getSelectedIndex() == 1) {
-            asset.setFinancialTerm(Finances.SCHEDULE_YEARLY);
-        } else {
-            asset.setFinancialTerm(Finances.SCHEDULE_MONTHLY);
-        }
-        this.setVisible(false);
+
+        asset.setFinancialTerm(choiceSchedule.getSelectedItem());
+        setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.io.FileType;
 import mekhq.campaign.personnel.Person;
 import org.w3c.dom.Node;
@@ -63,27 +64,6 @@ public class Finances implements Serializable {
     private int loanDefaults;
     private int failCollateral;
     private LocalDate wentIntoDebt;
-
-    public static final int SCHEDULE_BIWEEKLY  = 0;
-    public static final int SCHEDULE_MONTHLY   = 1;
-    public static final int SCHEDULE_QUARTERLY = 2;
-    public static final int SCHEDULE_YEARLY    = 3;
-    public static final int SCHEDULE_NUM       = 4;
-
-    public static String getScheduleName(int schedule) {
-        switch (schedule) {
-            case Finances.SCHEDULE_BIWEEKLY:
-                return "Bi-Weekly";
-            case Finances.SCHEDULE_MONTHLY:
-                return "Monthly";
-            case Finances.SCHEDULE_QUARTERLY:
-                return "Quarterly";
-            case Finances.SCHEDULE_YEARLY:
-                return "Yearly";
-            default:
-                return "?";
-        }
-    }
 
     public Finances() {
         transactions = new ArrayList<>();
@@ -127,11 +107,12 @@ public class Finances implements Serializable {
         return 0;
     }
 
-    public boolean debit(Money amount, int category, String reason, LocalDate date) {
+    public boolean debit(final TransactionType type, final LocalDate date, final Money amount,
+                         final String reason) {
         if (getBalance().isLessThan(amount)) {
             return false;
         }
-        Transaction t = new Transaction(category, date, amount.multipliedBy(-1), reason);
+        Transaction t = new Transaction(type, date, amount.multipliedBy(-1), reason);
         transactions.add(t);
         if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
@@ -140,8 +121,9 @@ public class Finances implements Serializable {
         return true;
     }
 
-    public void credit(Money amount, int category, String reason, LocalDate date) {
-        Transaction t = new Transaction(category, date, amount, reason);
+    public void credit(final TransactionType type, final LocalDate date, final Money amount,
+                       final String reason) {
+        Transaction t = new Transaction(type, date, amount, reason);
         transactions.add(t);
         if ((wentIntoDebt == null) && isInDebt()) {
             wentIntoDebt = date;
@@ -154,7 +136,7 @@ public class Finances implements Serializable {
      * clear transactions By default, this will be called up on Jan 1 of every year
      * in order to keep the transaction record from becoming too large
      */
-    public void newFiscalYear(Campaign campaign) {
+    public void newFiscalYear(final Campaign campaign) {
         if (campaign.getCampaignOptions().getNewFinancialYearFinancesToCSVExport()) {
             final String exportFileName = campaign.getName() + " Finances for "
                     + campaign.getCampaignOptions().getFinancialYearDuration().getExportFilenameDateString(campaign.getLocalDate())
@@ -165,7 +147,7 @@ public class Finances implements Serializable {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
-        credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), campaign.getLocalDate());
+        credit(TransactionType.CARRYOVER, campaign.getLocalDate(), carryover, resourceMap.getString("Carryover.text"));
     }
 
     public List<Transaction> getAllTransactions() {
@@ -241,9 +223,9 @@ public class Finances implements Serializable {
         // Handle contract payments
         if (campaign.getLocalDate().getDayOfMonth() == 1) {
             for (Contract contract : campaign.getActiveContracts()) {
-                credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT,
-                        String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()),
-                        campaign.getLocalDate());
+                credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+                        contract.getMonthlyPayOut(),
+                        String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()));
                 campaign.addReport(String.format(
                         resourceMap.getString("ContractPaymentCredit.text"),
                         contract.getMonthlyPayOut().toAmountAndSymbolString(),
@@ -254,17 +236,17 @@ public class Finances implements Serializable {
         }
 
         // Handle assets
-        for (Asset asset : assets) {
-            if ((asset.getFinancialTerm() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
-                credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
-                        campaign.getLocalDate());
+        for (final Asset asset : assets) {
+            if (asset.getFinancialTerm().isAnnually() && (campaign.getLocalDate().getDayOfYear() == 1)) {
+                credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), asset.getIncome(),
+                        "Income from " + asset.getName());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
                         asset.getName()));
-            } else if ((asset.getFinancialTerm() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
-                credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
-                        campaign.getLocalDate());
+            } else if (asset.getFinancialTerm().isMonthly() && (campaign.getLocalDate().getDayOfMonth() == 1)) {
+                credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), asset.getIncome(),
+                        "Income from " + asset.getName());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
@@ -279,8 +261,8 @@ public class Finances implements Serializable {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
 
-                    if (debit(peacetimeCost, Transaction.C_MAINTAIN,
-                            resourceMap.getString("PeacetimeCosts.title"), campaign.getLocalDate())) {
+                    if (debit(TransactionType.MAINTENANCE, campaign.getLocalDate(), peacetimeCost,
+                            resourceMap.getString("PeacetimeCosts.title"))) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCosts.text"),
                                 peacetimeCost.toAmountAndSymbolString()));
@@ -293,8 +275,8 @@ public class Finances implements Serializable {
                     Money ammoCost = accountant.getMonthlyAmmo();
                     Money fuelCost = accountant.getMonthlyFuel();
 
-                    if (debit(sparePartsCost, Transaction.C_MAINTAIN,
-                            resourceMap.getString("PeacetimeCostsParts.title"), campaign.getLocalDate())) {
+                    if (debit(TransactionType.MAINTENANCE, campaign.getLocalDate(), sparePartsCost,
+                            resourceMap.getString("PeacetimeCostsParts.title"))) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsParts.text"),
                                 sparePartsCost.toAmountAndSymbolString()));
@@ -302,8 +284,9 @@ public class Finances implements Serializable {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
                     }
-                    if (debit(ammoCost, Transaction.C_MAINTAIN,
-                            resourceMap.getString("PeacetimeCostsAmmunition.title"), campaign.getLocalDate())) {
+
+                    if (debit(TransactionType.MAINTENANCE, campaign.getLocalDate(), ammoCost,
+                            resourceMap.getString("PeacetimeCostsAmmunition.title"))) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsAmmunition.text"),
                                 ammoCost.toAmountAndSymbolString()));
@@ -311,8 +294,9 @@ public class Finances implements Serializable {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
                     }
-                    if (debit(fuelCost, Transaction.C_MAINTAIN,
-                            resourceMap.getString("PeacetimeCostsFuel.title"), campaign.getLocalDate())) {
+
+                    if (debit(TransactionType.MAINTENANCE, campaign.getLocalDate(), fuelCost,
+                            resourceMap.getString("PeacetimeCostsFuel.title"))) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsFuel.text"),
                                 fuelCost.toAmountAndSymbolString()));
@@ -325,13 +309,13 @@ public class Finances implements Serializable {
             if (campaignOptions.payForSalaries()) {
                 Money payRollCost = accountant.getPayRoll();
 
-                if (debit(payRollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
-                        campaign.getLocalDate())) {
+                if (debit(TransactionType.SALARIES, campaign.getLocalDate(), payRollCost,
+                        resourceMap.getString("Salaries.title"))) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
                                     payRollCost.toAmountAndSymbolString()));
 
-                    if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                    if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                         for (Person person : campaign.getActivePersonnel()) {
                             person.payPersonSalary();
                         }
@@ -346,8 +330,8 @@ public class Finances implements Serializable {
             if (campaignOptions.payForOverhead()) {
                 Money overheadCost = accountant.getOverheadExpenses();
 
-                if (debit(overheadCost, Transaction.C_OVERHEAD,
-                        resourceMap.getString("Overhead.title"), campaign.getLocalDate())) {
+                if (debit(TransactionType.OVERHEAD, campaign.getLocalDate(), overheadCost,
+                        resourceMap.getString("Overhead.title"))) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Overhead.text"),
                             overheadCost.toAmountAndSymbolString()));
@@ -361,9 +345,8 @@ public class Finances implements Serializable {
         List<Loan> newLoans = new ArrayList<>();
         for (Loan loan : loans) {
             if (loan.checkLoanPayment(campaign.getLocalDate())) {
-                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                        String.format(resourceMap.getString("Loan.title"), loan),
-                        campaign.getLocalDate())) {
+                if (debit(TransactionType.LOAN_PAYMENT, campaign.getLocalDate(), loan.getPaymentAmount(),
+                        String.format(resourceMap.getString("Loan.title"), loan))) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
                             loan.getPaymentAmount().toAmountAndSymbolString(), loan));
@@ -393,12 +376,12 @@ public class Finances implements Serializable {
                 && (contract instanceof AtBContract)) {
             Money shares = contract.getMonthlyPayOut().multipliedBy(((AtBContract) contract).getSharesPct())
                     .dividedBy(100);
-            if (debit(shares, Transaction.C_SALARY,
-                    String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()), date)) {
+            if (debit(TransactionType.SALARIES, date, shares,
+                    String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
                 campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
                         shares.toAmountAndSymbolString()));
 
-                if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                     int numberOfShares = 0;
                     boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {
@@ -426,9 +409,8 @@ public class Finances implements Serializable {
         Money overdueAmount = Money.zero();
         for (Loan loan : loans) {
             if (loan.isOverdue()) {
-                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                        String.format(resourceMap.getString("Loan.title"), loan),
-                        campaign.getLocalDate())) {
+                if (debit(TransactionType.LOAN_PAYMENT, campaign.getLocalDate(), loan.getPaymentAmount(),
+                        String.format(resourceMap.getString("Loan.title"), loan))) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
                             loan.getPaymentAmount().toAmountAndSymbolString(), loan));
@@ -499,14 +481,14 @@ public class Finances implements Serializable {
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
              CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
-                     .withHeader("Date", "Category", "Description", "Amount", "RunningTotal"))) {
+                     .withHeader("Date", "Type", "Description", "Amount", "RunningTotal"))) {
 
             Money runningTotal = Money.zero();
             for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
                         MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate()),
-                        transaction.getCategoryName(),
+                        transaction.getType(),
                         transaction.getDescription(),
                         transaction.getAmount(),
                         runningTotal.toAmountAndNameString());
