@@ -261,10 +261,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     // Divorce
     private JCheckBox chkUseManualDivorce;
+    private JCheckBox chkUseClannerDivorce;
+    private JCheckBox chkUsePrisonerDivorce;
     private Map<SplittingSurnameStyle, JSpinner> spnDivorceSurnameWeights;
     private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
     private JCheckBox chkUseRandomOppositeSexDivorce;
     private JCheckBox chkUseRandomSameSexDivorce;
+    private JCheckBox chkUseRandomClannerDivorce;
+    private JCheckBox chkUseRandomPrisonerDivorce;
     private JLabel lblPercentageRandomDivorceOppositeSexChance;
     private JSpinner spnPercentageRandomDivorceOppositeSexChance;
     private JLabel lblPercentageRandomDivorceSameSexChance;
@@ -4283,6 +4287,28 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseManualDivorce.setToolTipText(resources.getString("chkUseManualDivorce.toolTipText"));
         chkUseManualDivorce.setName("chkUseManualDivorce");
 
+        chkUseClannerDivorce = new JCheckBox(resources.getString("chkUseClannerDivorce.text"));
+        chkUseClannerDivorce.setToolTipText(resources.getString("chkUseClannerDivorce.toolTipText"));
+        chkUseClannerDivorce.setName("chkUseClannerDivorce");
+        chkUseClannerDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerDivorce.setEnabled(!method.isNone() && chkUseClannerDivorce.isSelected());
+        });
+
+        chkUsePrisonerDivorce = new JCheckBox(resources.getString("chkUsePrisonerDivorce.text"));
+        chkUsePrisonerDivorce.setToolTipText(resources.getString("chkUsePrisonerDivorce.toolTipText"));
+        chkUsePrisonerDivorce.setName("chkUsePrisonerDivorce");
+        chkUsePrisonerDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerDivorce.setEnabled(!method.isNone() && chkUsePrisonerDivorce.isSelected());
+        });
+
         final JPanel divorceSurnameWeightsPanel = createDivorceSurnameWeightsPanel();
 
         final JPanel randomDivorcePanel = createRandomDivorcePanel();
@@ -4300,6 +4326,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClannerDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
                         .addComponent(divorceSurnameWeightsPanel)
                         .addComponent(randomDivorcePanel)
         );
@@ -4307,6 +4335,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClannerDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
                         .addComponent(divorceSurnameWeightsPanel)
                         .addComponent(randomDivorcePanel)
         );
@@ -4376,6 +4406,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             final boolean percentageEnabled = method.isPercentage();
             chkUseRandomOppositeSexDivorce.setEnabled(enabled);
             chkUseRandomSameSexDivorce.setEnabled(enabled);
+            chkUseRandomClannerDivorce.setEnabled(enabled && chkUseClannerDivorce.isSelected());
+            chkUseRandomPrisonerDivorce.setEnabled(enabled && chkUsePrisonerDivorce.isSelected());
             percentageRandomDivorcePanel.setEnabled(percentageEnabled);
             lblPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
             spnPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
@@ -4413,6 +4445,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             spnPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
         });
 
+        chkUseRandomClannerDivorce = new JCheckBox(resources.getString("chkUseRandomClannerDivorce.text"));
+        chkUseRandomClannerDivorce.setToolTipText(resources.getString("chkUseRandomClannerDivorce.toolTipText"));
+        chkUseRandomClannerDivorce.setName("chkUseRandomClannerDivorce");
+
+        chkUseRandomPrisonerDivorce = new JCheckBox(resources.getString("chkUseRandomPrisonerDivorce.text"));
+        chkUseRandomPrisonerDivorce.setToolTipText(resources.getString("chkUseRandomPrisonerDivorce.toolTipText"));
+        chkUseRandomPrisonerDivorce.setName("chkUseRandomPrisonerDivorce");
+
         createPercentageRandomDivorcePanel(percentageRandomDivorcePanel);
 
         // Programmatically Assign Accessibility Labels
@@ -4435,6 +4475,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(comboRandomDivorceMethod, GroupLayout.Alignment.LEADING))
                         .addComponent(chkUseRandomOppositeSexDivorce)
                         .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(chkUseRandomClannerDivorce)
+                        .addComponent(chkUseRandomPrisonerDivorce)
                         .addComponent(percentageRandomDivorcePanel)
         );
 
@@ -4445,6 +4487,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(comboRandomDivorceMethod))
                         .addComponent(chkUseRandomOppositeSexDivorce)
                         .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(chkUseRandomClannerDivorce)
+                        .addComponent(chkUseRandomPrisonerDivorce)
                         .addComponent(percentageRandomDivorcePanel)
         );
 
@@ -5477,6 +5521,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         // Divorce
         chkUseManualDivorce.setSelected(options.isUseManualDivorce());
+        chkUseClannerDivorce.setSelected(options.isUseClannerDivorce());
+        chkUsePrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
         for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
             entry.getValue().setValue(options.getDivorceSurnameWeights().get(entry.getKey()) / 10.0);
         }
@@ -5496,6 +5542,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                 chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
             }
         }
+        chkUseRandomClannerDivorce.setSelected(options.isUseRandomClannerDivorce());
+        chkUseRandomPrisonerDivorce.setSelected(options.isUseRandomPrisonerDivorce());
         spnPercentageRandomDivorceOppositeSexChance.setValue(options.getPercentageRandomDivorceOppositeSexChance() * 100.0);
         spnPercentageRandomDivorceSameSexChance.setValue(options.getPercentageRandomDivorceSameSexChance() * 100.0);
 
@@ -6018,12 +6066,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             // Divorce
             options.setUseManualDivorce(chkUseManualDivorce.isSelected());
+            options.setUseClannerDivorce(chkUseClannerDivorce.isSelected());
+            options.setUsePrisonerDivorce(chkUsePrisonerDivorce.isSelected());
             for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
                 options.getDivorceSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
             }
             options.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());
             options.setUseRandomOppositeSexDivorce(chkUseRandomOppositeSexDivorce.isSelected());
             options.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
+            options.setUseRandomClannerDivorce(chkUseRandomClannerDivorce.isSelected());
+            options.setUseRandomPrisonerDivorce(chkUseRandomPrisonerDivorce.isSelected());
             options.setPercentageRandomDivorceOppositeSexChance((Double) spnPercentageRandomDivorceOppositeSexChance.getValue() / 100.0);
             options.setPercentageRandomDivorceSameSexChance((Double) spnPercentageRandomDivorceSameSexChance.getValue() / 100.0);
 
