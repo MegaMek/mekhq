@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,9 @@
 package mekhq;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.utils.MegaMekXmlUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -30,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -93,11 +96,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
+     * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
+     * TODO : Some of this may want to be back-ported into entity itself in MM and then
+     * TODO : re-factored out of EntityListFile.
      *
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
-     * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
-     * MM and then re-factored out of EntityListFile.
+     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * to support saving to/from XML for our purposes in MekHQ
      *
      * @param tgtEnt The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
@@ -485,15 +489,15 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         List<Entity> entities = prs.getEntities();
 
         switch (entities.size()) {
-        case 0:
-            return null;
-        case 1:
-            Entity entity = entities.get(0);
-            MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
-            return entity;
-        default:
-            throw new IllegalArgumentException(
-                    "More than one entity contained in XML string!  Expecting a single entity.");
+            case 0:
+                return null;
+            case 1:
+                final Entity entity = entities.get(0);
+                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                return entity;
+            default:
+                throw new IllegalArgumentException(
+                        "More than one entity contained in XML string! Expecting a single entity.");
         }
     }
 
@@ -502,5 +506,30 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
+    }
+
+    /**
+     * This writes a String or an array of Strings to file, with an the possible addition of an
+     * attribute and its value
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param attributeName the attribute to write as part of the XML tag
+     * @param attributeValue the value of the attribute
+     * @param values the String or String[] to write to XML
+     */
+    public static void writeSimpleXMLAttributedTag(final PrintWriter pw, final int indent,
+                                                   final String name,
+                                                   final @Nullable String attributeName,
+                                                   final @Nullable String attributeValue,
+                                                   final String... values) {
+        if (values.length > 0) {
+            final boolean hasAttribute = attributeValue != null;
+            pw.print(indentStr(indent) + "<" + name);
+            if (hasAttribute) {
+                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
+            }
+            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
+        }
     }
 }
