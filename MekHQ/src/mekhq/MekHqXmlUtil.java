@@ -441,6 +441,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @return The generated string.
      */
     private static String getTankCritString(Tank e, int indentLvl) {
+
         String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
         String critVal = "";
 

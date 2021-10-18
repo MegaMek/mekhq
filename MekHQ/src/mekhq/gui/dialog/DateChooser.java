@@ -440,16 +440,16 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private LocalDate parseDate(String dateString) {
         DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
-                {
-                        DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat()),
-                        DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat()),
-                        DateTimeFormatter.ofPattern("MMMM d, yyyy"),
-                        DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
-                        DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
-                        DateTimeFormatter.ofPattern("MMM d, yyyy"),
-                        DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-                        DateTimeFormatter.ISO_LOCAL_DATE
-                };
+        {
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat()),
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat()),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
+                DateTimeFormatter.ofPattern("MMM d, yyyy"),
+                DateTimeFormatter.ofPattern("MM/dd/yyyy"),
+                DateTimeFormatter.ISO_LOCAL_DATE
+        };
         for (DateTimeFormatter format : dateFormats) {
             try {
                 return LocalDate.parse(dateString, format);
