@@ -21,12 +21,14 @@
 
 package mekhq.campaign.unit.actions;
 
+import mekhq.MekHQ;
 import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.unit.Unit;
 
+import mekhq.campaign.universe.Systems;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +37,11 @@ public class StripUnitActionTest {
     @Before
     public void setup() {
         Ranks.initializeRankSystems();
+        try {
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
     }
 
     @Test

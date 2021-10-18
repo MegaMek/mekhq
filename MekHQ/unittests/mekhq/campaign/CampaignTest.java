@@ -20,12 +20,14 @@
  */
 package mekhq.campaign;
 
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 
+import mekhq.campaign.universe.Systems;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +51,11 @@ public class CampaignTest {
     @Before
     public void setup() {
         Ranks.initializeRankSystems();
+        try {
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
     }
 
     @Test
