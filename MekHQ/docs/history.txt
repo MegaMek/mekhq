@@ -33,6 +33,9 @@ VERSION HISTORY:
 + Issue #2809: Grounded dropship scenarios will no longer feature immediately floating and crashing dropships; will start
 + PR #2891: Maintainer Unofficial SPA
 + PR #2880: Standardized Suite Version Tracking
++ Issue #1793: Reports: AbstractDialog Swapover, GUI Code Isolation, Preference Bugfixes, and Code Standardization
++ Issues #1092, #1105, #1950, and #2695: Person/Tech to Unit and Unit to Person/Tech Assignment Menu Standardization
++ PR #2855: New Campaign Project: Campaign Preset Rework
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls

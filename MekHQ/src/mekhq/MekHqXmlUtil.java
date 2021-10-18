@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -90,11 +90,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * TODO: This is dumb and we should just use EntityListFile.writeEntityList.
+     * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
+     * TODO : Some of this may want to be back-ported into entity itself in MM and then
+     * TODO : re-factored out of EntityListFile.
      *
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified to support saving to/from
-     * XML for our purposes in MekHQ TODO: Some of this may want to be back-ported into entity itself in
-     * MM and then re-factored out of EntityListFile.
+     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * to support saving to/from XML for our purposes in MekHQ
      *
      * @param tgtEnt The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
@@ -478,7 +479,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             case 0:
                 return null;
             case 1:
-                Entity entity = entities.get(0);
+                final Entity entity = entities.get(0);
                 MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
@@ -492,5 +493,30 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
+    }
+
+    /**
+     * This writes a String or an array of Strings to file, with an the possible addition of an
+     * attribute and its value
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param attributeName the attribute to write as part of the XML tag
+     * @param attributeValue the value of the attribute
+     * @param values the String or String[] to write to XML
+     */
+    public static void writeSimpleXMLAttributedTag(final PrintWriter pw, final int indent,
+                                                   final String name,
+                                                   final @Nullable String attributeName,
+                                                   final @Nullable String attributeValue,
+                                                   final String... values) {
+        if (values.length > 0) {
+            final boolean hasAttribute = attributeValue != null;
+            pw.print(indentStr(indent) + "<" + name);
+            if (hasAttribute) {
+                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
+            }
+            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
+        }
     }
 }
