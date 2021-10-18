@@ -22,7 +22,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.personnel.enums.Profession;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

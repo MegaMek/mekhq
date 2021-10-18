@@ -34,6 +34,7 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.IAero;
 import megamek.common.MapSettings;
 import megamek.common.Minefield;
 import megamek.common.PlanetaryConditions;
@@ -498,5 +499,9 @@ public class AtBGameThread extends GameThread {
         destination.setStartingPos(source.getStartingPos(false));
         destination.setAltitude(source.getAltitude());
         destination.setElevation(source.getElevation());
+        
+        if (destination.isAirborne() && (destination.getAltitude() == 0)) {
+            ((IAero) destination).land();
+        }
     }
 }

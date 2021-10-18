@@ -39,7 +39,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -134,6 +134,10 @@ public class SkillType implements Serializable {
 
     public static Hashtable<String, SkillType> getSkillHash() {
         return lookupHash;
+    }
+
+    public static void setSkillHash(final Hashtable<String, SkillType> hash) {
+        lookupHash = hash;
     }
 
     public static String[] getSkillList() {

@@ -118,6 +118,9 @@ public class MissingMekLocation extends MissingPart {
                     this.name = "Mech Rear Right Leg";
                 }
                 break;
+            case Mech.LOC_CLEG:
+                this.name = "Mech Center Leg";
+                break;
         }
 
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
@@ -359,7 +362,7 @@ public class MissingMekLocation extends MissingPart {
                 } else {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
                 }
-            } else if (loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
+            } else if ((loc == Mech.LOC_RLEG) || (loc == Mech.LOC_LLEG) || (loc == Mech.LOC_CLEG)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
             }
             remove(false);

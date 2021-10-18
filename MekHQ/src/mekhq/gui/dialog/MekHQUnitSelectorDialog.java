@@ -152,12 +152,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             selectedUnit = new UnitOrder(entity, campaign);
             if (addToCampaign) {
                 buttonSelect.setEnabled(true);
-                Person logisticsPerson = campaign.getLogisticsPerson();
+                final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
                 buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                        campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
-                                .getValueAsString()));
-                buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
-                        logisticsPerson, false).getDesc());
+                        target.getValueAsString()));
+                buttonSelect.setToolTipText(target.getDesc());
             }
         }
 
