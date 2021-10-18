@@ -225,7 +225,7 @@ public abstract class AbstractMarriage {
             return;
         }
 
-        if (randomMarriage(person)) {
+        if (randomOppositeSexMarriage(person)) {
             marryRandomSpouse(campaign, today, person, false);
         } else if (isUseRandomSameSexMarriages() && randomSameSexMarriage(person)) {
             marryRandomSpouse(campaign, today, person, true);
@@ -234,11 +234,11 @@ public abstract class AbstractMarriage {
 
     //region Random Marriage
     /**
-     * This determines if a person will randomly marry.
+     * This determines if a person will randomly marry an opposite sex spouse.
      * @param person the person to determine if they are getting randomly married
      * @return true if the person is to randomly marry
      */
-    protected abstract boolean randomMarriage(final Person person);
+    protected abstract boolean randomOppositeSexMarriage(final Person person);
 
     /**
      * This determines if a person will randomly marry a same-sex spouse.

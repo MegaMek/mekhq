@@ -25,25 +25,25 @@ import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class PercentageRandomMarriage extends AbstractMarriage {
     //region Variable Declarations
-    private double percentage;
+    private double oppositeSexPercentage;
     private double sameSexPercentage;
     //endregion Variable Declarations
 
     //region Constructors
     public PercentageRandomMarriage(final CampaignOptions options) {
         super(RandomMarriageMethod.PERCENTAGE, options);
-        setPercentage(options.getPercentageRandomMarriageChance());
+        setOppositeSexPercentage(options.getPercentageRandomMarriageOppositeSexChance());
         setSameSexPercentage(options.getPercentageRandomMarriageSameSexChance());
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public double getPercentage() {
-        return percentage;
+    public double getOppositeSexPercentage() {
+        return oppositeSexPercentage;
     }
 
-    public void setPercentage(final double percentage) {
-        this.percentage = percentage;
+    public void setOppositeSexPercentage(final double oppositeSexPercentage) {
+        this.oppositeSexPercentage = oppositeSexPercentage;
     }
 
     public double getSameSexPercentage() {
@@ -56,8 +56,8 @@ public class PercentageRandomMarriage extends AbstractMarriage {
     //endregion Getters/Setters
 
     @Override
-    protected boolean randomMarriage(final Person person) {
-        return Compute.randomFloat() < getPercentage();
+    protected boolean randomOppositeSexMarriage(final Person person) {
+        return Compute.randomFloat() < getOppositeSexPercentage();
     }
 
     @Override

@@ -33,7 +33,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.*;
 import mekhq.campaign.*;
@@ -46,7 +45,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
@@ -1453,8 +1451,8 @@ public class CampaignGUI extends JPanel {
             getCampaign().getMarriage().setUseRandomClannerMarriages(newOptions.isUseRandomClannerMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
             if (getCampaign().getMarriage().getMethod().isPercentage()) {
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setPercentage(
-                        newOptions.getPercentageRandomMarriageChance());
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomMarriageOppositeSexChance());
                 ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
                         newOptions.getPercentageRandomMarriageSameSexChance());
             }

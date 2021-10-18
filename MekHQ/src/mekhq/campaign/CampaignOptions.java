@@ -233,7 +233,7 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomClannerMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
-    private double percentageRandomMarriageChance;
+    private double percentageRandomMarriageOppositeSexChance;
     private double percentageRandomMarriageSameSexChance;
 
     // Procreation
@@ -647,7 +647,7 @@ public class CampaignOptions implements Serializable {
         setUseRandomClannerMarriages(false);
         setUseRandomPrisonerMarriages(true);
         setRandomMarriageAgeRange(10);
-        setPercentageRandomMarriageChance(0.00025);
+        setPercentageRandomMarriageOppositeSexChance(0.00025);
         setPercentageRandomMarriageSameSexChance(0.00002);
 
         // Procreation
@@ -1563,19 +1563,19 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random marriage occurring
+     * This gets the decimal chance (between 0 and 1) of a random opposite sex marriage occurring
      * @return the chance, with a value between 0 and 1
      */
-    public double getPercentageRandomMarriageChance() {
-        return percentageRandomMarriageChance;
+    public double getPercentageRandomMarriageOppositeSexChance() {
+        return percentageRandomMarriageOppositeSexChance;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random marriage occurring
-     * @param percentageRandomMarriageChance the chance, with a value between 0 and 1
+     * This sets the decimal chance (between 0 and 1) of a random opposite sex marriage occurring
+     * @param percentageRandomMarriageOppositeSexChance the chance, with a value between 0 and 1
      */
-    public void setPercentageRandomMarriageChance(final double percentageRandomMarriageChance) {
-        this.percentageRandomMarriageChance = percentageRandomMarriageChance;
+    public void setPercentageRandomMarriageOppositeSexChance(final double percentageRandomMarriageOppositeSexChance) {
+        this.percentageRandomMarriageOppositeSexChance = percentageRandomMarriageOppositeSexChance;
     }
 
     /**
@@ -3366,7 +3366,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerMarriages", isUseRandomClannerMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageChance", getPercentageRandomMarriageChance());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
         //endregion Marriage
 
@@ -3921,8 +3921,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageChance")) {
-                    retVal.setPercentageRandomMarriageChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageOppositeSexChance")) {
+                    retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
                     retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Marriage
@@ -4205,7 +4205,7 @@ public class CampaignOptions implements Serializable {
                 //region Legacy
                 // Removed in 0.49.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) { // Legacy - 0.49.4 Removal
-                    retVal.setPercentageRandomMarriageChance(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) { // Legacy - 0.49.4 Removal
                     retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.4 Removal

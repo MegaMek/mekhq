@@ -30,7 +30,7 @@ public class DisabledRandomMarriage extends AbstractMarriage {
     //endregion Constructors
 
     @Override
-    protected boolean randomMarriage(final Person person) {
+    protected boolean randomOppositeSexMarriage(final Person person) {
         return false;
     }
 

@@ -259,7 +259,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkUseRandomClannerMarriages;
     private JCheckBox chkUseRandomPrisonerMarriages;
     private JSpinner spnRandomMarriageAgeRange;
-    private JSpinner spnPercentageRandomMarriageChance;
+    private JSpinner spnPercentageRandomMarriageOppositeSexChance;
     private JLabel lblPercentageRandomMarriageSameSexChance;
     private JSpinner spnPercentageRandomMarriageSameSexChance;
 
@@ -4311,13 +4311,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private void createPercentageRandomMarriagePanel(final JPanel panel) {
         // Create Panel Components
-        final JLabel lblPercentageRandomMarriageChance = new JLabel(resources.getString("lblPercentageRandomMarriageChance.text"));
-        lblPercentageRandomMarriageChance.setToolTipText(resources.getString("lblPercentageRandomMarriageChance.toolTipText"));
-        lblPercentageRandomMarriageChance.setName("lblPercentageRandomMarriageChance");
+        final JLabel lblPercentageRandomMarriageOppositeSexChance = new JLabel(resources.getString("lblPercentageRandomMarriageOppositeSexChance.text"));
+        lblPercentageRandomMarriageOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
+        lblPercentageRandomMarriageOppositeSexChance.setName("lblPercentageRandomMarriageOppositeSexChance");
 
-        spnPercentageRandomMarriageChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomMarriageChance.setToolTipText(resources.getString("lblPercentageRandomMarriageChance.toolTipText"));
-        spnPercentageRandomMarriageChance.setName("spnPercentageRandomMarriageChance");
+        spnPercentageRandomMarriageOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomMarriageOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
+        spnPercentageRandomMarriageOppositeSexChance.setName("spnPercentageRandomMarriageOppositeSexChance");
 
         lblPercentageRandomMarriageSameSexChance = new JLabel(resources.getString("lblPercentageRandomMarriageSameSexChance.text"));
         lblPercentageRandomMarriageSameSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageSameSexChance.toolTipText"));
@@ -4328,7 +4328,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnPercentageRandomMarriageSameSexChance.setName("spnPercentageRandomMarriageSameSexChance");
 
         // Programmatically Assign Accessibility Labels
-        lblPercentageRandomMarriageChance.setLabelFor(spnPercentageRandomMarriageChance);
+        lblPercentageRandomMarriageOppositeSexChance.setLabelFor(spnPercentageRandomMarriageOppositeSexChance);
         lblPercentageRandomMarriageSameSexChance.setLabelFor(spnPercentageRandomMarriageSameSexChance);
 
         // Layout the Panel
@@ -4343,8 +4343,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomMarriageChance)
-                                .addComponent(spnPercentageRandomMarriageChance, GroupLayout.Alignment.LEADING))
+                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
+                                .addComponent(spnPercentageRandomMarriageOppositeSexChance, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblPercentageRandomMarriageSameSexChance)
                                 .addComponent(spnPercentageRandomMarriageSameSexChance, GroupLayout.Alignment.LEADING))
@@ -4353,8 +4353,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomMarriageChance)
-                                .addComponent(spnPercentageRandomMarriageChance))
+                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
+                                .addComponent(spnPercentageRandomMarriageOppositeSexChance))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPercentageRandomMarriageSameSexChance)
                                 .addComponent(spnPercentageRandomMarriageSameSexChance))
@@ -5330,7 +5330,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseRandomClannerMarriages.setSelected(options.isUseRandomClannerMarriages());
         chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
-        spnPercentageRandomMarriageChance.setValue(options.getPercentageRandomMarriageChance() * 100.0);
+        spnPercentageRandomMarriageOppositeSexChance.setValue(options.getPercentageRandomMarriageOppositeSexChance() * 100.0);
         spnPercentageRandomMarriageSameSexChance.setValue(options.getPercentageRandomMarriageSameSexChance() * 100.0);
 
         // Procreation
@@ -5850,7 +5850,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setUseRandomClannerMarriages(chkUseRandomClannerMarriages.isSelected());
             options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
             options.setRandomMarriageAgeRange((Integer) spnRandomMarriageAgeRange.getValue());
-            options.setPercentageRandomMarriageChance((Double) spnPercentageRandomMarriageChance.getValue() / 100.0);
+            options.setPercentageRandomMarriageOppositeSexChance((Double) spnPercentageRandomMarriageOppositeSexChance.getValue() / 100.0);
             options.setPercentageRandomMarriageSameSexChance((Double) spnPercentageRandomMarriageSameSexChance.getValue() / 100.0);
 
             // Procreation
