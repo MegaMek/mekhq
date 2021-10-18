@@ -3287,8 +3287,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         //region Company Generation Options
         if (MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
-            companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(frame, campaign);
-            tabOptions.addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), new JScrollPane(companyGenerationOptionsPanel));
+            companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(getFrame(), campaign);
+            getOptionsPane().addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), new JScrollPane(companyGenerationOptionsPanel));
         }
         //endregion Company Generation Options
 

@@ -164,15 +164,14 @@ public class NewPlanetaryEventDialog extends JDialog {
         dateButton = new JButton(new AbstractAction() {
             private static final long serialVersionUID = 5708871251030417524L;
             {
-                putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip"));
+                putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip")); //$NON-NLS-1$
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(
-                        ((content instanceof JFrame) ? (JFrame) content : null), date);
-                if (dateSelectionDialog.showDialog().isConfirmed() && !date.equals(dateSelectionDialog.getDate())) {
-                    date = dateSelectionDialog.getDate();
+                DateChooser dc = new DateChooser((content instanceof JFrame) ? (JFrame) content : null, date);
+                if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+                    date = dc.getDate();
                     updateDate();
                 }
             }

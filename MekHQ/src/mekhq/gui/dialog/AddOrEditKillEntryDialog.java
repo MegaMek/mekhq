@@ -202,9 +202,9 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
     }
 
     private void changeDate() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, date);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            date = dateSelectionDialog.getDate();
+        DateChooser dc = new DateChooser(frame, date);
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }

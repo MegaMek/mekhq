@@ -147,9 +147,9 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     }
 
     private void changeDate() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(getFrame(), getDate());
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            setDate(dateSelectionDialog.getDate());
+        DateChooser dc = new DateChooser(getFrame(), getDate());
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            setDate(dc.getDate());
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
         }
     }

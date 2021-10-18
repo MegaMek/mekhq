@@ -52,6 +52,7 @@ public enum LayeredForceIcon {
     private final String layerPath;
     private final String tableName;
     private final int listSelectionModel;
+
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
@@ -71,7 +72,6 @@ public enum LayeredForceIcon {
         return toolTipText;
     }
 
-    //region Getters
     public String getLayerPath() {
         return layerPath;
     }

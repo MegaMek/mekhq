@@ -29,7 +29,6 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -423,7 +422,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         choiceSystem.addActionListener(evt -> {
             // Update the clan check box based on the new selected faction
-            PlanetarySystem selectedSystem = (PlanetarySystem) choiceSystem.getSelectedItem();
+            PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
 
             choicePlanet.setSelectedIndex(-1);
             updatePlanetsComboBoxModel(planetsModel, selectedSystem);
@@ -901,10 +900,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void filterPlanetarySystemsForOurFaction(boolean onlyOurFaction) {
-        PlanetarySystem selectedSystem = (PlanetarySystem) choiceSystem.getSelectedItem();
-        Planet selectedPlanet = (Planet) choicePlanet.getSelectedItem();
+        PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
+        Planet selectedPlanet = (Planet)choicePlanet.getSelectedItem();
         if (onlyOurFaction && choiceFaction.getSelectedItem() != null) {
-            Faction faction = (Faction) choiceFaction.getSelectedItem();
+            Faction faction = (Faction)choiceFaction.getSelectedItem();
 
             DefaultComboBoxModel<PlanetarySystem> model = getPlanetarySystemsComboBoxModel(faction);
             if (model.getIndexOf(selectedSystem) < 0) {
@@ -912,19 +911,18 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 selectedPlanet = null;
             }
 
-            updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>) choicePlanet.getModel(), null);
+            updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), null);
             choiceSystem.setModel(model);
         } else {
             choiceSystem.setModel(allSystems);
         }
         choiceSystem.setSelectedItem(selectedSystem);
 
-        updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>) choicePlanet.getModel(), selectedSystem);
+        updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), selectedSystem);
         choicePlanet.setSelectedItem(selectedPlanet);
     }
 
-    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel,
-                                            @Nullable PlanetarySystem planetarySystem) {
+    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel, PlanetarySystem planetarySystem) {
         planetsModel.removeAllElements();
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());
@@ -1251,35 +1249,43 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 
-    private void btnDateActionPerformed(final ActionEvent evt) {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, birthdate);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            birthdate = dateSelectionDialog.getDate();
+    private void btnDateActionPerformed(ActionEvent evt) {
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, birthdate);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            birthdate = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(birthdate));
             lblAge.setText(getAge() + " " + resourceMap.getString("age"));
         }
     }
 
-    private void btnServiceDateActionPerformed(final ActionEvent evt) {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, recruitment);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            recruitment = dateSelectionDialog.getDate();
+    private void btnServiceDateActionPerformed(ActionEvent evt) {
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, recruitment);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            recruitment = dc.getDate();
             btnServiceDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(recruitment));
         }
     }
 
     private void btnRankDateActionPerformed() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, lastRankChangeDate);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            lastRankChangeDate = dateSelectionDialog.getDate();
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, lastRankChangeDate);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            lastRankChangeDate = dc.getDate();
             btnRankDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(lastRankChangeDate));
         }
     }
 
     private void btnRetirementDateActionPerformed() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, retirement);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            retirement = dateSelectionDialog.getDate();
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, retirement);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            retirement = dc.getDate();
             btnRetirementDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(retirement));
         }
     }

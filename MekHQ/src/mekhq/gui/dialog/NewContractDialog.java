@@ -694,17 +694,18 @@ public class NewContractDialog extends JDialog {
     }
 
     private void changeStartDate() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, contract.getStartDate());
-        if (dateSelectionDialog.showDialog().isConfirmed()
-                && !contract.getStartDate().equals(dateSelectionDialog.getDate())) {
-        	if (campaign.getLocalDate().isAfter(dateSelectionDialog.getDate())) {
-        		JOptionPane.showMessageDialog(frame,
-        			    "You cannot choose a start date before the current date.",
-        			    "Invalid date",
-        			    JOptionPane.ERROR_MESSAGE);
-        		return;
-        	}
-            contract.setStartDate(dateSelectionDialog.getDate());
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, contract.getStartDate());
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            if (campaign.getLocalDate().isAfter(dc.getDate())) {
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot choose a start date before the current date.",
+                        "Invalid date",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }

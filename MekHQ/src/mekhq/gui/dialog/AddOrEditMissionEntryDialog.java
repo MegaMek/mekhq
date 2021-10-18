@@ -158,9 +158,9 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void changeDate() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, newDate);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
-            newDate = dateSelectionDialog.getDate();
+        DateChooser dc = new DateChooser(frame, newDate);
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            newDate = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
         }
     }

@@ -34,6 +34,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
@@ -1390,8 +1391,8 @@ public abstract class AbstractCompanyGenerator {
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
                     : minimumStartingFloat;
             if (!startingCash.isZero()) {
-                campaign.getFinances().credit(startingCash, Transaction.C_START,
-                        resources.getString(""), campaign.getLocalDate());
+                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL, campaign.getLocalDate(), startingCash,
+                        resources.getString(""));
             }
         }
     }

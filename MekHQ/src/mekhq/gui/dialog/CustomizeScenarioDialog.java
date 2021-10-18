@@ -55,7 +55,7 @@ import java.util.ResourceBundle;
  * @author  Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private JFrame frame;
     private Scenario scenario;
     private Mission mission;
@@ -115,7 +115,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
@@ -270,7 +270,7 @@ public class CustomizeScenarioDialog extends JDialog {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
-        } else if ((mission instanceof AtBContract) && 
+        } else if ((mission instanceof AtBContract) &&
                 (scenario instanceof AtBDynamicScenario) &&
                 (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
@@ -320,11 +320,11 @@ public class CustomizeScenarioDialog extends JDialog {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
-            
+
             if (choiceStatus.getSelectedItem() != null) {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
-            
+
             scenario.setDate(date);
         }
         scenario.resetLoot();
@@ -376,19 +376,21 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void changeDate() {
-        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, date);
-        if (dateSelectionDialog.showDialog().isConfirmed()) {
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, date);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (scenario.getStatus().isCurrent()) {
-                if (dateSelectionDialog.getDate().isBefore(campaign.getLocalDate())) {
+                if (dc.getDate().isBefore(campaign.getLocalDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    final LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
-                    if (!dateSelectionDialog.getDate().isBefore(nextMonday)) {
+                    if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
                                 "You cannot choose a date beyond the current week.",
                                 "Invalid date",
@@ -396,14 +398,14 @@ public class CustomizeScenarioDialog extends JDialog {
                         return;
                     }
                 }
-            } else if (dateSelectionDialog.getDate().isAfter(campaign.getLocalDate())) {
+            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a date after the current date.",
                         "Invalid date",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            date = dateSelectionDialog.getDate();
+            date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }

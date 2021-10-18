@@ -184,9 +184,9 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
         } else if (dateButton.equals(e.getSource())) {
-            final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(parent, getNewTransaction().getDate());
-            if (dateSelectionDialog.showDialog().isConfirmed()) {
-                dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(dateSelectionDialog.getDate()));
+            DateChooser chooser = new DateChooser(parent, newTransaction.getDate());
+            if (chooser.showDateChooser() == DateChooser.OK_OPTION) {
+                dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(chooser.getDate()));
             }
         }
     }

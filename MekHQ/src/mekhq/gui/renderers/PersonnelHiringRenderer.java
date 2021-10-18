@@ -182,7 +182,7 @@ public class PersonnelHiringRenderer extends JPanel implements ListCellRenderer<
             if (person == null) {
                 return;
             }
-            AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(getFrame(), person.getPortrait());
+            final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(getFrame(), person.getPortrait());
             if (portraitDialog.showDialog().isConfirmed() && (portraitDialog.getSelectedItem() != null)) {
                 person.setPortrait(portraitDialog.getSelectedItem());
                 getPersonnelHiringDetailPanel().updateValues();
