@@ -37,12 +37,11 @@ public enum MysteryBoxType {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     MysteryBoxType(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -53,6 +52,40 @@ public enum MysteryBoxType {
         return toolTipText;
     }
     //endregion Getters
+
+    //region Boolean Comparison Methods
+    public boolean isThirdSuccessionWar() {
+        return this == THIRD_SUCCESSION_WAR;
+    }
+
+    public boolean isStarLeagueRoyal() {
+        return this == STAR_LEAGUE_ROYAL;
+    }
+
+    public boolean isStarLeagueRegular() {
+        return this == STAR_LEAGUE_REGULAR;
+    }
+
+    public boolean isInnerSphereExperimental() {
+        return this == INNER_SPHERE_EXPERIMENTAL;
+    }
+
+    public boolean isClanKeshik() {
+        return this == CLAN_KESHIK;
+    }
+
+    public boolean isClanFrontLine() {
+        return this == CLAN_FRONT_LINE;
+    }
+
+    public boolean isClanSecondLine() {
+        return this == CLAN_SECOND_LINE;
+    }
+
+    public boolean isClanExperimental() {
+        return this == CLAN_EXPERIMENTAL;
+    }
+    //endregion Boolean Comparison Methods
 
 /*
     public AbstractMysteryBox getMysteryBox() {

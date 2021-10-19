@@ -40,12 +40,11 @@ public enum PartGenerationMethod {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PartGenerationMethod(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -57,11 +56,31 @@ public enum PartGenerationMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isDisabled() {
         return this == DISABLED;
     }
-    //endregion Boolean Comparisons
+
+    public boolean isWindchild() {
+        return this == WINDCHILD;
+    }
+
+    public boolean isMishra() {
+        return this == MISHRA;
+    }
+
+    public boolean isSingle() {
+        return this == SINGLE;
+    }
+
+    public boolean isDouble() {
+        return this == DOUBLE;
+    }
+
+    public boolean isTriple() {
+        return this == TRIPLE;
+    }
+    //endregion Boolean Comparison Methods
 
     public AbstractPartGenerator getGenerator() {
         switch (this) {
@@ -74,7 +93,7 @@ public enum PartGenerationMethod {
             case TRIPLE:
                 return new MultiplePartGenerator(this, 3);
             case DISABLED:
-                MekHQ.getLogger().error("Attempted to get generator for a disabled part generator. Returning Windchild");
+                MekHQ.getLogger().error("Attempted to get a generator when the part generator is Disabled. Returning Windchild");
             case WINDCHILD:
             default:
                 return new WindchildPartGenerator();

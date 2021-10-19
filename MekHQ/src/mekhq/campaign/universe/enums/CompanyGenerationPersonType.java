@@ -18,17 +18,40 @@
  */
 package mekhq.campaign.universe.enums;
 
+import megamek.common.util.EncodeControl;
+
+import java.util.ResourceBundle;
+
 public enum CompanyGenerationPersonType {
     //region Enum Declarations
-    COMPANY_COMMANDER,
-    CAPTAIN,
-    LIEUTENANT,
-    MECHWARRIOR,
-    SUPPORT,
-    ASSISTANT;
+    COMPANY_COMMANDER("CompanyGenerationPersonType.COMPANY_COMMANDER.text", "CompanyGenerationPersonType.COMPANY_COMMANDER.toolTipText"),
+    CAPTAIN("CompanyGenerationPersonType.CAPTAIN.text", "CompanyGenerationPersonType.CAPTAIN.toolTipText"),
+    LIEUTENANT("CompanyGenerationPersonType.LIEUTENANT.text", "CompanyGenerationPersonType.LIEUTENANT.toolTipText"),
+    MECHWARRIOR("CompanyGenerationPersonType.MECHWARRIOR.text", "CompanyGenerationPersonType.MECHWARRIOR.toolTipText"),
+    SUPPORT("CompanyGenerationPersonType.SUPPORT.text", "CompanyGenerationPersonType.SUPPORT.toolTipText"),
+    ASSISTANT("CompanyGenerationPersonType.ASSISTANT.text", "CompanyGenerationPersonType.ASSISTANT.toolTipText");
     //endregion Enum Declarations
 
-    //region Boolean Comparisons
+    //region Variable Declarations
+    private final String name;
+    private final String toolTipText;
+    //endregion Variable Declarations
+
+    //region Constructors
+    CompanyGenerationPersonType(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
+    }
+    //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
     public boolean isCompanyCommander() {
         return this == COMPANY_COMMANDER;
     }
@@ -49,6 +72,10 @@ public enum CompanyGenerationPersonType {
         return this == SUPPORT;
     }
 
+    public boolean isAssistant() {
+        return this == ASSISTANT;
+    }
+
     public boolean isOfficer() {
         return isCaptain() || isLieutenant();
     }
@@ -56,5 +83,10 @@ public enum CompanyGenerationPersonType {
     public boolean isCombat() {
         return isCompanyCommander() || isCaptain() || isLieutenant() || isMechWarrior();
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

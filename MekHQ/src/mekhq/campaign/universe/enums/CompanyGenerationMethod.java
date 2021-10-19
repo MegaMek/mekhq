@@ -36,12 +36,11 @@ public enum CompanyGenerationMethod {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     CompanyGenerationMethod(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -53,7 +52,7 @@ public enum CompanyGenerationMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isAtB() {
         return this == AGAINST_THE_BOT;
     }
@@ -61,7 +60,7 @@ public enum CompanyGenerationMethod {
     public boolean isWindchild() {
         return this == WINDCHILD;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
                                                  final CompanyGenerationOptions options) {
