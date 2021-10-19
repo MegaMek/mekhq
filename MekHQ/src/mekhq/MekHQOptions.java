@@ -108,7 +108,7 @@ public final class MekHQOptions extends SuiteConstants {
     //region Personnel Tab Display Options
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
+                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
     }
 
     public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
@@ -568,7 +568,7 @@ public final class MekHQOptions extends SuiteConstants {
 
     public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
         return CompanyGenerationMethod.valueOf(userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE)
-                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.AGAINST_THE_BOT.name()));
+                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.WINDCHILD.name()));
     }
 
     public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {

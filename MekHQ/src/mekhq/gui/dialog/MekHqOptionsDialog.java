@@ -684,7 +684,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CompanyGenerationMethod) {
-                    list.setToolTipText(((CompanyGenerationMethod) list.getSelectedValue()).getToolTipText());
+                    list.setToolTipText(((CompanyGenerationMethod) value).getToolTipText());
                 }
                 return this;
             }
