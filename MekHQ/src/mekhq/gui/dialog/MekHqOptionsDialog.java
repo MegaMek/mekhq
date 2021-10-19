@@ -203,14 +203,17 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         optionPersonnelFilterStyle = new JComboBox<>(PersonnelFilterStyle.values());
         optionPersonnelFilterStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof PersonnelFilterStyle) {
-                    list.setToolTipText(((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText());
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof PersonnelFilterStyle)
+                            ? ((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText() : "");
                 }
+
                 return this;
             }
         });
