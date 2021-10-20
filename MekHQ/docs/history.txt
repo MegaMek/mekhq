@@ -9,7 +9,7 @@ VERSION HISTORY:
 + Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
 + Issue #2838: Turrets now generate with the proper faction and thus names
 + Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
-+ Issue #2747: Fixing StratOps Scenario Template Path Capitalization
++ Issue #2747: Fixing StratCon Scenario Template Path Capitalization
 + PR #2847: Preventing Null Force Template Addition
 + PR #2849, 2846: Addressed multiple errors resulting in failure to generate aerospace scenarios
 + PR #2860: Unit Market properly initializes for new campaigns
