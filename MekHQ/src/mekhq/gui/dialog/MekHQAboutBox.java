@@ -1,7 +1,8 @@
 /*
  * MekBayAboutBox.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,7 +24,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
-import megameklab.com.MegaMekLab;
+import megameklab.com.MMLConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 
@@ -109,7 +110,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
 
-        appVersionLabelMegaMekLab.setText(MegaMekLab.VERSION); // NOI18N
+        appVersionLabelMegaMekLab.setText(MMLConstants.VERSION.toString());
         appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab"); // NOI18N
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
