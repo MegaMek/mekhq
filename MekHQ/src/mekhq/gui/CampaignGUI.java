@@ -2441,7 +2441,7 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(MekHQOptionsChangedEvent evt) {
+    public void handle(final MekHQOptionsChangedEvent evt) {
         miCompanyGenerator.setVisible(MekHQ.getMekHQOptions().getShowCompanyGenerator());
     }
 

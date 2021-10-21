@@ -39,14 +39,16 @@ public abstract class AbstractPartGenerator {
     }
     //endregion Constructors
 
-    //region Getters/Setters
+    //region Getters
     public PartGenerationMethod getMethod() {
         return method;
     }
-    //endregion Getters/Setters
+    //endregion Getters
 
     /**
-     * This generates based on the parts from a list of units, optionally excluding armour and ammunition
+     * This generates based on the parts from a list of units, optionally excluding armour and
+     * ammunition.
+     *
      * @param units the list of units to generate parts based off of
      * @param includeArmour whether to include armour in the parts generated
      * @param includeAmmunition whether to include ammunition in the parts generated
@@ -63,14 +65,14 @@ public abstract class AbstractPartGenerator {
     }
 
     /**
-     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor unassigned.
-     *                   Implementors are required to clone the parts as required.
+     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor
+     *                   unassigned. Implementors are required to clone the parts as required.
      * @return the list of generated parts
      */
     public abstract List<Part> generate(final List<Part> inputParts);
 
     /**
-     * This creates a clone of the input part, with it not being omni-podded if it was originally
+     * This creates a clone of the input part, with it not being omni-podded if it was originally.
      * @param inputPart the input part to clone
      * @return the cloned part
      */

@@ -3206,7 +3206,7 @@ public class CampaignOptions implements Serializable {
     }
 
     //region Company Generation Options
-    public CompanyGenerationOptions getCompanyGenerationOptions() {
+    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
         return companyGenerationOptions;
     }
 

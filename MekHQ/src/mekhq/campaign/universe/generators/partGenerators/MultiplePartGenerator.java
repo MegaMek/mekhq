@@ -21,8 +21,8 @@ package mekhq.campaign.universe.generators.partGenerators;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MultiplePartGenerator extends AbstractPartGenerator {
     //region Variable Declarations
@@ -44,11 +44,8 @@ public class MultiplePartGenerator extends AbstractPartGenerator {
 
     @Override
     public List<Part> generate(final List<Part> inputParts) {
-        final List<Part> parts = new ArrayList<>();
-        inputParts.stream().map(this::clonePart).forEach(part -> {
-            part.setQuantity(part.getQuantity() * getMultiple());
-            parts.add(part);
-        });
+        final List<Part> parts = inputParts.stream().map(this::clonePart).collect(Collectors.toList());
+        parts.forEach(part -> part.setQuantity(part.getQuantity() * getMultiple()));
         return parts;
     }
 }

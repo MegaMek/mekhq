@@ -489,8 +489,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region Company Generation Options
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
     //endregion Company Generation Options
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -3288,7 +3286,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         //region Company Generation Options
         if (MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
             companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(getFrame(), campaign);
-            getOptionsPane().addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), new JScrollPane(companyGenerationOptionsPanel));
+            getOptionsPane().addTab(resourceMap.getString("companyGenerationOptionsPanel.title"),
+                    new JScrollPane(companyGenerationOptionsPanel));
         }
         //endregion Company Generation Options
 

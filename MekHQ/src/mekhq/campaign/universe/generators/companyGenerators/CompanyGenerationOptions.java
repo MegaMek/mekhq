@@ -770,10 +770,9 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void writeToXML(final PrintWriter pw, int indent, final @Nullable String version) {
         if (version == null) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "companyGenerationOptions");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
         } else {
-            pw.println(String.format("%s<companyGenerationOptions version=\"%s\">",
-                    MekHqXmlUtil.indentStr(indent++), version));
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions", "version", version);
         }
 
         // Base Information
@@ -790,14 +789,14 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
 
         // Personnel
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportPersonnel");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
         for (final Map.Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportRole");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportRole");
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", entry.getKey().name());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "number", entry.getValue());
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "supportRole");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportRole");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "supportPersonnel");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
@@ -865,7 +864,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxTypes", getGenerateMysteryBoxTypes());
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "companyGenerationOptions");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
     }
 
     public static CompanyGenerationOptions parseFromXML(final Campaign campaign, final File file) {

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * 1 Part for every 3, rounded normally.
- * This means you get 1 part for 2-4 in the input array, plus another for every interval above that
+ * This means you get 1 part for 2-4 in the input array, plus another for every interval above that.
  */
 public class WindchildPartGenerator extends AbstractPartGenerator {
     //region Constructors
@@ -41,7 +41,7 @@ public class WindchildPartGenerator extends AbstractPartGenerator {
     public List<Part> generate(final List<Part> inputParts) {
         final Warehouse warehouse = new Warehouse();
         inputParts.forEach(part -> warehouse.addPart(clonePart(part), true));
-        warehouse.forEachPart(part -> part.setQuantity((int) Math.round(part.getQuantity() / 3d)));
+        warehouse.forEachPart(part -> part.setQuantity((int) Math.round(part.getQuantity() / 3.0)));
         return warehouse.getParts().stream().filter(part -> part.getQuantity() > 0).collect(Collectors.toList());
     }
 }
