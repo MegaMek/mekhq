@@ -454,8 +454,8 @@ public abstract class AbstractCompanyGenerator {
 
         for (final Map.Entry<PersonnelRole, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                trackers.add(new CompanyGenerationPersonTracker(
-                        generateSupportPerson(campaign, entry.getKey()), CompanyGenerationPersonType.SUPPORT));
+                trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.SUPPORT,
+                        generateSupportPerson(campaign, entry.getKey())));
             }
         }
         return trackers;
@@ -518,7 +518,7 @@ public abstract class AbstractCompanyGenerator {
             if (getOptions().isAutomaticallyAssignRanks()) {
                 astech.setRank(assistantRank);
             }
-            trackers.add(new CompanyGenerationPersonTracker(astech, CompanyGenerationPersonType.ASSISTANT));
+            trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.ASSISTANT, astech));
         }
 
         for (int i = 0; i < campaign.getMedicsNeed(); i++) {
@@ -526,7 +526,7 @@ public abstract class AbstractCompanyGenerator {
             if (getOptions().isAutomaticallyAssignRanks()) {
                 medic.setRank(assistantRank);
             }
-            trackers.add(new CompanyGenerationPersonTracker(medic, CompanyGenerationPersonType.ASSISTANT));
+            trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.ASSISTANT, medic));
         }
     }
     //endregion Support Personnel

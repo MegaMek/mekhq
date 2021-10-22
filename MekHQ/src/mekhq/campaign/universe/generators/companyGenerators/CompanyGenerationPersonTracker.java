@@ -26,18 +26,19 @@ import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 
 public class CompanyGenerationPersonTracker {
     //region Variable Declarations
-    private Person person;
     private CompanyGenerationPersonType personType;
+    private Person person;
     private AtBRandomMechParameters parameters;
     private Entity entity;
     //endregion Variable Declarations
 
     //region Constructors
     public CompanyGenerationPersonTracker(final Person person) {
-        this(person, CompanyGenerationPersonType.MECHWARRIOR);
+        this(CompanyGenerationPersonType.MECHWARRIOR, person);
     }
 
-    public CompanyGenerationPersonTracker(final Person person, final CompanyGenerationPersonType personType) {
+    public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
+                                          final Person person) {
         setPerson(person);
         setPersonType(personType);
         setParameters(null);
@@ -46,20 +47,20 @@ public class CompanyGenerationPersonTracker {
     //endregion Constructors
 
     //region Getters/Setters
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(final Person person) {
-        this.person = person;
-    }
-
     public CompanyGenerationPersonType getPersonType() {
         return personType;
     }
 
     public void setPersonType(final CompanyGenerationPersonType personType) {
         this.personType = personType;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(final Person person) {
+        this.person = person;
     }
 
     public @Nullable AtBRandomMechParameters getParameters() {
