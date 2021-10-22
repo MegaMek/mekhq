@@ -206,14 +206,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
             private static final long serialVersionUID = -543354619818226314L;
 
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof PersonnelFilterStyle)
-                            ? ((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText() : "");
+                if (value instanceof PersonnelFilterStyle) {
+                    list.setToolTipText(((PersonnelFilterStyle) value).getToolTipText());
                 }
-
                 return this;
             }
         });
