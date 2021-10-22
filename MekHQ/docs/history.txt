@@ -37,6 +37,7 @@ VERSION HISTORY:
 + Issues #1092, #1105, #1950, and #2695: Person/Tech to Unit and Unit to Person/Tech Assignment Menu Standardization
 + PR #2855: New Campaign Project: Campaign Preset Rework
 + PR #2912: Fixing an NPE in Personnel Filter Style
++ PR #2916: Dependents cannot have an assigned unit
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
