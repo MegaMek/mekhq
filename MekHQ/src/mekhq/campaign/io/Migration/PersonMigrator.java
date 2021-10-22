@@ -28,7 +28,7 @@ public class PersonMigrator {
 
     /**
      * This performs the final migration for a person, with everything but sanity checks performed.
-     * @param version the current version
+     * @param version the version being loaded from
      * @param people the people to migrate
      */
     public static void finalPersonMigration(final Version version, final Collection<Person> people) {
