@@ -63,7 +63,6 @@ public class AtBDynamicScenario extends AtBScenario {
     private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
     private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
 
-    // convenient pointers that let us keep data around that would otherwise need reloading
     private ScenarioTemplate template; // the template that is being used to generate this scenario
 
     private double effectivePlayerUnitCountMultiplier;
@@ -76,17 +75,17 @@ public class AtBDynamicScenario extends AtBScenario {
     private SkillLevel effectiveOpforSkill;
     private int effectiveOpforQuality;
 
-    private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
-    private Map<UUID, ScenarioForceTemplate> botUnitTemplates;
-    private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
-    private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
-
     // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
     private Map<UUID, BenchedEntityData> playerUnitSwaps;
 
-    private List<AtBScenarioModifier> scenarioModifiers;
-
     private boolean finalized;
+
+    // convenient pointers that let us keep data around that would otherwise need reloading
+    private transient Map<BotForce, ScenarioForceTemplate> botForceTemplates;
+    private transient Map<UUID, ScenarioForceTemplate> botUnitTemplates;
+    private transient Map<Integer, ScenarioForceTemplate> playerForceTemplates;
+    private transient Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
+    private transient List<AtBScenarioModifier> scenarioModifiers;
 
     public AtBDynamicScenario() {
         super();
@@ -98,13 +97,13 @@ public class AtBDynamicScenario extends AtBScenario {
         setHostileReinforcementDelayReduction(0);
         setEffectiveOpforSkill(SkillLevel.REGULAR);
         setEffectiveOpforQuality(IUnitRating.DRAGOON_C);
+        setPlayerUnitSwaps(new HashMap<>());
+        setFinalized(false);
         setBotForceTemplates(new HashMap<>());
         setBotUnitTemplates(new HashMap<>());
         setPlayerForceTemplates(new HashMap<>());
         setPlayerUnitTemplates(new HashMap<>());
-        setPlayerUnitSwaps(new HashMap<>());
         setScenarioModifiers(new ArrayList<>());
-        setFinalized(false);
     }
 
     @Override
