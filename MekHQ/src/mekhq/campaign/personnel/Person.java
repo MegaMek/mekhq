@@ -2703,7 +2703,7 @@ public class Person implements Serializable {
         return skills.getSkill(skillName);
     }
 
-    public int getSkillLevel(String skillName) {
+    public int getSkillLevel(final String skillName) {
         final Skill skill = getSkill(skillName);
         return (skill == null) ? 0 : skill.getExperienceLevel();
     }
