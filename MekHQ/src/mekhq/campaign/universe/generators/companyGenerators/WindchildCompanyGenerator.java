@@ -37,15 +37,18 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Personnel
     /**
      * Set based on greater than instead of the greater than or equal to of AtB
+     * @param campaign the campaign to use in generating the commanding officer's rank
      * @param commandingOfficer the commanding officer
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
-    protected void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors) {
+    protected void generateCommandingOfficerRank(final Campaign campaign,
+                                                 final Person commandingOfficer,
+                                                 final int numMechWarriors) {
         if (numMechWarriors > 36) {
-            commandingOfficer.setRank(Rank.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
+            commandingOfficer.setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors > 12) {
-            commandingOfficer.setRank(Rank.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
+            commandingOfficer.setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 5));
         } else if (numMechWarriors > 4) {
             commandingOfficer.setRank(Rank.RWO_MAX + 4);
         } else {

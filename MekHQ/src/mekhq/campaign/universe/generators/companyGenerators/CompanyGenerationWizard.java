@@ -52,8 +52,6 @@ public class CompanyGenerationWizard {
     //endregion Getters/Setters
 
     public void set() {
-        generator.applyPhaseZeroToCampaign(getCampaign());
-
         final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
         generator.generateUnitGenerationParameters(trackers);
         generator.generateEntities(getCampaign(), trackers);

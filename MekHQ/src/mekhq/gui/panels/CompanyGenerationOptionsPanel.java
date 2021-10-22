@@ -23,7 +23,6 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -40,13 +39,8 @@ import mekhq.gui.baseComponents.JDisableablePanel;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,11 +51,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     // Base Information
     private JComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod;
-    private JComboBox<FactionChoice> comboFaction;
-    private JCheckBox chkSpecifyStartingSystem;
-    private JCheckBox chkStartingSystemFactionSpecific;
-    private JComboBox<PlanetarySystem> comboStartingSystem;
-    private JComboBox<Planet> comboStartingPlanet;
     private JCheckBox chkGenerateMercenaryCompanyCommandLance;
     private JSpinner spnCompanyCount;
     private JSpinner spnIndividualLanceCount;
@@ -179,75 +168,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     public void setComboCompanyGenerationMethod(final JComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod) {
         this.comboCompanyGenerationMethod = comboCompanyGenerationMethod;
-    }
-
-    public JComboBox<FactionChoice> getComboFaction() {
-        return comboFaction;
-    }
-
-    public Faction getFaction() {
-        return ((FactionChoice) Objects.requireNonNull(getComboFaction().getSelectedItem())).getFaction();
-    }
-
-    public void setComboFaction(final JComboBox<FactionChoice> comboFaction) {
-        this.comboFaction = comboFaction;
-    }
-
-    public JCheckBox getChkSpecifyStartingSystem() {
-        return chkSpecifyStartingSystem;
-    }
-
-    public void setChkSpecifyStartingSystem(final JCheckBox chkSpecifyStartingSystem) {
-        this.chkSpecifyStartingSystem = chkSpecifyStartingSystem;
-    }
-
-    public JCheckBox getChkStartingSystemFactionSpecific() {
-        return chkStartingSystemFactionSpecific;
-    }
-
-    public void setChkStartingSystemFactionSpecific(final JCheckBox chkStartingSystemFactionSpecific) {
-        this.chkStartingSystemFactionSpecific = chkStartingSystemFactionSpecific;
-    }
-
-    public JComboBox<PlanetarySystem> getComboStartingSystem() {
-        return comboStartingSystem;
-    }
-
-    public @Nullable PlanetarySystem getStartingSystem() {
-        return (PlanetarySystem) getComboStartingSystem().getSelectedItem();
-    }
-
-    public void setComboStartingSystem(final JComboBox<PlanetarySystem> comboStartingSystem) {
-        this.comboStartingSystem = comboStartingSystem;
-    }
-
-    private void restoreComboStartingSystem() {
-        getComboStartingSystem().removeAllItems();
-        getComboStartingSystem().setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
-                getChkStartingSystemFactionSpecific().isSelected() ? getFaction() : null)));
-        restoreComboStartingPlanet();
-    }
-
-    public JComboBox<Planet> getComboStartingPlanet() {
-        return comboStartingPlanet;
-    }
-
-    public @Nullable Planet getStartingPlanet() {
-        return (Planet) getComboStartingPlanet().getSelectedItem();
-    }
-
-    public void setComboStartingPlanet(final JComboBox<Planet> comboStartingPlanet) {
-        this.comboStartingPlanet = comboStartingPlanet;
-    }
-
-    private void restoreComboStartingPlanet()  {
-        if (getStartingSystem() != null) {
-            getComboStartingPlanet().setModel(new DefaultComboBoxModel<>(
-                    getStartingSystem().getPlanets().toArray(new Planet[]{})));
-            getComboStartingPlanet().setSelectedItem(getStartingSystem().getPrimaryPlanet());
-        } else {
-            getComboStartingPlanet().removeAllItems();
-        }
     }
 
     public JCheckBox getChkGenerateMercenaryCompanyCommandLance() {
@@ -431,7 +351,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private void restoreComboCentralSystem() {
         getComboCentralSystem().removeAllItems();
         getComboCentralSystem().setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
-                getChkCentralSystemFactionSpecific().isSelected() ? getFaction() : null)));
+                getChkCentralSystemFactionSpecific().isSelected() ? getCampaign().getFaction() : null)));
         restoreComboCentralPlanet();
     }
 
@@ -845,9 +765,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     private JPanel createBaseInformationPanel() {
-        // Initialize Labels Used in ActionListeners
-        final JLabel lblStartingPlanet = new JLabel();
-
         // Create Panel Components
         final JLabel lblCompanyGenerationMethod = new JLabel(resources.getString("lblCompanyGenerationMethod.text"));
         lblCompanyGenerationMethod.setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
@@ -863,97 +780,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CompanyGenerationMethod) {
                     list.setToolTipText(((CompanyGenerationMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-
-        final JLabel lblFaction = new JLabel(resources.getString("Faction.text"));
-        lblFaction.setToolTipText(resources.getString("lblFaction.toolTipText"));
-        lblFaction.setName("lblFaction");
-
-        setComboFaction(new JComboBox<>(new DefaultComboBoxModel<>(getFactionChoices().toArray(new FactionChoice[]{}))));
-        getComboFaction().setToolTipText(resources.getString("lblFaction.toolTipText"));
-        getComboFaction().setName("comboFaction");
-        getComboFaction().addActionListener(evt -> {
-            if (getChkStartingSystemFactionSpecific().isSelected()) {
-                if ((getStartingPlanet() != null)
-                        && getStartingSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction())) {
-                    final PlanetarySystem startingSystem = getFaction().getStartingPlanet(getCampaign(), getCampaign().getLocalDate());
-                    if (startingSystem != null) {
-                        getComboStartingSystem().setSelectedItem(startingSystem);
-                        getComboStartingPlanet().setSelectedItem(startingSystem.getPrimaryPlanet());
-                    } else {
-                        restoreComboStartingSystem();
-                    }
-                } else {
-                    restoreComboStartingSystem();
-                }
-            }
-
-            if (getChkCentralSystemFactionSpecific().isSelected()) {
-                restoreComboStartingSystem();
-            }
-        });
-
-        setChkSpecifyStartingSystem(new JCheckBox(resources.getString("chkSpecifyStartingSystem.text")));
-        getChkSpecifyStartingSystem().setToolTipText(resources.getString("chkSpecifyStartingSystem.toolTipText"));
-        getChkSpecifyStartingSystem().setName("chkSpecifyStartingSystem");
-        getChkSpecifyStartingSystem().addActionListener(evt -> {
-            final boolean selected = getChkSpecifyStartingSystem().isSelected();
-            getChkStartingSystemFactionSpecific().setEnabled(selected);
-            lblStartingPlanet.setEnabled(selected);
-            getComboStartingSystem().setEnabled(selected);
-            getComboStartingPlanet().setEnabled(selected);
-        });
-
-        setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
-        getChkStartingSystemFactionSpecific().setToolTipText(resources.getString("chkStartingSystemFactionSpecific.toolTipText"));
-        getChkStartingSystemFactionSpecific().setName("chkStartingSystemFactionSpecific");
-        getChkStartingSystemFactionSpecific().addActionListener(evt -> {
-            if ((getStartingSystem() == null) || ((getStartingSystem() != null)
-                    && !getStartingSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction()))) {
-                restoreComboStartingSystem();
-            }
-        });
-
-        lblStartingPlanet.setText(resources.getString("lblStartingPlanet.text"));
-        lblStartingPlanet.setToolTipText(resources.getString("lblStartingPlanet.toolTipText"));
-        lblStartingPlanet.setName("lblStartingPlanet");
-
-        setComboStartingSystem(new JComboBox<>());
-        getComboStartingSystem().setToolTipText(resources.getString("comboStartingSystem.toolTipText"));
-        getComboStartingSystem().setName("comboStartingSystem");
-        getComboStartingSystem().setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
-                }
-                return this;
-            }
-        });
-        getComboStartingSystem().addActionListener(evt -> {
-            if ((getStartingSystem() == null) || ((getStartingSystem() != null) && (getStartingPlanet() != null)
-                    && !getStartingPlanet().getParentSystem().equals(getStartingSystem()))) {
-                restoreComboStartingPlanet();
-            }
-        });
-
-        setComboStartingPlanet(new JComboBox<>());
-        getComboStartingPlanet().setToolTipText(resources.getString("lblStartingPlanet.toolTipText"));
-        getComboStartingPlanet().setName("comboStartingPlanet");
-        getComboStartingPlanet().setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Planet) {
-                    setText(((Planet) value).getName(getCampaign().getLocalDate()));
                 }
                 return this;
             }
@@ -1006,17 +832,11 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         // Programmatically Assign Accessibility Labels
         lblCompanyGenerationMethod.setLabelFor(getComboCompanyGenerationMethod());
-        lblFaction.setLabelFor(getComboFaction());
-        lblStartingPlanet.setLabelFor(getComboStartingPlanet());
         lblCompanyCount.setLabelFor(getSpnCompanyCount());
         lblIndividualLanceCount.setLabelFor(getSpnIndividualLanceCount());
         lblLancesPerCompany.setLabelFor(getSpnLancesPerCompany());
         lblLanceSize.setLabelFor(getSpnLanceSize());
         lblStarLeagueYear.setLabelFor(getSpnStarLeagueYear());
-
-        // Disable Panel Portions by Default
-        getChkSpecifyStartingSystem().setSelected(true);
-        getChkSpecifyStartingSystem().doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -1033,16 +853,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblFaction)
-                                .addComponent(getComboFaction(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(getChkSpecifyStartingSystem())
-                                .addComponent(getChkStartingSystemFactionSpecific(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblStartingPlanet)
-                                .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblCompanyCount)
@@ -1064,16 +874,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblFaction)
-                                .addComponent(getComboFaction()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyStartingSystem())
-                                .addComponent(getChkStartingSystemFactionSpecific()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblStartingPlanet)
-                                .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet()))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyCount)
@@ -1333,7 +1133,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkCentralSystemFactionSpecific().setName("chkCentralSystemFactionSpecific");
         getChkCentralSystemFactionSpecific().addActionListener(evt -> {
             if ((getCentralSystem() == null) || ((getCentralSystem() != null)
-                    && !getCentralSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction()))) {
+                    && !getCentralSystem().getFactionSet(getCampaign().getLocalDate()).contains(getCampaign().getFaction()))) {
                 restoreComboCentralSystem();
             }
         });
@@ -2049,21 +1849,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         }
     }
 
-    private List<FactionChoice> getFactionChoices() {
-        final List<FactionChoice> factionChoices = new ArrayList<>();
-
-        for (final Faction faction : Factions.getInstance().getFactions()) {
-            if (faction.validIn(getCampaign().getLocalDate())) {
-                factionChoices.add(new FactionChoice(faction, getCampaign().getLocalDate()));
-            }
-        }
-
-        final NaturalOrderComparator noc = new NaturalOrderComparator();
-        factionChoices.sort((a, b) -> noc.compare(a.toString(), b.toString()));
-
-        return factionChoices;
-    }
-
     private PlanetarySystem[] getPlanetarySystems(final @Nullable Faction faction) {
         return getCampaign().getSystems().stream()
                 .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction))
@@ -2085,21 +1870,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     public void setOptions(final CompanyGenerationOptions options) {
         // Base Information
         getComboCompanyGenerationMethod().setSelectedItem(options.getMethod());
-        getComboFaction().setSelectedIndex(0); // default to 0
-        final List<FactionChoice> factionChoices = getFactionChoices();
-        for (int i = 0; i < factionChoices.size(); i++) {
-            if (options.getFaction().equals(factionChoices.get(i).getFaction())) {
-                getComboFaction().setSelectedIndex(i);
-                break;
-            }
-        }
-        if (getChkSpecifyStartingSystem().isSelected() != options.isSpecifyStartingPlanet()) {
-            getChkSpecifyStartingSystem().doClick();
-        }
-        getChkStartingSystemFactionSpecific().setSelected(false);
-        restoreComboStartingSystem();
-        getComboStartingSystem().setSelectedItem(options.getStartingPlanet().getParentSystem());
-        getComboStartingPlanet().setSelectedItem(options.getStartingPlanet());
         getChkGenerateMercenaryCompanyCommandLance().setSelected(options.isGenerateMercenaryCompanyCommandLance());
         getSpnCompanyCount().setValue(options.getCompanyCount());
         getSpnIndividualLanceCount().setValue(options.getIndividualLanceCount());
@@ -2206,8 +1976,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         // Base Information
         options.setMethod(getCompanyGenerationMethod());
-        options.setFaction(getFaction());
-        options.setStartingPlanet(getStartingPlanet());
         options.setGenerateMercenaryCompanyCommandLance(getChkGenerateMercenaryCompanyCommandLance().isSelected());
         options.setCompanyCount((Integer) getSpnCompanyCount().getValue());
         options.setIndividualLanceCount((Integer) getSpnIndividualLanceCount().getValue());
@@ -2302,15 +2070,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return false;
         }
 
-        // Starting System/Planet Validation
-        if ((getStartingSystem() == null) || (getStartingPlanet() == null)) {
-            JOptionPane.showMessageDialog(getFrame(),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidStartingPlanet.text"),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidOptions.title"),
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
         // Central System/Planet Validation
         if ((getCentralSystem() == null) || (getCentralPlanet() == null)) {
             JOptionPane.showMessageDialog(getFrame(),
@@ -2361,32 +2120,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     //endregion File I/O
 
     //region Static Classes
-    private static class FactionChoice {
-        //region Variable Declarations
-        private final Faction faction;
-        private final String displayName;
-        //endregion Variable Declarations
-
-        //region Constructors
-        public FactionChoice(final Faction faction, final LocalDate today) {
-            this.faction = faction;
-            this.displayName = String.format("%s [%s]", getFaction().getFullName(today.getYear()),
-                    getFaction().getShortName());
-        }
-        //endregion Constructors
-
-        //region Getters/Setters
-        public Faction getFaction() {
-            return faction;
-        }
-        //endregion Getters/Setters
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-    }
-
     private static class RoleToSpinner {
         //region Variable Declarations
         private final PersonnelRole role;

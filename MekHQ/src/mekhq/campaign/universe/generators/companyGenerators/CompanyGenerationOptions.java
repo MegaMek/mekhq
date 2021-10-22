@@ -24,8 +24,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
@@ -36,15 +34,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,9 +46,6 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Base Information
     private CompanyGenerationMethod method;
-    private Faction faction; // Not fully understood/Implemented
-    private boolean specifyStartingPlanet;
-    private Planet startingPlanet;
     private boolean generateMercenaryCompanyCommandLance;
     private int companyCount;
     private int individualLanceCount;
@@ -146,11 +133,6 @@ public class CompanyGenerationOptions implements Serializable {
     public CompanyGenerationOptions(final CompanyGenerationMethod method, final Campaign campaign) {
         // Base Information
         setMethod(method);
-        setFaction(campaign.getFaction());
-        setSpecifyStartingPlanet(true);
-        setStartingPlanet(Systems.getInstance().getSystems().getOrDefault(
-                getFaction().getStartingPlanet(campaign.getLocalDate()),
-                campaign.getSystemByName("Terra")).getPrimaryPlanet());
         setGenerateMercenaryCompanyCommandLance(false);
         setCompanyCount(1);
         setIndividualLanceCount(0);
@@ -252,30 +234,6 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setMethod(final CompanyGenerationMethod method) {
         this.method = method;
-    }
-
-    public Faction getFaction() {
-        return faction;
-    }
-
-    public void setFaction(final Faction faction) {
-        this.faction = faction;
-    }
-
-    public boolean isSpecifyStartingPlanet() {
-        return specifyStartingPlanet;
-    }
-
-    public void setSpecifyStartingPlanet(final boolean specifyStartingPlanet) {
-        this.specifyStartingPlanet = specifyStartingPlanet;
-    }
-
-    public Planet getStartingPlanet() {
-        return startingPlanet;
-    }
-
-    public void setStartingPlanet(final Planet startingPlanet) {
-        this.startingPlanet = startingPlanet;
     }
 
     public boolean isGenerateMercenaryCompanyCommandLance() {
@@ -777,10 +735,6 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Base Information
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specifyStartingPlanet", isSpecifyStartingPlanet());
-        MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "startingPlanet", "systemId",
-                getStartingPlanet().getParentSystem().getId(), getStartingPlanet().getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
@@ -912,17 +866,6 @@ public class CompanyGenerationOptions implements Serializable {
                     //region Base Information
                     case "method":
                         options.setMethod(CompanyGenerationMethod.valueOf(wn.getTextContent().trim()));
-                        break;
-                    case "faction":
-                        options.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
-                        break;
-                    case "specifyStartingPlanet":
-                        options.setSpecifyStartingPlanet(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "startingPlanet":
-                        String startingPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                        String startingPlanetPlanetId = wn.getTextContent().trim();
-                        options.setStartingPlanet(Systems.getInstance().getSystemById(startingPlanetSystemId).getPlanetById(startingPlanetPlanetId));
                         break;
                     case "generateMercenaryCompanyCommandLance":
                         options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn.getTextContent().trim()));

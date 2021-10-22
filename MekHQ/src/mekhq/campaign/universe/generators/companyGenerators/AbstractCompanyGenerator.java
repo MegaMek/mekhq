@@ -162,13 +162,15 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the Campaign to generate using
      */
     private void createPersonnelGenerator(final Campaign campaign) {
-        setPersonnelGenerator(campaign.getPersonnelGenerator(createFactionSelector(), createPlanetSelector()));
+        setPersonnelGenerator(campaign.getPersonnelGenerator(createFactionSelector(campaign),
+                createPlanetSelector()));
     }
 
     /**
+     * @param campaign the campaign to select a faction using
      * @return a newly created Faction Selector based on the provided options
      */
-    private AbstractFactionSelector createFactionSelector() {
+    private AbstractFactionSelector createFactionSelector(final Campaign campaign) {
         // TODO : central planet/system
 
         final AbstractFactionSelector factionSelector;
@@ -176,7 +178,7 @@ public abstract class AbstractCompanyGenerator {
             factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
             ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
         } else {
-            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
+            factionSelector = new DefaultFactionSelector(campaign.getFaction());
         }
         return factionSelector;
     }
@@ -220,18 +222,6 @@ public abstract class AbstractCompanyGenerator {
     }
     //endregion Determination Methods
 
-    //region Base Information
-    /**
-     * This sets the planet to the starting planet specified, if that option is enabled
-     * @param campaign the campaign to apply the location to
-     */
-    private void moveToStartingPlanet(final Campaign campaign) {
-        if (getOptions().isSpecifyStartingPlanet()) {
-            campaign.setLocation(new CurrentLocation(getOptions().getStartingPlanet().getParentSystem(), 0));
-        }
-    }
-    //endregion Base Information
-
     //region Personnel
     /**
      * @param campaign the campaign to use to generate the personnel
@@ -269,11 +259,11 @@ public abstract class AbstractCompanyGenerator {
         }
         trackers.sort(personnelSorter);
 
-        generateCommandingOfficer(trackers.get(0), numMechWarriors);
+        generateCommandingOfficer(campaign, trackers.get(0), numMechWarriors);
 
         generateOfficers(trackers);
 
-        generateStandardMechWarriors(trackers);
+        generateStandardMechWarriors(campaign, trackers);
 
         return trackers;
     }
@@ -285,10 +275,12 @@ public abstract class AbstractCompanyGenerator {
      * 3) Gets two random officer skill increases
      * 4) Gets the highest rank possible assigned to them
      *
+     * @param campaign the campaign to use in generating the commanding officer
      * @param commandingOfficer the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
-    private void generateCommandingOfficer(final CompanyGenerationPersonTracker commandingOfficer,
+    private void generateCommandingOfficer(final Campaign campaign,
+                                           final CompanyGenerationPersonTracker commandingOfficer,
                                            final int numMechWarriors) {
         commandingOfficer.setPersonType(CompanyGenerationPersonType.COMPANY_COMMANDER);
         commandingOfficer.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
@@ -297,15 +289,18 @@ public abstract class AbstractCompanyGenerator {
         assignRandomOfficerSkillIncrease(commandingOfficer.getPerson(), 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
-            generateCommandingOfficerRank(commandingOfficer.getPerson(), numMechWarriors);
+            generateCommandingOfficerRank(campaign, commandingOfficer.getPerson(), numMechWarriors);
         }
     }
 
     /**
+     * @param campaign the campaign to use in generating the commanding officer's rank
      * @param commandingOfficer the commanding officer
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
-    protected abstract void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors);
+    protected abstract void generateCommandingOfficerRank(final Campaign campaign,
+                                                          final Person commandingOfficer,
+                                                          final int numMechWarriors);
 
     /**
      * This generates the initial officer list and assigns the type
@@ -420,15 +415,17 @@ public abstract class AbstractCompanyGenerator {
     /**
      * Sets up standard MechWarriors from the provided trackers
      *
+     * @param campaign the campaign to generate the MechWarriors based on
      * @param trackers the list of all generated trackers
      */
-    private void generateStandardMechWarriors(final List<CompanyGenerationPersonTracker> trackers) {
+    private void generateStandardMechWarriors(final Campaign campaign,
+                                              final List<CompanyGenerationPersonTracker> trackers) {
         for (final CompanyGenerationPersonTracker tracker : trackers) {
             if (!tracker.getPersonType().isMechWarrior()) {
                 continue;
             }
 
-            generateStandardMechWarrior(tracker.getPerson());
+            generateStandardMechWarrior(campaign, tracker.getPerson());
         }
     }
 
@@ -436,12 +433,13 @@ public abstract class AbstractCompanyGenerator {
      * This sets up a standard MechWarrior
      * 1) Assigns rank of E12 - Sergeant, or E4 for Clan, WoB, and ComStar
      *
+     * @param campaign the campaign to generate the MechWarrior based on
      * @param person the MechWarrior to set up
      */
-    private void generateStandardMechWarrior(final Person person) {
+    private void generateStandardMechWarrior(final Campaign campaign, final Person person) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            person.setRank((getOptions().getFaction().isComStarOrWoB()
-                    || getOptions().getFaction().isClan()) ? 4 : 12);
+            person.setRank((campaign.getFaction().isComStarOrWoB()
+                    || campaign.getFaction().isClan()) ? 4 : 12);
         }
     }
     //endregion Combat Personnel
@@ -1152,7 +1150,7 @@ public abstract class AbstractCompanyGenerator {
         final List<Entity> mothballedEntities = new ArrayList<>();
 
         // Create the Faction Selector
-        final AbstractFactionSelector factionSelector = createFactionSelector();
+        final AbstractFactionSelector factionSelector = createFactionSelector(campaign);
 
         // Create the Mothballed Entities
         for (int i = 0; i < numberMothballedEntities; i++) {
@@ -1531,16 +1529,6 @@ public abstract class AbstractCompanyGenerator {
     //endregion Surprises
 
     //region Apply to Campaign
-    /**
-     * Phase Zero: Anything that is to be run BEFORE starting generation
-     *
-     * @param campaign the campaign to apply the generation to
-     */
-    public void applyPhaseZeroToCampaign(final Campaign campaign) {
-        // Move to Starting Planet
-        moveToStartingPlanet(campaign);
-    }
-
     /**
      * Phase One: Starting Planet and Finalizing Personnel, Unit, and Units
      *

@@ -121,7 +121,6 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
         final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
-        generator.applyPhaseZeroToCampaign(getCampaign());
 
         final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
         generator.generateUnitGenerationParameters(trackers);
