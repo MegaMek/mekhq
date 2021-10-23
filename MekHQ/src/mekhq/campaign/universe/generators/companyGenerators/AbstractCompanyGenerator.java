@@ -1103,18 +1103,18 @@ public abstract class AbstractCompanyGenerator {
         }
 
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));
-        if (weight < 40) {
-            return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-        } else if (weight > 130) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        } else if (weight > 200) {
-            return EntityWeightClass.WEIGHT_HEAVY;
+        if (weight > 390) {
+            return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         } else if (weight > 280) {
             return EntityWeightClass.WEIGHT_ASSAULT;
-        } else if (weight > 390) {
-            return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-        } else { // 40 <= weight <= 130
+        } else if (weight > 200) {
+            return EntityWeightClass.WEIGHT_HEAVY;
+        } else if (weight > 130) {
+            return EntityWeightClass.WEIGHT_MEDIUM;
+        } else if (weight >= 40) {
             return EntityWeightClass.WEIGHT_LIGHT;
+        } else {
+            return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         }
     }
     //endregion Unit
