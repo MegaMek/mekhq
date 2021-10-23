@@ -19,6 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.enums.ValidationState;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -962,7 +963,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // This puts the label above the spinner, separated into three columns. From the
         // personnelRoles array declaration, the i tracks the line and the j tracks the
-        for (int i = 0; i < (personnelRoles.length / 3.0); i++) {
+        for (int i = 0; i < (personnelRoles.length / 3); i++) {
             for (int j = 0; j < 3; j++) {
                 panel.add(labels.get(personnelRoles[j + (3 * i)]));
             }
@@ -1510,6 +1511,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkStartCourseToContractPlanet())
         );
 
+        // TODO : Wave 5 : Company Generation GUI
+        panel.setEnabled(false);
+        getChkSelectStartingContract().setEnabled(false);
+        getChkStartCourseToContractPlanet().setEnabled(false);
+
         return panel;
     }
 
@@ -1705,7 +1711,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(mysteryBoxPanel)
         );
 
-        // TODO : Remove me and implement Surprises
+        // TODO : Wave 7 : Surprises
         panel.setEnabled(false);
         getChkGenerateSurprises().setEnabled(false);
         getChkGenerateMysteryBoxes().setEnabled(false);
@@ -1732,6 +1738,13 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //endregion Initialization
 
     //region Options
+    /**
+     * Sets the options for this panel to the default for the selected CompanyGenerationMethod
+     */
+    public void setOptions() {
+        setOptions(getComboCompanyGenerationMethod().getSelectedItem());
+    }
+
     /**
      * Sets the options for this panel to the default for the provided CompanyGenerationMethod
      * @param method the CompanyGenerationOptions to create the CompanyGenerationOptions from
@@ -1947,57 +1960,65 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     }
 
     /**
-     * Validates the data contained in this panel
+     * Validates the data contained in this panel, returning the current state of validation.
+     * @param display to display dialogs containing the messages or not
      * @return true if the data validates successfully, otherwise false
      */
-    public boolean validateOptions() {
+    public ValidationState validateOptions(final boolean display) {
         //region Errors
         // Minimum Generation Size Validation
         // Minimum Generation Parameter of 1 Company or Lance, the Company Command Lance Doesn't Count
         if (((int) getSpnCompanyCount().getValue() <= 0)
                 && ((int) getSpnIndividualLanceCount().getValue() <= 0)) {
-            JOptionPane.showMessageDialog(getFrame(),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidGenerationSize.text"),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidOptions.title"),
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        resources.getString("CompanyGenerationOptionsPanel.InvalidGenerationSize.text"),
+                        resources.getString("CompanyGenerationOptionsPanel.InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
         }
 
         // Central System/Planet Validation
         if ((getComboCentralSystem().getSelectedItem() == null)
                 || (getComboCentralPlanet().getSelectedItem() == null)) {
-            JOptionPane.showMessageDialog(getFrame(),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidCentralPlanet.text"),
-                    resources.getString("CompanyGenerationOptionsPanel.InvalidOptions.title"),
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        resources.getString("CompanyGenerationOptionsPanel.InvalidCentralPlanet.text"),
+                        resources.getString("CompanyGenerationOptionsPanel.InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
         }
         //endregion Errors
 
         //region Warnings
-        // Support Personnel Count:
-        // 1) Above Recommended Maximum Support Personnel Count
-        // 2) Below Half of Recommended Maximum Support Personnel Count
-        final int maximumSupportPersonnelCount = determineMaximumSupportPersonnel();
-        final int currentSupportPersonnelCount = getSpnSupportPersonnelNumbers().values().stream()
-                .mapToInt(spinner -> (int) spinner.getValue()).sum();
-        if ((maximumSupportPersonnelCount < currentSupportPersonnelCount)
-                && (JOptionPane.showConfirmDialog(getFrame(),
-                        resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.text"),
-                        resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.title"),
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
-            return false;
-        } else if ((currentSupportPersonnelCount < (maximumSupportPersonnelCount / 2.0))
-                && (JOptionPane.showConfirmDialog(getFrame(),
-                        resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.text"),
-                        resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.title"),
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
-            return false;
+        // Only need to check these if they are to be displayed
+        if (display) {
+            // Support Personnel Count:
+            // 1) Above Recommended Maximum Support Personnel Count
+            // 2) Below Half of Recommended Maximum Support Personnel Count
+            final int maximumSupportPersonnelCount = determineMaximumSupportPersonnel();
+            final int currentSupportPersonnelCount = getSpnSupportPersonnelNumbers().values().stream()
+                    .mapToInt(spinner -> (int) spinner.getValue()).sum();
+            if ((maximumSupportPersonnelCount < currentSupportPersonnelCount)
+                    && (JOptionPane.showConfirmDialog(getFrame(),
+                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.text"),
+                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.title"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
+                return ValidationState.WARNING;
+            } else if ((currentSupportPersonnelCount < (maximumSupportPersonnelCount / 2.0))
+                    && (JOptionPane.showConfirmDialog(getFrame(),
+                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.text"),
+                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.title"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
+                return ValidationState.WARNING;
+            }
         }
         //endregion Warnings
 
         // The options specified are correct, and thus can be saved
-        return true;
+        return ValidationState.SUCCESS;
     }
     //endregion Options
 

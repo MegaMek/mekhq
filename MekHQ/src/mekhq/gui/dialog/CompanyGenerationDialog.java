@@ -18,9 +18,12 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.enums.ValidationState;
 import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -29,14 +32,18 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationPersonTracker;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
+/**
+ * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel.
+ * Wave 5 will be when this gets redone to be far nicer and more customizable.
+ */
+public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private Campaign campaign;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
@@ -77,41 +84,29 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
 
     @Override
     protected JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new GridLayout(2, 3));
+        final JPanel panel = new JPanel(new GridLayout(2, 3));
 
-        JButton cancelButton = new JButton(resources.getString("Cancel.text"));
-        cancelButton.setName("cancelButton");
-        cancelButton.addActionListener(this::cancelActionPerformed);
-        panel.add(cancelButton);
+        setOkButton(new MMButton("btnGenerate", resources, "Generate.text",
+                "CompanyGenerationDialog.btnGenerate.toolTipText", this::okButtonActionPerformed));
+        panel.add(getOkButton());
 
-        JButton btnExport = new JButton(resources.getString("Export.text"));
-        btnExport.addActionListener(evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML());
-        panel.add(btnExport);
+        panel.add(new MMButton("btnApply", resources, "Apply.text",
+                "CompanyGenerationDialog.btnApply.toolTipText", this::okButtonActionPerformed));
 
-        JButton okButton = new JButton(resources.getString("Generate.text"));
-        okButton.setName("okButton");
-        okButton.addActionListener(this::okButtonActionPerformed);
-        panel.add(okButton);
+        panel.add(new MMButton("btnCancel", resources, "Cancel.text",
+                "Cancel.toolTipText", this::cancelActionPerformed));
 
-        JButton btnRestore = new JButton(resources.getString("RestoreDefaults.text"));
-        btnRestore.setName("btnRestore");
-        btnRestore.addActionListener(evt -> getCompanyGenerationOptionsPanel().setOptions(
-                MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod()));
-        panel.add(btnRestore);
+        panel.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
+                "CompanyGenerationDialog.btnRestore.toolTipText", evt ->
+                getCompanyGenerationOptionsPanel().setOptions()));
 
-        JButton btnImport = new JButton(resources.getString("Import.text"));
-        btnImport.addActionListener(evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML());
-        panel.add(btnImport);
+        panel.add(new MMButton("btnImport", resources, "Import.text",
+                "CompanyGenerationDialog.btnImport.toolTipText",
+                evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML()));
 
-        JButton btnApply = new JButton(resources.getString("Apply.text"));
-        /*
-        btnApply.addActionListener(evt -> {
-            getCompanyGenerationOptionsPanel().apply();
-            MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
-            setVisible(false);
-        });
-        */
-        panel.add(btnApply);
+        panel.add(new MMButton("btnExport", resources, "Export.text",
+                "CompanyGenerationDialog.btnExport.toolTipText",
+                evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML()));
 
         return panel;
     }
@@ -135,5 +130,12 @@ public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
 
         final Contract contract = null;
         generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
+
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+    }
+
+    @Override
+    protected ValidationState validateAction(final boolean display) {
+        return getCompanyGenerationOptionsPanel().validateOptions(display);
     }
 }

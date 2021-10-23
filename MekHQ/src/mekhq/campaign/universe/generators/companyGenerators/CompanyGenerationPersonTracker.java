@@ -21,7 +21,6 @@ package mekhq.campaign.universe.generators.companyGenerators;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 
 public class CompanyGenerationPersonTracker {
@@ -34,13 +33,17 @@ public class CompanyGenerationPersonTracker {
 
     //region Constructors
     public CompanyGenerationPersonTracker(final Person person) {
-        this(CompanyGenerationPersonType.MECHWARRIOR, person);
+        var test = CompanyGenerationPersonType.MECHWARRIOR;
+        setPersonType(test);
+        setPerson(person);
+        setParameters(null);
+        setEntity(null);
     }
 
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
                                           final Person person) {
-        setPerson(person);
         setPersonType(personType);
+        setPerson(person);
         setParameters(null);
         setEntity(null);
     }
