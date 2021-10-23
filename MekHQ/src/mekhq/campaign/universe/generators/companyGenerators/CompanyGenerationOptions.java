@@ -119,7 +119,7 @@ public class CompanyGenerationOptions implements Serializable {
     // Surprises
     private boolean generateSurprises; // Not Implemented
     private boolean generateMysteryBoxes; // Not Implemented
-    private boolean[] generateMysteryBoxTypes; // Not Implemented
+    private Map<MysteryBoxType, Boolean> generateMysteryBoxTypes; // Not Implemented
     //endregion Variable Declarations
 
     //region Constructors
@@ -221,8 +221,8 @@ public class CompanyGenerationOptions implements Serializable {
         // Surprises
         setGenerateSurprises(true);
         setGenerateMysteryBoxes(true);
-        setGenerateMysteryBoxTypes(new boolean[MysteryBoxType.values().length]);
-        getGenerateMysteryBoxTypes()[MysteryBoxType.STAR_LEAGUE_REGULAR.ordinal()] = true;
+        setGenerateMysteryBoxTypes(new HashMap<>());
+        getGenerateMysteryBoxTypes().put(MysteryBoxType.STAR_LEAGUE_REGULAR, true);
     }
     //endregion Constructors
 
@@ -694,18 +694,22 @@ public class CompanyGenerationOptions implements Serializable {
         this.generateMysteryBoxes = generateMysteryBoxes;
     }
 
-    public boolean[] getGenerateMysteryBoxTypes() {
+    public Map<MysteryBoxType, Boolean> getGenerateMysteryBoxTypes() {
         return generateMysteryBoxTypes;
     }
 
-    public void setGenerateMysteryBoxTypes(final boolean... generateMysteryBoxTypes) {
+    public void setGenerateMysteryBoxTypes(final Map<MysteryBoxType, Boolean> generateMysteryBoxTypes) {
         this.generateMysteryBoxTypes = generateMysteryBoxTypes;
     }
     //endregion Surprises
     //endregion Getters/Setters
 
     //region File IO
-    public void writeToFile(File file) {
+    /**
+     * Writes these options to an XML file
+     * @param file the file to write to, or null to not write to a file
+     */
+    public void writeToFile(@Nullable File file) {
         if (file == null) {
             return;
         }
@@ -726,6 +730,13 @@ public class CompanyGenerationOptions implements Serializable {
         }
     }
 
+    /**
+     * @param pw the print writer to write to
+     * @param indent the indent level to write at
+     * @param version the version these options were written to file in. This may be null, in which
+     *                case they are being written to file as a part of a larger save than just these
+     *                options (e.g. saved as part of Campaign or CampaignOptions)
+     */
     public void writeToXML(final PrintWriter pw, int indent, final @Nullable String version) {
         if (version == null) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
@@ -745,10 +756,7 @@ public class CompanyGenerationOptions implements Serializable {
         // Personnel
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
         for (final Map.Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportRole");
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", entry.getKey().name());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "number", entry.getValue());
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportRole");
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
@@ -816,15 +824,26 @@ public class CompanyGenerationOptions implements Serializable {
         // Surprises
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxTypes", getGenerateMysteryBoxTypes());
-
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
+        for (final Map.Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
     }
 
-    public static CompanyGenerationOptions parseFromXML(final Campaign campaign, final File file) {
+    /**
+     * @param campaign the campaign to parse the options based on
+     * @param file the XML file to parse the company generation options from. This should not be null,
+     *             but null values are handled nicely.
+     * @return the parsed CompanyGenerationOptions, or the default Windchild options if there is an
+     * issue parsing the file.
+     */
+    public static CompanyGenerationOptions parseFromXML(final Campaign campaign,
+                                                        final @Nullable File file) {
         if (file == null) {
-            MekHQ.getLogger().error("Received a null file, returning the default AtB options");
-            return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
+            MekHQ.getLogger().error("Received a null file, returning the default Windchild options");
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
         }
         final Element element;
 
@@ -832,8 +851,8 @@ public class CompanyGenerationOptions implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to open file, returning the default AtB options", e);
-            return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
+            MekHQ.getLogger().error("Failed to open file, returning the default Windchild options", e);
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
         }
         element.normalize();
 
@@ -843,13 +862,13 @@ public class CompanyGenerationOptions implements Serializable {
             final Node wn = nl.item(i);
             if ("companyGenerationOptions".equals(wn.getNodeName()) && wn.hasChildNodes()) {
                 final CompanyGenerationOptions options = parseFromXML(wn.getChildNodes(), version);
-                return (options == null)
-                        ? new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign)
-                        : options;
+                if (options != null) {
+                    return options;
+                }
             }
         }
-        MekHQ.getLogger().error("Failed to parse file, returning the default AtB options");
-        return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
+        MekHQ.getLogger().error("Failed to parse file, returning the default Windchild options");
+        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
     }
 
     /**
@@ -892,25 +911,13 @@ public class CompanyGenerationOptions implements Serializable {
                         options.setSupportPersonnel(new HashMap<>());
                         final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
-                            final Node wn3 = nl2.item(y);
-                            if ("supportRole".equals(wn3.getNodeName())) {
-                                final NodeList nl3 = wn3.getChildNodes();
-                                PersonnelRole role = PersonnelRole.NONE;
-                                int number = -1;
-                                for (int z = 0; z < nl3.getLength(); z++) {
-                                    final Node wn4 = nl3.item(z);
-                                    switch (wn4.getNodeName()) {
-                                        case "role":
-                                            role = PersonnelRole.valueOf(wn4.getTextContent().trim());
-                                            break;
-                                        case "number":
-                                            number = Integer.parseInt(wn4.getTextContent().trim());
-                                            break;
-                                    }
-                                }
-                                if (!role.isNone() && (number != -1)) {
-                                    options.getSupportPersonnel().put(role, number);
-                                }
+                            final Node wn2 = nl2.item(y);
+                            try {
+                                options.getSupportPersonnel().put(
+                                        PersonnelRole.valueOf(wn2.getNodeName().trim()),
+                                        Integer.parseInt(wn2.getTextContent().trim()));
+                            } catch (Exception ignored) {
+
                             }
                         }
                         break;
@@ -1085,12 +1092,21 @@ public class CompanyGenerationOptions implements Serializable {
                     case "generateMysteryBoxes":
                         options.setGenerateMysteryBoxes(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "generateMysteryBoxTypes":
-                        final String[] values = wn.getTextContent().trim().split(",");
-                        for (int i = 0; i < Math.min(values.length, options.getGenerateMysteryBoxTypes().length); i++) {
-                            options.getGenerateMysteryBoxTypes()[i] = Boolean.parseBoolean(values[i]);
+                    case "generateMysteryBoxTypes": {
+                        options.setGenerateMysteryBoxTypes(new HashMap<>());
+                        final NodeList nl2 = wn.getChildNodes();
+                        for (int y = 0; y < nl2.getLength(); y++) {
+                            final Node wn2 = nl2.item(y);
+                            try {
+                                options.getGenerateMysteryBoxTypes().put(
+                                        MysteryBoxType.valueOf(wn2.getNodeName().trim()),
+                                        Boolean.parseBoolean(wn2.getTextContent().trim()));
+                            } catch (Exception ignored) {
+
+                            }
                         }
                         break;
+                    }
                     //endregion Surprises
                 }
             }
