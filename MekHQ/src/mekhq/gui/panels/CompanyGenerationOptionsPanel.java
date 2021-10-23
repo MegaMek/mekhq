@@ -19,7 +19,6 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -40,7 +39,6 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
@@ -126,8 +124,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkGenerateSurprises;
     private JCheckBox chkGenerateMysteryBoxes;
     private Map<MysteryBoxType, JCheckBox> chkGenerateMysteryBoxTypes;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
