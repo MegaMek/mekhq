@@ -33,11 +33,7 @@ public class CompanyGenerationPersonTracker {
 
     //region Constructors
     public CompanyGenerationPersonTracker(final Person person) {
-        var test = CompanyGenerationPersonType.MECHWARRIOR;
-        setPersonType(test);
-        setPerson(person);
-        setParameters(null);
-        setEntity(null);
+        this(CompanyGenerationPersonType.MECHWARRIOR, person);
     }
 
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
