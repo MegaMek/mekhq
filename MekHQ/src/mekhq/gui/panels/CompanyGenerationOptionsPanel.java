@@ -1838,7 +1838,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Finances
         getSpnStartingCash().setValue(options.getStartingCash());
-        getChkRandomizeStartingCash().setSelected(options.isRandomizeStartingCash());
+        if (getChkRandomizeStartingCash().isSelected() != options.isRandomizeStartingCash()) {
+            getChkRandomizeStartingCash().doClick();
+        }
         getSpnRandomStartingCashDiceCount().setValue(options.getRandomStartingCashDiceCount());
         getSpnMinimumStartingFloat().setValue(options.getMinimumStartingFloat());
         getChkPayForSetup().setSelected(options.isPayForSetup());
