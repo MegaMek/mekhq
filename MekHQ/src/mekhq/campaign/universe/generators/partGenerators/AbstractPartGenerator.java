@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.universe.generators.partGenerators;
 
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -27,6 +28,7 @@ import mekhq.campaign.work.WorkTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractPartGenerator {
     //region Variable Declarations
@@ -69,7 +71,17 @@ public abstract class AbstractPartGenerator {
      *                   unassigned. Implementors are required to clone the parts as required.
      * @return the list of generated parts
      */
-    public abstract List<Part> generate(final List<Part> inputParts);
+    public List<Part> generate(final List<Part> inputParts) {
+        return generateWarehouse(inputParts).getParts().stream()
+                .filter(part -> part.getQuantity() > 0).collect(Collectors.toList());
+    }
+
+    /**
+     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor
+     *                   unassigned. Implementors are required to clone the parts as required.
+     * @return a warehouse containing the generated parts
+     */
+    public abstract Warehouse generateWarehouse(final List<Part> inputParts);
 
     /**
      * This creates a clone of the input part, with it not being omni-podded if it was originally.

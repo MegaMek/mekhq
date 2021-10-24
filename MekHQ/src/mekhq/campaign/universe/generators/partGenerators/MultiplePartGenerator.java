@@ -18,9 +18,11 @@
  */
 package mekhq.campaign.universe.generators.partGenerators;
 
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +45,10 @@ public class MultiplePartGenerator extends AbstractPartGenerator {
     //endregion Getters
 
     @Override
-    public List<Part> generate(final List<Part> inputParts) {
-        final List<Part> parts = inputParts.stream().map(this::clonePart).collect(Collectors.toList());
-        parts.forEach(part -> part.setQuantity(part.getQuantity() * getMultiple()));
-        return parts;
+    public Warehouse generateWarehouse(final List<Part> inputParts) {
+        final Warehouse warehouse = new Warehouse();
+        inputParts.forEach(part -> warehouse.addPart(clonePart(part), true));
+        warehouse.forEachPart(part -> part.setQuantity(part.getQuantity() * getMultiple()));
+        return warehouse;
     }
 }

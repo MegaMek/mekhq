@@ -22,7 +22,6 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,10 +37,10 @@ public class WindchildPartGenerator extends AbstractPartGenerator {
     //endregion Constructors
 
     @Override
-    public List<Part> generate(final List<Part> inputParts) {
+    public Warehouse generateWarehouse(final List<Part> inputParts) {
         final Warehouse warehouse = new Warehouse();
         inputParts.forEach(part -> warehouse.addPart(clonePart(part), true));
         warehouse.forEachPart(part -> part.setQuantity((int) Math.round(part.getQuantity() / 3.0)));
-        return warehouse.getParts().stream().filter(part -> part.getQuantity() > 0).collect(Collectors.toList());
+        return warehouse;
     }
 }

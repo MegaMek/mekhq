@@ -18,12 +18,7 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
@@ -31,9 +26,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
@@ -48,13 +41,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.AbstractFactionSelector;
-import mekhq.campaign.universe.AbstractPlanetSelector;
-import mekhq.campaign.universe.DefaultFactionSelector;
-import mekhq.campaign.universe.DefaultPlanetSelector;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.RangedFactionSelector;
-import mekhq.campaign.universe.RangedPlanetSelector;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
@@ -62,16 +49,7 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -105,13 +83,9 @@ import java.util.stream.Stream;
  * FIXME :
  *      Backgrounds don't work
  *      Weighted Type for force icons don't work
- *      Dialog x doesn't work
- *      Dialog Buttons look odd and need fixing
- *      Dialog Modify the buttons, and have them appear or disappear based on the current panel
  *      Panel has odd whitespace usage
  *      System, Planet text search
  *
- * Phase Two:
  * TODO:
  *      Implement Surprises
  *      Implement Mystery Boxes
@@ -1058,11 +1032,15 @@ public abstract class AbstractCompanyGenerator {
 
         // Type
         // FIXME : I'm not working properly to determine the filename
-        final int weightClass = determineForceWeightClass(campaign, force, isLance);
-        final String weightClassName = EntityWeightClass.getClassName(weightClass);
-        String filename = String.format("BattleMech %s.png", weightClassName);
+        String filename = String.format("BattleMech %s.png",
+                EntityWeightClass.getClassName(determineForceWeightClass(campaign, force, isLance)));
         MekHQ.getLogger().warning(filename);
-        if (!MHQStaticDirectoryManager.getForceIcons().getItems().containsKey(filename)) {
+        try {
+            if (MHQStaticDirectoryManager.getForceIcons().getItem(LayeredForceIcon.TYPE.getLayerPath(), filename) == null) {
+                filename = "BattleMech.png";
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
             filename = "BattleMech.png";
         }
         iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
