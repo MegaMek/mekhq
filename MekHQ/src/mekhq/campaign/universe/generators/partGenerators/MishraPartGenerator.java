@@ -20,8 +20,9 @@ package mekhq.campaign.universe.generators.partGenerators;
 
 import megamek.common.Mech;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
@@ -34,15 +35,6 @@ import java.util.List;
  * 3) Remove all Engines
  * 3) All Heat Sinks are capped at 30 per type
  * 4) All 'Mech Heads [Sensors, Life Support] are capped at 2 per weight/type
- * 5) All Gyros are capped at 1 per weight/type
- * 6) MASC is capped at 1 per type
- * 7) Any other parts are capped at 6.
- */
-/**
- * The Rules for this Generator:
- * 3) Remove all Engines - EnginePart
- * 3) All Heat Sinks are capped at 30 per type - HeatSink
- * 4) All 'Mech Heads [Sensors, Life Support] are capped at 2 per weight/type - ???, MekLifeSupport
  * 5) All Gyros are capped at 1 per weight/type
  * 6) MASC is capped at 1 per type
  * 7) Any other parts are capped at 6.
@@ -64,9 +56,18 @@ public class MishraPartGenerator extends MultiplePartGenerator {
     @Override
     public Warehouse generateWarehouse(final List<Part> inputParts) {
         final Warehouse warehouse = super.generateWarehouse(inputParts);
+        warehouse.getParts().removeIf(part -> part instanceof EnginePart);
         warehouse.forEachPart(part -> {
-            if (part instanceof EnginePart) {
-                warehouse.removePart(part);
+            if (part instanceof HeatSink) {
+                part.setQuantity(Math.min(part.getQuantity(), 30));
+            } else if ((part instanceof MekCockpit) || (part instanceof MekLifeSupport)
+                    || (part instanceof MekSensor)
+                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mech.LOC_HEAD)) {
+                part.setQuantity(Math.min(part.getQuantity(), 2));
+            } else if ((part instanceof MekGyro) || (part instanceof MASC)) {
+                part.setQuantity(Math.min(part.getQuantity(), 1));
+            } else {
+                part.setQuantity(Math.min(part.getQuantity(), 6));
             }
         });
         return warehouse;
