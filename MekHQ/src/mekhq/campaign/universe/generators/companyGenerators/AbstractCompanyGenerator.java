@@ -82,7 +82,6 @@ import java.util.stream.Stream;
  *
  * FIXME :
  *      Backgrounds don't work
- *      Weighted Type for force icons don't work
  *      Panel has odd whitespace usage
  *      System, Planet text search
  *
@@ -314,7 +313,8 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateOfficer(final Person officer, final CompanyGenerationPersonType type) {
         if (!type.isOfficer()) {
-            MekHQ.getLogger().error(officer.getFullTitle() + " is not a valid officer for the officer generation, cannot generate them as an officer.");
+            MekHQ.getLogger().error(officer.getFullTitle()
+                    + " is not a valid officer for the officer generation, cannot generate them as an officer.");
             return;
         }
 
@@ -412,8 +412,8 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateStandardMechWarrior(final Campaign campaign, final Person person) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            person.setRank((campaign.getFaction().isComStarOrWoB()
-                    || campaign.getFaction().isClan()) ? 4 : 12);
+            person.setRank((campaign.getFaction().isComStarOrWoB() || campaign.getFaction().isClan())
+                    ? 4 : 12);
         }
     }
     //endregion Combat Personnel
@@ -465,7 +465,8 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to use in creating the assistants
      * @param trackers the trackers to add the newly created assistants to
      */
-    private void generateAssistants(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
+    private void generateAssistants(final Campaign campaign,
+                                    final List<CompanyGenerationPersonTracker> trackers) {
         // If you don't want to use pooled assistants, then this generates them as personnel instead
         if (getOptions().isPoolAssistants()) {
             return;
@@ -513,7 +514,7 @@ public abstract class AbstractCompanyGenerator {
     private void finalizePersonnel(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
         // Assign the founder flag if we need to
         if (getOptions().isAssignFounderFlag()) {
-            trackers.forEach(t -> t.getPerson().setFounder(true));
+            trackers.forEach(tracker -> tracker.getPerson().setFounder(true));
         }
 
         // Recruit all of the personnel, GM-style so that the initial hiring cost is calculated as
@@ -532,8 +533,10 @@ public abstract class AbstractCompanyGenerator {
                         tracker.getPerson().randomMarriage(campaign, date);
                     }
 
-                    if (getOptions().isSimulateRandomProcreation() && tracker.getPerson().getGender().isFemale()) {
-                        if (tracker.getPerson().isPregnant() && (date.compareTo(tracker.getPerson().getDueDate()) == 0)) {
+                    if (getOptions().isSimulateRandomProcreation()
+                            && tracker.getPerson().getGender().isFemale()) {
+                        if (tracker.getPerson().isPregnant()
+                                && (date.compareTo(tracker.getPerson().getDueDate()) == 0)) {
                             tracker.getPerson().birth(campaign, date);
                         } else {
                             tracker.getPerson().procreate(campaign, date);
@@ -549,7 +552,6 @@ public abstract class AbstractCompanyGenerator {
     //region Unit Generation Parameters
     /**
      * This generates the unit generation parameters and assigns them to their trackers
-     *
      * @param trackers the list of all personnel trackers
      */
     public void generateUnitGenerationParameters(List<CompanyGenerationPersonTracker> trackers) {
@@ -634,11 +636,14 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * Creates an individual set of parameters, rerolling the weight if Star League is rolled originally
+     * Creates an individual set of parameters, rerolling the weight if Star League is rolled
+     * originally.
+     *
      * @param tracker the tracker to generate the parameters based on
      * @return the created parameters
      */
-    private AtBRandomMechParameters createUnitGenerationParameter(final CompanyGenerationPersonTracker tracker) {
+    private AtBRandomMechParameters createUnitGenerationParameter(
+            final CompanyGenerationPersonTracker tracker) {
         final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
                 rollBattleMechWeight(tracker, true), rollBattleMechQuality(tracker));
         if (parameters.isStarLeague()) {
@@ -671,7 +676,8 @@ public abstract class AbstractCompanyGenerator {
      * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
      * @return the weight to use in generating the BattleMech
      */
-    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker, final boolean initialRoll) {
+    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
+                                     final boolean initialRoll) {
         int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
         if (!initialRoll) {
             roll = Math.min(roll, 12);
@@ -701,6 +707,7 @@ public abstract class AbstractCompanyGenerator {
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
     protected abstract int determineBattleMechQuality(final int roll);
+
     /**
      * @param trackers the trackers to sort into their lances
      * @return a new List containing the sorted personnel
@@ -718,53 +725,50 @@ public abstract class AbstractCompanyGenerator {
                 tracker.getPersonType().isMechWarrior()).collect(Collectors.toList());
 
         // Sort Command Lance
-        sortedTrackers.addAll(organizeTrackersIntoLance(trackers.get(0), standardMechWarriors));
+        organizeTrackersIntoLance(sortedTrackers, trackers.get(0), standardMechWarriors);
 
         // If the command lance is part of a company, we sort the rest of that company immediately
         if (!getOptions().isGenerateMercenaryCompanyCommandLance() && (getOptions().getCompanyCount() > 0)) {
             for (int i = 1; i < getOptions().getLancesPerCompany(); i++) {
-                sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
             }
         }
 
         // Sort into Companies
         while (!captains.isEmpty()) {
             // Assign the Captain's Lance
-            sortedTrackers.addAll(organizeTrackersIntoLance(captains.remove(0), standardMechWarriors));
+            organizeTrackersIntoLance(sortedTrackers, captains.remove(0), standardMechWarriors);
             // Then assign the other lances
             for (int y = 1; y < getOptions().getLancesPerCompany(); y++) {
-                sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
             }
         }
 
         // Sort any individual lances
         while (!lieutenants.isEmpty()) {
-            sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+            organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
         }
 
         return sortedTrackers;
     }
 
     /**
-     *
-     * @param officer
-     * @param standardMechWarriors
-     * @return
+     * @param sortedTrackers the list to add the now sorted lance to
+     * @param officer the officer to lead the lance
+     * @param standardMechWarriors the list of normal MechWarriors who can be assigned to this lance.
      */
-    private List<CompanyGenerationPersonTracker> organizeTrackersIntoLance(
-            final CompanyGenerationPersonTracker officer,
-            final List<CompanyGenerationPersonTracker> standardMechWarriors) {
-        final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
-        trackers.add(officer);
+    private void organizeTrackersIntoLance(final List<CompanyGenerationPersonTracker> sortedTrackers,
+                                           final CompanyGenerationPersonTracker officer,
+                                           final List<CompanyGenerationPersonTracker> standardMechWarriors) {
+        sortedTrackers.add(officer);
         if (standardMechWarriors.size() <= getOptions().getLanceSize() - 1) {
-            trackers.addAll(standardMechWarriors);
+            sortedTrackers.addAll(standardMechWarriors);
             standardMechWarriors.clear();
         } else {
             for (int i = 1; (i < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); i++) {
-                trackers.add(standardMechWarriors.remove(0));
+                sortedTrackers.add(standardMechWarriors.remove(0));
             }
         }
-        return trackers;
     }
     //endregion Unit Generation Parameters
 
@@ -835,7 +839,7 @@ public abstract class AbstractCompanyGenerator {
     protected MechSummary generateMechSummary(final Campaign campaign,
                                               final AtBRandomMechParameters parameters,
                                               final String faction, int year) {
-        Predicate<MechSummary> filter = ms ->
+        final Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
         return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
@@ -869,7 +873,8 @@ public abstract class AbstractCompanyGenerator {
      * @param trackers the list of trackers including the support 'Mech techs
      * @param units the list of units to have techs assigned to (order does not matter)
      */
-    private void assignTechsToUnits(final List<CompanyGenerationPersonTracker> trackers, final List<Unit> units) {
+    private void assignTechsToUnits(final List<CompanyGenerationPersonTracker> trackers,
+                                    final List<Unit> units) {
         if (!getOptions().isAssignTechsToUnits()) {
             return;
         }
@@ -901,13 +906,14 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate the unit within
      * @param trackers a CLONED list of trackers properly organized into lances
      */
-    private void generateUnit(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
+    private void generateUnit(final Campaign campaign,
+                              final List<CompanyGenerationPersonTracker> trackers) {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
         String background = "";
 
         if (getOptions().isGenerateForceIcons() && (MHQStaticDirectoryManager.getForceIcons() != null)) {
-            // FIXME: We need a new way to handle this form of search... just default to CSR for now
+            // FIXME : We need a new way to handle this form of search... just default to CSR for now
             background = "CSR.png";
             /*
             if (MHQStaticDirectoryManager.getForceIcons().getItems().keySet().stream()
@@ -1031,10 +1037,8 @@ public abstract class AbstractCompanyGenerator {
         final LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
         // Type
-        // FIXME : I'm not working properly to determine the filename
         String filename = String.format("BattleMech %s.png",
                 EntityWeightClass.getClassName(determineForceWeightClass(campaign, force, isLance)));
-        MekHQ.getLogger().warning(filename);
         try {
             if (MHQStaticDirectoryManager.getForceIcons().getItem(LayeredForceIcon.TYPE.getLayerPath(), filename) == null) {
                 filename = "BattleMech.png";
@@ -1072,14 +1076,9 @@ public abstract class AbstractCompanyGenerator {
      */
     private int determineForceWeightClass(final Campaign campaign, final Force force,
                                           final boolean isLance) {
-        double weight = 0.0;
-        for (final UUID unitId : force.getAllUnits(true)) {
-            final Unit unit = campaign.getUnit(unitId);
-            if ((unit != null) && (unit.getEntity() != null)) {
-                weight += unit.getEntity().getWeight();
-            }
-        }
-
+        double weight = force.getAllUnits(true).stream().map(campaign::getUnit)
+                .filter(unit -> (unit != null) && (unit.getEntity() != null))
+                .mapToDouble(unit -> unit.getEntity().getWeight()).sum();
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));
         if (weight > 390) {
             return EntityWeightClass.WEIGHT_SUPER_HEAVY;
@@ -1165,12 +1164,10 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
                                                   final List<Entity> mothballedEntities) {
-        final List<Unit> mothballedUnits = new ArrayList<>();
-        for (final Entity mothballedEntity : mothballedEntities) {
-            final Unit unit = campaign.addNewUnit(mothballedEntity, false, 0);
-            unit.completeMothball();
-            mothballedUnits.add(unit);
-        }
+        final List<Unit> mothballedUnits = mothballedEntities.stream()
+                .map(entity -> campaign.addNewUnit(entity, false, 0))
+                .collect(Collectors.toList());
+        mothballedUnits.forEach(Unit::completeMothball);
         return mothballedUnits;
     }
 
@@ -1193,9 +1190,9 @@ public abstract class AbstractCompanyGenerator {
         }
 
         final List<Armor> unitAssignedArmour = units.stream()
-                .flatMap(u -> u.getParts().stream())
-                .filter(p -> p instanceof Armor)
-                .map(p -> (Armor) p)
+                .flatMap(unit -> unit.getParts().stream())
+                .filter(part -> part instanceof Armor)
+                .map(part -> (Armor) part)
                 .collect(Collectors.toList());
         final List<Armor> armour = mergeIdenticalArmour(unitAssignedArmour);
         final double armourTonnageMultiplier = getOptions().getStartingArmourWeight()
@@ -1211,20 +1208,21 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<Armor> mergeIdenticalArmour(final List<Armor> unmergedArmour) {
         final List<Armor> mergedArmour = new ArrayList<>();
-        unmergedArmour.forEach(a -> {
+        unmergedArmour.forEach(armour -> {
             boolean unmerged = true;
-            for (final Armor armour : mergedArmour) {
-                if (areSameArmour(armour, a)) {
-                    armour.addAmount(a.getAmount());
+            for (final Armor a : mergedArmour) {
+                if (areSameArmour(a, armour)) {
+                    a.addAmount(armour.getAmount());
                     unmerged = false;
                     break;
                 }
             }
+
             if (unmerged) {
-                final Armor armour = a.clone();
-                armour.setMode(WorkTime.NORMAL);
-                armour.setOmniPodded(false);
-                mergedArmour.add(armour);
+                final Armor a = armour.clone();
+                a.setMode(WorkTime.NORMAL);
+                a.setOmniPodded(false);
+                mergedArmour.add(a);
             }
         });
         return mergedArmour;
@@ -1259,9 +1257,9 @@ public abstract class AbstractCompanyGenerator {
         }
 
         final List<AmmoBin> ammoBins = units.stream()
-                .flatMap(u -> u.getParts().stream())
-                .filter(p -> p instanceof AmmoBin)
-                .map(p -> (AmmoBin) p)
+                .flatMap(unit -> unit.getParts().stream())
+                .filter(part -> part instanceof AmmoBin)
+                .map(part -> (AmmoBin) part)
                 .collect(Collectors.toList());
 
         final List<AmmoStorage> ammunition = new ArrayList<>();
@@ -1552,7 +1550,8 @@ public abstract class AbstractCompanyGenerator {
      * @param ammunition the generated spare armour
      * @return a list of the generated mothballed spare units
      */
-    public List<Unit> applyPhaseTwoToCampaign(final Campaign campaign, final List<Entity> mothballedEntities,
+    public List<Unit> applyPhaseTwoToCampaign(final Campaign campaign,
+                                              final List<Entity> mothballedEntities,
                                               final List<Part> parts, final List<Armor> armour,
                                               final List<AmmoStorage> ammunition) {
         final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
@@ -1578,7 +1577,8 @@ public abstract class AbstractCompanyGenerator {
     public void applyPhaseThreeToCampaign(final Campaign campaign,
                                           final List<CompanyGenerationPersonTracker> trackers,
                                           final List<Unit> units, final List<Part> parts,
-                                          final List<Armor> armour, final List<AmmoStorage> ammunition,
+                                          final List<Armor> armour,
+                                          final List<AmmoStorage> ammunition,
                                           final @Nullable Contract contract) {
         // Process Contract
         processContract(campaign, contract);
