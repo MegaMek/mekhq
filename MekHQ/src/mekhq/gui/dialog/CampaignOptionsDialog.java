@@ -253,7 +253,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChanges;
-    private Map<MarriageSurnameStyle, JSpinner> spnMarriageSurnameWeights;
+    private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
     private MMComboBox<RandomMarriageMethod> comboRandomMarriageMethod;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JCheckBox chkUseRandomClannerMarriages;
@@ -4168,7 +4168,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.setName("marriageSurnameWeightsPanel");
 
         spnMarriageSurnameWeights = new HashMap<>();
-        for (final MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
+        for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
             if (style.isWeighted()) {
                 continue;
             }
@@ -5316,7 +5316,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
-        for (final Map.Entry<MarriageSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
+        for (final Map.Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
             entry.getValue().setValue(options.getMarriageSurnameWeights().get(entry.getKey()) / 10.0);
         }
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
@@ -5842,7 +5842,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
             options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
             options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
-            for (final Map.Entry<MarriageSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
+            for (final Map.Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
                 options.getMarriageSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
             }
             options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());

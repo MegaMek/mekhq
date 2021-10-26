@@ -28,7 +28,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.MarriageSurnameStyle;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 import java.time.LocalDate;
@@ -185,7 +185,7 @@ public abstract class AbstractMarriage {
      * @param surnameStyle the style for how the two people's surnames will change as part of the marriage
      */
     public void marry(final Campaign campaign, final LocalDate today, final Person origin,
-                      final @Nullable Person spouse, final MarriageSurnameStyle surnameStyle) {
+                      final @Nullable Person spouse, final MergingSurnameStyle surnameStyle) {
         if (spouse == null) {
             return;
         }
@@ -262,7 +262,7 @@ public abstract class AbstractMarriage {
                 .collect(Collectors.toList());
         if (!potentials.isEmpty()) {
             marry(campaign, today, person, potentials.get(Compute.randomInt(potentials.size())),
-                    MarriageSurnameStyle.WEIGHTED);
+                    MergingSurnameStyle.WEIGHTED);
         }
     }
 

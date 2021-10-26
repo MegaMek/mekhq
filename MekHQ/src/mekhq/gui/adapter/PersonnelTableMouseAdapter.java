@@ -317,7 +317,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getMarriage().marry(gui.getCampaign(),
                         gui.getCampaign().getLocalDate(), selectedPerson,
                         gui.getCampaign().getPerson(UUID.fromString(data[1])),
-                        MarriageSurnameStyle.valueOf(data[2]));
+                        MergingSurnameStyle.valueOf(data[2]));
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -1227,7 +1227,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     spouseMenu = new JMenu(status);
 
-                    for (final MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
+                    for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
                         spouseMenu.add(newMenuItem(style.getDropDownText(),
                                 makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
                     }
