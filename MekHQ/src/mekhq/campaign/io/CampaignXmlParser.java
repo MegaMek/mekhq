@@ -52,6 +52,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -523,8 +524,11 @@ public class CampaignXmlParser {
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }
 
-        //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
+        // Load Completed. Time for final migration and sanity checks.
+        // Final migration
+        PersonMigrator.finalPersonMigration(version, retVal.getPersonnel());
 
+        // Sanity Checks
         fixupUnitTechProblems(retVal);
 
         //unload any ammo bins in the warehouse
