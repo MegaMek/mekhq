@@ -40,9 +40,9 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 /**
- * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the common logic for
- * procreation, and is implemented by classes defining how to determine if a female person will randomly procreate on a
- * given day.
+ * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
+ * common logic for procreation, and is implemented by classes defining how to determine if a female
+ * person will randomly procreate on a given day.
  */
 public abstract class AbstractProcreation {
     //region Variable Declarations
@@ -241,7 +241,8 @@ public abstract class AbstractProcreation {
      * @param mother the newly pregnant mother
      * @param size the number of children the mother is having
      */
-    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size) {
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother,
+                             final int size) {
         if (size < 1) {
             return;
         }
@@ -258,7 +259,8 @@ public abstract class AbstractProcreation {
         if (campaign.getCampaignOptions().isLogProcreation()) {
             MedicalLogger.hasConceived(mother, today, babyAmount);
             if (mother.getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(), mother.getFullName(), today, babyAmount);
+                PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(),
+                        mother.getFullName(), today, babyAmount);
             }
         }
     }
@@ -298,7 +300,8 @@ public abstract class AbstractProcreation {
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
-            campaign.addReport(String.format(resources.getString("multipleBabiesBorn.report"), mother.getHyperlinkedName(),
+            campaign.addReport(String.format(resources.getString("multipleBabiesBorn.report"),
+                    mother.getHyperlinkedName(),
                     resources.getString("babyAmount.text").split(",")[size - 1]));
         }
 
@@ -311,8 +314,9 @@ public abstract class AbstractProcreation {
             baby.setBirthday(today);
 
             // Create reports and log the birth
-            campaign.addReport(String.format(resources.getString("babyBorn.report"), mother.getHyperlinkedName(),
-                    baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
+            campaign.addReport(String.format(resources.getString("babyBorn.report"),
+                    mother.getHyperlinkedName(), baby.getHyperlinkedName(),
+                    GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().isLogProcreation()) {
                 MedicalLogger.deliveredBaby(mother, baby, today);
                 if (father != null) {
