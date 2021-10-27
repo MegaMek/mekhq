@@ -2274,20 +2274,17 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> "
-                + funds.toAmountAndSymbolString()
-                + inDebt
-                + "</html>";
+        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
         lblFunds.setText(text);
     }
 
     private void refreshTempAstechs() {
-        String text = "<html><b>Temp Astechs:</b> " + getCampaign().getAstechPool() + "</html>";
+        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 
     private void refreshTempMedics() {
-        String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
@@ -2297,7 +2294,7 @@ public class CampaignGUI extends JPanel {
         } else {
             StringBuilder report = new StringBuilder();
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
-            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>:" + partsAvailability + "</html>");
+            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
         }
     }
 
