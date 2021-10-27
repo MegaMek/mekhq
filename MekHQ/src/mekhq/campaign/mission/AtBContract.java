@@ -714,7 +714,7 @@ public class AtBContract extends Contract implements Serializable {
         }
 
         final int extension;
-        final int roll = 1;//Compute.d6();
+        final int roll = Compute.d6();
         if (roll == 1) {
             extension = Math.max(1, getLength() / 2);
         } else if (roll == 2) {
