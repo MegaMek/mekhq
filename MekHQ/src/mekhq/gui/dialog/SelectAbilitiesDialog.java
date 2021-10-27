@@ -73,12 +73,12 @@ public class SelectAbilitiesDialog extends JDialog {
         for (final SpecialAbility spa : allSPA.values().stream()
                 .sorted((a, b) -> new NaturalOrderComparator().compare(a.getDisplayName(), b.getDisplayName()))
                 .collect(Collectors.toList())) {
-        	chk = new JCheckBox(spa.getDisplayName());
-        	if (selected.contains(spa.getName())) {
-        		chk.setSelected(true);
-        	}
-        	chkAbil.add(chk);
-        	panMain.add(chk);
+            chk = new JCheckBox(spa.getDisplayName());
+            if (selected.contains(spa.getName())) {
+                chk.setSelected(true);
+            }
+            chkAbil.add(chk);
+            panMain.add(chk);
             spaNames.add(spa.getName());
         }
 
@@ -110,25 +110,25 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void done() {
-    	selected = new Vector<>();
-    	for (int i = 0; i < spaNames.size(); i++) {
-    		if (chkAbil.get(i).isSelected()) {
-    			selected.add(spaNames.get(i));
-    		}
-    	}
-    	this.setVisible(false);
+        selected = new Vector<>();
+        for (int i = 0; i < spaNames.size(); i++) {
+            if (chkAbil.get(i).isSelected()) {
+                selected.add(spaNames.get(i));
+            }
+        }
+        this.setVisible(false);
     }
 
     public Vector<String> getSelected() {
-    	return selected;
+        return selected;
     }
 
     private void cancel() {
-    	this.setVisible(false);
-    	cancelled = true;
+        this.setVisible(false);
+        cancelled = true;
     }
 
     public boolean wasCancelled() {
-    	return cancelled;
+        return cancelled;
     }
 }
