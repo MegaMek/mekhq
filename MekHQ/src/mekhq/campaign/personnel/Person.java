@@ -19,38 +19,19 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Crew;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
-import megamek.common.VTOL;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -59,27 +40,10 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.io.Migration.PersonMigrator;
-import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.log.LogEntryFactory;
-import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.PersonalLogger;
-import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.*;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.Divorce;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -98,17 +62,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1773,21 +1727,21 @@ public class Person implements Serializable {
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
             }
-            if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
-                        getOptionList("::", PilotOptions.LVL3_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
             }
-            if (countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edge",
-                        getOptionList("::", PilotOptions.EDGE_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
                 // For support personnel, write an available edge value
                 if (hasSupportRole(true) || isEngineer()) {
                     MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeAvailable", getCurrentEdge());
                 }
             }
-            if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "implants",
-                        getOptionList("::", PilotOptions.MD_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
             }
             if (!techUnits.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "techUnitIds");
@@ -2895,7 +2849,7 @@ public class Person implements Serializable {
     }
 
     public void setEdge(int e) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals("edge")) {
                 ability.setValue(e);
@@ -2945,7 +2899,7 @@ public class Person implements Serializable {
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(String name, boolean status) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(status);
@@ -2960,7 +2914,7 @@ public class Person implements Serializable {
      * @param name of the trigger condition
      */
     public void changeEdgeTrigger(String name) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(!ability.booleanValue());
@@ -2975,7 +2929,7 @@ public class Person implements Serializable {
      */
     public String getEdgeTooltip() {
         StringBuilder edgett = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             //yuck, it would be nice to have a more fool-proof way of identifying edge triggers
             if (ability.getName().contains("edge_when") && ability.booleanValue()) {
