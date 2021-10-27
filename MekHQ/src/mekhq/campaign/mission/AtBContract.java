@@ -23,23 +23,19 @@ package mekhq.campaign.mission;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -718,7 +714,7 @@ public class AtBContract extends Contract implements Serializable {
         }
 
         final int extension;
-        final int roll = Compute.d6();
+        final int roll = 1;//Compute.d6();
         if (roll == 1) {
             extension = Math.max(1, getLength() / 2);
         } else if (roll == 2) {
@@ -732,6 +728,7 @@ public class AtBContract extends Contract implements Serializable {
                 warName, extension, ((extension == 1) ? " month" : " months")));
         setEndDate(getEndingDate().plusMonths(extension));
         extensionLength += extension;
+        MekHQ.triggerEvent(new MissionChangedEvent(this));
         return true;
     }
 
