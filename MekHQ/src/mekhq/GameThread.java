@@ -11,19 +11,11 @@
  */
 package mekhq;
 
-import java.awt.KeyboardFocusManager;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
-import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
-import megamek.common.IGame;
 import megamek.common.KeyBindParser;
 import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
@@ -31,6 +23,12 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 class GameThread extends Thread implements CloseClientListener {
     //region Variable Declarations
@@ -100,15 +98,14 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
 
-            // if game is running, shouldn't do the following, so detect the
-            // phase
-            for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            // if game is running, shouldn't do the following, so detect the phase
+            for (int i = 0; (i < 1000) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage" );
+                MekHQ.getLogger().warning("Thread in unknown stage");
             }
 
-            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info("Thread in lounge" );
+            if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
+                MekHQ.getLogger().info("Thread in lounge");
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {

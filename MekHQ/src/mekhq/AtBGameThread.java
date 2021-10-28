@@ -33,7 +33,6 @@ import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
-import megamek.common.IGame;
 import megamek.common.IAero;
 import megamek.common.MapSettings;
 import megamek.common.Minefield;
@@ -104,14 +103,13 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
 
-            // if game is running, shouldn't do the following, so detect the
-            // phase
-            for (int i = 0; (i < CLIENT_RETRY_COUNT) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            // if game is running, shouldn't do the following, so detect the phase
+            for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage");
+                MekHQ.getLogger().warning("Thread in unknown stage");
             }
 
-            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
+            if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
                 MekHQ.getLogger().info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
@@ -125,9 +123,8 @@ public class AtBGameThread extends GameThread {
 
                 MapSettings mapSettings = MapSettings.getInstance();
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1, 1); 
+                mapSettings.setMapSize(1, 1);
                 mapSettings.getBoardsSelectedVector().clear();
-                
 
                 // if the scenario is taking place in space, do space settings instead
                 if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
@@ -135,7 +132,7 @@ public class AtBGameThread extends GameThread {
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
                     mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
-                    
+
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
@@ -150,13 +147,13 @@ public class AtBGameThread extends GameThread {
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
-                    
+
                     // duplicate code, but getting a new instance of map settings resets the size parameters
                     mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                    mapSettings.setMapSize(1, 1); 
+                    mapSettings.setMapSize(1, 1);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 }
-                
+
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
@@ -499,7 +496,7 @@ public class AtBGameThread extends GameThread {
         destination.setStartingPos(source.getStartingPos(false));
         destination.setAltitude(source.getAltitude());
         destination.setElevation(source.getElevation());
-        
+
         if (destination.isAirborne() && (destination.getAltitude() == 0)) {
             ((IAero) destination).land();
         }
