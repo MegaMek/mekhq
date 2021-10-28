@@ -20,29 +20,22 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridLayout;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.SpecialAbility;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class SelectUnusedAbilityDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
@@ -117,11 +110,11 @@ public class SelectUnusedAbilityDialog extends JDialog {
     		String displayName = "";
     		String desc = "";
 
-    		PilotOptions poptions = new PilotOptions();
+            PersonnelOptions poptions = new PersonnelOptions();
         	for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
         		IOptionGroup group = i.nextElement();
 
-        		if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+        		if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
         			continue;
         		}
 
@@ -159,11 +152,11 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private String getDisplayName(String lookup) {
-    	PilotOptions poptions = new PilotOptions();
+        PersonnelOptions poptions = new PersonnelOptions();
     	for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
     		IOptionGroup group = i.nextElement();
 
-    		if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+    		if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
     			continue;
     		}
 
@@ -178,18 +171,18 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private String getDesc(String lookup) {
-    	PilotOptions poptions = new PilotOptions();
+        PersonnelOptions poptions = new PersonnelOptions();
     	for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
     		IOptionGroup group = i.nextElement();
 
-    		if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+    		if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
     			continue;
     		}
 
     		for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
     			IOption option = j.nextElement();
     			if (option.getName().equals(lookup)) {
-    				return(option.getDescription());
+    				return option.getDescription();
     			}
     		}
     	}

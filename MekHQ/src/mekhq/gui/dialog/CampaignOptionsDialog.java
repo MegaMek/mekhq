@@ -35,7 +35,6 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
@@ -54,6 +53,7 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.*;
@@ -5991,11 +5991,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private Vector<String> getUnusedSPA() {
         Vector<String> unused = new Vector<>();
-        PilotOptions poptions = new PilotOptions();
+        PersonnelOptions poptions = new PersonnelOptions();
         for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
-            if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
                 continue;
             }
 
