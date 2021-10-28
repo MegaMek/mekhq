@@ -39,6 +39,10 @@ VERSION HISTORY:
 + PR #2912: Fixing an NPE in Personnel Filter Style
 + PR #2916: Dependents cannot have an assigned unit
 + PR #2915: AtB Dynamic Scenario: Fixing missing serialization on all non-map values
++ Issue #2918: AtBContract End Date Display Does Not Update on Contract Extension
++ Issue #2920: Full Swapover to MekHQ's PersonnelOptions over MegaMek's PilotOptions
++ PR #2921: Main GUI Bottom Line Formatting Issues: Missing Space and Standardizing Colon Bolding
++ PR #2924: SelectAbilitiesDialog: Adding SPA Display Name Sorting
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls
