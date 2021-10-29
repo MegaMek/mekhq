@@ -101,7 +101,7 @@ class GameThread extends Thread implements CloseClientListener {
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < 1000) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().warning("Thread in unknown stage");
+                MekHQ.getLogger().error("Thread in unknown stage" );
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
