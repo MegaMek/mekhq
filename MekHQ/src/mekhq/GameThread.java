@@ -104,7 +104,7 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage" );
+                MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
