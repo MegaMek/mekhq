@@ -490,7 +490,7 @@ public class Campaign implements Serializable, ITechManager {
         if (unitGenerator != null && unitGenerator instanceof RATManager) {
             MekHQ.unregisterHandler(unitGenerator);
         }
-        if (campaignOptions.useStaticRATs()) {
+        if (campaignOptions.isUseStaticRATs()) {
             RATManager rm = new RATManager();
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 try {
@@ -500,7 +500,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
-            rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
+            rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
             unitGenerator = rm;
         } else {
             unitGenerator = new RATGeneratorConnector(getGameYear());

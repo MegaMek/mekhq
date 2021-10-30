@@ -25,7 +25,6 @@ import megamek.common.Crew;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
@@ -388,7 +387,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_ABILITY: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         selected, true);
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
@@ -402,7 +401,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_WEAPON_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -417,7 +416,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -432,7 +431,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_RANGEMASTER: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_RANGE_MASTER, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -447,7 +446,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_HUMANTRO: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -463,7 +462,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 String ability = data[3];
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         ability, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",

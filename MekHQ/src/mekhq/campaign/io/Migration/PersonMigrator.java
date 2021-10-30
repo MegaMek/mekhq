@@ -18,7 +18,31 @@
  */
 package mekhq.campaign.io.Migration;
 
+import megamek.Version;
+import mekhq.MekHqConstants;
+import mekhq.campaign.personnel.Person;
+
+import java.util.Collection;
+
 public class PersonMigrator {
+
+    /**
+     * This performs the final migration for a person, with everything but sanity checks performed.
+     * @param version the version being loaded from
+     * @param people the people to migrate
+     */
+    public static void finalPersonMigration(final Version version, final Collection<Person> people) {
+        if (MekHqConstants.VERSION.is(version)) {
+            return;
+        }
+
+        if (version.isLowerThan("0.49.4")) {
+            people.stream()
+                    .filter(person -> person.getPrimaryRole().isDependent() && (person.getUnit() != null))
+                    .forEach(person -> person.getUnit().remove(person, true));
+        }
+    }
+
     /**
      * This migrates awards from the Default Set of pre-0.47.6 to the newer standard following 0.47.14
      * @param text the previous award name
