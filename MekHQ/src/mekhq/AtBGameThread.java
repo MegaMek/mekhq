@@ -96,14 +96,13 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
 
-            // if game is running, shouldn't do the following, so detect the
-            // phase
-            for (int i = 0; (i < CLIENT_RETRY_COUNT) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            // if game is running, shouldn't do the following, so detect the phase
+            for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
                 MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
-            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
+            if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
                 MekHQ.getLogger().info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
@@ -119,7 +118,6 @@ public class AtBGameThread extends GameThread {
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
                 mapSettings.setMapSize(1, 1);
                 mapSettings.getBoardsSelectedVector().clear();
-
 
                 // if the scenario is taking place in space, do space settings instead
                 if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
