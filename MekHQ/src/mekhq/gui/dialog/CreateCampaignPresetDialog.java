@@ -508,8 +508,6 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         getChkSpecifyPlanet().doClick();
         getChkSpecifyRankSystem().setSelected(true);
         getChkSpecifyRankSystem().doClick();
-        getChkSpecifyCompanyGenerationOptions().setSelected(true);
-        getChkSpecifyCompanyGenerationOptions().doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();

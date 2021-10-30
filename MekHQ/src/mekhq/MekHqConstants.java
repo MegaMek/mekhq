@@ -47,10 +47,11 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
 
-    //region Personnel Tab Display Options
+    //region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
-    //endregion Personnel Tab Display Options
+    //endregion Personnel Tab
+    //endregion Display
 
     //region Colours
     public static final String DEPLOYED_FOREGROUND = "deployedForeground";
@@ -84,7 +85,6 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
-    //endregion Display
 
     //region Autosave
     public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
