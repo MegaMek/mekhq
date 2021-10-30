@@ -20,24 +20,11 @@
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.*;
-
-import javax.swing.JOptionPane;
-
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
-import megamek.common.PlanetaryConditions;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -46,11 +33,17 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
+
 /**
  * @author Neoancient
  *
- * Enhanced version of GameThread which imports settings and non-player
- * units into the MM game
+ * Enhanced version of GameThread which imports settings and non-player units into the MM game
  */
 public class AtBGameThread extends GameThread {
 
@@ -106,7 +99,7 @@ public class AtBGameThread extends GameThread {
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage");
+                MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
