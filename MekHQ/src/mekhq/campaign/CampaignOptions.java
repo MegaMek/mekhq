@@ -358,6 +358,12 @@ public class CampaignOptions implements Serializable {
     private boolean contractMarketReportRefresh;
     //endregion Markets Tab
 
+    //region RATs Tab
+    private boolean useStaticRATs;
+    private String[] rats;
+    private boolean ignoreRATEra;
+    //endregion RATs Tab
+
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
@@ -393,11 +399,6 @@ public class CampaignOptions implements Serializable {
     private boolean adjustPaymentForStrategy;
     private int[] atbBattleChance;
     private boolean generateChases;
-
-    // RATs
-    private boolean staticRATs;
-    private String[] rats;
-    private boolean ignoreRatEra;
 
     // Scenarios
     private boolean doubleVehicles;
@@ -776,6 +777,12 @@ public class CampaignOptions implements Serializable {
         setContractMarketReportRefresh(true);
         //endregion Markets Tab
 
+        //region RATs Tab
+        setUseStaticRATs(false);
+        setRATs("Xotl", "Total Warfare");
+        setIgnoreRATEra(false);
+        //endregion RATs Tab
+
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
@@ -815,11 +822,6 @@ public class CampaignOptions implements Serializable {
         atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
         atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
         generateChases = true;
-
-        // RATs
-        staticRATs = false;
-        rats = new String[]{ "Xotl", "Total Warfare" }; // TODO : Localize me
-        ignoreRatEra = false;
 
         // Scenarios
         doubleVehicles = false;
@@ -2084,6 +2086,32 @@ public class CampaignOptions implements Serializable {
     //endregion Contract Market
     //endregion Markets Tab
 
+    //region RATs Tab
+    public boolean isUseStaticRATs() {
+        return useStaticRATs;
+    }
+
+    public void setUseStaticRATs(final boolean useStaticRATs) {
+        this.useStaticRATs = useStaticRATs;
+    }
+
+    public String[] getRATs() {
+        return rats;
+    }
+
+    public void setRATs(final String... rats) {
+        this.rats = rats;
+    }
+
+    public boolean isIgnoreRATEra() {
+        return ignoreRATEra;
+    }
+
+    public void setIgnoreRATEra(final boolean ignore) {
+        ignoreRATEra = ignore;
+    }
+    //endregion RATs Tab
+
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
             case TECH_INTRO:
@@ -2906,30 +2934,6 @@ public class CampaignOptions implements Serializable {
         this.playerControlsAttachedUnits = playerControlsAttachedUnits;
     }
 
-    public String[] getRATs() {
-        return rats;
-    }
-
-    public void setRATs(String[] rats) {
-        this.rats = rats;
-    }
-
-    public boolean useStaticRATs() {
-        return staticRATs;
-    }
-
-    public void setStaticRATs(boolean staticRATs) {
-        this.staticRATs = staticRATs;
-    }
-
-    public boolean canIgnoreRatEra() {
-        return ignoreRatEra;
-    }
-
-    public void setIgnoreRatEra(boolean ignore) {
-        ignoreRatEra = ignore;
-    }
-
     public int getSearchRadius() {
         return searchRadius;
     }
@@ -3427,9 +3431,15 @@ public class CampaignOptions implements Serializable {
 
         //region Contract Market
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
+
+        //region RATs Tab
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useStaticRATs", isUseStaticRATs());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rats", getRATs());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "ignoreRATEra", isIgnoreRATEra());
+        //endregion RATs Tab
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<phenotypeProbabilities>"
@@ -3529,17 +3539,6 @@ public class CampaignOptions implements Serializable {
         }
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
-
-        //region AtB Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "rats", StringUtils.join(rats, ','));
-        if (staticRATs) {
-            pw1.println(MekHqXmlUtil.indentStr(indent) + "<staticRATs/>");
-        }
-
-        if (ignoreRatEra) {
-            pw1.println(MekHqXmlUtil.indentStr(indent) + "<ignoreRatEra/>");
-        }
-        //endregion AtB Options
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
@@ -3998,7 +3997,7 @@ public class CampaignOptions implements Serializable {
                 //endregion Price Multipliers
                 //endregion Finances Tab
 
-                //region Markets
+                //region Markets Tab
                 //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
                     retVal.setPersonnelMarketType(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
@@ -4037,7 +4036,16 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Contract Market
-                // endregion Markets
+                //endregion Markets Tab
+
+                //region RATs Tab
+                } else if (wn2.getNodeName().equals("useStaticRATs")) {
+                    retVal.setUseStaticRATs(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
+                    retVal.setRATs(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(","));
+                } else if (wn2.getNodeName().equals("ignoreRATEra")) {
+                    retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion RATs Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
@@ -4150,12 +4158,6 @@ public class CampaignOptions implements Serializable {
                     retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
                     retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
-                    retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
-                } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
-                    retVal.staticRATs = true;
-                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
-                    retVal.ignoreRatEra = true;
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
                     retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
@@ -4179,6 +4181,10 @@ public class CampaignOptions implements Serializable {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) { //Legacy - 0.49.3 Removal
+                    retVal.setUseStaticRATs(true);
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) { //Legacy - 0.49.3 Removal
+                    retVal.setIgnoreRATEra(true);
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
                     final double value = Double.parseDouble(wn2.getTextContent());
                     retVal.setClanUnitPriceMultiplier(value);
