@@ -30,7 +30,6 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -3485,7 +3484,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         getCampaign().clearGameData(entity);
         //Set up SPAs, Implants, Edge, etc
         if (getCampaign().getCampaignOptions().useAbilities()) {
-            PilotOptions options = new PilotOptions();
+            PersonnelOptions options = new PersonnelOptions();
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<>();
@@ -3494,7 +3493,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                      IOption option = j.nextElement();
-                     if (group.getKey().equals(PilotOptions.MD_ADVANTAGES)) {
+                     if (group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                          cyberOptionNames.add(option.getName());
                      } else {
                          optionNames.add(option.getName());
@@ -3528,7 +3527,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 double crewSize = crew.size();
 
                 // This does the following:
-                // 1. For each crew member, get all of their PilotOptions by name
+                // 1. For each crew member, get all of their PersonnelOptions by name
                 // 2. Flatten the crew member options into one stream
                 // 3. Group these options by their name
                 // 4. For each group, group by the object value and get the counts for each value
@@ -3616,7 +3615,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 //For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
-                PilotOptions cdrOptions = new PilotOptions();
+                PersonnelOptions cdrOptions = new PersonnelOptions();
                 if (null != commander) {
                     for (String optionName : optionNames) {
                         IOption option = commander.getOptions().getOption(optionName);

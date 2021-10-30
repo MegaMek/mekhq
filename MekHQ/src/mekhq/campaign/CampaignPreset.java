@@ -21,7 +21,6 @@ package mekhq.campaign;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utils.MegaMekXmlUtil;
@@ -30,6 +29,7 @@ import mekhq.MekHQOptions;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -461,7 +461,7 @@ public class CampaignPreset implements Serializable {
                         break;
                     }
                     case "specialAbilities": {
-                        final PilotOptions options = new PilotOptions();
+                        final PersonnelOptions options = new PersonnelOptions();
                         final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
                             final Node wn2 = nl2.item(y);

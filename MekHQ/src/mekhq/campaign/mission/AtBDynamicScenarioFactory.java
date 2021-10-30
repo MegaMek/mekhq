@@ -132,7 +132,7 @@ public class AtBDynamicScenarioFactory {
 
         scenario.setName(template.name);
         scenario.setDesc(template.detailedBriefing);
-        scenario.setScenarioTemplate(template);
+        scenario.setTemplate(template);
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         scenario.setMissionId(contract.getId());
