@@ -37,6 +37,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -75,6 +76,7 @@ public class CampaignPreset implements Serializable {
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
+    private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
     private GameOptions gameOptions;
@@ -91,14 +93,14 @@ public class CampaignPreset implements Serializable {
 
     public CampaignPreset(final boolean userData) {
         this("Title", "", userData, null, null, null, null,
-                2, null, null, null,
+                2, null, null, null, null,
                 new Hashtable<>(), new Hashtable<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
         this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
-                campaign.getGameOptions(), campaign.getCampaignOptions(),
+                null, campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
                 SpecialAbility.getAllSpecialAbilities());
     }
@@ -106,7 +108,9 @@ public class CampaignPreset implements Serializable {
     public CampaignPreset(final String title, final String description, final boolean userData,
                           final @Nullable LocalDate date, final @Nullable Faction faction,
                           final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
-                          final int contractCount, final @Nullable GameOptions gameOptions,
+                          final int contractCount,
+                          final @Nullable CompanyGenerationOptions companyGenerationOptions,
+                          final @Nullable GameOptions gameOptions,
                           final @Nullable CampaignOptions campaignOptions,
                           final @Nullable RandomSkillPreferences randomSkillPreferences,
                           final Hashtable<String, SkillType> skills,
@@ -122,6 +126,7 @@ public class CampaignPreset implements Serializable {
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
+        setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
         setGameOptions(gameOptions);
@@ -188,6 +193,14 @@ public class CampaignPreset implements Serializable {
 
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
+    }
+
+    public CompanyGenerationOptions getCompanyGenerationOptions() {
+        return companyGenerationOptions;
+    }
+
+    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
+        this.companyGenerationOptions = companyGenerationOptions;
     }
     //endregion Startup
 
@@ -322,6 +335,9 @@ public class CampaignPreset implements Serializable {
             getRankSystem().writeToXML(pw, indent, false);
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        if (getCompanyGenerationOptions() != null) {
+            getCompanyGenerationOptions().writeToXML(pw, indent, null);
+        }
         //endregion Startup
 
         //region Continuous
@@ -432,6 +448,9 @@ public class CampaignPreset implements Serializable {
                         break;
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
+                        break;
+                    case "companyGenerationOptions":
+                        preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));
                         break;
                     //endregion Startup
 

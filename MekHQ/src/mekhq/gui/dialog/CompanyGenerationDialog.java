@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -46,6 +47,7 @@ import java.util.List;
 public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private Campaign campaign;
+    private CompanyGenerationOptions companyGenerationOptions;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
     //endregion Variable Declarations
 
@@ -53,6 +55,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "CompanyGenerationDialog", "CompanyGenerationDialog.title");
         setCampaign(campaign);
+        setCompanyGenerationOptions(null);
         initialize();
     }
     //endregion Constructors
@@ -64,6 +67,14 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     public void setCampaign(final Campaign campaign) {
         this.campaign = campaign;
+    }
+
+    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
+        return companyGenerationOptions;
+    }
+
+    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
+        this.companyGenerationOptions = companyGenerationOptions;
     }
 
     public CompanyGenerationOptionsPanel getCompanyGenerationOptionsPanel() {
@@ -78,7 +89,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign()));
+        setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
+                getCompanyGenerationOptions()));
         return new JScrollPane(getCompanyGenerationOptionsPanel());
     }
 

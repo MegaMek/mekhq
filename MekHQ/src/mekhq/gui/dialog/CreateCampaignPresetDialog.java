@@ -41,6 +41,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -75,6 +76,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     private JCheckBox chkSpecifyRankSystem;
     private MMComboBox<RankSystem> comboRankSystem;
     private JSpinner spnContractCount;
+    private JCheckBox chkSpecifyCompanyGenerationOptions;
+    private CompanyGenerationOptions companyGenerationOptions;
     //endregion Startup
 
     //region Continuous
@@ -95,6 +98,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         this.campaign = campaign;
         setPreset(preset);
         setDate(campaign.getLocalDate());
+        setCompanyGenerationOptions(null);
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
                 ? campaign.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
@@ -243,6 +247,22 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     public void setSpnContractCount(final JSpinner spnContractCount) {
         this.spnContractCount = spnContractCount;
+    }
+
+    public JCheckBox getChkSpecifyCompanyGenerationOptions() {
+        return chkSpecifyCompanyGenerationOptions;
+    }
+
+    public void setChkSpecifyCompanyGenerationOptions(final JCheckBox chkSpecifyCompanyGenerationOptions) {
+        this.chkSpecifyCompanyGenerationOptions = chkSpecifyCompanyGenerationOptions;
+    }
+
+    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
+        return companyGenerationOptions;
+    }
+
+    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
+        this.companyGenerationOptions = companyGenerationOptions;
     }
     //endregion Startup
 
@@ -469,6 +489,16 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         getSpnContractCount().setToolTipText(resources.getString("lblContractCount.toolTipText"));
         getSpnContractCount().setName("spnContractCount");
 
+        setChkSpecifyCompanyGenerationOptions(new JCheckBox(resources.getString("chkSpecifyCompanyGenerationOptions.text")));
+        getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString("chkSpecifyCompanyGenerationOptions.toolTipText"));
+        getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
+
+        final JButton btnCompanyGenerationOptions = new MMButton("btnCompanyGenerationOptions",
+                resources, "btnCompanyGenerationOptions.text",
+                "btnCompanyGenerationOptions.toolTipText", evt -> setCompanyGenerationOptions(
+                        new CompanyGenerationOptionsDialog(getFrame(), getCampaign(),
+                                getCompanyGenerationOptions()).getSelectedItem()));
+
         // Disable Panel Portions by Default
         getChkSpecifyDate().setSelected(true);
         getChkSpecifyDate().doClick();
@@ -478,6 +508,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         getChkSpecifyPlanet().doClick();
         getChkSpecifyRankSystem().setSelected(true);
         getChkSpecifyRankSystem().doClick();
+        getChkSpecifyCompanyGenerationOptions().setSelected(true);
+        getChkSpecifyCompanyGenerationOptions().doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -510,6 +542,9 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblContractCount)
                                 .addComponent(getSpnContractCount(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkSpecifyCompanyGenerationOptions())
+                                .addComponent(btnCompanyGenerationOptions, GroupLayout.Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -532,6 +567,9 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblContractCount)
                                 .addComponent(getSpnContractCount()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(getChkSpecifyCompanyGenerationOptions())
+                                .addComponent(btnCompanyGenerationOptions))
         );
 
         return panel;
@@ -542,7 +580,6 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         setChkSpecifyGameOptions(new JCheckBox(resources.getString("chkSpecifyGameOptions.text")));
         getChkSpecifyGameOptions().setToolTipText(resources.getString("chkSpecifyGameOptions.toolTipText"));
         getChkSpecifyGameOptions().setName("chkSpecifyGameOptions");
-        getChkSpecifyRankSystem().addActionListener(evt -> getComboRankSystem().setEnabled(getChkSpecifyRankSystem().isSelected()));
 
         final JButton btnGameOptions = new MMButton("btnGameOptions", resources,
                 "btnGameOptions.text", "btnGameOptions.toolTipText", evt -> {
@@ -614,6 +651,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         preferences.manage(new JToggleButtonPreference(getChkSpecifyPlanet()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyRankSystem()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnContractCount()));
+        preferences.manage(new JToggleButtonPreference(getChkSpecifyCompanyGenerationOptions()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyGameOptions()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyCampaignOptions()));
     }
@@ -622,7 +660,47 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     //region Button Actions
     @Override
     protected void okAction() {
-        updatePreset();
+        if (!getState().isSuccess()) {
+            validateButtonActionPerformed(null);
+        }
+
+        if (getState().isSuccess() || getState().isWarning()) {
+            setPreset(new CampaignPreset());
+
+            getPreset().setTitle(getTxtPresetName().getText().trim());
+            getPreset().setDescription(getTxtPresetDescription().getText().trim());
+            if (getChkSpecifyDate().isSelected()) {
+                getPreset().setDate(getDate());
+            }
+
+            if (getChkSpecifyFaction().isSelected()) {
+                final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
+                getPreset().setFaction((factionDisplay == null) ? null : factionDisplay.getFaction());
+            }
+
+            if (getChkSpecifyPlanet().isSelected()) {
+                getPreset().setPlanet(getComboStartingPlanet().getSelectedItem());
+            }
+
+            if (getChkSpecifyRankSystem().isSelected()) {
+                getPreset().setRankSystem(getComboRankSystem().getSelectedItem());
+            }
+            getPreset().setContractCount((int) getSpnContractCount().getValue());
+            if (getChkSpecifyCompanyGenerationOptions().isSelected()) {
+                getPreset().setCompanyGenerationOptions(getCompanyGenerationOptions());
+            }
+
+            if (getChkSpecifyGameOptions().isSelected()) {
+                getPreset().setGameOptions(getGameOptions());
+            }
+
+            if (getChkSpecifyCampaignOptions().isSelected()) {
+                getPreset().setCampaignOptions(getCampaignOptions());
+                getPreset().setRandomSkillPreferences(getRandomSkillPreferences());
+                getPreset().setSkills(getSkills());
+                getPreset().setSpecialAbilities(getSpecialAbilities());
+            }
+        }
     }
 
     @Override
@@ -687,47 +765,5 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                 .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction.getFaction()))
                 .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
                 .collect(Collectors.toList()).toArray(new PlanetarySystem[]{});
-    }
-
-    public void updatePreset() {
-        if (!getState().isSuccess()) {
-            validateButtonActionPerformed(null);
-        }
-
-        if (getState().isSuccess() || getState().isWarning()) {
-            if (getPreset() == null) {
-                setPreset(new CampaignPreset());
-            }
-
-            getPreset().setTitle(getTxtPresetName().getText().trim());
-            getPreset().setDescription(getTxtPresetDescription().getText().trim());
-            if (getChkSpecifyDate().isSelected()) {
-                getPreset().setDate(getDate());
-            }
-
-            if (getChkSpecifyFaction().isSelected()) {
-                final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
-                getPreset().setFaction((factionDisplay == null) ? null : factionDisplay.getFaction());
-            }
-
-            if (getChkSpecifyPlanet().isSelected()) {
-                getPreset().setPlanet(getComboStartingPlanet().getSelectedItem());
-            }
-
-            if (getChkSpecifyRankSystem().isSelected()) {
-                getPreset().setRankSystem(getComboRankSystem().getSelectedItem());
-            }
-            getPreset().setContractCount((int) getSpnContractCount().getValue());
-            if (getChkSpecifyGameOptions().isSelected()) {
-                getPreset().setGameOptions(getGameOptions());
-            }
-
-            if (getChkSpecifyCampaignOptions().isSelected()) {
-                getPreset().setCampaignOptions(getCampaignOptions());
-                getPreset().setRandomSkillPreferences(getRandomSkillPreferences());
-                getPreset().setSkills(getSkills());
-                getPreset().setSpecialAbilities(getSpecialAbilities());
-            }
-        }
     }
 }

@@ -20,6 +20,7 @@ package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -128,16 +129,17 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //endregion Variable Declarations
 
     //region Constructors
-    public CompanyGenerationOptionsPanel(final JFrame frame, final Campaign campaign) {
+    public CompanyGenerationOptionsPanel(final JFrame frame, final Campaign campaign,
+                                         final @Nullable CompanyGenerationOptions companyGenerationOptions) {
         super(frame, "CompanyGenerationOptionsPanel", new GridBagLayout());
         this.campaign = campaign;
 
         initialize();
 
-        if (campaign.getCampaignOptions().getCompanyGenerationOptions() == null) {
+        if (companyGenerationOptions == null) {
             setOptions(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
         } else {
-            setOptions(campaign.getCampaignOptions().getCompanyGenerationOptions());
+            setOptions(companyGenerationOptions);
         }
     }
     //endregion Constructors
