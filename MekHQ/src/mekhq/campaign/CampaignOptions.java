@@ -19,43 +19,33 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import megamek.common.annotations.Nullable;
 import megamek.Version;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
-import mekhq.service.MassRepairOption;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.service.MassRepairOption;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author natit
@@ -421,10 +411,6 @@ public class CampaignOptions implements Serializable {
     private boolean usePlanetaryConditions;
     private int fixedMapChance;
     //endregion Against the Bot Tab
-
-    //region Company Generation Options
-    private CompanyGenerationOptions companyGenerationOptions;
-    //endregion Company Generation Options
     //endregion Variable Declarations
 
     //region Constructors
@@ -847,10 +833,6 @@ public class CampaignOptions implements Serializable {
         useLightConditions = true;
         usePlanetaryConditions = false;
         //endregion Against the Bot Tab
-
-        //region Company Generation Options
-        setCompanyGenerationOptions(null);
-        //endregion Company Generation Options
     }
     //endregion Constructors
 
@@ -3205,16 +3187,6 @@ public class CampaignOptions implements Serializable {
         this.fixedMapChance = fixedMapChance;
     }
 
-    //region Company Generation Options
-    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
-        return companyGenerationOptions;
-    }
-
-    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        this.companyGenerationOptions = companyGenerationOptions;
-    }
-    //endregion Company Generation Options
-
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3560,13 +3532,6 @@ public class CampaignOptions implements Serializable {
             pw1.println(MekHqXmlUtil.indentStr(indent) + "<ignoreRatEra/>");
         }
         //endregion AtB Options
-
-        //region Company Generation Options
-        if ((getCompanyGenerationOptions() != null)
-                && MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
-            getCompanyGenerationOptions().writeToXML(pw1, indent, null);
-        }
-        //endregion Company Generation Options
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
@@ -4203,14 +4168,6 @@ public class CampaignOptions implements Serializable {
                     retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                     retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
-
-                //region Company Generation
-                } else if (wn2.getNodeName().equals("companyGenerationOptions")) {
-                    if (!wn2.hasChildNodes()) {
-                        continue;
-                    }
-                    retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2.getChildNodes(), version));
-                //endregion Company Generation
 
                 //region Legacy
                 // Removed in 0.49.*

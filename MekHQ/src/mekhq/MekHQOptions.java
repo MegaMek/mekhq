@@ -86,7 +86,6 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
-    //region Expanded MekHQ Display Options
     //region Command Center Display
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
@@ -123,7 +122,7 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
     //endregion Personnel Tab Display Options
-    //endregion Expanded MekHQ Display Options
+    //endregion Display
 
     //region Colours
     public Color getDeployedForeground() {
@@ -372,7 +371,6 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
     }
     //endregion Colours
-    //endregion Display
 
     //region Autosave
     public boolean getNoAutosaveValue() {
@@ -492,14 +490,6 @@ public final class MekHQOptions extends SuiteConstants {
 
     public void setSaveMothballState(boolean value) {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_MOTHBALL_STATE, value);
-    }
-
-    public boolean getSaveCompanyGenerationOptions() {
-        return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, false);
-    }
-
-    public void setSaveCompanyGenerationOptions(final boolean value) {
-        userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, value);
     }
     //endregion Campaign XML Save Options
 

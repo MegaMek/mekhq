@@ -63,10 +63,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import mekhq.gui.model.RankTableModel;
-import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -485,10 +482,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
     //endregion Against the Bot Tab
-
-    //region Company Generation Options
-    private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
-    //endregion Company Generation Options
     //endregion Variable Declarations
 
     //region Constructors
@@ -3283,14 +3276,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         });
         //endregion Against the Bot Tab
 
-        //region Company Generation Options
-        if (MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
-            companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(getFrame(), campaign);
-            getOptionsPane().addTab(resourceMap.getString("companyGenerationOptionsPanel.title"),
-                    new JScrollPane(companyGenerationOptionsPanel));
-        }
-        //endregion Company Generation Options
-
         return getOptionsPane();
     }
 
@@ -5500,13 +5485,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseLightConditions.setSelected(options.getUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
         //endregion Against the Bot Tab
-
-        //region Company Generation Options
-        // Only trigger this if there are saved options and the panel has been initialized
-        if ((companyGenerationOptionsPanel != null) && (options.getCompanyGenerationOptions() != null)) {
-            companyGenerationOptionsPanel.setOptions(options.getCompanyGenerationOptions());
-        }
-        //endregion Company Generation Options
     }
 
     public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
@@ -5890,12 +5868,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
             options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
             // End Against the Bot
-
-            //region Company Generation Options
-            if (companyGenerationOptionsPanel != null) {
-                options.setCompanyGenerationOptions(companyGenerationOptionsPanel.createOptionsFromPanel());
-            }
-            //endregion Company Generation Options
 
             campaign.setCampaignOptions(options);
 

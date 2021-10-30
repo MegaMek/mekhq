@@ -110,7 +110,6 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
-    public static final String SAVE_COMPANY_GENERATION_OPTIONS = "saveCompanyGenerationOptions";
     //endregion Campaign XML Save Options
 
     //region File Paths

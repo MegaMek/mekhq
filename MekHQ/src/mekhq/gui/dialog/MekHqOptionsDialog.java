@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -41,8 +42,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private JCheckBox optionHistoricalDailyLog;
-    private JCheckBox optionCompanyGeneratorStartup;
-    private JCheckBox optionShowCompanyGenerator;
+    private JCheckBox chkCompanyGeneratorStartup;
+    private JCheckBox chkShowCompanyGenerator;
 
     //region Command Center Display
     private JCheckBox optionCommandCenterUseUnitMarket;
@@ -108,7 +109,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
     private JCheckBox optionSaveMothballState;
-    private JCheckBox optionSaveCompanyGenerationOptions;
     //endregion Campaign XML Save
 
     //region Nag Tab
@@ -122,8 +122,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Nag Tab
 
     //region Miscellaneous
-    private JSpinner optionStartGameDelay;
-    private JComboBox<CompanyGenerationMethod> optionDefaultCompanyGenerationMethod;
+    private JSpinner spnStartGameDelay;
+    private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
     //endregion Miscellaneous
     //endregion Variable Declarations
 
@@ -177,13 +177,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
 
-        optionCompanyGeneratorStartup = new JCheckBox(resources.getString("optionCompanyGeneratorStartup.text"));
-        optionCompanyGeneratorStartup.setToolTipText(resources.getString("optionCompanyGeneratorStartup.toolTipText"));
-        optionCompanyGeneratorStartup.setName("optionCompanyGeneratorStartup");
+        chkCompanyGeneratorStartup = new JCheckBox(resources.getString("chkCompanyGeneratorStartup.text"));
+        chkCompanyGeneratorStartup.setToolTipText(resources.getString("chkCompanyGeneratorStartup.toolTipText"));
+        chkCompanyGeneratorStartup.setName("chkCompanyGeneratorStartup");
 
-        optionShowCompanyGenerator = new JCheckBox(resources.getString("optionShowCompanyGenerator.text"));
-        optionShowCompanyGenerator.setToolTipText(resources.getString("optionShowCompanyGenerator.toolTipText"));
-        optionShowCompanyGenerator.setName("optionShowCompanyGenerator");
+        chkShowCompanyGenerator = new JCheckBox(resources.getString("chkShowCompanyGenerator.text"));
+        chkShowCompanyGenerator.setToolTipText(resources.getString("chkShowCompanyGenerator.toolTipText"));
+        chkShowCompanyGenerator.setName("chkShowCompanyGenerator");
 
         //region Command Center Display
         JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
@@ -239,8 +239,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionLongDisplayDateFormat)
                                 .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
                         .addComponent(optionHistoricalDailyLog)
-                        .addComponent(optionCompanyGeneratorStartup)
-                        .addComponent(optionShowCompanyGenerator)
+                        .addComponent(chkCompanyGeneratorStartup)
+                        .addComponent(chkShowCompanyGenerator)
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
@@ -263,8 +263,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionLongDisplayDateFormat)
                                 .addComponent(labelLongDisplayDateFormatExample))
                         .addComponent(optionHistoricalDailyLog)
-                        .addComponent(optionCompanyGeneratorStartup)
-                        .addComponent(optionShowCompanyGenerator)
+                        .addComponent(chkCompanyGeneratorStartup)
+                        .addComponent(chkShowCompanyGenerator)
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
@@ -573,10 +573,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveMothballState.setToolTipText(resources.getString("optionSaveMothballState.toolTipText"));
         optionSaveMothballState.setMnemonic(KeyEvent.VK_U);
 
-        optionSaveCompanyGenerationOptions = new JCheckBox(resources.getString("optionSaveCompanyGenerationOptions.text"));
-        optionSaveCompanyGenerationOptions.setToolTipText(resources.getString("optionSaveCompanyGenerationOptions.toolTipText"));
-        optionSaveCompanyGenerationOptions.setName("optionSaveCompanyGenerationOptions");
-
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -590,7 +586,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionPreferGzippedOutput)
                         .addComponent(optionWriteCustomsToXML)
                         .addComponent(optionSaveMothballState)
-                        .addComponent(optionSaveCompanyGenerationOptions)
         );
 
         layout.setHorizontalGroup(
@@ -598,7 +593,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionPreferGzippedOutput)
                         .addComponent(optionWriteCustomsToXML)
                         .addComponent(optionSaveMothballState)
-                        .addComponent(optionSaveCompanyGenerationOptions)
         );
 
         return body;
@@ -669,17 +663,18 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createMiscellaneousTab() {
         // Create Panel Components
-        JLabel labelStartGameDelay = new JLabel(resources.getString("labelStartGameDelay.text"));
-        labelStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
+        final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
+        lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
 
-        optionStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
-        optionStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
+        spnStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
+        spnStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
 
-        JLabel labelDefaultCompanyGenerationMethod = new JLabel(resources.getString("labelDefaultCompanyGenerationMethod.text"));
-        labelDefaultCompanyGenerationMethod.setToolTipText(resources.getString("labelDefaultCompanyGenerationMethod.toolTipText"));
+        final JLabel lblDefaultCompanyGenerationMethod = new JLabel(resources.getString("lblDefaultCompanyGenerationMethod.text"));
+        lblDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
 
-        optionDefaultCompanyGenerationMethod = new JComboBox<>(CompanyGenerationMethod.values());
-        optionDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
+        comboDefaultCompanyGenerationMethod = new MMComboBox<>("comboDefaultCompanyGenerationMethod", CompanyGenerationMethod.values());
+        comboDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
+        comboDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                           final int index, final boolean isSelected,
@@ -703,22 +698,22 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(labelStartGameDelay)
-                                .addComponent(optionStartGameDelay, GroupLayout.DEFAULT_SIZE,
+                                .addComponent(lblStartGameDelay)
+                                .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(labelDefaultCompanyGenerationMethod)
-                                .addComponent(optionDefaultCompanyGenerationMethod))
+                                .addComponent(lblDefaultCompanyGenerationMethod)
+                                .addComponent(comboDefaultCompanyGenerationMethod))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelStartGameDelay)
-                                .addComponent(optionStartGameDelay))
+                                .addComponent(lblStartGameDelay)
+                                .addComponent(spnStartGameDelay))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelDefaultCompanyGenerationMethod)
-                                .addComponent(optionDefaultCompanyGenerationMethod))
+                                .addComponent(lblDefaultCompanyGenerationMethod)
+                                .addComponent(comboDefaultCompanyGenerationMethod))
         );
 
         return body;
@@ -734,8 +729,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
-        MekHQ.getMekHQOptions().setCompanyGeneratorStartup(optionCompanyGeneratorStartup.isSelected());
-        MekHQ.getMekHQOptions().setShowCompanyGenerator(optionShowCompanyGenerator.isSelected());
+        MekHQ.getMekHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
+        MekHQ.getMekHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
         MekHQ.getMekHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
@@ -787,7 +782,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
         MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
-        MekHQ.getMekHQOptions().setSaveCompanyGenerationOptions(optionSaveCompanyGenerationOptions.isSelected());
 
         MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
         MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
@@ -797,8 +791,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
-        MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
-        MekHQ.getMekHQOptions().setDefaultCompanyGenerationMethod((CompanyGenerationMethod) Objects.requireNonNull(optionDefaultCompanyGenerationMethod.getSelectedItem()));
+        MekHQ.getMekHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
+        MekHQ.getMekHQOptions().setDefaultCompanyGenerationMethod(Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
@@ -807,8 +801,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
-        optionCompanyGeneratorStartup.setSelected(MekHQ.getMekHQOptions().getCompanyGeneratorStartup());
-        optionShowCompanyGenerator.setSelected(MekHQ.getMekHQOptions().getShowCompanyGenerator());
+        chkCompanyGeneratorStartup.setSelected(MekHQ.getMekHQOptions().getCompanyGeneratorStartup());
+        chkShowCompanyGenerator.setSelected(MekHQ.getMekHQOptions().getShowCompanyGenerator());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMekHQOptions().getPersonnelFilterStyle());
@@ -860,7 +854,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
         optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
-        optionSaveCompanyGenerationOptions.setSelected(MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions());
 
         optionUnmaintainedUnitsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS));
         optionInsufficientAstechsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS));
@@ -870,8 +863,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS));
 
-        optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
-        optionDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
+        spnStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
+        comboDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
     }
 
     //region Data Validation
