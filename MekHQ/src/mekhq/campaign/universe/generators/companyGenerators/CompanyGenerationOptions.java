@@ -142,7 +142,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel
         final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
-        if (getMethod().isWindchild()) {
+        if (method.isWindchildGrouping()) {
             supportPersonnel.put(PersonnelRole.MECH_TECH, 5);
             supportPersonnel.put(PersonnelRole.MECHANIC, 1);
             supportPersonnel.put(PersonnelRole.AERO_TECH, 1);
@@ -158,10 +158,10 @@ public class CompanyGenerationOptions implements Serializable {
         }
         setSupportPersonnel(supportPersonnel);
         setPoolAssistants(true);
-        setGenerateCaptains(method.isWindchild());
+        setGenerateCaptains(method.isWindchildGrouping());
         setAssignCompanyCommanderFlag(true);
-        setApplyOfficerStatBonusToWorstSkill(method.isWindchild());
-        setAssignBestOfficers(method.isWindchild());
+        setApplyOfficerStatBonusToWorstSkill(method.isWindchildGrouping());
+        setAssignBestOfficers(method.isWindchildGrouping());
         setAutomaticallyAssignRanks(true);
         setAssignFounderFlag(true);
 
@@ -174,17 +174,17 @@ public class CompanyGenerationOptions implements Serializable {
         setOriginDistanceScale(0.2);
 
         // Starting Simulation
-        setRunStartingSimulation(method.isWindchild());
+        setRunStartingSimulation(method.isWindchildGrouping());
         setSimulationDuration(5);
-        setSimulateRandomMarriages(method.isWindchild());
-        setSimulateRandomProcreation(method.isWindchild());
+        setSimulateRandomMarriages(method.isWindchildGrouping());
+        setSimulateRandomProcreation(method.isWindchildGrouping());
 
         // Units
         setGenerateUnitsAsAttached(method.isAtB());
-        setAssignBestRollToUnitCommander(method.isWindchild());
+        setAssignBestRollToUnitCommander(method.isWindchildGrouping());
         setSortStarLeagueUnitsFirst(true);
         setGroupByWeight(true);
-        setGroupByQuality(method.isWindchild());
+        setGroupByQuality(method.isWindchildGrouping());
         setKeepOfficerRollsSeparate(method.isAtB());
         setAssignTechsToUnits(true);
 
@@ -197,7 +197,7 @@ public class CompanyGenerationOptions implements Serializable {
         setSparesPercentOfActiveUnits(10);
         setPartGenerationMethod(PartGenerationMethod.WINDCHILD);
         setStartingArmourWeight(60);
-        setGenerateSpareAmmunition(method.isWindchild());
+        setGenerateSpareAmmunition(method.isWindchildGrouping());
         setNumberReloadsPerWeapon(4);
         setGenerateFractionalMachineGunAmmunition(true);
 
@@ -207,16 +207,16 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Finances
         setStartingCash(0);
-        setRandomizeStartingCash(method.isWindchild());
+        setRandomizeStartingCash(method.isWindchildGrouping());
         setRandomStartingCashDiceCount(8);
-        setMinimumStartingFloat(method.isWindchild() ? 3500000 : 0);
-        setPayForSetup(method.isWindchild());
-        setStartingLoan(method.isWindchild());
-        setPayForPersonnel(method.isWindchild());
-        setPayForUnits(method.isWindchild());
-        setPayForParts(method.isWindchild());
-        setPayForArmour(method.isWindchild());
-        setPayForAmmunition(method.isWindchild());
+        setMinimumStartingFloat(method.isWindchildGrouping() ? 3500000 : 0);
+        setPayForSetup(method.isWindchildGrouping());
+        setStartingLoan(method.isWindchildGrouping());
+        setPayForPersonnel(method.isWindchildGrouping());
+        setPayForUnits(method.isWindchildGrouping());
+        setPayForParts(method.isWindchildGrouping());
+        setPayForArmour(method.isWindchildGrouping());
+        setPayForAmmunition(method.isWindchildGrouping());
 
         // Surprises
         setGenerateSurprises(true);

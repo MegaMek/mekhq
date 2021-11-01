@@ -32,6 +32,12 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
         super(CompanyGenerationMethod.WINDCHILD, campaign, options);
     }
+
+    protected WindchildCompanyGenerator(final CompanyGenerationMethod method,
+                                        final Campaign campaign,
+                                        final CompanyGenerationOptions options) {
+        super(method, campaign, options);
+    }
     //endregion Constructors
 
     //region Personnel
@@ -72,12 +78,12 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
             case 2:
             case 3:
             case 4:
-                return EntityWeightClass.WEIGHT_LIGHT;
             case 5:
+                return EntityWeightClass.WEIGHT_LIGHT;
             case 6:
             case 7:
-                return EntityWeightClass.WEIGHT_MEDIUM;
             case 8:
+                return EntityWeightClass.WEIGHT_MEDIUM;
             case 9:
             case 10:
                 return EntityWeightClass.WEIGHT_HEAVY;
