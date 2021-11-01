@@ -1120,87 +1120,87 @@ public class ForceIconMigrator {
                 case "04 Lance.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                     break;
                 case "05 Lance Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                     break;
                 case "06 Company.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                     break;
                 case "07 Company Task Force.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(08) Company Task Force.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05A) Company Task Force.png"));
                     break;
                 case "08 Battalion.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                     break;
                 case "09 Battlegroup.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(10) Battlegroup.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06A) Battlegroup.png"));
                     break;
                 case "10 Regiment.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(11) Regiment.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Regiment.png"));
                     break;
                 case "11 Brigade.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(13) Brigade.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Brigade.png"));
                     break;
                 case "12 Division.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(15) Division.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Division.png"));
                     break;
                 case "13 Corps.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(17) Corps.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(10) Corps.png"));
                     break;
                 case "14 Field Army.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(19) Field Army.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(11) Field Army.png"));
                     break;
                 case "15 Army Group.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(21) Army Group.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(12) Army Group.png"));
                     break;
                 case "Brigade Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(14) Augmented Brigade.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(08A) Augmented Brigade.png"));
                     break;
                 case "Corps Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(18) Augmented Corps.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(10A) Augmented Corps.png"));
                     break;
                 case "Division Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(16) Augmented Division.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09A) Augmented Division.png"));
                     break;
                 case "Field Army Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(20) Augmented Field Army.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(11A) Augmented Field Army.png"));
                     break;
                 case "Regiment Augmented.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(12) Augmented Regiment.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07A) Augmented Regiment.png"));
                     break;
                 case "16 Level I.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
@@ -2184,7 +2184,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Aerospace.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 return layered;
             case "afighter.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2200,7 +2200,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Fixed Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "A.png"));
@@ -2220,7 +2220,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Heavy.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "laerospace.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2237,7 +2237,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Light.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "maerospace.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2254,7 +2254,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Medium.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             default:
                 return icon;
@@ -2516,7 +2516,7 @@ public class ForceIconMigrator {
             case "Epsilon_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(05) Epsilon.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(05) Epsilon.png"));
                 return layered;
             case "Eta.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2536,7 +2536,7 @@ public class ForceIconMigrator {
             case "Iota_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(09) Iota.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(09) Iota.png"));
                 return layered;
             case "Kappa.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2551,7 +2551,7 @@ public class ForceIconMigrator {
             case "Lambda_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(11) Lambda.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(11) Lambda.png"));
                 return layered;
             case "Mu.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2561,7 +2561,7 @@ public class ForceIconMigrator {
             case "Mu_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(12) Mu.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(12) Mu.png"));
                 return layered;
             case "Nu.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2576,7 +2576,7 @@ public class ForceIconMigrator {
             case "Omega_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(24) Omega.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(15) Omicron.png"));
                 return layered;
             case "Omicron.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2596,7 +2596,7 @@ public class ForceIconMigrator {
             case "Pi_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(16) Pi.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(16) Pi.png"));
                 return layered;
             case "Psi.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2606,7 +2606,7 @@ public class ForceIconMigrator {
             case "Psi_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(23) Psi.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(23) Psi.png"));
                 return layered;
             case "Rho.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2616,7 +2616,7 @@ public class ForceIconMigrator {
             case "Rho_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(17) Rho.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(17) Rho.png"));
                 return layered;
             case "Sigma.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2636,7 +2636,7 @@ public class ForceIconMigrator {
             case "Theta_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(08) Theta.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(08) Theta.png"));
                 return layered;
             case "Upsilon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2651,7 +2651,7 @@ public class ForceIconMigrator {
             case "Xi_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(14) Xi.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(14) Xi.png"));
                 return layered;
             case "Zeta.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2661,7 +2661,7 @@ public class ForceIconMigrator {
             case "Zeta_Icon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/", "(06) Zeta.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "Alphanumeric/Greek Letters/Upper Case/", "(06) Zeta.png"));
                 return layered;
             default:
                 return icon;
@@ -2906,7 +2906,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ADJUSTMENT)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ADJUSTMENT, "NATO/", "Air Mobile.png"));
@@ -2924,7 +2924,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 return layered;
             case "infantrylaserplatoon.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2932,7 +2932,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "LAS.png"));
@@ -2943,7 +2943,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Bottom/", "LRM.png"));
@@ -2954,7 +2954,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "jinfantry.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -2970,7 +2970,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ADJUSTMENT)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ADJUSTMENT, "StratOps/", "Jump Infantry.png"));
@@ -2984,7 +2984,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Infantry.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ADJUSTMENT, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ADJUSTMENT)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ADJUSTMENT, "StratOps/", "Jump Infantry.png"));
@@ -3111,7 +3111,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Heavy.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "hmechlancereinforced.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3121,7 +3121,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Heavy.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 return layered;
             case "hmechlancereinforcedaero.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3131,7 +3131,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Heavy.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/English Letters/", "A.png"));
@@ -3164,7 +3164,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Headquarters.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "HQmechlancereinforced.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3174,7 +3174,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Headquarters.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 return layered;
             case "HQmechlancereinforcedaero.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3184,7 +3184,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Headquarters.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/English Letters/", "A.png"));
@@ -3228,7 +3228,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Light.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "lmechlancereinforced.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3238,7 +3238,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Light.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 return layered;
             case "lmechlancereinforcedaero.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3248,7 +3248,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Light.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/English Letters/", "A.png"));
@@ -3274,7 +3274,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "BattleMech (Center).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 return layered;
             case "mmech.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3291,7 +3291,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Medium.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "mmechlancereinforcedaero.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3301,7 +3301,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Medium.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/English Letters/", "A.png"));
@@ -3464,7 +3464,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Medical.png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 return layered;
             case "mmhq.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -3957,7 +3957,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "H.png"));
@@ -3968,7 +3968,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "H.png"));
@@ -3987,7 +3987,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "H.png"));
@@ -4017,7 +4017,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Hover Tracked).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "L.png"));
@@ -4085,7 +4085,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Hover Tracked).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "M.png"));
@@ -4474,7 +4474,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Civilian).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "A.png"));
@@ -4487,7 +4487,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Civilian).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "A.png"));
@@ -4601,7 +4601,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4618,7 +4618,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4633,7 +4633,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4648,7 +4648,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4661,7 +4661,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4676,7 +4676,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4689,7 +4689,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4702,7 +4702,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4724,7 +4724,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4741,7 +4741,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4756,7 +4756,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4771,7 +4771,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4784,7 +4784,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4799,7 +4799,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4812,7 +4812,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4825,7 +4825,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4842,7 +4842,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4857,7 +4857,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4872,7 +4872,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -4885,7 +4885,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4900,7 +4900,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4913,7 +4913,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4926,7 +4926,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -4937,7 +4937,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5060,7 +5060,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5077,7 +5077,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5092,7 +5092,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5107,7 +5107,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5120,7 +5120,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5135,7 +5135,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5148,7 +5148,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5161,7 +5161,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5172,7 +5172,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5189,7 +5189,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5204,7 +5204,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5219,7 +5219,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5232,7 +5232,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5247,7 +5247,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5260,7 +5260,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5273,7 +5273,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "A.png"));
@@ -5381,7 +5381,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5398,7 +5398,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5413,7 +5413,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5428,7 +5428,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5441,7 +5441,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5456,7 +5456,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5469,7 +5469,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5482,7 +5482,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5504,7 +5504,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5521,7 +5521,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5536,7 +5536,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5551,7 +5551,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5564,7 +5564,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5579,7 +5579,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5592,7 +5592,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5605,7 +5605,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5622,7 +5622,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5637,7 +5637,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5652,7 +5652,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5665,7 +5665,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5680,7 +5680,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5693,7 +5693,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5706,7 +5706,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5717,7 +5717,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5840,7 +5840,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5857,7 +5857,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5872,7 +5872,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5887,7 +5887,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5900,7 +5900,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5915,7 +5915,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5928,7 +5928,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5941,7 +5941,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -5952,7 +5952,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5969,7 +5969,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5984,7 +5984,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -5999,7 +5999,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6012,7 +6012,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -6027,7 +6027,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -6040,7 +6040,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -6053,7 +6053,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "C.png"));
@@ -6064,7 +6064,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Civilian).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "A.png"));
@@ -6163,7 +6163,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6180,7 +6180,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6195,7 +6195,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6210,7 +6210,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6223,7 +6223,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6238,7 +6238,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6251,7 +6251,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6264,7 +6264,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Augmented Team.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(03A) Augmented Team.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6286,7 +6286,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6303,7 +6303,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6318,7 +6318,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6333,7 +6333,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6346,7 +6346,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6361,7 +6361,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6374,7 +6374,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6387,7 +6387,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6404,7 +6404,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6419,7 +6419,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6434,7 +6434,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6447,7 +6447,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6462,7 +6462,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6475,7 +6475,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6488,7 +6488,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Augmented Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04A) Augmented Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6499,7 +6499,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Lance.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6622,7 +6622,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6639,7 +6639,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6654,7 +6654,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6669,7 +6669,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6682,7 +6682,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6697,7 +6697,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6710,7 +6710,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6723,7 +6723,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(07) Company.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(05) Company.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6734,7 +6734,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6751,7 +6751,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6766,7 +6766,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6781,7 +6781,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Left/", "C3.png"));
@@ -6794,7 +6794,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6809,7 +6809,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6822,7 +6822,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
@@ -6835,7 +6835,7 @@ public class ForceIconMigrator {
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Aviation, Rotary Wing (Military).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(09) Battalion.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(06) Battalion.png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top/", "R.png"));
