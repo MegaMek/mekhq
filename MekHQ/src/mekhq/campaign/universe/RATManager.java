@@ -82,7 +82,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     @Subscribe
     public void updateRATConfig(OptionsChangedEvent ev) {
-        canIgnoreEra = ev.getOptions().canIgnoreRatEra();
+        canIgnoreEra = ev.getOptions().isIgnoreRATEra();
         setSelectedRATs(ev.getOptions().getRATs());
     }
 

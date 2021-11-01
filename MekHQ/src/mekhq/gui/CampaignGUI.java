@@ -1410,7 +1410,7 @@ public class CampaignGUI extends JPanel {
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
         boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
-        boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
+        boolean staticRATs = getCampaign().getCampaignOptions().isUseStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
@@ -1476,7 +1476,7 @@ public class CampaignGUI extends JPanel {
                 getCampaign().shutdownAtB();
             }
         }
-        if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
+        if (staticRATs != getCampaign().getCampaignOptions().isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
         if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
