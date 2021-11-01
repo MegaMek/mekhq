@@ -117,16 +117,18 @@ public class RandomPortraitGenerator {
         }
 
         final List<String> possiblePortraits = new ArrayList<>();
-        for (final String category : MHQStaticDirectoryManager.getPortraits().getCategories().keySet()) {
-            if (new File(category).compareTo(subdirectory) == 0) {
-                Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
-                while (names.hasNext()) {
-                    final String location = category + ":" + names.next();
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
+        for (final String category : MHQStaticDirectoryManager.getPortraits().getNonEmptyCategoryPaths()) {
+            if (new File(category).compareTo(subdirectory) != 0) {
+                continue;
+            }
+
+            final Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
+            while (names.hasNext()) {
+                final String location = category + ":" + names.next();
+                if (existingPortraits.contains(location)) {
+                    continue;
                 }
+                possiblePortraits.add(location);
             }
         }
         return possiblePortraits;

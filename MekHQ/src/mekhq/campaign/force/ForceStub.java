@@ -21,10 +21,10 @@
  */
 package mekhq.campaign.force;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;

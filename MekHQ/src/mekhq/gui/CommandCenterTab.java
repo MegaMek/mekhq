@@ -25,10 +25,14 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
-import mekhq.campaign.report.*;
+import mekhq.campaign.report.CargoReport;
+import mekhq.campaign.report.HangarReport;
+import mekhq.campaign.report.PersonnelReport;
+import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
@@ -435,24 +439,29 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports = new JPanel(new GridLayout(5, 1));
 
         JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
-        btnTransportReport.addActionListener(ev -> getCampaignGui().showReport(new TransportReport(getCampaign())));
+        btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
+                new TransportReport(getCampaign())).setVisible(true));
         panReports.add(btnTransportReport);
 
         JButton btnHangarOverview = new JButton(resourceMap.getString("btnHangarOverview.text"));
-        btnHangarOverview.addActionListener(evt -> getCampaignGui().showReport(new HangarReport(getCampaign())));
+        btnHangarOverview.addActionListener(evt -> new HangarReportDialog(getCampaignGui().getFrame(),
+                new HangarReport(getCampaign())).setVisible(true));
         panReports.add(btnHangarOverview);
 
         JButton btnPersonnelOverview = new JButton(resourceMap.getString("btnPersonnelOverview.text"));
-        btnPersonnelOverview.addActionListener(evt -> getCampaignGui().showReport(new PersonnelReport(getCampaign())));
+        btnPersonnelOverview.addActionListener(evt -> new PersonnelReportDialog(getCampaignGui().getFrame(),
+                new PersonnelReport(getCampaign())).setVisible(true));
         panReports.add(btnPersonnelOverview);
 
         JButton btnCargoCapacity = new JButton(resourceMap.getString("btnCargoCapacity.text"));
-        btnCargoCapacity.addActionListener(evt -> getCampaignGui().showReport(new CargoReport(getCampaign())));
+        btnCargoCapacity.addActionListener(evt -> new CargoReportDialog(getCampaignGui().getFrame(),
+                new CargoReport(getCampaign())).setVisible(true));
         panReports.add(btnCargoCapacity);
 
         btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
         btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
-        btnUnitRating.addActionListener(evt -> getCampaignGui().showReport(new RatingReport(getCampaign())));
+        btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
+                getCampaign()).setVisible(true));
         panReports.add(btnUnitRating);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));

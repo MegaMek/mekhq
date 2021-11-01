@@ -33,8 +33,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
 
-    // Re-parsing Prevention Variables: The are True at startup and when the specified directory
-    // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's an error.
+    // Re-parsing Prevention Variables: They are True at startup and when the specified directory
+    // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's
+    // an error.
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
     //endregion Variable Declarations
@@ -47,7 +48,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
 
     //region Initialization
     /**
-     * This initialized all of the directories under this manager
+     * This initializes all of the directories under this manager
      */
     public static void initialize() {
         MMStaticDirectoryManager.initialize();
@@ -96,8 +97,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
 
     //region Getters
     /**
-     * Returns an AbstractDirectory object containing all force icon filenames
-     * found in MekHQ's force icon folder.
+     * Returns an AbstractDirectory object containing all force icon filenames found in MekHQ's
+     * force icon folder.
      * @return an AbstractDirectory object with the force icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
@@ -107,8 +108,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all award icon filenames
-     * found in MekHQ's award icon folder.
+     * Returns an AbstractDirectory object containing all award icon filenames found in MekHQ's
+     * award icon folder.
      * @return an AbstractDirectory object with the award icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
@@ -116,15 +117,13 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         initializeAwardIcons();
         return awardIconDirectory;
     }
-
     //endregion Getters
 
     //region Refreshers
     /**
-     * Re-reads MekHQ's force icon folder and returns the updated
-     * AbstractDirectory object. This will update the AbstractDirectory object
-     * with changes to the force icons (like added image files and folders)
-     * while MekHQ is running.
+     * Re-reads MekHQ's force icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the force icons (like added image
+     * files and folders) while MekHQ is running.
      *
      * @see #getForceIcons()
      */
@@ -134,10 +133,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Re-reads MekHQ's award icon folder and returns the updated
-     * AbstractDirectory object. This will update the AbstractDirectory object
-     * with changes to the award icons (like added image files and folders)
-     * while MekHQ is running.
+     * Re-reads MekHQ's award icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the award icons (like added image
+     * files and folders) while MekHQ is running.
      *
      * @see #getAwardIcons()
      */

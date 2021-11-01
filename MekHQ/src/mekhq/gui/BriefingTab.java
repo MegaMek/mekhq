@@ -25,12 +25,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -473,7 +469,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollMissionView.repaint();
     }
 
-    protected void clearAssignedUnits() {
+    private void clearAssignedUnits() {
         if (0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove all units from this scenario?",
                 "Clear Units?", JOptionPane.YES_NO_OPTION)) {
             int row = scenarioTable.getSelectedRow();
@@ -485,7 +481,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    protected void resolveScenario() {
+    private void resolveScenario() {
         int row = scenarioTable.getSelectedRow();
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (null == scenario) {
@@ -517,51 +513,60 @@ public final class BriefingTab extends CampaignGuiTab {
         MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
     }
 
-    protected void printRecordSheets() {
-        int row = scenarioTable.getSelectedRow();
+    private void printRecordSheets() {
+        final int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
-            return;
-        }
 
-        Vector<Entity> chosen = new Vector<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
+        // First, we need to get all units assigned to the current scenario
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
 
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
-                }
+        // Then, we need to convert the ids to units, and filter out any units that are null and
+        // any units with null entities
+        final List<Unit> units = unitIds.stream().map(unitId -> getCampaign().getUnit(unitId))
+                .filter(unit -> (unit != null) && (unit.getEntity() != null))
+                .collect(Collectors.toList());
+
+        final List<Entity> chosen = new ArrayList<>();
+        final StringBuilder undeployed = new StringBuilder();
+
+        for (final Unit unit : units) {
+            if (unit.checkDeployment() == null) {
+                chosen.add(unit.getEntity());
+            } else {
+                undeployed.append("\n").append(unit.getName()).append(" (").append(unit.checkDeployment()).append(")");
             }
         }
 
         if (undeployed.length() > 0) {
-            Object[] options = { "Continue", "Cancel" };
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-            if (n == 1) {
+            final Object[] options = { "Continue", "Cancel" };
+            if (JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:" + undeployed,
+                    "Could not deploy some units", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        if (chosen.size() > 0) {
+        if (scenario instanceof AtBScenario) {
+            // Also print off allied sheets and all bot force sheets
+            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            chosen.addAll(((AtBScenario) scenario).getBotForces().stream()
+                    .flatMap(botForce -> botForce.getEntityList().stream())
+                    .collect(Collectors.toList()));
+        }
+
+        if (!chosen.isEmpty()) {
             UnitPrintManager.printAllUnits(chosen, true);
         }
     }
 
-    protected void loadScenario() {
+    private void loadScenario() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -572,7 +577,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    protected void startScenario() {
+    private void startScenario() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -615,7 +620,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (undeployed.length() > 0) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
+                    "The following units could not be deployed:" + undeployed, "Could not deploy some units",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 
             if (n == 1) {
@@ -656,7 +661,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    protected void joinScenario() {
+    private void joinScenario() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -693,7 +698,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (undeployed.length() > 0) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
+                    "The following units could not be deployed:" + undeployed, "Could not deploy some units",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
             if (n == 1) {
                 return;
@@ -705,7 +710,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    protected void deployListFile() {
+    private void deployListFile() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -742,7 +747,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (undeployed.length() > 0) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
+                    "The following units could not be deployed:" + undeployed, "Could not deploy some units",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
             if (n == 1) {
                 return;
@@ -751,7 +756,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario);
 
-        if (!maybeUnitFile.isPresent()) {
+        if (maybeUnitFile.isEmpty()) {
             return;
         }
 

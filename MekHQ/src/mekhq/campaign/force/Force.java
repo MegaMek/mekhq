@@ -21,11 +21,11 @@
  */
 package mekhq.campaign.force;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -42,14 +42,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

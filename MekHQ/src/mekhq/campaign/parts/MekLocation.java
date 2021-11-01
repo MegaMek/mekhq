@@ -153,6 +153,9 @@ public class MekLocation extends Part {
                     this.name = "Mech Rear Right Leg";
                 }
                 break;
+            case Mech.LOC_CLEG:
+                this.name = "Mech Center Leg";
+                break;
         }
 
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {

@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.io;
 
+import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
@@ -25,8 +26,6 @@ import megamek.common.Entity;
 import megamek.common.*;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
-import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.*;
 import mekhq.campaign.*;
@@ -37,6 +36,7 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.io.Migration.ForceIconMigrator;
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -46,10 +46,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -114,7 +111,7 @@ public class CampaignXmlParser {
         // Stupid weird parsing of XML. At least this cleans it up.
         campaignEle.normalize();
 
-        Version version = new Version(campaignEle.getAttribute("version"));
+        final Version version = new Version(campaignEle.getAttribute("version"));
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -244,7 +241,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
-                    processGameOptionNodes(retVal, wn);
+                    retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
                     processKillNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("shoppingList")) {
@@ -285,6 +282,8 @@ public class CampaignXmlParser {
 
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
+        final CampaignOptions options = retVal.getCampaignOptions();
+
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
@@ -300,6 +299,9 @@ public class CampaignXmlParser {
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
+
+        // Update the Personnel Modules
+        retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
 
         long timestamp = System.currentTimeMillis();
 
@@ -477,8 +479,11 @@ public class CampaignXmlParser {
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }
 
-        //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
+        // Load Completed. Time for final migration and sanity checks.
+        // Final migration
+        PersonMigrator.finalPersonMigration(version, retVal.getPersonnel());
 
+        // Sanity Checks
         fixupUnitTechProblems(retVal);
 
         //unload any ammo bins in the warehouse
@@ -869,7 +874,7 @@ public class CampaignXmlParser {
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
         MekHQ.getLogger().info("Loading Special Ability Nodes from XML...");
 
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
 
         // TODO: make SpecialAbility a Campaign instance
         SpecialAbility.clearSPA();
@@ -923,71 +928,6 @@ public class CampaignXmlParser {
         }
 
         MekHQ.getLogger().info("Load Kill Nodes Complete!");
-    }
-
-    private static void processGameOptionNodes(Campaign retVal, Node wn) {
-        MekHQ.getLogger().info("Loading GameOption Nodes from XML...");
-
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            } else if (!wn2.getNodeName().equalsIgnoreCase("gameoption")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                MekHQ.getLogger().error("Unknown node type not loaded in Game Option nodes: " + wn2.getNodeName());
-
-                continue;
-            }
-            NodeList nl = wn2.getChildNodes();
-
-            String name = null;
-            String value = null;
-            for (int y = 0; y < nl.getLength(); y++) {
-                Node wn3 = nl.item(y);
-                if (wn3.getNodeName().equalsIgnoreCase("name")) {
-                    name = wn3.getTextContent();
-                } else if (wn3.getNodeName().equalsIgnoreCase("value")) {
-                    value = wn3.getTextContent();
-                }
-            }
-            if ((null != name) && (null != value)) {
-                IOption option = retVal.getGameOptions().getOption(name);
-                if (null != option) {
-                    if (!option.getValue().toString().equals(value)) {
-                        try {
-                            switch (option.getType()) {
-                                case IOption.STRING:
-                                case IOption.CHOICE:
-                                    option.setValue(value);
-                                    break;
-                                case IOption.BOOLEAN:
-                                    option.setValue(Boolean.valueOf(value));
-                                    break;
-                                case IOption.INTEGER:
-                                    option.setValue(Integer.valueOf(value));
-                                    break;
-                                case IOption.FLOAT:
-                                    option.setValue(Float.valueOf(value));
-                                    break;
-                            }
-                        } catch (IllegalArgumentException iaEx) {
-                            MekHQ.getLogger().error("Error trying to load option '" + name
-                                    + "' with a value of '" + value + "'.");
-                        }
-                    }
-                } else {
-                    MekHQ.getLogger().error("Invalid option '" + name + "' when trying to load options file.");
-                }
-            }
-        }
-
-        MekHQ.getLogger().info("Load Game Option Nodes Complete!");
     }
 
     /**
@@ -1273,8 +1213,7 @@ public class CampaignXmlParser {
 
             // Fixup LargeCraftAmmoBins from old versions
             if ((prt.getUnit() != null) && (prt.getUnit().getEntity() != null)
-                    && ((version.getMinorVersion() < 43)
-                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
+                    && version.isLowerThan("0.43.5")
                     && ((prt instanceof AmmoBin) || (prt instanceof MissingAmmoBin))) {
                 if (prt.getUnit().getEntity().usesWeaponBays()) {
                     Mounted ammo;
@@ -1429,7 +1368,7 @@ public class CampaignXmlParser {
                 }
             }
 
-            // old versions didnt distinguish tank engines
+            // old versions didn't distinguish tank engines
             if ((prt instanceof EnginePart) && prt.getName().contains("Vehicle")) {
                 boolean isHover = null != u
                         && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
@@ -1451,9 +1390,7 @@ public class CampaignXmlParser {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 
-            if ((version.getMajorVersion() == 0)
-                    && ((version.getMinorVersion() < 44)
-                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 7)))) {
+            if (version.isLowerThan("0.44.0")) {
                 if ((prt instanceof MekLocation)
                         && (((MekLocation) prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
                     if (null != u) {

@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.SuiteConstants;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -27,7 +28,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
-public final class MekHQOptions {
+public final class MekHQOptions extends SuiteConstants {
     //region Variable Declarations
     private static final Preferences userPreferences = Preferences.userRoot();
     //endregion Variable Declarations
@@ -91,7 +92,7 @@ public final class MekHQOptions {
     //region Personnel Tab Display Options
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
+                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
     }
 
     public void setPersonnelFilterStyle(PersonnelFilterStyle value) {

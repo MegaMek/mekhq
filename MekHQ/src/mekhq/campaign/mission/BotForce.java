@@ -28,7 +28,7 @@ import java.util.Objects;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
