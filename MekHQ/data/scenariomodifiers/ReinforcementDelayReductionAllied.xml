@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Improved coordination allows friendly reinforcements to deploy quicker.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Allied</eventRecipient>
+	<reinforcementDelayReduction>1</reinforcementDelayReduction>
+</AtBScenarioModifier>

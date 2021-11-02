@@ -1,0 +1,80 @@
+Windchild's Guide to Loading Portraits in MekHQ
+Written 08-Feb-2020, Updated 05-Aug-2020, 01-Nov-2021.
+MekHQ version 0.49.5
+
+How Portrait Loading Works:
+The basic structure for loading a portrait is that it first determines the gender of the person, then looks for a folder located under the gender for a folder with the exact name of the primary role (see below for a list of possible primary roles). If that folder doesn't exist, is empty, or contains only pictures which are already assigned, the system continues with the next round of checking.
+The system then checks for specialist grouping folders (see below), if it applies to the role. If that folder doesn't exist, is empty, or contains only pictures which are already assigned, the system continues with the next round of checking.
+Next, the system looks in the general grouping folders (see below). If that folder doesn't exist, is empty, or contains only pictures which are already assigned, the system continues with the next round of checking.
+Finally, it checks the gendered folders.
+
+If the system finds at least one eligible picture in one of the checked folders, it stops searching the folders and picks a random picture from the eligible ones in that folder. Note that this stops the search, so if you put pictures in both /Male/MechWarrior and /Male/Combat, Male MechWarriors will never be assigned one of the pictures in the combat folder unless all the Male MechWarrior-specific pictures are already assigned.
+
+
+Folder Lists:
+To be loaded, the portrait must be located in one of the following folders. To determine the path required, you take the Primary Folder and add the Gendered Folder, then the folder beneath it (outside of the Admin subtypes, which will require the creation of the general Admin folder followed by their specification folder)
+For example, I want to load a group of portraits that are only for Male MechWarriors in version 0.49.5. The folder I would need to have to place these portraits into would therefore be mekhq-windows-0.49.5/data/images/portraits/Male/MechWarrior
+As a second example, I have a portrait that can be used by Female Admin in version 0.49.5. The folder I would need to place this portrait in would be mekhq-windows-0.49.5/data/images/portraits/Female/Admin
+As a third example, I have a portrait that can only be used by Female Admin/HR in version 0.49.5. The folder I would need to have to place this portrait in would be mekhq-windows-0.49.5/data/images/portraits/Female/Admin/HR
+
+Primary Folder: All portraits are located in the portraits folder, just replace the version of mekhq with the current version.
+mekhq-windows-0.49.5/data/images/portraits
+
+The following follows the format:
+Grouping						/Folder Name
+
+Gendered Folders: Note that all of the below MUST be added to one of the two gendered folders or the portraits will not load
+Male Portraits:					/Male
+Female Portraits:				/Female
+
+Primary Role Folders:
+MechWarrior:					/MechWarrior
+LAM Pilot:						/LAM Pilot
+Ground Vehicle Driver:			/Vehicle Driver
+Naval Vehicle Driver:			/Naval Driver
+VTOL Pilot:						/VTOL Pilot
+Vehicle Gunner:					/Vehicle Gunner
+Vehicle Crew:					/Vehicle Crewmember
+Aerospace Pilot:				/Aerospace Pilot
+Conventional Aircraft Pilot:	/Conventional Aircraft Pilot
+ProtoMech Pilot:				/ProtoMech Pilot
+Battle Armour:					/Battle Armor Pilot
+Battle Armour (Clan):			/Elemental
+Soldier:						/Soldier
+Vessel Pilot:					/Vessel Pilot
+Vessel Gunner:					/Vessel Gunner
+Vessel Crewmember:				/Vessel Crewmember
+Hyperspace Navigator:			/Hyperspace Navigator
+Mech Tech:						/Mech Tech
+Mechanic:						/Mechanic
+Aerospace Tech:					/Aerospace Tech
+Battle Armour Tech:				/Battle Armor Tech
+Astech:							/Astech
+Doctor:							/Doctor
+Medic:							/Medic
+Admin/Command:					/Admin/Command
+Admin/Logistical:				/Admin/Logistical
+Admin/Transport:				/Admin/Transport
+Admin/HR:						/Admin/HR
+Dependent: 						/Dependent
+None: 							/None
+
+
+Specialist Grouping Folders: (see below for what are in these groupings)
+Administrators:					/Admin
+Techs:							/Tech
+Medical Staff:					/Medical
+Vessel Crewmembers:				/Vessel Crew
+
+General Grouping Folders:
+Combat Personnel:				/Combat
+Support Personnel:				/Support
+
+
+For the Specialist Grouping Folder, the following roles are included in the groupings:
+Administrators: Admin/Command, Admin/HR, Admin/Logistical, Admin/Transport
+Techs: Mech Tech, Mechanic, Aerospace Tech, Battle Armour Tech
+Medical Staff: Doctor, Medic
+Vessel Crewmembers: Vessel Pilot, Vessel Gunner, Vessel Crewmember, Hyperspace Navigator
+
+

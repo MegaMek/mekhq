@@ -48,6 +48,7 @@ public class VeeSensor extends Part {
         this.name = "Vehicle Sensors";
     }
 
+    @Override
     public VeeSensor clone() {
         VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);

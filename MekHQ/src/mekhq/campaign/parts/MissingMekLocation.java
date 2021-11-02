@@ -32,6 +32,7 @@ import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.TechAdvancement;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -117,6 +118,9 @@ public class MissingMekLocation extends MissingPart {
                     this.name = "Mech Rear Right Leg";
                 }
                 break;
+            case Mech.LOC_CLEG:
+                this.name = "Mech Center Leg";
+                break;
         }
 
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
@@ -180,18 +184,22 @@ public class MissingMekLocation extends MissingPart {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-                loc = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
-                structureType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
-                percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
-                tsm = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-                forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+                    loc = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
+                    structureType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                    clan = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
+                    percent = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+                    tsm = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
+                    forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -354,7 +362,7 @@ public class MissingMekLocation extends MissingPart {
                 } else {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
                 }
-            } else if (loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
+            } else if ((loc == Mech.LOC_RLEG) || (loc == Mech.LOC_LLEG) || (loc == Mech.LOC_CLEG)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
             }
             remove(false);

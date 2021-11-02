@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.SuiteConstants;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
-public final class MekHQOptions {
+public final class MekHQOptions extends SuiteConstants {
     //region Variable Declarations
     private static final Preferences userPreferences = Preferences.userRoot();
     //endregion Variable Declarations
@@ -90,7 +91,7 @@ public final class MekHQOptions {
     //region Personnel Tab Display Options
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
+                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
     }
 
     public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
@@ -479,7 +480,7 @@ public final class MekHQOptions {
 
     //region File Paths
     /**
-     * @return the path of the folder to load when loading or saving rank systems
+     * @return the path of the folder to load when loading or saving bulk rank systems
      */
     public String getRankSystemsPath() {
         return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, "userdata/data/universe/");
@@ -489,7 +490,7 @@ public final class MekHQOptions {
      * This sets the path where one saves or loads their rank systems from, as this is not required
      * for any data but improves UX.
      *
-     * @param value the path where the person saved their last individual rank system.
+     * @param value the path where the person saved their last bulk rank system export
      */
     public void setRankSystemsPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.RANK_SYSTEMS_DIRECTORY_PATH, value);

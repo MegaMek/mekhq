@@ -1,21 +1,11 @@
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -25,6 +15,10 @@ import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.service.MassRepairMassSalvageMode;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -37,12 +31,13 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         this.partsTable = partsTable;
         this.partsModel = partsModel;
     }
-        
+
     public static void connect(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
         new PartsTableMouseAdapter(gui, partsTable, partsModel)
                 .connect(partsTable);
     }
 
+    @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         int row = partsTable.getSelectedRow();
@@ -86,16 +81,17 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getQuartermaster().sellPart(selectedPart, q);
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
-            double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund));
+                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity())
+                            .multipliedBy(gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier()));
                     gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
-            gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                    "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
+            gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
+                    gui.getCampaign().getLocalDate(), refundAmount,
+                    "refund for cancelled equipment sale");
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {

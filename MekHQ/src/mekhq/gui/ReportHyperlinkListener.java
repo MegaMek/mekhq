@@ -1,34 +1,37 @@
 /*
  * ReportHyperlinkListener.java
- * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
-import java.util.UUID;
+import mekhq.MekHQ;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
-
+import java.util.UUID;
 
 public class ReportHyperlinkListener implements HyperlinkListener {
+    //region Variable Declarations
+    private final CampaignGUI campaignGUI;
 
     public static final String UNIT = "UNIT";
     public static final String PERSON = "PERSON";
@@ -38,50 +41,64 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     public static final String REPAIR = "REPAIR";
     public static final String CONTRACT_MARKET = "CONTRACT_MARKET";
     public static final String UNIT_MARKET = "UNIT_MARKET";
+    //endregion Variable Declarations
 
-
-    private CampaignGUI campaignGUI;
-  
-    public ReportHyperlinkListener(CampaignGUI gui) {
-        campaignGUI = gui;
+    //region Constructors
+    public ReportHyperlinkListener(final CampaignGUI campaignGUI) {
+        this.campaignGUI = campaignGUI;
     }
-    
+    //endregion Constructors
+
     @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
-            // Must come before UNIT since it starts with UNIT as well
-            if(e.getDescription().startsWith(UNIT_MARKET)) {
-            	campaignGUI.showUnitMarket();
-            }
-            else if(e.getDescription().startsWith(UNIT)) {
-                UUID id = UUID.fromString(e.getDescription().split(":")[1]);
-                campaignGUI.focusOnUnit(id);
-            }
-            // Must come before PERSON since it starts with PERSON as well
-            else if(e.getDescription().startsWith(PERSONNEL_MARKET)) {
-            	campaignGUI.hirePersonMarket();
-            }
-            else if(e.getDescription().startsWith(PERSON)) {
-                UUID id = UUID.fromString(e.getDescription().split(":")[1]);
-                campaignGUI.focusOnPerson(id);
-            }
-            else if(e.getDescription().startsWith(NEWS)) {
-                int id =  Integer.parseInt(e.getDescription().split("\\|")[1]);
-                campaignGUI.showNews(id);
-            }
-            else if(e.getDescription().startsWith(MAINTENANCE)) {
-                UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
-                campaignGUI.showMaintenanceReport(id);
-            }
-            else if(e.getDescription().startsWith(REPAIR)) {
-                UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
-                campaignGUI.focusOnUnitInRepairBay(id);
-            }
-            else if(e.getDescription().startsWith(CONTRACT_MARKET)) {
-            	campaignGUI.showContractMarket();
+    public void hyperlinkUpdate(final HyperlinkEvent evt) {
+        if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            if (evt .getDescription().startsWith(UNIT_MARKET)) { // Must come before UNIT since it starts with UNIT as well
+                campaignGUI.showUnitMarket();
+            } else if (evt.getDescription().startsWith(UNIT)) {
+                try {
+                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
+                    campaignGUI.focusOnUnit(id);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
+            } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts with PERSON as well
+                campaignGUI.hirePersonMarket();
+            } else if (evt.getDescription().startsWith(PERSON)) {
+                try {
+                    final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
+                    campaignGUI.focusOnPerson(id);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
+            } else if (evt.getDescription().startsWith(NEWS)) {
+                try {
+                    final int id = Integer.parseInt(evt.getDescription().split("\\|")[1]);
+                    campaignGUI.showNews(id);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
+            } else if (evt.getDescription().startsWith(MAINTENANCE)) {
+                try {
+                    final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
+                    final Unit unit = campaignGUI.getCampaign().getUnit(id);
+                    if (unit == null) {
+                        MekHQ.getLogger().error("Unit id determination failure for " + id);
+                        return;
+                    }
+                    new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
+            } else if (evt.getDescription().startsWith(REPAIR)) {
+                try {
+                    final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
+                    campaignGUI.focusOnUnitInRepairBay(id);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(e);
+                }
+            } else if (evt.getDescription().startsWith(CONTRACT_MARKET)) {
+                campaignGUI.showContractMarket();
             }
         }
     }
-
 }
- 

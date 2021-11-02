@@ -259,13 +259,15 @@ public class Utilities {
     }
 
     public static boolean compareMounted(Mounted a, Mounted b) {
-        if (!a.getType().equals(b.getType()))
+        if (!a.getType().equals(b.getType())) {
             return false;
-        if (!a.getClass().equals(b.getClass()))
+        } else if (a.getClass() != b.getClass()) {
             return false;
-        if (!a.getName().equals(b.getName()))
+        } else if (!a.getName().equals(b.getName())) {
             return false;
-        return a.getLocation() == b.getLocation();
+        } else {
+            return a.getLocation() == b.getLocation();
+        }
     }
 
     /**
@@ -918,7 +920,9 @@ public class Utilities {
     }
 
     /**
-     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+     * Worker function that takes the PersonnelOptions (SPAs, in other words) from the given
+     * "old crew" and sets them for a person.
+     *
      * @param p The person whose SPAs to populate
      * @param oldCrew The entity the SPAs of whose crew we're importing
      */

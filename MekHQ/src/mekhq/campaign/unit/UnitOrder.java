@@ -47,7 +47,6 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
@@ -390,6 +389,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     /**
      * @return TechConstants tech level
      */
+    @Override
     public int getTechLevel() {
         return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getFaction().isClan());
     }

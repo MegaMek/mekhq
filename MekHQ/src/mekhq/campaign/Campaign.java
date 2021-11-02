@@ -39,11 +39,13 @@ import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.event.*;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.event.MissionRemovedEvent;
-import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.*;
@@ -54,9 +56,13 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.universe.eras.Eras;
+import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -74,36 +80,12 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
-import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.DayEndingEvent;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.GMModeEvent;
-import mekhq.campaign.event.LoanNewEvent;
-import mekhq.campaign.event.LoanPaidEvent;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.NetworkChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.OvertimeModeEvent;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartWorkEvent;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonNewEvent;
-import mekhq.campaign.event.PersonRemovedEvent;
-import mekhq.campaign.event.ReportEvent;
-import mekhq.campaign.event.ScenarioNewEvent;
-import mekhq.campaign.event.UnitNewEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
-import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -135,6 +117,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
@@ -146,7 +129,7 @@ import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.DefaultPlanetSelector;
-import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -258,7 +241,10 @@ public class Campaign implements Serializable, ITechManager {
 
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
-    private UnitMarket unitMarket; //AtB
+    private AbstractUnitMarket unitMarket;
+
+    private transient AbstractProcreation procreation;
+
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -309,15 +295,15 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
         partsStore = new PartsStore(this);
         gameOptions = new GameOptions();
-        gameOptions.initialize();
-        gameOptions.getOption("year").setValue(getGameYear());
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
         game.setOptions(gameOptions);
         customs = new ArrayList<>();
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
-        personnelMarket = new PersonnelMarket();
-        contractMarket = new ContractMarket();
-        unitMarket = new UnitMarket();
+        setPersonnelMarket(new PersonnelMarket());
+        setContractMarket(new ContractMarket());
+        setUnitMarket(new EmptyUnitMarket());
+        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -379,18 +365,14 @@ public class Campaign implements Serializable, ITechManager {
         this.name = s;
     }
 
-    public String getEraName() {
-        return Era.getEraNameFromYear(getGameYear());
-    }
-
-    public int getEra() {
-        return Era.getEra(getGameYear());
+    public Era getEra() {
+        return Eras.getInstance().getEra(getLocalDate());
     }
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
                 + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
-                + " (" + getEraName() + ")";
+                + " (" + getEra() + ")";
     }
 
     public LocalDate getLocalDate() {
@@ -447,40 +429,40 @@ public class Campaign implements Serializable, ITechManager {
         return shoppingList;
     }
 
-    public void setPersonnelMarket(PersonnelMarket pm) {
-        personnelMarket = pm;
-    }
-
+    //region Markets
     public PersonnelMarket getPersonnelMarket() {
         return personnelMarket;
     }
 
-    public void generateNewPersonnelMarket() {
-        personnelMarket.generatePersonnelForDay(this);
+    public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
+        this.personnelMarket = personnelMarket;
     }
 
-    public void setContractMarket(ContractMarket cm) {
-        contractMarket = cm;
-    }
-
+    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
     public ContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    public void generateNewContractMarket() {
-        contractMarket.generateContractOffers(this);
+    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
+    public void setContractMarket(final ContractMarket contractMarket) {
+        this.contractMarket = contractMarket;
     }
 
-    public void setUnitMarket(UnitMarket um) {
-        unitMarket = um;
-    }
-
-    public UnitMarket getUnitMarket() {
+    public AbstractUnitMarket getUnitMarket() {
         return unitMarket;
     }
 
-    public void generateNewUnitMarket() {
-        unitMarket.generateUnitOffers(this);
+    public void setUnitMarket(final AbstractUnitMarket unitMarket) {
+        this.unitMarket = unitMarket;
+    }
+    //endregion Markets
+
+    public AbstractProcreation getProcreation() {
+        return procreation;
+    }
+
+    public void setProcreation(final AbstractProcreation procreation) {
+        this.procreation = procreation;
     }
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
@@ -508,7 +490,7 @@ public class Campaign implements Serializable, ITechManager {
         if (unitGenerator != null && unitGenerator instanceof RATManager) {
             MekHQ.unregisterHandler(unitGenerator);
         }
-        if (campaignOptions.useStaticRATs()) {
+        if (campaignOptions.isUseStaticRATs()) {
             RATManager rm = new RATManager();
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 try {
@@ -518,7 +500,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
-            rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
+            rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
             unitGenerator = rm;
         } else {
             unitGenerator = new RATGeneratorConnector(getGameYear());
@@ -607,7 +589,8 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         StringBuilder report = new StringBuilder();
-        if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT, "Ship search", getLocalDate())) {
+        if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
+                getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
             report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
                     .append(" deducted for ship search.");
         } else {
@@ -673,7 +656,7 @@ public class Campaign implements Serializable, ITechManager {
         int transitDays = getCampaignOptions().getInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
-        getFinances().debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), getLocalDate());
+        getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
         addNewUnit(en, true, transitDays);
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
@@ -691,7 +674,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
-            if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getLocalDate())) {
+            if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
                         getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
@@ -1367,8 +1350,8 @@ public class Campaign implements Serializable, ITechManager {
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
-            if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
-                    "Recruitment of " + p.getFullName(), getLocalDate())) {
+            if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
+                    p.getSalary().multipliedBy(2), "Recruitment of " + p.getFullName())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -1905,7 +1888,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public List<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, true, false);
+        return getTechs(noZeroMinute, null, false);
     }
 
     /**
@@ -1914,49 +1897,53 @@ public class Campaign implements Serializable, ITechManager {
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
      * @param firstTechId The ID of the tech that should appear first in the list (assuming
      *                    active and satisfies the noZeroMinute argument)
-     * @param sorted If TRUE, then return the list sorted from worst to best
      * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
+    public List<Person> getTechs(final boolean noZeroMinute, final @Nullable UUID firstTechId,
+                                 final boolean eliteFirst) {
         List<Person> techs = new ArrayList<>();
 
         // Get the first tech.
         Person firstTech = getPerson(firstTechId);
         if ((firstTech != null) && firstTech.isTech() && firstTech.getStatus().isActive()
-                && (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
+                && (!noZeroMinute || (firstTech.getMinutesLeft() > 0))) {
             techs.add(firstTech);
         }
 
-        for (Person p : getActivePersonnel()) {
-            if (p.isTech() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
-                techs.add(p);
+        for (final Person person : getActivePersonnel()) {
+            if (person.isTech() && !person.equals(firstTech)
+                    && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
+                techs.add(person);
             }
         }
         // also need to loop through and collect engineers on self-crewed vessels
-        for (Unit u : getUnits()) {
-            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && (null != u.getEngineer())) {
-                techs.add(u.getEngineer());
+        for (final Unit unit : getUnits()) {
+            if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) && (unit.getEngineer() != null)) {
+                techs.add(unit.getEngineer());
             }
         }
 
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want
         // elites first
-        if (sorted) {
-            Comparator<Person> techSorter = Comparator.comparingInt(person ->
-                    person.getExperienceLevel(!person.getPrimaryRole().isTech()
-                            && person.getSecondaryRole().isTechSecondary()));
+        Comparator<Person> techSorter = Comparator.comparingInt(person ->
+                person.getExperienceLevel(!person.getPrimaryRole().isTech()
+                        && person.getSecondaryRole().isTechSecondary()));
 
-            if (eliteFirst) {
-                techSorter = techSorter.reversed().thenComparing(Comparator
-                        .comparingInt(Person::getDailyAvailableTechTime).reversed());
-            } else {
-                techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
-            }
-
-            techs.sort(techSorter);
+        if (eliteFirst) {
+            techSorter = techSorter.reversed().thenComparing(Comparator
+                    .comparingInt(Person::getDailyAvailableTechTime).reversed());
+        } else {
+            techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
         }
 
+        techSorter = techSorter.thenComparing(new PersonTitleSorter());
+
+        if (firstTechId == null) {
+            techs.sort(techSorter);
+        } else if (techs.size() > 1) {
+            techs.subList(1, techs.size()).sort(techSorter);
+        }
         return techs;
     }
 
@@ -2043,7 +2030,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         if (xpGained > 0) {
-            doctor.awardXP(xpGained);
+            doctor.awardXP(this, xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
         medWork.setDaysToWaitForHealing(getCampaignOptions()
@@ -2411,7 +2398,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        TargetRoll target = getTargetForAcquisition(acquisition, person);
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
 
@@ -2465,7 +2452,7 @@ public class Campaign implements Serializable, ITechManager {
             report += person.getHyperlinkedFullTitle() + " ";
         }
 
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        TargetRoll target = getTargetForAcquisition(acquisition, person);
 
         //check on funds
         if (!canPayFor(acquisition)) {
@@ -2476,7 +2463,6 @@ public class Campaign implements Serializable, ITechManager {
             target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(),
                     getCampaignOptions(), getFaction(), acquisition.getTechBase() == Part.T_CLAN);
         }
-
         report += "attempts to find " + acquisition.getAcquisitionName();
 
         //if impossible then return
@@ -2537,7 +2523,7 @@ public class Campaign implements Serializable, ITechManager {
             person.incrementAcquisition();
 
             if (xpGained > 0) {
-                person.awardXP(xpGained);
+                person.awardXP(this, xpGained);
                 report += " (" + xpGained + "XP gained) ";
             }
         }
@@ -2911,7 +2897,8 @@ public class Campaign implements Serializable, ITechManager {
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";
-                finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), getLocalDate());
+                finances.debit(TransactionType.REPAIRS, getLocalDate(), cost,
+                        "Repair of " + partWork.getPartName());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().getSuccessXP();
@@ -2942,8 +2929,9 @@ public class Campaign implements Serializable, ITechManager {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
+
         if (xpGained > 0) {
-            tech.awardXP(xpGained);
+            tech.awardXP(this, xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
@@ -3028,6 +3016,7 @@ public class Campaign implements Serializable, ITechManager {
                 addReport("The start and end dates of " + contract.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
@@ -3070,9 +3059,9 @@ public class Campaign implements Serializable, ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (Scenario s : contract.getCurrentAtBScenarios()) {
+            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
                 if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = ((AtBScenario) s).getLanceForceId();
+                    int forceId = s.getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3126,8 +3115,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void processNewDayATB() {
-        contractMarket.generateContractOffers(this);
-        unitMarket.generateUnitOffers(this);
+        contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
 
         if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
             setShipSearchExpiration(null);
@@ -3139,6 +3127,13 @@ public class Campaign implements Serializable, ITechManager {
 
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
+
+            // Training Experience - Award to eligible training lances on active contracts
+            getLances().values().stream()
+                    .filter(lance -> lance.getRole().isTraining()
+                            && (lance.getContract(this) != null) && lance.isEligible(this)
+                            && lance.getContract(this).isActiveOn(getLocalDate(), true))
+                    .forEach(this::awardTrainingXP);
         }
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
@@ -3161,16 +3156,22 @@ public class Campaign implements Serializable, ITechManager {
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
                 if (!getCampaignOptions().getDependentsNeverLeave()) {
-                    while ((change < 0) && (dependents.size() > 0)) {
-                        removePerson(Utilities.getRandomItem(dependents).getId());
+                    while ((change < 0) && !dependents.isEmpty()) {
+                        final Person person = Utilities.getRandomItem(dependents);
+                        addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                                person.getFullTitle()));
+                        removePerson(person, false);
+                        dependents.remove(person);
                         change++;
                     }
                 }
             } else {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
-                        Person p = newDependent(false);
-                        recruitPerson(p);
+                        final Person person = newDependent(false);
+                        recruitPerson(person, PrisonerStatus.FREE, true, false);
+                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                                person.getFullTitle()));
                     }
                 }
             }
@@ -3250,7 +3251,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.awardXP(getCampaignOptions().getIdleXP());
+                        p.awardXP(this, getCampaignOptions().getIdleXP());
                         addReport(p.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
@@ -3259,19 +3260,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Procreation
-            if (p.getGender().isFemale()) {
-                if (p.isPregnant()) {
-                    if (getCampaignOptions().useProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            p.birth(this);
-                        }
-                    } else {
-                        p.removePregnancy();
-                    }
-                } else if (getCampaignOptions().useProcreation()) {
-                    p.procreate(this);
-                }
-            }
+            getProcreation().processNewDay(this, getLocalDate(), p);
         }
     }
 
@@ -3416,7 +3405,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Autosave based on the previous day's information
-        this.autosaveService.requestDayAdvanceAutosave(this);
+        autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
         currentDay = currentDay.plus(1, ChronoUnit.DAYS);
@@ -3439,15 +3428,19 @@ public class Campaign implements Serializable, ITechManager {
             reloadNews();
 
             // Change Year Game Option
-            getGameOptions().getOption("year").setValue(getGameYear());
+            getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
         }
 
         readNews();
 
         getLocation().newDay(this);
 
-        // Manage the personnel market
+        // Manage the Markets
         getPersonnelMarket().generatePersonnelForDay(this);
+
+        // TODO : AbstractContractMarket : Uncomment
+        //getContractMarket().processNewDay(this);
+        getUnitMarket().processNewDay(this);
 
         // Process New Day for AtB
         if (getCampaignOptions().getUseAtB()) {
@@ -3517,22 +3510,20 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
-    public void removePerson(UUID id) {
-        removePerson(id, true);
+    public void removePerson(final @Nullable Person person) {
+        removePerson(person, true);
     }
 
-    public void removePerson(UUID id, boolean log) {
-        Person person = getPerson(id);
-
+    public void removePerson(final @Nullable Person person, final boolean log) {
         if (person == null) {
             return;
         }
 
         person.getGenealogy().clearGenealogy();
 
-        Unit u = person.getUnit();
-        if (null != u) {
-            u.remove(person, true);
+        final Unit unit = person.getUnit();
+        if (unit != null) {
+            unit.remove(person, true);
         }
         removeAllPatientsFor(person);
         person.removeAllTechJobs(this);
@@ -3543,7 +3534,7 @@ public class Campaign implements Serializable, ITechManager {
             addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
 
-        personnel.remove(id);
+        personnel.remove(person.getId());
 
         // Deal with Astech Pool Minutes
         if (person.getPrimaryRole().isAstech()) {
@@ -3556,17 +3547,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
 
-    public void awardTrainingXP(Lance l) {
-        awardTrainingXPByMaximumRole(l);
-    }
-
     /**
-     * Awards XP to the lance based on the maximum experience level of its
-     * commanding officer and the minimum experience level of the unit's
-     * members.
+     * Awards XP to the lance based on the maximum experience level of its commanding officer and
+     * the minimum experience level of the unit's members.
      * @param l The {@link Lance} to calculate XP to award for training.
      */
-    private void awardTrainingXPByMaximumRole(Lance l) {
+    private void awardTrainingXP(final Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
@@ -3604,7 +3590,7 @@ public class Campaign implements Serializable, ITechManager {
                                             : SkillType.EXP_ELITE);
                             if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
                                 // ...add one XP.
-                                p.awardXP(1);
+                                p.awardXP(this, 1);
                                 addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
                             }
                         }
@@ -3696,6 +3682,16 @@ public class Campaign implements Serializable, ITechManager {
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
+
+        // clear out StratCon force assignments
+        for (AtBContract contract : getActiveAtBContracts()) {
+            if (contract.getStratconCampaignState() != null) {
+                for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                    track.unassignForce(fid);
+                }
+            }
+        }
+
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
@@ -3886,7 +3882,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Faction getFaction() {
-        return Factions.getInstance().getFaction(factionCode);
+        return Factions.getInstance().getFaction(getFactionCode());
     }
 
     public String getFactionName() {
@@ -3900,6 +3896,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getFactionCode() {
         return factionCode;
+    }
+
+    public Faction getRetainerEmployer() {
+        return Factions.getInstance().getFaction(getRetainerEmployerCode());
     }
 
     public String getRetainerEmployerCode() {
@@ -3993,18 +3993,17 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-    public void addFunds(Money quantity) {
-        addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
+    public void addFunds(final Money quantity) {
+        addFunds(TransactionType.MISCELLANEOUS, quantity, null);
     }
 
-    public void addFunds(Money quantity, String description, int category) {
-        if (description == null || description.isEmpty()) {
+    public void addFunds(final TransactionType type, final Money quantity,
+                         @Nullable String description) {
+        if ((description == null) || description.isEmpty()) {
             description = "Rich Uncle";
         }
-        if (category == -1) {
-            category = Transaction.C_MISC;
-        }
-        finances.credit(quantity, category, description, getLocalDate());
+
+        finances.credit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
@@ -4023,9 +4022,8 @@ public class Campaign implements Serializable, ITechManager {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
         // Start the XML root.
-        pw1.println("<campaign version=\"" + resourceMap.getString("Application.version") + "\">");
+        pw1.println("<campaign version=\"" + MekHqConstants.VERSION + "\">");
 
         //region Basic Campaign Info
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "info");
@@ -4126,16 +4124,24 @@ public class Campaign implements Serializable, ITechManager {
         // parts is the biggest so it goes last
         parts.writeToXml(pw1, indent, "parts"); // Parts
 
-        writeGameOptions(pw1);
+        getGameOptions().writeToXML(pw1, indent);
 
+        // Markets
         getPersonnelMarket().writeToXML(this, pw1, indent);
+
+        // TODO : AbstractContractMarket : Uncomment
+        // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
+        //getContractMarket().writeToXML(pw1, indent);
+
+        // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move this above it
+        getUnitMarket().writeToXML(pw1, indent);
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
+            // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXml(pw1, indent);
 
-            unitMarket.writeToXml(pw1, indent);
             if (lances.size() > 0)   {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "lances");
                 for (Lance l : lances.values()) {
@@ -4210,19 +4216,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Okay, we're done.
         // Close everything out and be done with it.
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent - 1, "campaign");
-    }
-
-    public void writeGameOptions(PrintWriter pw1) {
-        pw1.println("\t<gameOptions>");
-        for (IBasicOption option : getGameOptionsVector()) {
-            pw1.println("\t\t<gameoption>"); //$NON-NLS-1$
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "name", option.getName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "value", option.getValue()
-                    .toString());
-            pw1.println("\t\t</gameoption>"); //$NON-NLS-1$
-        }
-        pw1.println("\t</gameOptions>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaign");
     }
 
     /**
@@ -4865,8 +4859,7 @@ public class Campaign implements Serializable, ITechManager {
 
         int helpMod;
         if ((partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed()) {
-            helpMod = getShorthandedModForCrews((partWork.getUnit().getEntity().getCrew() == null)
-                    ? MekHqConstants.ASTECH_TEAM_SIZE : partWork.getUnit().getEntity().getCrew().getHits());
+            helpMod = getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
         } else {
             final int helpers = getAvailableAstechs(minutes, isOvertime);
             helpMod = getShorthandedMod(helpers, false);
@@ -4929,19 +4922,13 @@ public class Campaign implements Serializable, ITechManager {
             // "astech days" used over
             // the cycle and take the average per day rounding down as our team
             // size
-            int helpMod = 0;
-            if (null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
-                int hits = 0;
-                if (null != partWork.getUnit().getEntity().getCrew()) {
-                    hits = partWork.getUnit().getEntity().getCrew().getHits();
-                } else {
-                    hits = 6;
-                }
-                helpMod = getShorthandedModForCrews(hits);
+            final int helpMod;
+            if (partWork.getUnit().isSelfCrewed()) {
+                helpMod = getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
             } else {
-                int helpers = partWork.getUnit().getAstechsMaintained();
-                helpMod = getShorthandedMod(helpers, false);
+                helpMod = getShorthandedMod(partWork.getUnit().getAstechsMaintained(), false);
             }
+
             if (helpMod > 0) {
                 target.addModifier(helpMod, "shorthanded");
             }
@@ -4956,24 +4943,27 @@ public class Campaign implements Serializable, ITechManager {
         return target;
     }
 
-    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition,
-            Person person) {
-        return getTargetForAcquisition(acquisition, person, true);
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
+        return getTargetForAcquisition(acquisition, getLogisticsPerson());
     }
 
-    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition,
-            Person person, boolean checkDaysToWait) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(
-                CampaignOptions.S_AUTO)) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS,
-                    "Automatic Success");
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
+                                              final @Nullable Person person) {
+        return getTargetForAcquisition(acquisition, person, false);
+    }
+
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
+                                              final @Nullable Person person,
+                                              final boolean checkDaysToWait) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
+
         if (null == person) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "No one on your force is capable of acquiring parts");
         }
-        Skill skill = person.getSkillForWorkingOn(
-                getCampaignOptions().getAcquisitionSkill());
+        final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
         if (null != getShoppingList().getShoppingItem(
                 acquisition.getNewEquipment())
                 && checkDaysToWait) {
@@ -5155,39 +5145,38 @@ public class Campaign implements Serializable, ITechManager {
          * contract. Don't restrict parts availability by contract if it has not started.
          */
         if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if ((c instanceof AtBContract) &&
-                        ((contract == null) ||
-                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
-                    contract = (AtBContract) c;
+            for (final AtBContract c : getActiveAtBContracts()) {
+                if ((contract == null)
+                        || (c.getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
+                    contract = c;
                 }
             }
         }
 
         // if we have a contract and it has started
-        if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
+        if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
             if (reportBuilder != null) {
-                reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
+                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType()).append(")");
             }
             return contract.getPartsAvailabilityLevel();
         }
 
         /* If contract is still null, the unit is not in a contract. */
-        Person adminLog = findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminMod = adminLogExp - SkillType.EXP_REGULAR;
+        final Person person = getLogisticsPerson();
+        int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
+                : person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
+        int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
-            reportBuilder.append(getUnitRatingMod() + "(unit rating)");
-            if (adminLog != null) {
-                reportBuilder.append(adminMod + "(" + adminLog.getFullName() +", logistics admin)");
+            reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
+            if (person != null) {
+                reportBuilder.append(modifier).append("(").append(person.getFullName()).append(", logistics admin)");
             } else {
-                reportBuilder.append(adminMod + "(no logistics admin)");
+                reportBuilder.append(modifier).append("(no logistics admin)");
             }
         }
 
-        return getUnitRatingMod() + adminMod;
+        return getUnitRatingMod() + modifier;
     }
 
     public void resetAstechMinutes() {
@@ -5337,18 +5326,19 @@ public class Campaign implements Serializable, ITechManager {
         return helpMod;
     }
 
-    public int getShorthandedModForCrews(int hits) {
-        int helpMod = 0;
+    public int getShorthandedModForCrews(final @Nullable Crew crew) {
+        final int hits = (crew == null) ? 5 : crew.getHits();
         if (hits >= 5) {
-            helpMod = 4;
+            return 4;
         } else if (hits == 4) {
-            helpMod = 3;
+            return  3;
         } else if (hits == 3) {
-            helpMod = 2;
+            return 2;
         } else if (hits > 0) {
-            helpMod = 1;
+            return 1;
+        } else {
+            return 0;
         }
-        return helpMod;
     }
 
     public int getMedicsPerDoctor() {
@@ -5415,14 +5405,29 @@ public class Campaign implements Serializable, ITechManager {
         return options;
     }
 
-    public void setGameOptions(GameOptions gameOptions) {
+    public void setGameOptions(final GameOptions gameOptions) {
         this.gameOptions = gameOptions;
     }
 
-    public void setGameOptions(Vector<IBasicOption> options) {
-        for (IBasicOption option : options) {
-            gameOptions.getOption(option.getName()).setValue(option.getValue());
+    public void setGameOptions(final Vector<IBasicOption> options) {
+        for (final IBasicOption option : options) {
+            getGameOptions().getOption(option.getName()).setValue(option.getValue());
         }
+        updateCampaignOptionsFromGameOptions();
+    }
+
+    public void updateCampaignOptionsFromGameOptions() {
+        getCampaignOptions().setUseTactics(getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
+        getCampaignOptions().setUseInitiativeBonus(getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
+        getCampaignOptions().setUseToughness(getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
+        getCampaignOptions().setUseArtillery(getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
+        getCampaignOptions().setUseAbilities(getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
+        getCampaignOptions().setUseEdge(getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
+        getCampaignOptions().setUseImplants(getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
+        getCampaignOptions().setQuirks(getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
+        getCampaignOptions().setAllowCanonOnly(getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
+        getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
+        MekHQ.triggerEvent(new OptionsChangedEvent(this));
     }
 
     /**
@@ -5444,7 +5449,7 @@ public class Campaign implements Serializable, ITechManager {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
                 Person p = getPerson(k.getPilotId());
                 if (null != p) {
-                    p.awardXP(getCampaignOptions().getKillXPAward());
+                    p.awardXP(this, getCampaignOptions().getKillXPAward());
                     MekHQ.triggerEvent(new PersonChangedEvent(p));
                 }
             }
@@ -5541,23 +5546,27 @@ public class Campaign implements Serializable, ITechManager {
         rskillPrefs = prefs;
     }
 
-    public void setStartingSystem() {
-        Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
-        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
+    /**
+     * @param planet the starting planet, or null to use the faction default
+     */
+    public void setStartingSystem(final @Nullable Planet planet) {
+        PlanetarySystem startingSystem;
+        if (planet == null) {
+            final Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
-        if (startingSystem == null) {
-            startingSystem = systemList.get(JOptionPane.showInputDialog(
-                    "This faction does not have a starting planet for this era. Please choose a planet."));
-            while (startingSystem == null) {
-                startingSystem = systemList.get(JOptionPane
-                        .showInputDialog("This planet you entered does not exist. Please choose a valid planet."));
+            if (startingSystem == null) {
+                startingSystem = systemList.get(JOptionPane.showInputDialog(
+                        "This faction does not have a starting planet for this era. Please choose a planet."));
+                while (startingSystem == null) {
+                    startingSystem = systemList.get(JOptionPane.showInputDialog(
+                            "This planet you entered does not exist. Please choose a valid planet."));
+                }
             }
+        } else {
+            startingSystem = planet.getParentSystem();
         }
-        location = new CurrentLocation(startingSystem, 0);
-    }
-
-    public void addLogEntry(Person p, LogEntry entry) {
-        p.addLogEntry(entry);
+        setLocation(new CurrentLocation(startingSystem, 0));
     }
 
     /**
@@ -5586,6 +5595,10 @@ public class Campaign implements Serializable, ITechManager {
         p.setOriginPlanet(planet);
     }
 
+    /**
+     * Clears Transient Game Data for an Entity
+     * @param entity the entity to clear the game data for
+     */
     public void clearGameData(Entity entity) {
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
@@ -5616,6 +5629,8 @@ public class Campaign implements Serializable, ITechManager {
         entity.resetCoolantFailureAmount();
         entity.setConversionMode(0);
         entity.setDoomed(false);
+        entity.setHidden(false);
+        entity.clearNarcAndiNarcPods();
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
@@ -6018,13 +6033,13 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if (remainingMoney.isPositive()) {
-                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
-                        "Remaining payment for " + contract.getName(), getLocalDate());
+                getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
+                        "Remaining payment for " + contract.getName());
                 addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract " + contract.getName());
             } else if (remainingMoney.isNegative()) {
-                getFinances().credit(remainingMoney, Transaction.C_CONTRACT,
-                        "Repaying payment overages for " + contract.getName(), getLocalDate());
+                getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
+                        "Repaying payment overages for " + contract.getName());
                 addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
                         + " to replay payment overages occurred during the contract " + contract.getName());
             }
@@ -6196,27 +6211,27 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addLoan(Loan loan) {
-        addReport("You have taken out loan " + loan.getDescription()
+        addReport("You have taken out loan " + loan
                 + ". Your account has been credited "
                 + loan.getPrincipal().toAmountAndSymbolString()
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
-        finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
-                "loan principal for " + loan.getDescription(), getLocalDate());
+        finances.credit(TransactionType.LOAN_PRINCIPAL, getLocalDate(), loan.getPrincipal(),
+                "Loan principal for " + loan);
     }
 
     public void payOffLoan(Loan loan) {
-        if (finances.debit(loan.getRemainingValue(),
-                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), getLocalDate())) {
+        if (finances.debit(TransactionType.LOAN_PAYMENT, getLocalDate(), loan.determineRemainingValue(),
+                "Loan payoff for " + loan)) {
             addReport("You have paid off the remaining loan balance of "
-                    + loan.getRemainingValue().toAmountAndSymbolString()
-                    + "on " + loan.getDescription());
+                    + loan.determineRemainingValue().toAmountAndSymbolString()
+                    + "on " + loan);
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
             addReport("<font color='red'>You do not have enough funds to pay off "
-                    + loan.getDescription() + "</font>");
+                    + loan + "</font>");
         }
 
     }
@@ -6286,8 +6301,8 @@ public class Campaign implements Serializable, ITechManager {
         if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
-                if (!(finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for "
-                                + u.getName(), getLocalDate()))) {
+                if (!(finances.debit(TransactionType.MAINTENANCE, getLocalDate(), u.getMaintenanceCost(),
+                        "Maintenance for " + u.getName()))) {
                     addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
                             + u.getHyperlinkedName() + "!</b></font>");
                     paidMaintenance = false;
@@ -6638,8 +6653,7 @@ public class Campaign implements Serializable, ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-        getContractMarket().generateContractOffers(this, newCampaign);
-        getUnitMarket().generateUnitOffers(this);
+        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
         setAtBEventProcessor(new AtBEventProcessor(this));
     }
 

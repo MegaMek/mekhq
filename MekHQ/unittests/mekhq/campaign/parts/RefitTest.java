@@ -46,7 +46,7 @@ import megamek.common.EquipmentType;
 import megamek.common.IPlayer;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
@@ -75,6 +75,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -110,6 +115,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -192,6 +202,11 @@ public class RefitTest {
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -235,7 +250,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version("1.0.0"));
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -301,8 +316,11 @@ public class RefitTest {
     @Test
     public void javelinJVN10Nto10ATest() {
         Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
@@ -437,7 +455,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version("1.0.0"));
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -503,8 +521,11 @@ public class RefitTest {
     @Test
     public void fleaFLE4toFLE15Test() {
         Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
@@ -666,7 +687,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version("1.0.0"));
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
         assertNotNull(deserialized);
         deserialized.reCalc();
 

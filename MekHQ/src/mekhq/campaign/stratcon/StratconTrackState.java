@@ -377,6 +377,54 @@ public class StratconTrackState {
     }
     
     /**
+     * Moves a strategic objectives from the source to the destination coordinates.
+     * @return True if the operation succeeded, false if it failed
+     */
+    public boolean moveObjective(StratconCoords source, StratconCoords destination) {
+        // safety: don't move it if it's not there; logic prevents two objectives in the same coords
+        if (getObjectivesByCoords().containsKey(source) &&
+                !getObjectivesByCoords().containsKey(destination)) {
+            StratconStrategicObjective objective = getObjectivesByCoords().get(source);
+            // gotta get the cache
+            getObjectivesByCoords().remove(source);
+            getObjectivesByCoords().put(destination, objective);
+            objective.setObjectiveCoords(destination);
+            return true;
+        } else {        
+            return false;
+        }
+    }
+    
+    /**
+     * Convenience method to fail an objective at the given coordinates.
+     */
+    public void failObjective(StratconCoords coords) {
+        if (getObjectivesByCoords().containsKey(coords)) {
+            getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratconStrategicObjective.OBJECTIVE_FAILED);
+        }
+    }
+    
+    /**
+     * Whether or not this track has a facility on it that reveals the track.
+     */
+    public boolean hasActiveTrackReveal() {
+        return getFacilities().values().stream().anyMatch(facility -> facility.getRevealTrack());
+    }
+    
+    /**
+     * Count of all the scenario odds adjustments from facilities
+     * (and potentially other sources) on this track.
+     */
+    public int getScenarioOddsAdjustment() {
+        int accumulator = 0;
+        for (StratconFacility facility : getFacilities().values()) {
+            accumulator += facility.getScenarioOddsModifier();
+        }
+        
+        return accumulator;
+    }
+    
+    /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
     public boolean isForceDeployed(int forceID) {

@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 
 /**
  * A kill record

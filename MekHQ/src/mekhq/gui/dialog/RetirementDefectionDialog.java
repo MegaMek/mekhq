@@ -18,46 +18,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
@@ -65,7 +29,7 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
@@ -77,14 +41,21 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -237,7 +208,6 @@ public class RetirementDefectionDialog extends JDialog {
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_SHARES, new FormattedNumberSorter());
             personnelTable.setRowSorter(personnelSorter);
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
@@ -484,8 +454,8 @@ public class RetirementDefectionDialog extends JDialog {
                     txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
                 }
                 if (getTotalBonus().isPositive()) {
-                    hqView.getCampaign().getFinances().debit(getTotalBonus(), Transaction.C_SALARY, "Bonus Payments",
-                            hqView.getCampaign().getLocalDate());
+                    hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
+                            hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
                 }
             } else if (ev.getSource().equals(btnDone)) {
                 for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {

@@ -85,8 +85,9 @@ public class FinanceTableModel extends DataTableModel {
         for (int i = 0; i <= row; i++) {
             balance = balance.plus(getTransaction(i).getAmount());
         }
+
         if (col == COL_CATEGORY) {
-            return transaction.getCategoryName();
+            return transaction.getType();
         } else if (col == COL_DESC) {
             return transaction.getDescription();
         } else if (col == COL_DEBIT) {

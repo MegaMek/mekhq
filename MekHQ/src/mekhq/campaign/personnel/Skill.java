@@ -180,6 +180,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -206,7 +207,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
             // Okay, now load Skill-specific fields!
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {

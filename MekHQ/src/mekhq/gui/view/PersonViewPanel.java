@@ -18,46 +18,19 @@
  */
 package mekhq.gui.view;
 
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.Image;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.accessibility.AccessibleRelation;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.table.TableColumn;
-
 import megamek.common.options.IOption;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.Utilities;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.familyTree.FormerSpouse;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.Award;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
@@ -68,6 +41,17 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.accessibility.AccessibleRelation;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -627,9 +611,8 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
             String dueDate = MekHQ.getMekHQOptions().getDisplayFormattedDate(
-                    campaign.getCampaignOptions().getDisplayTrueDueDate()
-                            ? person.getDueDate()
-                            : person.getExpectedDueDate());
+                    campaign.getCampaignOptions().isDisplayTrueDueDate()
+                            ? person.getDueDate() : person.getExpectedDueDate());
 
             lblDueDate2.setName("lblDueDate2");
             lblDueDate2.setText(dueDate);
@@ -669,9 +652,9 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        // We show the following if track total earnings is on for a free person, or if the
+        // We show the following if track total earnings is on for a free person or if the
         // person has previously tracked total earnings
-        if (campaign.getCampaignOptions().trackTotalEarnings()
+        if (campaign.getCampaignOptions().isTrackTotalEarnings()
                 && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
@@ -693,6 +676,33 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
+            firsty++;
+        }
+
+        // We show the following if track total xp earnings is on for a free person or if the
+        // person has previously tracked total xp earnings
+        if (campaign.getCampaignOptions().isTrackTotalXPEarnings()
+                && (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
+            JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));
+            lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings1, gridBagConstraints);
+
+            JLabel lblTotalXPEarnings2 = new JLabel(Integer.toString(person.getTotalXPEarnings()));
+            lblTotalXPEarnings2.setName("lblTotalXPEarnings2");
+            lblTotalXPEarnings1.setLabelFor(lblTotalXPEarnings2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalXPEarnings2, gridBagConstraints);
             firsty++;
         }
 
@@ -1195,7 +1205,7 @@ public class PersonViewPanel extends JScrollablePanel {
         //reset firsty
         firsty = colBreak;
 
-        if (campaign.getCampaignOptions().useAbilities() && (person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0)) {
+        if (campaign.getCampaignOptions().useAbilities() && (person.countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0)) {
             JLabel lblAbility1 = new JLabel(resourceMap.getString("lblAbility1.text"));
             lblAbility1.setName("lblAbility1");
             gridBagConstraints = new GridBagConstraints();
@@ -1210,7 +1220,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+            for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
                     JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
@@ -1224,7 +1234,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().useImplants() && (person.countOptions(PilotOptions.MD_ADVANTAGES) > 0)) {
+        if (campaign.getCampaignOptions().useImplants() && (person.countOptions(PersonnelOptions.MD_ADVANTAGES) > 0)) {
             JLabel lblImplants1 = new JLabel(resourceMap.getString("lblImplants1.text"));
             lblImplants1.setName("lblImplants1");
             gridBagConstraints = new GridBagConstraints();
@@ -1239,7 +1249,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (Enumeration<IOption> i = person.getOptions(PilotOptions.MD_ADVANTAGES); i.hasMoreElements();) {
+            for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.MD_ADVANTAGES); i.hasMoreElements();) {
                 IOption option = i.nextElement();
 
                 if (option.booleanValue()) {

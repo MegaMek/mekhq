@@ -1,38 +1,63 @@
-/.metadata
-/.recommenders/
-/RemoteSystemsTempFiles/
-/bin/
-/.settings/
-/logs/
-.DS_Store
-MekHQ/MekHQ.iml
-
-# Build directories
-MekHQ/pkgdir
-/build/
-
-# IDE directories
-MekHQ/.idea/
-/out/
-/.idea/
-/.vscode
+# These are all in alphabetical file system display order
 /.gradle/
-/settings_local.gradle
-/.classpath
-/.project
-/properties_local.gradle
-
-MekHQ/out/
-MekHQ/mmconf/mekhq.preferences
-MekHQ/userdata/**
+/.idea/
+/.recommenders/
+/.settings/
+/bin/
+/build/
+/logs/
+/MekHQ/.gradle/
+/MekHQ/.idea/
+/MekHQ/.settings/
+/MekHQ/bin/
+/MekHQ/build/
+/MekHQ/campaigns/
+!/MekHQ/campaigns/Fist and Falcon/
+!/MekHQ/campaigns/Sword and Dragon/
+!/MekHQ/campaigns/Wolf and Blake/
+/MekHQ/classes/
+/MekHQ/data/images/awards/
+!/MekHQ/data/images/awards/standard/
+/MekHQ/data/images/portraits/Female/
+/MekHQ/data/images/portraits/Male/
+/MekHQ/data/images/temp/
+/MekHQ/data/mechfiles/units.cache
+/MekHQ/data/mechfiles/customs/
+/MekHQ/data/universe/awards/
+!/MekHQ/data/universe/awards/standard.xml
+/MekHQ/logs/
+/MekHQ/mmconf/clientsettings.xml
+/MekHQ/mmconf/gameoptions.xml
+/MekHQ/mmconf/megamek.preferences
+/MekHQ/mmconf/megameklab.preferences
+/MekHQ/mmconf/megameklab.properties
+/MekHQ/mmconf/mekhq.preferences
+/MekHQ/mmconf/mekhq.properties
+/MekHQ/out/
+/MekHQ/pkgdir/
+/MekHQ/savegames/
+/MekHQ/userdata/**
 !/MekHQ/userdata/README.md
-!/MekHQ/userdata/data
+!/MekHQ/userdata/data/
 /MekHQ/userdata/data/**
 !/MekHQ/userdata/data/universe/
 /MekHQ/userdata/data/universe/**
 !/MekHQ/userdata/data/universe/ranks.xml
-*.sav.gz
-/MekHQ/campaigns
-!/MekHQ/campaigns/Fist and Falcon
-!/MekHQ/campaigns/Sword and Dragon
-!/MekHQ/campaigns/Wolf and Blake
+/MekHQ/.classpath
+/MekHQ/MekHQ.iml
+/MekHQ/MekHQ.jar
+/MekHQ/*.mul
+/MekHQ/*.zip
+/MekHQ/*.tar.gz
+/MekHQ/*.tar.bz2
+/MekHQ/*.blame
+/out/
+/RemoteSystemsTempFiles/
+/.classpath
+/.DS_Store
+/.metadata
+/.project
+/.vscode
+/properties_local.gradle
+/settings_local.gradle
+/*.sav.gz
