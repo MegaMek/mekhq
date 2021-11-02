@@ -169,7 +169,7 @@ public class MedicalLogger {
     public static void hasConceived(Person patient, LocalDate date, String sizeString) {
         String message = logEntriesResourceMap.getString("hasConceived.text");
 
-        if (sizeString != null) {
+        if (!sizeString.isBlank()) {
             message += " " + sizeString;
         }
 
