@@ -25,7 +25,6 @@ import megamek.common.Crew;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
@@ -293,17 +292,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy(gui.getCampaign());
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people)
+                        .filter(person -> (gui.getCampaign().getProcreation().canProcreate(
+                                gui.getCampaign().getLocalDate(), person, false) == null))
+                        .forEach(person -> {
+                            gui.getCampaign().getProcreation().addPregnancy(
+                                    gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
+                            MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                if (selectedPerson.isPregnant()) {
-                    selectedPerson.removePregnancy();
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    gui.getCampaign().getProcreation().removePregnancy(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
@@ -384,7 +387,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_ABILITY: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         selected, true);
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
@@ -398,7 +401,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_WEAPON_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -413,7 +416,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_SPECIALIST: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -428,7 +431,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_RANGEMASTER: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.GUNNERY_RANGE_MASTER, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -443,7 +446,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_HUMANTRO: {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -459,7 +462,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 String ability = data[3];
-                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                         ability, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
@@ -827,15 +830,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_TRYING_TO_CONCEIVE: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isTryingToConceive();
-                    for (Person person : people) {
-                        person.setTryingToConceive(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
-                    gui.getCampaign().personUpdated(selectedPerson);
+                final boolean tryingToConceive = !people[0].isTryingToConceive();
+                for (final Person person : people) {
+                    person.setTryingToConceive(tryingToConceive);
                 }
                 break;
             }
@@ -1738,7 +1735,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && person.getGender().isFemale()) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
                 cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
@@ -1941,7 +1939,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(cbMenuItem);
             }
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && StaticChecks.areAllFemale(selected)
                     && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
@@ -2182,6 +2181,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
                 menu.add(menuItem);
             }
+
             if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("removeAllInjuries.text"));
                 menuItem.setActionCommand(CMD_CLEAR_INJURIES);
@@ -2203,20 +2203,24 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (oneSelected) {
-                if (person.canProcreate(gui.getCampaign())) {
-                    menuItem = new JMenuItem(resources.getString("addPregnancy.text"));
+            if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
+                if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
+                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
+                    menuItem = new JMenuItem(resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                } else if (person.isPregnant()) {
-                    menuItem = new JMenuItem(resources.getString("removePregnancy.text"));
+                }
+
+                if (Stream.of(selected).anyMatch(Person::isPregnant)) {
+                    menuItem = new JMenuItem(resources.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
             }
-            popup.add(menu);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         //endregion GM Menu
 

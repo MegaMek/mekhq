@@ -58,6 +58,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -244,6 +246,7 @@ public class Campaign implements Serializable, ITechManager {
     private AbstractUnitMarket unitMarket;
 
     private transient AbstractDivorce divorce;
+    private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
@@ -304,6 +307,7 @@ public class Campaign implements Serializable, ITechManager {
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
+        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -465,6 +469,14 @@ public class Campaign implements Serializable, ITechManager {
     public void setDivorce(final AbstractDivorce divorce) {
         this.divorce = divorce;
     }
+
+    public AbstractProcreation getProcreation() {
+        return procreation;
+    }
+
+    public void setProcreation(final AbstractProcreation procreation) {
+        this.procreation = procreation;
+    }
     //endregion Personnel Modules
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
@@ -492,7 +504,7 @@ public class Campaign implements Serializable, ITechManager {
         if (unitGenerator != null && unitGenerator instanceof RATManager) {
             MekHQ.unregisterHandler(unitGenerator);
         }
-        if (campaignOptions.useStaticRATs()) {
+        if (campaignOptions.isUseStaticRATs()) {
             RATManager rm = new RATManager();
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 try {
@@ -502,7 +514,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
-            rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
+            rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
             unitGenerator = rm;
         } else {
             unitGenerator = new RATGeneratorConnector(getGameYear());
@@ -3255,23 +3267,11 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
-            // Procreation
-            if (p.getGender().isFemale()) {
-                if (p.isPregnant()) {
-                    if (getCampaignOptions().useProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            p.birth(this);
-                        }
-                    } else {
-                        p.removePregnancy();
-                    }
-                } else if (getCampaignOptions().useProcreation()) {
-                    p.procreate(this);
-                }
-            }
-
             // Divorce
             getDivorce().processNewDay(this, getLocalDate(), p);
+
+            // Procreation
+            getProcreation().processNewDay(this, getLocalDate(), p);
         }
     }
 
