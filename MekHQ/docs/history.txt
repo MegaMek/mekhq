@@ -3,6 +3,7 @@ VERSION HISTORY:
 0.49.5-SNAPSHOT
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
 + PR #2493: Procreation: Modularization, Expanded Options, and Bulk Manual Assignment/Removal
++ Documentation: Windchild Docs folder, Updating Existing Docs
 
 0.49.4 (2021-10-30 1800 UTC)
 + Issue #274: Moving Era Definitions to Data
