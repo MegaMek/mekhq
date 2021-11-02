@@ -954,42 +954,10 @@ public class Person implements Serializable {
                 }
                 break;
             case PREGNANCY_COMPLICATIONS:
-<<<<<<< HEAD
-                // The child might be able to be born, albeit into a world without their mother.
-                // This can be manually set by males and for those who are not pregnant. This is
-                // purposeful, to allow for player customization, and thus we first check if someone
-                // is pregnant before having the birth
-                if (isPregnant()) {
-                    int pregnancyWeek = getPregnancyWeek(today);
-                    double babyBornChance;
-                    if (pregnancyWeek > 35) {
-                        babyBornChance = 0.99;
-                    } else if (pregnancyWeek > 29) {
-                        babyBornChance = 0.95;
-                    } else if (pregnancyWeek > 25) {
-                        babyBornChance = 0.9;
-                    } else if (pregnancyWeek == 25) {
-                        babyBornChance = 0.8;
-                    } else if (pregnancyWeek == 24) {
-                        babyBornChance = 0.5;
-                    } else if (pregnancyWeek == 23) {
-                        babyBornChance = 0.25;
-                    } else {
-                        babyBornChance = 0;
-                    }
-
-                    if (Compute.randomFloat() < babyBornChance) {
-                        birth(campaign);
-                    }
-                }
+                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
             default:
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
-=======
-                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
-                MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
->>>>>>> upstream/master
                 break;
         }
 
