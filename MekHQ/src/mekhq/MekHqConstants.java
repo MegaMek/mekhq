@@ -23,9 +23,12 @@ package mekhq;
 import megamek.SuiteConstants;
 
 public final class MekHqConstants extends SuiteConstants {
+    //region General Constants
     // This is used in creating the name of save files, e.g. the MekHQ campaign file
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
     public static final int ASTECH_TEAM_SIZE = 6;
+    public static final int PREGNANCY_STANDARD_DURATION = 280; //standard duration of a pregnancy in days (40 weeks)
+    // endregion General Constants
 
     //region GUI Constants
     public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
