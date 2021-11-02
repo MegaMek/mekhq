@@ -18,29 +18,25 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.options.IOption;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
  * abilities are included.
  *
  * @author Neoancient
- *
  */
 public class CustomOption {
 
@@ -53,7 +49,7 @@ public class CustomOption {
 
     private CustomOption(String key) {
         this.name = key;
-        group = PilotOptions.LVL3_ADVANTAGES;
+        group = PersonnelOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;
     }

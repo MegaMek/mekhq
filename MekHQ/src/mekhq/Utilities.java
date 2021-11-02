@@ -920,7 +920,9 @@ public class Utilities {
     }
 
     /**
-     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+     * Worker function that takes the PersonnelOptions (SPAs, in other words) from the given
+     * "old crew" and sets them for a person.
+     *
      * @param p The person whose SPAs to populate
      * @param oldCrew The entity the SPAs of whose crew we're importing
      */

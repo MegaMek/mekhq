@@ -20,13 +20,13 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
@@ -38,7 +38,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import megamek.Version;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Document;
@@ -50,19 +49,12 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
- * person object we will use PilotOptions (and maybe at some point NonPilotOptions), so these
- * objects will not get written to actual personnel. Instead, we will we will keep track of a full static
+ * person object we will use PersonnelOptions, so these objects will not get written to actual
+ * personnel. Instead, we will we will keep track of a full static
  * hash of SPAs that will contain important information on XP costs and pre-reqs that can be
  * looked up to see if a person is eligible for a particular option. All of this
  * will be customizable via an external XML file that can be user selected in the campaign
@@ -331,7 +323,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
 
     @SuppressWarnings("unchecked")
-    public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
+    public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -398,7 +390,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
+    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -545,11 +537,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
         specialAbilities = spas;
     }
 
-    public static SpecialAbility getOption(String name) {
+    public static @Nullable SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
         if (null != retVal) {
             return retVal;
         }
+
         if (null != defaultSpecialAbilities) {
             retVal = defaultSpecialAbilities.get(name);
             if (null != retVal) {
@@ -736,7 +729,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String getDisplayName(String name) {
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
         IOption option = options.getOption(name);
         if (null != option) {
             return option.getDisplayableName();

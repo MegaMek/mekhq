@@ -18,47 +18,43 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.time.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.enums.Gender;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
+import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -74,7 +70,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private Map<String, JSpinner> skillBonus = new Hashtable<>();
     private Map<String, JLabel> skillValues = new Hashtable<>();
     private Map<String, JCheckBox> skillChks = new Hashtable<>();
-    private PilotOptions options;
+    private PersonnelOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
@@ -1127,17 +1123,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 .hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
-            if (group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)
+            if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)
                     && !campaign.getCampaignOptions().useAbilities()) {
                 continue;
             }
 
-            if (group.getKey().equalsIgnoreCase(PilotOptions.EDGE_ADVANTAGES)
+            if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)
                     && !campaign.getCampaignOptions().useEdge()) {
                 continue;
             }
 
-            if (group.getKey().equalsIgnoreCase(PilotOptions.MD_ADVANTAGES)
+            if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES)
                     && !campaign.getCampaignOptions().useImplants()) {
                 continue;
             }
