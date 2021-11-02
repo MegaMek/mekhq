@@ -862,7 +862,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), getCampaignOptions().getUseTimeInService());
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), getCampaignOptions().getUseTimeInRank());
-                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), getCampaignOptions().useProcreation());
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), getCampaignOptions().isUseManualProcreation() || !getCampaignOptions().getRandomProcreationMethod().isNone());
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), getCampaignOptions().useRetirementDateTracking());
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), true);
                 break;
