@@ -35,7 +35,6 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
@@ -54,6 +53,7 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.*;
@@ -63,6 +63,8 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.baseComponents.JDisableablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.RandomOriginOptionsPanel;
@@ -257,14 +259,23 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnChanceRandomSameSexMarriages;
 
     // Procreation
-    private JCheckBox chkUseProcreation;
-    private JSpinner spnChanceProcreation;
-    private JCheckBox chkUseProcreationNoRelationship;
-    private JSpinner spnChanceProcreationNoRelationship;
-    private JCheckBox chkDisplayTrueDueDate;
-    private JCheckBox chkLogConception;
-    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkUseManualProcreation;
+    private JCheckBox chkUseClannerProcreation;
+    private JCheckBox chkUsePrisonerProcreation;
+    private JSpinner spnMultiplePregnancyOccurrences;
+    private MMComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
+    private JCheckBox chkAssignChildrenOfFoundersFounderTag;
     private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayTrueDueDate;
+    private JCheckBox chkLogProcreation;
+    private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
+    private JCheckBox chkUseRelationshiplessRandomProcreation;
+    private JCheckBox chkUseRandomClannerProcreation;
+    private JCheckBox chkUseRandomPrisonerProcreation;
+    private JSpinner spnPercentageRandomProcreationRelationshipChance;
+    private JLabel lblPercentageRandomProcreationRelationshiplessChance;
+    private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -409,6 +420,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkContractMarketReportRefresh;
     //endregion Markets Tab
 
+    //region RATs Tab
+    private JRadioButton btnUseRATGenerator;
+    private JRadioButton btnUseStaticRATs;
+    private DefaultListModel<String> chosenRATModel;
+    private DefaultListModel<String> availableRATModel;
+    private JCheckBox chkIgnoreRATEra;
+    //endregion RATs Tab
+
     //region Against the Bot Tab
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
@@ -447,19 +466,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner[] spnAtBBattleChance;
     private JButton btnIntensityUpdate;
     private JCheckBox chkGenerateChases;
-
-    //RATs
-    private JRadioButton btnDynamicRATs;
-    private JRadioButton btnStaticRATs;
-    private DefaultListModel<String> chosenRatModel;
-    private JList<String> chosenRats;
-    private DefaultListModel<String> availableRatModel;
-    private JList<String> availableRats;
-    private JButton btnAddRat;
-    private JButton btnRemoveRat;
-    private JButton btnMoveRatUp;
-    private JButton btnMoveRatDown;
-    private JCheckBox chkIgnoreRatEra;
 
     //scenarios
     private JCheckBox chkDoubleVehicles;
@@ -2598,6 +2604,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         getOptionsPane().addTab(resourceMap.getString("marketsPanel.title"), createMarketsTab());
         //endregion Markets Tab
 
+        //region RATs Tab
+        getOptionsPane().addTab(resourceMap.getString("ratPanel.title"), createRATTab());
+        //endregion RATs Tab
+
         //region Against the Bot Tab
         panAtB = new JPanel();
 
@@ -2630,14 +2640,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnOpforLocalForceChance = new JSpinner();
         spnFixedMapChance = new JSpinner();
 
-        availableRats = new JList<>();
-        chosenRats = new JList<>();
-        btnAddRat = new JButton();
-        btnRemoveRat = new JButton();
-        btnMoveRatUp = new JButton();
-        btnMoveRatDown = new JButton();
-        chkIgnoreRatEra = new JCheckBox();
-
         spnSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
         chkMercSizeLimited = new JCheckBox();
@@ -2646,16 +2648,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUsePlanetaryConditions = new JCheckBox();
         chkAeroRecruitsHaveUnits = new JCheckBox();
 
-
         panAtB.setName("panAtB");
         panAtB.setLayout(new GridBagLayout());
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
-        JPanel panSubAtBRat = new JPanel(new GridBagLayout());
         JPanel panSubAtBContract = new JPanel(new GridBagLayout());
         JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
         panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
-        panSubAtBRat.setBorder(BorderFactory.createTitledBorder("Random Assignment Tables"));
         panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
         panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
 
@@ -2669,11 +2668,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panAtB.add(chkUseAtB, gridBagConstraints);
-        chkUseAtB.addActionListener(ev -> {
-            enableAtBComponents(panAtB, chkUseAtB.isSelected());
-            enableAtBComponents(panSubAtBRat,
-                    chkUseAtB.isSelected() && btnStaticRATs.isSelected());
-        });
+        chkUseAtB.addActionListener(ev -> enableAtBComponents(panAtB, chkUseAtB.isSelected()));
 
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
@@ -2691,32 +2686,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         gridBagConstraints.gridy = 1;
         panAtB.add(cbSkillLevel, gridBagConstraints);
 
-        btnDynamicRATs = new JRadioButton(resourceMap.getString("btnDynamicRATs.text"));
-        btnDynamicRATs.setToolTipText(resourceMap.getString("btnDynamicRATs.tooltip"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        panAtB.add(btnDynamicRATs, gridBagConstraints);
-
-        btnStaticRATs = new JRadioButton(resourceMap.getString("btnStaticRATs.text"));
-        btnStaticRATs.setToolTipText(resourceMap.getString("btnStaticRATs.tooltip"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        panAtB.add(btnStaticRATs, gridBagConstraints);
-        btnStaticRATs.addItemListener(ev -> enableAtBComponents(panSubAtBRat, btnStaticRATs.isSelected()));
-
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         panAtB.add(panSubAtBAdmin, gridBagConstraints);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
-        panAtB.add(panSubAtBRat, gridBagConstraints);
+        panAtB.add(panSubAtBScenario, gridBagConstraints);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBContract, gridBagConstraints);
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        panAtB.add(panSubAtBScenario, gridBagConstraints);
 
         chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
         chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
@@ -2806,124 +2785,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkClanVehicles.setToolTipText(resourceMap.getString("chkClanVehicles.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(btnDynamicRATs);
-        group.add(btnStaticRATs);
-
-        chosenRatModel = new DefaultListModel<>();
-        chosenRats.setModel(chosenRatModel);
-        chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        chosenRats.addListSelectionListener(arg0 -> {
-            btnRemoveRat.setEnabled(chosenRats.getSelectedIndex() >= 0);
-            btnMoveRatUp.setEnabled(chosenRats.getSelectedIndex() > 0);
-            btnMoveRatDown.setEnabled(chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
-        });
-        availableRatModel = new DefaultListModel<>();
-        for (String rat : RATManager.getAllRATCollections().keySet()) {
-            List<Integer> eras = RATManager.getAllRATCollections().get(rat);
-            if (eras != null) {
-                StringBuilder displayName = new StringBuilder(rat);
-                if (eras.size() > 0) {
-                    displayName.append(" (").append(eras.get(0));
-                    if (eras.size() > 1) {
-                        displayName.append("-").append(eras.get(eras.size() - 1));
-                    }
-                    displayName.append(")");
-                }
-                availableRatModel.addElement(displayName.toString());
-            }
-        }
-        availableRats.setModel(availableRatModel);
-        availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableRats.addListSelectionListener(arg0 -> btnAddRat.setEnabled(availableRats.getSelectedIndex() >= 0));
-
-        JTextArea txtRatInstructions = new JTextArea();
-        txtRatInstructions.setEditable(false);
-        txtRatInstructions.setWrapStyleWord(true);
-        txtRatInstructions.setLineWrap(true);
-        txtRatInstructions.setText(resourceMap.getString("txtRatInstructions.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubAtBRat.add(txtRatInstructions, gridBagConstraints);
-
-        JLabel lblChosenRats = new JLabel(resourceMap.getString("lblChosenRats.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBRat.add(lblChosenRats, gridBagConstraints);
-
-        JLabel lblAvailableRats = new JLabel(resourceMap.getString("lblAvailableRats.text"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        panSubAtBRat.add(lblAvailableRats, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(chosenRats, gridBagConstraints);
-
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(availableRats, gridBagConstraints);
-
-        JPanel panRatButtons = new JPanel();
-        panRatButtons.setLayout(new javax.swing.BoxLayout(panRatButtons, javax.swing.BoxLayout.Y_AXIS));
-        btnAddRat.setText(resourceMap.getString("btnAddRat.text"));
-        btnAddRat.setToolTipText(resourceMap.getString("btnAddRat.toolTipText"));
-        btnAddRat.addActionListener(arg0 -> {
-            int selectedIndex = availableRats.getSelectedIndex();
-            chosenRatModel.addElement(availableRats.getSelectedValue());
-            availableRatModel.removeElementAt(availableRats.getSelectedIndex());
-            availableRats.setSelectedIndex(Math.min(selectedIndex, availableRatModel.size() - 1));
-        });
-        btnAddRat.setEnabled(false);
-        panRatButtons.add(btnAddRat);
-        btnRemoveRat.setText(resourceMap.getString("btnRemoveRat.text"));
-        btnRemoveRat.setToolTipText(resourceMap.getString("btnRemoveRat.toolTipText"));
-        btnRemoveRat.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            availableRatModel.addElement(chosenRats.getSelectedValue());
-            chosenRatModel.removeElementAt(chosenRats.getSelectedIndex());
-            chosenRats.setSelectedIndex(Math.min(selectedIndex, chosenRatModel.size() - 1));
-        });
-        btnRemoveRat.setEnabled(false);
-        panRatButtons.add(btnRemoveRat);
-        btnMoveRatUp.setText(resourceMap.getString("btnMoveRatUp.text"));
-        btnMoveRatUp.setToolTipText(resourceMap.getString("btnMoveRatUp.toolTipText"));
-        btnMoveRatUp.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            String tmp = chosenRatModel.getElementAt(selectedIndex);
-            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex - 1), selectedIndex);
-            chosenRatModel.setElementAt(tmp, selectedIndex - 1);
-            chosenRats.setSelectedIndex(selectedIndex - 1);
-        });
-        btnMoveRatUp.setEnabled(false);
-        panRatButtons.add(btnMoveRatUp);
-        btnMoveRatDown.setText(resourceMap.getString("btnMoveRatDown.text"));
-        btnMoveRatDown.setToolTipText(resourceMap.getString("btnMoveRatDown.toolTipText"));
-        btnMoveRatDown.addActionListener(arg0 -> {
-            int selectedIndex = chosenRats.getSelectedIndex();
-            String tmp = chosenRatModel.getElementAt(selectedIndex);
-            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex + 1), selectedIndex);
-            chosenRatModel.setElementAt(tmp, selectedIndex + 1);
-            chosenRats.setSelectedIndex(selectedIndex + 1);
-        });
-        btnMoveRatDown.setEnabled(false);
-        panRatButtons.add(btnMoveRatDown);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        panSubAtBRat.add(panRatButtons, gridBagConstraints);
-
-        chkIgnoreRatEra.setText(resourceMap.getString("chkIgnoreRatEra.text"));
-        chkIgnoreRatEra.setToolTipText(resourceMap.getString("chkIgnoreRatEra.toolTipText"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        panSubAtBRat.add(chkIgnoreRatEra, gridBagConstraints);
 
         JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -3267,7 +3128,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         getOptionsPane().addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
         enableAtBComponents(panAtB, chkUseAtB.isSelected());
-        enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected() && btnStaticRATs.isSelected());
 
         SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
@@ -4172,68 +4032,51 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createProcreationPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblChanceProcreation = new JLabel();
-        JLabel lblChanceProcreationNoRelationship = new JLabel();
-        JLabel lblBabySurnameStyle = new JLabel();
-
         // Create Panel Components
-        chkUseProcreation = new JCheckBox(resources.getString("chkUseProcreation.text"));
-        chkUseProcreation.setToolTipText(resources.getString("chkUseProcreation.toolTipText"));
-        chkUseProcreation.setName("chkUseProcreation");
-        chkUseProcreation.addActionListener(evt -> {
-            final boolean selected = chkUseProcreation.isSelected();
-            lblChanceProcreation.setEnabled(selected);
-            spnChanceProcreation.setEnabled(selected);
-            chkUseProcreationNoRelationship.setEnabled(selected);
-            lblChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
-            spnChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
-            chkDisplayTrueDueDate.setEnabled(selected);
-            chkLogConception.setEnabled(selected);
-            lblBabySurnameStyle.setEnabled(selected);
-            comboBabySurnameStyle.setEnabled(selected);
-            chkDetermineFatherAtBirth.setEnabled(selected);
+        chkUseManualProcreation = new JCheckBox(resources.getString("chkUseManualProcreation.text"));
+        chkUseManualProcreation.setToolTipText(resources.getString("chkUseManualProcreation.toolTipText"));
+        chkUseManualProcreation.setName("chkUseManualProcreation");
+
+        chkUseClannerProcreation = new JCheckBox(resources.getString("chkUseClannerProcreation.text"));
+        chkUseClannerProcreation.setToolTipText(resources.getString("chkUseClannerProcreation.toolTipText"));
+        chkUseClannerProcreation.setName("chkUseClannerProcreation");
+        chkUseClannerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerProcreation.setEnabled(!method.isNone() && chkUseClannerProcreation.isSelected());
         });
 
-        lblChanceProcreation.setText(resources.getString("lblChanceProcreation.text"));
-        lblChanceProcreation.setToolTipText(resources.getString("lblChanceProcreation.toolTipText"));
-        lblChanceProcreation.setName("lblChanceProcreation");
-
-        spnChanceProcreation = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceProcreation.setToolTipText(resources.getString("lblChanceProcreation.toolTipText"));
-        spnChanceProcreation.setName("spnChanceProcreation");
-
-        chkUseProcreationNoRelationship = new JCheckBox(resources.getString("chkUseProcreationNoRelationship.text"));
-        chkUseProcreationNoRelationship.setToolTipText(resources.getString("chkUseProcreationNoRelationship.toolTipText"));
-        chkUseProcreationNoRelationship.setName("chkUseProcreationNoRelationship");
-        chkUseProcreationNoRelationship.addActionListener(evt -> {
-            final boolean selected = chkUseProcreation.isSelected() && chkUseProcreationNoRelationship.isSelected();
-            lblChanceProcreationNoRelationship.setEnabled(selected);
-            spnChanceProcreationNoRelationship.setEnabled(selected);
+        chkUsePrisonerProcreation = new JCheckBox(resources.getString("chkUsePrisonerProcreation.text"));
+        chkUsePrisonerProcreation.setToolTipText(resources.getString("chkUsePrisonerProcreation.toolTipText"));
+        chkUsePrisonerProcreation.setName("chkUsePrisonerProcreation");
+        chkUsePrisonerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerProcreation.setEnabled(!method.isNone() && chkUsePrisonerProcreation.isSelected());
         });
 
-        lblChanceProcreationNoRelationship.setText(resources.getString("lblChanceProcreationNoRelationship.text"));
-        lblChanceProcreationNoRelationship.setToolTipText(resources.getString("lblChanceProcreationNoRelationship.toolTipText"));
-        lblChanceProcreationNoRelationship.setName("lblChanceProcreationNoRelationship");
+        final JLabel lblMultiplePregnancyOccurrences = new JLabel(resources.getString("lblMultiplePregnancyOccurrences.text"));
+        lblMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrences.setName("lblMultiplePregnancyOccurrences");
 
-        spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceProcreationNoRelationship.setToolTipText(resources.getString("lblChanceProcreationNoRelationship.toolTipText"));
-        spnChanceProcreationNoRelationship.setName("spnChanceProcreationNoRelationship");
+        spnMultiplePregnancyOccurrences = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        spnMultiplePregnancyOccurrences.setName("spnMultiplePregnancyOccurrences");
 
-        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
-        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
-        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+        final JLabel lblMultiplePregnancyOccurrencesEnd = new JLabel(resources.getString("lblMultiplePregnancyOccurrencesEnd.text"));
+        lblMultiplePregnancyOccurrencesEnd.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrencesEnd.setName("lblMultiplePregnancyOccurrencesEnd");
 
-        chkLogConception = new JCheckBox(resources.getString("chkLogConception.text"));
-        chkLogConception.setToolTipText(resources.getString("chkLogConception.toolTipText"));
-        chkLogConception.setName("chkLogConception");
-
-        lblBabySurnameStyle.setText(resources.getString("lblBabySurnameStyle.text"));
+        final JLabel lblBabySurnameStyle = new JLabel(resources.getString("lblBabySurnameStyle.text"));
         lblBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         lblBabySurnameStyle.setName("lblBabySurnameStyle");
 
-        comboBabySurnameStyle = new JComboBox<>(BabySurnameStyle.values());
-        comboBabySurnameStyle.setName("comboBabySurnameStyle");
+        comboBabySurnameStyle = new MMComboBox<>("comboBabySurnameStyle", BabySurnameStyle.values());
+        comboBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -4247,24 +4090,37 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
         });
 
+        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox(resources.getString("chkAssignNonPrisonerBabiesFounderTag.text"));
+        chkAssignNonPrisonerBabiesFounderTag.setToolTipText(resources.getString("chkAssignNonPrisonerBabiesFounderTag.toolTipText"));
+        chkAssignNonPrisonerBabiesFounderTag.setName("chkAssignNonPrisonerBabiesFounderTag");
+
+        chkAssignChildrenOfFoundersFounderTag = new JCheckBox(resources.getString("chkAssignChildrenOfFoundersFounderTag.text"));
+        chkAssignChildrenOfFoundersFounderTag.setToolTipText(resources.getString("chkAssignChildrenOfFoundersFounderTag.toolTipText"));
+        chkAssignChildrenOfFoundersFounderTag.setName("chkAssignChildrenOfFoundersFounderTag");
+
         chkDetermineFatherAtBirth = new JCheckBox(resources.getString("chkDetermineFatherAtBirth.text"));
         chkDetermineFatherAtBirth.setToolTipText(resources.getString("chkDetermineFatherAtBirth.toolTipText"));
         chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
 
+        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
+        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
+        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+
+        chkLogProcreation = new JCheckBox(resources.getString("chkLogProcreation.text"));
+        chkLogProcreation.setToolTipText(resources.getString("chkLogProcreation.toolTipText"));
+        chkLogProcreation.setName("chkLogProcreation");
+
+        final JPanel randomProcreationPanel = createRandomProcreationPanel();
+
         // Programmatically Assign Accessibility Labels
-        lblChanceProcreation.setLabelFor(spnChanceProcreation);
-        lblChanceProcreationNoRelationship.setLabelFor(spnChanceProcreationNoRelationship);
+        lblMultiplePregnancyOccurrences.setLabelFor(spnMultiplePregnancyOccurrences);
         lblBabySurnameStyle.setLabelFor(comboBabySurnameStyle);
 
-        // Disable Panel by Default
-        chkUseProcreation.setSelected(true);
-        chkUseProcreation.doClick();
-
         // Layout the Panel
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("procreationPanel.title")));
         panel.setName("procreationPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -4272,41 +4128,199 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseProcreation)
+                        .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceProcreation)
-                                .addComponent(spnChanceProcreation, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkUseProcreationNoRelationship)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogProcreation)
+                        .addComponent(randomProcreationPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkUseProcreation)
+                        .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreation)
-                                .addComponent(spnChanceProcreation))
-                        .addComponent(chkUseProcreationNoRelationship)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogProcreation)
+                        .addComponent(randomProcreationPanel)
         );
 
         return panel;
+    }
+
+    private JPanel createRandomProcreationPanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel percentageRandomProcreationPanel = new JDisableablePanel("percentageRandomProcreationPanel");
+
+        // Create Panel Components
+        final JLabel lblRandomProcreationMethod = new JLabel(resources.getString("lblRandomProcreationMethod.text"));
+        lblRandomProcreationMethod.setToolTipText(resources.getString("lblRandomProcreationMethod.toolTipText"));
+        lblRandomProcreationMethod.setName("lblRandomProcreationMethod");
+
+        comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod", RandomProcreationMethod.values());
+        comboRandomProcreationMethod.setToolTipText(resources.getString("lblRandomProcreationMethod.toolTipText"));
+        comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomProcreationMethod) {
+                    list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomProcreationMethod.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            final boolean percentageEnabled = method.isPercentage();
+            final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
+            chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
+            chkUseRandomClannerProcreation.setEnabled(enabled && chkUseClannerProcreation.isSelected());
+            chkUseRandomPrisonerProcreation.setEnabled(enabled && chkUsePrisonerProcreation.isSelected());
+            percentageRandomProcreationPanel.setEnabled(percentageEnabled);
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+        });
+
+        chkUseRelationshiplessRandomProcreation = new JCheckBox(resources.getString("chkUseRelationshiplessRandomProcreation.text"));
+        chkUseRelationshiplessRandomProcreation.setToolTipText(resources.getString("chkUseRelationshiplessRandomProcreation.toolTipText"));
+        chkUseRelationshiplessRandomProcreation.setName("chkUseRelationshiplessRandomProcreation");
+        chkUseRelationshiplessRandomProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean sameSexEnabled = chkUseRelationshiplessRandomProcreation.isEnabled()
+                    && chkUseRelationshiplessRandomProcreation.isSelected();
+            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+        });
+
+        chkUseRandomClannerProcreation = new JCheckBox(resources.getString("chkUseRandomClannerProcreation.text"));
+        chkUseRandomClannerProcreation.setToolTipText(resources.getString("chkUseRandomClannerProcreation.toolTipText"));
+        chkUseRandomClannerProcreation.setName("chkUseRandomClannerProcreation");
+
+        chkUseRandomPrisonerProcreation = new JCheckBox(resources.getString("chkUseRandomPrisonerProcreation.text"));
+        chkUseRandomPrisonerProcreation.setToolTipText(resources.getString("chkUseRandomPrisonerProcreation.toolTipText"));
+        chkUseRandomPrisonerProcreation.setName("chkUseRandomPrisonerProcreation");
+
+        createPercentageRandomProcreationPanel(percentageRandomProcreationPanel);
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomProcreationMethod.setLabelFor(comboRandomProcreationMethod);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomProcreationPanel.title")));
+        panel.setName("randomProcreationPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomProcreationMethod)
+                                .addComponent(comboRandomProcreationMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
+                        .addComponent(percentageRandomProcreationPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomProcreationMethod)
+                                .addComponent(comboRandomProcreationMethod))
+                        .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
+                        .addComponent(percentageRandomProcreationPanel)
+        );
+
+        return panel;
+    }
+
+    private void createPercentageRandomProcreationPanel(final JPanel panel) {
+        // Create Panel Components
+        final JLabel lblPercentageRandomProcreationRelationshipChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshipChance.text"));
+        lblPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
+        lblPercentageRandomProcreationRelationshipChance.setName("lblPercentageRandomProcreationRelationshipChance");
+
+        spnPercentageRandomProcreationRelationshipChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
+        spnPercentageRandomProcreationRelationshipChance.setName("spnChanceProcreation");
+
+        lblPercentageRandomProcreationRelationshiplessChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
+        lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
+        lblPercentageRandomProcreationRelationshiplessChance.setName("lblPercentageRandomProcreationRelationshiplessChance");
+
+        spnPercentageRandomProcreationRelationshiplessChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
+        spnPercentageRandomProcreationRelationshiplessChance.setName("spnPercentageRandomProcreationRelationshiplessChance");
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomProcreationRelationshipChance.setLabelFor(spnPercentageRandomProcreationRelationshipChance);
+        lblPercentageRandomProcreationRelationshiplessChance.setLabelFor(spnPercentageRandomProcreationRelationshiplessChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomProcreationPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshipChance, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshipChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance))
+        );
     }
 
     private JPanel createDeathPanel() {
@@ -4872,6 +4886,199 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
     //endregion Markets Tab
+
+    //region RATs Tab
+    private JScrollPane createRATTab() {
+        // Initialize Components Used in ActionListeners
+        final JDisableablePanel traditionalRATPanel = new JDisableablePanel("traditionalRATPanel");
+
+        // Initialize Parsing Variables
+        final ButtonGroup group = new ButtonGroup();
+
+        // Create the Panel
+        final JPanel panel = new JPanel(new GridBagLayout());
+        panel.setName("ratPanel");
+
+        // Create Panel Components
+        btnUseRATGenerator = new JRadioButton(resources.getString("btnUseRATGenerator.text"));
+        btnUseRATGenerator.setToolTipText(resources.getString("btnUseRATGenerator.tooltip"));
+        btnUseRATGenerator.setName("btnUseRATGenerator");
+        group.add(btnUseRATGenerator);
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+        panel.add(btnUseRATGenerator, gbc);
+
+        btnUseStaticRATs = new JRadioButton(resources.getString("btnUseStaticRATs.text"));
+        btnUseStaticRATs.setToolTipText(resources.getString("btnUseStaticRATs.tooltip"));
+        btnUseStaticRATs.setName("btnUseStaticRATs");
+        btnUseStaticRATs.addItemListener(ev -> traditionalRATPanel.setEnabled(btnUseStaticRATs.isSelected()));
+        group.add(btnUseStaticRATs);
+        gbc.gridy++;
+        panel.add(btnUseStaticRATs, gbc);
+
+        createTraditionalRATPanel(traditionalRATPanel);
+        gbc.gridy++;
+        panel.add(traditionalRATPanel, gbc);
+
+        // Disable Panel Portions by Default
+        btnUseStaticRATs.setSelected(true);
+        btnUseStaticRATs.doClick();
+
+        return new JScrollPane(panel);
+    }
+
+    private void createTraditionalRATPanel(final JDisableablePanel panel) {
+        // Initialize Components Used in ActionListeners
+        final JList<String> chosenRATs = new JList<>();
+
+        // Create Panel Components
+        final JTextArea txtRATInstructions = new JTextArea(resources.getString("txtRATInstructions.text"));
+        txtRATInstructions.setEditable(false);
+        txtRATInstructions.setLineWrap(true);
+        txtRATInstructions.setWrapStyleWord(true);
+
+        final JLabel lblAvailableRATs = new JLabel(resources.getString("lblAvailableRATs.text"));
+
+        availableRATModel = new DefaultListModel<>();
+        for (final String rat : RATManager.getAllRATCollections().keySet()) {
+            final List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+                final StringBuilder displayName = new StringBuilder(rat);
+                if (!eras.isEmpty()) {
+                    displayName.append(" (").append(eras.get(0));
+                    if (eras.size() > 1) {
+                        displayName.append("-").append(eras.get(eras.size() - 1));
+                    }
+                    displayName.append(")");
+                }
+                availableRATModel.addElement(displayName.toString());
+            }
+        }
+        final JList<String> availableRATs = new JList<>(availableRATModel);
+        availableRATs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        final JButton btnAddRAT = new MMButton("btnAddRAT", resources, "btnAddRAT.text",
+                "btnAddRAT.toolTipText", evt -> {
+            final int selectedIndex = availableRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            chosenRATModel.addElement(availableRATs.getSelectedValue());
+            availableRATModel.removeElementAt(availableRATs.getSelectedIndex());
+            availableRATs.setSelectedIndex(Math.min(selectedIndex, availableRATModel.size() - 1));
+        });
+
+        final JButton btnRemoveRAT = new MMButton("btnRemoveRAT", resources, "btnRemoveRAT.text",
+                "btnRemoveRAT.toolTipText", evt -> {
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            availableRATModel.addElement(chosenRATs.getSelectedValue());
+            chosenRATModel.removeElementAt(chosenRATs.getSelectedIndex());
+            chosenRATs.setSelectedIndex(Math.min(selectedIndex, chosenRATModel.size() - 1));
+        });
+
+        final JButton btnMoveRATUp = new MMButton("btnMoveRATUp", resources, "btnMoveRATUp.text",
+                "btnMoveRATUp.toolTipText", evt ->{
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            final String element = chosenRATModel.getElementAt(selectedIndex);
+            chosenRATModel.setElementAt(chosenRATModel.getElementAt(selectedIndex - 1), selectedIndex);
+            chosenRATModel.setElementAt(element, selectedIndex - 1);
+            chosenRATs.setSelectedIndex(selectedIndex - 1);
+        });
+
+        final JButton btnMoveRATDown = new MMButton("btnMoveRATDown", resources, "btnMoveRATDown.text",
+                "btnMoveRATDown.toolTipText", evt -> {
+            final int selectedIndex = chosenRATs.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            final String element = chosenRATModel.getElementAt(selectedIndex);
+            chosenRATModel.setElementAt(chosenRATModel.getElementAt(selectedIndex + 1), selectedIndex);
+            chosenRATModel.setElementAt(element, selectedIndex + 1);
+            chosenRATs.setSelectedIndex(selectedIndex + 1);
+        });
+
+        final JLabel lblChosenRATs = new JLabel(resources.getString("lblChosenRATs.text"));
+
+        chosenRATModel = new DefaultListModel<>();
+        chosenRATs.setModel(chosenRATModel);
+        chosenRATs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        chosenRATs.addListSelectionListener(evt -> {
+            btnRemoveRAT.setEnabled(chosenRATs.getSelectedIndex() >= 0);
+            btnMoveRATUp.setEnabled(chosenRATs.getSelectedIndex() > 0);
+            btnMoveRATDown.setEnabled(chosenRATModel.size() > chosenRATs.getSelectedIndex() + 1);
+        });
+
+        chkIgnoreRATEra = new JCheckBox(resources.getString("chkIgnoreRATEra.text"));
+        chkIgnoreRATEra.setToolTipText(resources.getString("chkIgnoreRATEra.toolTipText"));
+        chkIgnoreRATEra.setName("chkIgnoreRATEra");
+
+        // Add Previously Impossible Listeners
+        availableRATs.addListSelectionListener(evt -> btnAddRAT.setEnabled(availableRATs.getSelectedIndex() >= 0));
+
+        // Programmatically Assign Accessibility Labels
+        lblAvailableRATs.setLabelFor(availableRATs);
+        lblChosenRATs.setLabelFor(chosenRATs);
+
+        // Layout the UI
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("traditionalRATPanel.title")));
+        panel.setLayout(new BorderLayout());
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(txtRATInstructions)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblAvailableRATs)
+                                        .addComponent(availableRATs))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnAddRAT)
+                                        .addComponent(btnRemoveRAT)
+                                        .addComponent(btnMoveRATUp)
+                                        .addComponent(btnMoveRATDown))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblChosenRATs)
+                                        .addComponent(chosenRATs)))
+                        .addComponent(chkIgnoreRATEra)
+        );
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtRATInstructions)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblAvailableRATs)
+                                        .addComponent(lblChosenRATs))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(availableRATs)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnAddRAT)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnRemoveRAT)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnMoveRATUp)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnMoveRATDown))
+                                        .addComponent(chosenRATs))
+                                .addComponent(chkIgnoreRATEra))
+        );
+    }
+    //endregion RATs Tab
     //endregion Center Pane
 
     @Override
@@ -5136,22 +5343,28 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
         // Procreation
-        if (chkUseProcreation.isSelected() != options.useProcreation()) {
-            chkUseProcreation.doClick();
-        }
-        spnChanceProcreation.setValue(options.getChanceProcreation() * 100.0);
-        if (chkUseProcreationNoRelationship.isSelected() != options.useProcreationNoRelationship()) {
-            if (chkUseProcreationNoRelationship.isEnabled()) {
-                chkUseProcreationNoRelationship.doClick();
+        chkUseManualProcreation.setSelected(options.isUseManualProcreation());
+        chkUseClannerProcreation.setSelected(options.isUseClannerProcreation());
+        chkUsePrisonerProcreation.setSelected(options.isUsePrisonerProcreation());
+        spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
+        chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
+        chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
+        chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
+        chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        chkLogProcreation.setSelected(options.isLogProcreation());
+        comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
+        if (chkUseRelationshiplessRandomProcreation.isSelected() != options.isUseRelationshiplessRandomProcreation()) {
+            if (chkUseRelationshiplessRandomProcreation.isEnabled()) {
+                chkUseRelationshiplessRandomProcreation.doClick();
             } else {
-                chkUseProcreationNoRelationship.setSelected(options.useProcreationNoRelationship());
+                chkUseRelationshiplessRandomProcreation.setSelected(options.isUseRelationshiplessRandomProcreation());
             }
         }
-        spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
-        chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
-        chkLogConception.setSelected(options.logConception());
-        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
-        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
+        chkUseRandomClannerProcreation.setSelected(options.isUseRandomClannerProcreation());
+        chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
+        spnPercentageRandomProcreationRelationshipChance.setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
+        spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
 
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
@@ -5308,6 +5521,32 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
         //endregion Markets Tab
 
+        //region RATs Tab
+        btnUseRATGenerator.setSelected(!options.isUseStaticRATs());
+        if (options.isUseStaticRATs() != btnUseStaticRATs.isSelected()) {
+            btnUseStaticRATs.doClick();
+        }
+        for (final String rat : options.getRATs()) {
+            final List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+                final StringBuilder displayName = new StringBuilder(rat);
+                if (!eras.isEmpty()) {
+                    displayName.append(" (").append(eras.get(0));
+                    if (eras.size() > 1) {
+                        displayName.append("-").append(eras.get(eras.size() - 1));
+                    }
+                    displayName.append(")");
+                }
+
+                if (availableRATModel.contains(displayName.toString())) {
+                    chosenRATModel.addElement(displayName.toString());
+                    availableRATModel.removeElement(displayName.toString());
+                }
+            }
+        }
+        chkIgnoreRATEra.setSelected(options.isIgnoreRATEra());
+        //endregion RATs Tab
+
         //region Against the Bot Tab
         if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
@@ -5347,27 +5586,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.TRAINING));
         btnIntensityUpdate.doClick();
         chkGenerateChases.setSelected(options.generateChases());
-
-        btnDynamicRATs.setSelected(!options.useStaticRATs());
-        btnStaticRATs.setSelected(options.useStaticRATs());
-        for (String rat : options.getRATs()) {
-            List<Integer> eras = RATManager.getAllRATCollections().get(rat);
-            if (eras != null) {
-                StringBuilder displayName = new StringBuilder(rat);
-                if (eras.size() > 0) {
-                    displayName.append(" (").append(eras.get(0));
-                    if (eras.size() > 1) {
-                        displayName.append("-").append(eras.get(eras.size() - 1));
-                    }
-                    displayName.append(")");
-                }
-                if (availableRatModel.contains(displayName.toString())) {
-                    chosenRatModel.addElement(displayName.toString());
-                    availableRatModel.removeElement(displayName.toString());
-                }
-            }
-        }
-        chkIgnoreRatEra.setSelected(options.canIgnoreRatEra());
 
         chkDoubleVehicles.setSelected(options.getDoubleVehicles());
         spnOpforLanceTypeMechs.setValue(options.getOpforLanceTypeMechs());
@@ -5648,14 +5866,22 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
 
             // Procreation
-            options.setUseProcreation(chkUseProcreation.isSelected());
-            options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
-            options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
-            options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
-            options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
-            options.setLogConception(chkLogConception.isSelected());
-            options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
+            options.setUseManualProcreation(chkUseManualProcreation.isSelected());
+            options.setUseClannerProcreation(chkUseClannerProcreation.isSelected());
+            options.setUsePrisonerProcreation(chkUsePrisonerProcreation.isSelected());
+            options.setMultiplePregnancyOccurrences((Integer) spnMultiplePregnancyOccurrences.getValue());
+            options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedItem());
+            options.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());
+            options.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
             options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+            options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setLogProcreation(chkLogProcreation.isSelected());
+            options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
+            options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
+            options.setUseRandomClannerProcreation(chkUseRandomClannerProcreation.isSelected());
+            options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
+            options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
+            options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
@@ -5704,6 +5930,17 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             //endregion Markets Tab
 
+            //region RATs Tab
+            options.setUseStaticRATs(btnUseStaticRATs.isSelected());
+            //Strip dates used in display name
+            String[] ratList = new String[chosenRATModel.size()];
+            for (int i = 0; i < chosenRATModel.size(); i++) {
+                ratList[i] = chosenRATModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
+            }
+            options.setRATs(ratList);
+            options.setIgnoreRATEra(chkIgnoreRATEra.isSelected());
+            //endregion RATs Tab
+
             // Start Against the Bot
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
@@ -5742,14 +5979,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
-            options.setStaticRATs(btnStaticRATs.isSelected());
-            options.setIgnoreRatEra(chkIgnoreRatEra.isSelected());
-            //Strip dates used in display name
-            String[] ratList = new String[chosenRatModel.size()];
-            for (int i = 0; i < chosenRatModel.size(); i++) {
-                ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
-            }
-            options.setRATs(ratList);
             options.setSearchRadius((Integer) spnSearchRadius.getValue());
             for (int i = 0; i < spnAtBBattleChance.length; i++) {
                 options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
@@ -5889,11 +6118,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private Vector<String> getUnusedSPA() {
         Vector<String> unused = new Vector<>();
-        PilotOptions poptions = new PilotOptions();
+        PersonnelOptions poptions = new PersonnelOptions();
         for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
-            if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
                 continue;
             }
 
@@ -6011,15 +6240,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             if (c instanceof JPanel) {
                 enableAtBComponents((JPanel) c, enabled);
-            } else if (enabled && c.equals(btnAddRat)) {
-                c.setEnabled(availableRats.getSelectedIndex() >= 0);
-            } else if (enabled && c.equals(btnRemoveRat)) {
-                c.setEnabled(chosenRats.getSelectedIndex() >= 0);
-            } else if (enabled && c.equals(btnMoveRatUp)) {
-                c.setEnabled(chosenRats.getSelectedIndex() > 0);
-            } else if (enabled && c.equals(btnMoveRatDown)) {
-                c.setEnabled((availableRats.getSelectedIndex() >= 0)
-                        && (chosenRatModel.size() > chosenRats.getSelectedIndex() + 1));
             } else {
                 c.setEnabled(enabled);
             }

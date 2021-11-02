@@ -507,29 +507,4 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
     }
-
-    /**
-     * This writes a String or an array of Strings to file, with an the possible addition of an
-     * attribute and its value
-     * @param pw the PrintWriter to use
-     * @param indent the indent to write at
-     * @param name the name of the XML tag
-     * @param attributeName the attribute to write as part of the XML tag
-     * @param attributeValue the value of the attribute
-     * @param values the String or String[] to write to XML
-     */
-    public static void writeSimpleXMLAttributedTag(final PrintWriter pw, final int indent,
-                                                   final String name,
-                                                   final @Nullable String attributeName,
-                                                   final @Nullable String attributeValue,
-                                                   final String... values) {
-        if (values.length > 0) {
-            final boolean hasAttribute = attributeValue != null;
-            pw.print(indentStr(indent) + "<" + name);
-            if (hasAttribute) {
-                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
-            }
-            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
-        }
-    }
 }
