@@ -39,7 +39,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getLocale())) : "";
     }
 
     public void setDisplayDateFormat(String value) {
@@ -47,7 +47,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public LocalDate parseDisplayFormattedDate(String text) {
-        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getLocale()));
     }
 
     public String getLongDisplayDateFormat() {
@@ -55,7 +55,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getLongDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()).withLocale(getLocale())) : "";
     }
 
     public void setLongDisplayDateFormat(String value) {
@@ -537,7 +537,7 @@ public final class MekHQOptions extends SuiteConstants {
 
     //region Temporary
     /**
-     * This is a temporary Locale getter, which sets the stage for a suite-wide localization.
+     * This is a temporary Locale getter, which sets the stage for suite-wide localization.
      */
     public Locale getLocale() {
         return new Locale("en");

@@ -410,7 +410,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), employer,
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -499,7 +500,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), contract.getEmployer(),
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;

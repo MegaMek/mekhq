@@ -159,7 +159,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat = new JTextField();
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
                 validateDateFormat(optionDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMekHQOptions().getLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         JLabel labelLongDisplayDateFormat = new JLabel(resources.getString("labelLongDisplayDateFormat.text"));
@@ -167,7 +168,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionLongDisplayDateFormat = new JTextField();
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
                 validateDateFormat(optionLongDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMekHQOptions().getLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
@@ -837,7 +839,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //region Data Validation
     private boolean validateDateFormat(final String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format).withLocale(MekHQ.getMekHQOptions().getLocale()));
         } catch (Exception ignored) {
             return false;
         }
