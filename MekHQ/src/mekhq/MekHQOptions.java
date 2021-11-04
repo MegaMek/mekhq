@@ -25,6 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions extends SuiteConstants {
@@ -533,4 +534,13 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
     }
     //endregion Miscellaneous Options
+
+    //region Temporary
+    /**
+     * This is a temporary Locale getter, which sets the stage for a suite-wide localization.
+     */
+    public Locale getLocale() {
+        return new Locale("en");
+    }
+    //endregion Temporary
 }
