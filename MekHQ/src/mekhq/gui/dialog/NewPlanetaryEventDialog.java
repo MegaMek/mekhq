@@ -73,8 +73,6 @@ public class NewPlanetaryEventDialog extends JDialog {
 
     private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
 
-    ResourceBundle resourceMap;
-
     private final Planet planet;
 
     private LocalDate date;
@@ -101,6 +99,9 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel socioindustrialCombined;
     private JLabel hpgCombined;
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
         this(parent, campaign, planet, true);
     }
@@ -120,10 +121,9 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     protected void initComponents(Campaign campaign) {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("form"); //$NON-NLS-1$
-        setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
+        setName("form");
+        setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(600, 600));
 
         final Container content = getContentPane();

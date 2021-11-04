@@ -341,7 +341,8 @@ public class MekHQ implements GameListener {
                 PreferenceManager.getClientPreferences().getLogDirectory() + File.separator + "timestamp")
                         .lastModified();
         // echo some useful stuff
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         StringBuilder msg = new StringBuilder();
         msg.append("\t").append(resourceMap.getString("Application.name")).append(" ")

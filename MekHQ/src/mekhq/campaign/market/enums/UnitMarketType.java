@@ -34,11 +34,12 @@ public enum UnitMarketType {
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     UnitMarketType(final String name) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors

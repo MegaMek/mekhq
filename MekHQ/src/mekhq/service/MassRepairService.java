@@ -53,7 +53,8 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 
 public class MassRepairService {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
+    private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private MassRepairService() {
 

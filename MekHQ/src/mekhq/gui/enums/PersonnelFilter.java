@@ -89,8 +89,6 @@ public enum PersonnelFilter {
     private final boolean baseline;
     private final boolean standard;
     private final boolean individualRole;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -105,6 +103,8 @@ public enum PersonnelFilter {
 
     PersonnelFilter(final String name, final String toolTipText, final boolean baseline,
                     final boolean standard, final boolean individualRole) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.baseline = baseline;

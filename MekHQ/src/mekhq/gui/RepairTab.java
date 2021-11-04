@@ -115,7 +115,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridLayout());

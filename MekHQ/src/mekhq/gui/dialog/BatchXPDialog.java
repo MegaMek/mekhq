@@ -84,13 +84,12 @@ public final class BatchXPDialog extends JDialog {
 
     private JLabel matchedPersonnelLabel;
 
-    private transient ResourceBundle resourceMap;
     private transient String choiceNoSkill;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true);
-
-        this.resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl());
 
         setTitle(resourceMap.getString("MassTrainingDialog.title"));
         choiceNoSkill = resourceMap.getString("skill.choice.text");

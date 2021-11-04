@@ -48,8 +48,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 public class HistoricalDailyReportDialog extends JDialog {
     private static final long serialVersionUID = -4373796917722483042L;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog", new EncodeControl()); //$NON-NLS-1$
-
     private CampaignGUI gui;
     private JPanel filterPanel;
     private JLabel pickTimeLabel;
@@ -58,6 +56,9 @@ public class HistoricalDailyReportDialog extends JDialog {
     private DailyReportLogPanel logPanel;
     private JButton closeBtn;
     private JLabel cacheInfoLabel;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.HistoricalDailyReportDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log

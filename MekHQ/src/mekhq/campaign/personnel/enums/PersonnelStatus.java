@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -37,12 +38,12 @@ public enum PersonnelStatus {
 
     //region Variable Declarations
     private final String statusName;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PersonnelStatus(String status) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.statusName = resources.getString(status);
     }
     //endregion Constructors

@@ -46,12 +46,12 @@ public enum PrisonerStatus {
     //region Variable Declarations
     private final String typeName;
     private final String titleExtension;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PrisonerStatus(String typeName, String titleExtension) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.typeName = resources.getString(typeName);
         this.titleExtension = resources.getString(titleExtension);
     }

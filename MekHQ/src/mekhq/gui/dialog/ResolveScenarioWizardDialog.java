@@ -186,7 +186,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblStatus;
     //endregion Preview Panel components
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.ResolveScenarioWizardDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {

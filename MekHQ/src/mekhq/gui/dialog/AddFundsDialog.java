@@ -30,8 +30,9 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
     private MMComboBox<TransactionType> categoryCombo;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
     private int closedType = JOptionPane.CLOSED_OPTION;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.AddFundsDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
 	/** Creates new form AlertPopup */
     public AddFundsDialog(Frame parent, boolean modal) {

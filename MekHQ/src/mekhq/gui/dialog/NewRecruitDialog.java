@@ -68,7 +68,8 @@ public class NewRecruitDialog extends JDialog {
         scrollView = new JScrollPane();
         choiceRanks = new javax.swing.JComboBox<>();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N

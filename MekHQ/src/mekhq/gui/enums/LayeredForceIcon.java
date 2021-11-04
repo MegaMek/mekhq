@@ -19,6 +19,7 @@
 package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 
 import javax.swing.*;
@@ -52,13 +53,13 @@ public enum LayeredForceIcon {
     private final String layerPath;
     private final String tableName;
     private final int listSelectionModel;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     LayeredForceIcon(final String name, final String toolTipText, final String layerPath,
                      final String tableName, final int listSelectionModel) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;

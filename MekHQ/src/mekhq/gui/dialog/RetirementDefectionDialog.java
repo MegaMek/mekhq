@@ -440,7 +440,9 @@ public class RetirementDefectionDialog extends JDialog {
                                 hqView.getCampaign());
                 initResults();
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
+                final ResourceBundle resourceMap = ResourceBundle.getBundle(
+                        "mekhq.resources.RetirementDefectionDialog",
+                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
                 btnEdit.setVisible(true);
                 btnRoll.setVisible(false);
                 btnDone.setVisible(true);

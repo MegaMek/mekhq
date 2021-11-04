@@ -290,7 +290,8 @@ public class CampaignPreset implements Serializable {
             writeToXML(pw, 0);
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }

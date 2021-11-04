@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 /**
  * Identifies the standard tabs and provides a factory method.
@@ -67,13 +68,10 @@ public enum GuiTabType {
     }
 
     GuiTabType(int defaultPos, String resKey, int mnemonic) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMekHQOptions().getLocale(),  new EncodeControl());
         this.defaultPos = defaultPos;
-
-        ResourceBundle resources = ResourceBundle.getBundle(
-                "mekhq.resources.CampaignGUI", new EncodeControl());
-
         name = (resKey == null) ? "Custom" : resources.getString(resKey);
-
         this.mnemonic = mnemonic;
     }
 

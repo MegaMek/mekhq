@@ -63,8 +63,8 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     private void initComponents() {
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");

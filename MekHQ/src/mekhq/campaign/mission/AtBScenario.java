@@ -208,7 +208,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private Map<Integer, Integer> numPlayerMinefields;
 
-    protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
+    protected static final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle(
+            "mekhq.resources.AtBScenarioBuiltIn", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     public AtBScenario () {

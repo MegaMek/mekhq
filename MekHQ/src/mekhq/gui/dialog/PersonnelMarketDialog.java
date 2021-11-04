@@ -83,7 +83,8 @@ public class PersonnelMarketDialog extends JDialog {
     private ArrayList<RowSorter.SortKey> sortKeys;
     private JSplitPane splitMain;
 
-    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */

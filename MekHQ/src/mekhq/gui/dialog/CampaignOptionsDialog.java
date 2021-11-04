@@ -598,7 +598,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         //endregion Variable Declaration and Initialisation
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setOptionsPane(new JTabbedPane());
         getOptionsPane().setName("optionsPane");

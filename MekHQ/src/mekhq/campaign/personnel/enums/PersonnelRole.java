@@ -65,8 +65,6 @@ public enum PersonnelRole {
     private final String clanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
     private final boolean marketable;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -83,6 +81,8 @@ public enum PersonnelRole {
     }
 
     PersonnelRole(final String name, final String clanName, final int mnemonic, final boolean marketable) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.clanName = (clanName != null) ? resources.getString(clanName) : this.name;
         this.mnemonic = mnemonic;

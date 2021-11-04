@@ -113,7 +113,8 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_PORTRAIT        = 51;
     public static final int N_COL               = 52;
 
-    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {

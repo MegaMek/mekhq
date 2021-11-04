@@ -68,7 +68,8 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int minAgeVal = 19;
     private int maxAgeVal = 99;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
         super(parent, modal);

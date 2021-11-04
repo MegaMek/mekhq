@@ -84,7 +84,8 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle(
+                "mekhq.resources.AddOrEditMissionEntryDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();

@@ -50,10 +50,11 @@ public enum ROMDesignation {
 
     //region Variable Declarations
     private final String designation;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     ROMDesignation(String designation) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.designation = resources.getString(designation);
     }
 

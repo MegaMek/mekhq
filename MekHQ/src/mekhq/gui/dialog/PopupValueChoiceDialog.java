@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
@@ -77,9 +78,10 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         DefaultFormatter df = (DefaultFormatter) jtf.getFormatter();
         df.setCommitsOnValidEdit(true);
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog", new EncodeControl()); //$NON-NLS-1$
+		final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
 
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N

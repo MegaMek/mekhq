@@ -110,7 +110,8 @@ public class ImageChoiceDialog extends JDialog {
     //endregion Constructors
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gbc;
 
         getContentPane().setLayout(new GridBagLayout());

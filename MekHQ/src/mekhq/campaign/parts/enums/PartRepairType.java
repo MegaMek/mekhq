@@ -46,12 +46,12 @@ public enum PartRepairType {
     //region Variable Declarations
     private final String name;
     private final boolean validForMRMS;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PartRepairType(String name, boolean validForMRMS) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.validForMRMS = validForMRMS;
     }

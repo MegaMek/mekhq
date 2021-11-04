@@ -74,11 +74,12 @@ public class CampaignExportWizard extends JDialog {
     private JTextField txtExportMoney = new JTextField();
     private JLabel lblMoney = new JLabel();
     private JLabel lblStatus;
-    private ResourceBundle resourceMap;
 
     private Campaign sourceCampaign;
 
     private Optional<File> destinationCampaignFile;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public enum CampaignExportWizardState {
         ForceSelection,
@@ -91,7 +92,6 @@ public class CampaignExportWizard extends JDialog {
     }
 
     public CampaignExportWizard(Campaign c) {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard", new EncodeControl());
         chkExportState.setText(resourceMap.getString("chkExportSettings.text"));
         chkExportState.setToolTipText(resourceMap.getString("chkExportSettings.tooltip"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
