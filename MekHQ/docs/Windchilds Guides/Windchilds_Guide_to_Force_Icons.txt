@@ -1,0 +1,49 @@
+Windchild's Guide to Force Icons (Unfinished - Will Finish With the Other AbstractIcon docs)
+Written 07-Nov-2021
+MekHQ version 0.49.6
+
+Warning: LayeredForceIconDialog: Selections do not hold when changing filters.
+
+
+
+Folder System:
+The origin folder is /data/images/force, which contains all potential force icons. Any folder below it, excluding /Pieces/ and /Units/, contain standard force icons (although you may select an image from any of the folders to use as a standard force icon). Finally, a file with the name empty.png must be included in the origin folder, as that is used as a default fallback image.
+/Pieces/: This contains the pieces used to create the layered force icon. This is split into eight subfolders, each one a layer of the overall icon. No other folders will be loaded from for layered force icons, but all folders under them can be loaded (check how /Pieces/Types/ is organized as an example).
+/Pieces/Adjustments/: This contains various adjustments to apply to the icon.
+/Pieces/Alphanumerics/: This contains various alphanumerics to apply to the icon.
+/Pieces/Backgrounds/: This contains various backgrounds for the icon.
+/Pieces/Formations/: This contains the potential BattleTech formations.
+/Pieces/Frames/: This contains frames to surround the force icon with.
+/Pieces/Logos/: This contains various faction logos.
+/Pieces/Special Modifiers/: This contains any special modifiers to add to the icon.
+/Pieces/Types/: This contains the various types for the icon.
+/Units/: This contains unit icon images, and by default has no folders below it.
+
+
+
+How Force Icons Are Handled Internally:
+StandardForceIcon:
+StandardForceIconChooser:
+StandardForceIconChooserTree:
+StandardForceIconDialog:
+
+UnitIcon:
+UnitIconDialog:
+UnitIconChooser:
+
+ForcePieceIcon:
+ForcePieceIconChooser:
+ForcePieceIconChooserTree:
+
+LayeredForceIcon:
+LayeredForceIconCreationPanel:
+LayeredForceIconDialog:
+LayeredForceIconLayer:
+LayeredForceIconOperationStatus: This enum contains the force operational statuses and their paths, and is used in determining the file name to use.
+
+TOEMouseAdapter: This allows you to copy a force icon, and then paste it to a force or a force and its children. It also lets you create/ modify an already existing force icon.
+CampaignGUI: This stores the currently copied force icon.
+ForceIconOperationalStatusStyle: This enum contains the various styles of operational status icons, which is used in their automated selection.
+MekHQOptions: This contains an option to automate operational status updates and allows you to select the indicator's style.
+Force: This contains the logic for automatically updating force icon operational statuses.
+ForceIconMigrator: This handles any migration for force icons, which is primarily for the migration to the Kailan pack.
