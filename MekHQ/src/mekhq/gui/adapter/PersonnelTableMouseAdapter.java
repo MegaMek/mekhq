@@ -480,7 +480,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resources.getString("confirmRetireQ.format"), person.getFullTitle()),
                             status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
-                        person.changeStatus(gui.getCampaign(), status);
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), status);
                     }
                 }
                 break;
@@ -1131,9 +1131,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("changeStatus.text"));
         for (PersonnelStatus status : PersonnelStatus.values()) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
-            if (person.getStatus() == status) {
-                cbMenuItem.setSelected(true);
-            }
+            cbMenuItem.setToolTipText(status.getToolTipText());
+            cbMenuItem.setSelected(person.getStatus() == status);
             cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
