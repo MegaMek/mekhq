@@ -56,6 +56,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -240,6 +242,9 @@ public class Campaign implements Serializable, ITechManager {
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
+
+    private transient AbstractProcreation procreation;
+
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -298,6 +303,7 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -450,6 +456,14 @@ public class Campaign implements Serializable, ITechManager {
         this.unitMarket = unitMarket;
     }
     //endregion Markets
+
+    public AbstractProcreation getProcreation() {
+        return procreation;
+    }
+
+    public void setProcreation(final AbstractProcreation procreation) {
+        this.procreation = procreation;
+    }
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -663,7 +677,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED, getLocalDate());
+                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
@@ -3257,19 +3271,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Procreation
-            if (p.getGender().isFemale()) {
-                if (p.isPregnant()) {
-                    if (getCampaignOptions().useProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            p.birth(this, getLocalDate());
-                        }
-                    } else {
-                        p.removePregnancy();
-                    }
-                } else if (getCampaignOptions().useProcreation()) {
-                    p.procreate(this, getLocalDate());
-                }
-            }
+            getProcreation().processNewDay(this, getLocalDate(), p);
         }
     }
 

@@ -260,14 +260,23 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnChanceRandomSameSexMarriages;
 
     // Procreation
-    private JCheckBox chkUseProcreation;
-    private JSpinner spnChanceProcreation;
-    private JCheckBox chkUseProcreationNoRelationship;
-    private JSpinner spnChanceProcreationNoRelationship;
-    private JCheckBox chkDisplayTrueDueDate;
-    private JCheckBox chkLogConception;
-    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkUseManualProcreation;
+    private JCheckBox chkUseClannerProcreation;
+    private JCheckBox chkUsePrisonerProcreation;
+    private JSpinner spnMultiplePregnancyOccurrences;
+    private MMComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
+    private JCheckBox chkAssignChildrenOfFoundersFounderTag;
     private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayTrueDueDate;
+    private JCheckBox chkLogProcreation;
+    private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
+    private JCheckBox chkUseRelationshiplessRandomProcreation;
+    private JCheckBox chkUseRandomClannerProcreation;
+    private JCheckBox chkUseRandomPrisonerProcreation;
+    private JSpinner spnPercentageRandomProcreationRelationshipChance;
+    private JLabel lblPercentageRandomProcreationRelationshiplessChance;
+    private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -4114,68 +4123,51 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createProcreationPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblChanceProcreation = new JLabel();
-        JLabel lblChanceProcreationNoRelationship = new JLabel();
-        JLabel lblBabySurnameStyle = new JLabel();
-
         // Create Panel Components
-        chkUseProcreation = new JCheckBox(resources.getString("chkUseProcreation.text"));
-        chkUseProcreation.setToolTipText(resources.getString("chkUseProcreation.toolTipText"));
-        chkUseProcreation.setName("chkUseProcreation");
-        chkUseProcreation.addActionListener(evt -> {
-            final boolean selected = chkUseProcreation.isSelected();
-            lblChanceProcreation.setEnabled(selected);
-            spnChanceProcreation.setEnabled(selected);
-            chkUseProcreationNoRelationship.setEnabled(selected);
-            lblChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
-            spnChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
-            chkDisplayTrueDueDate.setEnabled(selected);
-            chkLogConception.setEnabled(selected);
-            lblBabySurnameStyle.setEnabled(selected);
-            comboBabySurnameStyle.setEnabled(selected);
-            chkDetermineFatherAtBirth.setEnabled(selected);
+        chkUseManualProcreation = new JCheckBox(resources.getString("chkUseManualProcreation.text"));
+        chkUseManualProcreation.setToolTipText(resources.getString("chkUseManualProcreation.toolTipText"));
+        chkUseManualProcreation.setName("chkUseManualProcreation");
+
+        chkUseClannerProcreation = new JCheckBox(resources.getString("chkUseClannerProcreation.text"));
+        chkUseClannerProcreation.setToolTipText(resources.getString("chkUseClannerProcreation.toolTipText"));
+        chkUseClannerProcreation.setName("chkUseClannerProcreation");
+        chkUseClannerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerProcreation.setEnabled(!method.isNone() && chkUseClannerProcreation.isSelected());
         });
 
-        lblChanceProcreation.setText(resources.getString("lblChanceProcreation.text"));
-        lblChanceProcreation.setToolTipText(resources.getString("lblChanceProcreation.toolTipText"));
-        lblChanceProcreation.setName("lblChanceProcreation");
-
-        spnChanceProcreation = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceProcreation.setToolTipText(resources.getString("lblChanceProcreation.toolTipText"));
-        spnChanceProcreation.setName("spnChanceProcreation");
-
-        chkUseProcreationNoRelationship = new JCheckBox(resources.getString("chkUseProcreationNoRelationship.text"));
-        chkUseProcreationNoRelationship.setToolTipText(resources.getString("chkUseProcreationNoRelationship.toolTipText"));
-        chkUseProcreationNoRelationship.setName("chkUseProcreationNoRelationship");
-        chkUseProcreationNoRelationship.addActionListener(evt -> {
-            final boolean selected = chkUseProcreation.isSelected() && chkUseProcreationNoRelationship.isSelected();
-            lblChanceProcreationNoRelationship.setEnabled(selected);
-            spnChanceProcreationNoRelationship.setEnabled(selected);
+        chkUsePrisonerProcreation = new JCheckBox(resources.getString("chkUsePrisonerProcreation.text"));
+        chkUsePrisonerProcreation.setToolTipText(resources.getString("chkUsePrisonerProcreation.toolTipText"));
+        chkUsePrisonerProcreation.setName("chkUsePrisonerProcreation");
+        chkUsePrisonerProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerProcreation.setEnabled(!method.isNone() && chkUsePrisonerProcreation.isSelected());
         });
 
-        lblChanceProcreationNoRelationship.setText(resources.getString("lblChanceProcreationNoRelationship.text"));
-        lblChanceProcreationNoRelationship.setToolTipText(resources.getString("lblChanceProcreationNoRelationship.toolTipText"));
-        lblChanceProcreationNoRelationship.setName("lblChanceProcreationNoRelationship");
+        final JLabel lblMultiplePregnancyOccurrences = new JLabel(resources.getString("lblMultiplePregnancyOccurrences.text"));
+        lblMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrences.setName("lblMultiplePregnancyOccurrences");
 
-        spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceProcreationNoRelationship.setToolTipText(resources.getString("lblChanceProcreationNoRelationship.toolTipText"));
-        spnChanceProcreationNoRelationship.setName("spnChanceProcreationNoRelationship");
+        spnMultiplePregnancyOccurrences = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnMultiplePregnancyOccurrences.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        spnMultiplePregnancyOccurrences.setName("spnMultiplePregnancyOccurrences");
 
-        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
-        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
-        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+        final JLabel lblMultiplePregnancyOccurrencesEnd = new JLabel(resources.getString("lblMultiplePregnancyOccurrencesEnd.text"));
+        lblMultiplePregnancyOccurrencesEnd.setToolTipText(resources.getString("lblMultiplePregnancyOccurrences.toolTipText"));
+        lblMultiplePregnancyOccurrencesEnd.setName("lblMultiplePregnancyOccurrencesEnd");
 
-        chkLogConception = new JCheckBox(resources.getString("chkLogConception.text"));
-        chkLogConception.setToolTipText(resources.getString("chkLogConception.toolTipText"));
-        chkLogConception.setName("chkLogConception");
-
-        lblBabySurnameStyle.setText(resources.getString("lblBabySurnameStyle.text"));
+        final JLabel lblBabySurnameStyle = new JLabel(resources.getString("lblBabySurnameStyle.text"));
         lblBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         lblBabySurnameStyle.setName("lblBabySurnameStyle");
 
-        comboBabySurnameStyle = new JComboBox<>(BabySurnameStyle.values());
-        comboBabySurnameStyle.setName("comboBabySurnameStyle");
+        comboBabySurnameStyle = new MMComboBox<>("comboBabySurnameStyle", BabySurnameStyle.values());
+        comboBabySurnameStyle.setToolTipText(resources.getString("lblBabySurnameStyle.toolTipText"));
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -4189,24 +4181,37 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
         });
 
+        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox(resources.getString("chkAssignNonPrisonerBabiesFounderTag.text"));
+        chkAssignNonPrisonerBabiesFounderTag.setToolTipText(resources.getString("chkAssignNonPrisonerBabiesFounderTag.toolTipText"));
+        chkAssignNonPrisonerBabiesFounderTag.setName("chkAssignNonPrisonerBabiesFounderTag");
+
+        chkAssignChildrenOfFoundersFounderTag = new JCheckBox(resources.getString("chkAssignChildrenOfFoundersFounderTag.text"));
+        chkAssignChildrenOfFoundersFounderTag.setToolTipText(resources.getString("chkAssignChildrenOfFoundersFounderTag.toolTipText"));
+        chkAssignChildrenOfFoundersFounderTag.setName("chkAssignChildrenOfFoundersFounderTag");
+
         chkDetermineFatherAtBirth = new JCheckBox(resources.getString("chkDetermineFatherAtBirth.text"));
         chkDetermineFatherAtBirth.setToolTipText(resources.getString("chkDetermineFatherAtBirth.toolTipText"));
         chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
 
+        chkDisplayTrueDueDate = new JCheckBox(resources.getString("chkDisplayTrueDueDate.text"));
+        chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
+        chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
+
+        chkLogProcreation = new JCheckBox(resources.getString("chkLogProcreation.text"));
+        chkLogProcreation.setToolTipText(resources.getString("chkLogProcreation.toolTipText"));
+        chkLogProcreation.setName("chkLogProcreation");
+
+        final JPanel randomProcreationPanel = createRandomProcreationPanel();
+
         // Programmatically Assign Accessibility Labels
-        lblChanceProcreation.setLabelFor(spnChanceProcreation);
-        lblChanceProcreationNoRelationship.setLabelFor(spnChanceProcreationNoRelationship);
+        lblMultiplePregnancyOccurrences.setLabelFor(spnMultiplePregnancyOccurrences);
         lblBabySurnameStyle.setLabelFor(comboBabySurnameStyle);
 
-        // Disable Panel by Default
-        chkUseProcreation.setSelected(true);
-        chkUseProcreation.doClick();
-
         // Layout the Panel
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("procreationPanel.title")));
         panel.setName("procreationPanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -4214,41 +4219,199 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseProcreation)
+                        .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceProcreation)
-                                .addComponent(spnChanceProcreation, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkUseProcreationNoRelationship)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogProcreation)
+                        .addComponent(randomProcreationPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkUseProcreation)
+                        .addComponent(chkUseManualProcreation)
+                        .addComponent(chkUseClannerProcreation)
+                        .addComponent(chkUsePrisonerProcreation)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreation)
-                                .addComponent(spnChanceProcreation))
-                        .addComponent(chkUseProcreationNoRelationship)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceProcreationNoRelationship)
-                                .addComponent(spnChanceProcreationNoRelationship))
-                        .addComponent(chkDisplayTrueDueDate)
-                        .addComponent(chkLogConception)
+                                .addComponent(lblMultiplePregnancyOccurrences)
+                                .addComponent(spnMultiplePregnancyOccurrences)
+                                .addComponent(lblMultiplePregnancyOccurrencesEnd))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBabySurnameStyle)
                                 .addComponent(comboBabySurnameStyle))
+                        .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                        .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
+                        .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkLogProcreation)
+                        .addComponent(randomProcreationPanel)
         );
 
         return panel;
+    }
+
+    private JPanel createRandomProcreationPanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel percentageRandomProcreationPanel = new JDisableablePanel("percentageRandomProcreationPanel");
+
+        // Create Panel Components
+        final JLabel lblRandomProcreationMethod = new JLabel(resources.getString("lblRandomProcreationMethod.text"));
+        lblRandomProcreationMethod.setToolTipText(resources.getString("lblRandomProcreationMethod.toolTipText"));
+        lblRandomProcreationMethod.setName("lblRandomProcreationMethod");
+
+        comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod", RandomProcreationMethod.values());
+        comboRandomProcreationMethod.setToolTipText(resources.getString("lblRandomProcreationMethod.toolTipText"));
+        comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomProcreationMethod) {
+                    list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomProcreationMethod.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            final boolean percentageEnabled = method.isPercentage();
+            final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
+            chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
+            chkUseRandomClannerProcreation.setEnabled(enabled && chkUseClannerProcreation.isSelected());
+            chkUseRandomPrisonerProcreation.setEnabled(enabled && chkUsePrisonerProcreation.isSelected());
+            percentageRandomProcreationPanel.setEnabled(percentageEnabled);
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+        });
+
+        chkUseRelationshiplessRandomProcreation = new JCheckBox(resources.getString("chkUseRelationshiplessRandomProcreation.text"));
+        chkUseRelationshiplessRandomProcreation.setToolTipText(resources.getString("chkUseRelationshiplessRandomProcreation.toolTipText"));
+        chkUseRelationshiplessRandomProcreation.setName("chkUseRelationshiplessRandomProcreation");
+        chkUseRelationshiplessRandomProcreation.addActionListener(evt -> {
+            final RandomProcreationMethod method = comboRandomProcreationMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean sameSexEnabled = chkUseRelationshiplessRandomProcreation.isEnabled()
+                    && chkUseRelationshiplessRandomProcreation.isSelected();
+            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
+            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+        });
+
+        chkUseRandomClannerProcreation = new JCheckBox(resources.getString("chkUseRandomClannerProcreation.text"));
+        chkUseRandomClannerProcreation.setToolTipText(resources.getString("chkUseRandomClannerProcreation.toolTipText"));
+        chkUseRandomClannerProcreation.setName("chkUseRandomClannerProcreation");
+
+        chkUseRandomPrisonerProcreation = new JCheckBox(resources.getString("chkUseRandomPrisonerProcreation.text"));
+        chkUseRandomPrisonerProcreation.setToolTipText(resources.getString("chkUseRandomPrisonerProcreation.toolTipText"));
+        chkUseRandomPrisonerProcreation.setName("chkUseRandomPrisonerProcreation");
+
+        createPercentageRandomProcreationPanel(percentageRandomProcreationPanel);
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomProcreationMethod.setLabelFor(comboRandomProcreationMethod);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomProcreationPanel.title")));
+        panel.setName("randomProcreationPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomProcreationMethod)
+                                .addComponent(comboRandomProcreationMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
+                        .addComponent(percentageRandomProcreationPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomProcreationMethod)
+                                .addComponent(comboRandomProcreationMethod))
+                        .addComponent(chkUseRelationshiplessRandomProcreation)
+                        .addComponent(chkUseRandomClannerProcreation)
+                        .addComponent(chkUseRandomPrisonerProcreation)
+                        .addComponent(percentageRandomProcreationPanel)
+        );
+
+        return panel;
+    }
+
+    private void createPercentageRandomProcreationPanel(final JPanel panel) {
+        // Create Panel Components
+        final JLabel lblPercentageRandomProcreationRelationshipChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshipChance.text"));
+        lblPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
+        lblPercentageRandomProcreationRelationshipChance.setName("lblPercentageRandomProcreationRelationshipChance");
+
+        spnPercentageRandomProcreationRelationshipChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
+        spnPercentageRandomProcreationRelationshipChance.setName("spnChanceProcreation");
+
+        lblPercentageRandomProcreationRelationshiplessChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
+        lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
+        lblPercentageRandomProcreationRelationshiplessChance.setName("lblPercentageRandomProcreationRelationshiplessChance");
+
+        spnPercentageRandomProcreationRelationshiplessChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
+        spnPercentageRandomProcreationRelationshiplessChance.setName("spnPercentageRandomProcreationRelationshiplessChance");
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomProcreationRelationshipChance.setLabelFor(spnPercentageRandomProcreationRelationshipChance);
+        lblPercentageRandomProcreationRelationshiplessChance.setLabelFor(spnPercentageRandomProcreationRelationshiplessChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomProcreationPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshipChance, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshipChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
+                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance))
+        );
     }
 
     private JPanel createDeathPanel() {
@@ -5277,22 +5440,28 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
         // Procreation
-        if (chkUseProcreation.isSelected() != options.useProcreation()) {
-            chkUseProcreation.doClick();
-        }
-        spnChanceProcreation.setValue(options.getChanceProcreation() * 100.0);
-        if (chkUseProcreationNoRelationship.isSelected() != options.useProcreationNoRelationship()) {
-            if (chkUseProcreationNoRelationship.isEnabled()) {
-                chkUseProcreationNoRelationship.doClick();
+        chkUseManualProcreation.setSelected(options.isUseManualProcreation());
+        chkUseClannerProcreation.setSelected(options.isUseClannerProcreation());
+        chkUsePrisonerProcreation.setSelected(options.isUsePrisonerProcreation());
+        spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
+        chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
+        chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
+        chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
+        chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        chkLogProcreation.setSelected(options.isLogProcreation());
+        comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
+        if (chkUseRelationshiplessRandomProcreation.isSelected() != options.isUseRelationshiplessRandomProcreation()) {
+            if (chkUseRelationshiplessRandomProcreation.isEnabled()) {
+                chkUseRelationshiplessRandomProcreation.doClick();
             } else {
-                chkUseProcreationNoRelationship.setSelected(options.useProcreationNoRelationship());
+                chkUseRelationshiplessRandomProcreation.setSelected(options.isUseRelationshiplessRandomProcreation());
             }
         }
-        spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
-        chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
-        chkLogConception.setSelected(options.logConception());
-        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
-        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
+        chkUseRandomClannerProcreation.setSelected(options.isUseRandomClannerProcreation());
+        chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
+        spnPercentageRandomProcreationRelationshipChance.setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
+        spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
 
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
@@ -5553,6 +5722,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private void updateOptions() {
         try {
             campaign.setName(txtName.getText());
+            if (isStartup()) {
+                getCampaign().getForces().setName(getCampaign().getName());
+            }
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
@@ -5799,14 +5971,22 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
 
             // Procreation
-            options.setUseProcreation(chkUseProcreation.isSelected());
-            options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
-            options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
-            options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
-            options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
-            options.setLogConception(chkLogConception.isSelected());
-            options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
+            options.setUseManualProcreation(chkUseManualProcreation.isSelected());
+            options.setUseClannerProcreation(chkUseClannerProcreation.isSelected());
+            options.setUsePrisonerProcreation(chkUsePrisonerProcreation.isSelected());
+            options.setMultiplePregnancyOccurrences((Integer) spnMultiplePregnancyOccurrences.getValue());
+            options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedItem());
+            options.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());
+            options.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
             options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+            options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setLogProcreation(chkLogProcreation.isSelected());
+            options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
+            options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
+            options.setUseRandomClannerProcreation(chkUseRandomClannerProcreation.isSelected());
+            options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
+            options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
+            options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());

@@ -533,14 +533,8 @@ public abstract class AbstractCompanyGenerator {
                         tracker.getPerson().randomMarriage(campaign, date);
                     }
 
-                    if (getOptions().isSimulateRandomProcreation()
-                            && tracker.getPerson().getGender().isFemale()) {
-                        if (tracker.getPerson().isPregnant()
-                                && (date.compareTo(tracker.getPerson().getDueDate()) == 0)) {
-                            tracker.getPerson().birth(campaign, date);
-                        } else {
-                            tracker.getPerson().procreate(campaign, date);
-                        }
+                    if (getOptions().isSimulateRandomProcreation()) {
+                        campaign.getProcreation().processNewDay(campaign, date, tracker.getPerson());
                     }
                 }
             }

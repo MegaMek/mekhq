@@ -611,9 +611,8 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
             String dueDate = MekHQ.getMekHQOptions().getDisplayFormattedDate(
-                    campaign.getCampaignOptions().getDisplayTrueDueDate()
-                            ? person.getDueDate()
-                            : person.getExpectedDueDate());
+                    campaign.getCampaignOptions().isDisplayTrueDueDate()
+                            ? person.getDueDate() : person.getExpectedDueDate());
 
             lblDueDate2.setName("lblDueDate2");
             lblDueDate2.setText(dueDate);

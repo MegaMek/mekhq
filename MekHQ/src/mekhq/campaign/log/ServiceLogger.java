@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@ package mekhq.campaign.log;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -75,25 +76,21 @@ public class ServiceLogger {
                 MessageFormat.format(message, name) + rankEntry));
     }
 
-    public static void kia(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("kia.text")));
-    }
-
-    public static void mia(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("mia.text")));
-    }
-
-    public static void passedAway(Person person, LocalDate date, String cause) {
-        String message = logEntriesResourceMap.getString("passedAway.text");
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, cause)));
-    }
-
-    public static void retired(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
+    public static void changedStatus(final Person person, final LocalDate date,
+                                     final PersonnelStatus status) {
+        person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
+    }
+
+    public static void returnedFromLeave(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
+    }
+
+    public static void returnedFromAWOL(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromAWOL.text")));
     }
 
     public static void resurrected(Person person, LocalDate date) {
@@ -102,6 +99,10 @@ public class ServiceLogger {
 
     public static void rehired(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("rehired.text")));
+    }
+
+    public static void retired(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
     }
 
     public static void promotedTo(Person person, LocalDate date) {

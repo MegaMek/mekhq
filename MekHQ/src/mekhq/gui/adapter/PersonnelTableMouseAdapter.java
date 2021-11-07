@@ -291,17 +291,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy(gui.getCampaign(), gui.getCampaign().getLocalDate());
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people)
+                        .filter(person -> (gui.getCampaign().getProcreation().canProcreate(
+                                gui.getCampaign().getLocalDate(), person, false) == null))
+                        .forEach(person -> {
+                            gui.getCampaign().getProcreation().addPregnancy(
+                                    gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
+                            MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                if (selectedPerson.isPregnant()) {
-                    selectedPerson.removePregnancy();
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    gui.getCampaign().getProcreation().removePregnancy(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
@@ -477,7 +481,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resources.getString("confirmRetireQ.format"), person.getFullTitle()),
                             status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
-                        person.changeStatus(gui.getCampaign(), status, gui.getCampaign().getLocalDate());
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), status);
                     }
                 }
                 break;
@@ -827,15 +831,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_TRYING_TO_CONCEIVE: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isTryingToConceive();
-                    for (Person person : people) {
-                        person.setTryingToConceive(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
-                    gui.getCampaign().personUpdated(selectedPerson);
+                final boolean tryingToConceive = !people[0].isTryingToConceive();
+                for (final Person person : people) {
+                    person.setTryingToConceive(tryingToConceive);
                 }
                 break;
             }
@@ -1133,9 +1131,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("changeStatus.text"));
         for (PersonnelStatus status : PersonnelStatus.values()) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
-            if (person.getStatus() == status) {
-                cbMenuItem.setSelected(true);
-            }
+            cbMenuItem.setToolTipText(status.getToolTipText());
+            cbMenuItem.setSelected(person.getStatus() == status);
             cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
@@ -1732,7 +1729,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && person.getGender().isFemale()) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
                 cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
@@ -1923,7 +1921,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(cbMenuItem);
             }
 
-            if (gui.getCampaign().getCampaignOptions().useProcreation()
+            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
                     && StaticChecks.areAllFemale(selected)
                     && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
@@ -2153,6 +2152,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
                 menu.add(menuItem);
             }
+
             if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("removeAllInjuries.text"));
                 menuItem.setActionCommand(CMD_CLEAR_INJURIES);
@@ -2174,20 +2174,24 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (oneSelected) {
-                if (person.canProcreate(gui.getCampaign().getLocalDate())) {
-                    menuItem = new JMenuItem(resources.getString("addPregnancy.text"));
+            if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
+                if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
+                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
+                    menuItem = new JMenuItem(resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                } else if (person.isPregnant()) {
-                    menuItem = new JMenuItem(resources.getString("removePregnancy.text"));
+                }
+
+                if (Stream.of(selected).anyMatch(Person::isPregnant)) {
+                    menuItem = new JMenuItem(resources.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
             }
-            popup.add(menu);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         //endregion GM Menu
 
