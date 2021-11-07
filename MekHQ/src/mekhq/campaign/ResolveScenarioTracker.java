@@ -1389,9 +1389,9 @@ public class ResolveScenarioTracker {
                 getCampaign().addKill(k);
             }
             if (status.isMissing()) {
-                person.changeStatus(getCampaign(), PersonnelStatus.MIA);
+                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                person.changeStatus(getCampaign(), PersonnelStatus.KIA);
+                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
                 if (getCampaign().getCampaignOptions().getUseAtB() && isAtBContract) {
                     getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
                             true, getCampaign(), (AtBContract) mission);
