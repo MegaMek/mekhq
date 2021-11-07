@@ -1524,18 +1524,16 @@ public class CampaignGUI extends JPanel {
         getCampaign().reloadNews();
     }
 
-    private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {
-        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-        god.refreshOptions();
+    private void menuOptionsMMActionPerformed(final ActionEvent evt) {
+        final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.setEditable(true);
-        god.setVisible(true);
-        if (!god.wasCancelled()) {
+        if (god.showDialog().isConfirmed()) {
             getCampaign().setGameOptions(god.getOptions());
             refreshCalendar();
         }
     }
 
-    private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miLoadForcesActionPerformed(ActionEvent evt) {
         loadListFile(true);
     }
 
