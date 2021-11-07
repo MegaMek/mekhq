@@ -29,6 +29,7 @@ public class WindchildAssaultCompanyGenerator extends WindchildCompanyGenerator 
     }
     //endregion Constructors
 
+    //region Units
     /**
      * This guarantees a BattleMech, and rolls a heavy/assault weighted lance
      *
@@ -59,4 +60,5 @@ public class WindchildAssaultCompanyGenerator extends WindchildCompanyGenerator 
                 return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         }
     }
+    //endregion Units
 }

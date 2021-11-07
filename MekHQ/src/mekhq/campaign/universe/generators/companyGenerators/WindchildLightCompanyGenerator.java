@@ -29,6 +29,7 @@ public class WindchildLightCompanyGenerator extends WindchildCompanyGenerator {
     }
     //endregion Constructors
 
+    //region Units
     /**
      * This guarantees a BattleMech, and rolls a light/medium weighted lance
      *
@@ -59,4 +60,5 @@ public class WindchildLightCompanyGenerator extends WindchildCompanyGenerator {
                 return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         }
     }
+    //endregion Units
 }
