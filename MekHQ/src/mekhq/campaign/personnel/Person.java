@@ -19,38 +19,19 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Crew;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
-import megamek.common.VTOL;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -61,25 +42,10 @@ import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
-import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.Divorce;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.Marriage;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -98,18 +64,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.function.IntSupplier;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -134,34 +89,6 @@ public class Person implements Serializable {
     private boolean tryingToConceive;
     private LocalDate dueDate;
     private LocalDate expectedDueDate;
-
-    private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
-
-    // This creates a random range of approximately six weeks with which to modify the standard pregnancy duration
-    // To create randomized pregnancy duration
-    private static final IntSupplier PREGNANCY_MODIFY_DURATION = () -> {
-        double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
-            * Math.cos(2.0 * Math.PI * Math.random());
-        // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
-        return (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10);
-    };
-
-    private static final IntSupplier PREGNANCY_SIZE = () -> {
-        int children = 1;
-        // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
-        while (Compute.randomInt(50) == 0) {
-            ++ children;
-        }
-        return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
-    };
-
-    private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
-        "twins", "triplets", "quadruplets", "quintuplets",
-        "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
-    };
-
-    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
-    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
     //endregion Procreation
 
     //region Marriage
@@ -304,7 +231,6 @@ public class Person implements Serializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
-
     //endregion Variable Declarations
 
     //region Constructors
@@ -994,92 +920,50 @@ public class Person implements Serializable {
     /**
      * This is used to change the person's PersonnelStatus
      * @param campaign the campaign the person is part of
+     * @param today the current date
      * @param status the person's new PersonnelStatus
      */
-    public void changeStatus(Campaign campaign, PersonnelStatus status) {
+    public void changeStatus(final Campaign campaign, final LocalDate today,
+                             final PersonnelStatus status) {
         if (status == getStatus()) { // no change means we don't need to process anything
             return;
-        } else if (getStatus().isKIA()) {
+        } else if (getStatus().isDead() && !status.isDead()) {
             // remove date of death for resurrection
             setDateOfDeath(null);
+            ServiceLogger.resurrected(this, today);
         }
 
         switch (status) {
             case ACTIVE:
                 if (getStatus().isMIA()) {
-                    ServiceLogger.recoveredMia(this, campaign.getLocalDate());
-                } else if (getStatus().isDead()) {
-                    ServiceLogger.resurrected(this, campaign.getLocalDate());
+                    ServiceLogger.recoveredMia(this, today);
+                } else if (getStatus().isOnLeave()) {
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isAWOL()) {
+                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
                 } else {
-                    ServiceLogger.rehired(this, campaign.getLocalDate());
+                    ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
                 break;
             case RETIRED:
-                ServiceLogger.retired(this, campaign.getLocalDate());
+                ServiceLogger.retired(this, today);
                 if (campaign.getCampaignOptions().useRetirementDateTracking()) {
-                    setRetirement(campaign.getLocalDate());
+                    setRetirement(today);
                 }
-                break;
-            case MIA:
-                ServiceLogger.mia(this, campaign.getLocalDate());
-                break;
-            case KIA:
-                ServiceLogger.kia(this, campaign.getLocalDate());
-                break;
-            case NATURAL_CAUSES:
-                MedicalLogger.diedOfNaturalCauses(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case WOUNDS:
-                MedicalLogger.diedFromWounds(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case DISEASE:
-                MedicalLogger.diedFromDisease(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case OLD_AGE:
-                MedicalLogger.diedOfOldAge(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case PREGNANCY_COMPLICATIONS:
-                // The child might be able to be born, albeit into a world without their mother.
-                // This can be manually set by males and for those who are not pregnant. This is
-                // purposeful, to allow for player customization, and thus we first check if someone
-                // is pregnant before having the birth
-                if (isPregnant()) {
-                    int pregnancyWeek = getPregnancyWeek(campaign.getLocalDate());
-                    double babyBornChance;
-                    if (pregnancyWeek > 35) {
-                        babyBornChance = 0.99;
-                    } else if (pregnancyWeek > 29) {
-                        babyBornChance = 0.95;
-                    } else if (pregnancyWeek > 25) {
-                        babyBornChance = 0.9;
-                    } else if (pregnancyWeek == 25) {
-                        babyBornChance = 0.8;
-                    } else if (pregnancyWeek == 24) {
-                        babyBornChance = 0.5;
-                    } else if (pregnancyWeek == 23) {
-                        babyBornChance = 0.25;
-                    } else {
-                        babyBornChance = 0;
-                    }
-
-                    if (Compute.randomFloat() < babyBornChance) {
-                        birth(campaign);
-                    }
-                }
-                MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
+                // purposeful fall through
+            default:
+                ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
                 break;
         }
 
         setStatus(status);
 
         if (status.isDead()) {
-            setDateOfDeath(campaign.getLocalDate());
+            setDateOfDeath(today);
             // Don't forget to tell the spouse
             if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
@@ -1261,8 +1145,8 @@ public class Person implements Serializable {
         return id;
     }
 
-    public boolean isChild() {
-        return (getAge(getCampaign().getLocalDate()) <= 13);
+    public boolean isChild(final LocalDate today) {
+        return getAge(today) <= 13;
     }
 
     public Genealogy getGenealogy() {
@@ -1278,7 +1162,7 @@ public class Person implements Serializable {
         return tryingToConceive;
     }
 
-    public void setTryingToConceive(boolean tryingToConceive) {
+    public void setTryingToConceive(final boolean tryingToConceive) {
         this.tryingToConceive = tryingToConceive;
     }
 
@@ -1286,7 +1170,7 @@ public class Person implements Serializable {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(final LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -1294,142 +1178,12 @@ public class Person implements Serializable {
         return expectedDueDate;
     }
 
-    public void setExpectedDueDate(LocalDate expectedDueDate) {
+    public void setExpectedDueDate(final LocalDate expectedDueDate) {
         this.expectedDueDate = expectedDueDate;
-    }
-
-    public int getPregnancyWeek(LocalDate today) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(getExpectedDueDate()
-                .minus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS), today));
     }
 
     public boolean isPregnant() {
         return dueDate != null;
-    }
-
-    /**
-     * This is used to determine if a person can procreate
-     * @param campaign the campaign the person was in
-     * @return true if they can, otherwise false
-     */
-    public boolean canProcreate(Campaign campaign) {
-        return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(campaign.getLocalDate()) < 51);
-    }
-
-    public void procreate(Campaign campaign) {
-        if (canProcreate(campaign)) {
-            boolean conceived = false;
-            if (getGenealogy().hasSpouse()) {
-                Person spouse = getGenealogy().getSpouse();
-                if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
-                        && !(spouse.getGender() == getGender())) {
-                    // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
-                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
-                }
-            } else if (campaign.getCampaignOptions().useProcreationNoRelationship()) {
-                // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
-                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
-            }
-
-            if (conceived) {
-                addPregnancy(campaign);
-            }
-        }
-    }
-
-    public void addPregnancy(Campaign campaign) {
-        LocalDate dueDate = campaign.getLocalDate();
-        dueDate = dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
-        setExpectedDueDate(dueDate);
-        dueDate = dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
-        setDueDate(dueDate);
-
-        int size = PREGNANCY_SIZE.getAsInt();
-        extraData.set(PREGNANCY_CHILDREN_DATA, size);
-        extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
-                ? getGenealogy().getSpouse().getId().toString() : null);
-
-        String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-
-        campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
-        if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
-            if (getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(getGenealogy().getSpouse(),
-                        getFullName(), getCampaign().getLocalDate(), sizeString);
-            }
-        }
-    }
-
-    /**
-     * Removes a pregnancy and clears all related data from the current person
-     */
-    public void removePregnancy() {
-        setDueDate(null);
-        setExpectedDueDate(null);
-        extraData.set(PREGNANCY_CHILDREN_DATA, null);
-        extraData.set(PREGNANCY_FATHER_DATA, null);
-    }
-
-    /**
-     * This method is how a person gives birth to a number of babies and have them added to the campaign
-     * @param campaign the campaign to add the baby in question to
-     */
-    public void birth(Campaign campaign) {
-        // Determine the number of children
-        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
-
-        // Determine father information
-        Person father = (getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                ? campaign.getPerson(UUID.fromString(getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
-        father = campaign.getCampaignOptions().determineFatherAtBirth()
-                ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
-
-        // Determine Prisoner Status
-        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
-                ? getPrisonerStatus() : PrisonerStatus.FREE;
-
-        // Output a specific report to the campaign if they are giving birth to multiple children
-        if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
-            campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
-                    PREGNANCY_MULTIPLE_NAMES[size]));
-        }
-
-        // Create Babies
-        for (int i = 0; i < size; i++) {
-            // Create the specific baby
-            Person baby = campaign.newDependent(true);
-            String surname = campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(this, father, baby.getGender());
-            baby.setSurname(surname);
-            baby.setBirthday(campaign.getLocalDate());
-
-            // Recruit the baby
-            campaign.recruitPerson(baby, prisonerStatus, true, true);
-
-            // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, this);
-            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            if (father != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            }
-
-            // Create reports and log the birth
-            campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
-                if (father != null) {
-                    PersonalLogger.ourChildBorn(father, baby, getFullName(), campaign.getLocalDate());
-                }
-            }
-        }
-
-        // Cleanup Data
-        removePregnancy();
     }
     //endregion Pregnancy
 
@@ -1773,21 +1527,21 @@ public class Person implements Serializable {
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
             }
-            if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
-                        getOptionList("::", PilotOptions.LVL3_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
             }
-            if (countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edge",
-                        getOptionList("::", PilotOptions.EDGE_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
                 // For support personnel, write an available edge value
                 if (hasSupportRole(true) || isEngineer()) {
                     MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeAvailable", getCurrentEdge());
                 }
             }
-            if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+            if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "implants",
-                        getOptionList("::", PilotOptions.MD_ADVANTAGES));
+                        getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
             }
             if (!techUnits.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "techUnitIds");
@@ -2895,7 +2649,7 @@ public class Person implements Serializable {
     }
 
     public void setEdge(int e) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals("edge")) {
                 ability.setValue(e);
@@ -2945,7 +2699,7 @@ public class Person implements Serializable {
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(String name, boolean status) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(status);
@@ -2960,7 +2714,7 @@ public class Person implements Serializable {
      * @param name of the trigger condition
      */
     public void changeEdgeTrigger(String name) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(!ability.booleanValue());
@@ -2975,7 +2729,7 @@ public class Person implements Serializable {
      */
     public String getEdgeTooltip() {
         StringBuilder edgett = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             //yuck, it would be nice to have a more fool-proof way of identifying edge triggers
             if (ability.getName().contains("edge_when") && ability.booleanValue()) {

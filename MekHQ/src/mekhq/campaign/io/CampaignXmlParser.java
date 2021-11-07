@@ -18,41 +18,23 @@
  */
 package mekhq.campaign.io;
 
+import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
-import megamek.common.options.PilotOptions;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.MhqFileUtil;
-import mekhq.NullEntityException;
-import mekhq.Utilities;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.Warehouse;
+import mekhq.*;
+import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -60,27 +42,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingMekLocation;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MissingMASC;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -92,26 +56,11 @@ import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
 
 public class CampaignXmlParser {
     private InputStream is;
@@ -331,6 +280,8 @@ public class CampaignXmlParser {
 
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
+        final CampaignOptions options = retVal.getCampaignOptions();
+
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
@@ -342,6 +293,9 @@ public class CampaignXmlParser {
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
+
+        // Update the Personnel Modules
+        retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
 
         long timestamp = System.currentTimeMillis();
 
@@ -519,8 +473,11 @@ public class CampaignXmlParser {
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }
 
-        //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
+        // Load Completed. Time for final migration and sanity checks.
+        // Final migration
+        PersonMigrator.finalPersonMigration(version, retVal.getPersonnel());
 
+        // Sanity Checks
         fixupUnitTechProblems(retVal);
 
         //unload any ammo bins in the warehouse
@@ -915,7 +872,7 @@ public class CampaignXmlParser {
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
         MekHQ.getLogger().info("Loading Special Ability Nodes from XML...");
 
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
 
         // TODO: make SpecialAbility a Campaign instance
         SpecialAbility.clearSPA();

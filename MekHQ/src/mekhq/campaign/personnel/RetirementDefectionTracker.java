@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -187,7 +186,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
-                for (Enumeration<IOption> i = p.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                for (Enumeration<IOption> i = p.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                     IOption ability = i.nextElement();
                     if (ability.booleanValue()) {
                         if (ability.getName().equals("tactical_genius")) {
