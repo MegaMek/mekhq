@@ -675,7 +675,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
+                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
