@@ -484,6 +484,7 @@ task buildFromRepo (type: GradleBuild) {
     dependsOn cloneMMLRepo
 
     buildFile = "${repoDir}/build.gradle"
+    buildName = "mhq-build-repo"
     dir = "${repoDir}"
     tasks = [ 'assembleDist' ]
 }
@@ -502,6 +503,7 @@ task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
     group = 'distribution'
 
     buildFile = "${mmRepoDir}/build.gradle"
+    buildName = "mhq-build-mm"
     dir = "${mmRepoDir}"
     tasks = [ 'assembleDist' ]
 }
@@ -511,6 +513,7 @@ task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
     group = 'distribution'
 
     buildFile = "${mmlRepoDir}/build.gradle"
+    buildName = "mhq-build-mml"
     dir = "${mmlRepoDir}"
     tasks = [ 'assembleDist' ]
 }
@@ -523,6 +526,7 @@ task buildAllFromRepo (type: GradleBuild) {
     dependsOn buildMML
 
     buildFile = "${repoDir}/build.gradle"
+    buildName = "mhq-build-all-repo"
     dir = "${repoDir}"
     tasks = [ 'unixDistTar', 'windowsDistZip' ]
 }
