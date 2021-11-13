@@ -16,49 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe.generators.companyGenerators;
+package mekhq.campaign.universe.generators.battleMechWeightClassGenerators;
 
 import megamek.common.EntityWeightClass;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
 
-public class WindchildHeavyCompanyGenerator extends WindchildCompanyGenerator {
+public class AtBBattleMechWeightClassGenerator extends AbstractBattleMechWeightClassGenerator {
     //region Constructors
-    public WindchildHeavyCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
-        super(CompanyGenerationMethod.WINDCHILD_HEAVY, campaign, options);
+    public AtBBattleMechWeightClassGenerator() {
+        super(BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT);
     }
     //endregion Constructors
 
-    //region Units
-    /**
-     * This guarantees a BattleMech, and rolls a heavier lance
-     *
-     * @param roll the modified roll to use
-     * @return the generated EntityWeightClass
-     * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
-     * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
-     */
     @Override
-    protected int determineBattleMechWeight(final int roll) {
+    public int generate(final int roll) {
         switch (roll) {
             case 2:
             case 3:
+                return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
             case 4:
-                return EntityWeightClass.WEIGHT_LIGHT;
+            case 5:
             case 6:
+                return EntityWeightClass.WEIGHT_LIGHT;
             case 7:
-                return EntityWeightClass.WEIGHT_MEDIUM;
             case 8:
             case 9:
+                return EntityWeightClass.WEIGHT_MEDIUM;
             case 10:
-                return EntityWeightClass.WEIGHT_HEAVY;
-            case 5:
             case 11:
+                return EntityWeightClass.WEIGHT_HEAVY;
             case 12:
                 return EntityWeightClass.WEIGHT_ASSAULT;
             default:
                 return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         }
     }
-    //endregion Units
 }

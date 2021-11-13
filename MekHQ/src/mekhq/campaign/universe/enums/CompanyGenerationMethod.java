@@ -20,6 +20,7 @@ package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.*;
 
 import java.util.ResourceBundle;
@@ -27,10 +28,7 @@ import java.util.ResourceBundle;
 public enum CompanyGenerationMethod {
     //region Enum Declarations
     AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text", "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText"),
-    WINDCHILD_LIGHT("CompanyGenerationMethod.WINDCHILD_LIGHT.text", "CompanyGenerationMethod.WINDCHILD_LIGHT.toolTipText"),
-    WINDCHILD_HEAVY("CompanyGenerationMethod.WINDCHILD_HEAVY.text", "CompanyGenerationMethod.WINDCHILD_HEAVY.toolTipText"),
-    WINDCHILD_ASSAULT("CompanyGenerationMethod.WINDCHILD_ASSAULT.text", "CompanyGenerationMethod.WINDCHILD_ASSAULT.toolTipText");
+    WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -60,22 +58,6 @@ public enum CompanyGenerationMethod {
     public boolean isWindchild() {
         return this == WINDCHILD;
     }
-
-    public boolean isWindchildLight() {
-        return this == WINDCHILD_LIGHT;
-    }
-
-    public boolean isWindchildHeavy() {
-        return this == WINDCHILD_HEAVY;
-    }
-
-    public boolean isWindchildAssault() {
-        return this == WINDCHILD_ASSAULT;
-    }
-
-    public boolean isWindchildGrouping() {
-        return isWindchild() || isWindchildLight() || isWindchildHeavy() || isWindchildAssault();
-    }
     //endregion Boolean Comparison Methods
 
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
@@ -83,12 +65,6 @@ public enum CompanyGenerationMethod {
         switch (this) {
             case AGAINST_THE_BOT:
                 return new AtBCompanyGenerator(campaign, options);
-            case WINDCHILD_LIGHT:
-                return new WindchildLightCompanyGenerator(campaign, options);
-            case WINDCHILD_HEAVY:
-                return new WindchildHeavyCompanyGenerator(campaign, options);
-            case WINDCHILD_ASSAULT:
-                return new WindchildAssaultCompanyGenerator(campaign, options);
             case WINDCHILD:
             default:
                 return new WindchildCompanyGenerator(campaign, options);

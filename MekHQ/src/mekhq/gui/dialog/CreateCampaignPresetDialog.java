@@ -41,7 +41,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;

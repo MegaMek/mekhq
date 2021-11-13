@@ -18,25 +18,20 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
     public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
         super(CompanyGenerationMethod.WINDCHILD, campaign, options);
-    }
-
-    protected WindchildCompanyGenerator(final CompanyGenerationMethod method,
-                                        final Campaign campaign,
-                                        final CompanyGenerationOptions options) {
-        super(method, campaign, options);
     }
     //endregion Constructors
 
@@ -65,66 +60,6 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Units
     /**
-     * This guarantees a BattleMech, and rolls an overall heavier lance
-     *
-     * @param roll the modified roll to use
-     * @return the generated EntityWeightClass
-     * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
-     * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
-     */
-    @Override
-    protected int determineBattleMechWeight(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return EntityWeightClass.WEIGHT_LIGHT;
-            case 6:
-            case 7:
-            case 8:
-                return EntityWeightClass.WEIGHT_MEDIUM;
-            case 9:
-            case 10:
-                return EntityWeightClass.WEIGHT_HEAVY;
-            case 11:
-            case 12:
-                return EntityWeightClass.WEIGHT_ASSAULT;
-            default:
-                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-        }
-    }
-
-    /**
-     * This generates a slightly higher average quality rating
-     * @param roll the modified roll to use
-     * @return the generated IUnitRating magic int for Dragoon Quality
-     */
-    @Override
-    protected int determineBattleMechQuality(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-                return IUnitRating.DRAGOON_F;
-            case 5:
-            case 6:
-                return IUnitRating.DRAGOON_D;
-            case 7:
-            case 8:
-                return IUnitRating.DRAGOON_C;
-            case 9:
-            case 10:
-                return IUnitRating.DRAGOON_B;
-            case 11:
-            case 12:
-                return IUnitRating.DRAGOON_A;
-            default:
-                return IUnitRating.DRAGOON_ASTAR;
-        }
-    }
-
-    /**
      * This generates clan mech differently, so you can get any of the quality ratings for clanners
      *
      * @param campaign the campaign to generate for
@@ -145,7 +80,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
                 return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get a SL mech with A* Rating
-                final String factionCode = ((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL");
+                final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
                 return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {

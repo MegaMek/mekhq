@@ -42,9 +42,14 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
+import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBattleMechQualityGenerator;
+import mekhq.campaign.universe.generators.battleMechWeightClassGenerators.AbstractBattleMechWeightClassGenerator;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
 
@@ -72,30 +77,39 @@ import java.util.stream.Stream;
  *
  * Button that lets you pop out the options panel with everything disabled
  *
- * TODO :
- *      Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
- *      Finish the personnel randomization overrides
- *      Implement:
- *          centerPlanet
- *          selectStartingContract
- *          Finish Finances
- *
- * FIXME :
+ * TODO - Wave 2:
+ *      Marriage Module : Open : MHQ 2851
+ *      Random Origin Options : Open : MHQ 2856
+ *      Force Icon Rework : Open : MHQ
+ *      Finish Finances
  *      Backgrounds don't work
  *      Panel has odd whitespace usage
- *      System, Planet text search
- *
- * TODO:
+ *      System, Planet text search (if possible and feasible - might also be a bugfix, or require a new component)
+ *  TODO - Wave 3:
+ *      Contract Market Pane
+ *      Campaign Options Pane, Campaign Options Dialog Base Validation
+ *      Date Pane
+ *  TODO - Wave 4:
+ *      Startup GUI Rework
+ *  TODO - Wave 5:
+ *      Company Generator GUI
+ *      Implement Contracts
+ *  TODO - Wave 6:
+ *      Suite Options loading during startup, during the first load of a newer version (use a SuiteOption to track)
+ *      Add MegaMek Options as a panel during the startup
+ *  TODO - Wave 7:
+ *      Implement Era-based Part Generators
  *      Implement Surprises
  *      Implement Mystery Boxes
- *      Add MekHQ Options as a panel during the startup, but only for the first load (use a MekHQ Option to track it)
- *      Add MegaMek Options as a panel during the startup
+ *      Optional: Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
  */
 public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
     private final CompanyGenerationMethod method;
-    private CompanyGenerationOptions options;
-    private AbstractPersonnelGenerator personnelGenerator;
+    private final CompanyGenerationOptions options;
+    private final AbstractPersonnelGenerator personnelGenerator;
+    private final AbstractBattleMechWeightClassGenerator battleMechWeightClassGenerator;
+    private final AbstractBattleMechQualityGenerator battleMechQualityGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
@@ -104,8 +118,10 @@ public abstract class AbstractCompanyGenerator {
     protected AbstractCompanyGenerator(final CompanyGenerationMethod method, final Campaign campaign,
                                        final CompanyGenerationOptions options) {
         this.method = method;
-        setOptions(options);
-        createPersonnelGenerator(campaign);
+        this.options = options;
+        this.personnelGenerator = campaign.getPersonnelGenerator(createFactionSelector(campaign), createPlanetSelector());
+        this.battleMechWeightClassGenerator = getOptions().getBattleMechWeightClassGenerationMethod().getGenerator();
+        this.battleMechQualityGenerator = getOptions().getBattleMechQualityGenerationMethod().getGenerator();
     }
     //endregion Constructors
 
@@ -118,25 +134,8 @@ public abstract class AbstractCompanyGenerator {
         return options;
     }
 
-    public void setOptions(final CompanyGenerationOptions options) {
-        this.options = options;
-    }
-
     public AbstractPersonnelGenerator getPersonnelGenerator() {
         return personnelGenerator;
-    }
-
-    public void setPersonnelGenerator(final AbstractPersonnelGenerator personnelGenerator) {
-        this.personnelGenerator = personnelGenerator;
-    }
-
-    /**
-     * This creates the personnel generator to use with the generator's options
-     * @param campaign the Campaign to generate using
-     */
-    private void createPersonnelGenerator(final Campaign campaign) {
-        setPersonnelGenerator(campaign.getPersonnelGenerator(createFactionSelector(campaign),
-                createPlanetSelector()));
     }
 
     /**
@@ -171,6 +170,14 @@ public abstract class AbstractCompanyGenerator {
             planetSelector = new DefaultPlanetSelector();
         }
         return planetSelector;
+    }
+
+    public AbstractBattleMechWeightClassGenerator getBattleMechWeightClassGenerator() {
+        return battleMechWeightClassGenerator;
+    }
+
+    public AbstractBattleMechQualityGenerator getBattleMechQualityGenerator() {
+        return battleMechQualityGenerator;
     }
     //endregion Getters/Setters
 
@@ -647,6 +654,29 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
+     * @param tracker the tracker to roll based on
+     * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
+     * @return the weight to use in generating the BattleMech
+     */
+    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
+                                     final boolean initialRoll) {
+        int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
+        if (!initialRoll) {
+            roll = Math.min(roll, 12);
+        }
+        return getBattleMechWeightClassGenerator().generate(roll);
+    }
+
+    /**
+     * @param tracker the tracker to roll based on
+     * @return the quality to use in generating the BattleMech
+     */
+    private int rollBattleMechQuality(final CompanyGenerationPersonTracker tracker) {
+        return getBattleMechQualityGenerator().generate(
+                Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker));
+    }
+
+    /**
      * @param tracker the tracker to get the unit generation parameter modifier for
      * @return the modifier value
      */
@@ -661,46 +691,10 @@ public abstract class AbstractCompanyGenerator {
                 return 0;
             default:
                 // Shouldn't be hit, but a safety for attempting non-combat generation
+                MekHQ.getLogger().error("Attempting to generate a unit for a " + tracker.getPersonType() + ", returning a -20 modifier");
                 return -20;
         }
     }
-
-    /**
-     * @param tracker the tracker to roll based on
-     * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
-     * @return the weight to use in generating the BattleMech
-     */
-    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
-                                     final boolean initialRoll) {
-        int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
-        if (!initialRoll) {
-            roll = Math.min(roll, 12);
-        }
-        return determineBattleMechWeight(roll);
-    }
-
-    /**
-     * @param roll the modified roll to use
-     * @return the generated EntityWeightClass magic int
-     * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
-     * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
-     */
-    protected abstract int determineBattleMechWeight(final int roll);
-
-    /**
-     * @param tracker the tracker to roll based on
-     * @return the quality to use in generating the BattleMech
-     */
-    private int rollBattleMechQuality(final CompanyGenerationPersonTracker tracker) {
-        return determineBattleMechQuality(Utilities.dice(2, 6)
-                + getUnitGenerationParameterModifier(tracker));
-    }
-
-    /**
-     * @param roll the modified roll to use
-     * @return the generated IUnitRating magic int for Dragoon Quality
-     */
-    protected abstract int determineBattleMechQuality(final int roll);
 
     /**
      * @param trackers the trackers to sort into their lances
@@ -1133,13 +1127,13 @@ public abstract class AbstractCompanyGenerator {
 
             // Create the parameters to generate the 'Mech from
             final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
-                    determineBattleMechWeight(Utilities.dice(2, 6)),
-                    determineBattleMechQuality(Utilities.dice(2, 6))
+                    getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)),
+                    getBattleMechQualityGenerator().generate(Utilities.dice(2, 6))
             );
 
             // We want to ensure we get a 'Mech generated
             while (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-                parameters.setWeight(determineBattleMechWeight(Utilities.dice(2, 6)));
+                parameters.setWeight(getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)));
             }
 
             // Generate the 'Mech, and add it to the mothballed entities list

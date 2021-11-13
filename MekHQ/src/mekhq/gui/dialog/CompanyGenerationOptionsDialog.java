@@ -21,7 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 

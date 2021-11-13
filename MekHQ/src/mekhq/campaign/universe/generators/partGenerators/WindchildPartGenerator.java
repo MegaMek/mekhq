@@ -23,7 +23,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 1 Part for every 3, rounded normally.

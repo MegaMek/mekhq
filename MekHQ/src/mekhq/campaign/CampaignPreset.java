@@ -37,7 +37,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

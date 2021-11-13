@@ -27,11 +27,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.campaign.universe.enums.MysteryBoxType;
-import mekhq.campaign.universe.enums.PartGenerationMethod;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.enums.*;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.baseComponents.JDisableablePanel;
@@ -84,6 +81,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkSimulateRandomProcreation;
 
     // Units
+    private MMComboBox<BattleMechWeightClassGenerationMethod> comboBattleMechWeightClassGenerationMethod;
+    private MMComboBox<BattleMechQualityGenerationMethod> comboBattleMechQualityGenerationMethod;
     private JCheckBox chkGenerateUnitsAsAttached;
     private JCheckBox chkAssignBestRollToUnitCommander;
     private JCheckBox chkSortStarLeagueUnitsFirst;
@@ -410,6 +409,24 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //endregion Starting Simulation
 
     //region Units
+    public MMComboBox<BattleMechWeightClassGenerationMethod> getComboBattleMechWeightClassGenerationMethod() {
+        return comboBattleMechWeightClassGenerationMethod;
+    }
+
+    public void setComboBattleMechWeightClassGenerationMethod(
+            final MMComboBox<BattleMechWeightClassGenerationMethod> comboBattleMechWeightClassGenerationMethod) {
+        this.comboBattleMechWeightClassGenerationMethod = comboBattleMechWeightClassGenerationMethod;
+    }
+
+    public MMComboBox<BattleMechQualityGenerationMethod> getComboBattleMechQualityGenerationMethod() {
+        return comboBattleMechQualityGenerationMethod;
+    }
+
+    public void setComboBattleMechQualityGenerationMethod(
+            final MMComboBox<BattleMechQualityGenerationMethod> comboBattleMechQualityGenerationMethod) {
+        this.comboBattleMechQualityGenerationMethod = comboBattleMechQualityGenerationMethod;
+    }
+
     public JCheckBox getChkGenerateUnitsAsAttached() {
         return chkGenerateUnitsAsAttached;
     }
@@ -735,6 +752,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         lblCompanyGenerationMethod.setName("lblCompanyGenerationMethod");
 
         setComboCompanyGenerationMethod(new MMComboBox<>("comboCompanyGenerationMethod", CompanyGenerationMethod.values()));
+        getComboCompanyGenerationMethod().setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
         getComboCompanyGenerationMethod().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -1220,6 +1238,44 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     private JPanel createUnitsPanel() {
         // Create Panel Components
+        final JLabel lblBattleMechWeightClassGenerationMethod = new JLabel(resources.getString("lblBattleMechWeightClassGenerationMethod.text"));
+        lblBattleMechWeightClassGenerationMethod.setToolTipText(resources.getString("lblBattleMechWeightClassGenerationMethod.toolTipText"));
+        lblBattleMechWeightClassGenerationMethod.setName("lblBattleMechWeightClassGenerationMethod");
+
+        setComboBattleMechWeightClassGenerationMethod(new MMComboBox<>("comboBattleMechWeightClassGenerationMethod", BattleMechWeightClassGenerationMethod.values()));
+        getComboBattleMechWeightClassGenerationMethod().setToolTipText(resources.getString("lblBattleMechWeightClassGenerationMethod.toolTipText"));
+        getComboBattleMechWeightClassGenerationMethod().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof BattleMechWeightClassGenerationMethod) {
+                    list.setToolTipText(((BattleMechWeightClassGenerationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        final JLabel lblBattleMechQualityGenerationMethod = new JLabel(resources.getString("lblBattleMechQualityGenerationMethod.text"));
+        lblBattleMechQualityGenerationMethod.setToolTipText(resources.getString("lblBattleMechQualityGenerationMethod.toolTipText"));
+        lblBattleMechQualityGenerationMethod.setName("lblBattleMechQualityGenerationMethod");
+
+        setComboBattleMechQualityGenerationMethod(new MMComboBox<>("comboBattleMechQualityGenerationMethod", BattleMechQualityGenerationMethod.values()));
+        getComboBattleMechQualityGenerationMethod().setToolTipText(resources.getString("lblBattleMechQualityGenerationMethod.toolTipText"));
+        getComboBattleMechQualityGenerationMethod().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof BattleMechQualityGenerationMethod) {
+                    list.setToolTipText(((BattleMechQualityGenerationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
         setChkGenerateUnitsAsAttached(new JCheckBox(resources.getString("chkGenerateUnitsAsAttached.text")));
         getChkGenerateUnitsAsAttached().setToolTipText(resources.getString("chkGenerateUnitsAsAttached.toolTipText"));
         getChkGenerateUnitsAsAttached().setName("chkGenerateUnitsAsAttached");
@@ -1248,6 +1304,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkAssignTechsToUnits().setToolTipText(resources.getString("chkAssignTechsToUnits.toolTipText"));
         getChkAssignTechsToUnits().setName("chkAssignTechsToUnits");
 
+        // Programmatically Assign Accessibility Labels
+        lblBattleMechWeightClassGenerationMethod.setLabelFor(getComboBattleMechWeightClassGenerationMethod());
+        lblBattleMechQualityGenerationMethod.setLabelFor(getComboBattleMechQualityGenerationMethod());
+
         // Layout the UI
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("unitsPanel.title")));
@@ -1260,6 +1320,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblBattleMechWeightClassGenerationMethod)
+                                .addComponent(getComboBattleMechWeightClassGenerationMethod(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblBattleMechQualityGenerationMethod)
+                                .addComponent(getComboBattleMechQualityGenerationMethod(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
@@ -1271,6 +1337,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblBattleMechWeightClassGenerationMethod)
+                                .addComponent(getComboBattleMechWeightClassGenerationMethod()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblBattleMechQualityGenerationMethod)
+                                .addComponent(getComboBattleMechQualityGenerationMethod()))
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
@@ -1290,6 +1362,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         lblForceNamingMethod.setName("lblForceNamingMethod");
 
         setComboForceNamingMethod(new MMComboBox<>("comboForceNamingMethod", ForceNamingMethod.values()));
+        getComboForceNamingMethod().setToolTipText(resources.getString("lblForceNamingMethod.toolTipText"));
         getComboForceNamingMethod().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -1807,6 +1880,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkSimulateRandomProcreation().setSelected(options.isSimulateRandomProcreation());
 
         // Units
+        getComboBattleMechWeightClassGenerationMethod().setSelectedItem(options.getBattleMechWeightClassGenerationMethod());
+        getComboBattleMechQualityGenerationMethod().setSelectedItem(options.getBattleMechQualityGenerationMethod());
         getChkGenerateUnitsAsAttached().setSelected(options.isGenerateUnitsAsAttached());
         getChkAssignBestRollToUnitCommander().setSelected(options.isAssignBestRollToUnitCommander());
         getChkSortStarLeagueUnitsFirst().setSelected(options.isSortStarLeagueUnitsFirst());
@@ -1914,6 +1989,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setSimulateRandomProcreation(getChkSimulateRandomProcreation().isSelected());
 
         // Units
+        options.setBattleMechWeightClassGenerationMethod(getComboBattleMechWeightClassGenerationMethod().getSelectedItem());
+        options.setBattleMechQualityGenerationMethod(getComboBattleMechQualityGenerationMethod().getSelectedItem());
         options.setGenerateUnitsAsAttached(getChkGenerateUnitsAsAttached().isSelected());
         options.setAssignBestRollToUnitCommander(getChkAssignBestRollToUnitCommander().isSelected());
         options.setSortStarLeagueUnitsFirst(getChkSortStarLeagueUnitsFirst().isSelected());
