@@ -3,6 +3,7 @@ VERSION HISTORY:
 0.49.6-SNAPSHOT
 + PR #2857: Personnel Status: Expansions for Random Death
 + PR #2933: Startup: Rename Origin Force Node With Campaign Name
++ PR #2951: AssignUnitToPersonMenu: Adding Missing Personnel Filters
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
