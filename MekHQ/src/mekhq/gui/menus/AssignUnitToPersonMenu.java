@@ -118,6 +118,10 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .sorted(new PersonTitleSorter().reversed())
                     .collect(Collectors.toList());
 
+            if (personnel.isEmpty()) {
+                return;
+            }
+
             // The order of this if statement is required to properly filter based on the unit type
             if (isMech) {
                 personnel = personnel.stream()
@@ -159,8 +163,12 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 ? PersonnelRole.SOLDIER : PersonnelRole.BATTLE_ARMOUR))
                         .collect(Collectors.toList());
             } else {
-                MekHQ.getLogger().warning("Unhandled entity type of " + units[0].getEntity().getClass().toString());
-                personnel = new ArrayList<>();
+                MekHQ.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
+                return;
+            }
+
+            if (personnel.isEmpty()) {
+                return;
             }
 
             List<Person> filteredPersonnel;
