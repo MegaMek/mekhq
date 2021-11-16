@@ -5,6 +5,7 @@ VERSION HISTORY:
 + PR #2933: Startup: Rename Origin Force Node With Campaign Name
 + PR #2951: AssignUnitToPersonMenu: Adding Missing Personnel Filters
 + Increased base RAM assignment to 2 GB
++ PR #2474: Copy C3 Master on Restore
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
