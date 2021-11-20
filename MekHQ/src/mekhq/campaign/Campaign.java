@@ -1881,36 +1881,22 @@ public class Campaign implements Serializable, ITechManager {
         return getTechs(false);
     }
 
-    public List<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, false);
+    public List<Person> getTechs(final boolean noZeroMinute) {
+        return getTechs(noZeroMinute, false);
     }
 
     /**
      * Returns a list of active technicians.
      *
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
-     * @param firstTechId The ID of the tech that should appear first in the list (assuming
-     *                    active and satisfies the noZeroMinute argument)
      * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public List<Person> getTechs(final boolean noZeroMinute, final @Nullable UUID firstTechId,
-                                 final boolean eliteFirst) {
-        List<Person> techs = new ArrayList<>();
+    public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
+        final List<Person> techs = getActivePersonnel().stream()
+                .filter(person -> person.isTech() && (!noZeroMinute || (person.getMinutesLeft() > 0)))
+                .collect(Collectors.toList());
 
-        // Get the first tech.
-        Person firstTech = getPerson(firstTechId);
-        if ((firstTech != null) && firstTech.isTech() && firstTech.getStatus().isActive()
-                && (!noZeroMinute || (firstTech.getMinutesLeft() > 0))) {
-            techs.add(firstTech);
-        }
-
-        for (final Person person : getActivePersonnel()) {
-            if (person.isTech() && !person.equals(firstTech)
-                    && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
-                techs.add(person);
-            }
-        }
         // also need to loop through and collect engineers on self-crewed vessels
         for (final Unit unit : getUnits()) {
             if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) && (unit.getEngineer() != null)) {
@@ -1933,11 +1919,10 @@ public class Campaign implements Serializable, ITechManager {
 
         techSorter = techSorter.thenComparing(new PersonTitleSorter());
 
-        if (firstTechId == null) {
-            techs.sort(techSorter);
-        } else if (techs.size() > 1) {
+        if (techs.size() > 1) {
             techs.subList(1, techs.size()).sort(techSorter);
         }
+
         return techs;
     }
 
