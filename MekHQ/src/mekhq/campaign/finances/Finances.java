@@ -19,6 +19,23 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.event.LoanDefaultedEvent;
+import mekhq.campaign.event.TransactionCreditEvent;
+import mekhq.campaign.event.TransactionDebitEvent;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
+import mekhq.io.FileType;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,26 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
-import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.io.FileType;
-import mekhq.campaign.personnel.Person;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.event.LoanDefaultedEvent;
-import mekhq.campaign.event.TransactionCreditEvent;
-import mekhq.campaign.event.TransactionDebitEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -211,9 +208,6 @@ public class Finances implements Serializable {
     }
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Accountant accountant = campaign.getAccountant();
-
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
             // clear the ledger
@@ -256,10 +250,10 @@ public class Finances implements Serializable {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {
-            if (campaignOptions.usePeacetimeCost()) {
-                if (!campaignOptions.showPeacetimeCost()) {
+            if (campaign.getCampaignOptions().usePeacetimeCost()) {
+                if (!campaign.getCampaignOptions().showPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = accountant.getPeacetimeCost(false);
+                    Money peacetimeCost = campaign.getAccountant().getPeacetimeCost(false);
 
                     if (debit(TransactionType.MAINTENANCE, today, peacetimeCost,
                             resourceMap.getString("PeacetimeCosts.title"))) {
@@ -271,9 +265,9 @@ public class Finances implements Serializable {
                                 String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
                     }
                 } else {
-                    Money sparePartsCost = accountant.getMonthlySpareParts();
-                    Money ammoCost = accountant.getMonthlyAmmo();
-                    Money fuelCost = accountant.getMonthlyFuel();
+                    Money sparePartsCost = campaign.getAccountant().getMonthlySpareParts();
+                    Money ammoCost = campaign.getAccountant().getMonthlyAmmo();
+                    Money fuelCost = campaign.getAccountant().getMonthlyFuel();
 
                     if (debit(TransactionType.MAINTENANCE, today, sparePartsCost,
                             resourceMap.getString("PeacetimeCostsParts.title"))) {
@@ -306,8 +300,8 @@ public class Finances implements Serializable {
                 }
             }
 
-            if (campaignOptions.payForSalaries()) {
-                Money payRollCost = accountant.getPayRoll();
+            if (campaign.getCampaignOptions().payForSalaries()) {
+                Money payRollCost = campaign.getAccountant().getPayRoll();
 
                 if (debit(TransactionType.SALARIES, today, payRollCost,
                         resourceMap.getString("Salaries.title"))) {
@@ -327,8 +321,8 @@ public class Finances implements Serializable {
             }
 
             // Handle overhead expenses
-            if (campaignOptions.payForOverhead()) {
-                Money overheadCost = accountant.getOverheadExpenses();
+            if (campaign.getCampaignOptions().payForOverhead()) {
+                Money overheadCost = campaign.getAccountant().getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost,
                         resourceMap.getString("Overhead.title"))) {
