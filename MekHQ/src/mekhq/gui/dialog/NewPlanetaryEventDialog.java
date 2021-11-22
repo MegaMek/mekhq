@@ -109,7 +109,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
-        this.date = campaign.getLocalDate();
+        this.date = campaign.getDate();
         initComponents(campaign);
         setLocationRelativeTo(parent);
         setUserPreferences();

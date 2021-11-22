@@ -196,7 +196,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
             }
-            if (p.getAge(campaign.getLocalDate()) >= 50) {
+            if (p.getAge(campaign.getDate()) >= 50) {
                 target.addModifier(1, "Over 50");
             }
             if (campaign.getCampaignOptions().getUseShareSystem()) {
@@ -270,7 +270,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         if (null != contract) {
             rollRequired.remove(contract.getId());
         }
-        lastRetirementRoll = campaign.getLocalDate();
+        lastRetirementRoll = campaign.getDate();
     }
 
     public LocalDate getLastRetirementRoll() {

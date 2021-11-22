@@ -64,7 +64,6 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -496,7 +495,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
-        this.date = campaign.getLocalDate();
+        this.date = campaign.getDate();
         this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
         this.iconCategory = campaign.getIconCategory();
@@ -5725,7 +5724,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             if (isStartup()) {
                 getCampaign().getForces().setName(getCampaign().getName());
             }
-            campaign.setLocalDate(date);
+            campaign.setDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
             campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());

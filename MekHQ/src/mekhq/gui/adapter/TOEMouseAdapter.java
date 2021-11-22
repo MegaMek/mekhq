@@ -243,11 +243,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnits();
-                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
 
-                    ServiceLogger.assignedTo(tech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                    ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
 
                     if (singleForce.getAllUnits(false) != null) {
                         String cantTech = "";
@@ -426,7 +426,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnits();
 
-                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
 
                 if (singleForce.getAllUnits(false) !=null) {
                     for (UUID uuid : singleForce.getAllUnits(false)) {

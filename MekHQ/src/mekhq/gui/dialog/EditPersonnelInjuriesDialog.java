@@ -152,7 +152,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void addEntry() {
-        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getLocalDate()));
+        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getDate()));
         eied.setAlwaysOnTop(true);
         eied.setVisible(true);
         if (null != eied.getEntry()) {

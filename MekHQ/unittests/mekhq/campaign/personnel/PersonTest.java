@@ -244,7 +244,7 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getDate()).thenReturn(LocalDate.now());
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
@@ -270,7 +270,7 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getDate()).thenReturn(LocalDate.now());
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
@@ -296,7 +296,7 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getDate()).thenReturn(LocalDate.now());
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
@@ -322,7 +322,7 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getDate()).thenReturn(LocalDate.now());
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 

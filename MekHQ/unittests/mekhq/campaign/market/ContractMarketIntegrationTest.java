@@ -165,9 +165,9 @@ public class ContractMarketIntegrationTest {
         when(existing.getEmployerCode()).thenReturn("FWL");
         when(existing.getEnemyCode()).thenReturn("CC");
         when(existing.getSystemId()).thenReturn("Sian");
-        when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
-        when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
-        when(existing.isActiveOn(campaign.getLocalDate(), false)).thenCallRealMethod();
+        when(existing.getStartDate()).thenReturn(campaign.getDate().minusDays(3000));
+        when(existing.getEndingDate()).thenReturn(campaign.getDate().plusDays(3000));
+        when(existing.isActiveOn(campaign.getDate(), false)).thenCallRealMethod();
         when(existing.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
         campaign.importMission(existing);
 

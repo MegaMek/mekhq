@@ -67,7 +67,7 @@ public class FileDialogs {
         String fileName = String.format(
                 "%s%s_ExportedPersonnel.prsx",
                 campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
+                campaign.getDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
@@ -168,7 +168,7 @@ public class FileDialogs {
         String fileName = String.format(
                 "%s%s_ExportedParts.parts",
                 campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
+                campaign.getDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value =  GUI.fileDialogSave(
                 frame,
@@ -237,7 +237,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
         String fileName = String.format("%s%s.%s", campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)),
+                campaign.getDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)),
                 MekHQ.getMekHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
         Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,

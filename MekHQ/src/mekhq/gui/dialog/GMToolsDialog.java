@@ -643,7 +643,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getBirthday()));
+                (getPerson() == null) ? getGUI().getCampaign().getDate() : getPerson().getBirthday()));
         setComboRATFaction(new MMComboBox<>("comboRATFaction", factionModel));
         getComboRATFaction().setSelectedIndex(0);
         gbc.gridx++;
@@ -788,7 +788,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getBirthday()));
+                (getPerson() == null) ? getGUI().getCampaign().getDate() : getPerson().getBirthday()));
         setComboNameGeneratorFaction(new MMComboBox<>("comboRATFaction", factionModel));
         getComboNameGeneratorFaction().setSelectedIndex(0);
         gbc.gridx++;
@@ -978,7 +978,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final DefaultComboBoxModel<ClanDisplay> originClanModel = new DefaultComboBoxModel<>();
         originClanModel.addAll(ClanDisplay.getSortedClanDisplays(Clan.getClans(),
-                getGUI().getCampaign().getLocalDate()));
+                getGUI().getCampaign().getDate()));
         setComboOriginClan(new MMComboBox<>("comboOriginClan", originClanModel));
         getComboOriginClan().setSelectedIndex(0);
         getComboOriginClan().addActionListener(evt -> validateBloodnameInput());
@@ -1155,7 +1155,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             getChkProcreationEligibilityType().setName("chkProcreationEligibilityType");
             getChkProcreationEligibilityType().addActionListener(evt -> {
                 final String reason = getGUI().getCampaign().getProcreation().canProcreate(
-                        getGUI().getCampaign().getLocalDate(), getPerson(),
+                        getGUI().getCampaign().getDate(), getPerson(),
                         getChkProcreationEligibilityType().isSelected());
                 lblEligibility.setText(resources.getString((reason == null) ? "True.text" : "False.text"));
                 lblEligibility.setToolTipText(reason);
@@ -1252,7 +1252,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final Clan clan = Clan.getClan((getGUI().getCampaign().getFaction().isClan()
                 ? getGUI().getCampaign().getFaction() : getPerson().getOriginFaction()).getShortName());
         if (clan != null) {
-            getComboOriginClan().setSelectedItem(new ClanDisplay(clan, getGUI().getCampaign().getLocalDate()));
+            getComboOriginClan().setSelectedItem(new ClanDisplay(clan, getGUI().getCampaign().getDate()));
         }
 
         getComboPhenotype().setSelectedItem(getPerson().getPhenotype());

@@ -429,10 +429,10 @@ public class Person implements Serializable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, getCampaign().getLocalDate(),
+                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, getCampaign().getLocalDate(),
+                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -440,19 +440,19 @@ public class Person implements Serializable {
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
                     if (getCampaign().getCampaignOptions().getUseTimeInService()) {
-                        setRecruitment(getCampaign().getLocalDate());
+                        setRecruitment(getCampaign().getDate());
                     }
                     if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
-                        setLastRankChangeDate(getCampaign().getLocalDate());
+                        setLastRankChangeDate(getCampaign().getDate());
                     }
                 }
 
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, getCampaign().getLocalDate(),
+                        ServiceLogger.freed(this, getCampaign().getDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.joined(this, getCampaign().getLocalDate(),
+                        ServiceLogger.joined(this, getCampaign().getDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -739,8 +739,8 @@ public class Person implements Serializable {
             setRecruitment(null);
             setLastRankChangeDate(null);
         } else if (getPrimaryRole().isDependent()) {
-            setRecruitment(getCampaign().getLocalDate());
-            setLastRankChangeDate(getCampaign().getLocalDate());
+            setRecruitment(getCampaign().getDate());
+            setLastRankChangeDate(getCampaign().getDate());
         }
 
         // Finally, we can set the primary role
@@ -938,9 +938,9 @@ public class Person implements Serializable {
                 if (getStatus().isMIA()) {
                     ServiceLogger.recoveredMia(this, today);
                 } else if (getStatus().isOnLeave()) {
-                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                    ServiceLogger.returnedFromLeave(this, campaign.getDate());
                 } else if (getStatus().isAWOL()) {
-                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
+                    ServiceLogger.returnedFromAWOL(this, campaign.getDate());
                 } else {
                     ServiceLogger.rehired(this, today);
                 }
@@ -953,10 +953,10 @@ public class Person implements Serializable {
                 }
                 break;
             case PREGNANCY_COMPLICATIONS:
-                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
+                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getDate(), this);
                 // purposeful fall through
             default:
-                ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
+                ServiceLogger.changedStatus(this, campaign.getDate(), status);
                 break;
         }
 
@@ -1076,7 +1076,7 @@ public class Person implements Serializable {
             return "";
         }
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today = campaign.getDate();
 
         // If the person is dead, we only care about how long they spent in service to the company
         if (getDateOfDeath() != null) {
@@ -1109,7 +1109,7 @@ public class Person implements Serializable {
             return "";
         }
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today = campaign.getDate();
 
         // If the person is dead, we only care about how long it was from their last promotion till they died
         if (getDateOfDeath() != null) {
@@ -1224,7 +1224,7 @@ public class Person implements Serializable {
     }
 
     public boolean oldEnoughToMarry(Campaign campaign) {
-        return (getAge(campaign.getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
+        return (getAge(campaign.getDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
     }
 
     public void randomMarriage(Campaign campaign) {
@@ -1266,7 +1266,7 @@ public class Person implements Serializable {
             return false;
         }
 
-        int ageDifference = Math.abs(p.getAge(campaign.getLocalDate()) - getAge(campaign.getLocalDate()));
+        int ageDifference = Math.abs(p.getAge(campaign.getDate()) - getAge(campaign.getDate()));
 
         return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
@@ -1873,7 +1873,7 @@ public class Person implements Serializable {
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    LocalDate now = c.getLocalDate();
+                    LocalDate now = c.getDate();
                     retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
                         .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
@@ -2088,7 +2088,7 @@ public class Person implements Serializable {
 
         if (campaign.getCampaignOptions().getUseTimeInRank()) {
             if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
-                setLastRankChangeDate(campaign.getLocalDate());
+                setLastRankChangeDate(campaign.getDate());
             } else {
                 setLastRankChangeDate(null);
             }
@@ -2099,9 +2099,9 @@ public class Person implements Serializable {
         if (report) {
             if ((rankNumeric > oldRankNumeric)
                     || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(this, campaign.getLocalDate());
+                ServiceLogger.promotedTo(this, campaign.getDate());
             } else if ((rankNumeric < oldRankNumeric) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(this, campaign.getLocalDate());
+                ServiceLogger.demotedTo(this, campaign.getDate());
             }
         }
     }

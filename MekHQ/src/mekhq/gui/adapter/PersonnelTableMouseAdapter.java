@@ -293,10 +293,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
                         .filter(person -> (gui.getCampaign().getProcreation().canProcreate(
-                                gui.getCampaign().getLocalDate(), person, false) == null))
+                                gui.getCampaign().getDate(), person, false) == null))
                         .forEach(person -> {
                             gui.getCampaign().getProcreation().addPregnancy(
-                                    gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
+                                    gui.getCampaign(), gui.getCampaign().getDate(), person);
                             MekHQ.triggerEvent(new PersonChangedEvent(person));
                 });
                 break;
@@ -324,7 +324,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_AWARD: {
                 for (Person person : people) {
                     person.getAwardController().addAndLogAward(gui.getCampaign(), data[1], data[2],
-                            gui.getCampaign().getLocalDate());
+                            gui.getCampaign().getDate());
                 }
                 break;
             }
@@ -336,7 +336,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     (data.length > 3)
                                             ? MekHQ.getMekHQOptions().parseDisplayFormattedDate(data[3])
                                             : null,
-                                    gui.getCampaign().getLocalDate());
+                                    gui.getCampaign().getDate());
                         }
                     } catch (Exception e) {
                         MekHQ.getLogger().error("Could not remove award.", e);
@@ -352,7 +352,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
 
                 PersonalLogger.improvedSkill(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), selectedPerson.getSkill(type).getType().getName(),
+                        gui.getCampaign().getDate(), selectedPerson.getSkill(type).getType().getName(),
                         selectedPerson.getSkill(type).toString());
                 gui.getCampaign().addReport(String.format(resources.getString("improved.format"),
                         selectedPerson.getHyperlinkedName(), type));
@@ -369,13 +369,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 selectedPerson.changeEdge(1);
                                 selectedPerson.changeCurrentEdge(1);
                                 PersonalLogger.gainedEdge(gui.getCampaign(), selectedPerson,
-                                        gui.getCampaign().getLocalDate());
+                                        gui.getCampaign().getDate());
                                 gui.getCampaign().addReport(String.format(resources.getString("gainedEdge.format"),
                                         selectedPerson.getHyperlinkedName()));
                             }
                         } else {
                             PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                                    gui.getCampaign().getLocalDate(), spa);
+                                    gui.getCampaign().getDate(), spa);
                             gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                                     selectedPerson.getHyperlinkedName(), spa));
                         }
@@ -392,7 +392,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -407,7 +407,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -422,7 +422,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -437,7 +437,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -452,7 +452,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -468,7 +468,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(ability), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                        gui.getCampaign().getLocalDate(), displayName);
+                        gui.getCampaign().getDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("spaGainedChoices.format"),
                         selectedPerson.getHyperlinkedName(), displayName));
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -480,7 +480,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resources.getString("confirmRetireQ.format"), person.getFullTitle()),
                             status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
-                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), status);
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getDate(), status);
                     }
                 }
                 break;
@@ -706,7 +706,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     // Make the new edge point available to support personnel, but don't reset until
                     // the week ends
                     person.changeCurrentEdge(1);
-                    PersonalLogger.gainedEdge(gui.getCampaign(), person, gui.getCampaign().getLocalDate());
+                    PersonalLogger.gainedEdge(gui.getCampaign(), person, gui.getCampaign().getDate());
                     gui.getCampaign().addReport(String.format(resources.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName()));
                     gui.getCampaign().personUpdated(person);
                 }
@@ -725,7 +725,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setEdge(i);
                     //Reset currentEdge for support people
                     person.resetCurrentEdge();
-                    PersonalLogger.changedEdge(gui.getCampaign(), person, gui.getCampaign().getLocalDate());
+                    PersonalLogger.changedEdge(gui.getCampaign(), person, gui.getCampaign().getDate());
                     gui.getCampaign().personUpdated(person);
                 }
                 break;
@@ -736,11 +736,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (people.length > 1) {
                     nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, null,
                             (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
-                            gui.getCampaign().getLocalDate());
+                            gui.getCampaign().getDate());
                 } else {
                     nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, selectedPerson.getId(),
                             (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
-                            gui.getCampaign().getLocalDate());
+                            gui.getCampaign().getDate());
                 }
                 nkd.setVisible(true);
                 if (nkd.getKill().isPresent()) {
@@ -773,7 +773,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_LOG_ENTRY: {
                 final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
-                        gui.getFrame(), null, gui.getCampaign().getLocalDate());
+                        gui.getFrame(), null, gui.getCampaign().getDate());
                 if (addPersonnelLogDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
                         person.addLogEntry(addPersonnelLogDialog.getEntry().clone());
@@ -790,7 +790,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_MISSION_ENTRY: {
                 AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(
-                        gui.getFrame(), true, gui.getCampaign().getLocalDate());
+                        gui.getFrame(), true, gui.getCampaign().getDate());
                 addMissionDialog.setVisible(true);
                 Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
                 if (missionEntry.isPresent()) {
@@ -1197,7 +1197,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
                 JMenu spouseMenu;
 
-                LocalDate today = gui.getCampaign().getLocalDate();
+                LocalDate today = gui.getCampaign().getDate();
 
                 List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
                 personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
@@ -2174,7 +2174,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
-                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
+                        .canProcreate(gui.getCampaign().getDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);

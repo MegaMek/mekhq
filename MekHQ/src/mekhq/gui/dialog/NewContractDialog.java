@@ -679,7 +679,7 @@ public class NewContractDialog extends JDialog {
         contract.setType(txtType.getText());
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
-        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getDate(),
                 contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
 
         campaign.addMission(contract);
@@ -698,7 +698,7 @@ public class NewContractDialog extends JDialog {
         DateChooser dc = new DateChooser(frame, contract.getStartDate());
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            if (campaign.getLocalDate().isAfter(dc.getDate())) {
+            if (campaign.getDate().isAfter(dc.getDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a start date before the current date.",
                         "Invalid date",
@@ -739,7 +739,7 @@ public class NewContractDialog extends JDialog {
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
             contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    campaign.getLocalDate())).getId());
+                    campaign.getDate())).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
         } else if (choiceOverhead.equals(source)) {

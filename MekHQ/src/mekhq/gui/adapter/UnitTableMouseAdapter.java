@@ -384,7 +384,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
                 gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
-                        gui.getCampaign().getLocalDate(), refundAmount,
+                        gui.getCampaign().getDate(), refundAmount,
                         "refund for cancelled equipment sale");
             }
         } else if (command.equals(COMMAND_ARRIVE)) {

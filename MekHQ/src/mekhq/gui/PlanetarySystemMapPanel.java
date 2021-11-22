@@ -53,11 +53,9 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
 import megamek.common.util.ImageUtil;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -210,13 +208,13 @@ public class PlanetarySystemMapPanel extends JPanel {
                 if (null != imgZenithPoint) {
                     g2.drawImage(imgZenithPoint, zenithX, zenithY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
-                if (system.isZenithCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
+                if (system.isZenithCharge(campaign.getDate()) && (null != imgRechargeStation)) {
                     drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY+12, rechargeImgSize, rechargeImgSize);
                 }
                 if (null != imgNadirPoint) {
                     g2.drawImage(imgNadirPoint, nadirX, nadirY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
-                if (system.isNadirCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
+                if (system.isNadirCharge(campaign.getDate()) && (null != imgRechargeStation)) {
                     drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY+12, rechargeImgSize, rechargeImgSize);
                 }
 
@@ -312,7 +310,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         //draw the planet icon
                         Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p)); // TODO : Remove inline file path
                         g2.drawImage(planetIcon, x-radius, y-radius, diameter, diameter, null);
-                        final String planetName = p.getPrintableName(campaign.getLocalDate());
+                        final String planetName = p.getPrintableName(campaign.getDate());
 
                         //planet name
                         g2.setColor(Color.WHITE);
@@ -422,7 +420,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         //start with 16
         int fontSize = 16;
         g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
-        while (areNamesTooBig(g, system, campaign.getLocalDate(), limit) && fontSize >= 10) {
+        while (areNamesTooBig(g, system, campaign.getDate(), limit) && fontSize >= 10) {
             fontSize--;
             g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
         }

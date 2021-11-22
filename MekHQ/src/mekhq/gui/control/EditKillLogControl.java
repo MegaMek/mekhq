@@ -108,7 +108,7 @@ public class EditKillLogControl extends JPanel {
 
     private void addKill() {
         AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true,
-                person.getId(), "", campaign.getLocalDate());
+                person.getId(), "", campaign.getDate());
         dialog.setVisible(true);
         if (dialog.getKill().isPresent()) {
             campaign.addKill(dialog.getKill().get());

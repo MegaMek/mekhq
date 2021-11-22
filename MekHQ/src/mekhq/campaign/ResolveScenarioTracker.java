@@ -479,7 +479,7 @@ public class ResolveScenarioTracker {
                                     + " when trying to assign kills");
                             continue;
                         }
-                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate()));
+                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getDate()));
                     }
                 }
             }
@@ -1382,16 +1382,16 @@ public class ResolveScenarioTracker {
 
             if (status.wasDeployed()) {
                 person.awardXP(campaign, status.getXP());
-                ServiceLogger.participatedInMission(person, campaign.getLocalDate(),
+                ServiceLogger.participatedInMission(person, campaign.getDate(),
                         scenario.getName(), mission.getName());
             }
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
             if (status.isMissing()) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
+                person.changeStatus(getCampaign(), getCampaign().getDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
+                person.changeStatus(getCampaign(), getCampaign().getDate(), PersonnelStatus.KIA);
                 if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person, true,
                             campaign, (AtBContract) mission);
@@ -1445,7 +1445,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1457,7 +1457,7 @@ public class ResolveScenarioTracker {
         }
 
         if (prisonerRansoms.isGreaterThan(Money.zero())) {
-            getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getLocalDate(),
+            getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getDate(),
                     prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
             getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
                     + " has been credited to your account for prisoner ransoms following "
@@ -1483,7 +1483,7 @@ public class ResolveScenarioTracker {
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
                     campaign.getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                            getCampaign().getLocalDate(), value,
+                            getCampaign().getDate(), value,
                             "Battle loss compensation for " + unit.getName());
                     campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for "
                             + unit.getName() + " has been credited to your account.");
@@ -1528,7 +1528,7 @@ public class ResolveScenarioTracker {
                 if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
                     getCampaign().getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                            getCampaign().getLocalDate(), finalValue,
+                            getCampaign().getDate(), finalValue,
                             blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
                     campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
                 }
@@ -1557,7 +1557,7 @@ public class ResolveScenarioTracker {
             }
 
             if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
+                getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getDate(),
                         unitRansoms, "Unit ransoms for " + getScenario().getName());
                 getCampaign().addReport(unitRansoms.toAmountAndNameString()
                         + " has been credited to your account from unit ransoms following "
@@ -1575,7 +1575,7 @@ public class ResolveScenarioTracker {
             }
             if (((Contract) mission).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(TransactionType.SALVAGE_EXCHANGE, getCampaign().getLocalDate(),
+                campaign.getFinances().credit(TransactionType.SALVAGE_EXCHANGE, getCampaign().getDate(),
                         value, "Salvage exchange for " + scenario.getName());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
@@ -1603,7 +1603,7 @@ public class ResolveScenarioTracker {
         //lets reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
-        scenario.setDate(campaign.getLocalDate());
+        scenario.setDate(campaign.getDate());
         client = null;
     }
 

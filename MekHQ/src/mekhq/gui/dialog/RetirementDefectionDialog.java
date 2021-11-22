@@ -153,7 +153,7 @@ public class RetirementDefectionDialog extends JDialog {
             if (null == contract) {
                 instructions += "\n\nDays since last retirement roll: "
                         + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
-                        hqView.getCampaign().getLocalDate());
+                        hqView.getCampaign().getDate());
             }
             txtInstructions.setText(instructions);
         } else {
@@ -455,7 +455,7 @@ public class RetirementDefectionDialog extends JDialog {
                 }
                 if (getTotalBonus().isPositive()) {
                     hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
-                            hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
+                            hqView.getCampaign().getDate(), getTotalBonus(), "Bonus Payments");
                 }
             } else if (ev.getSource().equals(btnDone)) {
                 for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {

@@ -89,7 +89,7 @@ public final class InjuryUtil {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
         newInjuries.forEach(person::addInjury);
         if (newInjuries.size() > 0) {
-            MedicalLogger.returnedWithInjuries(person, c.getLocalDate(), newInjuries);
+            MedicalLogger.returnedWithInjuries(person, c.getDate(), newInjuries);
         }
     }
 
@@ -294,7 +294,7 @@ public final class InjuryUtil {
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
-                            MedicalLogger.docMadeAMistake(doc, p, i, c.getLocalDate());
+                            MedicalLogger.docMadeAMistake(doc, p, i, c.getDate());
 
                             // TODO: Add in special handling of the critical
                             //if (rnd.applyAsInt(100) < (fumbleLimit / 4)) {
@@ -309,7 +309,7 @@ public final class InjuryUtil {
                                 doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
                         rnd -> {
                             i.setTime(i.getTime() - critTimeReduction);
-                            MedicalLogger.docAmazingWork(doc, p, i, c.getLocalDate(), critTimeReduction);
+                            MedicalLogger.docAmazingWork(doc, p, i, c.getDate(), critTimeReduction);
                         }));
                 } else {
                     final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
@@ -323,12 +323,12 @@ public final class InjuryUtil {
                                 doc.awardXP(c, taskXP);
                                 doc.setNTasks(0);
 
-                                ServiceLogger.gainedXpFromMedWork(doc, c.getLocalDate(), taskXP);
+                                ServiceLogger.gainedXpFromMedWork(doc, c.getDate(), taskXP);
                             } else {
                                 doc.setNTasks(doc.getNTasks() + 1);
                             }
                             i.setWorkedOn(true);
-                            MedicalLogger.successfullyTreated(doc, p, c.getLocalDate(), i);
+                            MedicalLogger.successfullyTreated(doc, p, c.getDate(), i);
                             Unit u = p.getUnit();
                             if (null != u) {
                                 u.resetPilotAndEntity();
@@ -366,9 +366,9 @@ public final class InjuryUtil {
                 rnd -> {
                     if (xp > 0) {
                         doc.awardXP(c, xp);
-                        ServiceLogger.successfullyTreatedWithXp(doc, p, c.getLocalDate(), injuries, xp);
+                        ServiceLogger.successfullyTreatedWithXp(doc, p, c.getDate(), injuries, xp);
                     } else {
-                        ServiceLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
+                        ServiceLogger.successfullyTreated(doc, p, c.getDate(), injuries);
                     }
                     p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
                 }));
@@ -401,10 +401,10 @@ public final class InjuryUtil {
                             i.setTime(0);
                             if (rnd.applyAsInt(6) == 0) {
                                 i.setPermanent(true);
-                                MedicalLogger.injuryDidntHealProperly(p, c.getLocalDate(), i);
+                                MedicalLogger.injuryDidntHealProperly(p, c.getDate(), i);
                             } else {
                                 p.removeInjury(i);
-                                MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
+                                MedicalLogger.injuryHealed(p, c.getDate(), i);
                             }
                         }));
                 } else {
@@ -413,7 +413,7 @@ public final class InjuryUtil {
                         rnd -> {
                             i.setTime(0);
                             p.removeInjury(i);
-                            MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
+                            MedicalLogger.injuryHealed(p, c.getDate(), i);
                         }));
                 }
             } else if (i.getTime() > 1) {
@@ -425,7 +425,7 @@ public final class InjuryUtil {
                     String.format("%s becomes permanent", i.getName()),
                     rnd -> {
                         i.setTime(0);
-                        MedicalLogger.injuryBecamePermanent(p, c.getLocalDate(), i);
+                        MedicalLogger.injuryBecamePermanent(p, c.getDate(), i);
                     }));
             }
         });
@@ -435,17 +435,17 @@ public final class InjuryUtil {
                     boolean dismissed = false;
                     if (p.getStatus().isDead()) {
                         dismissed = true;
-                        MedicalLogger.diedInInfirmary(p, c.getLocalDate());
+                        MedicalLogger.diedInInfirmary(p, c.getDate());
                     } else if (p.getStatus().isMIA()) {
                         // What? How?
                         dismissed = true;
-                        MedicalLogger.abductedFromInfirmary(p, c.getLocalDate());
+                        MedicalLogger.abductedFromInfirmary(p, c.getDate());
                     } else if (p.getStatus().isRetired()) {
                         dismissed = true;
-                        MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getLocalDate());
+                        MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getDate());
                     } else if (!p.needsFixing()) {
                         dismissed = true;
-                        MedicalLogger.dismissedFromInfirmary(p, c.getLocalDate());
+                        MedicalLogger.dismissedFromInfirmary(p, c.getDate());
                     }
 
                     if (dismissed) {

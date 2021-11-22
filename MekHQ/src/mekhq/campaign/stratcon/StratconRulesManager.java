@@ -462,7 +462,7 @@ public class StratconRulesManager {
 
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
-        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        track.assignForce(forceID, coords, campaign.getDate(), sticky);
         MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
     }
 
@@ -579,15 +579,15 @@ public class StratconRulesManager {
 
         // set up dates for the scenario if doesn't have them already
         if (scenario.getDeploymentDate() == null) {
-            scenario.setDeploymentDate(campaign.getLocalDate());
+            scenario.setDeploymentDate(campaign.getDate());
         }
 
         if (scenario.getActionDate() == null) {
-            scenario.setActionDate(campaign.getLocalDate());
+            scenario.setActionDate(campaign.getDate());
         }
 
         if (scenario.getReturnDate() == null) {
-            scenario.setReturnDate(campaign.getLocalDate().plusDays(trackState.getDeploymentTime()));
+            scenario.setReturnDate(campaign.getDate().plusDays(trackState.getDeploymentTime()));
         }
 
         // set the # of rerolls based on the actual lance assigned.
@@ -678,7 +678,7 @@ public class StratconRulesManager {
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                 for (StratconScenario scenario : track.getScenarios().values()) {
                     if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                            && campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
+                            && campaign.getDate().equals(scenario.getDeploymentDate())) {
                         // "scenario name, track name"
                         sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
                     }
@@ -915,9 +915,9 @@ public class StratconRulesManager {
                 + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
         int returnDay = deploymentDay + track.getDeploymentTime();
 
-        LocalDate deploymentDate = campaign.getLocalDate().plusDays(deploymentDay);
-        LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
-        LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
+        LocalDate deploymentDate = campaign.getDate().plusDays(deploymentDay);
+        LocalDate battleDate = campaign.getDate().plusDays(battleDay);
+        LocalDate returnDate = campaign.getDate().plusDays(returnDay);
 
         scenario.setDeploymentDate(deploymentDate);
         scenario.setActionDate(battleDate);
@@ -1465,7 +1465,7 @@ public class StratconRulesManager {
      */
     public static void processTrackForceReturnDates(StratconTrackState track, Campaign campaign) {
         List<Integer> forcesToUndeploy = new ArrayList<>();
-        LocalDate date = campaign.getLocalDate();
+        LocalDate date = campaign.getDate();
 
         // for each force on the track, if the return date is today or in the past,
         // and the scenario has not yet occurred, undeploy it.
@@ -1589,7 +1589,7 @@ public class StratconRulesManager {
         if (!ev.getCampaign().getCampaignOptions().getUseStratCon()) {
             return;
         }
-        boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isMonday = ev.getCampaign().getDate().getDayOfWeek() == DayOfWeek.MONDAY;
 
         // run scenario generation routine for every track attached to an active contract
         for (AtBContract contract : ev.getCampaign().getActiveAtBContracts()) {
@@ -1611,7 +1611,7 @@ public class StratconRulesManager {
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {
                         if ((scenario.getDeploymentDate() != null) &&
-                                scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate()) &&
+                                scenario.getDeploymentDate().isBefore(ev.getCampaign().getDate()) &&
                                 scenario.getPrimaryForceIDs().isEmpty()) {
                             processIgnoredScenario(scenario, campaignState);
                         }

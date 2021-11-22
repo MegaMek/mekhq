@@ -434,7 +434,7 @@ public class ContractMarketDialog extends JDialog {
     private void acceptContract(ActionEvent evt) {
         if (selectedContract != null) {
             selectedContract.setName(contractView.getContractName());
-            campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+            campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getDate(),
                     selectedContract.getTotalAdvanceAmount(),
                     "Advance funds for " + selectedContract.getName());
             campaign.addMission(selectedContract);

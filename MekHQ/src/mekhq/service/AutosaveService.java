@@ -47,7 +47,7 @@ public class AutosaveService implements IAutosaveService {
     public void requestDayAdvanceAutosave(Campaign campaign) {
         assert campaign != null;
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today = campaign.getDate();
 
         if (MekHQ.getMekHQOptions().getAutosaveDailyValue()) {
             this.performAutosave(campaign);
@@ -122,7 +122,7 @@ public class AutosaveService implements IAutosaveService {
                         "Autosave-%d-%s-%s.cpnx.gz",
                         index++,
                         campaign.getName(),
-                        campaign.getLocalDate().format(DateTimeFormatter.ofPattern(
+                        campaign.getDate().format(DateTimeFormatter.ofPattern(
                                 MekHqConstants.FILENAME_DATE_FORMAT)));
 
                 repeatedName = false;

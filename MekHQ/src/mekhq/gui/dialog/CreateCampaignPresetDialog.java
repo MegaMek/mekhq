@@ -94,7 +94,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
         setPreset(preset);
-        setDate(campaign.getLocalDate());
+        setDate(campaign.getDate());
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
                 ? campaign.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
@@ -391,7 +391,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
             final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
             final PlanetarySystem startingSystem = getComboStartingSystem().getSelectedItem();
             if ((factionDisplay == null) || (startingSystem == null)
-                    || !startingSystem.getFactionSet(getCampaign().getLocalDate()).contains(factionDisplay.getFaction())) {
+                    || !startingSystem.getFactionSet(getCampaign().getDate()).contains(factionDisplay.getFaction())) {
                 restoreComboStartingSystem();
             }
         });
@@ -405,7 +405,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
-                    setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
+                    setText(((PlanetarySystem) value).getName(getCampaign().getDate()));
                 }
                 return this;
             }
@@ -428,7 +428,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
-                    setText(((Planet) value).getName(getCampaign().getLocalDate()));
+                    setText(((Planet) value).getName(getCampaign().getDate()));
                 }
                 return this;
             }
@@ -684,8 +684,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     private PlanetarySystem[] getPlanetarySystems(final @Nullable FactionDisplay faction) {
         return getCampaign().getSystems().stream()
-                .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction.getFaction()))
-                .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
+                .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getDate()).contains(faction.getFaction()))
+                .sorted(Comparator.comparing(p -> p.getName(getCampaign().getDate())))
                 .collect(Collectors.toList()).toArray(new PlanetarySystem[]{});
     }
 

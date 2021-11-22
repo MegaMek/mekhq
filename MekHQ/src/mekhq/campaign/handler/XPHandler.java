@@ -45,7 +45,7 @@ public class XPHandler {
     @Subscribe
     public void processAdminXP(NewDayEvent event) {
         final Campaign campaign = event.getCampaign();
-        if ((adminXP <= 0) || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.MONDAY)) {
+        if ((adminXP <= 0) || (campaign.getDate().getDayOfWeek() != DayOfWeek.MONDAY)) {
             return;
         }
         for (Person person : campaign.getAdmins()) {

@@ -152,7 +152,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         if ((cachedPlanets == null)
                 || !cachedPlanets.containsKey(faction)
                 || !cachedSystem.equals(campaign.getCurrentSystem())
-                || campaign.getLocalDate().isAfter(cachedDate)) {
+                || campaign.getDate().isAfter(cachedDate)) {
             createLookupMap(campaign, faction);
         }
 
@@ -173,7 +173,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     }
 
     private void createLookupMap(Campaign campaign, Faction faction) {
-        LocalDate now = campaign.getLocalDate();
+        LocalDate now = campaign.getDate();
 
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 

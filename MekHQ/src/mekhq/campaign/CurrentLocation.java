@@ -160,7 +160,7 @@ public class CurrentLocation implements Serializable {
      *         otherwise false.
      */
     public boolean isRecharging(Campaign campaign) {
-        return currentSystem.getRechargeTime(campaign.getLocalDate()) > 0;
+        return currentSystem.getRechargeTime(campaign.getDate()) > 0;
     }
 
     /**
@@ -169,7 +169,7 @@ public class CurrentLocation implements Serializable {
      * @param campaign The campaign object which owns the JumpShip.
      */
     public void setRecharged(Campaign campaign) {
-        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate());
+        rechargeTime = currentSystem.getRechargeTime(campaign.getDate());
     }
 
     /**
@@ -180,7 +180,7 @@ public class CurrentLocation implements Serializable {
         //recharge even if there is no jump path
         //because JumpShips don't go anywhere
         double hours = 24.0;
-        double neededRechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate());
+        double neededRechargeTime = currentSystem.getRechargeTime(campaign.getDate());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
             campaign.addReport("JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0) + " hours recharging drives");
@@ -207,18 +207,18 @@ public class CurrentLocation implements Serializable {
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 //jump
                 if (campaign.getCampaignOptions().payForTransport()) {
-                    if (!campaign.getFinances().debit(TransactionType.TRANSPORTATION, campaign.getLocalDate(),
+                    if (!campaign.getFinances().debit(TransactionType.TRANSPORTATION, campaign.getDate(),
                             campaign.calculateCostPerJump(
                                     true, campaign.getCampaignOptions().useEquipmentContractBase()),
-                            "Jump from " + currentSystem.getName(campaign.getLocalDate())
-                                    + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
+                            "Jump from " + currentSystem.getName(campaign.getDate())
+                                    + " to " + jumpPath.get(1).getName(campaign.getDate()))) {
                         campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }
                 }
-                campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(campaign.getLocalDate()));
+                campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(campaign.getDate()));
                 currentSystem = jumpPath.get(1);
-                jumpZenith = pickJumpPoint(campaign.getLocalDate());
+                jumpZenith = pickJumpPoint(campaign.getDate());
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
                 //reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
@@ -242,7 +242,7 @@ public class CurrentLocation implements Serializable {
             campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0) + " hours transiting into system");
             transitTime -= usedTransitTime/24.0;
             if (transitTime <= 0) {
-                campaign.addReport(jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                campaign.addReport(jumpPath.getLastSystem().getPrintableName(campaign.getDate()) + " reached.");
                 //we are here!
                 transitTime = 0;
                 jumpPath = null;

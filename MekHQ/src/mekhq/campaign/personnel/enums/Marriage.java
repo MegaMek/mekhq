@@ -192,15 +192,15 @@ public enum Marriage {
         spouse.getGenealogy().setSpouse(origin);
 
         // Then we do the logging
-        PersonalLogger.marriage(origin, spouse, campaign.getLocalDate());
-        PersonalLogger.marriage(spouse, origin, campaign.getLocalDate());
+        PersonalLogger.marriage(origin, spouse, campaign.getDate());
+        PersonalLogger.marriage(spouse, origin, campaign.getDate());
 
         if (campaign.getCampaignOptions().logMarriageNameChange()) {
             if (!spouse.getSurname().equals(spouseSurname)) {
-                PersonalLogger.marriageNameChange(spouse, origin, campaign.getLocalDate());
+                PersonalLogger.marriageNameChange(spouse, origin, campaign.getDate());
             }
             if (!origin.getSurname().equals(surname)) {
-                PersonalLogger.marriageNameChange(origin, spouse, campaign.getLocalDate());
+                PersonalLogger.marriageNameChange(origin, spouse, campaign.getDate());
             }
         }
 

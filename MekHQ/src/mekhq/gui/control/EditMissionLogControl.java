@@ -107,7 +107,7 @@ public class EditMissionLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign.getLocalDate());
+        AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign.getDate());
         dialog.setVisible(true);
         if (dialog.getEntry().isPresent()) {
             person.addMissionLogEntry(dialog.getEntry().get());

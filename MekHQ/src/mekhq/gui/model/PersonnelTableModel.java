@@ -403,7 +403,7 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_GENDER:
                 return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(p.getGender());
             case COL_AGE:
-                return Integer.toString(p.getAge(getCampaign().getLocalDate()));
+                return Integer.toString(p.getAge(getCampaign().getDate()));
             case COL_STATUS:
                 return p.getStatus();
             case COL_TYPE:
@@ -647,7 +647,7 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_ORIGIN_PLANET:
                 Planet originPlanet = p.getOriginPlanet();
                 if (originPlanet != null) {
-                    return originPlanet.getName(getCampaign().getLocalDate());
+                    return originPlanet.getName(getCampaign().getDate());
                 }
                 break;
             case COL_RECRUIT_DATE:

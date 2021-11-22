@@ -62,9 +62,9 @@ public class AtBEventProcessor {
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
         if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
-                && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+                && (ev.getCampaign().getDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
             if (ev.getCampaign().getFinances().debit(TransactionType.RECRUITMENT,
-                    ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
+                    ev.getCampaign().getDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");

@@ -625,7 +625,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblLocation, gridBagConstraints);
 
         txtLocation.setName("txtLocation"); // NOI18N
-        String systemName = contract.getSystemName(campaign.getLocalDate());
+        String systemName = contract.getSystemName(campaign.getDate());
         txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {

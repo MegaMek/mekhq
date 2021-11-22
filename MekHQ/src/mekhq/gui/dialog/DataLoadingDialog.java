@@ -203,7 +203,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
-                        ? campaign.getLocalDate() : preset.getDate();
+                        ? campaign.getDate() : preset.getDate();
 
                 // show the date chooser
                 final DateChooser dc = new DateChooser(frame, date);
@@ -220,7 +220,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setGameOptions(preset.getGameOptions());
                 }
 
-                campaign.setLocalDate(dc.getDate());
+                campaign.setDate(dc.getDate());
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
@@ -235,7 +235,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     return campaign; // shouldn't be required, but this ensures no further code runs
                 }
 
-                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getDate()) + "</b>");
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
                 //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());

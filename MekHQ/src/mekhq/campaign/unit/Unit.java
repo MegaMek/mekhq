@@ -4154,9 +4154,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4173,9 +4173,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4192,9 +4192,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4211,9 +4211,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4234,9 +4234,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4250,7 +4250,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         ensurePersonIsRegistered(p);
         tech = p;
         p.addTechUnit(this);
-        ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+        ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
 
@@ -4287,9 +4287,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(p, getCampaign().getDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(p, getCampaign().getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4327,7 +4327,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         if (log) {
-            ServiceLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFrom(person, getCampaign().getDate(), getName());
         }
     }
 

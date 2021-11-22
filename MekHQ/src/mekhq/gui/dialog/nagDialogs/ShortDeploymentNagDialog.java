@@ -38,7 +38,7 @@ public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
     protected boolean checkNag(final Campaign campaign) {
         if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
                 || !campaign.getLocation().isOnPlanet()
-                || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
+                || (campaign.getDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
             return false;
         }
 

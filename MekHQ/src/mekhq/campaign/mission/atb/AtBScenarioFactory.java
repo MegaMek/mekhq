@@ -199,7 +199,7 @@ public class AtBScenarioFactory {
                     // different contract, those not assigned to a contract, or for illegible lances
                     if (assignedLances.contains(lance.getForceId()) || (lance.getContract(c) == null)
                             || !lance.isEligible(c) || (lance.getMissionId() != contract.getId())
-                            || !lance.getContract(c).isActiveOn(c.getLocalDate(), true)) {
+                            || !lance.getContract(c).isActiveOn(c.getDate(), true)) {
                         continue;
                     }
 
@@ -267,7 +267,7 @@ public class AtBScenarioFactory {
                 if (!lList.isEmpty()) {
                     Lance lance = Utilities.getRandomItem(lList);
                     AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
-                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
+                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getDate()));
                     if (atbScenario != null) {
                         if ((lance.getMissionId() == atbScenario.getMissionId())
                                 || (lance.getMissionId() == Lance.NO_MISSION)) {

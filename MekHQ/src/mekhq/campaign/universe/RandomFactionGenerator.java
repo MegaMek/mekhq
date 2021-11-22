@@ -99,7 +99,7 @@ public class RandomFactionGenerator {
     }
 
     public void startup(Campaign c) {
-        borderTracker.setDate(c.getLocalDate());
+        borderTracker.setDate(c.getDate());
         final PlanetarySystem location = c.getLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
         borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());

@@ -200,7 +200,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblLocation, gridBagConstraintsLabels);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                contract.getSystemName(campaign.getLocalDate())));
+                contract.getSystemName(campaign.getDate())));
         txtLocation.setName("txtLocation");
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {

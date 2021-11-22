@@ -90,7 +90,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
             gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
-                    gui.getCampaign().getLocalDate(), refundAmount,
+                    gui.getCampaign().getDate(), refundAmount,
                     "refund for cancelled equipment sale");
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {

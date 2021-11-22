@@ -556,11 +556,11 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void checkEvents(Campaign c) {
-        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (c.getDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             nextWeekBattleTypeMod = 0;
         }
 
-        if (c.getLocalDate().getDayOfMonth() == 1) {
+        if (c.getDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
                 partsAvailabilityLevel++;
                 priorLogisticsFailure = false;
@@ -573,7 +573,7 @@ public class AtBContract extends Contract implements Serializable {
                     break;
                 case EVT_SPECIALMISSION:
                     c.addReport("<b>Special Event:</b> Special mission this month");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getDate());
                     specialEventScenarioType = getContractType().generateSpecialMissionType(c);
                     break;
                 case EVT_CIVILDISTURBANCE:
@@ -586,7 +586,7 @@ public class AtBContract extends Contract implements Serializable {
                     break;
                 case EVT_REBELLION:
                     c.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getDate());
                     specialEventScenarioType = AtBScenario.CIVILIANRIOT;
                     break;
                 case EVT_BETRAYAL:
@@ -640,7 +640,7 @@ public class AtBContract extends Contract implements Serializable {
                             break;
                         case 2:
                             text += "Internal Dissension";
-                            specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                            specialEventScenarioDate = getRandomDayOfMonth(c.getDate());
                             specialEventScenarioType = AtBScenario.AMBUSH;
                             break;
                         case 3:
@@ -668,7 +668,7 @@ public class AtBContract extends Contract implements Serializable {
                     break;
                 case EVT_BIGBATTLE:
                     c.addReport("<b>Special Event:</b> Big battle this month");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getDate());
                     specialEventScenarioType = getContractType().generateBigBattleType();
                     break;
             }
@@ -680,8 +680,8 @@ public class AtBContract extends Contract implements Serializable {
          * or big battle event is rolled.
          */
         if ((specialEventScenarioDate != null)
-                && !specialEventScenarioDate.isBefore(c.getLocalDate())) {
-            LocalDate nextMonday = c.getLocalDate().plusDays(8 - c.getLocalDate().getDayOfWeek().getValue());
+                && !specialEventScenarioDate.isBefore(c.getDate())) {
+            LocalDate nextMonday = c.getDate().plusDays(8 - c.getDate().getDayOfWeek().getValue());
 
             if (specialEventScenarioDate.isBefore(nextMonday)) {
                 AtBScenario s = AtBScenarioFactory.createScenario(c, null,
@@ -708,7 +708,7 @@ public class AtBContract extends Contract implements Serializable {
         }
 
         final String warName = RandomFactionGenerator.getInstance().getFactionHints().getCurrentWar(
-                getEmployerFaction(), getEnemy(), campaign.getLocalDate());
+                getEmployerFaction(), getEnemy(), campaign.getDate());
         if (warName == null) {
             return false;
         }

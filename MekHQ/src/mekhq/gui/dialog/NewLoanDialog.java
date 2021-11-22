@@ -105,7 +105,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
         IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
-        loan = Loan.getBaseLoan(rating, campaign.getLocalDate());
+        loan = Loan.getBaseLoan(rating, campaign.getDate());
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
         initComponents();
         setLocationRelativeTo(parent);
@@ -527,7 +527,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         loan.setYears(sldLength.getValue());
         loan.setFinancialTerm(choiceSchedule.getSelectedItem());
         loan.setCollateral(sldCollateral.getValue());
-        loan.setNextPayment(loan.getFinancialTerm().nextValidDate(campaign.getLocalDate()));
+        loan.setNextPayment(loan.getFinancialTerm().nextValidDate(campaign.getDate()));
 
         // Recalculate information based on settings
         loan.calculateAmortization();

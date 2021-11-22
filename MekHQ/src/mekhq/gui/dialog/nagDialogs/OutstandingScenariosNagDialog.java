@@ -42,6 +42,6 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
                 && campaign.getActiveAtBContracts(true).stream()
                         .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
                                 .anyMatch(scenario -> (scenario.getDate() != null)
-                                        && scenario.getDate().isEqual(campaign.getLocalDate())));
+                                        && scenario.getDate().isEqual(campaign.getDate())));
     }
 }

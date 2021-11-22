@@ -840,7 +840,7 @@ public final class BriefingTab extends CampaignGuiTab {
         final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
         final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
         final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
+                ? (canStartAnyGame && getCampaign().getDate().equals(scenario.getDate())) : canStartAnyGame;
         btnStartGame.setEnabled(canStartAtBGame);
         btnJoinGame.setEnabled(canStartAtBGame);
         btnLoadGame.setEnabled(canStartAtBGame);
@@ -882,8 +882,8 @@ public final class BriefingTab extends CampaignGuiTab {
             btnEditMission.setEnabled(true);
             btnCompleteMission.setEnabled(mission.getStatus().isActive());
             btnDeleteMission.setEnabled(true);
-            btnAddScenario.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()));
-            btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()) && getCampaign().isGM());
+            btnAddScenario.setEnabled(mission.isActiveOn(getCampaign().getDate()));
+            btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getDate()) && getCampaign().isGM());
         }
         refreshScenarioTableData();
     }

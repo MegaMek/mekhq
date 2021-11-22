@@ -78,8 +78,8 @@ public enum Divorce {
         if (spouse.getStatus().isDeadOrMIA() == origin.getStatus().isDeadOrMIA()) {
             reason = FormerSpouseReason.DIVORCE;
 
-            PersonalLogger.divorcedFrom(origin, spouse, campaign.getLocalDate());
-            PersonalLogger.divorcedFrom(spouse, origin, campaign.getLocalDate());
+            PersonalLogger.divorcedFrom(origin, spouse, campaign.getDate());
+            PersonalLogger.divorcedFrom(spouse, origin, campaign.getDate());
 
             campaign.addReport(String.format("%s has divorced %s!", origin.getHyperlinkedName(),
                     spouse.getHyperlinkedName()));
@@ -91,21 +91,21 @@ public enum Divorce {
             origin.getGenealogy().setSpouse(null);
         } else if (spouse.getStatus().isDeadOrMIA()) {
             if (spouse.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(spouse, origin, campaign.getLocalDate());
+                PersonalLogger.spouseKia(spouse, origin, campaign.getDate());
             }
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
         } else if (origin.getStatus().isDeadOrMIA()) {
             if (origin.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(origin, spouse, campaign.getLocalDate());
+                PersonalLogger.spouseKia(origin, spouse, campaign.getDate());
             }
             spouse.setMaidenName(null);
             spouse.getGenealogy().setSpouse(null);
         }
 
         // Add to former spouse list
-        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, campaign.getLocalDate(), reason));
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, campaign.getLocalDate(), reason));
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, campaign.getDate(), reason));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, campaign.getDate(), reason));
 
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(origin));

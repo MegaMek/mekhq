@@ -582,7 +582,7 @@ public class CampaignXmlParser {
 
             try {
                 if (xn.equalsIgnoreCase("calendar")) {
-                    retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                    retVal.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
                     retVal.setCamouflage(Camouflage.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {

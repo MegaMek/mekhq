@@ -141,7 +141,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         if (!newMission) {
-            suggestPlanet.setText(mission.getSystemName(campaign.getLocalDate()));
+            suggestPlanet.setText(mission.getSystemName(campaign.getDate()));
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -204,7 +204,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         mission.setType(txtType.getText());
 
         PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                campaign.getLocalDate());
+                campaign.getDate());
 
         if (canonSystem != null) {
             mission.setSystemId(canonSystem.getId());

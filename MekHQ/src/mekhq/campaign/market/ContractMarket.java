@@ -151,7 +151,7 @@ public class ContractMarket implements Serializable {
     }
 
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
+        if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getDate().getDayOfMonth() == 1))
                 || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
@@ -164,7 +164,7 @@ public class ContractMarket implements Serializable {
 
             int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-            Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
+            Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getDate());
             final boolean inMinorFaction = currentFactions.stream().noneMatch(faction ->
                     faction.isISMajorOrSuperPower() || faction.isClan());
             if (inMinorFaction) {
@@ -184,7 +184,7 @@ public class ContractMarket implements Serializable {
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {
                     for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
-                        for (Faction f : key.getFactionSet(campaign.getLocalDate())) {
+                        for (Faction f : key.getFactionSet(campaign.getDate())) {
                             if (!onlyFaction.equals(f)) {
                                 inBackwater = false;
                                 break;
@@ -198,9 +198,9 @@ public class ContractMarket implements Serializable {
             } else {
                 MekHQ.getLogger().warning(
                         "Unable to find any factions around "
-                            + campaign.getCurrentSystem().getName(campaign.getLocalDate())
+                            + campaign.getCurrentSystem().getName(campaign.getDate())
                             + " on "
-                            + campaign.getLocalDate());
+                            + campaign.getDate());
             }
 
             if (inBackwater) {
@@ -208,7 +208,7 @@ public class ContractMarket implements Serializable {
             }
 
             if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-                if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getLocalDate())) {
+                if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getDate())) {
                     numContracts++;
                     /* Though the rules do not state these modifiers are mutually exclusive, the fact that the
                      * distance of Galatea from a border means that it has no advantage for Mercs over border
@@ -227,9 +227,9 @@ public class ContractMarket implements Serializable {
             /* If located on a faction's capital (interpreted as the starting planet for that faction),
              * generate one contract offer for that faction.
              */
-            for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
+            for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getDate())) {
                 try {
-                    if (f.getStartingPlanet(campaign.getLocalDate()).equals(campaign.getCurrentSystem().getId())
+                    if (f.getStartingPlanet(campaign.getDate()).equals(campaign.getCurrentSystem().getId())
                             && RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
                         AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
                         if (c != null) {
@@ -356,7 +356,7 @@ public class ContractMarket implements Serializable {
          */
         if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Factions.getInstance().getFaction(employer)) &&
                 !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Factions.getInstance().getFaction(employer),
-                        Factions.getInstance().getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
+                        Factions.getInstance().getFaction(contract.getEnemyCode()), campaign.getDate())) {
             if (contract.getContractType().isPlanetaryAssault()) {
                 contract.setContractType(AtBContractType.GARRISON_DUTY);
             } else if (contract.getContractType().isReliefDuty()) {
@@ -384,7 +384,7 @@ public class ContractMarket implements Serializable {
         } catch (NullPointerException ex) {
             // could not calculate jump path; leave jp null
             MekHQ.getLogger().warning("Could not calculate jump path to contract location: "
-                            + contract.getSystem().getName(campaign.getLocalDate()), ex);
+                            + contract.getSystem().getName(campaign.getDate()), ex);
         }
 
         if (jp == null) {
@@ -454,7 +454,7 @@ public class ContractMarket implements Serializable {
             boolean factionValid = false;
             for (PlanetarySystem p : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
                 if (factionValid) break;
-                for (Faction f : p.getFactionSet(campaign.getLocalDate())) {
+                for (Faction f : p.getFactionSet(campaign.getDate())) {
                     if (f.getShortName().equals(contract.getEnemyCode())) {
                         factionValid = true;
                         break;

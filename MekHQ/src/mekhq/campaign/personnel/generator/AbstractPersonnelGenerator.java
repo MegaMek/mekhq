@@ -208,7 +208,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param isClanner A value indicating if {@code person} is a clanner.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanner) {
-        LocalDate birthday = campaign.getLocalDate();
+        LocalDate birthday = campaign.getDate();
         birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanner));
 
         // choose a random day and month

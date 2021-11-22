@@ -379,7 +379,7 @@ public final class BatchXPDialog extends JDialog {
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
                 p.spendXP(cost);
-                PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
+                PersonalLogger.improvedSkill(campaign, p, campaign.getDate(),
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
@@ -393,10 +393,10 @@ public final class BatchXPDialog extends JDialog {
                             if (campaign.getCampaignOptions().useEdge()) {
                                 p.changeEdge(1);
                                 p.changeCurrentEdge(1);
-                                PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());
+                                PersonalLogger.gainedEdge(campaign, p, campaign.getDate());
                             }
                         } else {
-                            PersonalLogger.gainedSPA(campaign, p, campaign.getLocalDate(), spa);
+                            PersonalLogger.gainedSPA(campaign, p, campaign.getDate(), spa);
                         }
                     }
                 }

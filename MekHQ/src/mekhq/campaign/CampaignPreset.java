@@ -96,7 +96,7 @@ public class CampaignPreset implements Serializable {
     }
 
     public CampaignPreset(final Campaign campaign) {
-        this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
+        this(campaign.getName(), "", true, campaign.getDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
                 campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),

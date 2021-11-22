@@ -437,7 +437,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int getTravelDays(Campaign c) {
         if (null != this.getSystem()) {
             JumpPath jumpPath = getJumpPath(c);
-            double days = Math.round(jumpPath.getTotalTime(c.getLocalDate(), c.getLocation().getTransitTime()) * 100.0) / 100.0;
+            double days = Math.round(jumpPath.getTotalTime(c.getDate(), c.getLocation().getTransitTime()) * 100.0) / 100.0;
             return (int) Math.round(days);
         }
         return 0;
@@ -643,12 +643,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         boolean adjustStartDate = false;
         LocalDate startDate = getStartDate();
         if (startDate == null) {
-            startDate = c.getLocalDate();
+            startDate = c.getDate();
             adjustStartDate = true;
         }
 
         if (adjustStartDate && (c.getSystemByName(systemId) != null)) {
-            int days = (int) Math.ceil(getJumpPath(c).getTotalTime(c.getLocalDate(),
+            int days = (int) Math.ceil(getJumpPath(c).getTotalTime(c.getDate(),
                     c.getLocation().getTransitTime()));
             startDate = startDate.plusDays(days);
         }

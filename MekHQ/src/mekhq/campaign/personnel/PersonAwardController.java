@@ -125,7 +125,7 @@ public class PersonAwardController {
         if (award.getEdgeReward() > 0) {
             person.changeEdge(award.getEdgeReward());
             person.changeCurrentEdge(award.getEdgeReward());
-            PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+            PersonalLogger.gainedEdge(campaign, person, campaign.getDate());
         }
 
         award.addDate(date);

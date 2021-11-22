@@ -200,7 +200,7 @@ public class InjuryType {
         }
         final int recoveryTime = getRecoveryTime(severity);
         final String fluff = getFluffText(loc, severity, p.getGender());
-        Injury result = new Injury(recoveryTime, fluff, loc, this, severity, c.getLocalDate(), false);
+        Injury result = new Injury(recoveryTime, fluff, loc, this, severity, c.getDate(), false);
         result.setVersion(Injury.VERSION);
         return result;
     }

@@ -251,7 +251,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
 
     public void startAdvancement(final ActionEvent evt) {
         MekHQ.registerHandler(this);
-        final LocalDate today = getGUI().getCampaign().getLocalDate();
+        final LocalDate today = getGUI().getCampaign().getDate();
         int days;
 
         if (getBtnStartAdvancement().equals(evt.getSource())) {

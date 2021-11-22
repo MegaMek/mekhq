@@ -307,7 +307,7 @@ public class AtBDynamicScenarioFactory {
         SkillLevel skill = SkillLevel.GREEN;
         int quality = 0;
         int generatedLanceCount = 0;
-        LocalDate currentDate = campaign.getLocalDate();
+        LocalDate currentDate = campaign.getDate();
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
         // planet owner logic requires some special handling
@@ -804,7 +804,7 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
+                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getDate()), scenario.getAtmosphere());
                 float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
 
                 scenario.setAtmosphere(atmosphere);

@@ -104,7 +104,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         pnlPath.setLayout(new java.awt.GridBagLayout());
         int i = 0;
         javax.swing.JLabel lblPlanet;
-        LocalDate currentDate = campaign.getLocalDate();
+        LocalDate currentDate = campaign.getDate();
         for (PlanetarySystem system : path.getSystems()) {
             lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -139,7 +139,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         lblCost = new javax.swing.JLabel();
         txtCost = new javax.swing.JLabel();
 
-        LocalDate currentDate = campaign.getLocalDate();
+        LocalDate currentDate = campaign.getDate();
         String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
         String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
 

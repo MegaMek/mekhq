@@ -392,7 +392,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), atmosphere);
+                atmosphere = Utilities.nonNull(p.getPressure(campaign.getDate()), atmosphere);
                 gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
             }
         }
@@ -1312,7 +1312,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         AtBContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getDate())
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
@@ -1381,7 +1381,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         AtBContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
                 Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();

@@ -137,7 +137,7 @@ public class Loot implements MekHqXmlSerializable {
     public void get(Campaign campaign, Scenario s) {
         //TODO: put in some reports
         if(cash.isPositive()) {
-            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
+            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getDate(), cash,
                     "Reward for " + getName() + " during " + s.getName());
         }
         for(Entity e : units) {

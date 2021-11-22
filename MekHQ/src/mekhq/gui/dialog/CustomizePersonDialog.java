@@ -405,7 +405,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     PlanetarySystem system = (PlanetarySystem) value;
-                    setText(system.getName(campaign.getLocalDate()));
+                    setText(system.getName(campaign.getDate()));
                 }
 
                 return this;
@@ -465,7 +465,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         cellHasFocus);
                 if (value instanceof Planet) {
                     Planet planet = (Planet) value;
-                    setText(planet.getName(campaign.getLocalDate()));
+                    setText(planet.getName(campaign.getDate()));
                 }
 
                 return this;
@@ -543,7 +543,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panDemog.add(btnDate, gridBagConstraints);
 
-        lblAge.setText(person.getAge(campaign.getLocalDate()) + " " + resourceMap.getString("age")); // NOI18N
+        lblAge.setText(person.getAge(campaign.getDate()) + " " + resourceMap.getString("age")); // NOI18N
         lblAge.setName("lblAge"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -873,7 +873,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-                .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
+                .sorted(Comparator.comparing(a -> a.getName(campaign.getDate())))
                 .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
@@ -1288,7 +1288,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     public int getAge() {
         // Get age based on year
-        return Period.between(birthdate, campaign.getLocalDate()).getYears();
+        return Period.between(birthdate, campaign.getDate()).getYears();
     }
 
     private void backgroundChanged() {

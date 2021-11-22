@@ -43,7 +43,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     @Override
     public List<Person> generatePersonnelForDay(Campaign c) {
-        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (c.getDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             List<Person> retVal = new ArrayList<>();
             Person p = null;
 
@@ -189,7 +189,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     @Override
     public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (c.getDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             return current;
         }
         return null;

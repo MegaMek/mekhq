@@ -483,7 +483,7 @@ public class FactionBorderTracker {
      */
     @Subscribe
     public synchronized void handleNewDayEvent(NewDayEvent event) {
-        now = event.getCampaign().getLocalDate();
+        now = event.getCampaign().getDate();
         invalid |= now.minusDays(dayThreshold).isAfter(lastUpdate)
                 || now.plusDays(dayThreshold).isBefore(lastUpdate);
 

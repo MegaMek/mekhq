@@ -142,7 +142,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         // Check if we need to update the default currency
         // by comparing the campaign's current date and
         // planetary system against our cached date and systems
-        LocalDate date = campaign.getLocalDate();
+        LocalDate date = campaign.getDate();
         PlanetarySystem currentSystem = this.campaign.getCurrentSystem();
         if ((lastChecked == null)
                 || this.lastChecked.isBefore(date)

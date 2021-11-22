@@ -149,7 +149,7 @@ public class HistoricalDailyReportDialog extends JDialog {
         logPanel.clearLogPanel();
         LocalDate trackDay = null;
         for (LogEntry log : gui.getCampaign().inMemoryLogHistory) {
-            if (ChronoUnit.DAYS.between(log.getDate(), gui.getCampaign().getLocalDate()) < days) {
+            if (ChronoUnit.DAYS.between(log.getDate(), gui.getCampaign().getDate()) < days) {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
                     logPanel.appendLog(Collections.singletonList("<b>"

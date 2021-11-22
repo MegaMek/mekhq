@@ -108,7 +108,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         if (cbPlanets.getSelectedItem() != null) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    campaign.getLocalDate())).getId());
+                    campaign.getDate())).getId());
         }
 
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
@@ -487,7 +487,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                 || getCurrentEnemyCode().equals("REB") || getCurrentEnemyCode().equals("PIR")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
-                systems.add(p.getName(campaign.getLocalDate()));
+                systems.add(p.getName(campaign.getDate()));
             }
         }
 
@@ -495,7 +495,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                 && !contract.getEnemyCode().equals("REB")) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
-                systems.add(p.getName(campaign.getLocalDate()));
+                systems.add(p.getName(campaign.getDate()));
             }
         }
 
@@ -526,7 +526,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             //contract.setPlanetName(suggestPlanet.getText());
         } else {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    campaign.getLocalDate())).getId());
+                    campaign.getDate())).getId());
         }
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(comboContractType.getSelectedItem());
@@ -544,7 +544,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
-        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getDate(),
                 contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
         campaign.addMission(contract);
 
@@ -566,7 +566,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract) this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    campaign.getLocalDate())).getId());
+                    campaign.getDate())).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
             needUpdatePayment = true;

@@ -99,7 +99,7 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         campaign = c;
         if (scenario.getDate() == null) {
-            scenario.setDate(campaign.getLocalDate());
+            scenario.setDate(campaign.getDate());
         }
         date = scenario.getDate();
 
@@ -270,7 +270,7 @@ public class CustomizeScenarioDialog extends JDialog {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
-        } else if ((mission instanceof AtBContract) && 
+        } else if ((mission instanceof AtBContract) &&
                 (scenario instanceof AtBDynamicScenario) &&
                 (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
@@ -320,11 +320,11 @@ public class CustomizeScenarioDialog extends JDialog {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
-            
+
             if (choiceStatus.getSelectedItem() != null) {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
-            
+
             scenario.setDate(date);
         }
         scenario.resetLoot();
@@ -381,14 +381,14 @@ public class CustomizeScenarioDialog extends JDialog {
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (scenario.getStatus().isCurrent()) {
-                if (dc.getDate().isBefore(campaign.getLocalDate())) {
+                if (dc.getDate().isBefore(campaign.getDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                    LocalDate nextMonday = campaign.getDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
                     if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
@@ -398,7 +398,7 @@ public class CustomizeScenarioDialog extends JDialog {
                         return;
                     }
                 }
-            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
+            } else if (dc.getDate().isAfter(campaign.getDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a date after the current date.",
                         "Invalid date",

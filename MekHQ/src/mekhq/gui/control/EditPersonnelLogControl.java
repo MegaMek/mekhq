@@ -107,7 +107,7 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void addEntry() {
-        final AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, person, campaign.getLocalDate());
+        final AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, person, campaign.getDate());
         if (dialog.showDialog().isConfirmed()) {
             person.addLogEntry(dialog.getEntry());
             refreshTable();

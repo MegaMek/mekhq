@@ -58,7 +58,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     public void processNewDay(final Campaign campaign) {
-        if (campaign.getLocalDate().getDayOfMonth() == 1) {
+        if (campaign.getDate().getDayOfMonth() == 1) {
             removeUnitOffers(campaign);
             generateUnitOffers(campaign);
         }
@@ -103,7 +103,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
         if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
             final Faction faction = Utilities.getRandomItem(campaign.getCurrentSystem()
-                    .getFactionSet(campaign.getLocalDate()));
+                    .getFactionSet(campaign.getDate()));
             if (campaign.getFaction().isClan() || (((faction != null)) && !faction.isClan())) {
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,
                         faction, IUnitRating.DRAGOON_A, 6);

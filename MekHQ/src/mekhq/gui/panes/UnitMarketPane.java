@@ -408,7 +408,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final int roll = Compute.d6();
             if (offer.getMarketType().isBlackMarket() && (roll < 3)) {
-                getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+                getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getDate(),
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
                 getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
@@ -416,7 +416,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 continue;
             }
 
-            getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+            getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getDate(),
                     price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 

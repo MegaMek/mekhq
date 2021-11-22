@@ -214,7 +214,7 @@ public class StratconTab extends CampaignGuiTab {
         }
         AtBContract currentContract = currentTDI.contract;
 
-        LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
+        LocalDate currentDate = getCampaignGui().getCampaign().getDate();
 
         if (currentContract.getStartDate().isAfter(currentDate)) {
             campaignStatusText.setText("Contract has not started.");
@@ -379,7 +379,7 @@ public class StratconTab extends CampaignGuiTab {
 
         // special case text reminding player to complete required scenarios
         if (!campaignState.getContract().getCommandRights().isIndependent()) {
-            boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
+            boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getDate());
 
             if (contractIsActive) {
                 sb.append("<span color='orange'>").append(OBJECTIVE_IN_PROGRESS);

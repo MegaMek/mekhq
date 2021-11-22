@@ -104,7 +104,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     public Faction selectFaction(Campaign campaign) {
         if ((cachedFactions == null)
                 || !cachedSystem.equals(campaign.getCurrentSystem())
-                || campaign.getLocalDate().isAfter(cachedDate)) {
+                || campaign.getDate().isAfter(cachedDate)) {
             createLookupMap(campaign);
         }
 
@@ -128,7 +128,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private void createLookupMap(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
-        LocalDate now = campaign.getLocalDate();
+        LocalDate now = campaign.getDate();
         boolean isClan = campaign.getFaction().isClan();
 
         Map<Faction, Double> weights = new HashMap<>();

@@ -335,7 +335,7 @@ public class MedicalViewDialog extends JDialog {
 
         String birthdayString = MekHQ.getMekHQOptions().getDisplayFormattedDate(p.getBirthday());
 
-        Period age = Period.between(p.getBirthday(), c.getLocalDate());
+        Period age = Period.between(p.getBirthday(), c.getDate());
 
         String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().toString()
                 : resourceMap.getString("baselinePhenotype.text");

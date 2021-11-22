@@ -165,6 +165,6 @@ public class ContractTest {
         Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
         Mockito.when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
+        Mockito.when(mockCampaign.getDate()).thenReturn(LocalDate.of(3067, 1, 1));
     }
 }

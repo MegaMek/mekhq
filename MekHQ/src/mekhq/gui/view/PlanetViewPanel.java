@@ -80,7 +80,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         pnlSystem = getSystemPanel();
-        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + " " + resourceMap.getString("system.text")));
+        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getDate()) + " " + resourceMap.getString("system.text")));
         add(pnlSystem);
 
         Planet planet = system.getPlanet(planetPos);
@@ -90,7 +90,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
         if (null != planet) {
             pnlPlanet = getPlanetPanel(planet);
-            pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(campaign.getLocalDate())));
+            pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(campaign.getDate())));
             add(pnlPlanet);
         }
     }
@@ -119,9 +119,9 @@ public class PlanetViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        LocalDate currentDate = campaign.getLocalDate();
+        LocalDate currentDate = campaign.getDate();
 
-        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(campaign.getLocalDate()) + "</i></nobr></html>");
+        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(campaign.getDate()) + "</i></nobr></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -381,7 +381,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        LocalDate currentDate = campaign.getLocalDate();
+        LocalDate currentDate = campaign.getDate();
 
         //Set up grid bag constraints
         GridBagConstraints gbcLabel = new GridBagConstraints();

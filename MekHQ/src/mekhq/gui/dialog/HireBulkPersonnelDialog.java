@@ -269,7 +269,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             return;
         }
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today = campaign.getDate();
         LocalDate earliestBirthDate = today.minus(maxAgeVal + 1, ChronoUnit.YEARS)
                 .plus(1, ChronoUnit.DAYS);
         final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate,

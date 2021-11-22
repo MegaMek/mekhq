@@ -553,7 +553,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
         if (getWarShipCount() > 0) {
             totalValue += 10;
-            if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
+            if (getCampaign().getDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
             }
         }

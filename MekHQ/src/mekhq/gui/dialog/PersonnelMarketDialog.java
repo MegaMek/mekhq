@@ -359,7 +359,7 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
-        if (pay && !campaign.getFinances().debit(TransactionType.UNIT_PURCHASE, campaign.getLocalDate(),
+        if (pay && !campaign.getFinances().debit(TransactionType.UNIT_PURCHASE, campaign.getDate(),
                 unitCost, "Purchased " + en.getShortName())) {
             return;
         }

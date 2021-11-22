@@ -452,7 +452,7 @@ public class InterstellarMapPanel extends JPanel {
                 minY = scr2mapY(getHeight() + size * 2.0);
                 maxX = scr2mapX(getWidth() + size * 2.0);
                 maxY = scr2mapY(- size * 2.0);
-                now = campaign.getLocalDate();
+                now = campaign.getDate();
 
                 Arc2D.Double arc = new Arc2D.Double();
                 //first get the jump diameter for selected planet
@@ -666,7 +666,7 @@ public class InterstellarMapPanel extends JPanel {
 
                 Map<Faction, String> capitals = new HashMap<>();
                 for (Faction faction : Factions.getInstance().getFactions()) {
-                    capitals.put(faction, faction.getStartingPlanet(campaign.getLocalDate()));
+                    capitals.put(faction, faction.getStartingPlanet(campaign.getDate()));
                 }
 
                 for (PlanetarySystem system : systems) {
@@ -717,7 +717,7 @@ public class InterstellarMapPanel extends JPanel {
                                         g2.fill(arc);
                                     }
                                     if (campaign.getCampaignOptions().getUseAtB()
-                                            && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
+                                            && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
                                         g2.setPaint(new Color(192, 192, 192));
                                         arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
@@ -749,7 +749,7 @@ public class InterstellarMapPanel extends JPanel {
                         if ((conf.showPlanetNamesThreshold == 0) || (conf.scale > conf.showPlanetNamesThreshold)
                                 || jumpPath.contains(system)
                                 || ((campaign.getLocation().getJumpPath() != null) && campaign.getLocation().getJumpPath().contains(system))) {
-                            final String planetName = system.getPrintableName(campaign.getLocalDate());
+                            final String planetName = system.getPrintableName(campaign.getDate());
                             final float xPos = (float) (x + size * 1.8);
                             final float yPos = (float) y;
                             g2.setPaint(Color.BLACK);
@@ -1044,14 +1044,14 @@ public class InterstellarMapPanel extends JPanel {
 
         //color shading is from the Viridis color palettes
 
-        long pop = p.getPopulation(campaign.getLocalDate());
+        long pop = p.getPopulation(campaign.getDate());
 
         //if no population, then just return black no matter what we asked for
         if (pop == 0L) {
             return Color.BLACK;
         }
 
-        SocioIndustrialData socio = p.getSocioIndustrial(campaign.getLocalDate());
+        SocioIndustrialData socio = p.getSocioIndustrial(campaign.getDate());
 
         if (null != socio && optTech.isSelected()) {
             switch (socio.tech) {
@@ -1168,7 +1168,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optHPG.isSelected()) {
-            Integer hpg = p.getHPG(campaign.getLocalDate());
+            Integer hpg = p.getHPG(campaign.getDate());
             if (null == hpg) {
                 return Color.BLACK;
             }
@@ -1189,7 +1189,7 @@ public class InterstellarMapPanel extends JPanel {
 
         if (optRecharge.isSelected()) {
             //use two shades of grey for C and D as this is pony express
-            switch (p.getNumberRechargeStations(campaign.getLocalDate())) {
+            switch (p.getNumberRechargeStations(campaign.getDate())) {
                 case 2:
                     return new Color(240,249,33);
                 case 1:

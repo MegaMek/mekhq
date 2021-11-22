@@ -130,7 +130,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         //write dates
         try {
             preparedStatement = connect.prepareStatement("UPDATE " + table + ".dates SET currentdate=?");
-            preparedStatement.setDate(1, Date.valueOf(campaign.getLocalDate().toString()));
+            preparedStatement.setDate(1, Date.valueOf(campaign.getDate().toString()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             MekHQ.getLogger().error(e);
