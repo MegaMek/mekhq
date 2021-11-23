@@ -340,7 +340,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
                                         useTransfers = campaign.getCampaignOptions().useTransfers();
                                     }
-                                    unit.addPilotOrSoldier(person, useTransfers);
+                                    unit.addGunner(person, useTransfers);
                                 }
                             }
                         });
