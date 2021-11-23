@@ -90,7 +90,7 @@ public class MissingRotor extends MissingPart {
 	
 	@Override
     public void fix() {
-	    if (null != unit && unit.getEntity() instanceof VTOL) {
+	    if ((null != unit) && (unit.getEntity() instanceof VTOL)) {
 	        int maxIsVal = unit.getEntity().getOInternal(VTOL.LOC_ROTOR);
 	        unit.getEntity().setInternal(maxIsVal, VTOL.LOC_ROTOR);
 	    }
