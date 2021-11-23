@@ -64,7 +64,6 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -199,6 +198,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseExtendedTOEForceName;
     private JCheckBox chkPersonnelLogSkillGain;
     private JCheckBox chkPersonnelLogAbilityGain;
     private JCheckBox chkPersonnelLogEdgeGain;
@@ -3234,6 +3234,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
 
+        chkUseExtendedTOEForceName = new JCheckBox(resources.getString("chkUseExtendedTOEForceName.text"));
+        chkUseExtendedTOEForceName.setToolTipText(resources.getString("chkUseExtendedTOEForceName.toolTipText"));
+        chkUseExtendedTOEForceName.setName("chkUseExtendedTOEForceName ");
+
         chkPersonnelLogSkillGain = new JCheckBox(resources.getString("chkPersonnelLogSkillGain.text"));
         chkPersonnelLogSkillGain.setToolTipText(resources.getString("chkPersonnelLogSkillGain.toolTipText"));
         chkPersonnelLogSkillGain.setName("chkPersonnelLogSkillGain");
@@ -3268,6 +3272,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
@@ -3285,6 +3290,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
@@ -5359,6 +5365,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseImplants.setSelected(options.useImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
+        chkUseExtendedTOEForceName.setSelected(options.isUseExtendedTOEForceName());
         chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
         chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
         chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
@@ -5901,6 +5908,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
             options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
             options.setUseTransfers(chkUseTransfers.isSelected());
+            options.setUseExtendedTOEForceName(chkUseExtendedTOEForceName.isSelected());
             options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
             options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
             options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
