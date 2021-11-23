@@ -10,6 +10,7 @@ VERSION HISTORY:
 + PR #2959: Finances: Fixing Various Property Issues
 + PR #2960: Campaign Options Dialog: Fixing Portrait Generation Property Issue
 + Issue #476: Log Entry for Personnel Moved In/Out of a ToE Force
++ Issue #2932, #2944: When assigning a vehicle gunner, don't assign them as a driver also.
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
