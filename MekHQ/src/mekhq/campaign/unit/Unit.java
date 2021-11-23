@@ -30,6 +30,7 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -3478,11 +3479,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         getCampaign().clearGameData(entity);
-        //Set up SPAs, Implants, Edge, etc
+        // Set up SPAs, Implants, Edge, etc
         if (getCampaign().getCampaignOptions().useAbilities()) {
-            PersonnelOptions options = new PersonnelOptions();
-            //This double enumeration is annoying to work with for crew-served units.
-            //Get the option names while we enumerate so they can be used later
+            PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
+            // This double enumeration is annoying to work with for crew-served units.
+            // Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<>();
             Set<String> cyberOptionNames = new HashSet<>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
@@ -3568,7 +3569,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
 
-                //Assign the options to our unit
+                // Assign the options to our unit
                 entity.getCrew().setOptions(options);
 
                 //Assign edge points to spacecraft and vehicle crews and infantry units
@@ -3611,7 +3612,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 //For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
-                PersonnelOptions cdrOptions = new PersonnelOptions();
+                PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
                 if (null != commander) {
                     for (String optionName : optionNames) {
                         IOption option = commander.getOptions().getOption(optionName);
