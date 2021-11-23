@@ -12,6 +12,7 @@ VERSION HISTORY:
 + Issue #476: Log Entry for Personnel Moved In/Out of a ToE Force
 + Issue #2932, #2944: When assigning a vehicle gunner, don't assign them as a driver also.
 + Issue #2866: Actually replace VTOL rotors as opposed to just eating the part
++ MegaMek #3232, #3244: PersonnelOptions/PilotOptions Fix (Multiplayer Games and Saves should work properly)
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
