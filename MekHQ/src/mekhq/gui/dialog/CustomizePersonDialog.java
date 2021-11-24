@@ -110,7 +110,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private Campaign campaign;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
             MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable declarations
 

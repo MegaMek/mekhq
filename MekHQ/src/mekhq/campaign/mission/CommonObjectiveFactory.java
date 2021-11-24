@@ -38,7 +38,7 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  *
  */
 public class CommonObjectiveFactory {
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle(
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
             "mekhq.resources.AtBScenarioBuiltIn", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**

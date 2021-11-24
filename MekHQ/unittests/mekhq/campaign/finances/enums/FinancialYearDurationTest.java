@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 import static org.junit.Assert.assertEquals;
 
 public class FinancialYearDurationTest {
-    private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     @Test

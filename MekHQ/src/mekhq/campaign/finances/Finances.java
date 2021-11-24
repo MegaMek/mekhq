@@ -56,7 +56,7 @@ import mekhq.campaign.mission.Contract;
 public class Finances implements Serializable {
     private static final long serialVersionUID = 8533117455496219692L;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
             "mekhq.resources.Finances", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private List<Transaction> transactions;
