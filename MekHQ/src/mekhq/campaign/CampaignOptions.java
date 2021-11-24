@@ -215,6 +215,8 @@ public class CampaignOptions implements Serializable {
     private boolean extraRandomOrigin;
     private double originDistanceScale;
 
+    // Retirement
+
     // Salary
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
@@ -587,6 +589,8 @@ public class CampaignOptions implements Serializable {
         setOriginSearchRadius(45);
         setExtraRandomOrigin(false);
         setOriginDistanceScale(0.6);
+
+        // Retirement
 
         // Salary
         setSalaryCommissionMultiplier(1.2);
@@ -1371,6 +1375,9 @@ public class CampaignOptions implements Serializable {
         this.originDistanceScale = originDistanceScale;
     }
     //endregion Personnel Randomization
+
+    //region Retirement
+    //endregion Retirement
 
     //region Salary
     public double getSalaryCommissionMultiplier() {
@@ -3422,6 +3429,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
         //endregion Personnel Randomization
 
+        //region Retirement
+        //endregion Retirement
+
         //region Salary
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
@@ -3937,6 +3947,9 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
                     retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Personnel Randomization
+
+                //region Retirement
+                //endregion Retirement
 
                 //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {

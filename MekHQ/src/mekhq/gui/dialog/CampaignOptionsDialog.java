@@ -224,6 +224,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     // Family
     private MMComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
 
+    // Dependents
+
     // Prisoners
     private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
@@ -238,6 +240,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnOriginSearchRadius;
     private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
+
+    // Retirement
 
     // Salary
     private JSpinner spnCommissionedSalary;
@@ -258,6 +262,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner[] spnMarriageSurnameWeights;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
+
+    // Divorce
 
     // Procreation
     private JCheckBox chkUseManualProcreation;
@@ -3163,10 +3169,17 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(createPrisonerPanel(), gbc);
+        personnelPanel.add(createDependentsPanel(), gbc);
 
         gbc.gridx++;
+        personnelPanel.add(createPrisonerPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
+
+        gbc.gridx++;
+        personnelPanel.add(createRetirementPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3178,14 +3191,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         personnelPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
-        personnelPanel.add(createProcreationPanel(), gbc);
+        personnelPanel.add(createDivorcePanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
+        personnelPanel.add(createProcreationPanel(), gbc);
+
+        gbc.gridx++;
         personnelPanel.add(createDeathPanel(), gbc);
 
-        JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
+        final JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
 
         return scrollPersonnel;
@@ -3536,6 +3551,21 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
 
+    public JPanel createDependentsPanel() {
+        // Create Panel Components
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("dependentsPanel.title")));
+        panel.setName("dependentsPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        return panel;
+    }
+
     private JPanel createPrisonerPanel() {
         // Create Panel Components
         JLabel lblPrisonerCaptureStyle = new JLabel(resources.getString("lblPrisonerCaptureStyle.text"));
@@ -3741,6 +3771,21 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(spnOriginDistanceScale))
         );
+
+        return panel;
+    }
+
+    private JPanel createRetirementPanel() {
+        // Create Panel Components
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("retirementPanel.title")));
+        panel.setName("retirementPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
         return panel;
     }
@@ -4126,6 +4171,22 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         return panel;
     }
+
+    private JPanel createDivorcePanel() {
+        // Create Panel Components
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("divorcePanel.title")));
+        panel.setName("divorcePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        return panel;
+    }
+
 
     private JPanel createProcreationPanel() {
         // Create Panel Components
@@ -5394,6 +5455,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         // Family
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
 
+        // Dependents
+
         // Prisoners
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
@@ -5410,6 +5473,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
         chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
         spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
+
+        // Retirement
 
         // Salary
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
@@ -5444,6 +5509,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
         }
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
+
+        // Divorce
 
         // Procreation
         chkUseManualProcreation.setSelected(options.isUseManualProcreation());
@@ -5917,7 +5984,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
             options.setUseTimeInRank(chkUseTimeInRank.isSelected());
             options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
             options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
             options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
@@ -5935,6 +6001,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             // Family
             options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedItem());
 
+            // Dependents
+
             // Prisoners
             options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
             options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
@@ -5950,6 +6018,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
             options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
 
+            // Retirement
+            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
+            options.setRetirementRolls(chkRetirementRolls.isSelected());
+            options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
+            options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
+            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
+
             // Salary
             options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
             options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
@@ -5958,6 +6033,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
                 options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
             }
+
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
@@ -5976,6 +6052,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
             options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
             options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
+
+            // Divorce
 
             // Procreation
             options.setUseManualProcreation(chkUseManualProcreation.isSelected());
@@ -6061,12 +6139,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
             options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
-            options.setRetirementRolls(chkRetirementRolls.isSelected());
-            options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
-            options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
-            options.setAtBAddDependents(chkAddDependents.isSelected());
-            options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
             options.setUseLeadership(chkUseLeadership.isSelected());
