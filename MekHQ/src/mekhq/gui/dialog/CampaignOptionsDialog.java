@@ -221,6 +221,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
 
+    // Family
+    private MMComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+
     // Prisoners
     private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
@@ -235,9 +238,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnOriginSearchRadius;
     private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
-
-    // Family
-    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
 
     // Salary
     private JSpinner spnCommissionedSalary;
@@ -3159,14 +3159,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         personnelPanel.add(createMedicalPanel(), gbc);
 
         gbc.gridx++;
-        personnelPanel.add(createPrisonerPanel(), gbc);
+        personnelPanel.add(createFamilyPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
+        personnelPanel.add(createPrisonerPanel(), gbc);
 
         gbc.gridx++;
-        personnelPanel.add(createFamilyPanel(), gbc);
+        personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3497,6 +3497,45 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
 
+    private JPanel createFamilyPanel() {
+        // Create Panel Components
+        final JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("lblDisplayFamilyLevel.text"));
+        lblDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
+        lblDisplayFamilyLevel.setName("lblDisplayFamilyLevel");
+
+        comboDisplayFamilyLevel = new MMComboBox<>("comboDisplayFamilyLevel", FamilialRelationshipDisplayLevel.values());
+        comboDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
+
+        // Programmatically Assign Accessibility Labels
+        lblDisplayFamilyLevel.setLabelFor(comboDisplayFamilyLevel);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("familyPanel.title")));
+        panel.setName("familyPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel))
+        );
+
+        return panel;
+    }
+
     private JPanel createPrisonerPanel() {
         // Create Panel Components
         JLabel lblPrisonerCaptureStyle = new JLabel(resources.getString("lblPrisonerCaptureStyle.text"));
@@ -3701,46 +3740,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(spnOriginDistanceScale))
-        );
-
-        return panel;
-    }
-
-    private JPanel createFamilyPanel() {
-        // Create Panel Components
-        JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("lblDisplayFamilyLevel.text"));
-        lblDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
-        lblDisplayFamilyLevel.setName("lblDisplayFamilyLevel");
-
-        comboDisplayFamilyLevel = new JComboBox<>(FamilialRelationshipDisplayLevel.values());
-        comboDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
-        comboDisplayFamilyLevel.setName("comboDisplayFamilyLevel");
-
-        // Programmatically Assign Accessibility Labels
-        lblDisplayFamilyLevel.setLabelFor(comboDisplayFamilyLevel);
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("familyPanel.title")));
-        panel.setName("familyPanel");
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblDisplayFamilyLevel)
-                                .addComponent(comboDisplayFamilyLevel, GroupLayout.Alignment.LEADING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblDisplayFamilyLevel)
-                                .addComponent(comboDisplayFamilyLevel))
         );
 
         return panel;
@@ -5392,6 +5391,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseRandomHitsForVehicles.setSelected(options.useRandomHitsForVehicles());
         chkUseTougherHealing.setSelected(options.useTougherHealing());
 
+        // Family
+        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
+
         // Prisoners
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
@@ -5408,9 +5410,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
         chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
         spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
-
-        // Family
-        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
 
         // Salary
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
@@ -5933,6 +5932,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
             options.setTougherHealing(chkUseTougherHealing.isSelected());
 
+            // Family
+            options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedItem());
+
             // Prisoners
             options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
             options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
@@ -5947,9 +5949,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
             options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
             options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
-
-            // Family
-            options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
 
             // Salary
             options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());

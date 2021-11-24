@@ -197,6 +197,9 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
 
+    // Family
+    private FamilialRelationshipDisplayLevel displayFamilyLevel;
+
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
     private PrisonerStatus defaultPrisonerStatus;
@@ -211,9 +214,6 @@ public class CampaignOptions implements Serializable {
     private int originSearchRadius;
     private boolean extraRandomOrigin;
     private double originDistanceScale;
-
-    // Family
-    private FamilialRelationshipDisplayLevel displayFamilyLevel;
 
     // Salary
     private double salaryCommissionMultiplier;
@@ -570,6 +570,9 @@ public class CampaignOptions implements Serializable {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
 
+        // Family
+        setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
         setDefaultPrisonerStatus(PrisonerStatus.PRISONER);
@@ -584,9 +587,6 @@ public class CampaignOptions implements Serializable {
         setOriginSearchRadius(45);
         setExtraRandomOrigin(false);
         setOriginDistanceScale(0.6);
-
-        // Family
-        setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
         // Salary
         setSalaryCommissionMultiplier(1.2);
@@ -1228,6 +1228,22 @@ public class CampaignOptions implements Serializable {
     }
     //endregion Medical
 
+    //region Family
+    /**
+     * @return the level of familial relation to display
+     */
+    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
+        return displayFamilyLevel;
+    }
+
+    /**
+     * @param displayFamilyLevel the level of familial relation to display
+     */
+    public void setDisplayFamilyLevel(final FamilialRelationshipDisplayLevel displayFamilyLevel) {
+        this.displayFamilyLevel = displayFamilyLevel;
+    }
+    //endregion Family
+
     //region Prisoners
     public PrisonerCaptureStyle getPrisonerCaptureStyle() {
         return prisonerCaptureStyle;
@@ -1355,22 +1371,6 @@ public class CampaignOptions implements Serializable {
         this.originDistanceScale = originDistanceScale;
     }
     //endregion Personnel Randomization
-
-    //region Family
-    /**
-     * @return the level of familial relation to display
-     */
-    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
-        return displayFamilyLevel;
-    }
-
-    /**
-     * @param displayFamilyLevel the level of familial relation to display
-     */
-    public void setDisplayFamilyLevel(final FamilialRelationshipDisplayLevel displayFamilyLevel) {
-        this.displayFamilyLevel = displayFamilyLevel;
-    }
-    //endregion Family
 
     //region Salary
     public double getSalaryCommissionMultiplier() {
@@ -3401,6 +3401,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "tougherHealing", useTougherHealing());
         //endregion Medical
 
+        //region Family
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        //endregion Family
+
         //region Prisoners
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
@@ -3417,10 +3421,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "extraRandomOrigin", extraRandomOrigin());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
         //endregion Personnel Randomization
-
-        //region Family
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
-        //endregion Family
 
         //region Salary
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
@@ -3896,6 +3896,11 @@ public class CampaignOptions implements Serializable {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Medical
 
+                //region Family
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
+                    retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+                //endregion Family
+
                 //region Prisoners
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
@@ -3932,11 +3937,6 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
                     retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Personnel Randomization
-
-                //region Family
-                } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                    retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
-                //endregion Family
 
                 //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
