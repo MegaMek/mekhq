@@ -4,8 +4,7 @@
 # Jobs:
 #
 #    - ci_cd: Build MekHQ for CI/CD on the specified Operating Systems for the specified Java versions
-#        - This job will use MM and MML source directly
-#          for the build.
+#        - This job will use MM and MML source directly for the build.
 #
 #    - other_os_ci: Build MekHQ on Windows and MacOS.
 #        - This job runs after `ci_cd` completes successfully.
