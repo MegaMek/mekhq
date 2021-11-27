@@ -2057,7 +2057,7 @@ public class Campaign implements Serializable, ITechManager {
         return target;
     }
 
-    public Person getLogisticsPerson() {
+    public @Nullable Person getLogisticsPerson() {
         int bestSkill = -1;
         int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
         Person admin = null;
@@ -5148,9 +5148,16 @@ public class Campaign implements Serializable, ITechManager {
 
         /* If contract is still null, the unit is not in a contract. */
         final Person person = getLogisticsPerson();
-        int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
-                : person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
-        int modifier = experienceLevel - SkillType.EXP_REGULAR;
+        final int experienceLevel;
+        if (person == null) {
+            experienceLevel = SkillType.EXP_ULTRA_GREEN;
+        } else if (CampaignOptions.S_TECH.equals(getCampaignOptions().getAcquisitionSkill())) {
+            experienceLevel = person.getBestTechSkill().getExperienceLevel();
+        } else {
+            experienceLevel = person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
+        }
+
+        final int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
