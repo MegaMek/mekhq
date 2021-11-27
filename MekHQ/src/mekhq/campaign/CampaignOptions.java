@@ -212,8 +212,12 @@ public class CampaignOptions implements Serializable {
     private boolean extraRandomOrigin;
     private double originDistanceScale;
 
+    // Retirement
+
     // Family
     private FamilialRelationshipDisplayLevel displayFamilyLevel;
+
+    // Dependent
 
     // Salary
     private double salaryCommissionMultiplier;
@@ -234,6 +238,8 @@ public class CampaignOptions implements Serializable {
     private int marriageAgeRange;
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
+
+    // Divorce
 
     // Procreation
     private boolean useManualProcreation;
@@ -585,8 +591,12 @@ public class CampaignOptions implements Serializable {
         setExtraRandomOrigin(false);
         setOriginDistanceScale(0.6);
 
+        // Retirement
+
         // Family
         setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+
+        // Dependent
 
         // Salary
         setSalaryCommissionMultiplier(1.2);
@@ -654,6 +664,8 @@ public class CampaignOptions implements Serializable {
         setMarriageAgeRange(10);
         setUseRandomSameSexMarriages(false);
         setChanceRandomSameSexMarriages(0.00002);
+
+        // Divorce
 
         // Procreation
         setUseManualProcreation(true);
@@ -1356,6 +1368,9 @@ public class CampaignOptions implements Serializable {
     }
     //endregion Personnel Randomization
 
+    //region Retirement
+    //endregion Retirement
+
     //region Family
     /**
      * @return the level of familial relation to display
@@ -1371,6 +1386,9 @@ public class CampaignOptions implements Serializable {
         this.displayFamilyLevel = displayFamilyLevel;
     }
     //endregion Family
+
+    //region Dependent
+    //endregion Dependent
 
     //region Salary
     public double getSalaryCommissionMultiplier() {
@@ -1608,6 +1626,9 @@ public class CampaignOptions implements Serializable {
         this.chanceRandomSameSexMarriages = chanceRandomSameSexMarriages;
     }
     //endregion Marriage
+
+    //region Divorce
+    //endregion Divorce
 
     //region Procreation
     public boolean isUseManualProcreation() {
@@ -3418,9 +3439,15 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
         //endregion Personnel Randomization
 
+        //region Retirement
+        //endregion Retirement
+
         //region Family
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
         //endregion Family
+
+        //region Dependent
+        //endregion Dependent
 
         //region Salary
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
@@ -3443,6 +3470,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", useRandomSameSexMarriages());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
         //endregion Marriage
+
+        //region Divorce
+        //endregion Divorce
 
         //region Procreation
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
@@ -3933,10 +3963,16 @@ public class CampaignOptions implements Serializable {
                     retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Personnel Randomization
 
+                //region Retirement
+                //endregion Retirement
+
                 //region Family
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
                     retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                 //endregion Family
+
+                //region Dependent
+                //endregion Dependent
 
                 //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
@@ -3994,6 +4030,9 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
                     retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Marriage
+
+                //region Divorce
+                //endregion Divorce
 
                 //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {

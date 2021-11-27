@@ -236,8 +236,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
 
+    // Retirement
+
     // Family
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+
+    // Dependent
 
     // Salary
     private JSpinner spnCommissionedSalary;
@@ -258,6 +262,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner[] spnMarriageSurnameWeights;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
+
+    // Divorce
 
     // Procreation
     private JCheckBox chkUseManualProcreation;
@@ -3166,7 +3172,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
+        personnelPanel.add(createRetirementPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         personnelPanel.add(createFamilyPanel(), gbc);
+
+        gbc.gridx++;
+        personnelPanel.add(createDependentPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3706,6 +3719,34 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
 
+    private JPanel createRetirementPanel() {
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("retirementPanel.title")));
+        panel.setName("retirementPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel))
+        );
+
+        return panel;
+    }
+
     private JPanel createFamilyPanel() {
         // Create Panel Components
         JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("lblDisplayFamilyLevel.text"));
@@ -3724,6 +3765,34 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("familyPanel.title")));
         panel.setName("familyPanel");
         GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDisplayFamilyLevel)
+                                .addComponent(comboDisplayFamilyLevel))
+        );
+
+        return panel;
+    }
+
+    private JPanel createDependentPanel() {
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("dependentPanel.title")));
+        panel.setName("dependentPanel");
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -5409,8 +5478,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
         spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
 
+        // Retirement
+
         // Family
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
+
+        // Dependent
 
         // Salary
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
@@ -5445,6 +5518,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
         }
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
+
+        // Divorce
 
         // Procreation
         chkUseManualProcreation.setSelected(options.isUseManualProcreation());
@@ -5948,8 +6023,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
             options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
 
+            // Retirement
+
             // Family
             options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
+
+            // Dependent
 
             // Salary
             options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
@@ -5977,6 +6056,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
             options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
             options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
+
+            // Divorce
 
             // Procreation
             options.setUseManualProcreation(chkUseManualProcreation.isSelected());
