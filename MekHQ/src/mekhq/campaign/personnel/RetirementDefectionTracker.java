@@ -124,6 +124,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
+
                 if (p.getPrimaryRole().isSupport()) {
                     support++;
                 } else if ((null == p.getUnit()) ||
@@ -147,11 +148,13 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     (null != campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER))) {
                 max += 6 * campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getLevel();
             }
+
             if (combat > 2 * max) {
                 combatLeadershipMod = 2;
             } else if (combat > max) {
                 combatLeadershipMod = 1;
             }
+
             if (support > 2 * max) {
                 supportLeadershipMod = 2;
             } else if (support > max) {
@@ -161,9 +164,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 
         for (Person p : campaign.getActivePersonnel()) {
             if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
-                    || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
+                    || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
                 continue;
             }
+
             /* Infantry units retire or defect by platoon */
             if ((null != p.getUnit()) && p.getUnit().usesSoldiers()
                     && !p.getUnit().isCommander(p)) {
@@ -177,12 +181,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 target.addModifier(1, "Failed mission");
             }
 
-            if (campaign.getCampaignOptions().getTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
+            if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
                 target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
-            if (campaign.getFactionCode().equals("PIR")) {
+
+            if (campaign.getFaction().isPirate()) {
                 target.addModifier(1, "Pirate");
             }
+
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
@@ -196,9 +202,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
             }
+
             if (p.getAge(campaign.getLocalDate()) >= 50) {
                 target.addModifier(1, "Over 50");
             }
+
             if (campaign.getCampaignOptions().getUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
                  * of a contract (e.g. >12 months since last roll), the
@@ -219,6 +227,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             } else {
                 //Bonus payments handled by dialog
             }
+
             if (p.getPrimaryRole().isSoldier()) {
                 target.addModifier(-1, p.getPrimaryRole().toString());
             }
@@ -228,12 +237,15 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     injuryMod++;
                 }
             }
+
             if (injuryMod > 0) {
                 target.addModifier(injuryMod, "Permanent injuries");
             }
+
             if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
                 target.addModifier(combatLeadershipMod, "Leadership");
             }
+
             if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
                 target.addModifier(supportLeadershipMod, "Leadership");
             }

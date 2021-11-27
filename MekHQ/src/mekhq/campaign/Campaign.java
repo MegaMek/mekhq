@@ -694,7 +694,7 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().canAtBAddDependents()) {
+                    if (getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -3123,7 +3123,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
+                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3140,7 +3140,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().getDependentsNeverLeave()) {
+                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = Utilities.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3151,7 +3151,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             } else {
-                if (getCampaignOptions().canAtBAddDependents()) {
+                if (getCampaignOptions().isUseRandomDependentAddition()) {
                     for (int i = 0; i < change; i++) {
                         final Person person = newDependent(false);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
@@ -3176,7 +3176,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Account for fatigue
-            if (getCampaignOptions().getTrackUnitFatigue()) {
+            if (getCampaignOptions().isTrackUnitFatigue()) {
                 processNewDayATBFatigue();
             }
         }

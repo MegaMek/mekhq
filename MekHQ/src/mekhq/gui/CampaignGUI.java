@@ -1412,7 +1412,7 @@ public class CampaignGUI extends JPanel {
         boolean atb = oldOptions.getUseAtB();
         boolean timeIn = oldOptions.getUseTimeInService();
         boolean rankIn = oldOptions.getUseTimeInRank();
-        boolean retirementDateTracking = oldOptions.useRetirementDateTracking();
+        boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
@@ -1441,8 +1441,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (retirementDateTracking != newOptions.useRetirementDateTracking()) {
-            if (newOptions.useRetirementDateTracking()) {
+        if (retirementDateTracking != newOptions.isUseRetirementDateTracking()) {
+            if (newOptions.isUseRetirementDateTracking()) {
                 getCampaign().initRetirementDateTracking();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {

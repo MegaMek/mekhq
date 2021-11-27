@@ -179,10 +179,10 @@ public class RetirementDefectionDialog extends JDialog {
             JLabel lblGeneralMod = new JLabel(resourceMap.getString("lblGeneralMod.text"));
             spnGeneralMod = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
             spnGeneralMod.setToolTipText(resourceMap.getString("spnGeneralMod.toolTipText"));
-            if (hqView.getCampaign().getCampaignOptions().getCustomRetirementMods()) {
+            if (hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers()) {
                 panTop.add(lblGeneralMod);
                 panTop.add(spnGeneralMod);
-                spnGeneralMod.addChangeListener(arg0 -> personnelTable.setGeneralMod((Integer)spnGeneralMod.getValue()));
+                spnGeneralMod.addChangeListener(arg0 -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
             }
 
             JLabel lblTotalDesc = new JLabel();
@@ -239,7 +239,7 @@ public class RetirementDefectionDialog extends JDialog {
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_SHARES)), false);
             }
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)),
-                    hqView.getCampaign().getCampaignOptions().getCustomRetirementMods());
+                    hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers());
             model.setData(targetRolls);
             model.addTableModelListener(ev -> {
                 if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
