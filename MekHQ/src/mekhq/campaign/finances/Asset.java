@@ -21,14 +21,19 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.finances.enums.TransactionType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 /**
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
@@ -45,6 +50,8 @@ public class Asset implements Serializable {
     private Money value;
     private FinancialTerm financialTerm;
     private Money income;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -90,14 +97,23 @@ public class Asset implements Serializable {
     }
     //region Getters/Setters
 
+    public void processNewDay(final Campaign campaign, final LocalDate today, final Finances finances) {
+        if (getFinancialTerm().endsToday(today)) {
+            finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
+                    "Income from " + getName());
+            campaign.addReport(String.format(resources.getString("AssetPayment.text"),
+                    getIncome().toAmountAndSymbolString(), getName()));
+        }
+    }
+
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "asset");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", getName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", getValue().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", getIncome().toXmlString());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "asset");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "asset");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", getValue().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "income", getIncome().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "asset");
     }
 
     public static Asset generateInstanceFromXML(final Node wn) {

@@ -140,7 +140,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
 
-        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.getValidAssetTerms());
+        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.values());
         choiceSchedule.setSelectedItem(asset.getFinancialTerm());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

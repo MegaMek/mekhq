@@ -230,23 +230,7 @@ public class Finances implements Serializable {
         }
 
         // Handle assets
-        for (final Asset asset : assets) {
-            if (asset.getFinancialTerm().isAnnually() && (today.getDayOfYear() == 1)) {
-                credit(TransactionType.MISCELLANEOUS, today, asset.getIncome(),
-                        "Income from " + asset.getName());
-                campaign.addReport(String.format(
-                        resourceMap.getString("AssetPayment.text"),
-                        asset.getIncome().toAmountAndSymbolString(),
-                        asset.getName()));
-            } else if (asset.getFinancialTerm().isMonthly() && (today.getDayOfMonth() == 1)) {
-                credit(TransactionType.MISCELLANEOUS, today, asset.getIncome(),
-                        "Income from " + asset.getName());
-                campaign.addReport(String.format(
-                        resourceMap.getString("AssetPayment.text"),
-                        asset.getIncome().toAmountAndSymbolString(),
-                        asset.getName()));
-            }
-        }
+        getAllAssets().forEach(asset -> asset.processNewDay(campaign, campaign.getLocalDate(), this));
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {

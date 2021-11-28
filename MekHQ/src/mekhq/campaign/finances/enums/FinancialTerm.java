@@ -23,6 +23,7 @@ import mekhq.MekHQ;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ResourceBundle;
 
@@ -84,8 +85,26 @@ public enum FinancialTerm {
                 return ((origin.getDayOfMonth() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth()))
                         .plusMonths(1);
             case QUARTERLY:
+                return (((origin.getDayOfMonth() == 1)
+                            && (origin.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR)))
+                        ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth())).plusMonths(3);
+            case ANNUALLY:
+            default:
+                return ((origin.getDayOfYear() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextYear()))
+                        .plusYears(1);
+        }
+    }
+
+    public boolean endsToday(final LocalDate today) {
+        switch (this) {
+            case BIWEEKLY:
+                return (today.getDayOfWeek() == DayOfWeek.MONDAY) && today.
+            case MONTHLY:
                 return ((origin.getDayOfMonth() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth()))
-                        .plusMonths(3);
+                        .plusMonths(1);
+            case QUARTERLY:
+                return (((origin.getDayOfMonth() == 1) && (((origin.getMonth().ordinal() - 1) % 3) == 0))
+                        ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth())).plusMonths(3);
             case ANNUALLY:
             default:
                 return ((origin.getDayOfYear() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextYear()))
@@ -105,10 +124,6 @@ public enum FinancialTerm {
             default:
                 return 1;
         }
-    }
-
-    public static FinancialTerm[] getValidAssetTerms() {
-        return new FinancialTerm[] { FinancialTerm.QUARTERLY, FinancialTerm.ANNUALLY };
     }
 
     //region File I/O
