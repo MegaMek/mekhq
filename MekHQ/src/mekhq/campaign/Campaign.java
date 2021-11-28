@@ -588,6 +588,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getShipSearchStart() == null) {
             return;
         }
+
         StringBuilder report = new StringBuilder();
         if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
                 getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
@@ -598,6 +599,7 @@ public class Campaign implements Serializable, ITechManager {
             setShipSearchStart(null);
             return;
         }
+
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
@@ -613,6 +615,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
+
                 if (ms != null) {
                     setShipSearchResult(ms.getName());
                     setShipSearchExpiration(getLocalDate().plusDays(31));
@@ -672,7 +675,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param unitAssignments List of unit assignments.
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
-    public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
+    public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
@@ -680,9 +683,11 @@ public class Campaign implements Serializable, ITechManager {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
+
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
+
                     if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
                         Person p = newPerson(getPerson(pid).getPrimaryRole());
                         p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
@@ -694,7 +699,9 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().isUseRandomDependentAddition()) {
+
+                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                            && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -705,6 +712,7 @@ public class Campaign implements Serializable, ITechManager {
                             }
                         }
                     }
+
                     if (unitAssignments.containsKey(pid)) {
                         removeUnit(unitAssignments.get(pid));
                     }
@@ -742,7 +750,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
+        if (campaignOptions.getUseAtB() && !force.getUnits().isEmpty()) {
             if (null == lances.get(id)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
@@ -3122,7 +3130,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
-        if ((getLocalDate().getDayOfYear() == 1)
+        if (getCampaignOptions().getRandomDependentMethod().isAtB() && (getLocalDate().getDayOfYear() == 1)
                 && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();

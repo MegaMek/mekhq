@@ -72,8 +72,8 @@ public class RetirementDefectionDialog extends JDialog {
     private AtBContract contract;
     private RetirementDefectionTracker rdTracker;
 
-    private HashMap<UUID, TargetRoll> targetRolls;
-    private HashMap<UUID, UUID> unitAssignments;
+    private Map<UUID, TargetRoll> targetRolls;
+    private Map<UUID, UUID> unitAssignments;
 
     private JPanel panMain;
     private JTextArea txtInstructions;
@@ -107,16 +107,14 @@ public class RetirementDefectionDialog extends JDialog {
 
     private boolean aborted = true;
 
-    public RetirementDefectionDialog (CampaignGUI gui,
-            AtBContract contract, boolean doRetirement) {
+    public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
         this.contract = contract;
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
-            targetRolls = rdTracker.calculateTargetNumbers(contract,
-                    hqView.getCampaign());
+            targetRolls = rdTracker.calculateTargetNumbers(contract, hqView.getCampaign());
         }
         currentPanel = doRetirement?PAN_OVERVIEW:PAN_RESULTS;
         setSize(new Dimension(800, 600));
@@ -431,6 +429,7 @@ public class RetirementDefectionDialog extends JDialog {
                     if (payBonus(id)) {
                         targetRolls.get(id).addModifier(-1, "Bonus");
                     }
+
                     if (miscModifier(id) != 0) {
                         targetRolls.get(id).addModifier(miscModifier(id), "Misc");
                     }
@@ -749,7 +748,7 @@ public class RetirementDefectionDialog extends JDialog {
         return unitAssignments.get(pid);
     }
 
-    public HashMap<UUID, UUID> getUnitAssignments() {
+    public Map<UUID, UUID> getUnitAssignments() {
         return unitAssignments;
     }
 

@@ -2666,15 +2666,19 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         chkUseAtB = new JCheckBox(resourceMap.getString("chkUseAtB.text"));
         chkUseAtB.setToolTipText(resourceMap.getString("chkUseAtB.toolTipText"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        chkUseAtB.addActionListener(evt -> {
+            final boolean enabled = chkUseAtB.isSelected();
+            enableAtBComponents(panAtB, enabled);
+            comboRandomRetirementMethod.setSelectedItem(enabled);
+        });
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panAtB.add(chkUseAtB, gridBagConstraints);
-        chkUseAtB.addActionListener(ev -> enableAtBComponents(panAtB, chkUseAtB.isSelected()));
 
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;

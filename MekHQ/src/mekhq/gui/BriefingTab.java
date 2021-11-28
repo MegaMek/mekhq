@@ -379,7 +379,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
+            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAtB()
+                    && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                         (AtBContract) mission, true);
                 rdd.setVisible(true);
@@ -393,7 +394,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         return;
                     }
                 } else {
-                    if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
+                    if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
                         for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);

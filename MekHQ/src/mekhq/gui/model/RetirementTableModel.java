@@ -75,13 +75,13 @@ public class RetirementTableModel extends AbstractTableModel {
         editPayout = false;
     }
 
-    public void setData(ArrayList<UUID> list, HashMap<UUID, UUID> unitAssignments) {
+    public void setData(List<UUID> list, Map<UUID, UUID> unitAssignments) {
         this.unitAssignments = Utilities.nonNull(unitAssignments, new HashMap<>());
         data = list;
         fireTableDataChanged();
     }
 
-    public void setData(HashMap<UUID, TargetRoll> targets) {
+    public void setData(Map<UUID, TargetRoll> targets) {
         this.targets = targets;
         data.clear();
         for (UUID id : targets.keySet()) {
