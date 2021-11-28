@@ -700,8 +700,7 @@ public class Campaign implements Serializable, ITechManager {
                         }
                     }
 
-                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
-                            && getCampaignOptions().isUseRandomDependentAddition()) {
+                    if (getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -1100,7 +1099,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so lets just wrap that around a
+        // we really just want the entity and the parts so let's just wrap that around a
         // new
         // unit.
         Unit unit = new Unit(tu.getEntity(), this);
@@ -3130,7 +3129,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
-        if (getCampaignOptions().getRandomDependentMethod().isAtB() && (getLocalDate().getDayOfYear() == 1)
+        if ((getLocalDate().getDayOfYear() == 1)
                 && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
@@ -3140,12 +3139,9 @@ public class Campaign implements Serializable, ITechManager {
                     dependents.add(p);
                 }
             }
-            int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-            if (roll < 2) {
-                roll = 2;
-            } else if (roll > 12) {
-                roll = 12;
-            }
+
+            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
                 if (!getCampaignOptions().isUseRandomDependentsRemoval()) {

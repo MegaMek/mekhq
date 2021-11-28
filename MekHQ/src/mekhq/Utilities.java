@@ -150,6 +150,10 @@ public class Utilities {
         return (int) Math.round(min * (1.0 - f) + max * f);
     }
 
+    public static int clamp(final int value, final int min, final int max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
     /**
      * The method is returns the same as a call to the following code:
      * <pre>T result = (null != getFirst()) ? getFirst() : getSecond();</pre>

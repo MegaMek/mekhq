@@ -2669,7 +2669,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseAtB.addActionListener(evt -> {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
-            comboRandomRetirementMethod.setSelectedItem(enabled);
+            comboRandomRetirementMethod.setEnabled(enabled);
+            comboRandomDependentMethod.setEnabled(enabled);
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

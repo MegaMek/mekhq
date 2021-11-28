@@ -176,6 +176,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     && !p.getUnit().isCommander(p)) {
                 continue;
             }
+
             TargetRoll target = new TargetRoll(5, "Target");
             target.addModifier(p.getExperienceLevel(false) - campaign.getUnitRatingMod(),
                     "Experience");
