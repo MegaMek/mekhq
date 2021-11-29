@@ -1410,8 +1410,8 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.getUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
-        final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
+        final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
         final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
 
