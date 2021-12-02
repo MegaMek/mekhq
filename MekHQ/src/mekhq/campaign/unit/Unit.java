@@ -30,6 +30,7 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -3482,11 +3483,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         getCampaign().clearGameData(entity);
-        //Set up SPAs, Implants, Edge, etc
+        // Set up SPAs, Implants, Edge, etc
         if (getCampaign().getCampaignOptions().useAbilities()) {
-            PersonnelOptions options = new PersonnelOptions();
-            //This double enumeration is annoying to work with for crew-served units.
-            //Get the option names while we enumerate so they can be used later
+            PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
+            // This double enumeration is annoying to work with for crew-served units.
+            // Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<>();
             Set<String> cyberOptionNames = new HashSet<>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
@@ -3572,7 +3573,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
 
-                //Assign the options to our unit
+                // Assign the options to our unit
                 entity.getCrew().setOptions(options);
 
                 //Assign edge points to spacecraft and vehicle crews and infantry units
@@ -3615,7 +3616,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 //For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
-                PersonnelOptions cdrOptions = new PersonnelOptions();
+                PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
                 if (null != commander) {
                     for (String optionName : optionNames) {
                         IOption option = commander.getOptions().getOption(optionName);
@@ -4280,6 +4281,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        addPilotOrSoldier(p, useTransfers, null);
+    }
+
+    public void addPilotOrSoldier(Person p, boolean useTransfers, Unit oldUnit) {
         Objects.requireNonNull(p);
 
         ensurePersonIsRegistered(p);
@@ -4292,8 +4297,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(oldUnit), getCampaign().getForceFor(this));
         } else {
             ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.addedToTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4332,6 +4341,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         if (log) {
             ServiceLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFromTOEForce(getCampaign(), person, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
     }
 
@@ -4618,17 +4629,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     //endregion Mothballing/Activation
 
-    public ArrayList<Person> getActiveCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
+    public List<Person> getActiveCrew() {
+        List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
-            if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
+            if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                 continue;
             }
             crew.add(p);
         }
+
         if (!usesSoloPilot() && !usesSoldiers()) {
             for (Person p : gunners) {
-                if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
+                if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                     continue;
                 }
                 crew.add(p);

@@ -60,7 +60,9 @@ dependencies {
 mainClassName = 'mekhq.MekHQ'
 
 ext {
-    jvmOptions = ['-Xmx1024m']
+    mmJvmOptions = ['-Xmx2048m']
+    mmlJvmOptions = ['-Xmx1024m']
+    mhqJvmOptions = ['-Xmx2048m']
     userdata='userdata'
     data = 'data'
     conf = 'mmconf'
@@ -208,7 +210,7 @@ task createStartScripts (type: CreateStartScripts) {
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
-    defaultJvmOpts = project.ext.jvmOptions
+    defaultJvmOpts = project.ext.mhqJvmOptions
     // The default template assumes the start script is in a subdirectory and always
     // sets APP_HOME to the parent directory of the one containing the script.
     // So we provide a modified template.
@@ -313,7 +315,7 @@ createExe {
     doLast {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
-${project.ext.jvmOptions.join('\n')}
+${project.ext.mhqJvmOptions.join('\n')}
 """
     }
 }
@@ -335,7 +337,7 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     doLast {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
-${project.ext.jvmOptions.join('\n')}
+${project.ext.mmJvmOptions.join('\n')}
 """
     }
 }
@@ -357,7 +359,7 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     doLast {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
-${project.ext.jvmOptions.join('\n')}
+${project.ext.mmlJvmOptions.join('\n')}
 """
     }
 }
