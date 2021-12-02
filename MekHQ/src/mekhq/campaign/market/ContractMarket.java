@@ -66,11 +66,6 @@ public class ContractMarket implements Serializable {
     public final static int CLAUSE_NUM = 4;
 
     /**
-     * An arbitrary maximum number of attempts to generate a contract.
-     */
-    private final static int MAXIMUM_GENERATION_RETRIES = 3;
-
-    /**
      * An arbitrary maximum number of attempts to find a random employer faction that
      * is not a Mercenary.
      */
@@ -282,9 +277,9 @@ public class ContractMarket implements Serializable {
      * the indicated number of retries, this will return null.
      */
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
-        if (campaign.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
-                int retries = MAXIMUM_GENERATION_RETRIES;
+                int retries = campaign.getCampaignOptions().getMaximumContractGenerationRetries();
                 AtBContract retVal = null;
                 while ((retries > 0) && (retVal == null)) {
                     // Send only 1 retry down because we're handling retries in our loop
@@ -302,7 +297,8 @@ public class ContractMarket implements Serializable {
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod) {
-        return generateAtBContract(campaign, employer, unitRatingMod, MAXIMUM_GENERATION_RETRIES);
+        return generateAtBContract(campaign, employer, unitRatingMod,
+                campaign.getCampaignOptions().getMaximumContractGenerationRetries());
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
