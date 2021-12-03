@@ -19,9 +19,7 @@
 package mekhq;
 
 import megamek.common.*;
-import megamek.common.annotations.Nullable;
 import megamek.utils.MegaMekXmlUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -32,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -226,8 +223,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>\n");
             Iterator<Entity> nc3List = list.iterator();
             while (nc3List.hasNext()) {
                 final Entity nc3Entity = nc3List.next();
@@ -235,31 +231,28 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
                     retVal.append(nc3Entity.getC3UUIDAsString());
-                    retVal.append("\"/>");
-                    retVal.append(CommonConstants.NL);
+                    retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>\n");
         }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>\n");
+
             Iterator<Entity> c3iList = list.iterator();
             while (c3iList.hasNext()) {
                 final Entity C3iEntity = c3iList.next();
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<c3i_link link=\"");
-                    retVal.append(C3iEntity.getC3UUIDAsString());
-                    retVal.append("\"/>");
-                    retVal.append(CommonConstants.NL);
+                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2))
+                            .append("<c3i_link link=\"")
+                            .append(C3iEntity.getC3UUIDAsString())
+                            .append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>\n");
         }
 
         // Finish writing this entity to the file.

@@ -1619,7 +1619,7 @@ public class CampaignGUI extends JPanel {
             List<String> techList = new ArrayList<>();
             String skillLvl;
 
-            List<Person> techs = getCampaign().getTechs(false, null, true);
+            List<Person> techs = getCampaign().getTechs(false, true);
             int lastRightTech = 0;
 
             for (Person tech : techs) {
@@ -2328,7 +2328,8 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+        if (!getCampaign().getCampaignOptions().getUseAtB()
+                || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             StringBuilder report = new StringBuilder();

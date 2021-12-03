@@ -60,8 +60,6 @@ public class CampaignTest {
 
     @Test
     public void testGetTechs() {
-        final UUID testId = UUID.fromString("c8682a91-346f-49b0-9f1f-28e669ee4e95");
-
         List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
@@ -123,8 +121,7 @@ public class CampaignTest {
         Mockito.when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
         Mockito.when(testCampaign.getTechs()).thenCallRealMethod();
         Mockito.when(testCampaign.getTechs(Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.nullable(UUID.class), Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getPerson(Mockito.eq(testId))).thenReturn(mockTechActiveTwo);
+        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.anyBoolean())).thenCallRealMethod();
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);
@@ -138,13 +135,6 @@ public class CampaignTest {
         expected.add(mockTechActive);
         expected.add(mockTechActiveTwo);
         Assert.assertEquals(expected, testCampaign.getTechs(true));
-
-        // Test getting the active techs with a specific tech listed first.
-        expected = new ArrayList<>(3);
-        expected.add(mockTechActiveTwo);
-        expected.add(mockTechActive);
-        expected.add(mockTechNoTime);
-        Assert.assertEquals(expected, testCampaign.getTechs(false, testId, false));
     }
 
     @Test
