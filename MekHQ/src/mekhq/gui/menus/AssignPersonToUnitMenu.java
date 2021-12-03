@@ -18,16 +18,7 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.Aero;
-import megamek.common.ConvFighter;
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.UnitType;
-import megamek.common.VTOL;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -35,7 +26,6 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import mekhq.gui.sorter.PersonTitleSorter;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -67,19 +57,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Initialize Menu
         setText(resources.getString("AssignPersonToUnitMenu.title"));
 
-        // Initial Parsing Booleans
-        boolean assign = true;
-
         // Impossible Assignments:
         // 1) All people must be active
         // 2) All people must be non-prisoners (bondsmen should be assignable to units)
         // 3) All people must not be primary civilians
         // 4) All people must share one of their non-civilian professions
-        if (Stream.of(people).anyMatch(person -> !person.getStatus().isActive()
+        boolean assign = Stream.of(people).noneMatch(person -> !person.getStatus().isActive()
                 || person.getPrisonerStatus().isPrisoner()
-                || Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())) {
-            assign = false;
-        }
+                || Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian());
 
         if (assign) {
             final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
@@ -355,7 +340,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
                                         useTransfers = campaign.getCampaignOptions().useTransfers();
                                     }
-                                    unit.addPilotOrSoldier(person, useTransfers);
+                                    unit.addGunner(person, useTransfers);
                                 }
                             }
                         });
