@@ -1,43 +1,39 @@
 /*
  * MekBayAboutBox.java
- * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import megameklab.com.MMLConstants;
+import mekhq.MekHQ;
+import mekhq.MekHqConstants;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.ResourceBundle;
-
-import javax.swing.JFrame;
-
-import megamek.MegaMek;
-import megamek.common.util.EncodeControl;
-import megameklab.com.MegaMekLab;
-import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
 
 public class MekHQAboutBox extends javax.swing.JDialog {
     private static final long serialVersionUID = -8514528257894201641L;
@@ -71,7 +67,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         setName("aboutBox"); // NOI18N
         setResizable(false);
         getContentPane().setLayout(new GridBagLayout());
-        
+
         appTitleLabel.setText(mekhqProperties.getString("Application.title")); // NOI18N
         appTitleLabel.setName("appTitleLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -83,48 +79,48 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         getContentPane().add(appTitleLabel, gridBagConstraints);
-        
+
         versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
         versionLabel.setName("versionLabel"); // NOI18N
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
-        
-        appVersionLabel.setText(mekhqProperties.getString("Application.version")); // NOI18N
+
+        appVersionLabel.setText(MekHqConstants.VERSION.toString());
         appVersionLabel.setName("appVersionLabel"); // NOI18N
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabel, gridBagConstraints);
-        
+
         versionLabelMegaMek.setText(resourceMap.getString("versionLabelMegaMek.text")); // NOI18N
         versionLabelMegaMek.setName("versionLabelMegaMek"); // NOI18N
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMek, gridBagConstraints);
-        
-        appVersionLabelMegaMek.setText(MegaMek.VERSION); // NOI18N
-        appVersionLabelMegaMek.setName("appVersionLabelMegaMek"); // NOI18N
+
+        appVersionLabelMegaMek.setText(MekHqConstants.VERSION.toString());
+        appVersionLabelMegaMek.setName("appVersionLabelMegaMek");
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMek, gridBagConstraints);
-        
+
         versionLabelMegaMekLab.setText(resourceMap.getString("versionLabelMegaMekLab.text")); // NOI18N
         versionLabelMegaMekLab.setName("versionLabelMegaMekLab"); // NOI18N
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
-        
-        appVersionLabelMegaMekLab.setText(MegaMekLab.VERSION); // NOI18N
+
+        appVersionLabelMegaMekLab.setText(MMLConstants.VERSION.toString());
         appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab"); // NOI18N
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
-        
+
         homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
         homepageLabel.setName("homepageLabel"); // NOI18N
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         getContentPane().add(homepageLabel, gridBagConstraints);
-        
+
         // use a JButton but make it look more like a regular link
         appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>"); // NOI18N
         appHomepage.setName("appHomepageLabel"); // NOI18N
@@ -144,27 +140,27 @@ public class MekHQAboutBox extends javax.swing.JDialog {
                 }
             }
         });
-        
+
         gridBagConstraints.gridx = 1;
         getContentPane().add(appHomepage, gridBagConstraints);
 
-        
+
         appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        
+
         // add some space at the bottom so the description text is easier to read
         gridBagConstraints.insets = new Insets(15,15,15,15);
 
         appDescLabel.setName("appDescLabel"); // NOI18N
 
         getContentPane().add(appDescLabel, gridBagConstraints);
-        
+
         setSize(200,200);
-        
+
         pack();
     }
 

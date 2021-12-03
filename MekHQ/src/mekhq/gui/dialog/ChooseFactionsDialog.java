@@ -41,8 +41,8 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.universe.Faction;

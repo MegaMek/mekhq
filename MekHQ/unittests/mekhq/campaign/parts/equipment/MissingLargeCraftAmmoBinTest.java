@@ -44,7 +44,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -101,7 +101,7 @@ public class MissingLargeCraftAmmoBinTest {
 
         // Get the AmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -113,7 +113,7 @@ public class MissingLargeCraftAmmoBinTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the AmmoBin
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof MissingLargeCraftAmmoBin);
 

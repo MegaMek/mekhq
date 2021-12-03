@@ -20,15 +20,15 @@
 package mekhq.campaign.mission;
 
 /**
- * A data structure containing metadata relevant to the effect that completing or failing an objective 
- * can have. 
+ * A data structure containing metadata relevant to the effect that completing or failing an objective
+ * can have.
  * @author NickAragua
  *
  */
 public class ObjectiveEffect {
-    
+
     /**
-     * The possible type of effect scaling effects, 
+     * The possible type of effect scaling effects,
      * aka what you multiply the effect by.
      */
     public enum EffectScalingType {
@@ -45,7 +45,7 @@ public class ObjectiveEffect {
          */
         Inverted
     }
-    
+
     /**
      * The behavior of the application when the objective effect is applied
      */
@@ -53,41 +53,77 @@ public class ObjectiveEffect {
         /*
          *  contributes a "victory point" towards the scenario's victory/defeat state
          */
-        ScenarioVictory,
+        ScenarioVictory("+%d Scenario VP", true),
         /*
          *  contributes a "negative victory point" towards the scenario's victory/defeat state
          */
-        ScenarioDefeat,
+        ScenarioDefeat("-%d Scenario VP", true),
         /*
          *  changes the contract score
          */
-        ContractScoreUpdate,
+        ContractScoreUpdate("%d Contract Score", true),
         /* changes the number of support points (not implemented yet)
-         * 
+         *
          */
-        SupportPointUpdate,
+        SupportPointUpdate("%d Support Points", true),
         /*
          *  changes the contract morale up or down
          */
-        ContractMoraleUpdate,
+        ContractMoraleUpdate("%d Contract Morale", true),
         /*
          *  insta-win the contract (player still has to manually complete it)
          */
-        ContractVictory,
+        ContractVictory("Early Contract Victory/Temporary Rout", false),
         /*
          *  insta-lose the contract (player still has to manually complete it)
          */
-        ContractDefeat,
+        ContractDefeat("Early Contract Loss", false),
         /*
          *  update the BV budget multiplier for template scenarios (not implemented yet)
          */
-        BVBudgetUpdate,
+        BVBudgetUpdate("%d%% BV budget increase", true),
         /*
          *  roll an AtB-style "bonus"
          */
-        AtBBonus
-    }        
-    
+        AtBBonus("%d AtB bonus roll(s)", true),
+
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility remains in play.
+         */
+        FacilityRemains("Facility Remains Intact", false),
+
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility is removed from play.
+         */
+        FacilityRemoved("Facility Destroyed", false),
+
+        /*
+         * In StratCon, relevant if scenario is about a facility, said facility changes ownership.
+         */
+        FacilityCaptured("Facility Captured", false);
+
+        private final String descriptiveText;
+        private boolean magnitudeIsRelevant;
+
+        /**
+         * Whether the scaling is relevant for this particular objective effect type -
+         * e.g. it doesn't matter how many times you destroy a facility, it's still destroyed
+         */
+        public boolean isMagnitudeRelevant() {
+            return magnitudeIsRelevant;
+        }
+
+        @Override
+        public String toString() {
+            return descriptiveText;
+        }
+
+        ObjectiveEffectType(String description, boolean magnitudeIsRelevant) {
+            descriptiveText = description;
+            this.magnitudeIsRelevant = magnitudeIsRelevant;
+        }
+    }
+
     /**
      * Possible conditions under which an objective effect may be triggered
      */
@@ -96,27 +132,30 @@ public class ObjectiveEffect {
          * An effect triggered when the associated objective is fulfilled
          */
         ObjectiveSuccess,
-        
+
         /**
          * An effect triggered when the associated objective is not fulfilled
          */
         ObjectiveFailure
     }
-    
+
     public ObjectiveEffectType effectType;
     // whether the effect is scaled to the # of units or fixed in nature
     public EffectScalingType effectScaling = EffectScalingType.Fixed;
     // how much of the effect per unit, or how much of the effect fixed
     public int howMuch;
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(effectType.toString());
-        sb.append(" - ");
-        sb.append(effectScaling.toString());
-        sb.append(" - ");
-        sb.append(howMuch);
+
+        if (effectType.isMagnitudeRelevant()) {
+            sb.append(" - ");
+            sb.append(effectScaling.toString());
+            sb.append(" - ");
+            sb.append(howMuch);
+        }
         return sb.toString();
     }
 }

@@ -11,22 +11,24 @@
  */
 package mekhq;
 
-import java.awt.KeyboardFocusManager;
-import java.io.IOException;
-import java.util.List;
-
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
-import megamek.common.IGame;
 import megamek.common.KeyBindParser;
 import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 class GameThread extends Thread implements CloseClientListener {
     //region Variable Declarations
@@ -59,7 +61,7 @@ class GameThread extends Thread implements CloseClientListener {
         this.password = password;
         this.client = c;
         this.app = app;
-        this.units = units;
+        this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
     }
@@ -96,17 +98,15 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
 
-            // if game is running, shouldn't do the following, so detect the
-            // phase
-            for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            // if game is running, shouldn't do the following, so detect the phase
+            for (int i = 0; (i < 1000) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage" );
+                MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
-            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info("Thread in lounge" );
-                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+            if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
+                MekHQ.getLogger().info("Thread in lounge");
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
@@ -114,23 +114,21 @@ class GameThread extends Thread implements CloseClientListener {
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
+                var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
-                    // Get the Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
-                    // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    // Add Mek to game
-                    client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Force force = campaign.getForceFor(unit);
+                    entity.setForceString(force.getFullMMName());
+                    entities.add(entity);
                 }
-
+                client.sendAddEntity(entities);
                 client.sendPlayerInfo();
             }
 
-            while(!stop) {
+            while (!stop) {
                 Thread.sleep(50);
             }
         } catch (Exception e) {

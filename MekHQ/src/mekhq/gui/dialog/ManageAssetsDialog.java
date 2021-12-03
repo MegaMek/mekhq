@@ -47,8 +47,8 @@ import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa
@@ -249,7 +249,7 @@ public class ManageAssetsDialog extends JDialog {
                 return asset.getIncome().toAmountAndSymbolString();
             }
             if (col == COL_SCHEDULE) {
-                return Finances.getScheduleName(asset.getSchedule());
+                return asset.getFinancialTerm();
             }
             return "?";
         }

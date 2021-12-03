@@ -40,7 +40,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentTypeLookup;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 
 public class InfantryAmmoStorageTest {
@@ -119,7 +119,7 @@ public class InfantryAmmoStorageTest {
 
         // Get the AmmoStorage XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -131,7 +131,7 @@ public class InfantryAmmoStorageTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the AmmoStorage
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof InfantryAmmoStorage);
 

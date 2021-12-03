@@ -171,15 +171,12 @@ public class JumpPath implements Serializable {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        MekHQ.getLogger().error(JumpPath.class, "Couldn't find planet named " + wn2.getTextContent());
+                        MekHQ.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(JumpPath.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

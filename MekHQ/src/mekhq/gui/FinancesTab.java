@@ -121,8 +121,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
-                financeTable, financeModel));
+        FinanceTableMouseAdapter.connect(getCampaignGui(), financeTable, financeModel);
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
@@ -136,8 +135,7 @@ public final class FinancesTab extends CampaignGuiTab {
         loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
-                loanTable, loanModel));
+        LoanTableMouseAdapter.connect(getCampaignGui(), loanTable, loanModel);
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         for (int i = 0; i < LoanTableModel.N_COL; i++) {
             column = loanTable.getColumnModel().getColumn(i);
@@ -248,7 +246,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private CategoryDataset setupMonthlyDataset() {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy");
+        final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 
@@ -374,11 +372,8 @@ public final class FinancesTab extends CampaignGuiTab {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            Money funds = addFundsDialog.getFundsQuantityField();
-            String description = addFundsDialog.getFundsDescription();
-            int category = addFundsDialog.getCategory();
-            addFundsDialog.dispose();
-            getCampaign().addFunds(funds, description, category);
+            getCampaign().addFunds(addFundsDialog.getTransactionType(),
+                    addFundsDialog.getFundsQuantityField(), addFundsDialog.getFundsDescription());
         }
     }
 

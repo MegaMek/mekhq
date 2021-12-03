@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN'
+          'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg contentScriptType="text/ecmascript" width="576.0" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" contentStyleType="text/css" height="139.20000000000002" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" version="1.0"
+><g style="mml-color-elements:" id="rs_template"
+  ><g transform="translate (0.966 0.966)"
+    ><path fill="#ffffff" d="M 2.5,10.714 L 7.975,2.500 l 82.038,0.000 l 5.475,8.214 L 570.525,10.714 l 5.475,8.214 L 576.000,127.486 l -5.475,8.214 L 98.488,135.700 l -5.475,-8.214 L 7.975,127.486 l -5.475,-8.214 Z" stroke-width="5.2" stroke-linejoin="round" stroke="#c8c7c7"
+      /><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 l 82.038,0.000 l 5.475,8.214 L 568.025,8.214 l 5.475,8.214 L 573.500,125.986 l -5.475,8.214 L 95.988,134.200 l -5.475,-8.214 L 5.475,125.986 l -5.475,-8.214 Z" stroke-width="1.932" stroke-linejoin="round" stroke="#231f20"
+      /><g transform="translate (2.5,3.0)"
+      ><path fill="#000000" d="M 0,7.500 l 4.999,-7.500 h 78.038 l 4.999,7.500 l -4.999,7.500 h -78.038 Z"
+        /><text fill="#ffffff" x="7.999" id="protomechIndex" y="11.250" style="font-family:Eurostile;font-size:10.600px;font-weight:bold;font-style:normal;mml-field-width:70.944" text-anchor="start"
+        >PROTOMECH #</text
+      ></g
+    ></g
+    ><g transform="translate (3.000 18.000)"
+    ><text x="3.000" y="8.774" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" textLength="15.930" lengthAdjust="spacingAndGlyphs"
+      >Type:</text
+      ><text fill="#231f20" x="22.523" id="type" y="8.774" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:70.143" text-anchor="start"
+      >Lorem Ipsum</text
+      ><text fill="#231f20" x="50.333" id="type2" y="17.548" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:45.333" text-anchor="start"
+      ></text
+      ><text x="3.000" y="17.548" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" textLength="16.411" lengthAdjust="spacingAndGlyphs"
+      >Tons:</text
+      ><text fill="#231f20" x="23.004" id="tonnage" y="17.548" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:22.329" text-anchor="start"
+      >0</text
+      ><text x="3.000" y="26.322" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" id="lblRole" textLength="15.108" lengthAdjust="spacingAndGlyphs"
+      >Role:</text
+      ><text fill="#231f20" x="21.702" id="role" y="26.322" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal;mml-field-width:70.964" text-anchor="start"
+      >Lorem Ipsum</text
+      ><text fill="#231f20" x="3.000" y="35.095" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Movement Points:</text
+      ><text fill="#231f20" x="5.000" y="43.869" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Walk:</text
+      ><text fill="#231f20" x="55.000" id="mpWalk" y="43.869" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+      ><text fill="#231f20" x="5.000" y="51.869" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Run:</text
+      ><text fill="#231f20" x="55.000" id="mpRun" y="51.869" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+      ><text fill="#231f20" x="5.000" id="lblJump" y="59.869" style="font-family:Eurostile;font-size:7.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Jump:</text
+      ><text fill="#231f20" x="55.000" id="mpJump" y="59.869" style="font-family:Eurostile;font-size:7.200px;font-weight:normal;font-style:normal" text-anchor="middle"
+      >0</text
+    ></g
+    ><g transform="translate (97.667 11.786)"
+    ><g
+      ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 179.858,0.000 l 5.475,8.214 L 185.333,72.405 l -5.475,8.214 L 5.475,80.619 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 172.643 l 3.749,5.625 l -3.749,5.625 h -172.643 Z"
+          /><text x="90.071" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="88.665" lengthAdjust="spacingAndGlyphs"
+          >WEAPONS INVENTORY</text
+        ></g
+      ></g
+      ><rect fill="none" x="3.000" width="179.333" id="inventory" height="65.369" y="14.250"
+    /></g
+    ><g transform="translate (287.000 11.786)"
+    ><g
+      ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 L 179.858,0.000 l 5.475,8.214 L 185.333,110.200 l -5.475,8.214 L 5.475,118.414 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+        /><g transform="translate (2.5,3.0)"
+        ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 172.643 l 3.749,5.625 l -3.749,5.625 h -172.643 Z"
+          /><text x="90.071" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="135.352" lengthAdjust="spacingAndGlyphs"
+          >HIT LOCATIONS AND CRITICAL HITS</text
+        ></g
+      ></g
+      ><text fill="#231f20" x="13.880" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >2D6</text
+      ><text fill="#231f20" x="24.760" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >LOCATION</text
+      ><text fill="#231f20" x="57.400" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >1st HIT</text
+      ><text fill="#231f20" x="102.733" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >2nd HIT</text
+      ><text fill="#231f20" x="148.067" y="22.650" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" text-anchor="start"
+      >3rd HIT</text
+      ><text fill="#231f20" x="13.880" y="32.029" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >2</text
+      ><text fill="#231f20" x="24.760" y="32.029" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Main Gun</text
+      ><path fill="#ffffff" d="M 57.400,27.744 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="32.029" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="44.779" lengthAdjust="spacingAndGlyphs"
+      >Main Gun Destroyed</text
+      ><text fill="#231f20" x="13.880" y="41.407" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >4</text
+      ><text fill="#231f20" x="24.760" y="41.407" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Right Arm</text
+      ><path fill="#ffffff" d="M 57.400,37.122 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="41.407" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.977" lengthAdjust="spacingAndGlyphs"
+      >+1 to Hit</text
+      ><path fill="#c8c7c7" d="M 102.733,37.122 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="111.133" y="41.407" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="46.323" lengthAdjust="spacingAndGlyphs"
+      >Right Arm Destroyed</text
+      ><text fill="#231f20" x="13.880" y="50.786" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >5,9</text
+      ><text fill="#231f20" x="24.760" y="50.786" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Legs</text
+      ><path fill="#ffffff" d="M 57.400,46.501 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="50.786" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="25.746" lengthAdjust="spacingAndGlyphs"
+      >-1 Walk MP</text
+      ><path fill="#ffffff" d="M 102.733,46.501 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="111.133" y="50.786" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="30.872" lengthAdjust="spacingAndGlyphs"
+      >1/2 Walk MP</text
+      ><path fill="#c8c7c7" d="M 148.067,46.501 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="156.467" y="50.786" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.581" lengthAdjust="spacingAndGlyphs"
+      >No Move</text
+      ><text fill="#231f20" x="13.880" y="60.164" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >6,7,8</text
+      ><text fill="#231f20" x="24.760" y="60.164" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Torso</text
+      ><path fill="#c8c7c7" d="M 57.400,55.879 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="60.164" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="29.808" lengthAdjust="spacingAndGlyphs"
+      >-1 Jump MP*</text
+      ><path fill="#c8c7c7" d="M 102.733,55.879 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="111.133" y="60.164" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="34.933" lengthAdjust="spacingAndGlyphs"
+      >1/2 Jump MP*</text
+      ><path fill="#231f20" d="M 148.067,55.879 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="156.467" y="60.164" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="12.419" lengthAdjust="spacingAndGlyphs"
+      >Proto</text
+      ><text x="156.467" y="67.164" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="22.603" lengthAdjust="spacingAndGlyphs"
+      >Destroyed</text
+      ><text fill="#231f20" x="13.880" y="69.543" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >10</text
+      ><text fill="#231f20" x="24.760" y="69.543" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Left Arm</text
+      ><path fill="#ffffff" d="M 57.400,65.258 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="69.543" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.977" lengthAdjust="spacingAndGlyphs"
+      >+1 to Hit</text
+      ><path fill="#c8c7c7" d="M 102.733,65.258 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="111.133" y="69.543" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="43.266" lengthAdjust="spacingAndGlyphs"
+      >Left Arm Destroyed</text
+      ><text fill="#231f20" x="13.880" y="78.921" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="middle"
+      >12</text
+      ><text fill="#231f20" x="24.760" y="78.921" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >Head</text
+      ><path fill="#ffffff" d="M 57.400,74.636 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="65.800" y="78.921" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.977" lengthAdjust="spacingAndGlyphs"
+      >+1 to Hit</text
+      ><path fill="#c8c7c7" d="M 102.733,74.636 c 0,-0.726 0.589,-1.315 1.315,-1.315 l 4.370,0 c 0.726,0 1.315,0.589, 1.315,1.315 l 0,4.370 c 0,0.726 -0.589,1.315, -1.315,1.315 l -4.370,0 c -0.726,0 -1.315,-0.589, -1.315,-1.315Z" stroke-width="0.96" stroke-linejoin="round" stroke="#231f20"
+      /><text x="111.133" y="78.921" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="19.975" lengthAdjust="spacingAndGlyphs"
+      >+2 to Hit</text
+      ><text x="111.133" y="85.921" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" textLength="47.320" lengthAdjust="spacingAndGlyphs"
+      >No Long Range Shots</text
+      ><text fill="#231f20" x="3.000" y="103.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal" text-anchor="start"
+      >*Torso Weapon Destroyed, Roll 1D6:</text
+      ><text fill="#231f20" x="6.000" id="torsoWeapon_0" y="110.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:54.400" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="65.840" id="torsoWeapon_1" y="110.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:54.400" text-anchor="start"
+      ></text
+      ><text fill="#231f20" x="125.680" id="torsoWeapon_2" y="110.414" style="font-family:Eurostile;font-size:5.700px;font-weight:bold;font-style:normal;mml-field-width:54.400" text-anchor="start"
+      ></text
+      ><text x="6.000" y="115.414" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:5.000px;font-weight:bold;font-style:normal" visibility="hidden" id="magClampNote"
+      >Magnetic Clamp System destroyed on first torso critical</text
+    ></g
+    ><g transform="translate (476.333 11.786)"
+    ><g transform="translate (5.337634472769196,0.0)"
+      ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 76.493 l 3.749,5.625 l -3.749,5.625 h -76.493 Z"
+        /><text x="41.996" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="69.539" lengthAdjust="spacingAndGlyphs"
+        >ARMOR DIAGRAM</text
+      ></g
+      ><g transform="matrix(1.008 0 0 1.008 4.800 11.250)"
+      >
+<g id="armor_diagram_protomech_biped" transform="matrix(1,0,0,-1,-485.35066,668.7845)"
+        ><g id="shadow_MG"
+          ><g id="g2514" transform="translate(516.7427,666.7183)"
+            ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -2.655,0 -4.809,-2.692 -4.809,-6.013 0,-3.321 2.154,-6.014 4.809,-6.014 2.657,0 4.811,2.693 4.811,6.014 C 4.811,-2.692 2.657,0 0,0" id="path2516"
+            /></g
+            ><g id="g2518" transform="translate(516.7427,666.7183)"
+            ><path style="fill:none;stroke:#c7c8ca;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -2.655,0 -4.809,-2.692 -4.809,-6.013 0,-3.321 2.154,-6.014 4.809,-6.014 2.657,0 4.811,2.693 4.811,6.014 C 4.811,-2.692 2.657,0 0,0 Z" id="path2520"
+            /></g
+          ></g
+          ><g id="g2522" transform="translate(568.9064,629.486)"
+          ><path style="fill:#c7c8ca;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 -0.568,1.7 -1.133,1.701 -1.985,1.985 -1.417,1.134 -1.418,1.417 -1.418,1.985 -1.982,2.268 -1.702,1.134 -0.568,1.701 -0.849,1.985 -1.703,1.134 -1.983,1.417 -1.7,1.418 -1.419,1.417 -1.868,0.533 0.168,1.167 1.132,0.85 1.702,0.851 1.701,0.284 0.851,1.984 0.849,2.267 -0.565,1.985 -1.135,-0.283 -0.283,-1.418 v -1.133 l -1.133,-0.851 -1.419,-0.283 -0.851,0.566 -0.568,1.134 -1.699,0.283 -1.702,-0.283 -2.267,-0.282 h -4.536 l -1.985,-0.284 -1.984,-0.568 -1.133,-1.133 -2.147,0.268 0.002,0.015 h -2.958 l -2.268,-0.283 -1.135,1.133 -1.984,0.568 -1.985,0.284 h -4.536 l -2.267,0.282 -1.702,0.283 -1.701,-0.283 -0.566,-1.134 -0.852,-0.566 -1.416,0.283 -1.136,0.851 v 1.133 l -0.282,1.418 -1.134,0.283 -0.567,-1.985 0.85,-2.267 0.851,-1.984 1.7,-0.284 1.701,-0.851 1.134,-0.85 0.283,-1.984 0.137,-1.221 -0.42,2.072 -2.835,-0.567 -1.418,-1.417 -1.7,-1.418 -1.984,-1.417 -1.701,-1.134 -0.85,-1.985 -0.567,-1.701 L -71.726,12.19 -73.71,9.922 -75.126,7.937 -76.543,6.52 -77.96,5.386 -79.945,3.401 -81.08,1.7 -81.646,0 l -0.568,-2.269 0.285,-1.983 0.566,-2.269 1.418,-1.701 1.416,-1.701 1.702,-1.417 1.701,-1.134 1.134,-1.418 2.266,-0.567 1.419,-1.134 h 1.418 l 2.267,0.567 1.134,0.567 v 1.134 l -1.417,0.568 -1.417,0.566 v 1.984 l 0.567,1.134 -0.567,0.851 -0.284,1.417 -0.283,1.418 h 0.85 l 0.85,-1.701 0.567,-1.701 0.851,-0.566 0.567,1.7 v 1.701 l -0.851,1.702 -1.134,0.85 -1.417,0.567 v 1.417 l 1.133,0.566 1.702,0.284 1.984,0.568 1.418,0.85 1.418,1.134 1.134,1.701 0.849,0.85 2.305,-0.247 2.958,0.265 -2.738,13.536 -1.391,-0.513 1.136,-1.417 c 0,0 1.416,-0.851 2.267,-0.851 0.85,0 1.701,-0.567 1.701,-0.567 l 2.269,-0.566 1.701,-0.567 1.416,-1.134 1.417,-1.702 1.702,-1.984 1.418,-2.268 1.418,-1.134 h 2.267 l 1.416,1.134 1.419,2.268 1.7,1.984 1.418,1.702 1.419,1.134 1.7,0.567 2.268,0.566 c 0,0 0.85,0.567 1.699,0.567 0.385,0 0.881,0.174 1.313,0.364 l -16.619,4.456 -15.026,-4.252 0.283,-2.552 0.284,-2.835 0.566,-2.552 0.285,-1.984 -0.285,-2.834 -0.566,-2.836 0.284,-2.268 0.567,-2.551 1.132,-2.269 0.03,-0.023 -0.135,0.077 -0.567,-2.268 -0.46,-3.455 0.281,-2.836 v -2.834 l -2.267,-2.836 -1.702,-3.401 -1.984,-2.835 -2.834,-4.535 -0.284,-1.702 -1.417,-1.134 -0.851,-1.417 0.567,-2.835 v -4.819 l 0.284,-1.701 0.567,-1.986 0.85,-1.7 -2.552,-7.371 -1.7,-1.134 -1.134,-0.85 -1.134,-1.702 -1.419,-1.984 -1.417,-1.418 -0.849,-1.133 -0.284,-1.418 h 2.834 l 0.285,-1.417 h 4.818 l 1.702,0.284 2.268,0.282 2.267,0.851 1.986,0.568 1.418,0.85 1.982,0.85 1.986,0.851 1.701,0.567 1.984,0.567 1.418,0.283 1.416,0.851 0.569,1.7 -0.569,1.701 -1.133,2.552 0.284,1.417 c 0,0 0,1.701 -0.284,2.552 -0.283,0.851 0,1.985 0,1.985 l -0.567,3.118 -0.849,1.134 -0.851,1.133 -0.284,1.985 0.284,1.419 0.283,2.834 0.568,1.985 1.982,1.7 1.986,1.985 1.133,1.418 0.568,1.417 1.418,2.268 1.133,0.568 1.134,-0.568 1.418,-2.268 0.567,-1.417 1.134,-1.418 1.985,-1.985 1.984,-1.7 0.568,-1.985 0.282,-2.834 0.285,-1.419 -0.285,-1.985 -0.85,-1.133 -0.851,-1.134 -0.567,-3.118 c 0,0 0.283,-1.134 0,-1.985 -0.284,-0.851 -0.284,-2.552 -0.284,-2.552 l 0.284,-1.417 -1.133,-2.552 -0.568,-1.701 0.568,-1.7 1.416,-0.851 1.418,-0.283 1.985,-0.567 1.701,-0.567 1.984,-0.851 1.984,-0.85 1.418,-0.85 1.984,-0.568 2.268,-0.851 2.267,-0.282 1.701,-0.284 h 4.822 l 0.282,1.417 h 2.834 l -0.283,1.418 -0.851,1.133 -1.416,1.418 -1.418,1.984 -1.134,1.702 -1.133,0.85 -1.703,1.134 -2.55,7.371 0.849,1.7 0.569,1.986 0.283,1.701 v 4.819 l 0.565,2.835 -0.848,1.417 -1.418,1.134 -0.284,1.702 -2.836,4.535 -1.983,2.835 -1.701,3.401 -2.268,2.836 v 2.834 l 0.282,2.836 -0.566,3.401 -0.567,2.268 1.133,2.269 0.568,2.551 0.283,2.268 -0.565,2.836 -0.286,2.834 0.286,1.984 0.565,2.552 0.284,2.835 0.265,2.386 c 0.486,0.22 0.869,0.449 0.869,0.449 l -0.424,1.171 -2.694,-12.512 2.551,-0.565 1.702,0.282 0.849,-0.85 1.134,-1.701 1.418,-1.134 1.418,-0.85 1.985,-0.568 1.7,-0.284 1.135,-0.566 v -1.417 l -1.419,-0.567 -1.133,-0.85 -0.852,-1.702 v -1.701 l 0.569,-1.7 0.848,0.566 0.568,1.701 0.851,1.701 h 0.85 l -0.282,-1.418 -0.285,-1.417 -0.567,-0.851 0.567,-1.134 v -1.984 l -1.418,-0.566 -1.416,-0.568 v -1.134 l 1.132,-0.567 2.269,-0.567 h 1.418 l 1.419,1.134 2.266,0.567 1.134,1.418 1.702,1.134 1.702,1.417 1.416,1.701 1.418,1.701 0.566,2.269 0.283,1.983 L 0,0" id="path2524"
+          /></g
+          ><g id="g2526" transform="translate(568.9064,629.486)"
+          ><path style="fill:none;stroke:#c7c8ca;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -0.568,1.7 -1.133,1.701 -1.985,1.985 -1.417,1.134 -1.418,1.417 -1.418,1.985 -1.982,2.268 -1.702,1.134 -0.568,1.701 -0.849,1.985 -1.703,1.134 -1.983,1.417 -1.7,1.418 -1.419,1.417 -1.868,0.533 0.168,1.167 1.132,0.85 1.702,0.851 1.701,0.284 0.851,1.984 0.849,2.267 -0.565,1.985 -1.135,-0.283 -0.283,-1.418 v -1.133 l -1.133,-0.851 -1.419,-0.283 -0.851,0.566 -0.568,1.134 -1.699,0.283 -1.702,-0.283 -2.267,-0.282 h -4.536 l -1.985,-0.284 -1.984,-0.568 -1.133,-1.133 -2.147,0.268 0.002,0.015 h -2.958 l -2.268,-0.283 -1.135,1.133 -1.984,0.568 -1.985,0.284 h -4.536 l -2.267,0.282 -1.702,0.283 -1.701,-0.283 -0.566,-1.134 -0.852,-0.566 -1.416,0.283 -1.136,0.851 v 1.133 l -0.282,1.418 -1.134,0.283 -0.567,-1.985 0.85,-2.267 0.851,-1.984 1.7,-0.284 1.701,-0.851 1.134,-0.85 0.283,-1.984 0.137,-1.221 -0.42,2.072 -2.835,-0.567 -1.418,-1.417 -1.7,-1.418 -1.984,-1.417 -1.701,-1.134 -0.85,-1.985 -0.567,-1.701 L -71.726,12.19 -73.71,9.922 -75.126,7.937 -76.543,6.52 -77.96,5.386 -79.945,3.401 -81.08,1.7 -81.646,0 l -0.568,-2.269 0.285,-1.983 0.566,-2.269 1.418,-1.701 1.416,-1.701 1.702,-1.417 1.701,-1.134 1.134,-1.418 2.266,-0.567 1.419,-1.134 h 1.418 l 2.267,0.567 1.134,0.567 v 1.134 l -1.417,0.568 -1.417,0.566 v 1.984 l 0.567,1.134 -0.567,0.851 -0.284,1.417 -0.283,1.418 h 0.85 l 0.85,-1.701 0.567,-1.701 0.851,-0.566 0.567,1.7 v 1.701 l -0.851,1.702 -1.134,0.85 -1.417,0.567 v 1.417 l 1.133,0.566 1.702,0.284 1.984,0.568 1.418,0.85 1.418,1.134 1.134,1.701 0.849,0.85 2.305,-0.247 2.958,0.265 -2.738,13.536 -1.391,-0.513 1.136,-1.417 c 0,0 1.416,-0.851 2.267,-0.851 0.85,0 1.701,-0.567 1.701,-0.567 l 2.269,-0.566 1.701,-0.567 1.416,-1.134 1.417,-1.702 1.702,-1.984 1.418,-2.268 1.418,-1.134 h 2.267 l 1.416,1.134 1.419,2.268 1.7,1.984 1.418,1.702 1.419,1.134 1.7,0.567 2.268,0.566 c 0,0 0.85,0.567 1.699,0.567 0.385,0 0.881,0.174 1.313,0.364 l -16.619,4.456 -15.026,-4.252 0.283,-2.552 0.284,-2.835 0.566,-2.552 0.285,-1.984 -0.285,-2.834 -0.566,-2.836 0.284,-2.268 0.567,-2.551 1.132,-2.269 0.03,-0.023 -0.135,0.077 -0.567,-2.268 -0.46,-3.455 0.281,-2.836 v -2.834 l -2.267,-2.836 -1.702,-3.401 -1.984,-2.835 -2.834,-4.535 -0.284,-1.702 -1.417,-1.134 -0.851,-1.417 0.567,-2.835 v -4.819 l 0.284,-1.701 0.567,-1.986 0.85,-1.7 -2.552,-7.371 -1.7,-1.134 -1.134,-0.85 -1.134,-1.702 -1.419,-1.984 -1.417,-1.418 -0.849,-1.133 -0.284,-1.418 h 2.834 l 0.285,-1.417 h 4.818 l 1.702,0.284 2.268,0.282 2.267,0.851 1.986,0.568 1.418,0.85 1.982,0.85 1.986,0.851 1.701,0.567 1.984,0.567 1.418,0.283 1.416,0.851 0.569,1.7 -0.569,1.701 -1.133,2.552 0.284,1.417 c 0,0 0,1.701 -0.284,2.552 -0.283,0.851 0,1.985 0,1.985 l -0.567,3.118 -0.849,1.134 -0.851,1.133 -0.284,1.985 0.284,1.419 0.283,2.834 0.568,1.985 1.982,1.7 1.986,1.985 1.133,1.418 0.568,1.417 1.418,2.268 1.133,0.568 1.134,-0.568 1.418,-2.268 0.567,-1.417 1.134,-1.418 1.985,-1.985 1.984,-1.7 0.568,-1.985 0.282,-2.834 0.285,-1.419 -0.285,-1.985 -0.85,-1.133 -0.851,-1.134 -0.567,-3.118 c 0,0 0.283,-1.134 0,-1.985 -0.284,-0.851 -0.284,-2.552 -0.284,-2.552 l 0.284,-1.417 -1.133,-2.552 -0.568,-1.701 0.568,-1.7 1.416,-0.851 1.418,-0.283 1.985,-0.567 1.701,-0.567 1.984,-0.851 1.984,-0.85 1.418,-0.85 1.984,-0.568 2.268,-0.851 2.267,-0.282 1.701,-0.284 h 4.822 l 0.282,1.417 h 2.834 l -0.283,1.418 -0.851,1.133 -1.416,1.418 -1.418,1.984 -1.134,1.702 -1.133,0.85 -1.703,1.134 -2.55,7.371 0.849,1.7 0.569,1.986 0.283,1.701 v 4.819 l 0.565,2.835 -0.848,1.417 -1.418,1.134 -0.284,1.702 -2.836,4.535 -1.983,2.835 -1.701,3.401 -2.268,2.836 v 2.834 l 0.282,2.836 -0.566,3.401 -0.567,2.268 1.133,2.269 0.568,2.551 0.283,2.268 -0.565,2.836 -0.286,2.834 0.286,1.984 0.565,2.552 0.284,2.835 0.265,2.386 c 0.486,0.22 0.869,0.449 0.869,0.449 l -0.424,1.171 -2.694,-12.512 2.551,-0.565 1.702,0.282 0.849,-0.85 1.134,-1.701 1.418,-1.134 1.418,-0.85 1.985,-0.568 1.7,-0.284 1.135,-0.566 v -1.417 l -1.419,-0.567 -1.133,-0.85 -0.852,-1.702 v -1.701 l 0.569,-1.7 0.848,0.566 0.568,1.701 0.851,1.701 h 0.85 l -0.282,-1.418 -0.285,-1.417 -0.567,-0.851 0.567,-1.134 v -1.984 l -1.418,-0.566 -1.416,-0.568 v -1.134 l 1.132,-0.567 2.269,-0.567 h 1.418 l 1.419,1.134 2.266,0.567 1.134,1.418 1.702,1.134 1.702,1.417 1.416,1.701 1.418,1.701 0.566,2.269 0.283,1.983 z" id="path2528"
+          /></g
+          ><g id="g2530" transform="translate(560.9679,565.6996)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 -0.849,1.134 -1.419,1.418 -1.417,1.983 -1.134,1.702 -1.134,0.85 -1.701,1.134 -2.552,7.372 0.851,1.7 0.567,1.985 0.282,1.701 v 4.818 l 0.569,2.836 -0.851,1.416 -1.418,1.135 -0.281,1.701 -2.838,4.536 -1.983,2.834 -1.702,3.403 -2.267,2.835 v 2.834 l 0.283,2.835 -0.567,3.402 -0.567,2.268 -13.323,-7.654 -13.43,7.708 -0.569,-2.268 -0.46,-3.456 0.284,-2.835 v -2.834 l -2.269,-2.835 -1.701,-3.403 -1.984,-2.834 -2.835,-4.536 -0.283,-1.701 -1.418,-1.135 -0.85,-1.416 0.566,-2.836 v -4.818 l 0.284,-1.701 0.567,-1.985 0.851,-1.7 -2.553,-7.372 -1.7,-1.134 -1.133,-0.85 L -63.218,4.535 -64.637,2.552 -66.054,1.134 -66.905,0 -67.188,-1.417 h 2.834 l 0.284,-1.418 h 4.819 l 1.702,0.283 2.267,0.283 2.269,0.852 1.984,0.566 1.418,0.851 1.985,0.85 1.984,0.851 1.702,0.567 1.983,0.567 1.418,0.284 1.418,0.85 0.567,1.701 -0.567,1.701 -1.134,2.552 0.283,1.417 c 0,0 0,1.701 -0.283,2.551 -0.284,0.85 0,1.985 0,1.985 l -0.567,3.118 -0.851,1.134 -0.849,1.135 -0.285,1.983 0.285,1.418 0.282,2.834 0.567,1.985 1.984,1.701 1.986,1.984 1.133,1.418 0.568,1.417 1.416,2.269 1.135,0.566 1.134,-0.566 1.417,-2.269 0.567,-1.417 1.135,-1.418 1.983,-1.984 1.984,-1.701 0.568,-1.985 0.283,-2.834 0.283,-1.418 -0.283,-1.983 -0.851,-1.135 -0.85,-1.134 -0.567,-3.118 c 0,0 0.284,-1.135 0,-1.985 -0.283,-0.85 -0.283,-2.551 -0.283,-2.551 l 0.283,-1.417 -1.134,-2.552 -0.567,-1.701 0.567,-1.701 1.418,-0.85 1.417,-0.284 1.984,-0.567 1.699,-0.567 1.987,-0.851 1.984,-0.85 1.418,-0.851 1.984,-0.566 2.268,-0.852 2.268,-0.283 1.701,-0.283 h 4.819 l 0.283,1.418 H 0.284 L 0,0" id="path2532"
+          /></g
+          ><g id="g2534" transform="translate(560.9679,565.6996)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -0.849,1.134 -1.419,1.418 -1.417,1.983 -1.134,1.702 -1.134,0.85 -1.701,1.134 -2.552,7.372 0.851,1.7 0.567,1.985 0.282,1.701 v 4.818 l 0.569,2.836 -0.851,1.416 -1.418,1.135 -0.281,1.701 -2.838,4.536 -1.983,2.834 -1.702,3.403 -2.267,2.835 v 2.834 l 0.283,2.835 -0.567,3.402 -0.567,2.268 -13.323,-7.654 -13.43,7.708 -0.569,-2.268 -0.46,-3.456 0.284,-2.835 v -2.834 l -2.269,-2.835 -1.701,-3.403 -1.984,-2.834 -2.835,-4.536 -0.283,-1.701 -1.418,-1.135 -0.85,-1.416 0.566,-2.836 v -4.818 l 0.284,-1.701 0.567,-1.985 0.851,-1.7 -2.553,-7.372 -1.7,-1.134 -1.133,-0.85 L -63.218,4.535 -64.637,2.552 -66.054,1.134 -66.905,0 -67.188,-1.417 h 2.834 l 0.284,-1.418 h 4.819 l 1.702,0.283 2.267,0.283 2.269,0.852 1.984,0.566 1.418,0.851 1.985,0.85 1.984,0.851 1.702,0.567 1.983,0.567 1.418,0.284 1.418,0.85 0.567,1.701 -0.567,1.701 -1.134,2.552 0.283,1.417 c 0,0 0,1.701 -0.283,2.551 -0.284,0.85 0,1.985 0,1.985 l -0.567,3.118 -0.851,1.134 -0.849,1.135 -0.285,1.983 0.285,1.418 0.282,2.834 0.567,1.985 1.984,1.701 1.986,1.984 1.133,1.418 0.568,1.417 1.416,2.269 1.135,0.566 1.134,-0.566 1.417,-2.269 0.567,-1.417 1.135,-1.418 1.983,-1.984 1.984,-1.701 0.568,-1.985 0.283,-2.834 0.283,-1.418 -0.283,-1.983 -0.851,-1.135 -0.85,-1.134 -0.567,-3.118 c 0,0 0.284,-1.135 0,-1.985 -0.283,-0.85 -0.283,-2.551 -0.283,-2.551 l 0.283,-1.417 -1.134,-2.552 -0.567,-1.701 0.567,-1.701 1.418,-0.85 1.417,-0.284 1.984,-0.567 1.699,-0.567 1.987,-0.851 1.984,-0.85 1.418,-0.851 1.984,-0.566 2.268,-0.852 2.268,-0.283 1.701,-0.283 h 4.819 l 0.283,1.418 h 2.836 z" id="path2536"
+          /></g
+          ><g id="g2538" transform="translate(542.2572,634.872)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 1.418,-0.284 3.118,0 3.97,-0.851 l 1.135,-1.701 1.417,-1.134 1.417,-0.85 1.984,-0.568 1.7,-0.282 1.135,-0.568 v -1.417 l -1.418,-0.567 -1.135,-0.85 -0.849,-1.701 v -1.702 l 0.567,-1.7 0.851,0.566 0.566,1.701 0.851,1.702 h 0.851 l -0.284,-1.419 -0.283,-1.417 -0.568,-0.85 0.568,-1.134 v -1.984 l -1.418,-0.567 -1.418,-0.568 v -1.134 l 1.135,-0.567 2.268,-0.567 h 1.417 l 1.417,1.134 2.268,0.568 1.135,1.417 1.701,1.134 1.7,1.417 1.417,1.701 1.417,1.701 0.567,2.269 0.285,1.984 -0.567,2.268 -0.567,1.701 -1.135,1.702 -1.983,1.983 -1.418,1.135 -1.417,1.416 -1.417,1.985 -1.986,2.268 -1.7,1.135 -0.566,1.7 -0.852,1.985 -1.701,1.134 -1.984,1.417 -1.701,1.417 -1.418,1.418 -4.78,0.284" id="path2540"
+          /></g
+          ><g id="g2542" transform="translate(542.2572,634.872)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 1.418,-0.284 3.118,0 3.97,-0.851 l 1.135,-1.701 1.417,-1.134 1.417,-0.85 1.984,-0.568 1.7,-0.282 1.135,-0.568 v -1.417 l -1.418,-0.567 -1.135,-0.85 -0.849,-1.701 v -1.702 l 0.567,-1.7 0.851,0.566 0.566,1.701 0.851,1.702 h 0.851 l -0.284,-1.419 -0.283,-1.417 -0.568,-0.85 0.568,-1.134 v -1.984 l -1.418,-0.567 -1.418,-0.568 v -1.134 l 1.135,-0.567 2.268,-0.567 h 1.417 l 1.417,1.134 2.268,0.568 1.135,1.417 1.701,1.134 1.7,1.417 1.417,1.701 1.417,1.701 0.567,2.269 0.285,1.984 -0.567,2.268 -0.567,1.701 -1.135,1.702 -1.983,1.983 -1.418,1.135 -1.417,1.416 -1.417,1.985 -1.986,2.268 -1.7,1.135 -0.566,1.7 -0.852,1.985 -1.701,1.134 -1.984,1.417 -1.701,1.417 -1.418,1.418 -4.78,0.284" id="path2544"
+          /></g
+          ><g id="g2546" transform="translate(512.8092,634.9069)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -1.416,-0.283 -2.304,0.248 -0.851,-0.851 -1.135,-1.701 -1.418,-1.134 -1.416,-0.85 -1.985,-0.568 -1.7,-0.282 -1.133,-0.568 v -1.417 l 1.417,-0.567 1.133,-0.85 0.85,-1.702 v -1.701 l -0.567,-1.7 -0.85,0.566 -0.566,1.701 -0.851,1.702 h -0.85 l 0.284,-1.419 0.282,-1.416 0.568,-0.851 -0.568,-1.133 v -1.984 l 1.418,-0.567 1.416,-0.568 v -1.134 l -1.133,-0.567 -2.267,-0.567 h -1.417 l -1.419,1.134 -2.267,0.568 -1.135,1.417 -1.701,1.134 -1.701,1.417 -1.417,1.701 -1.418,1.7 -0.566,2.269 -0.284,1.984 0.567,2.268 0.568,1.7 1.133,1.703 1.984,1.983 1.419,1.135 1.416,1.416 1.418,1.985 1.984,2.268 1.702,1.135 0.567,1.7 0.851,1.985 1.7,1.134 1.984,1.417 1.701,1.417 1.418,1.418 5.387,1.134" id="path2548"
+          /></g
+          ><g id="g2550" transform="translate(512.8092,634.9069)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -1.416,-0.283 -2.304,0.248 -0.851,-0.851 -1.135,-1.701 -1.418,-1.134 -1.416,-0.85 -1.985,-0.568 -1.7,-0.282 -1.133,-0.568 v -1.417 l 1.417,-0.567 1.133,-0.85 0.85,-1.702 v -1.701 l -0.567,-1.7 -0.85,0.566 -0.566,1.701 -0.851,1.702 h -0.85 l 0.284,-1.419 0.282,-1.416 0.568,-0.851 -0.568,-1.133 v -1.984 l 1.418,-0.567 1.416,-0.568 v -1.134 l -1.133,-0.567 -2.267,-0.567 h -1.417 l -1.419,1.134 -2.267,0.568 -1.135,1.417 -1.701,1.134 -1.701,1.417 -1.417,1.701 -1.418,1.7 -0.566,2.269 -0.284,1.984 0.567,2.268 0.568,1.7 1.133,1.703 1.984,1.983 1.419,1.135 1.416,1.416 1.418,1.985 1.984,2.268 1.702,1.135 0.567,1.7 0.851,1.985 1.7,1.134 1.984,1.417 1.701,1.417 1.418,1.418 5.387,1.134" id="path2552"
+          /></g
+          ><g id="g2554" transform="translate(527.5168,615.8778)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 2.268,-0.283 4.252,-0.567 6.52,-1.134 7.937,-1.418 8.505,0 v 1.984 l -0.568,2.269 1.702,0.851 1.7,0.85 1.985,1.7 1.134,2.269 0.568,2.551 0.282,2.268 -0.567,2.835 -0.283,2.834 0.283,1.985 0.567,2.551 0.284,2.835 0.283,2.552 h -31.751 l 0.282,-2.552 0.285,-2.835 0.566,-2.551 0.284,-1.985 -0.284,-2.834 -0.566,-2.835 0.283,-2.268 0.567,-2.551 1.132,-2.269 1.987,-1.7 3.401,-1.701 -0.567,-2.269 V 0 l 0.567,-1.418 1.418,0.284 2.269,0.567 1.982,0.284 z" id="path2556"
+          /></g
+          ><g id="g2558" transform="translate(527.5168,615.8778)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 2.268,-0.283 4.252,-0.567 6.52,-1.134 7.937,-1.418 8.505,0 v 1.984 l -0.568,2.269 1.702,0.851 1.7,0.85 1.985,1.7 1.134,2.269 0.568,2.551 0.282,2.268 -0.567,2.835 -0.283,2.834 0.283,1.985 0.567,2.551 0.284,2.835 0.283,2.552 h -31.751 l 0.282,-2.552 0.285,-2.835 0.566,-2.551 0.284,-1.985 -0.284,-2.834 -0.566,-2.835 0.283,-2.268 0.567,-2.551 1.132,-2.269 1.987,-1.7 3.401,-1.701 -0.567,-2.269 V 0 l 0.567,-1.418 1.418,0.284 2.269,0.567 1.982,0.284 L 0,0" id="path2560"
+          /></g
+          ><g id="g2562" transform="translate(527.5168,615.8778)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 0,0 2.268,-0.283 4.252,-0.567 6.52,-1.134 7.937,-1.418 8.505,0 v 1.984 l -0.568,2.269 1.702,0.851 1.7,0.85 1.985,1.7 1.134,2.269 0.568,2.551 0.282,2.268 -0.567,2.835 -0.283,2.834 0.283,1.985 0.567,2.551 0.284,2.835 0.283,2.552 h -31.751 l 0.282,-2.552 0.285,-2.835 0.566,-2.551 0.284,-1.985 -0.284,-2.834 -0.566,-2.835 0.283,-2.268 0.567,-2.551 1.132,-2.269 1.987,-1.7 3.401,-1.701 -0.567,-2.269 V 0 l 0.567,-1.418 1.418,0.284 2.269,0.567 1.982,0.284 L 0,0" id="path2564"
+          /></g
+          ><g id="g2566" transform="translate(552.1804,662.6537)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -1.134,-0.282 -0.285,-1.419 v -1.134 l -1.133,-0.849 -1.417,-0.285 -0.849,0.568 -0.569,1.134 -1.701,0.283 -1.701,-0.283 -2.267,-0.285 h -4.537 l -1.983,-0.283 -1.986,-0.566 -1.134,-1.134 -2.144,0.268 v 0.015 h -2.959 l -2.267,-0.283 -1.134,1.134 -1.984,0.566 -1.985,0.283 h -4.536 l -2.267,0.285 -1.701,0.283 -1.702,-0.283 -0.567,-1.134 -0.85,-0.568 -1.418,0.285 -1.134,0.849 v 1.134 l -0.284,1.419 -1.133,0.282 -0.567,-1.984 0.851,-2.268 0.849,-1.984 1.702,-0.284 1.701,-0.851 1.135,-0.85 0.282,-1.984 0.284,-2.553 0.566,-1.983 1.134,-1.417 c 0,0 1.418,-0.852 2.268,-0.852 0.851,0 1.702,-0.566 1.702,-0.566 l 2.268,-0.567 1.701,-0.568 1.418,-1.133 1.416,-1.701 1.702,-1.985 1.416,-2.267 1.418,-1.134 h 2.268 l 1.417,1.134 1.418,2.267 1.701,1.985 1.417,1.701 1.419,1.133 1.7,0.568 2.269,0.567 c 0,0 0.85,0.566 1.7,0.566 0.849,0 2.267,0.852 2.267,0.852 l 1.134,1.417 0.568,1.983 0.284,2.553 0.283,1.984 1.133,0.85 1.702,0.851 1.701,0.284 0.85,1.984 0.851,2.268 L 0,0" id="path2568"
+          /></g
+          ><g id="g2570" transform="translate(552.1804,662.6537)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -1.134,-0.282 -0.285,-1.419 v -1.134 l -1.133,-0.849 -1.417,-0.285 -0.849,0.568 -0.569,1.134 -1.701,0.283 -1.701,-0.283 -2.267,-0.285 h -4.537 l -1.983,-0.283 -1.986,-0.566 -1.134,-1.134 -2.144,0.268 v 0.015 h -2.959 l -2.267,-0.283 -1.134,1.134 -1.984,0.566 -1.985,0.283 h -4.536 l -2.267,0.285 -1.701,0.283 -1.702,-0.283 -0.567,-1.134 -0.85,-0.568 -1.418,0.285 -1.134,0.849 v 1.134 l -0.284,1.419 -1.133,0.282 -0.567,-1.984 0.851,-2.268 0.849,-1.984 1.702,-0.284 1.701,-0.851 1.135,-0.85 0.282,-1.984 0.284,-2.553 0.566,-1.983 1.134,-1.417 c 0,0 1.418,-0.852 2.268,-0.852 0.851,0 1.702,-0.566 1.702,-0.566 l 2.268,-0.567 1.701,-0.568 1.418,-1.133 1.416,-1.701 1.702,-1.985 1.416,-2.267 1.418,-1.134 h 2.268 l 1.417,1.134 1.418,2.267 1.701,1.985 1.417,1.701 1.419,1.133 1.7,0.568 2.269,0.567 c 0,0 0.85,0.566 1.7,0.566 0.849,0 2.267,0.852 2.267,0.852 l 1.134,1.417 0.568,1.983 0.284,2.553 0.283,1.984 1.133,0.85 1.702,0.851 1.701,0.284 0.85,1.984 0.851,2.268 z" id="path2572"
+          /></g
+          ><g id="g2574" transform="translate(527.6581,640.9674)"
+          ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 -1.418,0.849 -1.417,0.568 -0.85,1.702 -0.568,1.983 -0.566,1.985 -0.567,2.268 v 1.417 l 0.85,1.985 1.133,1.418 1.985,1.133 H 1.416 L 3.403,14.175 4.535,12.757 5.386,10.772 V 9.355 L 4.82,7.087 4.253,5.102 3.685,3.119 2.834,1.417 1.416,0.849 Z" id="path2576"
+          /></g
+          ><g id="g2578" transform="translate(527.6581,640.9674)"
+          ><path style="fill:none;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 -1.418,0.849 -1.417,0.568 -0.85,1.702 -0.568,1.983 -0.566,1.985 -0.567,2.268 v 1.417 l 0.85,1.985 1.133,1.418 1.985,1.133 H 1.416 L 3.403,14.175 4.535,12.757 5.386,10.772 V 9.355 L 4.82,7.087 4.253,5.102 3.685,3.119 2.834,1.417 1.416,0.849 0,0" id="path2580"
+          /></g
+          ><g id="armor_MG"
+          ><g id="g2582" transform="translate(515.8928,667.5696)"
+            ><path style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.96600002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -2.656,0 -4.81,-2.693 -4.81,-6.014 0,-3.322 2.154,-6.014 4.81,-6.014 2.658,0 4.811,2.692 4.811,6.014 C 4.811,-2.693 2.658,0 0,0" id="path2584"
+            /></g
+            ><g id="g2586" transform="translate(515.8928,667.5696)"
+            ><path style="fill:none;stroke:#000000;stroke-width:0.45899999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 0,0 c -2.656,0 -4.81,-2.693 -4.81,-6.014 0,-3.322 2.154,-6.014 4.81,-6.014 2.658,0 4.811,2.692 4.811,6.014 C 4.811,-2.693 2.658,0 0,0 Z" id="path2588"
+            /></g
+          ></g
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.33199406px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text3032" transform="matrix(0.98162644,0,-0.19081282,-0.98162644,488.9417,626.3481)"
+          ><tspan x="0 2.4475768 4.9168134 6.4243474" y="0" id="tspan3020"
+            >Left</tspan
+            ><tspan x="0.84473884" y="4.3319941" id="tspan3022"
+            >Arm</tspan
+            ><tspan x="68.501823" y="0.2902436" id="tspan3024"
+            >Right</tspan
+            ><tspan x="69.346565" y="4.6222377" id="tspan3026"
+            >Arm</tspan
+            ><tspan x="35.990208" y="9.820631" id="tspan3028"
+            >Torso</tspan
+            ><tspan x="38.034908" y="15.885423" id="tspan3030"
+            >Legs</tspan
+          ></text
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:3.58099556px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text_MG" transform="matrix(0.98162643,0,-0.19081285,-0.98162643,523.5285,662.6363)"
+          ><tspan x="0 3.6060627" y="0" id="tspan3034"
+            >Main Gun</tspan
+          ></text
+          >
+<text style="font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.33199406px;font-family:Eurostile;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" id="text3040" transform="matrix(0.98162644,0,-0.19081282,-0.98162644,533.5791,653.47)"
+          ><tspan x="0" y="0" id="tspan3038"
+            >Head</tspan
+          ></text
+          >
+           </g
+          >
+   <g fill="none" id="armorPips"
+          >
+    <g style="mml-multisection:true" id="armorPipsHD" transform="translate(42.335,13.18)"
+            ><g id="armorPipsHDSection01"
+              >
+      <rect x="-2.4" width="4.8" y="0" height="3.2" id="armorHDRow00"
+                />
+      <rect x="-4.3" width="8.6" y="1" height="3.2" id="armorHDRow01"
+                />
+      <rect x="-4.95" width="9.9" y="2" height="3.2" id="armorHDRow02"
+                />
+      </g
+                ><g id="armorPipsHDSection02"
+                >
+      <rect x="-4" width="8" y="7.8" height="3.2" id="armorHDRow03"
+                  />
+      <rect x="-3.55" width="7.1" y="8.8" height="3.2" id="armorHDRow04"
+                  />
+      <rect x="-2.9" width="5.8" y="9.8" height="3.2" id="armorHDRow05"
+                  />
+    </g
+                ></g
+                >
+    <g id="armorPipsT" transform="translate(42.335,25.78)"
+                >
+      <rect x="-14.6" width="29.2" y="0" height="3.2" id="armorTRow00" style="mml-gap:-8,8"
+                  />
+      <rect x="-14.25" width="28.5" y="2.6" height="3.2" id="armorTRow01" style="mml-gap:-5.9,5.9"
+                  />
+      <rect x="-14" width="28" y="5.2" height="3.2" id="armorTRow03" style="mml-gap:-4,4"
+                  />
+      <rect x="-14" width="28" y="7.8" height="3.2" id="armorTRow04"
+                  />
+      <rect x="-14.5" width="29" y="10.4" height="3.2" id="armorTRow05"
+                  />
+      <rect x="-14.5" width="29" y="13" height="3.2" id="armorTRow06"
+                  />
+    </g
+                  >
+    <g id="armorPipsRA" transform="rotate(-45,59.07844,-61.47437)"
+                  >
+      <rect x="-7.3" width="14.2" y="5.2" height="3.2" id="armorRARow02"
+                    />
+      <rect x="-6.8" width="12.6" y="7.8" height="3.2" id="armorRARow03"
+                    />
+      <rect x="-7.2" width="13" y="10.4" height="3.2" id="armorRARow04"
+                    />
+      <rect x="-6.7" width="12.5" y="13" height="3.2" id="armorRARow05"
+                    />
+      <rect x="-4.7" width="9.9" y="15.6" height="3.2" id="armorRARow06"
+                    />
+    </g
+                    >
+    <g id="armorPipsLA" transform="matrix(-0.70712197,-0.70710678,-0.70712197,0.70710678,23.488057,23.636133)"
+                    >
+      <rect x="-7.3" width="14.2" y="5.2" height="3.2" id="armorLARow02"
+                      />
+      <rect x="-6.8" width="12.6" y="7.8" height="3.2" id="armorLARow03"
+                      />
+      <rect x="-7.2" width="13" y="10.4" height="3.2" id="armorLARow04"
+                      />
+      <rect x="-6.7" width="12.5" y="13" height="3.2" id="armorLARow05"
+                      />
+      <rect x="-4.7" width="9.9" y="15.6" height="3.2" id="armorLARow06"
+                      />
+    </g
+                      >
+    <g id="armorPipsL" transform="translate(42.335,59.08)"
+                      >
+      <rect x="-20" width="40" y="7.8" height="3.2" id="armorLRow00" style="mml-gap:-5.7,5.7"
+                        />
+      <rect x="-21.7" width="43.4" y="10.4" height="3.2" id="armorLRow01" style="mml-gap:-8.8,8.8"
+                        />
+      <rect x="-22.8" width="45.6" y="13" height="3.2" id="armorLRow02" style="mml-gap:-10,10"
+                        />
+      <rect x="-24.2" width="45.6" y="15.6" height="3.2" id="armorLRow03" style="mml-gap:-10,10"
+                        />
+      <rect x="-22.8" width="45.6" y="18.2" height="3.2" id="armorLRow04" style="mml-gap:-10.3,10.3"
+                        />
+      <rect x="-24" width="48" y="20.8" height="3.2" id="armorLRow05" style="mml-gap:-10,10"
+                        />
+      <rect x="-23.8" width="47.6" y="23.4" height="3.2" id="armorLRow06" style="mml-gap:-9.7,9.7"
+                        />
+      <rect x="-22.8" width="48" y="26" height="3.2" id="armorLRow07" style="mml-gap:-8.3,8.3"
+                        />
+      <rect x="-22.5" width="48" y="28.6" height="3.2" id="armorLRow08" style="mml-gap:-8.2,8.2"
+                        />
+    </g
+                        >
+    <g id="armorPipsMG" transform="translate(30.535,1.78)"
+                        >
+      <rect x="-1.5" width="3" y="0" height="3.2" id="armorMGRow00"
+                          />
+      <rect x="-3.1" width="6.2" y="0.95" height="3.2" id="armorMGRow01"
+                          />
+      <rect x="-3.75" width="7.5" y="2.3" height="3.2" id="armorMGRow02"
+                          />
+      <rect x="-4" width="8" y="3.45" height="3.2" id="armorMGRow03"
+                          />
+      <rect x="-3.9" width="7.8" y="4.6" height="3.2" id="armorMGRow04"
+                          />
+    </g
+                          >
+   </g
+                          >
+   <g fill="none" id="structurePips"
+                          >
+    <g id="structurePipsHD" transform="translate(42.335,13.18)"
+                            >
+      <rect x="-4.4" width="8.8" y="5.2" height="2.6" id="structureHDRow00"
+                              />
+    </g
+                              >
+    <g id="structurePipsT" transform="translate(42.335,42.78)"
+                              >
+      <rect x="-13" width="26" y="0" height="2.6" id="structureTRow00"
+                                />
+      <rect x="-9.1" width="18.2" y="2.6" height="2.6" id="structureTRow01"
+                                />
+    </g
+                                >
+    <g id="structurePipsRA" transform="rotate(-45,59.07844,-61.47437)"
+                                >
+      <rect x="-1.9" width="8" y="0" height="2.6" id="structureRARow00"
+                                  />
+      <rect x="-4.4" width="10.8" y="2.6" height="2.6" id="structureRARow01"
+                                  />
+    </g
+                                  >
+    <g id="structurePipsLA" transform="matrix(-0.70712197,-0.70710678,-0.70712197,0.70710678,23.488057,23.636133)"
+                                  >
+      <rect x="-1.9" width="8" y="0" height="2.6" id="structureLARow00"
+                                    />
+      <rect x="-4.4" width="10.8" y="2.6" height="2.6" id="structureLARow01"
+                                    />
+    </g
+                                    >
+    <g id="structurePipsL" transform="translate(42.335,59.08)"
+                                    >
+      <rect x="-14.6" width="29.2" y="0" height="2.6" id="structureLRow00"
+                                      />
+      <rect x="-16.85" width="33.7" y="2.6" height="2.6" id="structureLRow01" style="mml-gap:-3,3"
+                                      />
+      <rect x="-18.5" width="37" y="5.2" height="2.6" id="structureLRow02" style="mml-gap:-4,4"
+                                      />
+    </g
+                                      >
+    <g id="structurePipsMG" transform="translate(30.535,1.78)"
+                                      >
+      <rect x="-3.3" width="6.6" y="6.5" height="2.6" id="structureMGRow00"
+                                        />
+      <rect x="-2.4" width="4.8" y="7.8" height="2.6" id="structureMGRow01"
+                                        />
+    </g
+                                        >
+   </g
+                                        >
+</g
+                                        ><g transform="translate (5.337634472769196,0.0)"
+                                        ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 76.493 l 3.749,5.625 l -3.749,5.625 h -76.493 Z"
+                                          /><text x="41.996" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="69.539" lengthAdjust="spacingAndGlyphs"
+                                          >ARMOR DIAGRAM</text
+                                        ></g
+                                      ></g
+                                      ><g transform="translate (5.000 88.191)"
+                                      ><g
+                                        ><path fill="#ffffff" d="M 0.0,8.214 L 5.475,0.000 l 81.717,0.000 l 5.475,8.214 L 272.525,8.214 l 5.475,8.214 L 278.000,25.581 l -5.475,8.214 L 5.475,33.795 l -5.475,-8.214 Z" stroke-width="0.95" stroke-linejoin="round" stroke="#231f20"
+                                          /><g transform="translate (2.5,3.0)"
+                                          ><path fill="#000000" d="M 0,5.625 l 3.749,-5.625 h 79.717 l 3.749,5.625 l -3.749,5.625 h -79.717 Z"
+                                            /><text x="43.608" y="8.438" fill="#ffffff" text-anchor="middle" style="font-family:Eurostile;font-size:8.600px;font-weight:bold;font-style:normal" textLength="45.172" lengthAdjust="spacingAndGlyphs"
+                                            >PILOT DATA</text
+                                          ></g
+                                        ></g
+                                        ><text fill="#231f20" x="9.845" y="21.668" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" text-anchor="start"
+                                        >Name:</text
+                                        ><text fill="#231f20" x="32.073" id="pilotName0" y="21.668" style="font-family:Eurostile;font-size:6.760px;font-weight:normal;font-style:normal" text-anchor="start"
+                                        >Lorem Ipsum</text
+                                        ><path id="blankCrewName0" d="M 32.073,22.668 L 135.428,22.668" stroke-width="0.720" stroke-linejoin="round" stroke="#231f20"
+                                        /><text x="9.845" y="30.941" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.760px;font-weight:bold;font-style:normal" id="gunnerySkillText0" textLength="39.172" lengthAdjust="spacingAndGlyphs"
+                                        >Gunnery Skill:</text
+                                        ><text fill="#231f20" x="52.392" id="gunnerySkill0" y="30.941" style="font-family:Eurostile;font-size:6.760px;font-weight:normal;font-style:normal" text-anchor="start"
+                                        >0</text
+                                        ><path id="blankGunnerySkill0" d="M 52.392,31.941 L 88.012,31.941" stroke-width="0.720" stroke-linejoin="round" stroke="#231f20"
+                                        /><g
+                                        ><path fill="none" d="M 182.470,12.738 c 0,-0.560 0.455,-1.015 1.015,-1.015 l 85.020,0 c 0.560,0 1.015,0.455, 1.015,1.015 l 0,15.970 c 0,0.560 -0.455,1.015, -1.015,1.015 l -85.020,0 c -0.560,0 -1.015,-0.455, -1.015,-1.015Z" stroke-width="1.0" stroke-linejoin="round" stroke="#231f20"
+                                          /><path fill="none" stroke-width="0.58" d="M 182.470,20.723 l 87.050,0 M 196.978,11.723 l 0,18.000  M 211.487,11.723 l 0,18.000  M 225.995,11.723 l 0,18.000  M 240.503,11.723 l 0,18.000  M 255.012,11.723 l 0,18.000" stroke-linecap="round" stroke-linejoin="miter" stroke="#231f20"
+                                          /><text fill="#231f20" x="189.724" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >1</text
+                                          ><text fill="#231f20" x="189.724" y="27.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.508" text-anchor="middle"
+                                          >3</text
+                                          ><text fill="#231f20" x="204.232" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >2</text
+                                          ><text fill="#231f20" x="204.232" y="27.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.508" text-anchor="middle"
+                                          >5</text
+                                          ><text fill="#231f20" x="218.741" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >3</text
+                                          ><text fill="#231f20" x="218.741" y="27.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.508" text-anchor="middle"
+                                          >7</text
+                                          ><text fill="#231f20" x="233.249" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >4</text
+                                          ><text fill="#231f20" x="233.249" y="27.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.508" text-anchor="middle"
+                                          >10</text
+                                          ><text fill="#231f20" x="247.758" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >5</text
+                                          ><text fill="#231f20" x="247.758" y="27.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal;mml-field-width:10.508" text-anchor="middle"
+                                          >11</text
+                                          ><text fill="#231f20" x="262.266" y="18.723" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" text-anchor="middle"
+                                          >6</text
+                                          ><text x="262.266" y="27.723" fill="#231f20" text-anchor="middle" style="font-family:Eurostile;font-size:5.800px;font-weight:bold;font-style:normal" textLength="10.508" lengthAdjust="spacingAndGlyphs"
+                                          >Dead</text
+                                          ><text fill="#231f20" x="180.470" y="18.723" style="font-family:Eurostile;font-size:5.200px;font-weight:bold;font-style:normal;mml-field-width:45.950" text-anchor="end"
+                                          >Hits Taken</text
+                                          ><text fill="#231f20" x="180.470" y="27.723" style="font-family:Eurostile;font-size:5.200px;font-weight:bold;font-style:normal;mml-field-width:45.950" text-anchor="end"
+                                          >Consciousness #</text
+                                        ></g
+                                      ></g
+                                      ><text x="99.667" y="130.200" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" textLength="9.046" lengthAdjust="spacingAndGlyphs"
+                                      >BV:</text
+                                      ><text fill="#231f20" x="111.806" id="bv" y="130.200" style="font-family:Eurostile;font-size:6.200px;font-weight:normal;font-style:normal" text-anchor="start"
+                                      >0</text
+                                      ><text x="146.000" y="130.200" fill="#231f20" text-anchor="start" style="font-family:Eurostile;font-size:6.200px;font-weight:bold;font-style:normal" textLength="18.711" lengthAdjust="spacingAndGlyphs"
+                                      >Armor:</text
+                                      ><text fill="#231f20" x="167.804" id="armorType" y="130.200" style="font-family:Eurostile;font-size:6.200px;font-weight:normal;font-style:normal" text-anchor="start"
+                                      >Standard</text
+                                      ><rect fill="none" x="75.667" width="20.000" id="eraIcon" height="20.000" y="66.191"
+                                    /></g
+                                  ></svg
+                                >

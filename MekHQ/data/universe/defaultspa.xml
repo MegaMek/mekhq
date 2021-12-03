@@ -546,6 +546,20 @@
             <skill>Tech/Vessel::Regular</skill>
         </skillPrereq>
     </ability>
+    <ability>
+        <lookupName>tech_maintainer</lookupName>
+        <displayName>Maintainer (Unofficial)</displayName>
+        <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
+        <xpCost>8</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
 
 	<!-- OTHER SPA -->
 	<ability>

@@ -169,37 +169,10 @@ public class MedicalLogger {
     public static void hasConceived(Person patient, LocalDate date, String sizeString) {
         String message = logEntriesResourceMap.getString("hasConceived.text");
 
-        if (sizeString != null) {
+        if (!sizeString.isBlank()) {
             message += " " + sizeString;
         }
 
-        patient.addLogEntry(new MedicalLogEntry(date, message));
-    }
-
-    public static void diedFromWounds(Person patient, LocalDate date) {
-        String message = logEntriesResourceMap.getString("diedFromWounds.text");
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(patient.getGender())));
-        patient.addLogEntry(medicalLogEntry);
-    }
-
-    public static void diedOfNaturalCauses(Person patient, LocalDate date) {
-        String message = logEntriesResourceMap.getString("diedOfNaturalCauses.text");
-        patient.addLogEntry(new MedicalLogEntry(date, message));
-    }
-
-    public static void diedFromDisease(Person patient, LocalDate date) {
-        String message = logEntriesResourceMap.getString("diedFromDisease.text");
-        patient.addLogEntry(new MedicalLogEntry(date, message));
-    }
-
-    public static void diedOfOldAge(Person patient, LocalDate date) {
-        String message = logEntriesResourceMap.getString("diedOfOldAge.text");
-        patient.addLogEntry(new MedicalLogEntry(date, message));
-    }
-
-    public static void diedFromPregnancyComplications(Person patient, LocalDate date) {
-        String message = logEntriesResourceMap.getString("diedFromPregnancyComplications.text");
         patient.addLogEntry(new MedicalLogEntry(date, message));
     }
 }

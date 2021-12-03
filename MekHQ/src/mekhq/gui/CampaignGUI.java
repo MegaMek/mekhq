@@ -2,6 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,85 +21,71 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
+import chat.ChatClient;
+import megamek.Version;
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
-import mekhq.MekHqConstants;
-import mekhq.campaign.finances.Money;
-import mekhq.gui.dialog.*;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import chat.ChatClient;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.Version;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.event.AssetEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.DayEndingEvent;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.LoanEvent;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionEvent;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonEvent;
-import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.event.*;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
-import mekhq.campaign.report.RatingReport;
-import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.nagDialogs.*;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The application's main frame.
@@ -138,7 +125,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /* for the top button panel */
@@ -206,8 +193,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showGMToolsDialog() {
-        GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
-        gmTools.setVisible(true);
+        new GMToolsDialog(getFrame(), this, null).setVisible(true);
     }
 
     public void showMassMothballDialog(Unit[] units, boolean activate) {
@@ -216,10 +202,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAdvanceDaysDialog() {
-        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this);
-        advanceDaysDialog.setModal(true);
-        advanceDaysDialog.setVisible(true);
-        advanceDaysDialog.dispose();
+        new AdvanceDaysDialog(getFrame(), this).setVisible(true);
     }
 
     public void randomizeAllBloodnames() {
@@ -247,6 +230,9 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
+        if (getCampaign().getCampaignOptions().getUseStratCon()) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
         addStandardTab(GuiTabType.MAP);
         addStandardTab(GuiTabType.PERSONNEL);
         addStandardTab(GuiTabType.HANGAR);
@@ -326,6 +312,10 @@ public class CampaignGUI extends JPanel {
 
     public CampaignGuiTab getTab(GuiTabType tabType) {
         return standardTabs.get(tabType);
+    }
+
+    public CommandCenterTab getCommandCenterTab() {
+        return (CommandCenterTab) getTab(GuiTabType.COMMAND);
     }
 
     public TOETab getTOETab() {
@@ -555,21 +545,22 @@ public class CampaignGUI extends JPanel {
         // TODO: Implement "Export All" versions for Personnel and Parts
         // See the JavaDoc comment for used mnemonic keys
         menuBar = new JMenuBar();
+        menuBar.getAccessibleContext().setAccessibleName("Main Menu");
 
         //region File Menu
-        // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
-        // C, E, H, I, L, M, N, S, T, U, X
-        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
+        // The File menu uses the following Mnemonic keys as of 05-APR-2021:
+        // C, E, H, I, L, M, N, R, S, T, U, X
+        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text"));
         menuFile.setMnemonic(KeyEvent.VK_F);
 
-        JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
+        JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text"));
         menuLoad.setMnemonic(KeyEvent.VK_L);
         menuLoad.addActionListener(this::menuLoadXmlActionPerformed);
         menuFile.add(menuLoad);
 
-        JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
+        JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text"));
         menuSave.setMnemonic(KeyEvent.VK_S);
-        menuSave.addActionListener(this::menuSaveXmlActionPerformed);
+        menuSave.addActionListener(this::saveCampaign);
         menuFile.add(menuSave);
 
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
@@ -578,27 +569,47 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuNew);
 
         //region menuImport
-        // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
-        // A, C, F, P
-        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        // The Import menu uses the following Mnemonic keys as of 12-APR-2021:
+        // A, C, F, I, P
+        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
         menuImport.setMnemonic(KeyEvent.VK_I);
 
-        JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
-        miImportOptions.setMnemonic(KeyEvent.VK_C);
-        miImportOptions.addActionListener(this::miImportOptionsActionPerformed);
-        menuImport.add(miImportOptions);
+        final JMenuItem miImportCampaignPreset = new JMenuItem(resourceMap.getString("miImportCampaignPreset.text"));
+        miImportCampaignPreset.setToolTipText(resourceMap.getString("miImportCampaignPreset.toolTipText"));
+        miImportCampaignPreset.setName("miImportCampaignPreset");
+        miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
+        miImportCampaignPreset.addActionListener(evt -> {
+            final CampaignPresetSelectionDialog campaignPresetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
+            if (!campaignPresetSelectionDialog.showDialog().isConfirmed()) {
+                return;
+            }
+            final CampaignPreset preset = campaignPresetSelectionDialog.getSelectedPreset();
+            if (preset == null) {
+                return;
+            }
+            preset.applyContinuousToCampaign(getCampaign());
+        });
+        menuImport.add(miImportCampaignPreset);
 
-        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
         miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.addActionListener(this::miImportPersonActionPerformed);
         menuImport.add(miImportPerson);
 
-        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        JMenuItem miImportIndividualRankSystem = new JMenuItem(resourceMap.getString("miImportIndividualRankSystem.text"));
+        miImportIndividualRankSystem.setToolTipText(resourceMap.getString("miImportIndividualRankSystem.toolTipText"));
+        miImportIndividualRankSystem.setName("miImportIndividualRankSystem");
+        miImportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
+        miImportIndividualRankSystem.addActionListener(evt -> getCampaign().setRankSystem(RankSystem
+                .generateIndividualInstanceFromXML(FileDialogs.openIndividualRankSystem(getFrame()).orElse(null))));
+        menuImport.add(miImportIndividualRankSystem);
+
+        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text"));
         miImportParts.setMnemonic(KeyEvent.VK_A);
         miImportParts.addActionListener(this::miImportPartsActionPerformed);
         menuImport.add(miImportParts);
 
-        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text"));
         miLoadForces.setMnemonic(KeyEvent.VK_F);
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
         menuImport.add(miLoadForces);
@@ -607,28 +618,28 @@ public class CampaignGUI extends JPanel {
         //endregion menuImport
 
         //region menuExport
-        // The Export menu uses the following Mnemonic keys as of 19-March-2020:
+        // The Export menu uses the following Mnemonic keys as of 12-APR-2021:
         // C, X, S
-        JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
+        JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text"));
         menuExport.setMnemonic(KeyEvent.VK_X);
 
         //region CSV Export
-        // The CSV menu uses the following Mnemonic keys as of 19-March-2020:
+        // The CSV menu uses the following Mnemonic keys as of 12-APR-2021:
         // F, P, U
-        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
+        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text"));
         miExportCSVFile.setMnemonic(KeyEvent.VK_C);
 
-        JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text")); // NOI18N
+        JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
         miExportPersonCSV.addActionListener(this::miExportPersonnelCSVActionPerformed);
         miExportCSVFile.add(miExportPersonCSV);
 
-        JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text")); // NOI18N
+        JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
         miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
         miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
         miExportCSVFile.add(miExportUnitCSV);
 
-        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
         miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
         miExportCSVFile.add(miExportFinancesCSV);
@@ -637,15 +648,42 @@ public class CampaignGUI extends JPanel {
         //endregion CSV Export
 
         //region XML Export
-        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, P
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        // The XML menu uses the following Mnemonic keys as of 12-APR-2021:
+        // C, I, P, R
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
-        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
-        miExportOptions.setMnemonic(KeyEvent.VK_C);
-        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
-        miExportXMLFile.add(miExportOptions);
+        final JMenuItem miExportCampaignPreset = new JMenuItem(resourceMap.getString("miExportCampaignPreset.text"));
+        miExportCampaignPreset.setName("miExportCampaignPreset");
+        miExportCampaignPreset.setMnemonic(KeyEvent.VK_C);
+        miExportCampaignPreset.addActionListener(evt -> {
+            final CreateCampaignPresetDialog createCampaignPresetDialog
+                    = new CreateCampaignPresetDialog(getFrame(), getCampaign(), null);
+            if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+                return;
+            }
+            final CampaignPreset preset = createCampaignPresetDialog.getPreset();
+            if (preset == null) {
+                return;
+            }
+            preset.writeToFile(getFrame(),
+                    FileDialogs.saveCampaignPreset(getFrame(), preset).orElse(null));
+        });
+        miExportXMLFile.add(miExportCampaignPreset);
+
+        JMenuItem miExportRankSystems = new JMenuItem(resourceMap.getString("miExportRankSystems.text"));
+        miExportRankSystems.setName("miExportRankSystems");
+        miExportRankSystems.setMnemonic(KeyEvent.VK_R);
+        miExportRankSystems.addActionListener(evt -> Ranks.exportRankSystemsToFile(FileDialogs
+                        .saveRankSystems(getFrame()).orElse(null), getCampaign().getRankSystem()));
+        miExportXMLFile.add(miExportRankSystems);
+
+        JMenuItem miExportIndividualRankSystem = new JMenuItem(resourceMap.getString("miExportIndividualRankSystem.text"));
+        miExportIndividualRankSystem.setName("miExportIndividualRankSystem");
+        miExportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
+        miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRankSystem()
+                .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null)));
+        miExportXMLFile.add(miExportIndividualRankSystem);
 
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
@@ -666,24 +704,81 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuExport);
         //endregion menuExport
 
-        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        //region Menu Refresh
+        // The Import menu uses the following Mnemonic keys as of 29-MAY-2021:
+        // A, C, F, P, R, U
+        JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
+        menuRefresh.setMnemonic(KeyEvent.VK_R);
+
+        JMenuItem miRefreshUnitCache = new JMenuItem(resourceMap.getString("miRefreshUnitCache.text"));
+        miRefreshUnitCache.setName("miRefreshUnitCache");
+        miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
+        miRefreshUnitCache.addActionListener(evt -> MechSummaryCache.refreshUnitData(false));
+        menuRefresh.add(miRefreshUnitCache);
+
+        JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
+        miRefreshCamouflage.setName("miRefreshCamouflage");
+        miRefreshCamouflage.setMnemonic(KeyEvent.VK_C);
+        miRefreshCamouflage.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshCamouflageDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshCamouflage);
+
+        JMenuItem miRefreshPortraits = new JMenuItem(resourceMap.getString("miRefreshPortraits.text"));
+        miRefreshPortraits.setName("miRefreshPortraits");
+        miRefreshPortraits.setMnemonic(KeyEvent.VK_P);
+        miRefreshPortraits.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshPortraitDirectory();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshPortraits);
+
+        JMenuItem miRefreshForceIcons = new JMenuItem(resourceMap.getString("miRefreshForceIcons.text"));
+        miRefreshForceIcons.setName("miRefreshForceIcons");
+        miRefreshForceIcons.setMnemonic(KeyEvent.VK_F);
+        miRefreshForceIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshForceIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshForceIcons);
+
+        JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
+        miRefreshAwards.setName("miRefreshAwards");
+        miRefreshAwards.setMnemonic(KeyEvent.VK_A);
+        miRefreshAwards.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshAwardIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshAwards);
+
+        JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
+        miRefreshRanks.setName("miRefreshRanks");
+        miRefreshRanks.setMnemonic(KeyEvent.VK_R);
+        miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
+        menuRefresh.add(miRefreshRanks);
+
+        menuFile.add(menuRefresh);
+        //endregion Menu Refresh
+
+        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
         miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
 
-        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
         menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
-        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text"));
         menuOptionsMM.setMnemonic(KeyEvent.VK_M);
         menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
         menuFile.add(menuOptionsMM);
 
         JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
         menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
-        menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
+        menuMekHqOptions.addActionListener(evt -> new MekHqOptionsDialog(getFrame()).setVisible(true));
         menuFile.add(menuMekHqOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
@@ -719,7 +814,7 @@ public class CampaignGUI extends JPanel {
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
@@ -743,15 +838,14 @@ public class CampaignGUI extends JPanel {
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
+        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
-        for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
-            int miHireMnemonic = Person.getRoleMnemonic(i);
-            if (miHireMnemonic != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(miHireMnemonic);
+        for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
+            JMenuItem miHire = new JMenuItem(role.getName(getCampaign().getFaction().isClan()));
+            if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+                miHire.setMnemonic(role.getMnemonic());
             }
-            miHire.setActionCommand(Integer.toString(i));
+            miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
         }
@@ -791,12 +885,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
-            if (need > 0) {
-                getCampaign().increaseAstechPool(need);
-            }
-        });
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
@@ -840,12 +929,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
-            if (need > 0) {
-                getCampaign().increaseMedicPool(need);
-            }
-        });
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
@@ -866,27 +950,32 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
-        miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
+        miDragoonsRating.addActionListener(evt ->
+                new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
         miPersonnelReport.setMnemonic(KeyEvent.VK_P);
-        miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
+        miPersonnelReport.addActionListener(evt ->
+                new PersonnelReportDialog(getFrame(), new PersonnelReport(getCampaign())).setVisible(true));
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text"));
         miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
-        miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
+        miHangarBreakdown.addActionListener(evt ->
+                new HangarReportDialog(getFrame(), new HangarReport(getCampaign())).setVisible(true));
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text"));
         miTransportReport.setMnemonic(KeyEvent.VK_T);
-        miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
+        miTransportReport.addActionListener(evt ->
+                new TransportReportDialog(getFrame(), new TransportReport(getCampaign())).setVisible(true));
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text"));
         miCargoReport.setMnemonic(KeyEvent.VK_C);
-        miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
+        miCargoReport.addActionListener(evt ->
+                new CargoReportDialog(getFrame(), new CargoReport(getCampaign())).setVisible(true));
         menuReports.add(miCargoReport);
 
         menuBar.add(menuReports);
@@ -984,6 +1073,7 @@ public class CampaignGUI extends JPanel {
 
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
+        statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
@@ -1002,6 +1092,7 @@ public class CampaignGUI extends JPanel {
         lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate())); // NOI18N
 
         btnPanel = new JPanel(new GridBagLayout());
+        btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1112,6 +1203,7 @@ public class CampaignGUI extends JPanel {
             miPlaf.addActionListener(this::changeTheme);
         }
     }
+
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
@@ -1134,16 +1226,22 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
+            ((RepairTab) getTab(GuiTabType.REPAIR)).focusOnUnit(id);
             tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
     }
 
+    public void focusOnPerson(Person person) {
+        if (person != null) {
+            focusOnPerson(person.getId());
+        }
+    }
+
     public void focusOnPerson(UUID id) {
-        if (null == id) {
+        if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
             return;
         }
@@ -1159,93 +1257,9 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public boolean nagShortMaintenance() {
-        if (!getCampaign().getCampaignOptions().checkMaintenance()) {
-            return false;
-        }
-        Vector<Unit> notMaintained = new Vector<>();
-        int totalAstechMinutesNeeded = 0;
-        for (Unit u : getCampaign().getHangar().getUnits()) {
-            if (u.isUnmaintained()) {
-                notMaintained.add(u);
-            } else if (u.isPresent() && (u.getEngineer() == null)) {
-                // only add astech minutes for non-crewed units who are present
-                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
-            }
-        }
-
-        if (notMaintained.size() > 0) {
-            if (JOptionPane.YES_OPTION != JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "You have unmaintained units. Do you really wish to advance the day?",
-                            "Unmaintained Units", JOptionPane.YES_NO_OPTION)) {
-                return true;
-            }
-        }
-
-        int minutesAvail = getCampaign().getPossibleAstechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            minutesAvail += getCampaign().getPossibleAstechPoolOvertime();
-        }
-        if (minutesAvail < totalAstechMinutesNeeded) {
-            int needed = (int) Math
-                    .ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
-            return JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
-                    "You do not have enough astechs to provide for full maintenance. You need "
-                            + needed + " more astech(s). Do you wish to proceed?",
-                    "Astech shortage", JOptionPane.YES_NO_OPTION);
-        }
-
-        return false;
-    }
-
-    public boolean nagShortDeployments() {
-        if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
-            return false;
-        }
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)
-                    || !getCampaign().getLocation().isOnPlanet()) {
-                continue;
-            }
-            if (getCampaign().getDeploymentDeficit((AtBContract) m) > 0) {
-                return 0 != JOptionPane
-                        .showConfirmDialog(
-                                null,
-                                "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
-                                "Unmet deployment requirements",
-                                JOptionPane.YES_NO_OPTION);
-            }
-        }
-        return false;
-    }
-
-    public boolean nagOutstandingScenarios() {
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)) {
-                continue;
-            }
-            for (Scenario s : m.getScenarios()) {
-                if (!s.isCurrent() || !(s instanceof AtBScenario)) {
-                    continue;
-                }
-                if (getCampaign().getLocalDate().equals(s.getDate())) {
-                    return 0 != JOptionPane
-                            .showConfirmDialog(
-                                    null,
-                                    "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
-                                    "Pending battle", JOptionPane.YES_NO_OPTION);
-                }
-            }
-        }
-        return false;
-    }
-
-    private void hirePerson(java.awt.event.ActionEvent evt) {
-        int type = Integer.parseInt(evt.getActionCommand());
-        NewRecruitDialog npd = new NewRecruitDialog(this, true,
-                getCampaign().newPerson(type));
+    private void hirePerson(final ActionEvent evt) {
+        final NewRecruitDialog npd = new NewRecruitDialog(this, true,
+                getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
         npd.setVisible(true);
     }
 
@@ -1255,8 +1269,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void hireBulkPersonnel() {
-        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign());
+        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hbpd.setVisible(true);
     }
 
@@ -1266,8 +1279,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
-        umd.setVisible(true);
+        if (getCampaign().getUnitMarket().getMethod().isNone()) {
+            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+        } else {
+            new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
+        }
     }
 
     public void showShipSearch() {
@@ -1275,16 +1291,16 @@ public class CampaignGUI extends JPanel {
         ssd.setVisible(true);
     }
 
-    private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+    public boolean saveCampaign(ActionEvent evt) {
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
             // I want a file, y'know!
-            return;
+            return false;
         }
 
-        saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file);
     }
 
     /**
@@ -1351,11 +1367,7 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private String getExtensionForSaveFile(Campaign c) {
-        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
-    }
-
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuLoadXmlActionPerformed(ActionEvent evt) {
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
@@ -1391,17 +1403,26 @@ public class CampaignGUI extends JPanel {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
-        boolean atb = getCampaign().getCampaignOptions().getUseAtB();
-        boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
-        boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
-        boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
-        boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
-        boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
-        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
+    /**
+     * @param evt the event triggering the opening of the Campaign Options Dialog
+     */
+    private void menuOptionsActionPerformed(final ActionEvent evt) {
+        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
+        // We need to handle it like this for now, as the options above get written to currently
+        boolean atb = oldOptions.getUseAtB();
+        boolean timeIn = oldOptions.getUseTimeInService();
+        boolean rankIn = oldOptions.getUseTimeInRank();
+        boolean retirementDateTracking = oldOptions.useRetirementDateTracking();
+        boolean staticRATs = oldOptions.isUseStaticRATs();
+        boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
+        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
-        if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+
+        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
+
+        if (timeIn != newOptions.getUseTimeInService()) {
+            if (newOptions.getUseTimeInService()) {
                 getCampaign().initTimeInService();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1410,8 +1431,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+        if (rankIn != newOptions.getUseTimeInRank()) {
+            if (newOptions.getUseTimeInRank()) {
                 getCampaign().initTimeInRank();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1420,8 +1441,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (retirementDateTracking != getCampaign().getCampaignOptions().useRetirementDateTracking()) {
-            if (getCampaign().getCampaignOptions().useRetirementDateTracking()) {
+        if (retirementDateTracking != newOptions.useRetirementDateTracking()) {
+            if (newOptions.useRetirementDateTracking()) {
                 getCampaign().initRetirementDateTracking();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1430,17 +1451,46 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+        // Procreation Updates
+        if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
+            getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getProcreation().setUseClannerProcreation(newOptions.isUseClannerProcreation());
+            getCampaign().getProcreation().setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
+            getCampaign().getProcreation().setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
+            getCampaign().getProcreation().setUseRandomClannerProcreation(newOptions.isUseRandomClannerProcreation());
+            getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
+            if (getCampaign().getProcreation().getMethod().isPercentage()) {
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshipChance());
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
+            }
+        }
+
+        // Clear Procreation Data if Disabled
+        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
+            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
+                    .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
+        }
+
+        final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
+        if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
+            getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
+            getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
+            miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        }
+
+        if (atb != newOptions.getUseAtB()) {
+            if (newOptions.getUseAtB()) {
                 getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+            miContractMarket.setVisible(newOptions.getUseAtB());
+            miShipSearch.setVisible(newOptions.getUseAtB());
+            miRetirementDefectionDialog.setVisible(newOptions.getUseAtB());
+            if (newOptions.getUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
@@ -1456,34 +1506,28 @@ public class CampaignGUI extends JPanel {
                 getCampaign().shutdownAtB();
             }
         }
-        if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
+
+        if (staticRATs != newOptions.isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
-        if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
+
+        if (factionIntroDate != newOptions.useFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
         getCampaign().reloadNews();
     }
 
-    private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {
-        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-        god.refreshOptions();
+    private void menuOptionsMMActionPerformed(final ActionEvent evt) {
+        final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.setEditable(true);
-        god.setVisible(true);
-        if (!god.wasCancelled()) {
+        if (god.showDialog().isConfirmed()) {
             getCampaign().setGameOptions(god.getOptions());
-            setCampaignOptionsFromGameOptions();
             refreshCalendar();
         }
     }
 
-    private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
-        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame());
-        dialog.setVisible(true);
-    }
-
-    private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miLoadForcesActionPerformed(ActionEvent evt) {
         loadListFile(true);
     }
 
@@ -1495,17 +1539,12 @@ public class CampaignGUI extends JPanel {
         savePersonFile();
     }
 
-    private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {
-        saveOptionsFile(FileType.XML, resourceMap.getString("dlgSaveCampaignXML.text"),
-                getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedCampaignSettings");
-    }
-
     private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1514,7 +1553,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1523,7 +1562,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1532,12 +1571,8 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
-    }
-
-    private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {
-        loadOptionsFile();
     }
 
     private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1572,46 +1607,35 @@ public class CampaignGUI extends JPanel {
         if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
-                JOptionPane
-                        .showMessageDialog(
-                                frame,
-                                "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
-                                "No Engineer", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getTechs().size() > 0) {
+        } else if (getCampaign().getActivePersonnel().stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
             String skillLvl;
-            int TimePerDay;
 
-            List<Person> techs = getCampaign().getTechs();
-            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
+            List<Person> techs = getCampaign().getTechs(false, true);
+            int lastRightTech = 0;
+
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
-                    TimePerDay = 240 - tech.getMaintenanceTimeUsing();
-                } else {
-                    TimePerDay = 480 - tech.getMaintenanceTimeUsing();
-                }
                 skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
-                name = tech.getFullName()
-                        + ", "
-                        + skillLvl
-                        + " "
-                        + tech.getPrimaryRoleDesc()
-                        + " ("
-                        + getCampaign().getTargetFor(r, tech).getValueAsString()
-                        + "+)"
-                        + ", "
-                        + tech.getMinutesLeft() + "/" + TimePerDay
-                        + " minutes";
+                name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
+                        + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
+                        + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
                 techHash.put(name, tech);
-                techList.add(name);
+                if (tech.isRightTechTypeFor(r)) {
+                    techList.add(lastRightTech++, name);
+                } else {
+                    techList.add(name);
+                }
             }
 
             String s = (String) JOptionPane.showInputDialog(frame,
@@ -1622,7 +1646,17 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTech(techHash.get(s));
+            Person selectedTech = techHash.get(s);
+
+            if (!selectedTech.isRightTechTypeFor(r)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
+                        "This tech is not appropriate for this unit. Would you like to continue?",
+                        "Incorrect Tech Type", JOptionPane.YES_NO_OPTION)) {
+                    return;
+                }
+            }
+
+            r.setTech(selectedTech);
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
@@ -1675,36 +1709,6 @@ public class CampaignGUI extends JPanel {
         if (hasTab(GuiTabType.MEKLAB)) {
             ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
         }
-    }
-
-    public void showReport(Report report) {
-        ReportDialog rd = new ReportDialog(getFrame(), report);
-        rd.pack();
-        rd.setVisible(true);
-    }
-
-    public void showMaintenanceReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
-        mrd.setVisible(true);
-    }
-
-    public void showUnitCostReport(UUID id) {
-        if (null == id) {
-            return;
-        }
-        Unit u = getCampaign().getUnit(id);
-        if (null == u) {
-            return;
-        }
-        UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
-        mrd.setVisible(true);
     }
 
     /**
@@ -1970,7 +1974,7 @@ public class CampaignGUI extends JPanel {
             // Stupid weird parsing of XML. At least this cleans it up.
             personnelEle.normalize();
 
-            Version version = new Version(personnelEle.getAttribute("version"));
+            final Version version = new Version(personnelEle.getAttribute("version"));
 
             // we need to iterate through three times, the first time to collect
             // any custom units that might not be written yet
@@ -1983,16 +1987,14 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    // Error condition of sorts!
-                    // Errr, what should we do here?
                     MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if (getCampaign().getPerson(p.getId()) != null
-                        && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
-                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
+                if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
+                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
+                            + p.getFullName() + ", Id " + p.getId() + ")");
                     p = null;
                 }
 
@@ -2012,7 +2014,7 @@ public class CampaignGUI extends JPanel {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
                 if (p.getGenealogy().hasSpouse()
-                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
@@ -2022,11 +2024,11 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p.isPregnant()) {
-                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
                     UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
                     if ((fatherId != null)
                             && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
-                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
+                        p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
                     }
                 }
             }
@@ -2035,7 +2037,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    //TODO: disable if not using personnel tab
+    // TODO: disable if not using personnel tab
     private void savePersonFile() {
         File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
@@ -2076,17 +2078,15 @@ public class CampaignGUI extends JPanel {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // Start the XML root.
-            pw.println("<personnel version=\""
-                    + resourceMap.getString("Application.version") + "\">");
+            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXml(pw, 1);
+                    people[i].writeToXML(getCampaign(), pw, 1);
                 }
             } else {
-                selectedPerson.writeToXml(pw, 1);
+                selectedPerson.writeToXML(getCampaign(), pw, 1);
             }
             // Okay, we're done.
             // Close everything out and be done with it.
@@ -2114,69 +2114,10 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void saveOptionsFile(FileType format, String dialogTitle, String filename) {
-        Optional<File> maybeFile = GUI.fileDialogSave(
-                frame,
-                dialogTitle,
-                format,
-                MekHQ.getCampaignOptionsDirectory().getValue(),
-                filename + "." + format.getRecommendedExtension());
-
-        if (!maybeFile.isPresent()) {
-            return;
-        }
-
-        MekHQ.getCampaignOptionsDirectory().setValue(maybeFile.get().getParent());
-
-        File file = checkFileEnding(maybeFile.get(), format.getRecommendedExtension());
-        checkToBackupFile(file, file.getPath());
-
-        // Then save it out to that file.
-        try (OutputStream os = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
-            // File header
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<options version=\"" + resourceMap.getString("Application.version") + "\">");
-            // Start the XML root.
-            getCampaign().getCampaignOptions().writeToXml(pw, 1);
-            pw.println("\t<skillTypes>");
-            for (String name : SkillType.skillList) {
-                SkillType type = SkillType.getType(name);
-                if (null != type) {
-                    type.writeToXml(pw, 2);
-                }
-            }
-            pw.println("\t</skillTypes>");
-            pw.println("\t<specialAbilities>");
-            for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
-                SpecialAbility.getAbility(key).writeToXml(pw, 2);
-            }
-            pw.println("\t</specialAbilities>");
-            getCampaign().getRandomSkillPreferences().writeToXml(pw, 1);
-            pw.println("</options>");
-            // Okay, we're done.
-            pw.flush();
-
-            JOptionPane.showMessageDialog(tabMain, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
-
-            MekHQ.getLogger().info("Campaign Options saved saved to " + file);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                    "Oh no! The program was unable to correctly export your campaign options. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
-                            + "the future.",
-                    "Could not export campaign options", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
     protected void loadPartsFile() {
         Optional<File> maybeFile = FileDialogs.openParts(frame);
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -2205,7 +2146,7 @@ public class CampaignGUI extends JPanel {
         // Stupid weird parsing of XML. At least this cleans it up.
         partsEle.normalize();
 
-        Version version = new Version(partsEle.getAttribute("version"));
+        final Version version = new Version(partsEle.getAttribute("version"));
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
@@ -2235,127 +2176,10 @@ public class CampaignGUI extends JPanel {
         MekHQ.getLogger().info("Finished load of parts file");
     }
 
-    protected void loadOptionsFile() {
-        Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
-
-        if (!maybeFile.isPresent()) {
-            return;
-        }
-
-        File optionsFile = maybeFile.get();
-
-        MekHQ.getLogger().info("Starting load of options file from XML...");
-        // Initialize variables.
-        Document xmlDoc;
-
-        // Open up the file.
-        try (InputStream is = new FileInputStream(optionsFile)) {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
-            return;
-        }
-
-        Element partsEle = xmlDoc.getDocumentElement();
-        NodeList nl = partsEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML. At least this cleans it up.
-        partsEle.normalize();
-
-        Version version = new Version(partsEle.getAttribute("version"));
-
-        CampaignOptions options = null;
-        RandomSkillPreferences rsp = null;
-
-        // we need to iterate through three times, the first time to collect
-        // any custom units that might not be written yet
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            String xn = wn.getNodeName();
-
-            if (xn.equalsIgnoreCase("campaignOptions")) {
-                options = CampaignOptions.generateCampaignOptionsFromXml(wn, version);
-            } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
-            } else if (xn.equalsIgnoreCase("skillTypes")) {
-                NodeList wList = wn.getChildNodes();
-
-                // Okay, lets iterate through the children, eh?
-                for (int x2 = 0; x2 < wList.getLength(); x2++) {
-                    Node wn2 = wList.item(x2);
-
-                    // If it's not an element node, we ignore it.
-                    if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-
-                    if (wn2.getNodeName().startsWith("ability-")) {
-                        continue;
-                    } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
-                        // Error condition of sorts!
-                        // Errr, what should we do here?
-                        MekHQ.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
-                        continue;
-                    }
-                    SkillType.generateInstanceFromXML(wn2, version);
-                }
-            } else if (xn.equalsIgnoreCase("specialAbilities")) {
-                PilotOptions pilotOptions = new PilotOptions();
-                SpecialAbility.clearSPA();
-
-                NodeList wList = wn.getChildNodes();
-
-                // Okay, lets iterate through the children, eh?
-                for (int x2 = 0; x2 < wList.getLength(); x2++) {
-                    Node wn2 = wList.item(x2);
-
-                    // If it's not an element node, we ignore it.
-                    if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-
-                    if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                        // Error condition of sorts!
-                        // Errr, what should we do here?
-                        MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
-                        continue;
-                    }
-
-                    SpecialAbility.generateInstanceFromXML(wn2, pilotOptions, null);
-                }
-            }
-
-        }
-
-        if (null != options) {
-            this.getCampaign().setCampaignOptions(options);
-        }
-        if (null != rsp) {
-            this.getCampaign().setRandomSkillPreferences(rsp);
-        }
-
-        MekHQ.getLogger().info("Finished load of campaign options file");
-        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
-
-        refreshCalendar();
-        getCampaign().reloadNews();
-    }
-
     private void savePartsFile() {
         Optional<File> maybeFile = FileDialogs.saveParts(frame, getCampaign());
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -2398,9 +2222,8 @@ public class CampaignGUI extends JPanel {
                 // File header
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
                 // Start the XML root.
-                pw.println("<parts version=\"" + resourceMap.getString("Application.version") + "\">");
+                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
@@ -2490,61 +2313,90 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> "
-                + funds.toAmountAndSymbolString()
-                + inDebt
-                + "</html>";
+        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
         lblFunds.setText(text);
     }
 
     private void refreshTempAstechs() {
-        String text = "<html><b>Temp Astechs:</b> " + getCampaign().getAstechPool() + "</html>";
+        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 
     private void refreshTempMedics() {
-        String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+        if (!getCampaign().getCampaignOptions().getUseAtB()
+                || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             StringBuilder report = new StringBuilder();
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
-            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>:" + partsAvailability + "</html>");
+            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
         }
     }
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     @Subscribe
-    public void handleDayEnding(DayEndingEvent ev) {
+    public void handleDayEnding(DayEndingEvent evt) {
         // first check for overdue loan payments - don't allow advancement until
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
             showOverdueLoansDialog();
-            ev.cancel();
+            evt.cancel();
+            return;
         }
+
         if (getCampaign().checkRetirementDefections()) {
             showRetirementDefectionDialog();
-            ev.cancel();
+            evt.cancel();
+            return;
         }
+
         if (getCampaign().checkYearlyRetirements()) {
             showRetirementDefectionDialog();
-            ev.cancel();
+            evt.cancel();
+            return;
         }
-        if (nagShortMaintenance()) {
-            ev.cancel();
+
+        if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
         }
+
+        if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (getCampaign().getCampaignOptions().getUseAtB()) {
-            if (nagShortDeployments()) {
-                ev.cancel();
+            if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
             }
-            if (nagOutstandingScenarios()) {
-                ev.cancel();
+
+            if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
+
+            if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
             }
         }
     }
@@ -2560,9 +2412,17 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(OptionsChangedEvent ev) {
+    public void handle(final OptionsChangedEvent evt) {
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
+            removeStandardTab(GuiTabType.STRATCON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
+
+        refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
+        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
     @Subscribe
@@ -2606,7 +2466,7 @@ public class CampaignGUI extends JPanel {
     public void handlePersonUpdate(PersonEvent ev) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
         // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
             refreshPartsAvailability();
         }
     }
@@ -2722,19 +2582,5 @@ public class CampaignGUI extends JPanel {
      */
     public ResourceBundle getResourceMap() {
         return resourceMap;
-    }
-
-    private void setCampaignOptionsFromGameOptions() {
-        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
-        getCampaign().getCampaignOptions().setInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
-        getCampaign().getCampaignOptions().setToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
-        getCampaign().getCampaignOptions().setArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
-        getCampaign().getCampaignOptions().setAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
-        getCampaign().getCampaignOptions().setEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
-        getCampaign().getCampaignOptions().setImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
-        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
-        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
-        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
-        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }

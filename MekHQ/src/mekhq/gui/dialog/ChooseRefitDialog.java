@@ -50,8 +50,8 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa
@@ -150,7 +150,7 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
                  BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
                  BorderFactory.createEmptyBorder(5,5,5,5)));
-        MechView mv = new MechView(unit.getEntity(), false, true);
+        MechView mv = new MechView(unit.getEntity(), false, true, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new java.awt.Dimension(300, 400));
@@ -359,7 +359,7 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
             } else if (col == COL_TARGET) {
-                return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
+                return campaign.getTargetForAcquisition(r).getValueAsString();
             } else {
                 return "?";
             }
@@ -411,7 +411,7 @@ public class ChooseRefitDialog extends JDialog {
             }
             switch (col) {
                 case COL_TARGET:
-                    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getDesc();
+                    return campaign.getTargetForAcquisition(r).getDesc();
                 default:
                     return null;
             }

@@ -20,8 +20,8 @@ import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -242,7 +242,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                    MekHQ.getLogger().error(e);
                 }
                 yearLabel.setText(String.valueOf(--y));
                 updateDayGrid(false);
@@ -253,7 +253,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                    MekHQ.getLogger().error(e);
                 }
                 yearLabel.setText(String.valueOf(++y));
                 updateDayGrid(false);
@@ -267,7 +267,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                    MekHQ.getLogger().error(e);
                 }
                 date = LocalDate.of(y, m, d);
                 ready = true;
@@ -309,7 +309,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(getClass(), "updateDayGrid", e);
+            MekHQ.getLogger().error(e);
         }
 
         // decide what day of the week is the first day of this month
@@ -398,7 +398,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(getClass(), "getLastDay", e);
+            MekHQ.getLogger().error(e);
         }
 
         return LocalDate.of(y, m, 1).lengthOfMonth();

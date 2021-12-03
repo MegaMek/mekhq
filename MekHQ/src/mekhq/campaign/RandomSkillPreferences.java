@@ -25,8 +25,9 @@ import java.io.Serializable;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
 
+import megamek.Version;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,7 +56,7 @@ public class RandomSkillPreferences implements Serializable {
 
     public RandomSkillPreferences() {
         overallRecruitBonus = 0;
-        recruitBonuses = new int[Person.T_NUM];
+        recruitBonuses = new int[PersonnelRole.values().length];
         randomizeSkill = true;
         useClanBonuses = true;
         antiMekProb = 10;
@@ -77,14 +78,16 @@ public class RandomSkillPreferences implements Serializable {
         overallRecruitBonus = b;
     }
 
-    public int getRecruitBonus(int type) {
-        return (type < recruitBonuses.length) ? recruitBonuses[type] : 0;
+    public int[] getRecruitBonuses() {
+        return recruitBonuses;
     }
 
-    public void setRecruitBonus(int type, int bonus) {
-        if (type < recruitBonuses.length) {
-            recruitBonuses[type] = bonus;
-        }
+    public int getRecruitBonus(PersonnelRole role) {
+        return getRecruitBonuses()[role.ordinal()];
+    }
+
+    public void setRecruitBonus(int index, int bonus) {
+        recruitBonuses[index] = bonus;
     }
 
     public int getSpecialAbilBonus(int type) {
@@ -197,7 +200,7 @@ public class RandomSkillPreferences implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "randomSkillPreferences");
     }
 
-    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
+    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
         MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
@@ -209,45 +212,56 @@ public class RandomSkillPreferences implements Serializable {
             Node wn2 = wList.item(x);
 
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE)
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
+            }
 
             MekHQ.getLogger().debug(wn2.getNodeName() + ": " + wn2.getTextContent());
-            if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
-                retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
-                retVal.randomizeSkill = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("useClanBonuses")) {
-                retVal.useClanBonuses = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("antiMekProb")) {
-                retVal.antiMekProb = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("combatSmallArmsBonus")) {
-                retVal.combatSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("supportSmallArmsBonus")) {
-                retVal.supportSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("artilleryProb")) {
-                retVal.artilleryProb = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("artilleryBonus")) {
-                retVal.artilleryBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillProb")) {
-                retVal.secondSkillProb = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
-                retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
+                    retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
+                    retVal.randomizeSkill = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanBonuses")) {
+                    retVal.useClanBonuses = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("antiMekProb")) {
+                    retVal.antiMekProb = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatSmallArmsBonus")) {
+                    retVal.combatSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportSmallArmsBonus")) {
+                    retVal.supportSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("artilleryProb")) {
+                    retVal.artilleryProb = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("artilleryBonus")) {
+                    retVal.artilleryBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillProb")) {
+                    retVal.secondSkillProb = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
+                    retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    if (version.isLowerThan("0.49.0")) {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.recruitBonuses[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = Integer.parseInt(values[i]);
+                        }
+                    } else {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.tacticsMod[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilBonus")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.specialAbilBonus[i] = Integer.parseInt(values[i]);
+                    }
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.tacticsMod[i] = Integer.parseInt(values[i]);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilBonus")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.specialAbilBonus[i] = Integer.parseInt(values[i]);
-                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 

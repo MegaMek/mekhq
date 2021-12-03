@@ -130,9 +130,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            MekHQ.getLogger().error(getClass(), "canImport", "UnsupportedFlavor: " + ufe.getMessage());
+            MekHQ.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            MekHQ.getLogger().error(getClass(), "canImport", "I/O error: " + ioe.getMessage());
+            MekHQ.getLogger().error("I/O error: " + ioe.getMessage());
         }
 
         if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
@@ -162,9 +162,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            MekHQ.getLogger().error(this, "UnsupportedFlavor: " + ufe.getMessage());
+            MekHQ.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            MekHQ.getLogger().error(this, "I/O error: " + ioe.getMessage());
+            MekHQ.getLogger().error("I/O error: " + ioe.getMessage());
         }
 
         // Get drop location info.

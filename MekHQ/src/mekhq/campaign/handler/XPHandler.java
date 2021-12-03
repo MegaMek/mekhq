@@ -49,21 +49,21 @@ public class XPHandler {
             return;
         }
         for (Person person : campaign.getAdmins()) {
-            if (person.isAdminPrimary()) {
-                if(adminXPPeriod > 1) {
+            if (person.getPrimaryRole().isAdministrator()) {
+                if (adminXPPeriod > 1) {
                     Integer weeksLeft = person.getExtraData().get(NEXT_ADMIN_XP_DELAY);
-                    if(null == weeksLeft) {
+                    if (null == weeksLeft) {
                         // Assign a random value between 1 and the max
                         weeksLeft = Compute.randomInt(adminXPPeriod) + 1;
                     }
-                    -- weeksLeft;
-                    if(weeksLeft == 0) {
-                        person.awardXP(adminXP);
+
+                    if (--weeksLeft == 0) {
+                        person.awardXP(campaign, adminXP);
                         weeksLeft = adminXPPeriod;
                     }
                     person.getExtraData().set(NEXT_ADMIN_XP_DELAY, weeksLeft);
                 } else {
-                    person.awardXP(adminXP);
+                    person.awardXP(campaign, adminXP);
                 }
             }
         }

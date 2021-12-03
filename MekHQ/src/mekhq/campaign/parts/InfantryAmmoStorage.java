@@ -73,6 +73,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
         return weaponType;
     }
 
+    @Override
     public InfantryAmmoStorage clone() {
         InfantryAmmoStorage storage = new InfantryAmmoStorage(0, getType(), getShots(), getWeaponType(), getCampaign());
         storage.copyBaseData(this);
@@ -97,7 +98,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof InfantryAmmoStorage)
+        return (getClass() == part.getClass())
                 && isSameAmmoType(((InfantryAmmoStorage) part).getType(), ((InfantryAmmoStorage) part).getWeaponType());
     }
 

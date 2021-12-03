@@ -1,7 +1,8 @@
 /*
  * ReportLogPanel.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,18 +13,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
-
 import java.awt.BorderLayout;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
@@ -32,102 +30,121 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import megamek.common.util.StringUtil;
 import mekhq.Utilities;
 
 /**
- * This is a panel for displaying the reporting log for each day. We are putting it into
- * its own panel so that we can later extend this to include chat and maybe break up the log
- * into different sections
+ * This is a panel for displaying the reporting log for each day. We are putting it into its own
+ * panel so that we can later extend this to include chat and maybe break up the log into different
+ * sections.
  *
  * @author Jay Lawson
- *
  */
 public class DailyReportLogPanel extends JPanel {
-
+    //region Variable Declarations
     private static final long serialVersionUID = -6512675362473724385L;
+    private final CampaignGUI gui;
+    private JTextPane txtLog;
+    private String logText = "";
+    //endregion Variable Declarations
 
-    CampaignGUI gui;
-    JTextPane txtLog;
-    String logText = "";
-
-    public DailyReportLogPanel(CampaignGUI gui) {
+    public DailyReportLogPanel(final CampaignGUI gui) {
         this.gui = gui;
-        txtLog = new JTextPane() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 9000659006965230883L;
-
-            public boolean getScrollableTracksViewportWidth() {
-                return true;
-            }
-        };
-        txtLog.addHyperlinkListener(gui.getReportHLL());
-        initComponents();
+        initialize();
     }
 
-    private void initComponents() {
-        setLayout(new BorderLayout());
-        txtLog.setContentType("text/html"); // NOI18N
-        txtLog.setEditable(false);
-        DefaultCaret caret = (DefaultCaret)txtLog.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        JScrollPane scrLog = new JScrollPane(txtLog);
-        scrLog.setBorder(new EmptyBorder(2,5,2,2));
-        add(scrLog, BorderLayout.CENTER);
+    //region Getters/Setters
+    public CampaignGUI getGUI() {
+        return gui;
     }
 
-    public void clearLogPanel() {
-        logText = "";
-        txtLog.setText("");
+    public JTextPane getTxtLog() {
+        return txtLog;
     }
 
-    public void refreshLog(String s) {
-    	if(logText.equals(s)) {
-    		return;
-    	}
-        logText = s;
-        //txtLog.setText(logText); -- NO. BAD. DON'T DO THIS.
-        Reader stringReader = new StringReader(logText);
-        HTMLEditorKit htmlKit = new HTMLEditorKit();
-        HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
-        try {
-			htmlKit.read(stringReader, blank, 0);
-		} catch (Exception e) {
-			// Ignore
-		}
-        txtLog.setDocument(blank);
-		txtLog.setCaretPosition(blank.getLength());
-		//possibly nag user about new reports in command center
-		gui.checkDailyLogNag();
+    public void setTxtLog(final JTextPane txtLog) {
+        this.txtLog = txtLog;
     }
-
-	public void appendLog(List<String> newReports) {
-		String addedText = Utilities.combineString(newReports, ""); //$NON-NLS-1$z
-		if((null != addedText) && (addedText.length() > 0)) {
-		    if (logText.length() > 0) {
-    			HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
-    			try {
-    				// Element 0 is <head>, Element 1 is <body>
-    				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
-    				logText = logText + addedText;
-    			} catch (BadLocationException | IOException e) {
-    				// Shouldn't happen
-    			}
-    			txtLog.setCaretPosition(doc.getLength());
-    			gui.checkDailyLogNag();
-		    } else {
-		        refreshLog(addedText);
-		    }
-		}
-	}
 
     public String getLogText() {
         return logText;
     }
+
+    public void setLogText(final String logText) {
+        this.logText = logText;
+    }
+    //region Getters/Setters
+
+    //region Initialization
+    private void initialize() {
+        setLayout(new BorderLayout());
+
+        setTxtLog(new JTextPane() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+        });
+        getTxtLog().setContentType("text/html");
+        getTxtLog().setEditable(false);
+        ((DefaultCaret) getTxtLog().getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        getTxtLog().getAccessibleContext().setAccessibleName("Daily Log");
+        getTxtLog().addHyperlinkListener(gui.getReportHLL());
+
+        final JScrollPane logPanel = new JScrollPane(getTxtLog());
+        logPanel.setBorder(new EmptyBorder(2,5,2,2));
+        add(logPanel, BorderLayout.CENTER);
+    }
+    //endregion Initialization
+
+    public void clearLogPanel() {
+        setLogText("");
+        getTxtLog().setText("");
+    }
+
+    public void refreshLog(final String text) {
+    	if (text.equals(getLogText())) {
+    		return;
+    	}
+
+        setLogText(text);
+        final Reader stringReader = new StringReader(getLogText());
+        final HTMLEditorKit htmlKit = new HTMLEditorKit();
+        final HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
+        try {
+			htmlKit.read(stringReader, blank, 0);
+		} catch (Exception ignored) {
+
+		}
+        getTxtLog().setDocument(blank);
+        getTxtLog().setCaretPosition(blank.getLength());
+        getGUI().checkDailyLogNag();
+    }
+
+	public void appendLog(final List<String> newReports) {
+		final String addedText = Utilities.combineString(newReports, "");
+		if (StringUtil.isNullOrEmpty(addedText)) {
+		    return;
+        }
+
+        if (getLogText().isBlank()) {
+            refreshLog(addedText);
+            return;
+        }
+
+        final HTMLDocument doc = (HTMLDocument) getTxtLog().getDocument();
+        try {
+            // Element 0 is <head>, Element 1 is <body>
+            doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
+            setLogText(getLogText() + addedText);
+        } catch (Exception ignored) {
+
+        }
+        getTxtLog().setCaretPosition(doc.getLength());
+        getGUI().checkDailyLogNag();
+	}
 }

@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy dropship has been grounded in this area, but it's weapons are still active so pay attention.</additionalBriefingText>
+	<additionalBriefingText>An enemy dropship has been detected in the area.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
@@ -13,7 +13,7 @@
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
-		<destinationZone>4</destinationZone>
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>

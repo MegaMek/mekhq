@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,31 @@
  */
 package mekhq.campaign.io.Migration;
 
+import megamek.Version;
+import mekhq.MekHqConstants;
+import mekhq.campaign.personnel.Person;
+
+import java.util.Collection;
+
 public class PersonMigrator {
+
+    /**
+     * This performs the final migration for a person, with everything but sanity checks performed.
+     * @param version the version being loaded from
+     * @param people the people to migrate
+     */
+    public static void finalPersonMigration(final Version version, final Collection<Person> people) {
+        if (MekHqConstants.VERSION.is(version)) {
+            return;
+        }
+
+        if (version.isLowerThan("0.49.4")) {
+            people.stream()
+                    .filter(person -> person.getPrimaryRole().isDependent() && (person.getUnit() != null))
+                    .forEach(person -> person.getUnit().remove(person, true));
+        }
+    }
+
     /**
      * This migrates awards from the Default Set of pre-0.47.6 to the newer standard following 0.47.14
      * @param text the previous award name
@@ -81,45 +105,97 @@ public class PersonMigrator {
     public static String migrateRankSystemName(int system) {
         switch (system) {
             case 0:
-                return "Second Star League";
+                return "Second Star League Defense Force";
             case 1:
-                return "Federated Suns";
+                return "Armed Forces of the Federated Suns";
             case 2:
-                return "Federated Commonwealth";
+                return "Armed Forces of the Federated Commonwealth";
             case 3:
-                return "Lyran Commonwealth";
+                return "Lyran Commonwealth Armed Forces";
             case 4:
-                return "Lyran Alliance";
+                return "Lyran Alliance Armed Forces";
             case 5:
-                return "Free Worlds League";
+                return "Free Worlds League Military";
             case 6:
-                return "Capellan Confederation";
+                return "Capellan Confederation Armed Forces";
             case 7:
                 return "Capellan Confederation Warrior House";
             case 8:
-                return "Draconis Combine";
+                return "Draconis Combine Mustered Soldiery";
             case 9:
                 return "Clan";
             case 10:
-                return "ComStar";
+                return "Com Guard";
             case 11:
-                return "Word of Blake";
+                return "Word of Blake Militia";
             case 12:
                 return "Custom";
             case 13:
-                return "Magistracy of Canopus";
+                return "Magistracy Armed Forces";
             case 14:
-                return "Taurian Concordat";
+                return "Taurian Defense Force";
             case 15:
-                return "Marian Hegemony";
+                return "Marian Hegemony Armed Forces";
             case 16:
-                return "Outworlds Alliance";
+                return "Alliance Military Corps";
             case 17:
-                return "Free Rasalhague Republic";
+                return "KungsArmé";
             case 18:
-                return "Aurigan Coalition";
+                return "Aurigan Coalition Military";
             case 19:
-                return "First Star League";
+                return "Star League Defense Force";
+            default:
+                return "?";
+        }
+    }
+
+    /**
+     * This migrates the rank system id to a rank system code as per changes made in 0.49.0
+     * @param system the system id of the loaded rank system
+     * @return the system's code
+     */
+    public static String migrateRankSystemCode(final int system) {
+        switch (system) {
+            case 0:
+                return "SSLDF";
+            case 1:
+                return "AFFS";
+            case 2:
+                return "AFFC";
+            case 3:
+                return "LCAF";
+            case 4:
+                return "LAAF";
+            case 5:
+                return "FWLM";
+            case 6:
+                return "CCAF";
+            case 7:
+                return "CCWH";
+            case 8:
+                return "DCMS";
+            case 9:
+                return "CLAN";
+            case 10:
+                return "CG";
+            case 11:
+                return "WOBM";
+            case 12:
+                return "CUSTOM";
+            case 13:
+                return "MAF";
+            case 14:
+                return "TDF";
+            case 15:
+                return "MHAF";
+            case 16:
+                return "AMC";
+            case 17:
+                return "KA";
+            case 18:
+                return "ACM";
+            case 19:
+                return "SLDF";
             default:
                 return "?";
         }

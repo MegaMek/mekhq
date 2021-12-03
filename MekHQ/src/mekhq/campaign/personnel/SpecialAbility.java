@@ -20,30 +20,14 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.Version;
 import megamek.common.EquipmentType;
+import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.autocannons.LBXACWeapon;
@@ -54,12 +38,23 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
- * person object we will use PilotOptions (and maybe at some point NonPilotOptions), so these
- * objects will not get written to actual personnel. Instead, we will we will keep track of a full static
+ * person object we will use PersonnelOptions, so these objects will not get written to actual
+ * personnel. Instead, we will we will keep track of a full static
  * hash of SPAs that will contain important information on XP costs and pre-reqs that can be
  * looked up to see if a person is eligible for a particular option. All of this
  * will be customizable via an external XML file that can be user selected in the campaign
@@ -68,7 +63,6 @@ import mekhq.Version;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
-
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -123,7 +117,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
 
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+    @Override
+    @SuppressWarnings(value = "unchecked") // FIXME: Broken Java with it's Object clones
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -328,7 +323,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
 
     @SuppressWarnings("unchecked")
-    public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
+    public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -395,22 +390,18 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
-        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
-
+    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
@@ -450,29 +441,25 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
     public static void initializeSPA() {
-        final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
         specialAbilities = new Hashtable<>();
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
+        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -519,7 +506,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return specialAbilities;
     }
 
-    public static SpecialAbility getDefaultAbility(String name) {
+    public static @Nullable SpecialAbility getDefaultAbility(String name) {
         if (null != defaultSpecialAbilities) {
             return defaultSpecialAbilities.get(name);
         }
@@ -550,11 +537,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
         specialAbilities = spas;
     }
 
-    public static SpecialAbility getOption(String name) {
+    public static @Nullable SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
         if (null != retVal) {
             return retVal;
         }
+
         if (null != defaultSpecialAbilities) {
             retVal = defaultSpecialAbilities.get(name);
             if (null != retVal) {
@@ -568,58 +556,85 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
-        ArrayList<String> candidates = new ArrayList<>();
-        for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
-            EquipmentType et = e.nextElement();
-
-            if (!isWeaponEligibleForSPA(et, type, clusterOnly)) {
-                continue;
-            }
-
-            WeaponType wt = (WeaponType) et;
-
-            if (TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
-                continue;
-            }
-
-            int lvl = wt.getTechLevel(year);
-            if (lvl < 0) {
-                continue;
-            }
-
-            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
-                continue;
-            }
-
-            if (techLvl == TechConstants.T_IS_UNOFFICIAL) {
-                continue;
-            }
-
-            int ntimes = 10;
-            if (techLvl >= TechConstants.T_IS_ADVANCED) {
-                ntimes = 1;
-            }
-
-            while (ntimes > 0) {
-                candidates.add(et.getName());
-                ntimes--;
+    /**
+     * This return a random weapon to specialize in, selected based on weightings. Introtech
+     * weaponry is weighted at 50, standard weaponry at 25, advanced weaponry at 5, while experimental
+     * and unofficial weaponry are both weighted at 1.
+     *
+     * @param person the person to generate the weapon specialization for
+     * @param techLevel the maximum tech level to generate a weapon for
+     * @param year the year to generate the specialization for
+     * @param clusterOnly whether to only consider cluster weapons or not
+     * @return the name of the selected weapon, or null if there are no weapons that can be selected
+     */
+    public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel,
+                                                              final int year, final boolean clusterOnly) {
+        final WeightedIntMap<EquipmentType> weapons = new WeightedIntMap<>();
+        // First try to generate based on the person's unit
+        if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
+            for (final Mounted mounted : person.getUnit().getEntity().getEquipment()) {
+                addValidWeaponryToMap(mounted.getType(), person, techLevel, year, clusterOnly, weapons);
             }
         }
-        if (candidates.isEmpty()) {
-            return "??";
+
+        // If that doesn't generate a valid weapon, then turn to the wider list
+        if (weapons.isEmpty()) {
+            for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements(); ) {
+                final EquipmentType equipmentType = e.nextElement();
+                addValidWeaponryToMap(equipmentType, person, techLevel, year, clusterOnly, weapons);
+            }
         }
-        return Utilities.getRandomItem(candidates);
+        return weapons.isEmpty() ? null : weapons.randomItem().getName();
     }
 
     /**
-     * Worker function that determines if a piece of equipment is eligible
-     * for being selected for an SPA.
+     * This is a worker method to add any valid weaponry to the weighted map used to generate a
+     * random weapon specialization
+     *
+     * @param equipmentType the equipment type to test for validity
+     * @param person the person to generate the weapon specialization for
+     * @param techLevel the maximum tech level to generate a weapon for
+     * @param year the year to generate the specialization for
+     * @param clusterOnly whether to only consider cluster weapons or not
+     * @param weapons the weighted map of weaponry to add the equipmentType to if valid
+     */
+    private static void addValidWeaponryToMap(final EquipmentType equipmentType,
+                                              final Person person, final int techLevel,
+                                              final int year, final boolean clusterOnly,
+                                              final WeightedIntMap<EquipmentType> weapons) {
+        // Ensure it is a weapon eligible for the SPA in question, and the tech level is IS for
+        // IS personnel and Clan for Clan personnel
+        if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
+                || (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanner())) {
+            return;
+        }
+
+        // Ensure the weapon's tech level is valid (zero or above)
+        int weaponTechLevel = equipmentType.getTechLevel(year);
+        if (weaponTechLevel < 0) {
+            return;
+        }
+        // Ensure that the weapon's tech level is lower than that of the specified tech level
+        weaponTechLevel = Utilities.getSimpleTechLevel(weaponTechLevel);
+        if (techLevel < weaponTechLevel) {
+            return;
+        }
+
+        // Determine the weight based on the tech level
+        final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ? 50
+                : (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ? 25
+                : (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5
+                : 1;
+        weapons.add(weight, equipmentType);
+    }
+
+    /**
+     * Worker function that determines if a piece of equipment is eligible for being selected for an SPA.
      * @param et Equipment type to check
-     * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
+     * @param role Person's primary role. This check is ignored if PersonnelRole.NONE is passed in.
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
-    public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
+    public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
         }
@@ -637,15 +652,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return false;
         }
 
-        if (type > Person.T_NONE &&
-                !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
-                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
-                        || type == Person.T_NVEE_DRIVER
-                        || type == Person.T_GVEE_DRIVER
-                        || type == Person.T_VTOL_PILOT))
-                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+        if (!role.isDependentOrNone()
+                && !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && !role.isMechWarrior())
+                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
+                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
+                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMechPilot()))) {
             return false;
         }
 
@@ -672,7 +684,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             toReturn += getDisplayName(prereq) + "<br>";
         }
         for (SkillPrereq skPr : prereqSkills) {
-            toReturn += skPr.toString() + "<br>";
+            toReturn += skPr + "<br>";
         }
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
@@ -717,7 +729,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String getDisplayName(String name) {
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
         IOption option = options.getOption(name);
         if (null != option) {
             return option.getDisplayableName();
@@ -731,7 +743,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>)specialAbilities.clone();
+        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
     }
 
     public static void nullifyDefaultSPA() {

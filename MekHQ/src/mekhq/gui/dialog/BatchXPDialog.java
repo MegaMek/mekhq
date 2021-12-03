@@ -18,54 +18,28 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.*;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SortOrder;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
-import megamek.common.options.PilotOptions;
+import megamek.client.ui.preferences.*;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.model.RankTableModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public final class BatchXPDialog extends JDialog {
     private static final long serialVersionUID = -7897406116865495209L;
@@ -126,7 +100,7 @@ public final class BatchXPDialog extends JDialog {
         personnelModel.refreshData();
         personnelSorter = new TableRowSorter<>(personnelModel);
         personnelSorter.setSortsOnUpdates(true);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(campaign));
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new PersonRankStringSorter(campaign));
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_XP, new FormattedNumberSorter());
         personnelSorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(1, SortOrder.ASCENDING)));
@@ -219,15 +193,15 @@ public final class BatchXPDialog extends JDialog {
         choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null));
-        for (int i = 1; i < Person.T_NUM; ++ i) {
-            personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        for (PersonnelRole personnelRole : personnelRoles) {
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole.ordinal()));
         }
-        personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(0, campaign.getFaction().isClan()), 0));
-        // Add "none" for generic AsTechs
         choiceType.setModel(personTypeModel);
         choiceType.setSelectedIndex(0);
         choiceType.addActionListener(e -> {
-            personnelFilter.setPrimaryRole(((PersonTypeItem) choiceType.getSelectedItem()).getId());
+            PersonTypeItem personTypeItem = (PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem());
+            personnelFilter.setPrimaryRole((personTypeItem.getId() == null) ? null : personnelRoles[personTypeItem.getId()]);
             updatePersonnelTable();
         });
         panel.add(choiceType);
@@ -242,7 +216,7 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
         choiceExp.addActionListener(e -> {
-            personnelFilter.setExpLevel(((PersonTypeItem) choiceExp.getSelectedItem()).getId());
+            personnelFilter.setExpLevel(((PersonTypeItem) Objects.requireNonNull(choiceExp.getSelectedItem())).getId());
             updatePersonnelTable();
         });
         panel.add(choiceExp);
@@ -252,18 +226,14 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
         personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
 
-        Object[][] ranks = campaign.getRanks().getRanksForModel();
-        for (int i = 0; i < ranks.length; i++) {
-            StringBuilder rankName = new StringBuilder(((String) ranks[i][0]).trim());
-            for (int j = 1; j <= RankTableModel.COL_NAME_TECH; j++) {
-                rankName.append(", ").append(((String) ranks[i][j]).trim());
-            }
-            personRankModel.addElement(new PersonTypeItem(rankName.toString(), i));
+        final List<Rank> ranks = campaign.getRankSystem().getRanks();
+        for (int i = 0; i < ranks.size(); i++) {
+            personRankModel.addElement(new PersonTypeItem(ranks.get(i).getRankNamesAsString(", "), i));
         }
         choiceRank.setModel(personRankModel);
         choiceRank.setSelectedIndex(0);
         choiceRank.addActionListener(e -> {
-            personnelFilter.setRank(((PersonTypeItem) choiceRank.getSelectedItem()).getId());
+            personnelFilter.setRank(((PersonTypeItem) Objects.requireNonNull(choiceRank.getSelectedItem())).getId());
             updatePersonnelTable();
         });
         panel.add(choiceRank);
@@ -389,7 +359,7 @@ public final class BatchXPDialog extends JDialog {
 
     protected void spendXP() {
         String skillName = (String) choiceSkill.getSelectedItem();
-        if (choiceNoSkill.equals(skillName)) {
+        if (choiceNoSkill.equals(skillName) || (skillName == null)) {
             // This shouldn't happen, but guard against it anyway.
             return;
         }
@@ -408,22 +378,25 @@ public final class BatchXPDialog extends JDialog {
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
-                p.awardXP(-cost);
+                p.spendXP(cost);
+                PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
+                        p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if (campaign.getCampaignOptions().getUseAtB()) {
-                    if ((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
+                    if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
-                        SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        String spa = spaGenerator.rollSPA(p);
-                        if (null == spa) {
+                        final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
+                        final String spa = spaGenerator.rollSPA(p);
+                        if (spa == null) {
                             if (campaign.getCampaignOptions().useEdge()) {
-                                p.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
-                                PersonalLogger.gainedEdge(p, campaign.getLocalDate());
+                                p.changeEdge(1);
+                                p.changeCurrentEdge(1);
+                                PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());
                             }
                         } else {
-                            PersonalLogger.gained(p, campaign.getLocalDate(), spa);
+                            PersonalLogger.gainedSPA(campaign, p, campaign.getLocalDate(), spa);
                         }
                     }
                 }
@@ -445,7 +418,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
-        private Integer primaryRole = null;
+        private PersonnelRole primaryRole = null;
         private Integer expLevel = null;
         private Integer rank = null;
         private boolean onlyOfficers = false;
@@ -484,8 +457,8 @@ public final class BatchXPDialog extends JDialog {
             return true;
         }
 
-        public void setPrimaryRole(Integer role) {
-            primaryRole = role;
+        public void setPrimaryRole(PersonnelRole primaryRole) {
+            this.primaryRole = primaryRole;
         }
 
         public void setExpLevel(Integer level) {

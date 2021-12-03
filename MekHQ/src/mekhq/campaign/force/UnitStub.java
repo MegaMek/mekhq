@@ -35,11 +35,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class UnitStub implements Serializable {
+    //region Variable Declarations
     private static final long serialVersionUID = 1448449600864209589L;
 
     private String desc;
     private AbstractIcon portrait;
+    //endregion Variable Declarations
 
+    //region Constructors
     public UnitStub() {
         portrait = new Portrait();
         desc = "";
@@ -50,15 +53,25 @@ public class UnitStub implements Serializable {
         Person commander = u.getCommander();
         portrait = (commander == null) ? new Portrait() : commander.getPortrait();
     }
+    //endregion Constructors
 
-    @Override
-    public String toString() {
-        return desc;
-    }
-
+    //region Getters/Setters
     public AbstractIcon getPortrait() {
         return portrait;
     }
+
+    public void setPortrait(final AbstractIcon portrait) {
+        this.portrait = portrait;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(final String desc) {
+        this.desc = desc;
+    }
+    //endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
         String name = "<font color='red'>No Crew</font>";
@@ -80,17 +93,10 @@ public class UnitStub implements Serializable {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtil.isNullOrEmpty(desc)) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        if (!StringUtil.isNullOrEmpty(getDesc())) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
         }
-
-        if (!getPortrait().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitCategory", getPortrait().getCategory());
-        }
-
-        if (!getPortrait().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitFileName", getPortrait().getFilename());
-        }
+        getPortrait().writeToXML(pw1, indent);
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitStub");
     }
 
@@ -104,19 +110,23 @@ public class UnitStub implements Serializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+                    retVal.setDesc(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
+                    retVal.setPortrait(Portrait.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) { // Legacy - 0.49.3 removal
                     retVal.getPortrait().setFilename(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             MekHQ.getLogger().error(ex);
         }
         return retVal;
+    }
+
+    @Override
+    public String toString() {
+        return desc;
     }
 }

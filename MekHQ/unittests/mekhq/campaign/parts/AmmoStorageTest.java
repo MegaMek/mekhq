@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 import megamek.common.AmmoType;
 import megamek.common.BombType;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -397,7 +397,7 @@ public class AmmoStorageTest {
 
         // Get the AmmoStorage XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -409,7 +409,7 @@ public class AmmoStorageTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the AmmoStorage
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof AmmoStorage);
 
@@ -436,7 +436,7 @@ public class AmmoStorageTest {
 
         // Get the AmmoStorage XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -448,7 +448,7 @@ public class AmmoStorageTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the AmmoStorage
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof AmmoStorage);
 

@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,150 +34,150 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MotiveSystem extends Part {
+    private static final long serialVersionUID = -5637743997294510810L;
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -5637743997294510810L;
+    int damage;
+    int penalty;
 
-	int damage;
-	int penalty;
+    public MotiveSystem() {
+        this(0, null);
+    }
 
-	public MotiveSystem() {
-		this(0, null);
-	}
+    public MotiveSystem(int ton, Campaign c) {
+        super(ton, c);
+        this.name = "Motive System";
+        this.damage = 0;
+        this.penalty = 0;
+    }
 
-	public MotiveSystem(int ton, Campaign c) {
-		super(ton, c);
-		this.name = "Motive System";
-		this.damage = 0;
-		this.penalty = 0;
-	}
+    @Override
+    public int getBaseTime() {
+        return 60;
+    }
 
-	@Override
-	public int getBaseTime() {
-		return 60;
-	}
+    @Override
+    public int getDifficulty() {
+        return -1;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return -1;
-	}
-
-	public MotiveSystem clone() {
-		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
+    @Override
+    public MotiveSystem clone() {
+        MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
-	}
+    }
 
-	@Override
-	public int getBaseAvailability(int era) {
-		return RATING_B;
-	}
+    @Override
+    public int getBaseAvailability(int era) {
+        return RATING_B;
+    }
 
-	@Override
-	public Money getStickerPrice() {
-		// TODO Auto-generated method stub
-		return Money.zero();
-	}
+    @Override
+    public Money getStickerPrice() {
+        // TODO Auto-generated method stub
+        return Money.zero();
+    }
 
-	@Override
-	public double getTonnage() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public double getTonnage() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof MotiveSystem;
-	}
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof MotiveSystem;
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("damage")) {
-				damage = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("penalty")) {
-				penalty = Integer.parseInt(wn2.getTextContent());
-			}
-		}
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("damage")) {
+                    damage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("penalty")) {
+                    penalty = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
 
-	}
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<damage>"
-				+damage
-				+"</damage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<penalty>"
-				+penalty
-				+"</penalty>");
-		writeToXmlEnd(pw1, indent);
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<damage>"
+                +damage
+                +"</damage>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<penalty>"
+                +penalty
+                +"</penalty>");
+        writeToXmlEnd(pw1, indent);
 
-	}
+    }
 
-	@Override
-	public String checkFixable() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void fix() {
-		super.fix();
-		damage = 0;
-		penalty = 0;
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).resetMovementDamage();
-		}
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        damage = 0;
+        penalty = 0;
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            ((Tank) unit.getEntity()).resetMovementDamage();
+        }
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-		// you can't do this so nothing here
+    @Override
+    public void remove(boolean salvage) {
+        // you can't do this so nothing here
 
-	}
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		//motive systems don't have to check for destruction since they
-		//cannot be removed
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			Tank t = (Tank)unit.getEntity();
-			damage = t.getMotiveDamage();
-			penalty = t.getMotivePenalty();
-		}
-	}
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        //motive systems don't have to check for destruction since they
+        //cannot be removed
+        if(null != unit && unit.getEntity() instanceof Tank) {
+            Tank t = (Tank)unit.getEntity();
+            damage = t.getMotiveDamage();
+            penalty = t.getMotivePenalty();
+        }
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		// TODO Auto-generated method stub
-		//you can't get here so, dont worry about it
-	}
+    @Override
+    public void updateConditionFromPart() {
+        // TODO Auto-generated method stub
+        //you can't get here so, dont worry about it
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return damage > 0 || penalty > 0;
-	}
+    @Override
+    public boolean needsFixing() {
+        return damage > 0 || penalty > 0;
+    }
 
-	@Override
+    @Override
     public String getDetails() {
         return getDetails(true);
     }
@@ -187,38 +187,38 @@ public class MotiveSystem extends Part {
         if (includeRepairDetails) {
             return "-" + damage + " MP/-" + penalty + " Piloting";
         } else {
-            return super.getDetails(includeRepairDetails);
+            return super.getDetails(false);
         }
     }
 
-	@Override
-	public String checkScrappable() {
-		return "Motive type cannot be scrapped";
-	}
+    @Override
+    public String checkScrappable() {
+        return "Motive type cannot be scrapped";
+    }
 
-	@Override
-	public boolean canNeverScrap() {
-		return true;
-	}
+    @Override
+    public boolean canNeverScrap() {
+        return true;
+    }
 
-	@Override
-	public boolean isSalvaging() {
-		return false;
-	}
+    @Override
+    public boolean isSalvaging() {
+        return false;
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TankLocation.TECH_ADVANCEMENT;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TankLocation.TECH_ADVANCEMENT;
+    }
 }

@@ -78,7 +78,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
@@ -184,6 +184,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
+    @Override
     public Campaign getCampaign() {
         return campaign;
     }
@@ -482,7 +483,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 //its a new part
                 //dont actually add the part iself but rather its missing equivalent
                 //except in the case of armor, ammobins and the spacecraft cooling system
-                if (part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem) {
+                if (part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem
+                        || part instanceof TransportBayPart) {
                     newPartList.add(part);
                 } else {
                     Part mPart = part.getMissingPart();
@@ -601,7 +603,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_F);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech)newUnit.getEntity()).hasTSM() != ((Mech)oldUnit.getEntity()).hasTSM()) {
+                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
                     updateRefitClass(CLASS_E);
                 } else {
                     updateRefitClass(CLASS_F);
@@ -973,9 +975,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //infantry take zero time to re-organize
         //also check for squad size and number changes
-        if (oldUnit.getEntity() instanceof Infantry && !(oldUnit.getEntity() instanceof BattleArmor)) {
-            if (((Infantry)oldUnit.getEntity()).getSquadN() != ((Infantry)newEntity).getSquadN()
-                    ||((Infantry)oldUnit.getEntity()).getSquadSize() != ((Infantry)newEntity).getSquadSize()) {
+        if (oldUnit.isConventionalInfantry()) {
+            if (((Infantry) oldUnit.getEntity()).getSquadN() != ((Infantry) newEntity).getSquadN()
+                    ||((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
                 updateRefitClass(CLASS_A);
             }
             time = 0;
@@ -1016,6 +1018,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
             cost = oldUnit.getBuyCost().multipliedBy(0.1);
+        }
+        if (oldUnit.hasPrototypeTSM() || newUnit.hasPrototypeTSM()) {
+            time *= 2;
         }
     }
 
@@ -1418,7 +1423,7 @@ public class Refit extends Part implements IAcquisitionWork {
         int expectedHeatSinkParts = 0;
         if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
             // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
-            // SmallCraft, Dropship, Jumpship, Warship, and SpaceStation use SpacecraftCoolingSystem instead
+            // SmallCraft, DropShip, JumpShip, WarShip, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
                     untrackedHeatSinkCount(newEntity);
         }
@@ -1489,6 +1494,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         for (Part p : newParts) {
+            // CAW: after a refit some parts ended up NOT having a Campaign attached,
+            // see https://github.com/MegaMek/mekhq/issues/2703
+            p.setCampaign(getCampaign());
+
             if (p instanceof AmmoBin) {
                 //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
                 //Consider all LC ammobins empty and load them back up.
@@ -1499,7 +1508,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 ((AmmoBin) p).loadBin();
             }
         }
-        
+
         if (null != newArmorSupplies) {
             getCampaign().getWarehouse().removePart(newArmorSupplies);
         }
@@ -1630,7 +1639,7 @@ public class Refit extends Part implements IAcquisitionWork {
             MekHQ.getLogger().info(String.format("Saved %s %s to %s",
                     newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s", 
+            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s",
                     newEntity.getChassis(), newEntity.getModel()), e);
 
             if (fileNameCampaign != null) {
@@ -2005,7 +2014,7 @@ public class Refit extends Part implements IAcquisitionWork {
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("time")) {
@@ -2175,6 +2184,7 @@ public class Refit extends Part implements IAcquisitionWork {
         return null;
     }
 
+    @Override
     public Money getStickerPrice() {
         return cost;
     }
@@ -2296,8 +2306,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public void suggestNewName() {
-        if (newEntity instanceof Infantry && !(newEntity instanceof BattleArmor)) {
-            Infantry infantry = (Infantry)newEntity;
+        if (newEntity.isConventionalInfantry()) {
+            Infantry infantry = (Infantry) newEntity;
             String chassis;
             switch (infantry.getMovementMode()) {
             case INF_UMU:

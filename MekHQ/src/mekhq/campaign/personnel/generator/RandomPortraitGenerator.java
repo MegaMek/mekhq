@@ -19,19 +19,13 @@
 package mekhq.campaign.personnel.generator;
 
 import megamek.common.Compute;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RandomPortraitGenerator {
     private RandomPortraitGenerator() {
@@ -45,13 +39,13 @@ public class RandomPortraitGenerator {
      * @param p the {@link Person} to generate a unique portrait for
      * @return the generated portrait
      */
-    public static AbstractIcon generate(Collection<Person> personnel, Person p) {
+    public static Portrait generate(Collection<Person> personnel, Person p) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates
         Set<String> existingPortraits = new HashSet<>();
         for (Person existingPerson : personnel) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
+            existingPortraits.add(existingPerson.getPortrait().getCategory() + ":"
+                    + existingPerson.getPortrait().getFilename());
         }
 
         List<String> possiblePortraits;
@@ -60,35 +54,30 @@ public class RandomPortraitGenerator {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, Person.getRoleDesc(p.getPrimaryRole(), p.isClanner()));
+        File searchFile = new File(genderFile, p.getPrimaryRole().getName(p.isClanner()));
 
         possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
         if (possiblePortraits.isEmpty()) {
             String searchCat_RoleGroup = "";
-            if (p.isAdminPrimary()) {
+            if (p.getPrimaryRole().isAdministrator()) {
                 searchCat_RoleGroup = "Admin";
-            } else if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                    || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                    || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                    || p.getPrimaryRole() == Person.T_NAVIGATOR) {
+            } else if (p.getPrimaryRole().isVesselCrew()) {
                 searchCat_RoleGroup = "Vessel Crew";
-            } else if (p.isTechPrimary()) {
+            } else if (p.getPrimaryRole().isTech()) {
                 searchCat_RoleGroup = "Tech";
-            } else if (p.getPrimaryRole() == Person.T_MEDIC
-                    || p.getPrimaryRole() == Person.T_DOCTOR) {
+            } else if (p.getPrimaryRole().isMedicalStaff()) {
                 searchCat_RoleGroup = "Medical";
             }
 
-            // TODO : Java 11 : Swap to isBlank
-            if (!searchCat_RoleGroup.trim().isEmpty()) {
+            if (!searchCat_RoleGroup.isBlank()) {
                 searchFile = new File(genderFile, searchCat_RoleGroup);
                 possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
             }
         }
 
         if (possiblePortraits.isEmpty()) {
-            searchFile = new File(genderFile, p.hasPrimaryCombatRole() ? "Combat" : "Support");
+            searchFile = new File(genderFile, p.getPrimaryRole().isCombat() ? "Combat" : "Support");
             possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
         }
 
@@ -123,19 +112,19 @@ public class RandomPortraitGenerator {
      */
     private static List<String> getPossibleRandomPortraits(Set<String> existingPortraits, File subDir) {
         List<String> possiblePortraits = new ArrayList<>();
-        Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (new File(category).compareTo(subDir) == 0) {
-                Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
-                while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
+        for (final String category : MHQStaticDirectoryManager.getPortraits().getNonEmptyCategoryPaths()) {
+            if (new File(category).compareTo(subDir) != 0) {
+                continue;
+            }
+
+            Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
+            while (names.hasNext()) {
+                String name = names.next();
+                String location = category + ":" + name;
+                if (existingPortraits.contains(location)) {
+                    continue;
                 }
+                possiblePortraits.add(location);
             }
         }
         return possiblePortraits;

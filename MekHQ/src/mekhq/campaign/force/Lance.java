@@ -36,11 +36,11 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -91,17 +91,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         forceId = fid;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
-                break;
-            }
-            if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
-                    missionId = m.getId();
-                } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
-                }
-            }
+        for (AtBContract contract : c.getActiveAtBContracts()) {
+            missionId = ((contract.getParentContract() == null)
+                    ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }
@@ -227,7 +219,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public boolean isEligible(Campaign c) {
         // ensure the lance is marked as a combat force
-        if (!c.getForce(forceId).isCombatForce()) {
+        final Force force = c.getForce(forceId);
+        if ((force == null) || !force.isCombatForce()) {
             return false;
         }
 
@@ -247,7 +240,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
 
         boolean hasGround = false;
-        for (UUID id : c.getForce(forceId).getUnits()) {
+        for (UUID id : force.getUnits()) {
             Unit unit = c.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
@@ -298,14 +291,21 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             return null;
         }
 
+        // if we are using StratCon, don't *also* generate legacy scenarios
+        if (c.getCampaignOptions().getUseStratCon() &&
+                (getContract(c).getStratconCampaignState() != null)) {
+            return null;
+        }
+
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
-        int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
+        int battleTypeMod = 1 + (AtBMoraleLevel.NORMAL.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular scenario.
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
+
         /*if (true) {
             AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
             scenario.setMissionId(this.getMissionId());
@@ -474,8 +474,6 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)";
-
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -498,7 +496,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
         return retVal;
     }

@@ -81,11 +81,10 @@ public class AutosaveService implements IAutosaveService {
                     writer.close();
                 }
             } else {
-                MekHQ.getLogger().error(this,
-                        "Unable to perform an autosave because of a null or empty file name");
+                MekHQ.getLogger().error("Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "performAutosave", ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -108,8 +107,7 @@ public class AutosaveService implements IAutosaveService {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    MekHQ.getLogger().error(this,
-                            "Unable to delete file " + autosaveFiles.get(index).getName());
+                    MekHQ.getLogger().error("Unable to delete file " + autosaveFiles.get(index).getName());
                     index++;
                 }
             }

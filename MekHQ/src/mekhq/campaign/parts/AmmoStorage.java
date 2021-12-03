@@ -22,7 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -59,6 +61,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         this.shots = shots;
     }
 
+    @Override
     public AmmoStorage clone() {
         AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
@@ -115,11 +118,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(@Nullable Part part) {
-        if ((getType() != null) && (part instanceof AmmoStorage)) {
-            return getType().equals(((AmmoStorage) part).getType());
-        }
-
-        return false;
+        return (getClass() == part.getClass())
+                && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
     /**
@@ -164,10 +164,14 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                typeName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
-                shots = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+                    typeName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
+                    shots = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -216,6 +220,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return false;
     }
 
+    @Override
     public String getDesc() {
         String toReturn = "<html><font size='2'";
         String scheduled = "";
@@ -250,7 +255,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
-        if(campaign.getQuartermaster().buyPart(newPart, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
@@ -299,10 +304,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
+        if (getAllAcquisitionMods().getValue() > -1) {
             bonus = "+" + bonus;
         }
-
         return "(" + bonus + ")";
     }
 
@@ -315,10 +319,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        if(isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+        if (isClanTechBase() && (campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0)) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        }
-        else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         //availability mod
@@ -336,7 +339,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String getQuantityName(int quan) {
         int totalShots = quan * getShots();
         String report = "" + totalShots + " shots of " + getName();
-        if(totalShots == 1) {
+        if (totalShots == 1) {
             report = "" + totalShots + " shot of " + getName();
         }
         return report;
@@ -346,7 +349,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String getArrivalReport() {
         int totalShots = quantity * getShots();
         String report = getQuantityName(quantity);
-        if(totalShots == 1) {
+        if (totalShots == 1) {
             report += " has arrived";
         } else {
             report += " have arrived";

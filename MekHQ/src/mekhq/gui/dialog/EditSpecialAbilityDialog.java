@@ -12,43 +12,29 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrereq;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- *
- * @author  Taharqa
+ * @author Taharqa
  */
 public class EditSpecialAbilityDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
@@ -69,33 +55,36 @@ public class EditSpecialAbilityDialog extends JDialog {
     private Vector<String> invalidAbilities;
     private Vector<String> removeAbilities;
 
-    private Hashtable<String, SpecialAbility> allSPA;
+    private Hashtable<String, SpecialAbility> allSPAs;
 
     private JLabel lblPrereqAbil;
     private JLabel lblInvalidAbil;
     private JLabel lblRemoveAbil;
-    
+
     private boolean cancelled;
     private int currentXP;
 
+    //region Constructors
     @SuppressWarnings("unchecked")
-	public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
+	public EditSpecialAbilityDialog(JFrame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
         super(parent, true);
         this.ability = spa;
-        this.allSPA = hash;
-        // FIXME: Java is broken, so we had to supress unchecked warnings for these 4 lines
+        this.allSPAs = hash;
+        // FIXME: Java is broken, so we had to suppress unchecked warnings for these 4 lines
         // Basically, Vector<E>.clone() returns an Object instead of a new Vector<E> - DOH!
-        prereqAbilities = (Vector<String>)ability.getPrereqAbilities().clone();
-        invalidAbilities = (Vector<String>)ability.getInvalidAbilities().clone();
-        removeAbilities = (Vector<String>)ability.getRemovedAbilities().clone();
-        prereqSkills = (Vector<SkillPrereq>)ability.getPrereqSkills().clone();
+        prereqAbilities = (Vector<String>) ability.getPrereqAbilities().clone();
+        invalidAbilities = (Vector<String>) ability.getInvalidAbilities().clone();
+        removeAbilities = (Vector<String>) ability.getRemovedAbilities().clone();
+        prereqSkills = (Vector<SkillPrereq>) ability.getPrereqSkills().clone();
         cancelled = false;
         currentXP = ability.getCost();
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
 
+    //region Initialization
     private void initComponents() {
     	java.awt.GridBagConstraints gridBagConstraints;
 
@@ -131,15 +120,13 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Prerequisite Abilities</b></html>"), gridBagConstraints);
         btnEditPrereqAbil = new javax.swing.JButton("Edit Prereq Abilities");
-        btnEditPrereqAbil.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, prereqAbilities, allSPA);
-                sad.setVisible(true);
-                if(!sad.wasCancelled()) {
-                	prereqAbilities = sad.getSelected();
-                    lblPrereqAbil.setText("<html>" + getPrereqAbilDesc() + "</html>");
-                    refreshGUI();
-                }
+        btnEditPrereqAbil.addActionListener(evt -> {
+            SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, prereqAbilities, allSPAs);
+            sad.setVisible(true);
+            if (!sad.wasCancelled()) {
+                prereqAbilities = sad.getSelected();
+                lblPrereqAbil.setText("<html>" + getPrerequisiteAbilityDesc() + "</html>");
+                refreshGUI();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -154,7 +141,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new java.awt.Insets(1, 10, 1, 1);
-        lblPrereqAbil = new JLabel("<html>" + getPrereqAbilDesc() + "</html>");
+        lblPrereqAbil = new JLabel("<html>" + getPrerequisiteAbilityDesc() + "</html>");
         panAbil.add(lblPrereqAbil, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -165,15 +152,13 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Invalid Abilities</b></html>"), gridBagConstraints);
         btnEditInvalid = new javax.swing.JButton("Edit Invalid Abilities");
-        btnEditInvalid.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, invalidAbilities, allSPA);
-                sad.setVisible(true);
-                if(!sad.wasCancelled()) {
-                	invalidAbilities = sad.getSelected();
-                    lblInvalidAbil.setText("<html>" + getInvalidDesc() + "</html>");
-                    refreshGUI();
-                }
+        btnEditInvalid.addActionListener(evt -> {
+            SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, invalidAbilities, allSPAs);
+            sad.setVisible(true);
+            if (!sad.wasCancelled()) {
+                invalidAbilities = sad.getSelected();
+                lblInvalidAbil.setText("<html>" + getInvalidDesc() + "</html>");
+                refreshGUI();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -199,15 +184,13 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Removed Abilities</b></html>"), gridBagConstraints);
         btnEditRemove = new javax.swing.JButton("Edit Removed Abilities");
-        btnEditRemove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, removeAbilities, allSPA);
-                sad.setVisible(true);
-                if(!sad.wasCancelled()) {
-                	removeAbilities = sad.getSelected();
-                    lblRemoveAbil.setText("<html>" + getRemovedDesc() + "</html>");
-                    refreshGUI();
-                }
+        btnEditRemove.addActionListener(evt -> {
+            SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, removeAbilities, allSPAs);
+            sad.setVisible(true);
+            if (!sad.wasCancelled()) {
+                removeAbilities = sad.getSelected();
+                lblRemoveAbil.setText("<html>" + getRemovedDesc() + "</html>");
+                refreshGUI();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -266,11 +249,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         btnOK.setText("OK"); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edit();
-            }
-        });
+        btnOK.addActionListener(evt -> edit());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -281,11 +260,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         btnClose.setText("Cancel"); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnClose.addActionListener(evt -> cancel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -312,14 +287,12 @@ public class EditSpecialAbilityDialog extends JDialog {
         panSkill.add(new JLabel("<html><b>Prerequisite Skillsets</b></html>"), gridBagConstraints);
 
         btnAddSkillPrereq = new javax.swing.JButton("Add Skill Prereq");
-        btnAddSkillPrereq.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
-            	nspd.setVisible(true);
-            	if(!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
-                	prereqSkills.add(nspd.getPrereq());
-                	refreshGUI();
-                }
+        btnAddSkillPrereq.addActionListener(evt -> {
+            EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
+            nspd.setVisible(true);
+            if (!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
+                prereqSkills.add(nspd.getPrereq());
+                refreshGUI();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -332,11 +305,9 @@ public class EditSpecialAbilityDialog extends JDialog {
         panSkill.add(btnAddSkillPrereq, gridBagConstraints);
 
         btnClearPrereqSkills = new javax.swing.JButton("Clear Skill Prereqs");
-        btnClearPrereqSkills.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                prereqSkills = new Vector<SkillPrereq>();
-                refreshGUI();
-            }
+        btnClearPrereqSkills.addActionListener(evt -> {
+            prereqSkills = new Vector<>();
+            refreshGUI();
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -417,9 +388,44 @@ public class EditSpecialAbilityDialog extends JDialog {
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
+    //endregion Initialization
+
+    //region Getters/Setters
+    public Hashtable<String, SpecialAbility> getAllSPAs() {
+        return allSPAs;
+    }
+
+    public void setAllSPAs(Hashtable<String, SpecialAbility> allSPAs) {
+        this.allSPAs = allSPAs;
+    }
+
+    public Vector<String> getPrerequisiteAbilities() {
+        return prereqAbilities;
+    }
+
+    public void setPrerequisiteAbilities(Vector<String> prerequisiteAbilities) {
+        this.prereqAbilities = prerequisiteAbilities;
+    }
+
+    public Vector<String> getInvalidAbilities() {
+        return invalidAbilities;
+    }
+
+    public void setInvalidAbilities(Vector<String> invalidAbilities) {
+        this.invalidAbilities = invalidAbilities;
+    }
+
+    public Vector<String> getRemoveAbilities() {
+        return removeAbilities;
+    }
+
+    public void setRemoveAbilities(Vector<String> removeAbilities) {
+        this.removeAbilities = removeAbilities;
+    }
+    //endregion Getters/Setters
 
     private void edit() {
-    	ability.setCost((Integer)spnXP.getModel().getValue());
+    	ability.setCost((Integer) spnXP.getModel().getValue());
     	ability.setPrereqAbilities(prereqAbilities);
     	ability.setInvalidAbilities(invalidAbilities);
     	ability.setRemovedAbilities(removeAbilities);
@@ -432,41 +438,47 @@ public class EditSpecialAbilityDialog extends JDialog {
         this.setVisible(false);
     }
 
-    private String getPrereqAbilDesc() {
-        String toReturn = "";
-        for(String prereq : prereqAbilities) {
-            toReturn += allSPA.get(prereq).getDisplayName() + "<br>";
+    private String getPrerequisiteAbilityDesc() {
+        StringBuilder toReturn = new StringBuilder();
+        for (String prerequisite : getPrerequisiteAbilities()) {
+            SpecialAbility prerequisiteAbility = getAllSPAs().get(prerequisite);
+            prerequisiteAbility = (prerequisiteAbility == null)
+                    ? SpecialAbility.getOption(prerequisite) : prerequisiteAbility;
+            if (prerequisiteAbility != null) {
+                toReturn.append(prerequisiteAbility.getDisplayName()).append("<br>");
+            }
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
-        }
-        return toReturn;
+        return (toReturn.length() == 0) ? "None" : toReturn.toString();
     }
 
     private String getInvalidDesc() {
-        String toReturn = "";
-        for(String invalid : invalidAbilities) {
-            toReturn += allSPA.get(invalid).getDisplayName() + "<br>";
+        StringBuilder toReturn = new StringBuilder();
+        for (String invalid : getInvalidAbilities()) {
+            SpecialAbility invalidAbility = getAllSPAs().get(invalid);
+            invalidAbility = (invalidAbility == null)
+                    ? SpecialAbility.getOption(invalid) : invalidAbility;
+            if (invalidAbility != null) {
+                toReturn.append(invalidAbility.getDisplayName()).append("<br>");
+            }
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
-        }
-        return toReturn;
+        return (toReturn.length() == 0) ? "None" : toReturn.toString();
     }
 
     private String getRemovedDesc() {
-        String toReturn = "";
-        for(String remove : removeAbilities) {
-            toReturn += allSPA.get(remove).getDisplayName() + "<br>";
+        StringBuilder removedDescription = new StringBuilder();
+        for (String remove : getRemoveAbilities()) {
+            SpecialAbility removeAbility = getAllSPAs().get(remove);
+            removeAbility = (removeAbility == null)
+                    ? SpecialAbility.getOption(remove) : removeAbility;
+            if (removeAbility != null) {
+                removedDescription.append(removeAbility.getDisplayName()).append("<br>");
+            }
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
-        }
-        return toReturn;
+        return (removedDescription.length() == 0) ? "None" : removedDescription.toString();
     }
 
     private void refreshGUI() {
-    	currentXP = (Integer)spnXP.getModel().getValue();
+    	currentXP = (Integer) spnXP.getModel().getValue();
     	getContentPane().removeAll();
     	initComponents();
     	getContentPane().revalidate();
@@ -480,12 +492,12 @@ public class EditSpecialAbilityDialog extends JDialog {
     private void editSkillPrereq(int i) {
     	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, prereqSkills.get(i));
     	nspd.setVisible(true);
-    	if(!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
+    	if (!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
         	prereqSkills.set(i, nspd.getPrereq());
         	refreshGUI();
         }
     }
-    
+
     public boolean wasCancelled() {
     	return cancelled;
     }

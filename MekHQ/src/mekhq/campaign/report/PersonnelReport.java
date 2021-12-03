@@ -1,7 +1,8 @@
 /*
  * PersonnelReport.java
  *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,70 +13,32 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
-
-import java.awt.Dimension;
-import java.awt.Font;
-
-import javax.swing.JSplitPane;
-import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * @author Jay Lawson
  */
-public class PersonnelReport extends Report {
-
-
-    public PersonnelReport(Campaign c) {
-        super(c);
+public class PersonnelReport extends AbstractReport {
+    //region Constructors
+    public PersonnelReport(final Campaign campaign) {
+        super(campaign);
     }
-
-    public String getTitle() {
-        return "Personnel Report";
-    }
-
-    public JTextPane getCombatPersonnelReport() {
-    	// Load combat personnel
-        JTextPane txtCombat = new JTextPane();
-        txtCombat.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtCombat.setText(getCombatPersonnelDetails());
-        return txtCombat;
-    }
-
-    public JTextPane getSupportPersonnelReport() {
-    	// Load support personnel
-        JTextPane txtSupport = new JTextPane();
-        txtSupport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtSupport.setText(getSupportPersonnelDetails());
-        return txtSupport;
-    }
-
-    public JTextPane getReport() {
-        // SplitPane them
-        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getCombatPersonnelReport(), getSupportPersonnelReport());
-		splitOverviewPersonnel.setName("splitOverviewPersonnel");
-		splitOverviewPersonnel.setOneTouchExpandable(true);
-		splitOverviewPersonnel.setResizeWeight(0.5);
-
-		// Actual report pane
-		JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.insertComponent(splitOverviewPersonnel);
-        return txtReport;
-    }
+    //endregion Constructors
 
     public String getCombatPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_NUM];
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        int[] countPersonByType = new int[personnelRoles.length];
         int countTotal = 0;
         int countInjured = 0;
         int countMIA = 0;
@@ -85,13 +48,13 @@ public class PersonnelReport extends Report {
         Money salary = Money.zero();
 
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.hasPrimaryCombatRole() || !p.getPrisonerStatus().isFree()) {
+            if (!p.getPrimaryRole().isCombat() || !p.getPrisonerStatus().isFree()) {
                 continue;
             }
 
             // Add them to the total count
             if (p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole()]++;
+                countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
                 if (getCampaign().getCampaignOptions().useAdvancedMedical() && (p.getInjuries().size() > 0)) {
                     countInjured++;
@@ -115,10 +78,10 @@ public class PersonnelReport extends Report {
 
         sb.append(String.format("%-30s        %4s\n", "Total Combat Personnel", countTotal));
 
-        for (int i = 0; i < Person.T_NUM; i++) {
-            if (Person.isCombatRole(i)) {
-                sb.append(String.format("    %-30s    %4s\n",
-                        Person.getRoleDesc(i, getCampaign().getFaction().isClan()), countPersonByType[i]));
+        for (PersonnelRole role : personnelRoles) {
+            if (role.isCombat()) {
+                sb.append(String.format("    %-30s    %4s\n", role.getName(getCampaign().getFaction().isClan()),
+                        countPersonByType[role.ordinal()]));
             }
         }
 
@@ -134,7 +97,8 @@ public class PersonnelReport extends Report {
     }
 
     public String getSupportPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_NUM];
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        int[] countPersonByType = new int[personnelRoles.length];
         int countTotal = 0;
         int countInjured = 0;
         int countMIA = 0;
@@ -148,10 +112,10 @@ public class PersonnelReport extends Report {
 
         for (Person p : getCampaign().getPersonnel()) {
             // Add them to the total count
-            boolean primarySupport = p.hasPrimarySupportRole(false);
+            final boolean primarySupport = p.getPrimaryRole().isSupport(true);
 
             if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole()]++;
+                countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
                 if ((p.getInjuries().size() > 0) || (p.getHits() > 0)) {
                     countInjured++;
@@ -178,7 +142,7 @@ public class PersonnelReport extends Report {
                 countDead++;
             }
 
-            if (p.isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
+            if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
                 dependents++;
             }
         }
@@ -187,10 +151,10 @@ public class PersonnelReport extends Report {
 
         sb.append(String.format("%-30s        %4s\n", "Total Support Personnel", countTotal));
 
-        for (int i = 0; i < Person.T_NUM; i++) {
-            if (Person.isSupportRole(i)) {
-                sb.append(String.format("    %-30s    %4s\n",
-                        Person.getRoleDesc(i, getCampaign().getFaction().isClan()), countPersonByType[i]));
+        for (PersonnelRole role : personnelRoles) {
+            if (role.isSupport(true)) {
+                sb.append(String.format("    %-30s    %4s\n", role.getName(getCampaign().getFaction().isClan()),
+                        countPersonByType[role.ordinal()]));
             }
         }
 

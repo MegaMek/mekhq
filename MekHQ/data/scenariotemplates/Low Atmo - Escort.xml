@@ -3,6 +3,8 @@
     <name>Low Atmo - Escort</name>
     <shortBriefing>Escort allied dropship.</shortBriefing>
     <detailedBriefing>Escort designated dropship to its destination.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>true</allowRotation>
@@ -13,99 +15,6 @@
         <useStandardAtBSizing>false</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
-    <scenarioForces>
-        <entry>
-            <key>Player</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-3</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>true</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                </deploymentZones>
-                <destinationZone>4</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>0</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Player</forceName>
-                <generationMethod>0</generationMethod>
-                <generationOrder>1</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>0</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>5</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
-            <key>Primary Opfor</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-3</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
-                <destinationZone>4</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
-                <generationMethod>1</generationMethod>
-                <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>0</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>5</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
-            <key>Allied Dropship</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>11</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>true</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
-                <destinationZone>4</destinationZone>
-                <fixedUnitCount>1</fixedUnitCount>
-                <forceAlignment>1</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Allied Dropship</forceName>
-                <generationMethod>3</generationMethod>
-                <generationOrder>4</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>5</startingAltitude>
-                <syncDeploymentType>SameEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-    </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
@@ -136,7 +45,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Allied Dropship</associatedForceName>
+                <associatedForceName>Allied DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
@@ -169,4 +78,100 @@
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>2</deploymentZone>
+                    <deploymentZone>4</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
+                    <deploymentZone>8</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Primary Opfor</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones/>
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Primary Opfor</forceName>
+                <generationMethod>1</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Allied Dropship</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>11</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones/>
+                <destinationZone>6</destinationZone>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceAlignment>1</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Allied Dropship</forceName>
+                <generationMethod>4</generationMethod>
+                <generationOrder>4</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>SameEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
 </ScenarioTemplate>

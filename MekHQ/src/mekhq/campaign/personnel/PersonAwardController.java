@@ -18,9 +18,12 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
+import mekhq.campaign.log.PersonalLogger;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,17 +102,31 @@ public class PersonAwardController {
      * @param awardName is the name of the award
      * @param date is the date it was awarded
      */
-    public void addAndLogAward(String setName, String awardName, LocalDate date) {
-        Award award;
+    public void addAndLogAward(final Campaign campaign, final String setName,
+                               final String awardName, final LocalDate date) {
+        final Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
+            if (award == null) {
+                MekHQ.getLogger().error("Cannot award a null award, returning.");
+                return;
+            }
             awards.add(award);
         }
-        person.awardXP(award.getXPReward());
-        person.changeEdge(award.getEdgeReward());
-        person.resetCurrentEdge(); //Reset the person's edge points
+
+        if (award.getXPReward() < 0) {
+            person.spendXP(-award.getXPReward());
+        } else {
+            person.awardXP(campaign, award.getXPReward());
+        }
+
+        if (award.getEdgeReward() > 0) {
+            person.changeEdge(award.getEdgeReward());
+            person.changeCurrentEdge(award.getEdgeReward());
+            PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+        }
 
         award.addDate(date);
         logAward(award, date);
@@ -118,9 +135,13 @@ public class PersonAwardController {
 
     /**
      * Gives the award to this person
-     * @param award is the award it was awarded
+     * @param award is the award being loaded from XML
      */
-    public void addAwardFromXml(Award award) {
+    public void addAwardFromXml(final @Nullable Award award) {
+        if (award == null) {
+            return;
+        }
+
         if (hasAward(award)) {
             Award existingAward = getAward(award.getSet(), award.getName());
             existingAward.mergeDatesFrom(award);

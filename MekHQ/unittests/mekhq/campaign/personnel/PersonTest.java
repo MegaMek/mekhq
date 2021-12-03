@@ -20,43 +20,19 @@ public class PersonTest {
     private Person mockPerson;
 
     @Test
-    public void testIsCombatRoleReturnsTrueAtEdgesOfRange() {
-        assertTrue(Person.isCombatRole(Person.T_MECHWARRIOR));
-        assertTrue(Person.isCombatRole(Person.T_NAVIGATOR));
-    }
-
-    @Test
-    public void testIsCombatRoleReturnsOutsideRange() {
-        assertFalse(Person.isCombatRole(Person.T_NONE));
-        assertFalse(Person.isCombatRole(Person.T_MECH_TECH));
-        assertFalse(Person.isCombatRole(Person.T_NUM));
-        assertFalse(Person.isCombatRole(Person.T_LAM_PILOT));
-        assertFalse(Person.isCombatRole(-1));
-    }
-
-    @Test
-    public void testIsSupportRoleReturnsTrueAtEdgesOfRange() {
-        assertTrue(Person.isSupportRole(Person.T_MECH_TECH));
-        assertTrue(Person.isSupportRole(Person.T_ADMIN_HR));
-    }
-
-    @Test
-    public void testIsSupportRoleReturnsOutsideRange() {
-        assertFalse(Person.isSupportRole(Person.T_NONE));
-        assertFalse(Person.isSupportRole(Person.T_NAVIGATOR));
-        assertFalse(Person.isSupportRole(Person.T_NUM));
-        assertFalse(Person.isSupportRole(Person.T_LAM_PILOT));
-        assertFalse(Person.isSupportRole(-1));
-    }
-
-    @Test
     public void testAddAndRemoveAward() {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
@@ -79,9 +55,15 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
         assertEquals( 2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
@@ -359,11 +341,11 @@ public class PersonTest {
         verify(unit0, Mockito.times(0)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
     }
 
-    private void initPerson(){
+    private void initPerson() {
         mockPerson = spy(new Person("TestGivenName", "TestSurname", null, "MERC"));
     }
 
-    private void initAwards(){
+    private void initAwards() {
         AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(),"TestSet");
     }
 }

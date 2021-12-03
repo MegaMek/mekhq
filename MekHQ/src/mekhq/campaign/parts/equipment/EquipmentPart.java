@@ -62,7 +62,7 @@ public class EquipmentPart extends Part {
     protected String typeName;
     protected int equipmentNum;
     protected double equipTonnage;
-    protected double size = 1.0;
+    protected double size;
 
     public EquipmentType getType() {
         return type;
@@ -107,8 +107,8 @@ public class EquipmentPart extends Part {
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
-        if (null != unit) {
-            equipTonnage = type.getTonnage(unit.getEntity(), size);
+        if ((u != null) && (type != null)) {
+            equipTonnage = type.getTonnage(u.getEntity(), size);
         }
     }
 
@@ -116,6 +116,7 @@ public class EquipmentPart extends Part {
         equipTonnage = ton;
     }
 
+    @Override
     public EquipmentPart clone() {
         EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, size, omniPodded, campaign);
         clone.copyBaseData(this);
@@ -149,7 +150,8 @@ public class EquipmentPart extends Part {
         // they are not acceptable substitutes, so we need to check for that as
         // well
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return part instanceof EquipmentPart && getType().equals(((EquipmentPart) part).getType())
+        return (getClass() == part.getClass())
+                && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage() && getStickerPrice().equals(part.getStickerPrice())
                 && getSize() == ((EquipmentPart) part).getSize()
                 && isOmniPodded() == part.isOmniPodded();
@@ -392,20 +394,20 @@ public class EquipmentPart extends Part {
 
     @Override
     public String checkFixable() {
-        final Unit unit = getUnit();
-        if ((unit != null) && (unit.isSalvage() || isTeamSalvaging())) {
+        if (isSalvaging()) {
             return null;
         }
 
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
+        final Unit unit = getUnit();
         final Mounted m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
             if (unit.isLocationBreached(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is breached.";
             }
-    
+
             if (unit.isLocationDestroyed(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is destroyed.";
             }
@@ -701,7 +703,7 @@ public class EquipmentPart extends Part {
         }
 
         // if we are still here then we need to check the other weapons, if any of them
-        // are usable then we should do the same thing. Otherwise all weapons are destroyed 
+        // are usable then we should do the same thing. Otherwise all weapons are destroyed
         // and we should mark the bay as unusuable.
         for (int wId : weaponBay.getBayWeapons()) {
             final Mounted m = unit.getEntity().getEquipment(wId);

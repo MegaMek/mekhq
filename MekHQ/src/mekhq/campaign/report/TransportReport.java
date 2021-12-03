@@ -1,7 +1,8 @@
 /*
  * TransportReport.java
  *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,20 +13,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
 
-import java.awt.Dimension;
-import java.awt.Font;
-
-import javax.swing.JTextPane;
-
-import megamek.common.*;
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -33,24 +29,12 @@ import mekhq.campaign.unit.Unit;
 /**
  * @author Jay Lawson
  */
-public class TransportReport extends Report {
-
-
-    public TransportReport(Campaign c) {
-        super(c);
+public class TransportReport extends AbstractReport {
+    //region Constructors
+    public TransportReport(final Campaign campaign) {
+        super(campaign);
     }
-
-    public String getTitle() {
-        return "Transport Capacity Report";
-    }
-
-    public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(getTransportDetails());
-        return txtReport;
-    }
+    //endregion Constructors
 
     public String getTransportDetails() {
         HangarStatistics stats = getCampaign().getHangarStatistics();
@@ -78,7 +62,7 @@ public class TransportReport extends Report {
         String asfAppend = "";
         int newNoASF = Math.max(noASF - freeSC, 0);
         int placedASF = Math.max(noASF - newNoASF, 0);
-        if (noASF > 0 && freeSC > 0) {
+        if ((noASF > 0) && (freeSC > 0)) {
             asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
             freeSC -= placedASF;
         }
@@ -86,20 +70,20 @@ public class TransportReport extends Report {
         String lvAppend = "";
         int newNolv = Math.max(nolv - freehv, 0);
         int placedlv = Math.max(nolv - newNolv, 0);
-        if (nolv > 0 && freehv > 0) {
+        if ((nolv > 0) && (freehv > 0)) {
             lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
             freehv -= placedlv;
         }
 
-        if (noBA > 0 && freeinf > 0) {
+        if ((noBA > 0) && (freeinf > 0)) {
 
         }
 
-        if (noinf > 0 && freeba > 0) {
+        if ((noinf > 0) && (freeba > 0)) {
 
         }
 
-        StringBuffer sb = new StringBuffer("Transports\n\n");
+        final StringBuilder sb = new StringBuilder("Transports\n\n");
 
         // Lets do Mechs first.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mech Bays (Occupied):",
@@ -126,7 +110,7 @@ public class TransportReport extends Report {
                     "Light Vehicles Not Transported:", newNolv));
         }
 
-        if (nolv > 0 && freehv > 0) {
+        if ((nolv > 0) && (freehv > 0)) {
 
         }
 
@@ -134,7 +118,7 @@ public class TransportReport extends Report {
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Infantry Bays (Occupied):",
                 stats.getTotalInfantryBays(), stats.getOccupiedBays(Entity.ETYPE_INFANTRY), "Infantry Not Transported:", noinf));
 
-        if (noBA > 0 && freeinf > 0) {
+        if ((noBA > 0) && (freeinf > 0)) {
 
         }
 
@@ -143,7 +127,7 @@ public class TransportReport extends Report {
                 stats.getTotalBattleArmorBays(), stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), "Battle Armor Not Transported:",
                 noBA));
 
-        if (noinf > 0 && freeba > 0) {
+        if ((noinf > 0) && (freeba > 0)) {
 
         }
 
@@ -152,27 +136,26 @@ public class TransportReport extends Report {
                 stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), "Small Craft Not Transported:",
                 noSC));
 
-        if (noASF > 0 && freeSC > 0) {
+        if ((noASF > 0) && (freeSC > 0)) {
             // Lets do ASF in Free Small Craft Bays next.
             sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   ASF in Small Craft Bays (Occupied):",
                     stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
                     "ASF Not Transported:", newNoASF));
         }
 
-        // Lets do Protomechs next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Protomech Bays (Occupied):",
-                stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "Protomechs Not Transported:", noSC));
+        // Lets do ProtoMechs next.
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "ProtoMech Bays (Occupied):",
+                stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "ProtoMechs Not Transported:", noSC));
 
         sb.append("\n\n");
 
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Docking Collars (Occupied):",
-                stats.getTotalDockingCollars(), stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), "Dropships Not Transported:", noDS));
+                stats.getTotalDockingCollars(), stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), "DropShips Not Transported:", noDS));
 
         sb.append("\n\n");
 
         sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
 
-        return new String(sb);
+        return sb.toString();
     }
-
 }

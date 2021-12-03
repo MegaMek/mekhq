@@ -53,8 +53,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * A dialog to decide how you want to pay off collateral when you
@@ -303,10 +303,10 @@ public class PayCollateralDialog extends JDialog {
         }
 
         int percent = 0;
-        if (loan.getCollateralAmount().isPositive()) {
+        if (loan.determineCollateralAmount().isPositive()) {
             percent = amount
                     .multipliedBy(100)
-                    .dividedBy(loan.getCollateralAmount())
+                    .dividedBy(loan.determineCollateralAmount())
                     .getAmount().intValue();
         }
 
@@ -316,7 +316,7 @@ public class PayCollateralDialog extends JDialog {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(amount.toAmountString() + "/" + loan.getCollateralAmount().toAmountString());
+        barAmount.setString(amount.toAmountString() + "/" + loan.determineCollateralAmount().toAmountString());
     }
 
     public ArrayList<UUID> getUnits() {

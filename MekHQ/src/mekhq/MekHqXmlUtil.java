@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,45 +18,29 @@
  */
 package mekhq;
 
-import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import megamek.common.icons.Camouflage;
+import megamek.common.*;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import megamek.common.Aero;
-import megamek.common.BombType;
-import megamek.common.CommonConstants;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.FighterSquadron;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.Tank;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
     /**
-     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
-     * attacks, but unsafe from XML entity expansion attacks.
+     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from
+     * XML entity expansion attacks.
+     *
      * @return A DocumentBuilder less safe to use to read untrusted XML.
      */
     public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
@@ -109,13 +93,14 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
-     * to support saving to/from XML for our purposes in MekHQ TODO: Some of
-     * this may want to be back-ported into entity itself in MM and then
-     * re-factored out of EntityListFile.
+     * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
+     * TODO : Some of this may want to be back-ported into entity itself in MM and then
+     * TODO : re-factored out of EntityListFile.
      *
-     * @param tgtEnt
-     *            The entity to serialize to XML.
+     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * to support saving to/from XML for our purposes in MekHQ
+     *
+     * @param tgtEnt The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
      */
     public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, List<Entity> list) {
@@ -128,12 +113,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         StringBuilder retVal = new StringBuilder();
 
         // Start writing this entity to the file.
-        retVal.append(MekHqXmlUtil.indentStr(indentLvl))
-                .append("<entity chassis=\"").append(escape(tgtEnt.getChassis()))
-                .append("\" model=\"").append(escape(tgtEnt.getModel()))
-                .append("\" type=\"").append(escape(tgtEnt.getMovementModeAsString()))
-                .append("\" commander=\"").append(tgtEnt.isCommander())
-                .append("\" externalId=\"").append(tgtEnt.getExternalIdAsString());
+        retVal.append(MekHqXmlUtil.indentStr(indentLvl)).append("<entity chassis=\"")
+                .append(escape(tgtEnt.getChassis())).append("\" model=\"").append(escape(tgtEnt.getModel()))
+                .append("\" type=\"").append(escape(tgtEnt.getMovementModeAsString())).append("\" commander=\"")
+                .append(tgtEnt.isCommander()).append("\" externalId=\"").append(tgtEnt.getExternalIdAsString());
 
         if (tgtEnt.countQuirks() > 0) {
             retVal.append("\" quirks=\"").append(escape(tgtEnt.getQuirkList("::")));
@@ -146,21 +129,32 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
-         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
-             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
-         }
+        if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
+            retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
+        }
 
-         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
-             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
-         }
+        if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
+            retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
+        }
 
-         if (tgtEnt.getDeployRound() > 0) {
-             retVal.append(String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound()));
-         }
+        if (tgtEnt.getDeployRound() > 0) {
+            retVal.append(String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound()));
+        }
 
-         if (tgtEnt instanceof Infantry) {
-             retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN()));
-         }
+        if (tgtEnt instanceof Infantry) {
+            retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN()));
+        }
+
+        retVal.append(String.format("\" %s=\"%d", MULParser.ALTITUDE, tgtEnt.getAltitude()));
+
+        if (tgtEnt.isOffBoard()) {
+            retVal.append("\" offboard=\"");
+            retVal.append(String.valueOf(tgtEnt.isOffBoard()));
+            retVal.append("\" offboard_distance=\"");
+            retVal.append(String.valueOf(tgtEnt.getOffBoardDistance()));
+            retVal.append("\" offboard_direction=\"");
+            retVal.append(String.valueOf(tgtEnt.getOffBoardDirection().getValue()));
+        }
 
         retVal.append("\">\n");
 
@@ -185,13 +179,16 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             Aero a = (Aero) tgtEnt;
 
             // SI
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI()).append("\"/>\n");
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI())
+                    .append("\"/>\n");
 
             // Heat sinks
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks()).append("\"/>\n");
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks())
+                    .append("\"/>\n");
 
             // Fuel
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel()).append("\"/>\n");
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel())
+                    .append("\"/>\n");
 
             // TODO: dropship docking collars, bays
 
@@ -200,12 +197,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 Jumpship j = (Jumpship) a;
 
                 // KF integrity
-                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1))
-                        .append("<KF integrity=\"").append(j.getKFIntegrity()).append("\"/>\n");
+                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<KF integrity=\"")
+                        .append(j.getKFIntegrity()).append("\"/>\n");
 
                 // KF sail integrity
-                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1))
-                        .append("<sail integrity=\"").append(j.getSailIntegrity()).append("\"/>\n");
+                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<sail integrity=\"")
+                        .append(j.getSailIntegrity()).append("\"/>\n");
             }
 
             // Crits
@@ -218,7 +215,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
         // Add the locations of this entity (if any are needed).
-        String loc = EntityListFile.getLocString(tgtEnt, indentLvl+1);
+        String loc = EntityListFile.getLocString(tgtEnt, indentLvl + 1);
 
         if (null != loc) {
             retVal.append(loc);
@@ -226,8 +223,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>\n");
             Iterator<Entity> nc3List = list.iterator();
             while (nc3List.hasNext()) {
                 final Entity nc3Entity = nc3List.next();
@@ -235,31 +231,28 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
                     retVal.append(nc3Entity.getC3UUIDAsString());
-                    retVal.append("\"/>");
-                    retVal.append(CommonConstants.NL);
+                    retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>\n");
         }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>\n");
+
             Iterator<Entity> c3iList = list.iterator();
             while (c3iList.hasNext()) {
                 final Entity C3iEntity = c3iList.next();
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<c3i_link link=\"");
-                    retVal.append(C3iEntity.getC3UUIDAsString());
-                    retVal.append("\"/>");
-                    retVal.append(CommonConstants.NL);
+                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2))
+                            .append("<c3i_link link=\"")
+                            .append(C3iEntity.getC3UUIDAsString())
+                            .append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>");
-            retVal.append(CommonConstants.NL);
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>\n");
         }
 
         // Finish writing this entity to the file.
@@ -292,11 +285,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
-     * Modified to support saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...) Modified to support
+     * saving to/from XML for our purposes in MekHQ
      *
-     * @param a
-     *            The Aero unit to generate a crit string for.
+     * @param a The Aero unit to generate a crit string for.
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
@@ -354,7 +346,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             critVal = critVal.concat(" gear=\"none\"");
         }
 
-        if (!critVal.equals("")) {
+        if (!critVal.isBlank()) {
             // then add beginning and end
             retVal = retVal.concat(critVal);
             retVal = retVal.concat("/>\n");
@@ -366,12 +358,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Contents copied from
-     * megamek.common.EntityListFile.getTurretLockedString(...) Modified to
-     * support saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getTurretLockedString(...) Modified to support
+     * saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a turret-locked string for.
+     * @param e The tank to generate a turret-locked string for.
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
@@ -383,11 +373,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getMovementString(...)
-     * Modified to support saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getMovementString(...) Modified to support
+     * saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a movement string for.
+     * @param e The tank to generate a movement string for.
      * @return The generated string.
      */
     private static String getMovementString(Tank e, int indentLvl) {
@@ -395,10 +384,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         boolean im = false;
 
         // This can throw an NPE for no obvious reason.
-        // Okay, fine.  If the tank doesn't even *have* an object related to this...
+        // Okay, fine. If the tank doesn't even *have* an object related to this...
         // Lets assume it's fully mobile, as any other fact hasn't been recorded.
         try {
-             im = e.isImmobile();
+            im = e.isImmobile();
         } catch (NullPointerException ex) {
             // Ignore - just don't completely fail out.
         }
@@ -422,53 +411,46 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
-     * Modified to support saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getTankCritString(...) Modified to support
+     * saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a movement string for.
+     * @param e The tank to generate a movement string for.
      * @return The generated string.
      */
-     private static String getTankCritString(Tank e, int indentLvl) {
+    private static String getTankCritString(Tank e, int indentLvl) {
 
-         String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
-         String critVal = "";
+        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
+        String critVal = "";
 
-         // crits
-         if (e.getSensorHits() > 0) {
-         critVal = critVal.concat(" sensors=\"");
-         critVal = critVal.concat(Integer.toString(e.getSensorHits()));
-         critVal = critVal.concat("\"");
-         }
-         if (e.isEngineHit()) {
-         critVal = critVal.concat(" engine=\"");
-         critVal = critVal.concat("hit");
-         critVal = critVal.concat("\"");
-         }
+        // crits
+        if (e.getSensorHits() > 0) {
+            critVal = critVal.concat(" sensors=\"");
+            critVal = critVal.concat(Integer.toString(e.getSensorHits()));
+            critVal = critVal.concat("\"");
+        }
+        if (e.isEngineHit()) {
+            critVal = critVal.concat(" engine=\"");
+            critVal = critVal.concat("hit");
+            critVal = critVal.concat("\"");
+        }
 
-         /* crew are handled as a Person object in MekHq...
-         if (e.isDriverHit()) {
-         critVal = critVal.concat(" driver=\"");
-         critVal = critVal.concat("hit");
-         critVal = critVal.concat("\"");
-         }
-
-         if (e.isCommanderHit()) {
-         critVal = critVal.concat(" commander=\"");
-         critVal = critVal.concat("hit");
-         critVal = critVal.concat("\"");
-         }
+        /*
+         * crew are handled as a Person object in MekHq... if (e.isDriverHit()) { critVal =
+         * critVal.concat(" driver=\""); critVal = critVal.concat("hit"); critVal = critVal.concat("\""); }
+         *
+         * if (e.isCommanderHit()) { critVal = critVal.concat(" commander=\""); critVal =
+         * critVal.concat("hit"); critVal = critVal.concat("\""); }
          */
 
-         if (!critVal.equals("")) {
-         // then add beginning and end
-         retVal = retVal.concat(critVal);
-         retVal = retVal.concat("/>\n");
-         } else {
-         return critVal;
-         }
+        if (!critVal.isBlank()) {
+            // then add beginning and end
+            retVal = retVal.concat(critVal);
+            retVal = retVal.concat("/>\n");
+        } else {
+            return critVal;
+        }
 
-         return retVal;
+        return retVal;
 
     }
 
@@ -479,25 +461,21 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
     }
 
     /**
-     * Parses the given node as if it was a .mul file and returns the first
-     * entity it contains.
+     * Parses the given node as if it was a .mul file and returns the first entity it contains.
      * <p>
-     * In theme with {@link MULParser}, this method fails silently and returns
-     * {@code null} if the input can't be parsed; if it can be parsed and
-     * contains more than one entity, an {@linkplain IllegalArgumentException}
-     * is thrown.
+     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the input
+     * can't be parsed; if it can be parsed and contains more than one entity, an
+     * {@linkplain IllegalArgumentException} is thrown.
      *
-     * @param element
-     *        the xml tag to parse
+     * @param element the xml tag to parse
      *
-     * @return the first entity parsed from the given element, or {@code null}
-     *         if anything is wrong with the input
+     * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
+     *         the input
      *
-     * @throws IllegalArgumentException
-     *         if the given element parses to multiple entities
+     * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
+        MekHQ.getLogger().trace("Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -507,11 +485,12 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             case 0:
                 return null;
             case 1:
-                Entity entity = entities.get(0);
-                MekHQ.getLogger().trace(MekHqXmlUtil.class, "Returning " + entity + " from getEntityFromXmlString(String)...");
+                final Entity entity = entities.get(0);
+                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
-                throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
+                throw new IllegalArgumentException(
+                        "More than one entity contained in XML string! Expecting a single entity.");
         }
     }
 

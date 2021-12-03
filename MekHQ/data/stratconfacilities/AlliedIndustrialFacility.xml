@@ -1,0 +1,7 @@
+<StratconFacility>
+	<capturedDefinition>HostileIndustrialFacility.xml</capturedDefinition>
+	<displayableName>Industrial Center</displayableName>
+        <facilityType>IndustrialFacility</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

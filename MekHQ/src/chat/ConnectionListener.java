@@ -37,7 +37,7 @@ public class ConnectionListener extends Thread {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "run", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

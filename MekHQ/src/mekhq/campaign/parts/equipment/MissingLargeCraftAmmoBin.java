@@ -19,6 +19,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -121,7 +122,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         // than an LargeCraftAmmoBin. Subclasses should use a similar check, which
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
-        if ((part instanceof LargeCraftAmmoBin) && (part.getClass() == LargeCraftAmmoBin.class)) {
+        if (Objects.equals(part.getClass(), LargeCraftAmmoBin.class)) {
             LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) part;
             return getType().equals(ammoBin.getType())
                     && (getFullShots() == ammoBin.getFullShots());
@@ -164,10 +165,14 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
-                bayEqNum = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
+                    bayEqNum = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

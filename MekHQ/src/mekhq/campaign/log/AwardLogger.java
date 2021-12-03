@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.log;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
@@ -51,8 +52,12 @@ public class AwardLogger {
      * @param logEntryText text of the log entry
      * @return award of the owner corresponding to the log entry text
      */
-    public static Award getAwardFromLogEntry(Person person, String logEntryText) {
-        String message = logEntriesResourceMap.getString("awarded.text");
+    public static @Nullable Award getAwardFromLogEntry(final @Nullable Person person, final String logEntryText) {
+        if (person == null) {
+            return null;
+        }
+
+        final String message = logEntriesResourceMap.getString("awarded.text");
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(logEntryText);
 
@@ -62,7 +67,7 @@ public class AwardLogger {
             award = person.getAwardController().getAward(matcher.group(2), matcher.group(1));
         } else {
             // In a first implementation, the award Set was not included in the log, so it is impossible to distinguish
-            //  awards with same name but in different set. So it assumes it is the first it finds, using the old message format.
+            // awards with same name but in different set. So it assumes it is the first it finds, using the old message format.
             pattern = Pattern.compile("Awarded (.*): (.*)");
             matcher = pattern.matcher(logEntryText);
             if (matcher.matches()) {

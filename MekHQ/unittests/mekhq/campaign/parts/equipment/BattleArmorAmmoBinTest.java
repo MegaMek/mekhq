@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 import megamek.common.AmmoType;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
@@ -122,7 +122,7 @@ public class BattleArmorAmmoBinTest {
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -134,7 +134,7 @@ public class BattleArmorAmmoBinTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the BattleArmorAmmoBin
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
 
@@ -162,7 +162,7 @@ public class BattleArmorAmmoBinTest {
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -174,7 +174,7 @@ public class BattleArmorAmmoBinTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the BattleArmorAmmoBin
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
 
@@ -203,7 +203,7 @@ public class BattleArmorAmmoBinTest {
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -215,7 +215,7 @@ public class BattleArmorAmmoBinTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the BattleArmorAmmoBin
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
 
@@ -243,7 +243,7 @@ public class BattleArmorAmmoBinTest {
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
-        assertFalse(xml.trim().isEmpty());
+        assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
         DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -255,7 +255,7 @@ public class BattleArmorAmmoBinTest {
         assertEquals("part", partElt.getNodeName());
 
         // Deserialize the BattleArmorAmmoBin
-        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
         assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
 

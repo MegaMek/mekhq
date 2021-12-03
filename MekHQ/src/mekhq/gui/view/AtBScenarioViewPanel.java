@@ -1,7 +1,7 @@
 /*
  * AtBScenarioViewPanel.java
  *
- * Copyright (C) 2014-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -56,6 +56,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
@@ -71,12 +73,12 @@ import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.gui.dialog.PrincessBehaviorDialog;
+import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
  * @author Neoancient
  */
-public class AtBScenarioViewPanel extends ScrollablePanel {
+public class AtBScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
 
     private AtBScenario scenario;
@@ -134,12 +136,13 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private StubTreeModel playerForceModel;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
+        super();
         this.frame = frame;
         this.scenario = s;
         this.campaign = c;
         botStubs = new ArrayList<>();
 
-        if (s.isCurrent()) {
+        if (s.getStatus().isCurrent()) {
             s.refresh(c);
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
@@ -156,7 +159,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         panStats = new JPanel();
         txtDesc = new JTextArea();
@@ -165,7 +168,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setScrollableTracksViewportWidth(false);
+        setTracksViewportWidth(false);
 
         int y = 0;
 
@@ -221,8 +224,8 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(lblStatus, gridBagConstraints);
 
-        lblStatusDesc.setName("lblOwner"); // NOI18N
-        lblStatusDesc.setText(scenario.getStatusName());
+        lblStatusDesc.setName("lblOwner");
+        lblStatusDesc.setText(scenario.getStatus().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblStatusDesc, gridBagConstraints);
@@ -286,7 +289,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
-            if (scenario.isCurrent()) {
+            if (scenario.getStatus().isCurrent()) {
                 tree.addMouseListener(new TreeMouseAdapter(tree, i));
             }
         }
@@ -304,7 +307,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridy = y++;
         panStats.add(lblTypeDesc, gridBagConstraints);
 
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             lblForce.setText(resourceMap.getString("lblForce.text"));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -342,7 +345,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
-        if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
         } else if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
             y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
@@ -350,7 +353,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
         }
 
-        if(!(scenario instanceof AtBDynamicScenario)) {
+        if (!(scenario instanceof AtBDynamicScenario)) {
             lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -363,7 +366,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             panStats.add(lblPlayerStartPos, gridBagConstraints);
         }
 
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             btnReroll = new JButton(scenario.getRerollsRemaining() +
                     " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +
                     " Remaining");
@@ -393,11 +396,11 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         StringBuilder objectiveBuilder = new StringBuilder();
         objectiveBuilder.append(scenario.getDeploymentInstructions());
 
-        for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
+        for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
 
-            for(String forceName : objective.getAssociatedForceNames()) {
+            for (String forceName : objective.getAssociatedForceNames()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(forceName);
                 objectiveBuilder.append("\n");
@@ -415,7 +418,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 
-                if(associatedUnitName.length() == 0) {
+                if (associatedUnitName.length() == 0) {
                     continue;
                 }
                 objectiveBuilder.append("\t");
@@ -423,15 +426,15 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 objectiveBuilder.append("\n");
             }
 
-            for(String detail : objective.getDetails()) {
+            objectiveBuilder.append("\t");
+            objectiveBuilder.append(objective.getTimeLimitString());
+            objectiveBuilder.append("\n");
+
+            for (String detail : objective.getDetails()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(detail);
                 objectiveBuilder.append("\n");
             }
-
-            objectiveBuilder.append("\t");
-            objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
 
             objectiveBuilder.append("\n");
         }
@@ -453,7 +456,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
 
-        if(scenario.getLoot().size() > 0) {
+        if (scenario.getLoot().size() > 0) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
@@ -464,7 +467,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
 
-            for(Loot loot : scenario.getLoot()) {
+            for (Loot loot : scenario.getLoot()) {
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy++;
                 gridBagConstraints.gridwidth = 2;
@@ -493,7 +496,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblTerrain, gridBagConstraints);
 
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -514,7 +517,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblMap, gridBagConstraints);
 
         chkReroll[REROLL_MAP] = new JCheckBox();
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -523,7 +526,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             chkReroll[REROLL_MAP].addItemListener(checkBoxListener);
         }
 
-        lblMapDesc.setText(scenario.getMap());
+        lblMapDesc.setText(scenario.getMapForDisplay());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapDesc, gridBagConstraints);
@@ -535,7 +538,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblMapSize, gridBagConstraints);
 
         chkReroll[REROLL_MAPSIZE] = new JCheckBox();
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -556,7 +559,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblLight, gridBagConstraints);
 
         chkReroll[REROLL_LIGHT] = new JCheckBox();
-        if (scenario.isCurrent() && campaign.getCampaignOptions().getUseLightConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().getUseLightConditions()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -579,7 +582,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblWeather, gridBagConstraints);
 
         chkReroll[REROLL_WEATHER] = new JCheckBox();
-        if (scenario.isCurrent() && campaign.getCampaignOptions().getUseWeatherConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().getUseWeatherConditions()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -676,7 +679,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblMapSize, gridBagConstraints);
 
         chkReroll[REROLL_MAPSIZE] = new JCheckBox();
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -719,7 +722,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblMapSize, gridBagConstraints);
 
         chkReroll[REROLL_MAPSIZE] = new JCheckBox();
-        if (scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -910,75 +913,6 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
        }
     }
 
-    protected static class EntityListModel implements TreeModel {
-        private ArrayList<String> root;
-        private Vector<TreeModelListener> listeners = new Vector<>();
-        private String name;
-
-        public EntityListModel(ArrayList<String> root, String name) {
-            this.root = root;
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public Object getChild(Object parent, int index) {
-            if (parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>) parent).get(index);
-            }
-            return null;
-        }
-
-        @Override
-        public int getChildCount(Object parent) {
-            if (parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>) parent).size();
-            }
-            return 0;
-        }
-
-        @Override
-        public int getIndexOfChild(Object parent, Object child) {
-            if (parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>) parent).indexOf(child);
-            }
-            return 0;
-        }
-
-        @Override
-        public Object getRoot() {
-            return root;
-        }
-
-        @Override
-        public boolean isLeaf(Object node) {
-            return node instanceof String;
-        }
-
-        @Override
-        public void valueForPathChanged(TreePath arg0, Object arg1) {
-            // Auto-generated method stub
-
-        }
-
-        @Override
-        public void addTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null && !listeners.contains( listener ) ) {
-                 listeners.addElement( listener );
-              }
-           }
-
-           @Override
-        public void removeTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null ) {
-                 listeners.removeElement( listener );
-              }
-           }
-    }
-
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
         private JTree tree;
         int index;
@@ -993,16 +927,18 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             String command = action.getActionCommand();
 
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
-                PrincessBehaviorDialog pbd = new PrincessBehaviorDialog(frame,
+                BotConfigDialog pbd = new BotConfigDialog(frame,
+                        null,
                         scenario.getBotForce(index).getBehaviorSettings(),
-                        scenario.getBotForce(index).getName());
+                        null);
+                pbd.setBotName(scenario.getBotForce(index).getName());
                 pbd.setVisible(true);
-                if (!pbd.dialogAborted) {
+                if (pbd.getResult() != DialogResult.CANCELLED) {
                     scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }
             } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
-                if (tree.getSelectionCount() > 0) {
+                if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
@@ -1023,9 +959,13 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         }
 
         private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
+            final JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
-                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                if (path == null) {
+                    return;
+                }
+
                 JMenuItem menuItem;
                 if (path.getPathCount() > 1) {
                     menuItem = new JMenuItem("Edit Unit...");
@@ -1040,6 +980,5 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
-    };
-
+    }
 }

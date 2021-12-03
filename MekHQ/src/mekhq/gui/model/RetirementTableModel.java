@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.swing.JTable;
@@ -24,9 +26,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -53,14 +55,13 @@ public class RetirementTableModel extends AbstractTableModel {
     };
 
     private final Campaign campaign;
-    private final MekHqColors colors = new MekHqColors();
-    private ArrayList<UUID> data;
-    private HashMap<UUID, TargetRoll> targets;
-    private HashMap<UUID, Boolean> payBonus;
-    private HashMap<UUID, Integer> miscMods;
+    private List<UUID> data;
+    private Map<UUID, TargetRoll> targets;
+    private Map<UUID, Boolean> payBonus;
+    private Map<UUID, Integer> miscMods;
     private int generalMod;
-    private HashMap<UUID, UUID> unitAssignments;
-    private HashMap<UUID, Money> altPayout;
+    private Map<UUID, UUID> unitAssignments;
+    private Map<UUID, Money> altPayout;
     boolean editPayout;
 
     public RetirementTableModel(Campaign c) {
@@ -298,12 +299,10 @@ public class RetirementTableModel extends AbstractTableModel {
                     campaign.getRetirementDefectionTracker().getPayout(data.get(row));
                 if (null == pay) {
                     return "";
-                }
-                if (pay.getDependents() > 0) {
+                } else if (pay.getDependents() > 0) {
                     return pay.getDependents() + " Dependents";
                 } else if (pay.hasRecruit()) {
-                    return Person.getRoleDesc(pay.getRecruitType(),
-                            campaign.getFaction().isClan());
+                    return pay.getRecruitRole().getName(campaign.getFaction().isClan());
                 } else if (pay.hasHeir()) {
                     return "Heir";
                 } else {
@@ -333,12 +332,12 @@ public class RetirementTableModel extends AbstractTableModel {
             miscMods.put(data.get(row), (Integer)value);
         } else if (col == COL_UNIT) {
             if (null != value) {
-                unitAssignments.put(getPerson(row).getId(), (UUID)value);
+                unitAssignments.put(getPerson(row).getId(), (UUID) value);
             }
         } else if (col == COL_RECRUIT) {
-            for (int i = 0; i < Person.T_NUM; i++) {
-                if (Person.getRoleDesc(i, campaign.getFaction().isClan()).equals(value)) {
-                    campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitType(i);
+            for (PersonnelRole role : PersonnelRole.values()) {
+                if (role.getName(campaign.getFaction().isClan()).equals(value)) {
+                    campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitRole(role);
                     break;
                 }
             }
@@ -363,7 +362,7 @@ public class RetirementTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    public HashMap<UUID, Money> getAltPayout() {
+    public Map<UUID, Money> getAltPayout() {
         return altPayout;
     }
 
@@ -380,14 +379,11 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
-        /**
-         *
-         */
          private static final long serialVersionUID = 770305943352316265L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, row, column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -397,8 +393,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    colors.getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    colors.getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
                 }
             }
             return this;
@@ -422,12 +418,12 @@ public class RetirementTableModel extends AbstractTableModel {
             if (actualCol == COL_PERSON) {
                 setPortrait(p);
                 setText(p.getFullDesc());
-            }
-            if (actualCol == COL_ASSIGN) {
+            } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
                     u = p.getTechUnits().get(0);
                 }
+
                 if (null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
@@ -445,8 +441,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 } else {
                     clearImage();
                 }
-            }
-            if (actualCol == COL_FORCE) {
+            } else if (actualCol == COL_FORCE) {
                 Force force = campaign.getForceFor(p);
                 if (null != force) {
                     String desc = "<html><b>" + force.getName() + "</b>";
@@ -473,10 +468,10 @@ public class RetirementTableModel extends AbstractTableModel {
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             if (!isSelected) {
-                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-                        campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    colors.getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    colors.getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
+                        && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
                 }
             }
 

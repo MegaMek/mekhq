@@ -74,7 +74,7 @@ public class ScriptPluginManager {
     private void addModule(File script, String extension) {
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            MekHQ.getLogger().warning(this, "Could not find script engine for extension " + extension);
+            MekHQ.getLogger().warning("Could not find script engine for extension " + extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -86,7 +86,7 @@ public class ScriptPluginManager {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, "While parsing script " + script.getName(), e);
+            MekHQ.getLogger().error("While parsing script " + script.getName(), e);
         }
     }
 
@@ -94,10 +94,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            MekHQ.getLogger().info(ScriptPluginManager.class, "Engine: " + engine.getEngineName());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "\tVersion: " + engine.getEngineVersion());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "\tAlias: " + engine.getNames());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "\tLanguage name: " + engine.getLanguageName() + "\n");
+            MekHQ.getLogger().info("Engine: " + engine.getEngineName());
+            MekHQ.getLogger().info("\tVersion: " + engine.getEngineVersion());
+            MekHQ.getLogger().info("\tAlias: " + engine.getNames());
+            MekHQ.getLogger().info("\tLanguage name: " + engine.getLanguageName() + "\n");
         }
     }
 }

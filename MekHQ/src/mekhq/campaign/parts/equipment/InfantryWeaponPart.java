@@ -20,16 +20,15 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-
 import megamek.common.EquipmentType;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.MissingPart;
-
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -89,14 +88,18 @@ public class InfantryWeaponPart extends EquipmentPart {
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                equipmentNum = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                typeName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-                equipTonnage = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("primary")) {
-                primary = Boolean.parseBoolean(wn2.getTextContent().trim());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
+                    equipmentNum = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+                    typeName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
+                    equipTonnage = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("primary")) {
+                    primary = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
         restore();
