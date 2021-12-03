@@ -67,8 +67,8 @@ public class BattleArmorEquipmentProposal extends EquipmentProposal {
             // Try to find one for each trooper; if the Entity has multiple pieces of equipment of
             // this type this will make sure we're only setting one group to this equipment number.
             final Part[] perTrooper = new Part[squadSize];
-            for (final EquipmentPart part : parts) {
-                final int trooper = ((BattleArmorEquipmentPart) part).getTrooper();
+            for (final BattleArmorEquipmentPart part : parts) {
+                final int trooper = part.getTrooper();
                 if (trooper > 0) {
                     perTrooper[trooper - 1] = part;
                 }
@@ -77,9 +77,9 @@ public class BattleArmorEquipmentProposal extends EquipmentProposal {
             // Assign a part to any empty position and set the trooper field
             for (int t = 0; t < perTrooper.length; t++) {
                 if (perTrooper[t] == null) {
-                    for (final Part part : parts) {
-                        if (((BattleArmorEquipmentPart) part).getTrooper() < 1) {
-                            ((BattleArmorEquipmentPart) part).setTrooper(t + 1);
+                    for (final BattleArmorEquipmentPart part : parts) {
+                        if (part.getTrooper() < 1) {
+                            part.setTrooper(t + 1);
                             break;
                         }
                     }

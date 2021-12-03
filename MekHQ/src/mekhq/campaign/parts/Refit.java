@@ -1470,8 +1470,8 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         oldUnit.setParts(newParts);
 
-        EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
-        EquipmentUnscramblerResult result = unscrambler.unscramble();
+        final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
+        final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
             MekHQ.getLogger().warning(result.getMessage());
         }
@@ -1484,7 +1484,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (newEntity instanceof Mech) {
             // Now that Mech part locations have been set
             // Remove heat sink parts added for supply chain tracking purposes
-            for (Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
+            for (final Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
                 final Part part = partsIter.next();
                 if ((part instanceof HeatSink) && (part.getLocation() == Entity.LOC_NONE)) {
                     getCampaign().getWarehouse().removePart(part);
@@ -1555,8 +1555,8 @@ public class Refit extends Part implements IAcquisitionWork {
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
     }
 
-    private void changeAmmoBinMunitions(Unit unit) {
-        for (Part part : unit.getParts()) {
+    private void changeAmmoBinMunitions(final Unit unit) {
+        for (final Part part : unit.getParts()) {
             if (part instanceof AmmoBin) {
                 final AmmoBin ammoBin = (AmmoBin) part;
                 final Mounted mounted = unit.getEntity().getEquipment(ammoBin.getEquipmentNum());

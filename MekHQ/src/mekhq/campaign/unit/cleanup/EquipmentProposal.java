@@ -94,10 +94,7 @@ public class EquipmentProposal {
 
     public void apply() {
         for (final Part part : original.keySet()) {
-            int equipmentNum = -1;
-            if (mapped.get(part) != null) {
-                equipmentNum = mapped.get(part);
-            }
+            final int equipmentNum = (mapped.get(part) == null) ? -1 : mapped.get(part);
 
             if (part instanceof EquipmentPart) {
                 ((EquipmentPart) part).setEquipmentNum(equipmentNum);
