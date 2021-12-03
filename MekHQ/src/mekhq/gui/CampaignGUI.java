@@ -2328,7 +2328,8 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+        if (!getCampaign().getCampaignOptions().getUseAtB()
+                || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             StringBuilder report = new StringBuilder();
