@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.unit.cleanup;
 
 import megamek.common.EquipmentType;
@@ -8,22 +26,25 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
 public final class EquipmentProposalReport {
+    //region Constructors
     private EquipmentProposalReport() {
+
     }
+    //endregion Constructors
 
     /**
      * Creates a message detailing the results of the unscrambling.
      * @param proposal The unscrambling proposal.
      * @return A String describing the result of the unscrambling operation.
      */
-    public static String createReport(EquipmentProposal proposal) {
-        StringBuilder builder = new StringBuilder();
+    public static String createReport(final EquipmentProposal proposal) {
+        final StringBuilder builder = new StringBuilder();
 
         final Unit unit = proposal.getUnit();
         if (!proposal.isReduced()) {
             builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n",
                     unit.getName(), unit.getId()));
-            for (Part part : proposal.getParts()) {
+            for (final Part part : proposal.getParts()) {
                 if (proposal.hasProposal(part)) {
                     continue;
                 }
@@ -37,29 +58,30 @@ public final class EquipmentProposalReport {
         }
 
         builder.append("\r\nEquipment Parts:\r\n");
-        for (Part p : proposal.getParts()) {
-            int equipNum;
-            if (p instanceof EquipmentPart) {
-                equipNum = ((EquipmentPart) p).getEquipmentNum();
-            } else if (p instanceof MissingEquipmentPart) {
-                equipNum = ((MissingEquipmentPart) p).getEquipmentNum();
+        for (final Part part : proposal.getParts()) {
+            final int equipNum;
+            if (part instanceof EquipmentPart) {
+                equipNum = ((EquipmentPart) part).getEquipmentNum();
+            } else if (part instanceof MissingEquipmentPart) {
+                equipNum = ((MissingEquipmentPart) part).getEquipmentNum();
             } else {
                 continue;
             }
-            boolean isMissing = !proposal.hasProposal(p);
-            String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
+
+            final boolean isMissing = !proposal.hasProposal(part);
+            String eName = (equipNum >= 0) ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
             if (isMissing) {
                 eName = "<Incorrect>";
             }
-            builder.append(String.format(" %d: %s %s %s %s\r\n", (!isMissing ? equipNum : proposal.getOriginalMapping(p)),
-                    p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
+            builder.append(String.format(" %d: %s %s %s %s\r\n", (!isMissing ? equipNum : proposal.getOriginalMapping(part)),
+                    part.getName(), part.getLocationName(), eName, isMissing ? " (Missing)" : ""));
         }
 
         builder.append("\r\nEquipment:\r\n");
-        for (Mounted m : unit.getEntity().getEquipment()) {
-            int equipNum = unit.getEntity().getEquipmentNum(m);
-            EquipmentType mType = m.getType();
-            boolean isAvailable = proposal.getEquipment(equipNum) != null;
+        for (final Mounted m : unit.getEntity().getEquipment()) {
+            final int equipNum = unit.getEntity().getEquipmentNum(m);
+            final EquipmentType mType = m.getType();
+            final boolean isAvailable = proposal.getEquipment(equipNum) != null;
             builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
         }
 
