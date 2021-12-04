@@ -245,7 +245,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private CategoryDataset setupMonthlyDataset() {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
-                .withLocale(MekHQ.getMekHQOptions().getLocale());
+                .withLocale(MekHQ.getMekHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 

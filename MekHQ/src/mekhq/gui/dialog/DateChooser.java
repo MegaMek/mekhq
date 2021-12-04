@@ -442,20 +442,20 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
         {
                 DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat())
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat())
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern("MMMM d, yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern("E, MMMM d, yyyy G")
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern("E, MMMM d, yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern("MMM d, yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
                 DateTimeFormatter.ofPattern("MM/dd/yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getLocale()),
-                DateTimeFormatter.ISO_LOCAL_DATE.withLocale(MekHQ.getMekHQOptions().getLocale())
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ISO_LOCAL_DATE.withLocale(MekHQ.getMekHQOptions().getDateLocale())
         };
         for (DateTimeFormatter format : dateFormats) {
             try {

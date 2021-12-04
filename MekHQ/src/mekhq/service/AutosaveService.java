@@ -124,7 +124,7 @@ public class AutosaveService implements IAutosaveService {
                         campaign.getName(),
                         campaign.getLocalDate().format(DateTimeFormatter
                                 .ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                .withLocale(MekHQ.getMekHQOptions().getLocale())));
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale())));
 
                 repeatedName = false;
                 for (File file : autosaveFiles) {

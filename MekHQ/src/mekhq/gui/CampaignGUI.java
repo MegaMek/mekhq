@@ -1543,7 +1543,7 @@ public class CampaignGUI extends JPanel {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
                             DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedPlanets");
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
@@ -1555,7 +1555,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
                             DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedFinances");
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
@@ -1567,7 +1567,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(
                             DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedPersonnel");
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
@@ -1579,7 +1579,7 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
                             DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedUnits");
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);

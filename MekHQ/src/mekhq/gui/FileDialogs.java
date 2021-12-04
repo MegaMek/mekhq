@@ -68,7 +68,7 @@ public class FileDialogs {
                 "%s%s_ExportedPersonnel.prsx",
                 campaign.getName(),
                 campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMekHQOptions().getLocale())));
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())));
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
@@ -170,7 +170,7 @@ public class FileDialogs {
                 "%s%s_ExportedParts.parts",
                 campaign.getName(),
                 campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMekHQOptions().getLocale())));
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())));
 
         Optional<File> value =  GUI.fileDialogSave(
                 frame,
@@ -240,7 +240,7 @@ public class FileDialogs {
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
         String fileName = String.format("%s%s.%s", campaign.getName(),
                 campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMekHQOptions().getLocale())),
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())),
                 MekHQ.getMekHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
         Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,

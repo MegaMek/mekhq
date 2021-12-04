@@ -160,7 +160,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
                 validateDateFormat(optionDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText())
-                                .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         JLabel labelLongDisplayDateFormat = new JLabel(resources.getString("labelLongDisplayDateFormat.text"));
@@ -169,7 +169,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
                 validateDateFormat(optionLongDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
-                                .withLocale(MekHQ.getMekHQOptions().getLocale()))
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
@@ -839,7 +839,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //region Data Validation
     private boolean validateDateFormat(final String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(format).withLocale(MekHQ.getMekHQOptions().getLocale()));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format).withLocale(MekHQ.getMekHQOptions().getDateLocale()));
         } catch (Exception ignored) {
             return false;
         }
