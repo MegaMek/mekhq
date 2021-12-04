@@ -700,7 +700,8 @@ public class Campaign implements Serializable, ITechManager {
                         }
                     }
 
-                    if (getCampaignOptions().isUseRandomDependentAddition()) {
+                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                            && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -3130,6 +3131,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
+                && getCampaignOptions().getRandomDependentMethod().isAtB()
                 && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
