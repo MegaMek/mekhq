@@ -237,6 +237,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     // Retirement
     private JCheckBox chkUseRetirementDateTracking;
+    private JPanel randomRetirementPanel;
     private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
     private JCheckBox chkUseYearEndRandomRetirement;
     private JCheckBox chkUseContractCompletionRandomRetirement;
@@ -248,6 +249,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
 
     // Dependent
+    private JPanel randomDependentPanel;
     private MMComboBox<RandomDependentMethod> comboRandomDependentMethod;
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
@@ -2669,8 +2671,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseAtB.addActionListener(evt -> {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
-            comboRandomRetirementMethod.setEnabled(enabled);
-            comboRandomDependentMethod.setEnabled(enabled);
+            randomRetirementPanel.setEnabled(enabled);
+            randomDependentPanel.setEnabled(enabled);
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3693,7 +3695,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
         chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
 
-        final JPanel randomRetirementPanel = createRandomRetirementPanel();
+        createRandomRetirementPanel();
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -3721,7 +3723,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
 
-    private JPanel createRandomRetirementPanel() {
+    private void createRandomRetirementPanel() {
         // Create Panel Components
         final JLabel lblRandomRetirementMethod = new JLabel(resources.getString("lblRandomRetirementMethod.text"));
         lblRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
@@ -3746,7 +3748,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             if (method == null) {
                 return;
             }
-            final boolean enabled = !method.isNone();
+            final boolean enabled = comboRandomRetirementMethod.isEnabled() && !method.isNone();
             chkUseYearEndRandomRetirement.setEnabled(enabled);
             chkUseContractCompletionRandomRetirement.setEnabled(enabled);
             chkUseCustomRetirementModifiers.setEnabled(enabled);
@@ -3775,13 +3777,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
 
         // Layout the Panel
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
-        panel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
-        panel.setName("randomRetirementPanel");
+        randomRetirementPanel = new JDisableablePanel("randomRetirementMethod");
+        randomRetirementPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
+        randomRetirementPanel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
 
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final GroupLayout layout = new GroupLayout(randomRetirementPanel);
+        randomRetirementPanel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
@@ -3808,8 +3809,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseCustomRetirementModifiers)
                         .addComponent(chkTrackUnitFatigue)
         );
-
-        return panel;
     }
 
     private JPanel createFamilyPanel() {
@@ -3854,7 +3853,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createDependentPanel() {
         // Create Panel Components
-        final JPanel randomDependentPanel = createRandomDependentPanel();
+        createRandomDependentPanel();
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -3880,7 +3879,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         return panel;
     }
 
-    private JPanel createRandomDependentPanel() {
+    private void createRandomDependentPanel() {
         // Create Panel Components
         final JLabel lblRandomDependentMethod = new JLabel(resources.getString("lblRandomDependentMethod.text"));
         lblRandomDependentMethod.setToolTipText(resources.getString("lblRandomDependentMethod.toolTipText"));
@@ -3905,7 +3904,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             if (method == null) {
                 return;
             }
-            final boolean enabled = !method.isNone();
+            final boolean enabled = comboRandomDependentMethod.isEnabled() && !method.isNone();
             chkUseRandomDependentAddition.setEnabled(enabled);
             chkUseRandomDependentRemoval.setEnabled(enabled);
         });
@@ -3919,13 +3918,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
 
         // Layout the Panel
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDependentPanel.title")));
-        panel.setToolTipText(resources.getString("randomDependentPanel.toolTipText"));
-        panel.setName("randomDependentPanel");
+        randomDependentPanel = new JDisableablePanel("randomDependentPanel");
+        randomDependentPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDependentPanel.title")));
+        randomDependentPanel.setToolTipText(resources.getString("randomDependentPanel.toolTipText"));
 
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final GroupLayout layout = new GroupLayout(randomDependentPanel);
+        randomDependentPanel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
@@ -3946,8 +3944,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseRandomDependentAddition)
                         .addComponent(chkUseRandomDependentRemoval)
         );
-
-        return panel;
     }
 
     private JPanel createSalaryPanel() {
