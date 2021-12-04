@@ -2668,6 +2668,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         chkUseAtB = new JCheckBox(resourceMap.getString("chkUseAtB.text"));
         chkUseAtB.setToolTipText(resourceMap.getString("chkUseAtB.toolTipText"));
+        chkUseAtB.setSelected(true);
         chkUseAtB.addActionListener(evt -> {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
@@ -3107,10 +3108,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
-        scrAtB.setPreferredSize(new java.awt.Dimension(500, 410));
+        scrAtB.setPreferredSize(new Dimension(500, 410));
 
         getOptionsPane().addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
-        enableAtBComponents(panAtB, chkUseAtB.isSelected());
 
         SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
