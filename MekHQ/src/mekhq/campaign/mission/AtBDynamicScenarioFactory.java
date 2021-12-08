@@ -659,7 +659,9 @@ public class AtBDynamicScenarioFactory {
         int primaryUnitCount = 0;
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
-            if (scenario.getPlayerForceTemplates().get(forceID).getContributesToUnitCount()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            
+            if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
                 primaryUnitCount += campaign.getForce(forceID).getAllUnits(true).size();
             }
         }
