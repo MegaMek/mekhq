@@ -89,6 +89,10 @@ public class StoryArc implements MekHqXmlSerializable {
         this.title = t;
     }
 
+    public String getTitle() { return this.title; }
+
+    public String getDescription() { return this.description; }
+
     private void setDescription(String d) {
         this.description = d;
     }

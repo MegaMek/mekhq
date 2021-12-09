@@ -38,10 +38,12 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.storyarcs.StoryArc;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.storyarcs.StoryArc;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,6 +52,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
@@ -250,6 +253,19 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
+
+                //Story Arcs
+                //TODO: eventually this should get its own button, but putting it here for testing purposes
+                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
+                if (storyArcSelectionDialog.showDialog().isCancelled()) {
+                    setVisible(false);
+                    cancelled = true;
+                    cancel(true);
+                    return campaign; // shouldn't be required, but this ensures no further code runs
+                }
+                final StoryArc storyArc = storyArcSelectionDialog.getSelectedStoryArc();
+                campaign.initiateStoryArc(storyArc);
+
             } else {
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
