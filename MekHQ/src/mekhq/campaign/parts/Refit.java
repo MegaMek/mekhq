@@ -89,6 +89,8 @@ import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
+import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -1467,14 +1469,22 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         oldUnit.setParts(newParts);
-        Utilities.unscrambleEquipmentNumbers(oldUnit, true);
+
+        final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
+        final EquipmentUnscramblerResult result = unscrambler.unscramble();
+        if (!result.succeeded()) {
+            MekHQ.getLogger().warning(result.getMessage());
+        }
+
+        changeAmmoBinMunitions(oldUnit);
+
         assignArmActuators();
         assignBayParts();
 
         if (newEntity instanceof Mech) {
             // Now that Mech part locations have been set
             // Remove heat sink parts added for supply chain tracking purposes
-            for (Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
+            for (final Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
                 final Part part = partsIter.next();
                 if ((part instanceof HeatSink) && (part.getLocation() == Entity.LOC_NONE)) {
                     getCampaign().getWarehouse().removePart(part);
@@ -1543,6 +1553,24 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+    }
+
+    private void changeAmmoBinMunitions(final Unit unit) {
+        for (final Part part : unit.getParts()) {
+            if (part instanceof AmmoBin) {
+                final AmmoBin ammoBin = (AmmoBin) part;
+                final Mounted mounted = unit.getEntity().getEquipment(ammoBin.getEquipmentNum());
+                if ((mounted != null) && (mounted.getType() instanceof AmmoType)
+                        && !ammoBin.getType().equals(mounted.getType())
+                        && ammoBin.canChangeMunitions((AmmoType) mounted.getType())) {
+                    // AmmoBin changed munition type during a refit
+                    ammoBin.updateConditionFromPart();
+                    // Unload bin before munition change
+                    ammoBin.unload();
+                    ammoBin.changeMunition((AmmoType) mounted.getType());
+                }
+            }
+        }
     }
 
     public void saveCustomization() throws EntityLoadingException {
