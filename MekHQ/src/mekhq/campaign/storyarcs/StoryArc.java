@@ -127,6 +127,11 @@ public class StoryArc implements MekHqXmlSerializable {
         return c.getMission(campaignMissionId);
     }
 
+    public void begin() {
+        //do nothing for the moment
+        //TODO: define and start first event
+    }
+
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

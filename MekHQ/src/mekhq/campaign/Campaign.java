@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.storyarcs.StoryArc;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.service.AutosaveService;
@@ -257,6 +258,8 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
+
+    private StoryArc storyArc;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
 
@@ -3999,6 +4002,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setCampaignOptions(CampaignOptions options) {
         campaignOptions = options;
+    }
+
+    public void initiateStoryArc(StoryArc arc) {
+        arc.setCampaign(this);
+        this.storyArc = arc;
+        storyArc.begin();
     }
 
     public void writeToXml(PrintWriter pw1) {
