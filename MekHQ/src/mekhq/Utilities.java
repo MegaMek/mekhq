@@ -13,122 +13,57 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import megamek.client.generator.RandomNameGenerator;
-import megamek.common.enums.Gender;
-import megamek.common.util.StringUtil;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.equipment.*;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-
 import megamek.client.Client;
-import megamek.common.ASFBay;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.Bay;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Crew;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.HeavyVehicleBay;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.LightVehicleBay;
-import megamek.common.Mech;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.SmallCraftBay;
-import megamek.common.SuperHeavyVehicleBay;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
-import megamek.common.UnitType;
-import megamek.common.VTOL;
-import megamek.common.logging.LogLevel;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.Node;
 
-public class Utilities {
-    private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
+public class Utilities {
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
-    private static int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
+    private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
 
     public static int roll3d6() {
         Vector<Integer> rolls = new Vector<>();
@@ -165,10 +100,9 @@ public class Utilities {
      *
      * @return <i>null</i> if the collection itself is null or empty;
      * can return <i>null</i> if the collection contains <i>null</i> items.
-     *
      */
-    public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if ((null == collection) || collection.isEmpty()) {
+    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
+        if ((collection == null) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
@@ -213,7 +147,7 @@ public class Utilities {
      */
     public static int lerp(int min, int max, double f) {
         // The order of operations is important here, to not lose precision
-        return (int)Math.round(min * (1.0 - f) + max * f);
+        return (int) Math.round(min * (1.0 - f) + max * f);
     }
 
     /**
@@ -255,67 +189,85 @@ public class Utilities {
         return result;
     }
 
-    public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<>();
-        for (AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+    public static <T> int compareNullable(final @Nullable T a, final @Nullable T b,
+                                          final Comparator<? super T> comparator) {
+        if (a == b) { // Strict comparison is desired, to handle both null too
+            return 0;
+        } else if (a == null) {
+            return 1;
+        } else if (b == null) {
+            return -1;
+        } else {
+            return comparator.compare(a, b);
+        }
+    }
+
+    public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
+        if (currentAmmoType == null) {
+            return Collections.emptyList();
+        }
+
+        List<AmmoType> ammoTypes = new ArrayList<>();
+        for (AmmoType ammoType : AmmoType.getMunitionsFor(currentAmmoType.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
-                    && !atype.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
+                    && !ammoType.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
-            int lvl = atype.getTechLevel(entity.getTechLevelYear());
+            int lvl = ammoType.getTechLevel(entity.getTechLevelYear());
             if (lvl < 0) {
                 lvl = 0;
             }
+
             if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
-            }
-            if (TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
+            } else if (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
                 continue;
             }
 
             // Only Protos can use Proto-specific ammo
-            if (atype.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
+            if (ammoType.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
                 continue;
             }
 
-            // When dealing with machine guns, Protos can only
-            // use proto-specific machine gun ammo
+            // When dealing with machine guns, Protos can only use proto-specific machine gun ammo
             if ((entity instanceof Protomech)
-                    && atype.hasFlag(AmmoType.F_MG)
-                    && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+                    && ammoType.hasFlag(AmmoType.F_MG)
+                    && !ammoType.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
 
-            if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
+            if (ammoType.hasFlag(AmmoType.F_NUCLEAR) && ammoType.hasFlag(AmmoType.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
             }
 
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
-            if ((atype.getRackSize() == cur_atype.getRackSize())
-                    && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
-                    && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
-                    && ((atype.getTonnage(entity) == cur_atype.getTonnage(entity))
-                    || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
-                atypes.add(atype);
+            if ((ammoType.getRackSize() == currentAmmoType.getRackSize())
+                    && (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoType.F_BATTLEARMOR))
+                    && (ammoType.hasFlag(AmmoType.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoType.F_ENCUMBERING))
+                    && ((ammoType.getTonnage(entity) == currentAmmoType.getTonnage(entity))
+                    || ammoType.hasFlag(AmmoType.F_CAP_MISSILE))) {
+                ammoTypes.add(ammoType);
             }
         }
-        return atypes;
+        return ammoTypes;
     }
 
-    public static boolean compareMounted (Mounted a, Mounted b) {
-        if (!a.getType().equals(b.getType()))
+    public static boolean compareMounted(Mounted a, Mounted b) {
+        if (!a.getType().equals(b.getType())) {
             return false;
-        if (!a.getClass().equals(b.getClass()))
+        } else if (a.getClass() != b.getClass()) {
             return false;
-        if (!a.getName().equals(b.getName()))
+        } else if (!a.getName().equals(b.getName())) {
             return false;
-        return a.getLocation() == b.getLocation();
+        } else {
+            return a.getLocation() == b.getLocation();
+        }
     }
 
     /**
@@ -367,10 +319,9 @@ public class Utilities {
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
-        for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+        for (MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, we continue
             if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
@@ -400,9 +351,8 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
-                        "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
-                                + ", including among available refits."); // $NON-NLS-1$
+                MekHQ.getLogger().warning("Could not determine tech progression for " + summary.getName()
+                                + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -489,9 +439,9 @@ public class Utilities {
             return SkillType.EXP_ULTRA_GREEN;
         } else if (roll < 6) {
             return SkillType.EXP_GREEN;
-        } else if(roll < 10) {
+        } else if (roll < 10) {
             return SkillType.EXP_REGULAR;
-        } else if(roll < 12) {
+        } else if (roll < 12) {
             return SkillType.EXP_VETERAN;
         } else {
             return SkillType.EXP_ELITE;
@@ -504,26 +454,26 @@ public class Utilities {
         //if two of the same type are tie rank, take the first one
         int bestRank = -1;
         Person commander = null;
-        for(Person p : vesselCrew) {
-            if(null != p && p.getRankNumeric() > bestRank) {
+        for (Person p : vesselCrew) {
+            if (null != p && p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        for(Person p : gunners) {
-            if(p.getRankNumeric() > bestRank) {
+        for (Person p : gunners) {
+            if (p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        for(Person p : drivers) {
-            if(null != p && p.getRankNumeric() > bestRank) {
+        for (Person p : drivers) {
+            if (null != p && p.getRankNumeric() > bestRank) {
                 commander = p;
                 bestRank = p.getRankNumeric();
             }
         }
-        if(navigator != null) {
-            if(navigator.getRankNumeric() > bestRank) {
+        if (navigator != null) {
+            if (navigator.getRankNumeric() > bestRank) {
                 commander = navigator;
                 bestRank = navigator.getRankNumeric();
             }
@@ -559,14 +509,14 @@ public class Utilities {
      */
     public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
         int casualties;
-        if(e instanceof Infantry) {
+        if (e instanceof Infantry) {
             e.applyDamage();
             casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
-                    if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                    if (Compute.d6(2) >= 7) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -607,7 +557,7 @@ public class Utilities {
             //region Solo Pilot
             Person p;
             if (u.getEntity() instanceof LandAirMech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
@@ -616,38 +566,37 @@ public class Utilities {
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
                         - oldCrew.getGunnery(), 0);
-                p.setSecondaryRole(Person.T_AERO_PILOT);
             } else if (u.getEntity() instanceof Mech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof Aero) {
-                p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof ConvFighter) {
-                p = c.newPerson(Person.T_CONV_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget()
                         - oldCrew.getPiloting(), 0);
             } else if (u.getEntity() instanceof Protomech) {
-                p = c.newPerson(Person.T_PROTO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.PROTOMECH_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof VTOL) {
-                p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else {
                 //assume tanker if we got here
-                p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
@@ -663,13 +612,13 @@ public class Utilities {
                 for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
                     if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
                                 - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
                                 - oldCrew.getGunnery(slot), 0);
                     } else if (u.getEntity() instanceof Aero) {
-                        p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
                                 - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
@@ -706,30 +655,30 @@ public class Utilities {
                 for (int slot = 0; slot < driversNeeded; slot++) {
                     Person p;
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        p = c.newPerson(Person.T_SPACE_PILOT, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.VESSEL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
                                         - oldCrew.getPiloting()),
                                 0);
                         totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof BattleArmor) {
-                        p = c.newPerson(Person.T_BA, Person.T_NONE, factionCode,
+                    } else if (u.getEntity() instanceof BattleArmor) {
+                        p = c.newPerson(PersonnelRole.BATTLE_ARMOUR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_GUN_BA).getTarget()
                                         - oldCrew.getGunnery()),
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof Infantry) {
-                        p = c.newPerson(Person.T_INFANTRY, Person.T_NONE, factionCode,
+                    } else if (u.getEntity() instanceof Infantry) {
+                        p = c.newPerson(PersonnelRole.SOLDIER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
                                 0);
                         totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                    } else if(u.getEntity() instanceof VTOL) {
-                        p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode,
+                    } else if (u.getEntity() instanceof VTOL) {
+                        p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(
                                 SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
@@ -738,7 +687,7 @@ public class Utilities {
                                 SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                                 0);
                     } else if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(
                                 SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
@@ -748,7 +697,7 @@ public class Utilities {
                                 0);
                     } else {
                         //assume tanker if we got here
-                        p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode,
+                        p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(
                                 SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
@@ -810,7 +759,7 @@ public class Utilities {
                     for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
                         Person p;
                         if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                            p = c.newPerson(Person.T_SPACE_GUNNER, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.VESSEL_GUNNER, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
                                     SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
@@ -818,7 +767,7 @@ public class Utilities {
                                     0);
                             totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
                         } else if (u.getEntity() instanceof Mech) {
-                            p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_PILOT_MECH,
                                     SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
@@ -831,7 +780,7 @@ public class Utilities {
                             totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
                         } else {
                             //assume tanker if we got here
-                            p = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                            p = c.newPerson(PersonnelRole.VEHICLE_GUNNER, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
                                     SkillType.getType(SkillType.S_GUN_VEE).getTarget()
@@ -875,22 +824,21 @@ public class Utilities {
 
             for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
                 Person p = c.newPerson(u.getEntity().isSupportVehicle()
-                                ? Person.T_VEHICLE_CREW
-                                : Person.T_SPACE_CREW,
-                        Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
+                                ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW,
+                        factionCode, oldCrew.getGender(numberPeopleGenerated));
 
                 migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(p);
             }
 
             if (u.canTakeNavigator()) {
-                navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
+                navigator = c.newPerson(PersonnelRole.VESSEL_NAVIGATOR, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
             if (u.canTakeTechOfficer()) {
-                consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_GUNNER, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
@@ -958,22 +906,23 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Integer.parseInt(phenotype));
+                    p.setPhenotype(Phenotype.parseFromString(phenotype));
                 }
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
-                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+            if (!oldCrew.getPortrait(crewIndex).isDefault()) {
+                p.setPortrait(oldCrew.getPortrait(crewIndex).clone());
             }
         }
     }
 
     /**
-     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+     * Worker function that takes the PersonnelOptions (SPAs, in other words) from the given
+     * "old crew" and sets them for a person.
+     *
      * @param p The person whose SPAs to populate
      * @param oldCrew The entity the SPAs of whose crew we're importing
      */
@@ -1049,14 +998,14 @@ public class Utilities {
     public static String getOptionDisplayName(IOption option) {
         String name = option.getDisplayableNameWithValue();
         name = name.replaceAll("\\(.+?\\)", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        if(option.getType() == IOption.CHOICE) {
+        if (option.getType() == IOption.CHOICE) {
             name += " - " + option.getValue(); //$NON-NLS-1$
         }
         return name;
     }
 
-    public static String printMoneyArray(Money[] array) {
-        StringJoiner joiner = new StringJoiner(","); //$NON-NLS-1$
+    public static String printMoneyArray(Money... array) {
+        StringJoiner joiner = new StringJoiner(",");
         for (Money value : array) {
             joiner.add(value.toXmlString());
         }
@@ -1064,11 +1013,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;
@@ -1100,7 +1057,7 @@ public class Utilities {
     }
 
     //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
-    public static void copyfile(File inFile, File outFile){
+    public static void copyfile(File inFile, File outFile) {
         try {
             InputStream in = new FileInputStream(inFile);
 
@@ -1112,17 +1069,16 @@ public class Utilities {
 
             byte[] buf = new byte[1024];
             int len;
-            while ((len = in.read(buf)) > 0){
+            while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info(Utilities.class, "copyFile", "File copied."); //$NON-NLS-1$
+            MekHQ.getLogger().info("File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile",
-                    e.getMessage() + " in the specified directory."); //$NON-NLS-1$
+            MekHQ.getLogger().error(e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -1133,10 +1089,14 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
+
+        Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
+
+        // Handle exact matches first
         List<Part> remaining = new ArrayList<>();
         for (Part part : unit.getParts()) {
             int eqnum = -1;
@@ -1148,59 +1108,107 @@ public class Utilities {
                 eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
                 etype = ((MissingEquipmentPart) part).getType();
             }
-            if (null != etype) {
+
+            if (etype != null) {
+                Mounted mounted = unit.getEntity().getEquipment(eqnum);
                 if (equipNums.contains(eqnum)
-                        && etype.equals(unit.getEntity().getEquipment(eqnum).getType())) {
+                        && (mounted != null)
+                        && etype.equals(mounted.getType())) {
                     equipNums.remove((Integer) eqnum);
+                    partMap.put(eqnum, part);
                 } else {
                     remaining.add(part);
                 }
             }
         }
+
+        // Handle approximate matches (AmmoBins with munition or bomb type changes)
+        List<Part> notFound = new ArrayList<>();
+        for (Part part : remaining) {
+            int eqnum = -1;
+            EquipmentType etype = null;
+            if (part instanceof EquipmentPart) {
+                eqnum = ((EquipmentPart) part).getEquipmentNum();
+                etype = ((EquipmentPart) part).getType();
+            } else if (part instanceof MissingEquipmentPart) {
+                eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
+                etype = ((MissingEquipmentPart) part).getType();
+            } else {
+                continue;
+            }
+
+            // Invalid equipment or already found
+            if ((etype == null) || partMap.containsKey(eqnum)) {
+                notFound.add(part);
+                continue;
+            }
+
+            Mounted mounted = unit.getEntity().getEquipment(eqnum);
+            if ((part instanceof AmmoBin)
+                    && (etype instanceof AmmoType)
+                    && (mounted != null)
+                    && (mounted.getType() instanceof AmmoType)) {
+                // Handle AmmoBins which had their AmmoType changed but did not get reloaded yet.
+                AmmoBin ammoBin = (AmmoBin) part;
+                AmmoType mountedType = (AmmoType) mounted.getType();
+                if (mountedType.equalsAmmoTypeOnly(ammoBin.getType())
+                        && (mountedType.getRackSize() == ammoBin.getType().getRackSize())) {
+                    equipNums.remove((Integer) eqnum);
+                    partMap.put(eqnum, part);
+                    continue;
+                }
+            }
+
+            notFound.add(part);
+        }
+
+        remaining = new ArrayList<>(notFound);
+        notFound.clear();
+
         // For ammo types we want to match the same munition type if possible to avoid
         // imposing unnecessary ammo swaps.
         // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
-        List<Part> notFound = new ArrayList<>();
         for (Part part : remaining) {
             boolean found = false;
             int i = -1;
 
             if (part instanceof EquipmentPart) {
-                EquipmentPart epart = (EquipmentPart)part;
+                EquipmentPart epart = (EquipmentPart) part;
                 for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof AmmoBin) {
-                        //If this is a refit, we want to update our ammo bin parts to match
-                        //the munitions specified in the refit, then reassign the equip number
+                        if (!(m.getType() instanceof AmmoType)) {
+                            continue;
+                        }
+
+                        AmmoBin ammoBin = (AmmoBin) part;
+                        AmmoType ammoType = (AmmoType) m.getType();
+
+                        // If this is a refit, we want to update our ammo bin parts to match
+                        // the munitions specified in the refit, then reassign the equip number
                         if (refit) {
-                            if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                                epart.setEquipmentNum(equipNum);
-                                ((AmmoBin) epart).changeMunition(m.getType());
+                            if (ammoBin.getType().equalsAmmoTypeOnly(ammoType)
+                                    && (ammoType.getRackSize() == ammoBin.getType().getRackSize())
+                                    && !m.isDestroyed()) {
+                                ammoBin.setEquipmentNum(equipNum);
+                                // Ensure Entity is synch'd with part
+                                ammoBin.updateConditionFromPart();
+                                // Unload bin before munition change
+                                ammoBin.unload();
+                                ammoBin.changeMunition(ammoType);
+                                partMap.put(equipNum, part);
                                 found = true;
                                 break;
                             }
-                        } else {
-                            //If this is not a refit, make sure the munitions match
-                            if (m.getType() instanceof AmmoType) {
-                                if (((AmmoType) epart.getType()).getMunitionType()
-                                        != ((AmmoType) m.getType()).getMunitionType()) {
-                                    continue;
-                                }
-                                if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                                    epart.setEquipmentNum(equipNum);
-                                    found = true;
-                                    break;
-                                }
-                            }
                         }
-                    } else {
-                        if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                            epart.setEquipmentNum(equipNum);
-                            found = true;
-                            break;
-                        }
+                    }
+                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
+                        found = true;
+                        break;
                     }
                 }
             } else if (part instanceof MissingEquipmentPart) {
@@ -1209,20 +1217,19 @@ public class Utilities {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof MissingAmmoBin
-                            && (!(m.getType() instanceof AmmoType)
-                            || (((AmmoType) epart.getType()).getMunitionType()
-                            != ((AmmoType) m.getType()).getMunitionType()))) {
+                            && !(m.getType() instanceof AmmoType)) {
                         continue;
                     }
                     if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
+                        partMap.put(equipNum, part);
                         found = true;
                         break;
                     }
                 }
             }
 
-            if(found) {
+            if (found) {
                 equipNums.remove(i);
             } else {
                 notFound.add(part);
@@ -1253,16 +1260,29 @@ public class Utilities {
                 }
                 int equipNum;
                 if (p instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart)p;
+                    EquipmentPart ePart = (EquipmentPart) p;
                     equipNum = ePart.getEquipmentNum();
                 } else {
-                    MissingEquipmentPart mePart = (MissingEquipmentPart)p;
+                    MissingEquipmentPart mePart = (MissingEquipmentPart) p;
                     equipNum = mePart.getEquipmentNum();
                 }
                 boolean isMissing = remaining.contains(p);
                 String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
                 if (isMissing) {
                     eName = "<Incorrect>";
+
+                    // Break the incorrect equipment number linkage if there is already a valid part at the location.
+                    // This ensures only one part is mapped to each equipment number, avoiding crashes and other
+                    // problems when these parts get out of sync.
+                    if ((equipNum >= 0) && partMap.containsKey(equipNum)) {
+                        if (p instanceof EquipmentPart) {
+                            EquipmentPart ePart = (EquipmentPart) p;
+                            ePart.setEquipmentNum(-1);
+                        } else {
+                            MissingEquipmentPart mePart = (MissingEquipmentPart) p;
+                            mePart.setEquipmentNum(-1);
+                        }
+                    }
                 }
                 builder.append(String.format(" %d: %s %s %s %s\r\n", equipNum, p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
             }
@@ -1274,7 +1294,7 @@ public class Utilities {
                 boolean isAvailable = equipNums.contains(equipNum);
                 builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
             }
-            MekHQ.getLogger().log(Utilities.class, "unscrambleEquipmentNumbers", LogLevel.WARNING, builder.toString());
+            MekHQ.getLogger().warning(builder.toString());
         }
     }
 
@@ -1340,73 +1360,6 @@ public class Utilities {
         //TODO: Is it necessary to update armor?
     }
 
-    public static int getDaysBetween(Date date1, Date date2) {
-        return (int) ((date2.getTime() - date1.getTime()) / MILLISECONDS_IN_DAY );
-    }
-
-    /**
-     * Calculates the number of days between start and end dates, taking
-     * into consideration leap years, year boundaries etc.
-     *
-     * @param start the start date
-     * @param end the end date, must be later than the start date
-     * @return the number of days between the start and end dates
-     */
-    public static long countDaysBetween(Date start, Date end) {
-        if (end.before(start)) {
-            throw new IllegalArgumentException("The end date must be later than the start date");
-        }
-
-        //reset all hours mins and secs to zero on start date
-        Calendar startCal = GregorianCalendar.getInstance();
-        startCal.setTime(start);
-        startCal.set(Calendar.HOUR_OF_DAY, 0);
-        startCal.set(Calendar.MINUTE, 0);
-        startCal.set(Calendar.SECOND, 0);
-        long startTime = startCal.getTimeInMillis();
-
-        //reset all hours mins and secs to zero on end date
-        Calendar endCal = GregorianCalendar.getInstance();
-        endCal.setTime(end);
-        endCal.set(Calendar.HOUR_OF_DAY, 0);
-        endCal.set(Calendar.MINUTE, 0);
-        endCal.set(Calendar.SECOND, 0);
-        long endTime = endCal.getTimeInMillis();
-
-        return (endTime - startTime) / MILLISECONDS_IN_DAY;
-    }
-
-    public static int getDiffFullYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-                (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
-            diff--;
-        }
-        return diff;
-    }
-
-    public static int getDiffPartialYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (diff == 0 && countDaysBetween(a.getTime(), b.getTime()) > 0) {
-            return 1;
-        }
-        return diff;
-    }
-
-    /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
-    public static DateTime getDateTimeDay(Calendar cal) {
-        return new LocalDateTime(cal).toDateTime(DateTimeZone.UTC);
-    }
-
-    /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
-    public static DateTime getDateTimeDay(Date date) {
-        return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
-    }
-
     /**
      * Export a JTable to a CSV file
      * @param table     the table to save to csv
@@ -1414,31 +1367,30 @@ public class Utilities {
      * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
+        TableModel model = table.getModel();
+        String[] columns = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            columns[i] = model.getColumnName(i);
+        }
 
+        String report;
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
+                    Object value = model.getValueAt(i, j);
                     // use regex to remove any HTML tags
-                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
+                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTableToCSV", LogLevel.INFO, "Error exporting JTable");
+        } catch (Exception ioe) {
+            MekHQ.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1447,20 +1399,20 @@ public class Utilities {
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
         Vector<String> output = new Vector<>();
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             output.add(st.nextToken());
         }
         return output;
     }
 
     public static String combineString(Collection<String> vec, String sep) {
-        if((null == vec) || (null == sep)) {
+        if ((null == vec) || (null == sep)) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for( String part : vec ) {
-            if( first ) {
+        for (String part : vec) {
+            if (first) {
                 first = false;
             } else {
                 sb.append(sep);
@@ -1472,16 +1424,16 @@ public class Utilities {
 
     /** @return the input string with all words capitalized */
     public static String capitalize(String str) {
-        if((null == str) || str.isEmpty()) {
+        if ((null == str) || str.isEmpty()) {
             return str;
         }
         final char[] buffer = str.toCharArray();
         boolean capitalizeNext = true;
-        for(int i = 0; i < buffer.length; ++ i) {
+        for (int i = 0; i < buffer.length; i++) {
             final char ch = buffer[i];
-            if(Character.isWhitespace(ch)) {
+            if (Character.isWhitespace(ch)) {
                 capitalizeNext = true;
-            } else if(capitalizeNext) {
+            } else if (capitalizeNext) {
                 buffer[i] = Character.toTitleCase(ch);
                 capitalizeNext = false;
             }
@@ -1520,7 +1472,7 @@ public class Utilities {
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
-        if(highFirst) {
+        if (highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
             while(li.hasPrevious()) {
                 Map.Entry<String, Integer> entry = li.previous();
@@ -1538,7 +1490,7 @@ public class Utilities {
     public static boolean isLikelyCapture(Entity en) {
         //most of these conditions are now controlled better in en.canEscape, but there
         //are some additional ones we want to add
-        if(!en.canEscape()) {
+        if (!en.canEscape()) {
             return true;
         }
         return en.isDestroyed() || en.isDoomed() || en.isStalled() || en.isStuck();
@@ -1555,16 +1507,12 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
-        final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
-
         if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles((dir1, name) -> {
-                return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
-            });
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".xml"));
             if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
                 Arrays.sort(files, Comparator.comparing(File::getPath));
@@ -1575,9 +1523,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.getLogger().error(Utilities.class, METHOD_NAME, ex);
+                            MekHQ.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
                         }
                     }
                 }
@@ -1634,9 +1580,8 @@ public class Utilities {
      * @param loadFighters - Should aero type units be loaded?
      * @param loadGround - should ground units be loaded?
      */
-    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
-                Client client, boolean loadFighters, boolean loadGround) {
-        String METHOD_NAME = "loadPlayerTransports(int,Set<Integer>,Client,boolean,boolean)";
+    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad, Client client,
+                                            boolean loadFighters, boolean loadGround) {
         if (!loadFighters && !loadGround) {
             //Nothing to do. Get outta here!
             return;
@@ -1664,15 +1609,15 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(e);
                 }
-            } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+            } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
                 // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(e);
                 }
             }
         }

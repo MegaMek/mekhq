@@ -12,24 +12,27 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package mekhq.gui.model;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.UnitMarket;
+import megamek.common.util.EncodeControl;
+import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
  * Model for displaying offers on the UnitMarket
@@ -37,127 +40,106 @@ import mekhq.campaign.market.UnitMarket;
  * Code borrowed heavily from PersonnelTableModel
  *
  * @author Neoancient
- *
  */
 public class UnitMarketTableModel extends DataTableModel {
+    //region Variable Declarations
+    private static final long serialVersionUID = -6275443301484277495L;
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -6275443301484277495L;
+    public static final int COL_MARKET = 0;
+    public static final int COL_UNITTYPE = 1;
+    public static final int COL_WEIGHTCLASS = 2;
+    public static final int COL_UNIT = 3;
+    public static final int COL_PRICE = 4;
+    public static final int COL_PERCENT = 5;
+    public static final int COL_DELIVERY = 6;
+    public static final int COL_NUM = 7;
 
-	public static final int COL_MARKET = 0;
-	public static final int COL_UNITTYPE = 1;
-	public static final int COL_WEIGHTCLASS = 2;
-	public static final int COL_UNIT = 3;
-	public static final int COL_PRICE = 4;
-	public static final int COL_PERCENT = 5;
-	public static final int COL_NUM = 6;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    //endregion Variable Declarations
 
-	private static final String[] colNames = {
-		"Market", "Type", "Weight Class", "Unit", "Price", "Percent"
-	};
+    //region Constructors
+    public UnitMarketTableModel(final List<UnitMarketOffer> offers) {
+        columnNames = resources.getString("UnitMarketTableModel.columnNames").split(",");
+        setData(offers);
+    }
+    //endregion Constructors
 
-	public UnitMarketTableModel() {
-		data = new ArrayList<UnitMarket.MarketOffer>();
-	}
+    public int getColumnWidth(final int column) {
+        switch (column) {
+            case COL_MARKET:
+            case COL_PRICE:
+                return 90;
+            case COL_UNITTYPE:
+                return 15;
+            case COL_UNIT:
+                return 175;
+            case COL_WEIGHTCLASS:
+                return 50;
+            default:
+                return 20;
+        }
+    }
 
-    @Override
-    public int getColumnCount() {
-        return COL_NUM;
+    public int getAlignment(final int column) {
+        switch (column) {
+            case COL_PRICE:
+            case COL_PERCENT:
+            case COL_DELIVERY:
+                return SwingConstants.RIGHT;
+            case COL_MARKET:
+            case COL_UNITTYPE:
+            case COL_WEIGHTCLASS:
+            case COL_UNIT:
+                return SwingConstants.LEFT;
+            default:
+                return SwingConstants.CENTER;
+        }
+    }
+
+    public Optional<UnitMarketOffer> getOffer(final int row) {
+        return ((row >= 0) && (row < getData().size())) ? Optional.of((UnitMarketOffer) getData().get(row))
+                : Optional.empty();
     }
 
     @Override
-    public String getColumnName(int column) {
-    	return colNames[column];
+    public Object getValueAt(final int row, final int column) {
+        return getData().isEmpty() ? "" : getOffer(row).map(o -> getValueFor(o, column)).orElse("?");
     }
 
-    public int getColumnWidth(int c) {
-        switch(c) {
-        case COL_MARKET:
-        case COL_UNIT:
-            return 100;
-        case COL_UNITTYPE:
-        case COL_WEIGHTCLASS:
-        	return 50;
-        case COL_PRICE:
-            return 70;
-        default:
-            return 20;
-        }
-    }
-
-
-    public int getAlignment(int col) {
-        switch(col) {
-        case COL_PRICE:
-        case COL_PERCENT:
-            return SwingConstants.RIGHT;
-        case COL_MARKET:
-        case COL_UNITTYPE:
-        case COL_WEIGHTCLASS:
-        case COL_UNIT:
-            return SwingConstants.LEFT;
-        default:
-            return SwingConstants.CENTER;
+    private Object getValueFor(final UnitMarketOffer offer, final int column) {
+        switch (column) {
+            case COL_MARKET:
+                return offer.getMarketType();
+            case COL_UNITTYPE:
+                return UnitType.getTypeName(offer.getUnitType());
+            case COL_WEIGHTCLASS:
+                return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
+                        offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+            case COL_UNIT:
+                return offer.getUnit().getName();
+            case COL_PRICE:
+                return offer.getPrice().toAmountAndSymbolString();
+            case COL_PERCENT:
+                return offer.getPercent() + "%";
+            case COL_DELIVERY:
+                return offer.getTransitDuration();
+            default:
+                return "?";
         }
     }
 
-    @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
+    public TableCellRenderer getRenderer() {
+        return new Renderer();
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
+    public class Renderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                                                       final boolean isSelected, final boolean hasFocus,
+                                                       final int row, final int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(getAlignment(table.convertColumnIndexToModel(column)));
+            return this;
+        }
     }
-
-    public UnitMarket.MarketOffer getOffer(int i) {
-        if( i >= data.size()) {
-            return null;
-        }
-        return (UnitMarket.MarketOffer)data.get(i);
-    }
-
-    @Override
-    public Object getValueAt(int row, int col) {
-        UnitMarket.MarketOffer o;
-        if(data.isEmpty()) {
-            return "";
-        } else {
-            o = getOffer(row);
-        }
-        if(col == COL_MARKET) {
-            return UnitMarket.marketNames[o.market];
-        }
-        if(col == COL_UNITTYPE) {
-            return UnitType.getTypeName(o.unitType);
-        }
-        if(col == COL_WEIGHTCLASS) {
-            if (o.unit != null) {
-                return EntityWeightClass.getClassName(o.unitWeight,
-                        o.unit.getUnitType(), o.unit.isSupport());
-            }
-        }
-        if(col == COL_UNIT) {
-        	if (o.unit != null) {
-        		return o.unit.getName();
-        	}
-            return "";
-        }
-        if(col == COL_PRICE) {
-        	if (null == o.unit) {
-        		return "";
-        	}
-            return Money.of((double)o.unit.getCost())
-                    .multipliedBy(o.pct)
-                    .dividedBy(100)
-                    .toAmountAndSymbolString();
-        }
-        if(col == COL_PERCENT) {
-       		return o.pct + "%";
-        }
-        return "?";
-	}
 }

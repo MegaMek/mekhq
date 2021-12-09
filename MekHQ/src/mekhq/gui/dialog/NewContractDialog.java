@@ -1,7 +1,7 @@
 /*
  * NewContractDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,85 +12,91 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemListener;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
-
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ResourceBundle;
 
 /**
- *
- * @author  Taharqa
+ * @author Taharqa
  */
-public class NewContractDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
-    protected Frame frame;
+public class NewContractDialog extends JDialog {
+    private static final long serialVersionUID = -8038099101234445018L;
+    protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;
-    protected SimpleDateFormat dateFormatter;
     private JComboBox<Person> cboNegotiator;
+
+    protected JButton btnClose;
+    protected JButton btnOK;
+    protected JTextField txtName;
+    protected JTextField txtEmployer;
+    protected JTextField txtType;
+    protected MarkdownEditorPanel txtDesc;
+    protected JSuggestField suggestPlanet;
+
+    protected JButton btnDate;
+    protected JComboBox<String> choiceOverhead;
+    protected MMComboBox<ContractCommandRights> choiceCommand;
+    protected JSpinner spnLength;
+    protected JSpinner spnMultiplier;
+    protected JSpinner spnTransport;
+    protected JSpinner spnSalvageRights;
+    protected JCheckBox checkSalvageExchange;
+    protected JSpinner spnStraightSupport;
+    protected JSpinner spnBattleLossComp;
+    protected JSpinner spnSignBonus;
+    protected JSpinner spnAdvance;
+    protected JCheckBox checkMRBC;
 
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     /** Creates new form NewTeamDialog */
-    public NewContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewContractDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.frame = parent;
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
-        dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
 
-    protected void initComponents() {
-    	java.awt.GridBagConstraints gridBagConstraints;
+    public Contract getContract() {
+        return contract;
+    }
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl()); //$NON-NLS-1$
+    protected void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -98,8 +104,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         JPanel newContractPanel = new JPanel(new java.awt.GridBagLayout());
 
         JPanel descPanel = new JPanel();
-		descPanel.setLayout(new java.awt.GridBagLayout());
-		gridBagConstraints = new java.awt.GridBagConstraints();
+        descPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -111,11 +117,11 @@ public class NewContractDialog extends javax.swing.JDialog {
         newContractPanel.add(descPanel, gridBagConstraints);
 
         JPanel contractPanel = new JPanel();
-		contractPanel.setLayout(new java.awt.GridBagLayout());
-		contractPanel.setBorder(BorderFactory.createCompoundBorder(
+        contractPanel.setLayout(new java.awt.GridBagLayout());
+        contractPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("contractPanel.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -126,11 +132,11 @@ public class NewContractDialog extends javax.swing.JDialog {
         newContractPanel.add(contractPanel, gridBagConstraints);
 
         JPanel totalsPanel = new JPanel();
-		totalsPanel.setLayout(new java.awt.GridBagLayout());
-		totalsPanel.setBorder(BorderFactory.createCompoundBorder(
+        totalsPanel.setLayout(new java.awt.GridBagLayout());
+        totalsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("totalsPanel.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
@@ -182,9 +188,9 @@ public class NewContractDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-	protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
-		java.awt.GridBagConstraints gridBagConstraints;
-		txtName = new javax.swing.JTextField();
+    protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
+        java.awt.GridBagConstraints gridBagConstraints;
+        txtName = new javax.swing.JTextField();
         JLabel lblName = new JLabel();
         txtEmployer = new javax.swing.JTextField();
         JLabel lblEmployer = new JLabel();
@@ -229,15 +235,15 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				contract.setPlanetName(suggestPlanet.getText());
-				//reset the start date so this can be recalculated
-				contract.setStartDate(campaign.getDate());
-				contract.calculateContract(campaign);
-				btnDate.setText(dateFormatter.format(contract.getStartDate()));
-				refreshTotals();
-			}
-		});*/
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contract.setPlanetName(suggestPlanet.getText());
+                //reset the start date so this can be recalculated
+                contract.setStartDate(campaign.getDate());
+                contract.calculateContract(campaign);
+                btnDate.setText(dateFormatter.format(contract.getStartDate()));
+                refreshTotals();
+            }
+        });*/
         suggestPlanet.addFocusListener(contractUpdateFocusListener);
         suggestPlanet.addActionListener(contractUpdateActionListener);
 
@@ -331,17 +337,16 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtDesc, gridBagConstraints);
-	}
+    }
 
-	protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
+    protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
         contractPaymentBreakdown = new ContractPaymentBreakdown(totalsPanel, contract, campaign);
         contractPaymentBreakdown.display(0, 1);
-	}
+    }
 
-	protected void initContractPanel(ResourceBundle resourceMap,
-			JPanel contractPanel) {
-		java.awt.GridBagConstraints gridBagConstraints;
-		JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
+    protected void initContractPanel(ResourceBundle resourceMap, JPanel contractPanel) {
+        java.awt.GridBagConstraints gridBagConstraints;
+        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
         JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
         JLabel lblMultiplier = new JLabel(resourceMap.getString("lblMultiplier.text"));
         JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
@@ -354,11 +359,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
 
-        btnDate = new javax.swing.JButton();
-        btnDate.setText(dateFormatter.format(contract.getStartDate()));
-        //btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
-        btnDate.setName("btnDate"); // NOI18N
-        //btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
 
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
@@ -377,27 +379,35 @@ public class NewContractDialog extends javax.swing.JDialog {
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
 
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
-		for (int i = 0; i < Contract.OH_NUM; i++) {
-			overheadModel.addElement(Contract.getOverheadCompName(i));
-		}
-		choiceOverhead = new JComboBox<>(overheadModel);
-		choiceOverhead.setSelectedIndex(contract.getOverheadComp());
+        for (int i = 0; i < Contract.OH_NUM; i++) {
+            overheadModel.addElement(Contract.getOverheadCompName(i));
+        }
+        choiceOverhead = new JComboBox<>(overheadModel);
+        choiceOverhead.setSelectedIndex(contract.getOverheadComp());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
 
-        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<>();
-		for (int i = 0; i < Contract.COM_NUM; i++) {
-			commandModel.addElement(Contract.getCommandRightsName(i));
-		}
-		choiceCommand = new JComboBox<>(commandModel);
-		choiceCommand.setSelectedIndex(contract.getCommandRights());
-		choiceCommand.addActionListener(contractUpdateActionListener);
+        choiceCommand = new MMComboBox<>("choiceCommand", ContractCommandRights.values());
+        choiceCommand.setSelectedItem(contract.getCommandRights());
+        choiceCommand.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ContractCommandRights) {
+                    list.setToolTipText(((ContractCommandRights) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        choiceCommand.addActionListener(contractUpdateActionListener);
 
-		spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportComp(), 0, 100, 10));
-		spnTransport.addChangeListener(contractUpdateChangeListener);
+        spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportComp(), 0, 100, 10));
+        spnTransport.addChangeListener(contractUpdateChangeListener);
 
-		spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePct(), 0, 100, 10));
-		spnSalvageRights.addChangeListener(contractUpdateChangeListener);
+        spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePct(), 0, 100, 10));
+        spnSalvageRights.addChangeListener(contractUpdateChangeListener);
 
         spnStraightSupport = new JSpinner(new SpinnerNumberModel(contract.getStraightSupport(), 0, 100, 10));
         spnStraightSupport.addChangeListener(contractUpdateChangeListener);
@@ -645,110 +655,68 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(spnAdvance, gridBagConstraints);
-	}
+    }
 
-   protected void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+   protected void btnOKActionPerformed(ActionEvent evt) {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
 
         String chosenName = txtName.getText();
-    	for(Mission m : campaign.getMissions()) {
-    		if(m.getName().equals(chosenName)) {
-    			JOptionPane.showMessageDialog(frame,
-    				    "There is already a mission with the name " + chosenName,
-    				    "Duplicate Mission Name",
-    				    JOptionPane.ERROR_MESSAGE);
-    			return;
-    		}
-    	}
+        for (Mission m : campaign.getMissions()) {
+            if (m.getName().equals(chosenName)) {
+                JOptionPane.showMessageDialog(frame,
+                        "There is already a mission with the name " + chosenName,
+                        "Duplicate Mission Name",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
 
-    	contract.setName(txtName.getText());
-    	//contract.setPlanetName(suggestPlanet.getText());
-    	contract.setEmployer(txtEmployer.getText());
-    	contract.setType(txtType.getText());
-    	contract.setDesc(txtDesc.getText());
-    	contract.setCommandRights(choiceCommand.getSelectedIndex());
-    	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
-    	campaign.addMission(contract);
+        contract.setName(txtName.getText());
+        //contract.setPlanetName(suggestPlanet.getText());
+        contract.setEmployer(txtEmployer.getText());
+        contract.setType(txtType.getText());
+        contract.setDesc(txtDesc.getText());
+        contract.setCommandRights(choiceCommand.getSelectedItem());
+        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+                contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
 
-    	// Negotiator XP
-    	Person negotiator = (Person)cboNegotiator.getSelectedItem();
-    	if (negotiator != null && campaign.getCampaignOptions().getContractNegotiationXP() > 0) {
-    	    negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
-    	}
+        campaign.addMission(contract);
 
-    	this.setVisible(false);
+        // Negotiator XP
+        Person negotiator = (Person) cboNegotiator.getSelectedItem();
+        if ((negotiator != null) && (campaign.getCampaignOptions().getContractNegotiationXP() > 0)) {
+            negotiator.awardXP(campaign, campaign.getCampaignOptions().getContractNegotiationXP());
+        }
+
+        this.setVisible(false);
     }
 
     private void changeStartDate() {
         // show the date chooser
-    	GregorianCalendar cal = new GregorianCalendar();
-    	cal.setTime(contract.getStartDate());
-        DateChooser dc = new DateChooser(frame, cal);
-        // user can eiter choose a date or cancel by closing
+        DateChooser dc = new DateChooser(frame, contract.getStartDate());
+        // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-        	if(campaign.getCalendar().getTime().after(dc.getDate().getTime())) {
-        		JOptionPane.showMessageDialog(frame,
-        			    "You cannot choose a start date before the current date.",
-        			    "Invalid date",
-        			    JOptionPane.ERROR_MESSAGE);
-        		return;
-        	}
-            contract.setStartDate(dc.getDate().getTime());
+            if (campaign.getLocalDate().isAfter(dc.getDate())) {
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot choose a start date before the current date.",
+                        "Invalid date",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
-            btnDate.setText(dateFormatter.format(contract.getStartDate()));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 
-    public int getContractId() {
-    	return contract.getId();
-    }
-
-    /*
-    private void refreshTotals() {
-    	lblBaseAmount2.setText(formatter.format(contract.getBaseAmount()));
-    	lblOverheadAmount2.setText("+" + formatter.format(contract.getOverheadAmount()));
-    	lblSupportAmount2.setText("+" + formatter.format(contract.getSupportAmount()));
-    	lblTransitAmount2.setText("+" + formatter.format(contract.getTransitAmount()));
-    	lblTransportAmount2.setText("+" + formatter.format(contract.getTransportAmount()));
-    	lblTotalAmount2.setText(formatter.format(contract.getTotalAmount()));
-    	lblSignBonusAmount2.setText("+" + formatter.format(contract.getSigningBonusAmount()));
-    	lblFeeAmount2.setText("-" + formatter.format(contract.getFeeAmount()));
-    	lblTotalAmountPlus2.setText(formatter.format(contract.getTotalAmountPlusFeesAndBonuses()));
-    	lblAdvanceMoney2.setText(formatter.format(contract.getTotalAdvanceAmount()));
-    	lblMonthlyAmount2.setText(formatter.format(contract.getMonthlyPayOut()));
-    	lblProfit2.setText(formatter.format(contract.getEstimatedTotalProfit(campaign)));
-    }*/
-
-    private void btnCloseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(ActionEvent evt) {
         if (!btnClose.equals(evt.getSource())) {
             return;
         }
-    	setVisible(false);
+        setVisible(false);
     }
-
-    protected javax.swing.JButton btnClose;
-    protected javax.swing.JButton btnOK;
-    protected javax.swing.JTextField txtName;
-    protected javax.swing.JTextField txtEmployer;
-    protected javax.swing.JTextField txtType;
-    protected MarkdownEditorPanel txtDesc;
-    protected JSuggestField suggestPlanet;
-
-    protected javax.swing.JButton btnDate;
-    protected JComboBox<String> choiceOverhead;
-    protected JComboBox<String> choiceCommand;
-    protected JSpinner spnLength;
-    protected JSpinner spnMultiplier;
-    protected JSpinner spnTransport;
-    protected JSpinner spnSalvageRights;
-    protected JCheckBox checkSalvageExchange;
-    protected JSpinner spnStraightSupport;
-    protected JSpinner spnBattleLossComp;
-    protected JSpinner spnSignBonus;
-    protected JSpinner spnAdvance;
-    protected JCheckBox checkMRBC;
 
     protected FocusListener contractUpdateFocusListener = new FocusListener() {
         @Override
@@ -771,13 +739,13 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
             contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+                    campaign.getLocalDate())).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
         } else if (choiceOverhead.equals(source)) {
             contract.setOverheadComp(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {
-            contract.setCommandRights(choiceCommand.getSelectedIndex());
+            contract.setCommandRights(choiceCommand.getSelectedItem());
         } else if (checkMRBC.equals(source)) {
             contract.setMRBCFee(checkMRBC.isSelected());
         } else if (checkSalvageExchange.equals(source)) {
@@ -802,9 +770,6 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         contract.calculateContract(campaign);
         contractPaymentBreakdown.refresh();
-        btnDate.setText(dateFormatter.format(contract.getStartDate()));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
     }
-
-    // End of variables declaration//GEN-END:variables
-
 }

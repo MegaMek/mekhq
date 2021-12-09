@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
@@ -26,35 +25,34 @@ import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
 
 /**
- *
  * @author  Taharqa
  */
 public class CustomizeMissionDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
 
-    /** Creates new form NewTeamDialog */
-    public CustomizeMissionDialog(java.awt.Frame parent, boolean modal, Mission m, Campaign c) {
+    public CustomizeMissionDialog(JFrame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
-        if(null == m) {
-        	mission = new Mission("New Mission");
-        	newMission = true;
+        if (null == m) {
+            mission = new Mission("New Mission");
+            newMission = true;
         } else {
-        	mission = m;
-        	newMission = false;
+            mission = m;
+            newMission = false;
         }
         campaign = c;
         initComponents();
@@ -63,8 +61,12 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         pack();
     }
 
+    public Mission getMission() {
+        return mission;
+    }
+
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
@@ -138,8 +140,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         getContentPane().add(lblPlanetName, gridBagConstraints);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
-        if(!newMission) {
-            suggestPlanet.setText(mission.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar())));
+        if (!newMission) {
+            suggestPlanet.setText(mission.getSystemName(campaign.getLocalDate()));
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -167,12 +169,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -183,12 +180,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -207,36 +199,30 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+        mission.setName(txtName.getText());
+        mission.setType(txtType.getText());
 
-    	mission.setName(txtName.getText());
-    	mission.setType(txtType.getText());
-    	
-    	PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                Utilities.getDateTimeDay(campaign.getCalendar()));
-    	
-    	if(canonSystem != null) {
-    	    mission.setSystemId(canonSystem.getId());
-    	} else {
-    	    mission.setSystemId(null);
-    	    mission.setLegacyPlanetName(suggestPlanet.getText());
-    	}
-    	
-    	mission.setDesc(txtDesc.getText());
-    	if(newMission) {
-    		campaign.addMission(mission);
-    	}
-    	this.setVisible(false);
-    }
+        PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
+                campaign.getLocalDate());
 
-    public int getMissionId() {
-    	return mission.getId();
+        if (canonSystem != null) {
+            mission.setSystemId(canonSystem.getId());
+        } else {
+            mission.setSystemId(null);
+            mission.setLegacyPlanetName(suggestPlanet.getText());
+        }
+
+        mission.setDesc(txtDesc.getText());
+        if (newMission) {
+            campaign.addMission(mission);
+        }
+        this.setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	this.setVisible(false);
+        this.setVisible(false);
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
@@ -245,9 +231,5 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtType;
     private MarkdownEditorPanel txtDesc;
     private javax.swing.JLabel lblPlanetName;
-	private JSuggestField suggestPlanet;
-
-
-    // End of variables declaration//GEN-END:variables
-
+    private JSuggestField suggestPlanet;
 }

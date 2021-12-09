@@ -1,87 +1,66 @@
-/**
+/*
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All rights reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.PersonnelTab;
+import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author Neoancient
- *
  */
 public class RetirementDefectionDialog extends JDialog {
-    /**
-     *
-     */
     private static final long serialVersionUID = -5551772461081092679L;
 
     private static final String PAN_OVERVIEW = "PanOverview";
@@ -101,7 +80,7 @@ public class RetirementDefectionDialog extends JDialog {
     private CardLayout cardLayout;
 
     /* Overview Panel components */
-    private JComboBox<String> cbGroupOverview;
+    private JComboBox<PersonnelFilter> cbGroupOverview;
     private JSpinner spnGeneralMod;
     private JLabel lblTotal;
     private RetirementTable personnelTable;
@@ -110,7 +89,7 @@ public class RetirementDefectionDialog extends JDialog {
     private JTextArea txtTargetDetails;
 
     /* Results Panel components */
-    private JComboBox<String> cbGroupResults;
+    private JComboBox<PersonnelFilter> cbGroupResults;
     private JLabel lblPayment;
     private RetirementTable retireeTable;
     private JButton btnAddUnit;
@@ -173,8 +152,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
             if (null == contract) {
                 instructions += "\n\nDays since last retirement roll: "
-                        + Utilities.countDaysBetween(rdTracker.getLastRetirementRoll().getTime(),
-                                hqView.getCampaign().getDate());
+                        + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
+                        hqView.getCampaign().getLocalDate());
             }
             txtInstructions.setText(instructions);
         } else {
@@ -189,8 +168,8 @@ public class RetirementDefectionDialog extends JDialog {
             JPanel panOverview = new JPanel(new BorderLayout());
 
             cbGroupOverview = new JComboBox<>();
-            for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
-                cbGroupOverview.addItem(PersonnelTab.getPersonnelGroupName(i));
+            for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+                cbGroupOverview.addItem(filter);
             }
             JPanel panTop = new JPanel();
             panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
@@ -225,30 +204,26 @@ public class RetirementDefectionDialog extends JDialog {
             personnelTable = new RetirementTable(model, hqView);
 
             personnelSorter = new TableRowSorter<>(model);
-            personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
+            personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_SHARES, new FormattedNumberSorter());
             personnelTable.setRowSorter(personnelSorter);
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
             personnelSorter.setSortKeys(sortKeys);
 
-            cbGroupOverview.addActionListener(evt -> filterPersonnel(personnelSorter, cbGroupOverview.getSelectedIndex(), false));
+            cbGroupOverview.addActionListener(evt -> filterPersonnel(personnelSorter, cbGroupOverview, false));
 
-            personnelTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent ev) {
-                    if (personnelTable.getSelectedRow() < 0) {
-                        return;
-                    }
-                    int row = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());
-                    UUID id = ((RetirementTableModel)(personnelTable.getModel())).getPerson(row).getId();
-                    txtTargetDetails.setText(targetRolls.get(id).getDesc() +
-                            (payBonus(id)?" -1 (Bonus)":"") +
-                            ((miscModifier(id) != 0)?miscModifier(id) + " (Misc)":""));
+            personnelTable.getSelectionModel().addListSelectionListener(ev -> {
+                if (personnelTable.getSelectedRow() < 0) {
+                    return;
                 }
+                int row = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());
+                UUID id = ((RetirementTableModel)(personnelTable.getModel())).getPerson(row).getId();
+                txtTargetDetails.setText(targetRolls.get(id).getDesc() +
+                        (payBonus(id)?" -1 (Bonus)":"") +
+                        ((miscModifier(id) != 0)?miscModifier(id) + " (Misc)":""));
             });
 
             personnelTable.getColumnModel().getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)).
@@ -266,19 +241,16 @@ public class RetirementDefectionDialog extends JDialog {
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)),
                     hqView.getCampaign().getCampaignOptions().getCustomRetirementMods());
             model.setData(targetRolls);
-            model.addTableModelListener(new TableModelListener() {
-                @Override
-                public void tableChanged(TableModelEvent ev) {
-                    if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-                        Money bonus = getTotalBonus();
-                        if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
-                            lblTotal.setText("<html><font color='red'>"
-                                    + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
-                            btnRoll.setEnabled(false);
-                        } else {
-                            lblTotal.setText(getTotalBonus().toAmountAndSymbolString());
-                            btnRoll.setEnabled(true);
-                        }
+            model.addTableModelListener(ev -> {
+                if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+                    Money bonus = getTotalBonus();
+                    if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
+                        lblTotal.setText("<html><font color='red'>"
+                                + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
+                        btnRoll.setEnabled(false);
+                    } else {
+                        lblTotal.setText(getTotalBonus().toAmountAndSymbolString());
+                        btnRoll.setEnabled(true);
                     }
                 }
             });
@@ -298,10 +270,9 @@ public class RetirementDefectionDialog extends JDialog {
 
         JPanel panRetirees = new JPanel(new BorderLayout());
 
-        cbGroupResults = new JComboBox<String>();
-        cbGroupResults.addItem("All Personnel");
-        for (int i = 1; i < PersonnelTab.PG_NUM; i++) {
-            cbGroupResults.addItem(PersonnelTab.getPersonnelGroupName(i));
+        cbGroupResults = new JComboBox<>();
+        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+            cbGroupResults.addItem(filter);
         }
         JPanel panTop = new JPanel();
         panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
@@ -314,30 +285,22 @@ public class RetirementDefectionDialog extends JDialog {
         panTop.add(lblFinalPayout);
         panTop.add(Box.createRigidArea(new Dimension(5, 0)));
         panTop.add(lblPayment);
-        cbUnitCategory = new JComboBox<String>();
+        cbUnitCategory = new JComboBox<>();
         cbUnitCategory.addItem("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             cbUnitCategory.addItem(UnitType.getTypeDisplayableName(i));
         }
         cbUnitCategory.setSelectedIndex(0);
-        cbUnitCategory.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                filterUnits();
-            }
-        });
+        cbUnitCategory.addActionListener(evt -> filterUnits());
         panTop.add(cbUnitCategory);
         chkShowAllUnits = new JCheckBox("Show All Units");
-        chkShowAllUnits.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                if (chkShowAllUnits.isSelected()) {
-                    cbUnitCategory.setSelectedIndex(0);
-                } else {
-                    setUnitGroup();
-                }
-                filterUnits();
+        chkShowAllUnits.addActionListener(evt -> {
+            if (chkShowAllUnits.isSelected()) {
+                cbUnitCategory.setSelectedIndex(0);
+            } else {
+                setUnitGroup();
             }
+            filterUnits();
         });
         panTop.add(Box.createHorizontalGlue());
         panTop.add(chkShowAllUnits);
@@ -346,25 +309,17 @@ public class RetirementDefectionDialog extends JDialog {
 
         RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
         retireeTable = new RetirementTable(model, hqView);
-        retireeSorter = new TableRowSorter<RetirementTableModel>(model);
-        retireeSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
+        retireeSorter = new TableRowSorter<>(model);
+        retireeSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
         retireeTable.setRowSorter(retireeSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         retireeSorter.setSortKeys(sortKeys);
-        cbGroupResults.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
-            }
-        });
+        cbGroupResults.addActionListener(evt -> filterPersonnel(retireeSorter, cbGroupResults, true));
 
-        retireeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent ev) {
-                enableAddRemoveButtons();
-                setUnitGroup();
-            }
+        retireeTable.getSelectionModel().addListSelectionListener(ev -> {
+            enableAddRemoveButtons();
+            setUnitGroup();
         });
         model.addTableModelListener(arg0 -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
 
@@ -377,7 +332,6 @@ public class RetirementDefectionDialog extends JDialog {
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)), false);
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_SHARES)), false);
 
-
         UnitAssignmentTableModel unitModel = new UnitAssignmentTableModel(hqView.getCampaign());
         unitAssignmentTable = new JTable(unitModel);
         unitAssignmentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -385,28 +339,24 @@ public class RetirementDefectionDialog extends JDialog {
         columnModel = new XTableColumnModel();
         unitAssignmentTable.setColumnModel(columnModel);
         unitAssignmentTable.createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitAssignmentTableModel>(unitModel);
+        unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitAssignmentTableModel.COL_UNIT, new WeightClassSorter());
         unitAssignmentTable.setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> unitSortKeys = new ArrayList<RowSorter.SortKey>();
-        unitSortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));        sortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
+        ArrayList<RowSorter.SortKey> unitSortKeys = new ArrayList<>();
+        unitSortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
+        sortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
         unitSorter.setSortKeys(unitSortKeys);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < UnitAssignmentTableModel.N_COL; i++) {
             column = unitAssignmentTable.getColumnModel().getColumn(unitAssignmentTable.convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
-                column.setCellRenderer(unitModel.getRenderer(i, hqView.getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(i));
         }
 
         unitAssignmentTable.setRowHeight(80);
         unitAssignmentTable.setIntercellSpacing(new Dimension(0, 0));
         unitAssignmentTable.setShowGrid(false);
-        unitAssignmentTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent ev) {
-                enableAddRemoveButtons();
-            }
-        });
+        unitAssignmentTable.getSelectionModel().addListSelectionListener(ev -> enableAddRemoveButtons());
 
         JPanel panResults = new JPanel();
         panResults.setLayout(new BoxLayout(panResults, BoxLayout.X_AXIS));
@@ -417,21 +367,11 @@ public class RetirementDefectionDialog extends JDialog {
         panAddRemoveBtns.setLayout(new BoxLayout(panAddRemoveBtns, BoxLayout.Y_AXIS));
         btnAddUnit = new JButton("<<<");
         btnAddUnit.setEnabled(false);
-        btnAddUnit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                addUnit();
-            }
-        });
+        btnAddUnit.addActionListener(ev -> addUnit());
         panAddRemoveBtns.add(btnAddUnit);
         btnRemoveUnit = new JButton(">>>");
         btnRemoveUnit.setEnabled(false);
-        btnRemoveUnit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                removeUnit();
-            }
-        });
+        btnRemoveUnit.addActionListener(ev -> removeUnit());
         panAddRemoveBtns.add(btnRemoveUnit);
         panResults.add(panAddRemoveBtns);
 
@@ -451,12 +391,9 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.addActionListener(buttonListener);
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
-                ((RetirementTableModel)retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
-            }
+        btnEdit.addActionListener(arg0 -> {
+            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+            ((RetirementTableModel)retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
         btnRoll = new JButton(resourceMap.getString("btnRoll.text"));
         btnRoll.addActionListener(buttonListener);
@@ -517,12 +454,13 @@ public class RetirementDefectionDialog extends JDialog {
                     txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
                 }
                 if (getTotalBonus().isPositive()) {
-                    hqView.getCampaign().getFinances().debit(getTotalBonus(), Transaction.C_SALARY, "Bonus Payments",
-                            hqView.getCampaign().getDate());
+                    hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
+                            hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
                 }
             } else if (ev.getSource().equals(btnDone)) {
                 for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {
-                    rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(pid));
+                    rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel) retireeTable.getModel())
+                            .getAltPayout().get(pid));
                 }
                 aborted = false;
                 setVisible(false);
@@ -535,12 +473,12 @@ public class RetirementDefectionDialog extends JDialog {
 
     private void initResults() {
         /* Find unassigned units that can be stolen */
-        ArrayList<UUID> unassignedMechs = new ArrayList<UUID>();
-        ArrayList<UUID> unassignedASF = new ArrayList<UUID>();
-        ArrayList<UUID> availableUnits = new ArrayList<UUID>();
-        for (Unit u : hqView.getCampaign().getUnits()) {
+        List<UUID> unassignedMechs = new ArrayList<>();
+        List<UUID> unassignedASF = new ArrayList<>();
+        ArrayList<UUID> availableUnits = new ArrayList<>();
+        hqView.getCampaign().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
-                continue;
+                return;
             }
             availableUnits.add(u.getId());
             if (UnitType.MEK == u.getEntity().getUnitType()) {
@@ -553,7 +491,8 @@ public class RetirementDefectionDialog extends JDialog {
                     unassignedASF.add(u.getId());
                 }
             }
-        }
+        });
+
         /* Defectors who steal a unit will take either the one they were
          * piloting or one of the unassigned units (50/50, unless there
          * is only one choice)
@@ -561,11 +500,11 @@ public class RetirementDefectionDialog extends JDialog {
         for (UUID id : rdTracker.getRetirees(contract)) {
             Person p = hqView.getCampaign().getPerson(id);
             if (rdTracker.getPayout(id).hasStolenUnit()) {
-                boolean unassignedAvailable = (unassignedMechs.size() > 0 &&
-                        p.getPrimaryRole() == Person.T_MECHWARRIOR) ||
-                        (unassignedASF.size() > 0 &&
-                                p.getPrimaryRole() == Person.T_AERO_PILOT);
-                /* If a unit has previously been assigned, check that it is still available
+                boolean unassignedAvailable = (
+                        (unassignedMechs.size() > 0) && p.getPrimaryRole().isMechWarrior())
+                        || ((unassignedASF.size() > 0) && p.getPrimaryRole().isAerospacePilot());
+                /*
+                 * If a unit has previously been assigned, check that it is still available
                  * and either assigned to the current player or unassigned. If so, keep
                  * the previous value.
                  */
@@ -574,18 +513,16 @@ public class RetirementDefectionDialog extends JDialog {
                         && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
                     continue;
                 }
-                if (null != hqView.getCampaign().getPerson(id).getUnitId() &&
-                        (Compute.d6() < 4 || !unassignedAvailable)) {
-                    unitAssignments.put(id, p.getUnitId());
+                if ((p.getUnit() != null) && ((Compute.d6() < 4) || !unassignedAvailable)) {
+                    unitAssignments.put(id, p.getUnit().getId());
                 } else if (unassignedAvailable) {
-                    if (p.getPrimaryRole() == Person.T_MECHWARRIOR) {
+                    if (p.getPrimaryRole().isMechWarrior()) {
                         int roll = Compute.randomInt(unassignedMechs.size());
                         unitAssignments.put(id, unassignedMechs.get(roll));
                         rdTracker.getPayout(id).setStolenUnitId(unassignedMechs.get(roll));
                         availableUnits.remove(unassignedMechs.get(roll));
                         unassignedMechs.remove(roll);
-                    }
-                    if (p.getPrimaryRole() == Person.T_AERO_PILOT) {
+                    } else if (p.getPrimaryRole().isAerospacePilot()) {
                         int roll = Compute.randomInt(unassignedASF.size());
                         unitAssignments.put(id, unassignedASF.get(roll));
                         rdTracker.getPayout(id).setStolenUnitId(unassignedASF.get(roll));
@@ -597,10 +534,10 @@ public class RetirementDefectionDialog extends JDialog {
             /* Retirees who brought a unit will take the same unit when
              * they go if it is still around and has not been stolen.
              */
-            if (hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
-                    null != p.getOriginalUnitId() &&
-                    !unitAssignments.values().contains(p.getOriginalUnitId()) &&
-                    null != hqView.getCampaign().getUnit(p.getOriginalUnitId())) {
+            if (hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit()
+                    && (null != p.getOriginalUnitId())
+                    && !unitAssignments.containsValue(p.getOriginalUnitId())
+                    && (hqView.getCampaign().getUnit(p.getOriginalUnitId()) != null)) {
                 unitAssignments.put(id, p.getOriginalUnitId());
                 if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
                     Money temp = rdTracker.getPayout(id).getPayoutAmount()
@@ -613,70 +550,49 @@ public class RetirementDefectionDialog extends JDialog {
                     rdTracker.getPayout(id).setPayoutAmount(temp);
                 }
             }
-            /* For infantry, the unit commander makes a retirement roll on behalf of the
+            /*
+             * For infantry, the unit commander makes a retirement roll on behalf of the
              * entire unit. Unassigned infantry can retire individually.
              */
-            if (p.getUnitId() != null && (p.getPrimaryRole() == Person.T_INFANTRY ||
-                    p.getPrimaryRole() == Person.T_BA)) {
-                unitAssignments.put(id, p.getUnitId());
+            if ((p.getUnit() != null) && p.getPrimaryRole().isSoldierOrBattleArmour()) {
+                unitAssignments.put(id, p.getUnit().getId());
             }
-            ((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
+            ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }
 
         ArrayList<UUID> retireeList = new ArrayList<>();
         boolean showRecruitColumn = false;
         for (UUID pid : rdTracker.getRetirees(contract)) {
             retireeList.add(pid);
-            if (hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).getDependents() > 0 ||
-                    hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasHeir() ||
-                    hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasRecruit()) {
+            if ((hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).getDependents() > 0)
+                    || hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasHeir()
+                    || hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasRecruit()) {
                 showRecruitColumn = true;
             }
         }
-        ((XTableColumnModel)retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
-        ((RetirementTableModel)retireeTable.getModel()).setData(retireeList, unitAssignments);
-        filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
+        ((XTableColumnModel) retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
+        ((RetirementTableModel) retireeTable.getModel()).setData(retireeList, unitAssignments);
+        filterPersonnel(retireeSorter, cbGroupResults, true);
         lblPayment.setText(totalPayout().toAmountAndSymbolString());
     }
 
-    private void filterPersonnel(TableRowSorter<RetirementTableModel> sorter, int groupIndex, boolean resultsView) {
-        final int nGroup = groupIndex;
-        final boolean results = resultsView;
-        RowFilter<RetirementTableModel, Integer> personTypeFilter = new RowFilter<RetirementTableModel, Integer>() {
+    private void filterPersonnel(TableRowSorter<RetirementTableModel> sorter, JComboBox<PersonnelFilter> comboBox, boolean resultsView) {
+        PersonnelFilter nGroup = (comboBox.getSelectedItem() != null)
+                ? (PersonnelFilter) comboBox.getSelectedItem()
+                : PersonnelFilter.ACTIVE;
+
+        sorter.setRowFilter(new RowFilter<RetirementTableModel, Integer>() {
             @Override
             public boolean include(Entry<? extends RetirementTableModel, ? extends Integer> entry) {
-                RetirementTableModel personModel = entry.getModel();
-                Person person = personModel.getPerson(entry.getIdentifier());
-                if (results && null != rdTracker.getRetirees(contract) &&
-                        !rdTracker.getRetirees(contract).contains(person.getId())) {
+                Person person = entry.getModel().getPerson(entry.getIdentifier());
+                if (resultsView && (rdTracker.getRetirees(contract) != null)
+                        && !rdTracker.getRetirees(contract).contains(person.getId())) {
                     return false;
+                } else {
+                    return nGroup.getFilteredInformation(person);
                 }
-                int type = person.getPrimaryRole();
-                if ((nGroup == 0) ||
-                    (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
-                    (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
-                    (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
-                    (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER
-                            || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT
-                            || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW)) ||
-                    (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
-                    (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
-                    (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
-                    (nGroup == PersonnelTab.PG_BA && type == Person.T_BA) ||
-                    (nGroup == PersonnelTab.PG_SOLDIER && type == Person.T_INFANTRY) ||
-                    (nGroup == PersonnelTab.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
-                    (nGroup == PersonnelTab.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
-                    (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                    (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
-                        ) {
-                    return person.isActive() || results;
-                }
-                return ((nGroup == PersonnelTab.PG_MIA) && (person.getStatus() == PersonnelStatus.MIA))
-                        || ((nGroup == PersonnelTab.PG_KIA) && (person.getStatus() == PersonnelStatus.KIA))
-                        || ((nGroup == PersonnelTab.PG_RETIRE) && (person.getStatus() == PersonnelStatus.RETIRED));
             }
-        };
-        sorter.setRowFilter(personTypeFilter);
+        });
     }
 
     public void filterUnits() {
@@ -689,7 +605,7 @@ public class RetirementDefectionDialog extends JDialog {
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
                 if (!chkShowAllUnits.isSelected() &&
                         retireeTable.getSelectedRow() >= 0) {
-                    Person selectedPerson = ((RetirementTableModel)retireeTable.getModel()).
+                    Person selectedPerson = ((RetirementTableModel) retireeTable.getModel()).
                             getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
                     if (null != rdTracker.getPayout(selectedPerson.getId()) &&
                             rdTracker.getPayout(selectedPerson.getId()).getWeightClass() > 0 &&
@@ -698,11 +614,11 @@ public class RetirementDefectionDialog extends JDialog {
                     }
                 }
                 /* Can't really give a platoon as payment */
-                if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR ||
-                        unit.getEntity().getUnitType() == UnitType.INFANTRY) {
+                if ((unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR)
+                        || (unit.getEntity().getUnitType() == UnitType.INFANTRY)) {
                     return false;
                 }
-                if (unitAssignments.values().contains(unit.getId())) {
+                if (unitAssignments.containsValue(unit.getId())) {
                     return false;
                 }
                 if (nGroup < 0) {
@@ -721,7 +637,7 @@ public class RetirementDefectionDialog extends JDialog {
 
     public static int weightClassIndex(Unit u) {
         int retVal = u.getEntity().getWeightClass();
-        if (u.getEntity().isClan() || u.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+        if (u.getEntity().isClan() || (u.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET)) {
             retVal++;
         }
         if (!u.isFunctional()) {
@@ -739,8 +655,8 @@ public class RetirementDefectionDialog extends JDialog {
             if (null == rdTracker.getPayout(id)) {
                 continue;
             }
-            if (((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet().contains(id)) {
-                retVal = retVal.plus(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(id));
+            if (((RetirementTableModel) retireeTable.getModel()).getAltPayout().containsKey(id)) {
+                retVal = retVal.plus(((RetirementTableModel) retireeTable.getModel()).getAltPayout().get(id));
                 continue;
             }
             Money payout = rdTracker.getPayout(id).getPayoutAmount();
@@ -771,12 +687,11 @@ public class RetirementDefectionDialog extends JDialog {
              */
             if (null != unitAssignments.get(id)) {
                 payout = payout.plus(getShortfallAdjustment(
-                                        rdTracker.getPayout(id).getWeightClass(),
-                                        RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
+                        rdTracker.getPayout(id).getWeightClass(),
+                        RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
             }
             /* If the pilot has stolen a unit, there is no payout */
-            if (rdTracker.getPayout(id).hasStolenUnit() &&
-                    null != unitAssignments.get(id)) {
+            if (rdTracker.getPayout(id).hasStolenUnit() && (null != unitAssignments.get(id))) {
                 payout = Money.zero();
             }
             // If the payout is negative just set it to zero
@@ -790,12 +705,12 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     public boolean payBonus(UUID id) {
-        return ((RetirementTableModel)personnelTable.getModel()).getPayBonus(id);
+        return ((RetirementTableModel) personnelTable.getModel()).getPayBonus(id);
     }
 
     public int miscModifier(UUID id) {
-        return ((RetirementTableModel)personnelTable.getModel()).getMiscModifier(id) +
-                (Integer)spnGeneralMod.getValue();
+        return ((RetirementTableModel) personnelTable.getModel()).getMiscModifier(id) +
+                (Integer) spnGeneralMod.getValue();
     }
 
     private int getTotalShares() {
@@ -809,7 +724,7 @@ public class RetirementDefectionDialog extends JDialog {
     private Money getTotalBonus() {
         Money retVal = Money.zero();
         for (UUID id : targetRolls.keySet()) {
-            if (((RetirementTableModel)(personnelTable.getModel())).getPayBonus(id)) {
+            if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
                 retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id)));
             }
         }
@@ -825,8 +740,9 @@ public class RetirementDefectionDialog extends JDialog {
     public static Money getShortfallAdjustment(int required, int actual) {
         if (actual >= required) {
             return Money.zero();
+        } else {
+            return Money.of((required - actual) * 3000000);
         }
-        return Money.of((required - actual) * 3000000);
     }
 
     public UUID getUnitId(UUID pid) {
@@ -843,8 +759,7 @@ public class RetirementDefectionDialog extends JDialog {
 
     private boolean unitAssignmentsComplete() {
         for (UUID id : rdTracker.getRetirees(contract)) {
-            if (rdTracker.getPayout(id).getWeightClass() > 0 &&
-                    !unitAssignments.keySet().contains(id)) {
+            if ((rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id)) {
                 return false;
             }
         }
@@ -863,14 +778,13 @@ public class RetirementDefectionDialog extends JDialog {
                     !btnEdit.isSelected()) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
-            } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole() == Person.T_INFANTRY ||
-                    hqView.getCampaign().getPerson(pid).getPrimaryRole() == Person.T_BA) {
+            } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
-            } else if (unitAssignments.keySet().contains(pid)) {
+            } else if (unitAssignments.containsKey(pid)) {
                 btnAddUnit.setEnabled(false);
                 if ((hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
-                        unitAssignments.get(pid) == hqView.getCampaign().getPerson(pid).getOriginalUnitId()) &&
+                        unitAssignments.get(pid).equals(hqView.getCampaign().getPerson(pid).getOriginalUnitId())) &&
                         !btnEdit.isSelected()) {
                     btnRemoveUnit.setEnabled(false);
                 } else {
@@ -883,7 +797,8 @@ public class RetirementDefectionDialog extends JDialog {
                 } else if (btnEdit.isSelected()) {
                     btnAddUnit.setEnabled(true);
                 } else {
-                    Unit unit = ((UnitAssignmentTableModel)unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
+                    Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel())
+                            .getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
                     btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity()));
                 }
                 btnRemoveUnit.setEnabled(false);
@@ -895,56 +810,60 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void addUnit() {
-        Person person = ((RetirementTableModel)retireeTable.getModel()).getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
-        Unit unit = ((UnitAssignmentTableModel)unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
+        Person person = ((RetirementTableModel) retireeTable.getModel())
+                .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
+        Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel())
+                .getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
         unitAssignments.put(person.getId(), unit.getId());
         btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
-        ((RetirementTableModel)retireeTable.getModel()).fireTableDataChanged();
+        ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
 
     private void removeUnit() {
-        Person person = ((RetirementTableModel)retireeTable.getModel()).getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
+        Person person = ((RetirementTableModel) retireeTable.getModel())
+                .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
         unitAssignments.remove(person.getId());
         btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
-        ((RetirementTableModel)retireeTable.getModel()).fireTableDataChanged();
+        ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
 
     private void setUnitGroup() {
-        if (!chkShowAllUnits.isSelected() && retireeTable.getSelectedRow() >= 0) {
-            Person p = ((RetirementTableModel)retireeTable.getModel()).getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
+        if (!chkShowAllUnits.isSelected() && (retireeTable.getSelectedRow() >= 0)) {
+            Person p = ((RetirementTableModel) retireeTable.getModel())
+                    .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
             switch (p.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
-                cbUnitCategory.setSelectedIndex(UnitType.MEK + 1);
-                break;
-            case Person.T_GVEE_DRIVER:
-            case Person.T_VEE_GUNNER:
-                cbUnitCategory.setSelectedIndex(UnitType.TANK + 1);
-                break;
-            case Person.T_BA:
-                cbUnitCategory.setSelectedIndex(UnitType.BATTLE_ARMOR + 1);
-                break;
-            case Person.T_INFANTRY:
-                cbUnitCategory.setSelectedIndex(UnitType.INFANTRY + 1);
-                break;
-            case Person.T_PROTO_PILOT:
-                cbUnitCategory.setSelectedIndex(UnitType.PROTOMEK + 1);
-                break;
-            case Person.T_VTOL_PILOT:
-                cbUnitCategory.setSelectedIndex(UnitType.VTOL + 1);
-                break;
-            case Person.T_NVEE_DRIVER:
-                cbUnitCategory.setSelectedIndex(UnitType.NAVAL + 1);
-                break;
-            case Person.T_CONV_PILOT:
-                cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);
-                break;
-            case Person.T_AERO_PILOT:
-                cbUnitCategory.setSelectedIndex(UnitType.AERO + 1);
-                break;
-            default:
-                cbUnitCategory.setSelectedIndex(0);
+                case MECHWARRIOR:
+                    cbUnitCategory.setSelectedIndex(UnitType.MEK + 1);
+                    break;
+                case GROUND_VEHICLE_DRIVER:
+                case VEHICLE_GUNNER:
+                    cbUnitCategory.setSelectedIndex(UnitType.TANK + 1);
+                    break;
+                case NAVAL_VEHICLE_DRIVER:
+                    cbUnitCategory.setSelectedIndex(UnitType.NAVAL + 1);
+                    break;
+                case VTOL_PILOT:
+                    cbUnitCategory.setSelectedIndex(UnitType.VTOL + 1);
+                    break;
+                case AEROSPACE_PILOT:
+                    cbUnitCategory.setSelectedIndex(UnitType.AERO + 1);
+                    break;
+                case CONVENTIONAL_AIRCRAFT_PILOT:
+                    cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);
+                    break;
+                case PROTOMECH_PILOT:
+                    cbUnitCategory.setSelectedIndex(UnitType.PROTOMEK + 1);
+                    break;
+                case BATTLE_ARMOUR:
+                    cbUnitCategory.setSelectedIndex(UnitType.BATTLE_ARMOR + 1);
+                    break;
+                case SOLDIER:
+                    cbUnitCategory.setSelectedIndex(UnitType.INFANTRY + 1);
+                    break;
+                default:
+                    cbUnitCategory.setSelectedIndex(0);
             }
             filterUnits();
         }
@@ -952,19 +871,15 @@ public class RetirementDefectionDialog extends JDialog {
 }
 
 class RetirementTable extends JTable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -2839165270046226216L;
 
-    private class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
+    private static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
         private static final long serialVersionUID = 7956499745127048276L;
         private JSpinner spinner;
 
         public SpinnerEditor() {
             spinner = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
-            ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setEditable(false);
+            ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().setEditable(false);
         }
 
         @Override
@@ -973,8 +888,8 @@ class RetirementTable extends JTable {
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table,
-                Object value, boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                     int row, int column) {
             spinner.setValue(value);
             return spinner;
         }
@@ -987,13 +902,12 @@ class RetirementTable extends JTable {
         XTableColumnModel columnModel = new XTableColumnModel();
         setColumnModel(columnModel);
         createDefaultColumnsFromModel();
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < RetirementTableModel.N_COL; i++) {
             column = getColumnModel().getColumn(convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
-            if (i != RetirementTableModel.COL_PAY_BONUS &&
-                    i != RetirementTableModel.COL_MISC_MOD) {
-                column.setCellRenderer(model.getRenderer(i, hqView.getIconPackage()));
+            if ((i != RetirementTableModel.COL_PAY_BONUS) && (i != RetirementTableModel.COL_MISC_MOD)) {
+                column.setCellRenderer(model.getRenderer(i));
             }
         }
 
@@ -1001,22 +915,18 @@ class RetirementTable extends JTable {
         setIntercellSpacing(new Dimension(0, 0));
         setShowGrid(false);
 
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)).
-            setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS))
+                .setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)).
-            setCellEditor(new SpinnerEditor());
+        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD))
+                .setCellEditor(new SpinnerEditor());
 
-        JComboBox<String> cbRecruitType = new JComboBox<>();
-        for (int i = Person.T_NONE; i < Person.T_NUM; i++) {
-            cbRecruitType.addItem(Person.getRoleDesc(i, hqView.getCampaign().getFaction().isClan()));
-        }
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)).
-            setCellEditor(new DefaultCellEditor(cbRecruitType));
+        JComboBox<PersonnelRole> cbRecruitRole = new JComboBox<>(PersonnelRole.values());
+        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_RECRUIT))
+                .setCellEditor(new DefaultCellEditor(cbRecruitRole));
     }
 
     public void setGeneralMod(int mod) {
         ((RetirementTableModel)getModel()).setGeneralMod(mod);
     }
-
 }

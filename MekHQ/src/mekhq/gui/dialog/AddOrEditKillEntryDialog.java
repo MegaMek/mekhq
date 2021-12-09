@@ -1,68 +1,71 @@
 /*
  * NewKillDialog.java
- * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
+import javax.swing.*;
 
 /**
- *
  * @author  Taharqa
  */
 public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private Frame frame;
+    private JFrame frame;
     private int operationType;
     private Kill kill;
-    private Date date;
+    private LocalDate date;
 
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JLabel lblKill;
-    private javax.swing.JTextField txtKill;
-    private javax.swing.JLabel lblKiller;
-    private javax.swing.JTextField txtKiller;
-    private javax.swing.JButton btnDate;
+    private JButton btnClose;
+    private JButton btnOK;
+    private JLabel lblKill;
+    private JTextField txtKill;
+    private JLabel lblKiller;
+    private JTextField txtKiller;
+    private JButton btnDate;
 
-    public AddOrEditKillEntryDialog(Frame parent, boolean modal, UUID killerPerson, String killerUnit, Date entryDate) {
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate) {
         this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate));
     }
 
-    public AddOrEditKillEntryDialog(Frame parent, boolean modal, Kill kill) {
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill) {
         this(parent, modal, EDIT_OPERATION, kill);
     }
 
-    private AddOrEditKillEntryDialog(Frame parent, boolean modal, int operationType, Kill kill) {
+    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill) {
         super(parent, modal);
 
         assert kill != null;
@@ -70,6 +73,7 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         this.frame = parent;
         this.kill = kill;
         this.date = this.kill.getDate();
+        this.operationType = operationType;
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -80,99 +84,99 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+         GridBagConstraints gridBagConstraints;
 
-        txtKill = new javax.swing.JTextField();
-        lblKill = new javax.swing.JLabel();
-        txtKiller = new javax.swing.JTextField();
-        lblKiller = new javax.swing.JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-        btnDate = new javax.swing.JButton();
-    
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        txtKill = new JTextField();
+        lblKill = new JLabel();
+        txtKiller = new JTextField();
+        lblKiller = new JLabel();
+        btnOK = new JButton();
+        btnClose = new JButton();
+        btnDate = new JButton();
+
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog", new EncodeControl());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         if (this.operationType == ADD_OPERATION) {
             setTitle(resourceMap.getString("dialogAdd.title"));
         } else {
             setTitle(resourceMap.getString("dialogEdit.title"));
         }
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-        
-        lblKill.setText(resourceMap.getString("lblKill.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        getContentPane().setLayout(new GridBagLayout());
+
+        lblKill.setText(resourceMap.getString("lblKill.text"));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKill, gridBagConstraints);
-        
+
         txtKill.setText(kill.getWhatKilled());
-        txtKill.setMinimumSize(new java.awt.Dimension(150, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        txtKill.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKill, gridBagConstraints);
-        
-        lblKiller.setText(resourceMap.getString("lblKiller.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+
+        lblKiller.setText(resourceMap.getString("lblKiller.text"));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKiller, gridBagConstraints);
-        
+
         txtKiller.setText(kill.getKilledByWhat());
-        txtKiller.setMinimumSize(new java.awt.Dimension(150, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        txtKiller.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
- 
-        btnDate.setText(getDateAsString());
-        btnDate.setName("btnDate"); // NOI18N
+
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
-        
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
@@ -185,30 +189,23 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	kill.setWhatKilled(txtKill.getText());
-    	kill.setKilledByWhat(txtKiller.getText());
-    	kill.setDate(date);
-    	this.setVisible(false);
+    private void btnOKActionPerformed(ActionEvent evt) {
+        kill.setWhatKilled(txtKill.getText());
+        kill.setKilledByWhat(txtKiller.getText());
+        kill.setDate(date);
+        this.setVisible(false);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	kill = null;
-    	this.setVisible(false);
+    private void btnCloseActionPerformed(ActionEvent evt) {
+        kill = null;
+        this.setVisible(false);
     }
 
     private void changeDate() {
-    	GregorianCalendar cal = new GregorianCalendar();
-    	cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal);
+        DateChooser dc = new DateChooser(frame, date);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate().getTime();
-            btnDate.setText(getDateAsString());
+            date = dc.getDate();
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
-    }
-    
-    private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
     }
 }

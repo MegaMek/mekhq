@@ -3,7 +3,7 @@
 1
 </BlockVersion>
 
-##Write the version number just in case...
+# Write the version number just in case...
 <Version>
 MAM0
 </Version>
@@ -13,7 +13,7 @@ Tank
 </UnitType>
 
 <Name>
-Sleipnir APC
+Sleipnir APC Tank
 </Name>
 
 <Model>
@@ -90,4 +90,3 @@ House Arano
 <fuelType>
 PETROCHEMICALS
 </fuelType>
-

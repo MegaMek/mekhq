@@ -12,17 +12,19 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,7 +45,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EnginePart extends Part {
@@ -62,6 +63,7 @@ public class EnginePart extends Part {
         this.name = engine.getEngineName() + " Engine";
     }
 
+    @Override
     public EnginePart clone() {
         EnginePart clone = new EnginePart(getUnitTonnage(),
                 new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
@@ -77,32 +79,32 @@ public class EnginePart extends Part {
     public double getTonnage() {
         double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
-        case Engine.COMBUSTION_ENGINE:
-            weight *= 2.0f;
-            break;
-        case Engine.NORMAL_ENGINE:
-            break;
-        case Engine.XL_ENGINE:
-            weight *= 0.5f;
-            break;
-        case Engine.LIGHT_ENGINE:
-            weight *= 0.75f;
-            break;
-        case Engine.XXL_ENGINE:
-            weight /= 3f;
-            break;
-        case Engine.COMPACT_ENGINE:
-            weight *= 1.5f;
-            break;
-        case Engine.FISSION:
-            weight *= 1.75;
-            weight = Math.max(5, weight);
-            break;
-        case Engine.FUEL_CELL:
-            weight *= 1.2;
-            break;
-        case Engine.NONE:
-            return 0;
+            case Engine.COMBUSTION_ENGINE:
+                weight *= 2.0f;
+                break;
+            case Engine.NORMAL_ENGINE:
+                break;
+            case Engine.XL_ENGINE:
+                weight *= 0.5f;
+                break;
+            case Engine.LIGHT_ENGINE:
+                weight *= 0.75f;
+                break;
+            case Engine.XXL_ENGINE:
+                weight /= 3f;
+                break;
+            case Engine.COMPACT_ENGINE:
+                weight *= 1.5f;
+                break;
+            case Engine.FISSION:
+                weight *= 1.75;
+                weight = Math.max(5, weight);
+                break;
+            case Engine.FUEL_CELL:
+                weight *= 1.2;
+                break;
+            case Engine.NONE:
+                return 0;
         }
         weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 
@@ -185,14 +187,18 @@ public class EnginePart extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
-                engineType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-                engineRating = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
-                engineFlags = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("forHover")) {
-                forHover = wn2.getTextContent().equalsIgnoreCase("true");
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
+                    engineType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+                    engineRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
+                    engineFlags = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forHover")) {
+                    forHover = wn2.getTextContent().equalsIgnoreCase("true");
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -239,17 +245,17 @@ public class EnginePart extends Part {
             if (unit.getEntity() instanceof Protomech) {
                 ((Protomech) unit.getEntity()).setEngineHit(true);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
     }
@@ -267,7 +273,7 @@ public class EnginePart extends Part {
                 }
             }
             if (unit.getEntity() instanceof Aero) {
-                engineHits = ((Aero) unit.getEntity()).getEngineHits();
+                engineHits = unit.getEntity().getEngineHits();
                 engineCrits = 3;
             }
             if (unit.getEntity() instanceof Tank) {
@@ -281,7 +287,7 @@ public class EnginePart extends Part {
                 if (unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
                     engineHits = 1;
                 } else {
-                    engineHits = ((Protomech) unit.getEntity()).getEngineHits();
+                    engineHits = unit.getEntity().getEngineHits();
                 }
             }
             if (engineHits >= engineCrits) {
@@ -481,7 +487,7 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ENGINE;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ENGINE;
     }
 }

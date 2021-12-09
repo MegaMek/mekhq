@@ -18,43 +18,29 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseEvent;
-import java.util.*;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.WindowConstants;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.Crew;
-import megamek.common.util.DirectoryItems;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
+import megamek.common.util.StringUtil;
+import megamek.common.util.fileUtils.AbstractDirectory;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -69,7 +55,7 @@ public class ImageChoiceDialog extends JDialog {
     /**
      * The categorized image patterns.
      */
-    private DirectoryItems imageItems;
+    private AbstractDirectory imageItems;
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
@@ -91,12 +77,13 @@ public class ImageChoiceDialog extends JDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename, DirectoryItems items) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
+                             AbstractDirectory items) {
         this(parent, modal, category, filename, null, items, false);
     }
 
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
-                             LinkedHashMap<String, Vector<String>> iconMap, DirectoryItems items,
+                             LinkedHashMap<String, Vector<String>> iconMap, AbstractDirectory items,
                              boolean force) {
         super(parent, modal);
         this.category = category;
@@ -137,20 +124,20 @@ public class ImageChoiceDialog extends JDialog {
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         String match = null;
-        categoryModel.addElement(Crew.ROOT_PORTRAIT);
-        Iterator<String> names = (imageItems != null)
-                ? imageItems.getCategoryNames() : Collections.emptyIterator();
-        while (names.hasNext()) {
-            String name = names.next();
-            if (!"".equals(name)) {
-                categoryModel.addElement(name);
-                if (category.equals(name)) {
-                    match = name;
-                    break;
-                }
+        categoryModel.addElement(AbstractIcon.ROOT_CATEGORY);
+        final List<String> names = (imageItems == null) ? new ArrayList<>()
+                : imageItems.getNonEmptyCategoryPaths();
+        for (final String name : names) {
+            if (StringUtil.isNullOrEmpty(name)) {
+                continue;
+            }
+
+            categoryModel.addElement(name);
+            if (category.equals(name)) {
+                match = name;
             }
         }
-        categoryModel.setSelectedItem((match != null) ? match : Crew.ROOT_PORTRAIT);
+        categoryModel.setSelectedItem((match != null) ? match : AbstractIcon.ROOT_CATEGORY);
         JComboBox<String> comboCategories = new JComboBox<>(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
         comboCategories.addItemListener(this::comboCategoriesItemStateChanged);
@@ -201,6 +188,17 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
+            // We need to ensure that the state that it comes into is saved, as we need to add the
+            // default frame icon otherwise
+            final boolean emptyInitialIconMap = iconMap.isEmpty();
+
+            // Add the default frame icon
+            if (emptyInitialIconMap) {
+                Vector<String> initFrame = new Vector<>();
+                initFrame.add("Frame.png");
+                iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), initFrame);
+            }
+
             LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
             layeredTables = new JTable[layeredForceIcons.length];
 
@@ -220,7 +218,7 @@ public class ImageChoiceDialog extends JDialog {
                 panel.add(scrollPane, gbc);
                 tableModel.reset();
                 tableModel.setCategory(layeredForceIcons[i].getLayerPath());
-                tableModel.addImage(Force.ICON_NONE);
+                tableModel.addImage(AbstractIcon.DEFAULT_ICON_FILENAME);
                 Iterator<String> imageIterator = (imageItems != null)
                         ? imageItems.getItemNames(layeredForceIcons[i].getLayerPath())
                         : Collections.emptyIterator();
@@ -229,8 +227,9 @@ public class ImageChoiceDialog extends JDialog {
                 }
                 layerTabs.addTab(layeredForceIcons[i].toString(), panel);
 
-                // Initialize Initial Values, provided the Icon Map is not empty
-                if (!iconMap.isEmpty()) {
+                // Initialize Initial Values, provided the Icon Map is not empty on input or it
+                // is the frame (as we set that value otherwise)
+                if (!emptyInitialIconMap || (layeredForceIcons[i] == LayeredForceIcon.FRAME)) {
                     if (iconMap.containsKey(layeredForceIcons[i].getLayerPath())) {
                         if (layeredForceIcons[i].getListSelectionModel() == ListSelectionModel.SINGLE_SELECTION) {
                             // Determine the current selected value
@@ -257,14 +256,6 @@ public class ImageChoiceDialog extends JDialog {
                 }
             }
 
-            // Then trigger the initial refresh
-            refreshLayeredPreview();
-
-            // And add the missing ListSelectionListeners, which must be done after the initial refresh
-            for (JTable table : layeredTables) {
-                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-            }
-
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
             layerPanel.add(layerTabs, gbc);
@@ -283,7 +274,7 @@ public class ImageChoiceDialog extends JDialog {
             tabbedPane.addTab(resourceMap.getString("Force.layered"), layerPanel);
 
             // Set currently selected tab based on the initial category
-            if (!iconMap.isEmpty()) {
+            if (!emptyInitialIconMap) {
                 tabbedPane.setSelectedComponent(layerPanel);
             }
 
@@ -298,14 +289,13 @@ public class ImageChoiceDialog extends JDialog {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(tabbedPane, gbc);
 
-            // Add the tableImages List Selection Listener now that the values have been
-            // initialized for Layered Icons
-            tableImages.getSelectionModel().addListSelectionListener(event -> {
-                // Clear selections on the layered tables
-                for (JTable table : layeredTables) {
-                    table.clearSelection();
-                }
-            });
+            // Then trigger the initial refresh
+            refreshLayeredPreview();
+
+            // And add the missing ListSelectionListeners, which must be done after the initial refresh
+            for (JTable table : layeredTables) {
+                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+            }
         } else {
             // Add the image panel to the content pane
             gbc = new GridBagConstraints();
@@ -358,7 +348,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableImages.getSelectedRow() != -1) {
             filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
         } else {
-            filename = Crew.PORTRAIT_NONE;
+            filename = AbstractIcon.DEFAULT_ICON_FILENAME;
         }
         changed = true;
         setVisible(false);
@@ -390,7 +380,7 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void refreshLayeredPreview() {
-        // Add the image frame
+        // Clear the icon map
         iconMap.clear();
 
         // Check each table for what is, or is not, selected
@@ -411,10 +401,10 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         category = Force.ROOT_LAYERED;
-        filename = Force.ICON_NONE;
+        filename = AbstractIcon.DEFAULT_ICON_FILENAME;
 
         // Build the layered image
-        Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
+        Image forceImage = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
         ImageIcon imageIcon = new ImageIcon(forceImage);
 
         // Disable selection of a static icon
@@ -430,8 +420,8 @@ public class ImageChoiceDialog extends JDialog {
         imageTableModel.setCategory(category);
         // Translate the "root image" category name.
         Iterator<String> imageNames;
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            imageTableModel.addImage(Crew.PORTRAIT_NONE);
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
+            imageTableModel.addImage(AbstractIcon.DEFAULT_ICON_FILENAME);
             imageNames = (imageItems != null)
                     ? imageItems.getItemNames("") : Collections.emptyIterator();
         } else {
@@ -459,7 +449,7 @@ public class ImageChoiceDialog extends JDialog {
 
         public ImageTableModel() {
             columnNames = new String[] {"Images"};
-            category = Crew.ROOT_PORTRAIT;
+            category = AbstractIcon.ROOT_CATEGORY;
             names = new ArrayList<>();
         }
 
@@ -474,7 +464,7 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void reset() {
-            category = Crew.ROOT_PORTRAIT;
+            category = AbstractIcon.ROOT_CATEGORY;
             names = new ArrayList<>();
         }
 
@@ -518,7 +508,7 @@ public class ImageChoiceDialog extends JDialog {
         public class Renderer extends ImagePanel implements TableCellRenderer {
             private static final long serialVersionUID = -6025788865509594987L;
 
-            public Renderer(DirectoryItems images) {
+            public Renderer(AbstractDirectory images) {
                 super(images);
             }
 
@@ -551,12 +541,12 @@ public class ImageChoiceDialog extends JDialog {
         }
     }
 
-    public static class ImagePanel extends JPanel {
+    public class ImagePanel extends JPanel {
         private static final long serialVersionUID = -3724175393116586310L;
-        private DirectoryItems items;
+        private AbstractDirectory items;
         private JLabel lblImage;
 
-        public ImagePanel(DirectoryItems items) {
+        public ImagePanel(AbstractDirectory items) {
             this.items = items;
             initComponents();
         }
@@ -585,14 +575,22 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void setImage(String category, String name) {
-            if ((null == category) || name.equals(Crew.PORTRAIT_NONE)) {
+            if ((null == category) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(name)) {
+                int width = force ? 110 : 76;
+                int height = 76;
+
+                BufferedImage noImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D graphics = noImage.createGraphics();
+                graphics.setComposite(AlphaComposite.Clear);
+                graphics.fillRect(0, 0, width, height);
+                lblImage.setIcon(new ImageIcon(noImage));
                 return;
             }
 
             // Try to get the image file.
             try {
                 // Translate the root image directory name.
-                if (Crew.ROOT_PORTRAIT.equals(category)) {
+                if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                     category = ""; //$NON-NLS-1$
                 }
                 Image image = (Image) items.getItem(category, name);
@@ -606,7 +604,7 @@ public class ImageChoiceDialog extends JDialog {
                     lblImage.setIcon(new ImageIcon(image));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "setImage", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

@@ -12,21 +12,27 @@ public abstract class DataTableModel extends AbstractTableModel {
     protected String[] columnNames;
     protected List<?> data;
 
+    @Override
     public int getRowCount() {
         return data.size();
     }
 
+    @Override
     public int getColumnCount() {
         return columnNames.length;
     }
 
     @Override
     public String getColumnName(int column) {
-        return columnNames[column];
+        if (column < getColumnCount()) {
+            return columnNames[column];
+        } else {
+            return "?";
+        }
     }
 
     @Override
-    public Class<? extends Object> getColumnClass(int c) {
+    public Class<?> getColumnClass(int c) {
         return getValueAt(0, c).getClass();
     }
 

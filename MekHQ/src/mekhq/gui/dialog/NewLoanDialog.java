@@ -1,37 +1,35 @@
 /*
  * NewLoanDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.rating.IUnitRating;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -40,16 +38,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -65,7 +58,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private int rating;
     private Money maxCollateralValue;
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panMain;
     private JPanel panInfo;
     private JPanel panBtn;
@@ -89,7 +81,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JSlider sldInterest;
     private JSlider sldCollateral;
     private JSlider sldLength;
-    private JComboBox<String> choiceSchedule;
+    private MMComboBox<FinancialTerm> choiceSchedule;
 
     private JLabel lblAPR;
     private JLabel lblCollateralPct;
@@ -113,7 +105,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
         IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
-        loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
+        loan = Loan.getBaseLoan(rating, campaign.getLocalDate());
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
         initComponents();
         setLocationRelativeTo(parent);
@@ -148,14 +140,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         txtName = new javax.swing.JTextField(loan.getInstitution());
         txtName.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 changeInstitution();
             }
@@ -164,22 +159,25 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
                 loan.setInstitution(txtName.getText());
             }
         });
-        txtNumber = new javax.swing.JTextField(loan.getRefNumber());
+        txtNumber = new javax.swing.JTextField(loan.getReferenceNumber());
         txtNumber.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
             public void changeRefNumber() {
-                loan.setRefNumber(txtNumber.getText());
+                loan.setReferenceNumber(txtNumber.getText());
             }
         });
 
@@ -260,13 +258,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
-            scheduleModel.addElement(Finances.getScheduleName(i));
-        }
-        choiceSchedule = new JComboBox<>(scheduleModel);
-        choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
-
+        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.values());
+        choiceSchedule.setSelectedItem(loan.getFinancialTerm());
         choiceSchedule.addActionListener(this);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -372,13 +365,13 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(panInfo, gridBagConstraints);
 
-        btnAdd = new JButton(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnAdd.setName("btnOK"); // NOI18N
+        btnAdd = new JButton(resourceMap.getString("btnOkay.text"));
+        btnAdd.setName("btnOK");
         btnAdd.addActionListener(evt -> addLoan());
         panBtn.add(btnAdd);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnClose"); // NOI18N
+        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
         btnCancel.addActionListener(evt -> cancel());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 1;
@@ -526,45 +519,43 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void refreshLoan(Money principal) {
-    	// Modify loan settings
-    	loan.setPrincipal(principal);
-    	loan.setRate(sldInterest.getValue());
-    	loan.setCollateral(sldCollateral.getValue());
-    	loan.setYears(sldLength.getValue());
-    	loan.setSchedule(choiceSchedule.getSelectedIndex());
-    	loan.setInstitution(txtName.getText());
-    	loan.setRefNumber(txtNumber.getText());
-    	
-    	// Recalculate information based on settings
-    	loan.setNextPayment((GregorianCalendar)campaign.getCalendar().clone());
-    	loan.setFirstPaymentDate();
-    	loan.calculateAmortization();
-    	
-    	// Refresh dialog values
+        // Modify loan settings
+        loan.setInstitution(txtName.getText());
+        loan.setReferenceNumber(txtNumber.getText());
+        loan.setPrincipal(principal);
+        loan.setRate(sldInterest.getValue());
+        loan.setYears(sldLength.getValue());
+        loan.setFinancialTerm(choiceSchedule.getSelectedItem());
+        loan.setCollateral(sldCollateral.getValue());
+        loan.setNextPayment(loan.getFinancialTerm().nextValidDate(campaign.getLocalDate()));
+
+        // Recalculate information based on settings
+        loan.calculateAmortization();
+
+        // Refresh dialog values
         refreshValues();
     }
 
     private void refreshValues() {
-        final String METHOD_NAME = "refreshValues";
         try {
             txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblAPR.setText(loan.getInterestRate() + "%");
-            lblCollateralPct.setText(loan.getCollateralPercent() + "%");
+            lblAPR.setText(loan.getRate() + "%");
+            lblCollateralPct.setText(loan.getCollateral() + "%");
             lblYears.setText(loan.getYears() + " years");
-            lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
+            lblSchedule.setText(loan.getFinancialTerm().toString());
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
+            lblFirstPayment.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
-            lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
-            lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
-        } catch (Exception ex ){
-            MekHQ.getLogger().error(NewLoanDialog.class, METHOD_NAME, ex);
+            lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
+            lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(ex);
         }
     }
 
     private void addLoan() {
-        if (maxCollateralValue.isLessThan(loan.getCollateralAmount())) {
+        if (maxCollateralValue.isLessThan(loan.determineCollateralAmount())) {
             JOptionPane.showMessageDialog(
                     frame,
                     resourceMap.getString("addLoanErrorMessage.text"),
@@ -583,7 +574,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private void setSliders() {
         if (campaign.getCampaignOptions().useLoanLimits()) {
             int[] interest = Loan.getInterestBracket(rating);
-            sldInterest = new JSlider(interest[0], interest[2], loan.getInterestRate());
+            sldInterest = new JSlider(interest[0], interest[2], loan.getRate());
             if (interest[2] - interest[0] > 30) {
                 sldInterest.setMajorTickSpacing(10);
             } else {
@@ -593,7 +584,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             sldInterest.setPaintLabels(true);
 
             int[] collateral = Loan.getCollateralBracket(rating);
-            sldCollateral = new JSlider(collateral[0], collateral[2], loan.getCollateralPercent());
+            sldCollateral = new JSlider(collateral[0], collateral[2], loan.getCollateral());
             if (collateral[2] - collateral[0] > 50) {
                 sldCollateral.setMajorTickSpacing(20);
             } else {
@@ -607,12 +598,12 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             sldLength.setPaintTicks(true);
             sldLength.setPaintLabels(true);
         } else {
-            sldInterest = new JSlider(0, 100, loan.getInterestRate());
+            sldInterest = new JSlider(0, 100, loan.getRate());
             sldInterest.setMajorTickSpacing(10);
             sldInterest.setPaintTicks(true);
             sldInterest.setPaintLabels(true);
 
-            sldCollateral = new JSlider(0, 300, loan.getCollateralPercent());
+            sldCollateral = new JSlider(0, 300, loan.getCollateral());
             sldCollateral.setMajorTickSpacing(50);
             sldCollateral.setPaintTicks(true);
             sldCollateral.setPaintLabels(true);
@@ -634,11 +625,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         if (campaign.getCampaignOptions().useLoanLimits()) {
             if (e.getSource() == sldInterest) {
                 sldCollateral.removeChangeListener(this);
-                sldCollateral.setValue(Loan.recalculateCollateralFromInterest(sldInterest.getValue(), rating));
+                sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));
                 sldCollateral.addChangeListener(this);
             } else if (e.getSource() == sldCollateral) {
                 sldInterest.removeChangeListener(this);
-                sldInterest.setValue(Loan.recalculateInterestFromCollateral(sldCollateral.getValue(), rating));
+                sldInterest.setValue(Loan.recalculateInterestFromCollateral(rating, sldCollateral.getValue()));
                 sldInterest.addChangeListener(this);
             }
         }

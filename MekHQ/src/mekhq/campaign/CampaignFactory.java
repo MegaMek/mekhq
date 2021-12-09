@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
@@ -33,7 +33,6 @@ import mekhq.campaign.io.CampaignXmlParser;
  * from its detected format.
  */
 public class CampaignFactory {
-
     private MekHQ app;
 
     /**
@@ -73,22 +72,15 @@ public class CampaignFactory {
 
         byte[] header = readHeader(is);
 
-        boolean isGzipped = false;
         // Check if the first two bytes are the GZIP magic bytes...
-        if (header.length >= 2 && header[0] == (byte) 0x1f
-            && header[1] == (byte) 0x8b) {
-            // ..if so, assume campaign is in a gzip file
-            isGzipped = true;
+        if ((header.length >= 2) && (header[0] == (byte) 0x1f) && (header[1] == (byte) 0x8b)) {
             is = new GZIPInputStream(is);
         }
         // ...otherwise, assume we're an XML file.
 
         CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
 
-        Campaign c = parser.parse();
-        c.setPreferGzippedOutput(isGzipped);
-
-        return c;
+        return parser.parse();
     }
 
     private byte[] readHeader(InputStream is) throws IOException {

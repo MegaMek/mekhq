@@ -10,33 +10,30 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
 public class FactionHintsTest {
-    
+
     private Faction createTestFaction(final String id) {
         Faction f = mock(Faction.class);
         when(f.getShortName()).thenReturn(id);
         return f;
     }
-    
+
     @Test
     public void testIsAlliedWith() {
         FactionHints hints = new FactionHints();
@@ -44,8 +41,8 @@ public class FactionHintsTest {
         Faction f2 = createTestFaction("F2");
         Faction f3 = createTestFaction("F3");
         hints.addAlliance("", null, null, f1, f2);
-        Date date = new Date();
-        
+        LocalDate date = LocalDate.now();
+
         assertTrue(hints.isAlliedWith(f1, f2, date));
         assertTrue(hints.isAlliedWith(f2, f1, date));
         assertFalse(hints.isAlliedWith(f1, f3, date));
@@ -59,8 +56,8 @@ public class FactionHintsTest {
         Faction f2 = createTestFaction("F2");
         Faction f3 = createTestFaction("F3");
         hints.addRivalry("", null, null, f1, f2);
-        Date date = new Date();
-        
+        LocalDate date = LocalDate.now();
+
         assertTrue(hints.isRivalOf(f1, f2, date));
         assertTrue(hints.isRivalOf(f2, f1, date));
         assertFalse(hints.isRivalOf(f1, f3, date));
@@ -74,8 +71,8 @@ public class FactionHintsTest {
         Faction f2 = createTestFaction("F2");
         Faction f3 = createTestFaction("F3");
         hints.addWar("", null, null, f1, f2);
-        Date date = new Date();
-        
+        LocalDate date = LocalDate.now();
+
         assertTrue(hints.isAtWarWith(f1, f2, date));
         assertTrue(hints.isAtWarWith(f2, f1, date));
         assertFalse(hints.isAtWarWith(f1, f3, date));
@@ -88,16 +85,17 @@ public class FactionHintsTest {
         FactionHints hints = new FactionHints();
         Faction f1 = createTestFaction("F1");
         Faction f2 = createTestFaction("F2");
-        Calendar start = new GregorianCalendar(3000, 1, 1);
-        Calendar end = new GregorianCalendar(3010, 1, 1);
-        
-        hints.addWar(WAR_NAME, start.getTime(), end.getTime(), f1, f2);
-        Calendar now = new GregorianCalendar(3005, 1, 1); 
+        LocalDate start = LocalDate.of(3000, 1, 1);
+        LocalDate end = LocalDate.of(3010, 1, 1);
 
-        assertEquals(hints.getCurrentWar(f1, f2, now.getTime()), WAR_NAME);
-        assertEquals(hints.getCurrentWar(f2, f1, now.getTime()), WAR_NAME);
+        hints.addWar(WAR_NAME, start, end, f1, f2);
+
+        LocalDate now = LocalDate.of(3005, 1, 1);
+
+        assertEquals(hints.getCurrentWar(f1, f2, now), WAR_NAME);
+        assertEquals(hints.getCurrentWar(f2, f1, now), WAR_NAME);
         // This test will fail if run between 3000 and 3010
-        assertEquals(hints.getCurrentWar(f1, f2, new Date()), null);
+        assertEquals(hints.getCurrentWar(f1, f2, LocalDate.now()), null);
     }
 
     @Test
@@ -106,8 +104,8 @@ public class FactionHintsTest {
         Faction f1 = createTestFaction("F1");
         Faction f2 = createTestFaction("F2");
         Faction f3 = createTestFaction("F3");
-        Date now = new Date();
-        
+        LocalDate now = LocalDate.now();
+
         hints.addNeutralFaction(f1);
         hints.addNeutralExceptions("", null, null, f1, f3);
 
@@ -122,10 +120,10 @@ public class FactionHintsTest {
         Faction outer = createTestFaction("outer");
         Faction inner = createTestFaction("inner");
         Faction opponent = createTestFaction("opponent");
-        Date now = new Date();
-        
+        LocalDate now = LocalDate.now();
+
         hints.addContainedFaction(outer, inner, null, null, 0.5);
-        
+
         assertTrue(hints.getContainedFactions(outer, now).contains(inner));
         assertEquals(hints.getContainedFactionHost(inner, now), outer);
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
@@ -139,10 +137,10 @@ public class FactionHintsTest {
         Faction inner = createTestFaction("inner");
         Faction opponent = createTestFaction("opponent");
         Faction nonOpponent = createTestFaction("nonOpponent");
-        Date now = new Date();
-        
+        LocalDate now = LocalDate.now();
+
         hints.addContainedFaction(outer, inner, null, null, 0.5, Collections.singletonList(opponent));
-        
+
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
         assertFalse(hints.isContainedFactionOpponent(outer, inner, nonOpponent, now));
     }

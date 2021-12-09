@@ -1,5 +1,5 @@
 /*
- * Location.java
+ * BattleArmorSuit.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -76,6 +76,7 @@ public class BattleArmorSuit extends Part {
     private Money alternateCost = Money.zero();
     private double alternateTon;
     private int introYear;
+    private boolean isReplacement;
 
     public BattleArmorSuit() {
         super(0, null);
@@ -120,6 +121,7 @@ public class BattleArmorSuit extends Part {
         initializeExtraCostsAndTons();
     }
 
+    @Override
     public BattleArmorSuit clone() {
         BattleArmorSuit clone = new BattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
         clone.copyBaseData(this);
@@ -136,78 +138,75 @@ public class BattleArmorSuit extends Part {
         trooper = i;
     }
 
+    @Override
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildPartIds().size()==0) {
+        if ((null == unit) && !hasChildParts()) {
             return alternateTon;
         }
         double tons = 0;
         switch(weightClass) {
         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-            if(clan) {
+            if (clan) {
                 tons += 0.13;
             } else {
                 tons += 0.08;
             }
             tons += groundMP * .025;
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 tons += jumpMP * .045;
-            }
-            else if(jumpType == EntityMovementMode.VTOL) {
+            } else if (jumpType == EntityMovementMode.VTOL) {
                 tons += jumpMP * .03;
             } else {
                 tons += jumpMP * .025;
             }
             break;
         case EntityWeightClass.WEIGHT_LIGHT:
-            if(clan) {
+            if (clan) {
                 tons += 0.15;
             } else {
                 tons += 0.1;
             }
             tons += groundMP * .03;
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 tons += jumpMP * .045;
-            }
-            else if(jumpType == EntityMovementMode.VTOL) {
+            } else if (jumpType == EntityMovementMode.VTOL) {
                 tons += jumpMP * .04;
             } else {
                 tons += jumpMP * .025;
             }
             break;
         case EntityWeightClass.WEIGHT_MEDIUM:
-            if(clan) {
+            if (clan) {
                 tons += 0.25;
             } else {
                 tons += 0.175;
             }
             tons += groundMP * .04;
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 tons += jumpMP * .085;
-            }
-            else if(jumpType == EntityMovementMode.VTOL) {
+            } else if (jumpType == EntityMovementMode.VTOL) {
                 tons += jumpMP * .06;
             } else {
                 tons += jumpMP * .05;
             }
             break;
         case EntityWeightClass.WEIGHT_HEAVY:
-            if(clan) {
+            if (clan) {
                 tons += 0.4;
             } else {
                 tons += 0.3;
             }
             tons += groundMP * .08;
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 tons += jumpMP * .16;
-            }
-            else {
+            } else {
                 tons += jumpMP * .125;
             }
             break;
         case EntityWeightClass.WEIGHT_ASSAULT:
-            if(clan) {
+            if (clan) {
                 tons += 0.7;
             } else {
                 tons += 0.55;
@@ -218,12 +217,11 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if(null == unit && getChildPartIds().size()==0) {
+        if ((null == unit) && !hasChildParts()) {
             tons += alternateTon;
         }
-        for(int childId : getChildPartIds()) {
-            Part p = campaign.getPart(childId);
-            if(null != p && !(p instanceof BattleArmorSuit)) {
+        for (Part p : getChildParts()) {
+            if (!(p instanceof BattleArmorSuit)) {
                 tons += p.getTonnage();
             }
         }
@@ -234,14 +232,14 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildPartIds().size()==0) {
-            return alternateCost;
+        if ((null == unit) && !hasChildParts()) {
+            return (alternateCost != null) ? alternateCost : Money.zero();
         }
         Money cost = Money.zero();
         switch(weightClass) {
         case EntityWeightClass.WEIGHT_MEDIUM:
             cost = cost.plus(100000);
-            if(jumpType == EntityMovementMode.VTOL) {
+            if (jumpType == EntityMovementMode.VTOL) {
                 cost = cost.plus(jumpMP * 100000);
             } else {
                 cost = cost.plus(jumpMP * 75000);
@@ -249,7 +247,7 @@ public class BattleArmorSuit extends Part {
             break;
         case EntityWeightClass.WEIGHT_HEAVY:
             cost = cost.plus(200000);
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 cost = cost.plus(jumpMP * 100000);
             } else {
                 cost = cost.plus(jumpMP * 150000);
@@ -257,7 +255,7 @@ public class BattleArmorSuit extends Part {
             break;
         case EntityWeightClass.WEIGHT_ASSAULT:
             cost = cost.plus(400000);
-            if(jumpType == EntityMovementMode.INF_UMU) {
+            if (jumpType == EntityMovementMode.INF_UMU) {
                 cost = cost.plus(jumpMP * 150000);
             } else {
                 cost = cost.plus(jumpMP * 300000);
@@ -267,14 +265,11 @@ public class BattleArmorSuit extends Part {
             cost = cost.plus(50000 * (jumpMP + 1));
         }
         cost = cost.plus(25000 * (groundMP-1));
-        for(int childId : getChildPartIds()) {
-            Part p = campaign.getPart(childId);
-            if(null != p) {
-                if(p instanceof BaArmor) {
-                    cost = cost.plus(p.getCurrentValue());
-                } else if (!(p instanceof BattleArmorSuit)) {
-                    cost = cost.plus(p.getStickerPrice());
-                }
+        for (Part p : getChildParts()) {
+            if (p instanceof BaArmor) {
+                cost = cost.plus(p.getCurrentValue());
+            } else if (!(p instanceof BattleArmorSuit)) {
+                cost = cost.plus(p.getStickerPrice());
             }
         }
 
@@ -287,7 +282,7 @@ public class BattleArmorSuit extends Part {
         //simplest way to do this is just get the full cost and tonnage of a new unit and divide by
         //squad size
         MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
-        if(null != summary) {
+        if (null != summary) {
             double squadSize = summary.getArmorTypes().length - 1;
             alternateCost = Money.of(summary.getAlternateCost()).dividedBy(squadSize);
             alternateTon = summary.getSuitWeight();
@@ -364,10 +359,7 @@ public class BattleArmorSuit extends Part {
                 +"<weightClass>"
                 +weightClass
                 +"</weightClass>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<jumpType>"
-                +MekHqXmlUtil.escape(EntityMovementMode.token(jumpType))
-                +"</jumpType>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpType", jumpType.name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<alternateCost>"
                 +alternateCost.toXmlString()
@@ -383,30 +375,34 @@ public class BattleArmorSuit extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
-                trooper = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("groundMP")) {
-                groundMP = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("jumpMP")) {
-                jumpMP = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("weightClass")) {
-                weightClass = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("quad")) {
-                quad = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("chassis")) {
-                chassis = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
-                model = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
-                jumpType = EntityMovementMode.type(MekHqXmlUtil.unEscape(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
-                alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
-                alternateTon = Double.parseDouble(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
+                    trooper = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("groundMP")) {
+                    groundMP = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpMP")) {
+                    jumpMP = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("weightClass")) {
+                    weightClass = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("quad")) {
+                    quad = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                    clan = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("chassis")) {
+                    chassis = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
+                    model = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
+                    jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
+                    alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
+                    alternateTon = Double.parseDouble(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -414,7 +410,7 @@ public class BattleArmorSuit extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
+        if (null != unit) {
             unit.getEntity().setInternal(unit.getEntity().getOInternal(trooper), trooper);
         }
     }
@@ -427,38 +423,39 @@ public class BattleArmorSuit extends Part {
     @Override
     public void remove(boolean salvage) {
         ArrayList<Part> trooperParts = new ArrayList<>();
-        if(null != unit) {
+        if (null != unit) {
             Person trooperToRemove = null;
-            if(unit.getEntity().getInternal(trooper) > 0) {
+            if (unit.getEntity().getInternal(trooper) > 0) {
                 //then there is a trooper here, so remove a crewmember
-                if(unit.getCrew().size() > 0) {
+                if (unit.getCrew().size() > 0) {
                     trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
                     //dont remove yet - we need to first set the internal to
                     //destroyed so, this slot gets skipped over when we reset the pilot
                 }
             }
-            for(Part part : unit.getParts()) {
-                if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == trooper) {
+            for (Part part : unit.getParts()) {
+                if (part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart) part).getTrooper() == trooper) {
                     trooperParts.add(part);
                     addChildPart(part);
                 }
-                if(part instanceof BaArmor && ((BaArmor)part).getLocation() == trooper) {
-                    BaArmor armorClone = (BaArmor)part.clone();
-                    armorClone.setAmount(((BaArmor)part).getAmount());
-                    armorClone.setParentPartId(getId());
-                    campaign.addPart(armorClone, 0);
+
+                if (part instanceof BaArmor && part.getLocation() == trooper) {
+                    BaArmor armorClone = (BaArmor) part.clone();
+                    armorClone.setAmount(((BaArmor) part).getAmount());
+                    armorClone.setParentPart(this);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, trooper);
-            if(null != trooperToRemove) {
+            if (null != trooperToRemove) {
                 unit.remove(trooperToRemove, true);
             }
             unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, trooper);
             unit.getEntity().setLocationBlownOff(trooper, false);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
             trooper = 0;
             unit.removePart(this);
             //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
@@ -469,15 +466,15 @@ public class BattleArmorSuit extends Part {
             //existence. I am going to remove it and see if it causes problems.
             //unit.runDiagnostic(false);
         }
-        for(Part p : trooperParts) {
+        for (Part p : trooperParts) {
             p.remove(salvage);
         }
-        Part spare = campaign.checkForExistingSparePart(this);
-        if(!salvage) {
-            campaign.removePart(this);
-        } else if(null != spare) {
+        Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+        if (!salvage) {
+            campaign.getWarehouse().removePart(this);
+        } else if (null != spare) {
             spare.incrementQuantity();
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -485,17 +482,17 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             if (trooper < 0) {
-                MekHQ.getLogger().error(getClass(), "updateConditionFromEntity",
-                        "Trooper location -1 found on BattleArmorSuit attached to unit");
+                MekHQ.getLogger().error("Trooper location -1 found on BattleArmorSuit attached to unit");
                 return;
             }
-            if(unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
-                if(!checkForDestruction) {
+
+            if (unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
+                if (!checkForDestruction) {
                     remove(false);
                 } else {
-                    if(Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                    if (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                         remove(false);
                     } else {
                         //it seems a little weird to change the entity here, but no other
@@ -524,20 +521,17 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null != unit) {
+        if (null != unit) {
             return "Trooper " + trooper;
         } else {
             int nEquip = 0;
             int armor = 0;
-            if(getChildPartIds().size() > 0) {
-                for(int childId : getChildPartIds()) {
-                    Part p = campaign.getPart(childId);
-                    if(null != p) {
-                        if(p instanceof BaArmor) {
-                            armor = ((BaArmor)p).getAmount();
-                        } else {
-                            nEquip++;
-                        }
+            if (!hasChildParts()) {
+                for (Part p : getChildParts()) {
+                    if (p instanceof BaArmor) {
+                        armor = ((BaArmor)p).getAmount();
+                    } else {
+                        nEquip++;
                     }
                 }
                 return nEquip + " pieces of equipment; " + armor + " armor points";
@@ -556,7 +550,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public TargetRoll getAllMods(Person tech) {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "BA suit removal");
         }
         return super.getAllMods(tech);
@@ -598,10 +592,10 @@ public class BattleArmorSuit extends Part {
         return trooper;
     }
 
+    @Override
     public boolean needsMaintenance() {
         return false;
     }
-
 
     /*
      * This method  will load up a TestUnit in order to identify the parts that need to be
@@ -610,43 +604,50 @@ public class BattleArmorSuit extends Part {
     private void addSubParts() {
         //first get a copy of the entity so we can create a test unit
         MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
-        if(null == summary) {
+        if (null == summary) {
             return;
         }
         Entity newEntity = null;
         try {
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(getClass(), "addSubParts", e);
+            MekHQ.getLogger().error(e);
         }
         Unit newUnit = null;
         if (null != newEntity) {
             newUnit = new TestUnit(newEntity, campaign, false);
         }
-        if(null != newUnit) {
+        if (null != newUnit) {
             //This now works, except when GM Mode is used to procure which must not be using the
             //find method
-            for(Part part : newUnit.getParts()) {
-                if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
+            for (Part part : newUnit.getParts()) {
+                if (part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart) part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
                     Part newEquip = part.clone();
-                    newEquip.setParentPartId(getId());
-                    campaign.addPart(newEquip, 0);
+                    newEquip.setParentPart(this);
+                    campaign.getQuartermaster().addPart(newEquip, 0);
                     addChildPart(newEquip);
-                }
-                else if(part instanceof BaArmor && ((BaArmor)part).getLocation() == BattleArmor.LOC_TROOPER_1) {
-                    BaArmor armorClone = (BaArmor)part.clone();
+                } else if (part instanceof BaArmor && part.getLocation() == BattleArmor.LOC_TROOPER_1) {
+                    BaArmor armorClone = (BaArmor) part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
-                    armorClone.setParentPartId(getId());
-                    campaign.addPart(armorClone, 0);
+                    armorClone.setParentPart(this);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }
         }
     }
 
+    /**
+     * Sets a value indicating whether or not this part
+     * is being used as a replacement.
+     */
+    public void isReplacement(boolean value) {
+        isReplacement = value;
+    }
+
     @Override
     public void postProcessCampaignAddition() {
-        if(getChildPartIds().isEmpty()) {
+        if (!isReplacement && !hasChildParts()) {
             addSubParts();
         }
     }
@@ -662,7 +663,7 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ARMOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ARMOR;
     }
 }

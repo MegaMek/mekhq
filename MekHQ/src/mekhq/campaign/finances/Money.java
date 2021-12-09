@@ -1,7 +1,8 @@
 /*
  * Money.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 - Vicente Cartas Espinel <vicente.cartas at outlook.com>. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,17 +13,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
 import org.joda.money.BigMoney;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -32,14 +33,18 @@ import java.util.List;
  * currency.
  *
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
- *
  */
-public class Money implements Comparable<Money> {
+public class Money implements Comparable<Money>, Serializable {
+    private static final long serialVersionUID = 2018272535276369842L;
     private BigMoney wrapped;
 
     private Money(BigMoney money) {
         assert money != null;
         this.wrapped = money;
+    }
+
+    private BigMoney getWrapped() {
+        return wrapped;
     }
 
     public static Money of(double amount, Currency currency) {
@@ -58,122 +63,120 @@ public class Money implements Comparable<Money> {
         return zero(CurrencyManager.getInstance().getDefaultCurrency());
     }
 
-    public static Money fromXmlString(String xmlData) {
-        return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
-    }
-
     public boolean isZero() {
-        return this.wrapped.isZero();
+        return getWrapped().isZero();
     }
 
     public boolean isPositive() {
-        return this.wrapped.isPositive();
+        return getWrapped().isPositive();
     }
 
     public boolean isPositiveOrZero() {
-        return this.wrapped.isPositive() ||
-                this.wrapped.isZero();
+        return getWrapped().isPositive() || getWrapped().isZero();
     }
 
     public boolean isNegative() {
-        return this.wrapped.isNegative();
+        return getWrapped().isNegative();
     }
 
     public boolean isGreaterThan(Money other) {
-        return this.wrapped.isGreaterThan(other.wrapped);
+        return getWrapped().isGreaterThan(other.getWrapped());
     }
 
     public boolean isGreaterOrEqualThan(Money other) {
-        return this.wrapped.isGreaterThan(other.wrapped) ||
-                this.wrapped.isEqual(other.wrapped);
+        return getWrapped().isGreaterThan(other.getWrapped()) || getWrapped().isEqual(other.getWrapped());
     }
 
     public boolean isLessThan(Money other) {
-        return this.wrapped.isLessThan(other.wrapped);
+        return getWrapped().isLessThan(other.getWrapped());
     }
 
     public BigDecimal getAmount() {
-        return this.wrapped.getAmount();
+        return getWrapped().getAmount();
     }
 
     public Money absolute() {
-        if (this.isPositiveOrZero()) {
-            return this;
-        } else {
-            return this.multipliedBy(-1);
-        }
+        return isPositiveOrZero() ? this : this.multipliedBy(-1);
     }
 
     public Money plus(Money amount) {
-        return new Money(this.wrapped.plus(amount.wrapped));
+        if (amount == null) {
+            return plus(0L);
+        }
+
+        return new Money(getWrapped().plus(amount.getWrapped()));
     }
 
     public Money plus(double amount) {
-        return new Money(this.wrapped.plus(amount));
+        return new Money(getWrapped().plus(amount));
     }
 
     public Money plus(List<Money> amounts) {
-        return new Money(this.wrapped.plus((Iterable<BigMoney>)(amounts.stream().map(x -> x.wrapped)::iterator)));
+        return new Money(getWrapped().plus((Iterable<BigMoney>) (amounts.stream().map(Money::getWrapped)::iterator)));
     }
 
     public Money minus(Money amount) {
-        return new Money(this.wrapped.minus(amount.wrapped));
+        if (amount == null) {
+            return minus(0L);
+        }
+
+        return new Money(getWrapped().minus(amount.getWrapped()));
     }
 
     public Money minus(long amount) {
-        return new Money(this.wrapped.minus(amount));
+        return new Money(getWrapped().minus(amount));
     }
 
     public Money minus(double amount) {
-        return new Money(this.wrapped.minus(amount));
+        return new Money(getWrapped().minus(amount));
     }
 
     public Money multipliedBy(long amount) {
-        return new Money(this.wrapped.multipliedBy(amount));
+        return new Money(getWrapped().multipliedBy(amount));
     }
 
     public Money multipliedBy(double amount) {
-        return new Money(this.wrapped.multipliedBy(amount));
+        return new Money(getWrapped().multipliedBy(amount));
     }
 
     public Money dividedBy(double amount) {
-        return new Money(this.wrapped.dividedBy(amount, RoundingMode.HALF_EVEN));
+        return new Money(getWrapped().dividedBy(amount, RoundingMode.HALF_EVEN));
     }
 
     public Money dividedBy(Money money) {
-        return new Money(this.wrapped.dividedBy(
-                money.wrapped.getAmount(),
-                RoundingMode.HALF_EVEN));
-    }
-
-    public String toXmlString() {
-        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
+        return new Money(getWrapped().dividedBy(money.getWrapped().getAmount(), RoundingMode.HALF_EVEN));
     }
 
     public String toAmountString() {
-        return CurrencyManager.getInstance().getUiAmountPrinter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance().getUiAmountPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     public String toAmountAndSymbolString() {
-        return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     public String toAmountAndNameString() {
-        return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
+
+    //region File I/O
+    public String toXmlString() {
+        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+    }
+
+    public static Money fromXmlString(String xmlData) {
+        return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {
-        return this.wrapped.toString();
+        return getWrapped().toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Money) {
-            return this.wrapped.isEqual(((Money)obj).wrapped);
-        }
-
-        return false;
+        return (obj instanceof Money) && getWrapped().isEqual(((Money) obj).getWrapped());
     }
 
     @Override
@@ -183,9 +186,6 @@ public class Money implements Comparable<Money> {
 
     @Override
     public int compareTo(Money o) {
-        if (null == o) {
-            return -1;
-        }
-        return wrapped.compareTo(o.wrapped);
+        return (o != null) ? getWrapped().compareTo(o.getWrapped()) : -1;
     }
 }

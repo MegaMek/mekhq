@@ -23,19 +23,26 @@ package mekhq.campaign.unit.actions;
 
 import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.unit.Unit;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class StripUnitActionTest {
+    @Before
+    public void setup() {
+        Ranks.initializeRankSystems();
+    }
+
     @Test
     public void strippedMekHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -45,7 +52,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -55,7 +62,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -65,7 +72,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(unit.isSalvage());
     }

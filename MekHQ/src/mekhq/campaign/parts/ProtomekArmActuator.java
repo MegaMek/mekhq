@@ -12,18 +12,19 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -37,7 +38,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekArmActuator extends Part {
@@ -49,6 +49,7 @@ public class ProtomekArmActuator extends Part {
         this(0, 0, null);
     }
 
+    @Override
     public ProtomekArmActuator clone() {
         ProtomekArmActuator clone = new ProtomekArmActuator(getUnitTonnage(), location, campaign);
         clone.copyBaseData(this);
@@ -61,7 +62,7 @@ public class ProtomekArmActuator extends Part {
 
     public ProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Arm Actuator";
+        this.name = "ProtoMech Arm Actuator";
         this.location = loc;
     }
 
@@ -85,9 +86,10 @@ public class ProtomekArmActuator extends Part {
     @Override
     public boolean isSamePartType (Part part) {
         return part instanceof ProtomekArmActuator
-                && getUnitTonnage() == ((ProtomekArmActuator)part).getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
+    @Override
     public int getLocation() {
         return location;
     }
@@ -106,11 +108,15 @@ public class ProtomekArmActuator extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("location")) {
-                location = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                    location = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -118,7 +124,7 @@ public class ProtomekArmActuator extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
+        if (null != unit) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
         }
     }
@@ -140,20 +146,20 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             int h = Math.max(1, hits);
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, h);
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                campaign.removePart(this);
-            } else if(null != spare) {
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -162,48 +168,42 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
-        	int priorHits = hits;
+        if (null != unit) {
+            int priorHits = hits;
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
-            if(checkForDestruction
-					&& hits > priorHits
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
+            if (checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
     }
 
     @Override
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 120;
-		}
-        if(hits <= 1) {
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return 120;
+        } else if (hits <= 1) {
             return 100;
-        }
-        else if(hits == 2) {
+        } else if (hits == 2) {
             return 150;
+        } else {
+            return 200;
         }
-        else {
-        	return 200;
-        }
-	}
+    }
 
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return 0;
-		}
-		if(hits <= 1) {
+    @Override
+    public int getDifficulty() {
+        if (isSalvaging()) {
             return 0;
-        }
-        else if(hits == 2) {
+        } else if (hits <= 1) {
+            return 0;
+        } else if (hits == 2) {
             return 1;
+        } else {
+            return 3;
         }
-        else {
-        	return 3;
-        }
-	}
+    }
 
     @Override
     public boolean needsFixing() {
@@ -217,7 +217,7 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null != unit) {
+        if (null != unit) {
             return unit.getEntity().getLocationName(location);
         }
         return getUnitTonnage() + " tons";
@@ -225,8 +225,8 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(hits > 0) {
+        if (null != unit) {
+            if (hits > 0) {
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, 1);
             } else {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
@@ -236,16 +236,16 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-    		return null;
-    	}
-        if(isSalvaging()) {
+        if (null == unit) {
             return null;
         }
-        if(unit.isLocationBreached(location)) {
+        if (isSalvaging()) {
+            return null;
+        }
+        if (unit.isLocationBreached(location)) {
             return unit.getEntity().getLocationName(location) + " is breached.";
         }
-        if(isMountedOnDestroyedLocation()) {
+        if (isMountedOnDestroyedLocation()) {
             return unit.getEntity().getLocationName(location) + " is destroyed.";
         }
         return null;
@@ -276,10 +276,10 @@ public class ProtomekArmActuator extends Part {
         return false;
     }
 
-	@Override
-	public String getLocationName() {
-		return unit != null ? unit.getEntity().getLocationName(location) : null;
-	}
+    @Override
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {
@@ -287,7 +287,7 @@ public class ProtomekArmActuator extends Part {
     }
 
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ACTUATOR;
     }
 }

@@ -1,7 +1,5 @@
 /*
- * UnitMarketDialog.java
- *
- * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,458 +10,127 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
-import megamek.client.ui.swing.MechViewPanel;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import megamek.client.ui.baseComponents.MMButton;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.market.UnitMarket;
-import mekhq.gui.model.UnitMarketTableModel;
-import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.preferences.PreferencesNode;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.panes.UnitMarketPane;
 
-/**
- * Code copied heavily from PersonnelMarketDialog
- *
- * @author Neoancient
- *
- */
-public class UnitMarketDialog extends JDialog {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -7668601227249317220L;
+import javax.swing.*;
+import java.awt.*;
 
-	private static boolean showMeks = true;
-	private static boolean showVees = true;
-	private static boolean showAero = false;
-	private static boolean pctThreshold = false;
-	private static int threshold = 120;
+public class UnitMarketDialog extends AbstractMHQButtonDialog {
+    //region Variable Declarations
+    private final Campaign campaign;
 
-	private UnitMarketTableModel marketModel;
-	private Campaign campaign;
-    private UnitMarket unitMarket;
-    boolean addToCampaign;
-    Entity selectedEntity = null;
+    private UnitMarketPane unitMarketPane;
 
-    private JButton btnAdd;
-    private JButton btnPurchase;
-    private JButton btnClose;
-    private JCheckBox chkShowMeks;
-    private JCheckBox chkShowVees;
-    private JCheckBox chkShowAero;
-    private JCheckBox chkPctThreshold;
-    private JLabel lblPctThreshold;
-    private JSpinner spnThreshold;
-    private JPanel panelOKBtns;
-    private JPanel panelMain;
-    private JPanel panelFilterBtns;
-    private JTable tableUnits;
-    private JLabel lblBlackMarketWarning;
-    private MechViewPanel mechViewPanel;
-    private JScrollPane scrollTableUnits;
-    private JScrollPane scrollUnitView;
-    private TableRowSorter<UnitMarketTableModel> sorter;
-    ArrayList <RowSorter.SortKey> sortKeys;
-    private JSplitPane splitMain;
+    // Buttons
+    private JButton purchaseButton;
+    private JButton addGMButton;
+    private JButton removeButton;
+    //endregion Variable Declarations
 
-    /** Creates new form UnitSelectorDialog */
-    public UnitMarketDialog(Frame frame, Campaign c) {
-        super(frame, true);
-        campaign = c;
-        unitMarket = c.getUnitMarket();
-        marketModel = new UnitMarketTableModel();
-        marketModel.setData(unitMarket.getOffers());
-        initComponents();
-        filterOffers();
-        setLocationRelativeTo(frame);
-        setUserPreferences();
+    //region Constructors
+    public UnitMarketDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "UnitMarketDialog", "UnitMarketDialog.title");
+        this.campaign = campaign;
+        initialize();
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
     }
 
-    @SuppressWarnings("serial")
-	private void initComponents() {
-        GridBagConstraints gbc = new GridBagConstraints();
+    public UnitMarketPane getUnitMarketPane() {
+        return unitMarketPane;
+    }
 
-        scrollTableUnits = new JScrollPane();
-        scrollUnitView = new JScrollPane();
-        mechViewPanel = new MechViewPanel();
-        tableUnits = new JTable();
-        panelMain = new JPanel();
-        panelFilterBtns = new JPanel();
-        chkShowMeks = new JCheckBox();
-        chkShowVees = new JCheckBox();
-        chkShowAero = new JCheckBox();
-        chkPctThreshold = new JCheckBox();
-        lblPctThreshold = new JLabel();
-        spnThreshold = new JSpinner(new SpinnerNumberModel(threshold, 60, 130, 5));
-        lblBlackMarketWarning = new JLabel();
-        panelOKBtns = new JPanel();
-        btnPurchase = new JButton();
-        btnClose = new JButton();
+    public void setUnitMarketPane(final UnitMarketPane unitMarketPane) {
+        this.unitMarketPane = unitMarketPane;
+    }
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
-        getContentPane().setLayout(new BorderLayout());
+    //region Buttons
+    public JButton getPurchaseButton() {
+        return purchaseButton;
+    }
 
-        panelFilterBtns.setLayout(new GridBagLayout());
+    public void setPurchaseButton(final JButton purchaseButton) {
+        this.purchaseButton = purchaseButton;
+    }
 
-        ItemListener checkboxListener = new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {
-				showMeks = chkShowMeks.isSelected();
-				showAero = chkShowAero.isSelected();
-				showVees = chkShowVees.isSelected();
-				pctThreshold = chkPctThreshold.isSelected();
-				spnThreshold.setEnabled(chkPctThreshold.isSelected());
-				filterOffers();
-			}
-        };
+    public JButton getAddGMButton() {
+        return addGMButton;
+    }
 
-        chkShowMeks.setText(resourceMap.getString("chkShowMeks.text"));
-        chkShowMeks.setSelected(showMeks);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.0;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        panelFilterBtns.add(chkShowMeks, gbc);
-        chkShowMeks.addItemListener(checkboxListener);
+    public void setAddGMButton(final JButton addGMButton) {
+        this.addGMButton = addGMButton;
+    }
 
-        chkShowVees.setText(resourceMap.getString("chkShowVees.text"));
-        chkShowVees.setSelected(showVees);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.0;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        panelFilterBtns.add(chkShowVees, gbc);
-        chkShowVees.addItemListener(checkboxListener);
+    public JButton getRemoveButton() {
+        return removeButton;
+    }
 
-        chkShowAero.setText(resourceMap.getString("chkShowAero.text"));
-        chkShowAero.setSelected(showAero);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        panelFilterBtns.add(chkShowAero, gbc);
-        chkShowAero.addItemListener(checkboxListener);
+    public void setRemoveButton(final JButton removeButton) {
+        this.removeButton = removeButton;
+    }
+    //endregion Buttons
+    //endregion Getters/Setters
 
-        JPanel panel = new JPanel();
-        chkPctThreshold.setText(resourceMap.getString("chkPctThreshold.text"));
-        chkPctThreshold.setSelected(pctThreshold);
-        spnThreshold.setEnabled(pctThreshold);
-        lblPctThreshold.setText(resourceMap.getString("lblPctThreshold.text"));
-        panel.add(chkPctThreshold);
-        panel.add(spnThreshold);
-        panel.add(lblPctThreshold);
-        chkPctThreshold.addItemListener(checkboxListener);
-        spnThreshold.addChangeListener(arg0 -> {
-            threshold = (Integer)spnThreshold.getValue();
-            filterOffers();
-        });
+    //region Initialization
+    @Override
+    protected Container createCenterPane() {
+        setUnitMarketPane(new UnitMarketPane(getFrame(), getCampaign()));
+        getUnitMarketPane().getMarketTable().getSelectionModel().addListSelectionListener(evt -> refreshView());
+        return getUnitMarketPane();
+    }
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0.0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        panelFilterBtns.add(panel, gbc);
+    @Override
+    protected JPanel createButtonPanel() {
+        final JPanel panel = new JPanel(new GridLayout(1, getCampaign().isGM() ? 4 : 2));
+        setPurchaseButton(new MMButton("btnPurchase", resources.getString("Purchase.text"),
+                resources.getString("Purchase.toolTipText"), evt -> okAction()));
+        panel.add(getPurchaseButton());
 
-        scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTableUnits.setName("srcTablePersonnel"); // NOI18N
-        scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
+        if (getCampaign().isGM()) {
+            setAddGMButton(new MMButton("btnAddGM", resources.getString("AddGM.text"),
+                    resources.getString("AddGM.toolTipText"), evt -> getUnitMarketPane().addSelectedOffers()));
+            panel.add(getAddGMButton());
 
-        gbc = new GridBagConstraints();
-        tableUnits.setModel(marketModel);
-        tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableUnits.setColumnModel(new XTableColumnModel());
-        tableUnits.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<>(marketModel);
-        sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
-        Comparator<String> numComparator = (arg0, arg1) -> {
-            if (arg0.length() != arg1.length()) {
-                return arg0.length() - arg1.length();
-            }
-            return arg0.compareTo(arg1);
-        };
-        sorter.setComparator(UnitMarketTableModel.COL_PRICE, numComparator);
-        sorter.setComparator(UnitMarketTableModel.COL_PERCENT, numComparator);
-        tableUnits.setRowSorter(sorter);
-        tableUnits.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableUnits.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                offerChanged(evt);
-            }
-        });
-        TableColumn column = null;
-        for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
-            column = ((XTableColumnModel)tableUnits.getColumnModel()).getColumnByModelIndex(i);
-            column.setPreferredWidth(marketModel.getColumnWidth(i));
-            column.setCellRenderer(new DefaultTableCellRenderer() {
-                public Component getTableCellRendererComponent(JTable table,
-                        Object value, boolean isSelected, boolean hasFocus,
-                        int row, int column) {
-                    super.getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
-                    setHorizontalAlignment(((UnitMarketTableModel)table.getModel()).
-                    		getAlignment(table.convertColumnIndexToModel(column)));
-                    return this;
-                }
-            });
+            setRemoveButton(new MMButton("btnRemove", resources.getString("Remove.text"),
+                    resources.getString("Remove.toolTipText"), evt -> getUnitMarketPane().removeSelectedOffers()));
+            panel.add(getRemoveButton());
         }
 
-        tableUnits.setIntercellSpacing(new Dimension(0, 0));
-        tableUnits.setShowGrid(false);
-        scrollTableUnits.setViewportView(tableUnits);
+        panel.add(new MMButton("btnCancel", resources.getString("Cancel.text"),
+                resources.getString("Cancel.toolTipText"), this::cancelActionPerformed));
+        return panel;
+    }
+    //endregion Initialization
 
-        lblBlackMarketWarning.setText(resourceMap.getString("lblBlackMarketWarning.text"));
-
-        scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTableUnits.setName("scrollTableUnits"); // NOI18N
-        scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
-        panelMain.setLayout(new BorderLayout());
-        panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
-        panelMain.add(scrollTableUnits, BorderLayout.CENTER);
-        panelMain.add(lblBlackMarketWarning, BorderLayout.PAGE_END);
-
-        scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
-        scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 600));
-        scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollUnitView.setViewportView(mechViewPanel);
-
-        splitMain = new JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollUnitView);
-        splitMain.setOneTouchExpandable(true);
-        splitMain.setResizeWeight(0.0);
-        getContentPane().add(splitMain, BorderLayout.CENTER);
-
-        panelOKBtns.setLayout(new java.awt.GridBagLayout());
-
-        btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
-        btnPurchase.setName("btnPurchase"); // NOI18N
-        btnPurchase.addActionListener(evt -> purchaseUnit(evt));
-        panelOKBtns.add(btnPurchase, new java.awt.GridBagConstraints());
-        btnPurchase.setEnabled(null != selectedEntity);
-
-        btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-        btnAdd.addActionListener(evt -> addUnit());
-        btnAdd.setEnabled(null !=  selectedEntity);
-        panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
-
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
-        panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
-
-        getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
-
-        pack();
+    @Override
+    protected void okAction() {
+        getUnitMarketPane().purchaseSelectedOffers();
     }
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
-
-        chkShowMeks.setName("showMeks");
-        preferences.manage(new JToggleButtonPreference(chkShowMeks));
-
-        chkShowAero.setName("showAero");
-        preferences.manage(new JToggleButtonPreference(chkShowAero));
-
-        chkShowVees.setName("showVees");
-        preferences.manage(new JToggleButtonPreference(chkShowVees));
-
-        chkPctThreshold.setName("useThreshold");
-        preferences.manage(new JToggleButtonPreference(chkPctThreshold));
-
-        spnThreshold.setName("thresholdValue");
-        preferences.manage(new JIntNumberSpinnerPreference(spnThreshold));
-
-        tableUnits.setName("unitsTable");
-        preferences.manage(new JTablePreference(tableUnits));
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
-    }
-
-    public Entity getUnit() {
-	    return selectedEntity;
-	}
-
-	private void purchaseUnit(ActionEvent evt) {
-	    if(null != selectedEntity) {
-	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
-	    		campaign.calculatePartTransitTime(Compute.d6(2) - 2);
-			UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			Money cost = Money.of(offer.unit.getCost() * offer.pct / 100.0);
-			if (campaign.getFunds().isLessThan(cost)) {
-				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-				 return;
-			}
-
-			int roll = Compute.d6();
-			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
-				campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
-						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
-						campaign.getCalendar().getTime());
-				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
-			} else {
-				campaign.getFinances().debit(cost, Transaction.C_UNIT,
-						"Purchased " + selectedEntity.getShortName(),
-						campaign.getCalendar().getTime());
-				campaign.addUnit(selectedEntity, false, transitDays);
-				if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
-					campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
-				}
-			}
-			UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			unitMarket.removeOffer(selected);
-			((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
-	    	refreshOfferView();
-	    }
-	}
-
-	private void addUnit() {
-		if (null != selectedEntity) {
-			campaign.addUnit(selectedEntity, false, 0);
-        	UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-	    	unitMarket.removeOffer(selected);
-	    	((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
-			refreshOfferView();
-		}
-	}
-
-	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-	    selectedEntity = null;
-	    setVisible(false);
-	}
-
-    private void filterOffers() {
-    	RowFilter<UnitMarketTableModel, Integer> unitTypeFilter = null;
-    	unitTypeFilter = new RowFilter<UnitMarketTableModel,Integer>() {
-    		@Override
-    		public boolean include(Entry<? extends UnitMarketTableModel, ? extends Integer> entry) {
-    			UnitMarket.MarketOffer offer = marketModel.getOffer(entry.getIdentifier());
-    			boolean underThreshold = !chkPctThreshold.isSelected() ||
-    					offer.pct <= (Integer)spnThreshold.getValue();
-    			if (offer.unitType == UnitType.MEK) {
-    				return underThreshold && chkShowMeks.isSelected();
-    			}
-    			if (offer.unitType == UnitType.TANK) {
-    				return underThreshold && chkShowVees.isSelected();
-    			}
-    			if (offer.unitType == UnitType.AERO) {
-    				return underThreshold && chkShowAero.isSelected();
-    			}
-    			return false;
-    		}
-    	};
-        sorter.setRowFilter(unitTypeFilter);
-   	}
-
-    private void offerChanged(ListSelectionEvent evt) {
-        final String METHOD_NAME = "offerChanged(ListSelectionEvent)"; //$NON-NLS-1$
-
-        int view = tableUnits.getSelectedRow();
-        if(view < 0) {
-            //selection got filtered away
-            selectedEntity= null;
-            refreshOfferView();
-            return;
+    private void refreshView() {
+        final boolean enabled = getUnitMarketPane().getSelectedEntity() != null;
+        getPurchaseButton().setEnabled(enabled);
+        if (getAddGMButton() != null) {
+            getAddGMButton().setEnabled(enabled);
         }
-		MechSummary ms = marketModel.getOffer(tableUnits.convertRowIndexToModel(view)).unit;
-		try {
-			selectedEntity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-		} catch (EntityLoadingException e) {
-            selectedEntity = null;
-            btnPurchase.setEnabled(false);
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                    + ms.getEntryName() + ": " + e.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
-            refreshOfferView();
-            return;
-		}
-        refreshOfferView();
-    }
 
-     void refreshOfferView() {
-    	 int row = tableUnits.getSelectedRow();
-         if(row < 0 || selectedEntity == null) {
-             mechViewPanel.reset();
-         } else {
-	    	 mechViewPanel.setMech(selectedEntity, true);
-	 		//This odd code is to make sure that the scrollbar stays at the top
-	 		//I cant just call it here, because it ends up getting reset somewhere later
-	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	 			public void run() {
-	 				scrollUnitView.getVerticalScrollBar().setValue(0);
-	 			}
-	 		});
-         }
-         btnPurchase.setEnabled(null != selectedEntity);
-         btnAdd.setEnabled(null != selectedEntity && campaign.isGM());
-    }
-
-	@Override
-    public void setVisible(boolean visible) {
-        filterOffers();
-         super.setVisible(visible);
+        if (getRemoveButton() != null) {
+            getRemoveButton().setEnabled(enabled);
+        }
     }
 }

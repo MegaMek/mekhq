@@ -1,11 +1,27 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.util.LinkedHashMap;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -14,34 +30,24 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
-import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
-import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
 
 /**
  * An extension of JPanel that is intended to be used for visual table renderers
  * allowing for a visual image and html coded text
  *
  * @author Jay Lawson
- *
  */
 public class BasicInfo extends JPanel {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -7337823041775639463L;
 
     private JLabel lblImage;
     private JLabel lblLoad;
-    IconPackage icons;
 
-    public BasicInfo(IconPackage i) {
-        this.icons = i;
+    public BasicInfo() {
         lblImage = new JLabel();
         lblLoad = new JLabel();
 
@@ -119,101 +125,17 @@ public class BasicInfo extends JPanel {
         }
     }
 
-    protected Image getImageFor(Unit u) {
-
-        if (null == icons.getMechTiles()) {
-            return null;
-        }
-        Image base = icons.getMechTiles().imageFor(u.getEntity(), this, -1);
-        if (null == base) {
-            return null;
-        }
-        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
-        return entityImage.loadPreviewImage();
-    }
-
-    protected Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getCamo", e);
-        }
-        return camo;
-    }
-
     protected void setPortrait(Person p) {
-
-        String category = p.getPortraitCategory();
-        String filename = p.getPortraitFileName();
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)) {
-            return;
-        }
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        if (Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait = null;
-        try {
-            portrait = (Image) icons.getPortraits().getItem(category, filename);
-            if (null == portrait) {
-                // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
-                category = "";
-                p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
-                filename = "default.gif";
-                portrait = (Image) icons.getPortraits().getItem(category, filename);
-            }
-            // make sure no images are longer than 72 pixels
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(-1, 58, Image.SCALE_SMOOTH);
-                setImage(portrait);
-            }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setPortrait", e);
-        }
+        setImage(p.getPortrait().getImage(54));
     }
 
     protected Image getImageFor(Force force) {
-        String category = force.getIconCategory();
-        String filename = force.getIconFileName();
-        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)
-                || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-            filename = "empty.png";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait = null;
         try {
-            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-            } else {
-                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                }
-            }
-            return portrait;
+            return MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                    force.getIconFileName(), force.getIconMap())
+                    .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getImageFor", e);
+            MekHQ.getLogger().error("Failed to build force icon", e);
             return null;
         }
     }

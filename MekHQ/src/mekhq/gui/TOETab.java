@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -24,14 +23,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.DropMode;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -57,10 +49,8 @@ import mekhq.gui.view.UnitViewPanel;
 
 /**
  * Display organization tree (TO&E) and force/unit summary
- *
  */
 public final class TOETab extends CampaignGuiTab {
-
     private static final long serialVersionUID = 5959426263276996830L;
 
     private JTree orgTree;
@@ -86,8 +76,9 @@ public final class TOETab extends CampaignGuiTab {
 
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
-        orgTree.addMouseListener(new TOEMouseAdapter(getCampaignGui()));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
+        orgTree.getAccessibleContext().setAccessibleName("Table of Organization and Equipment (TOE)");
+        TOEMouseAdapter.connect(getCampaignGui(), orgTree);
+        orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(ev -> refreshForceView());
@@ -96,6 +87,7 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
         panForceView = new JPanel();
+        panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
         panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
         panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
@@ -140,6 +132,7 @@ public final class TOETab extends CampaignGuiTab {
             int crewSize = u.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
+                crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
                 final JScrollPane scrollPerson = new JScrollPane();
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
@@ -157,7 +150,7 @@ public final class TOETab extends CampaignGuiTab {
                         return d;
                     }
                 };
-                crewList.setCellRenderer(model.getRenderer(getIconPackage()));
+                crewList.setCellRenderer(model.getRenderer());
                 crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
                 crewList.setVisibleRowCount(1);
                 crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -177,22 +170,16 @@ public final class TOETab extends CampaignGuiTab {
                 }
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    scrollPerson.getVerticalScrollBar().setValue(0);
-                });
+                SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
-            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign()));
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                scrollUnit.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
         } else if (node instanceof Force) {
-            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                scrollForce.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }
         panForceView.updateUI();
     }

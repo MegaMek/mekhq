@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import mekhq.MekHqXmlSerializable;
@@ -24,56 +23,49 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class LogEntry implements Cloneable, MekHqXmlSerializable {
-
-    private static final SimpleDateFormat dateFormat() {
-        // LATER centralise date formatting so that every class doesn't have its own format and - possibly - switch to java.time
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
-    }
+    private LocalDate date;
+    private String desc; // non-null
+    private LogEntryType type;
 
     // Keep protected so that only specific Log Entries, with a defined type, are created
-    protected LogEntry(Date date, String desc) {
+    protected LogEntry(LocalDate date, String desc) {
         this(date, desc, null);
     }
 
     // Keep protected so that only specific Log Entries, with a defined type, are created
-    protected LogEntry(Date date, String desc, LogEntryType type) {
+    protected LogEntry(LocalDate date, String desc, LogEntryType type) {
         this.date = date;
-        this.desc = desc != null ? desc : ""; //$NON-NLS-1$
+        this.desc = (desc != null) ? desc : "";
         this.type = type;
     }
 
-    private Date date;
-    private String desc; // non-null
-    private LogEntryType type;
-
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
-    
-    public void setDate(Date date) {
+
+    public void setDate(LocalDate date) {
         this.date = date;
     }
-    
+
     public String getDesc() {
         return desc;
     }
-    
+
     public void setDesc(String desc) {
-        this.desc = desc != null ? desc : ""; //$NON-NLS-1$
+        this.desc = (desc != null) ? desc : "";
     }
-    
+
     public LogEntryType getType() {
         return type;
     }
-    
+
     public void setType(LogEntryType type) {
         this.type = type;
     }
@@ -81,20 +73,28 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw, int indent) {
         StringBuilder sb = new StringBuilder();
-        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>"); //$NON-NLS-1$
-        if (date != null)    sb.append("<date>").append(dateFormat().format(date)).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
-        assert desc != null; sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type.toString())).append("</type>");  //$NON-NLS-1$//$NON-NLS-2$
-        sb.append("</logEntry>"); //$NON-NLS-1$
+        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
+        if (date != null) {
+            sb.append("<date>").append(MekHqXmlUtil.saveFormattedDate(date)).append("</date>");
+        }
+        sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
+        if (type != null) {
+            sb.append("<type>").append(MekHqXmlUtil.escape(type.toString())).append("</type>");
+        }
+        sb.append("</logEntry>");
         pw.println(sb.toString());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (null != date) sb.append("[").append(dateFormat().format(date)).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+        if (null != date) {
+            sb.append("[").append(date.toString()).append("] ");
+        }
         sb.append(desc);
-        if (null != type) sb.append(" (").append(type).append(")");  //$NON-NLS-1$//$NON-NLS-2$
+        if (null != type) {
+            sb.append(" (").append(type).append(")");
+        }
         return sb.toString();
     }
 
@@ -110,9 +110,14 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (getClass() != obj.getClass()) {
+            return false;
+        }
+
         LogEntry other = (LogEntry) obj;
         return Objects.equals(date, other.date)
             && desc.equals(other.desc)
@@ -127,5 +132,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
      * @param newDesc the new description of the log entry
      * @param person whose person this log entry belongs
      */
-    public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, Person person){}
+    public void onLogEntryEdited(LocalDate originalDate, LocalDate newDate, String originalDesc, String newDesc, Person person) {
+
+    }
 }

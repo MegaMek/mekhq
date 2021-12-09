@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,15 +10,14 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
-import chat.In;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
@@ -29,30 +28,32 @@ public enum PrisonerStatus {
     /**
      * This is used for personnel who are not (currently) prisoners
      */
-    FREE("PrisonerStatus.FREE.text"),
+    FREE("PrisonerStatus.FREE.text", "PrisonerStatus.FREE.titleExtension"),
     /**
      * This is used to track standard personnel who are prisoners and not willing to defect
      */
-    PRISONER("PrisonerStatus.PRISONER.text"),
+    PRISONER("PrisonerStatus.PRISONER.text", "PrisonerStatus.PRISONER.titleExtension"),
     /**
      * This is used to track standard personnel who are prisoners and are willing to defect
      */
-    PRISONER_DEFECTOR("PrisonerStatus.PRISONER_DEFECTOR.text"),
+    PRISONER_DEFECTOR("PrisonerStatus.PRISONER_DEFECTOR.text", "PrisonerStatus.PRISONER_DEFECTOR.titleExtension"),
     /**
      * This is used to track clan personnel who become Bondsmen when captured
      */
-    BONDSMAN("PrisonerStatus.BONDSMAN.text");
+    BONDSMAN("PrisonerStatus.BONDSMAN.text", "PrisonerStatus.BONDSMAN.titleExtension");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String typeName;
+    private final String titleExtension;
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    PrisonerStatus(String typeName) {
+    PrisonerStatus(String typeName, String titleExtension) {
         this.typeName = resources.getString(typeName);
+        this.titleExtension = resources.getString(titleExtension);
     }
     //endregion Constructors
 
@@ -77,6 +78,10 @@ public enum PrisonerStatus {
         return this == BONDSMAN;
     }
     //endregion Boolean Comparisons
+
+    public String getTitleExtension() {
+        return titleExtension;
+    }
 
     @Override
     public String toString() {
@@ -110,8 +115,7 @@ public enum PrisonerStatus {
 
         }
 
-        MekHQ.getLogger().error(PrisonerStatus.class, "parseFromString",
-                    "Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+        MekHQ.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
 
         return FREE;
     }

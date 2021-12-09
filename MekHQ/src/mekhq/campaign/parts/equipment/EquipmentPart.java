@@ -2,6 +2,7 @@
  * EquipmentPart.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -34,12 +35,11 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
-import megamek.common.logging.LogLevel;
+import megamek.common.annotations.Nullable;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
@@ -62,7 +62,7 @@ public class EquipmentPart extends Part {
     protected String typeName;
     protected int equipmentNum;
     protected double equipTonnage;
-    protected double size = 1.0;
+    protected double size;
 
     public EquipmentType getType() {
         return type;
@@ -77,7 +77,7 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart() {
-        this(0, null, -1, 1.0, false, null);
+        this(0, null, Entity.LOC_NONE, 1.0, false, null);
     }
 
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, double size, Campaign c) {
@@ -91,16 +91,15 @@ public class EquipmentPart extends Part {
             this.name = type.getName(size);
             this.typeName = type.getInternalName();
         }
-        if (equipNum != -1) {
-            this.equipmentNum = equipNum;
-        } else {
-            equipmentNum = -1;
-        }
+
+        this.equipmentNum = equipNum;
+        this.size = size;
+
         if (null != type) {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                MekHQ.getLogger().error(EquipmentPart.class, "EquipmentPart", ex);
+                MekHQ.getLogger().error(ex);
             }
         }
     }
@@ -108,8 +107,8 @@ public class EquipmentPart extends Part {
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
-        if (null != unit) {
-            equipTonnage = type.getTonnage(unit.getEntity(), size);
+        if ((u != null) && (type != null)) {
+            equipTonnage = type.getTonnage(u.getEntity(), size);
         }
     }
 
@@ -117,12 +116,11 @@ public class EquipmentPart extends Part {
         equipTonnage = ton;
     }
 
+    @Override
     public EquipmentPart clone() {
         EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, size, omniPodded, campaign);
         clone.copyBaseData(this);
-        if (hasVariableTonnage(type)) {
-            clone.setEquipTonnage(equipTonnage);
-        }
+        clone.setEquipTonnage(equipTonnage);
         return clone;
     }
 
@@ -142,8 +140,7 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            MekHQ.getLogger().error(getClass(), "restore",
-                    "Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
         }
     }
 
@@ -153,7 +150,8 @@ public class EquipmentPart extends Part {
         // they are not acceptable substitutes, so we need to check for that as
         // well
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return part instanceof EquipmentPart && getType().equals(((EquipmentPart) part).getType())
+        return (getClass() == part.getClass())
+                && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage() && getStickerPrice().equals(part.getStickerPrice())
                 && getSize() == ((EquipmentPart) part).getSize()
                 && isOmniPodded() == part.isOmniPodded();
@@ -201,79 +199,88 @@ public class EquipmentPart extends Part {
     @Override
     public void fix() {
         super.fix();
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted) {
-                mounted.setHit(false);
-                mounted.setMissing(false);
-                mounted.setDestroyed(false);
-                unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
-            }
-            checkWeaponBay();
+
+        final Mounted mounted = getMounted();
+        if (mounted != null) {
+            mounted.setHit(false);
+            mounted.setMissing(false);
+            mounted.setDestroyed(false);
+            unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
         }
+
+        checkWeaponBay(getUnit(), getType(), getEquipmentNum());
     }
 
     @Override
-    public MissingPart getMissingPart() {
+    public MissingEquipmentPart getMissingPart() {
         return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, size, omniPodded);
     }
 
     @Override
     public void remove(boolean salvage) {
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+        final int equipmentNum = getEquipmentNum();
+        final Unit unit = getUnit();
+        if (unit != null) {
+            final Mounted mounted = getMounted();
             if (null != mounted) {
                 mounted.setHit(true);
                 mounted.setDestroyed(true);
                 mounted.setRepairable(false);
                 unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
-            if (!salvage) {
-                campaign.removePart(this);
-            } else if (null != spare) {
-                int number = quantity;
-                while (number > 0) {
-                    spare.incrementQuantity();
-                    number--;
-                }
-                campaign.removePart(this);
-            }
-            unit.removePart(this);
-            Part missing = getMissingPart();
+
+            MissingEquipmentPart missing = getMissingPart();
             if (null != missing) {
                 unit.addPart(missing);
+                campaign.getQuartermaster().addPart(missing, 0);
             }
-            campaign.addPart(missing, 0);
+
+            unit.removePart(this);
+            setUnit(null);
+            setEquipmentNum(-1);
+
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else {
+                // Now that we're a spare part, add us back into the campaign
+                // to merge us with any other parts of the same type
+                campaign.getQuartermaster().addPart(this, 0);
+            }
+
+            checkWeaponBay(unit, getType(), equipmentNum);
         }
-        checkWeaponBay();
-        setUnit(null);
-        updateConditionFromEntity(false);
-        equipmentNum = -1;
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if (null != unit) {
-            int priorHits = hits;
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted) {
-                if (mounted.isMissing()) {
-                    remove(false);
-                    return;
-                }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
-                        mounted.getLocation());
-                if (mounted.isSplit()) {
-                    hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
-                            mounted.getSecondLocation());
-                }
-                omniPodded = mounted.isOmniPodMounted();
-            }
-            if (checkForDestruction && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-                remove(false);
-            }
+        final Unit unit = getUnit();
+        final Mounted mounted = getMounted();
+        if ((unit == null) || (mounted == null)) {
+            return;
+        }
+
+        if (mounted.isMissing()) {
+            remove(false);
+            return;
+        }
+
+        int priorHits = getHits();
+
+        int newHits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(),
+                mounted.getLocation());
+        if (mounted.isSplit()) {
+            newHits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(),
+                    mounted.getSecondLocation());
+        }
+
+        setHits(newHits);
+
+        omniPodded = mounted.isOmniPodMounted();
+
+        if (checkForDestruction && (getHits() > priorHits)
+                && (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
+            remove(false);
+            return;
         }
     }
 
@@ -282,10 +289,13 @@ public class EquipmentPart extends Part {
         if (isSalvaging()) {
             return isOmniPodded() ? 30 : 120;
         }
-        // LAM bomb bays only take 60 minutes to repair.
+
+        final int hits = getHits();
         if ((type instanceof MiscType) && type.hasFlag(MiscType.F_BOMB_BAY)) {
-            return 60;
+            // LAM bomb bays only take 60 minutes to repair.
+            return (hits > 0) ? 60 : 0;
         }
+
         if (hits == 1) {
             return 100;
         } else if (hits == 2) {
@@ -295,6 +305,7 @@ public class EquipmentPart extends Part {
         } else if (hits > 3) {
             return 250;
         }
+
         return 0;
     }
 
@@ -324,14 +335,24 @@ public class EquipmentPart extends Part {
         return hits > 0;
     }
 
-    public int getLocation() {
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted) {
-                return mounted.getLocation();
+    protected @Nullable Mounted getMounted() {
+        final Unit unit = getUnit();
+        if ((unit != null) && (unit.getEntity() != null) && (getEquipmentNum() >= 0)) {
+            final Mounted mounted = unit.getEntity().getEquipment(getEquipmentNum());
+            if (mounted != null) {
+                return mounted;
             }
+
+            MekHQ.getLogger().warning("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
-        return -1;
+
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        final Mounted mounted = getMounted();
+        return (mounted != null) ? mounted.getLocation() : Entity.LOC_NONE;
     }
 
     public double getSize() {
@@ -339,36 +360,36 @@ public class EquipmentPart extends Part {
     }
 
     public boolean isRearFacing() {
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted) {
-                return mounted.isRearMounted();
-            }
-        }
-        return false;
+        final Mounted mounted = getMounted();
+        return (mounted != null) && mounted.isRearMounted();
     }
 
     @Override
     public void updateConditionFromPart() {
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted) {
-                mounted.setMissing(false);
-                if (hits >= 1) {
-                    mounted.setDestroyed(true);
-                    mounted.setHit(true);
-                    mounted.setRepairable(true);
-                    unit.damageSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, hits);
-                } else {
-                    mounted.setHit(false);
-                    mounted.setDestroyed(false);
-                    mounted.setRepairable(true);
-                    unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
-                }
-                setOmniPodded(mounted.isOmniPodMounted());
-            }
-            checkWeaponBay();
+        final Unit unit = getUnit();
+        if (unit == null) {
+            return;
         }
+
+        final Mounted mounted = getMounted();
+        if (mounted != null) {
+            mounted.setMissing(false);
+            if (getHits() > 0) {
+                mounted.setDestroyed(true);
+                mounted.setHit(true);
+                mounted.setRepairable(true);
+                unit.damageSystem(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(), getHits());
+            } else {
+                mounted.setHit(false);
+                mounted.setDestroyed(false);
+                mounted.setRepairable(true);
+                unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum());
+            }
+
+            setOmniPodded(mounted.isOmniPodMounted());
+        }
+
+        checkWeaponBay(unit, getType(), getEquipmentNum());
     }
 
     @Override
@@ -376,82 +397,56 @@ public class EquipmentPart extends Part {
         if (isSalvaging()) {
             return null;
         }
+
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
-        if (null != unit) {
-            Mounted m = unit.getEntity().getEquipment(equipmentNum);
-            if (null != m) {
-                int loc = m.getLocation();
+        final Unit unit = getUnit();
+        final Mounted m = getMounted();
+        if ((unit != null) && (m != null)) {
+            int loc = m.getLocation();
+            if (unit.isLocationBreached(loc)) {
+                return unit.getEntity().getLocationName(loc) + " is breached.";
+            }
+
+            if (unit.isLocationDestroyed(loc)) {
+                return unit.getEntity().getLocationName(loc) + " is destroyed.";
+            }
+
+            if (m.isSplit()) {
+                loc = m.getSecondLocation();
                 if (unit.isLocationBreached(loc)) {
                     return unit.getEntity().getLocationName(loc) + " is breached.";
                 }
                 if (unit.isLocationDestroyed(loc)) {
                     return unit.getEntity().getLocationName(loc) + " is destroyed.";
                 }
-                loc = m.getSecondLocation();
-                if (loc != Entity.LOC_NONE) {
-                    if (unit.isLocationBreached(loc)) {
-                        return unit.getEntity().getLocationName(loc) + " is breached.";
-                    }
-                    if (unit.isLocationDestroyed(loc)) {
-                        return unit.getEntity().getLocationName(loc) + " is destroyed.";
-                    }
-                }
             }
         }
+
         return null;
     }
 
     @Override
     public boolean isMountedOnDestroyedLocation() {
-        // This should do the exact same as the big loop commented out below - Dylan
-        try {
-            return unit != null && unit.getEntity() != null && unit.getEntity().getEquipment(equipmentNum) != null
-                    && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "isMountedOnDestroyedLocation()", e);
+        final Unit unit = getUnit();
+        final Mounted mounted = getMounted();
+        if ((unit != null) && (mounted != null)) {
+            return unit.isLocationDestroyed(mounted.getLocation())
+                    || (mounted.isSplit() && unit.isLocationDestroyed(mounted.getSecondLocation()));
         }
+
         return false;
-        /*
-         * if(null == unit) { return false; } for(int loc = 0; loc <
-         * unit.getEntity().locations(); loc++) { for (int i = 0; i <
-         * unit.getEntity().getNumberOfCriticals(loc); i++) { CriticalSlot slot =
-         * unit.getEntity().getCritical(loc, i);
-         *
-         * // ignore empty & system slots if ((slot == null) || (slot.getType() !=
-         * CriticalSlot.TYPE_EQUIPMENT)) { continue; } Mounted equip =
-         * unit.getEntity().getEquipment(equipmentNum); Mounted m1 = slot.getMount();
-         * Mounted m2 = slot.getMount2(); if (m1 == null && m2 == null) { continue; } if
-         * (slot.getIndex() == equipmentNum || (equip.equals(m1) || equip.equals(m2))) {
-         * return unit.isLocationDestroyed(loc); } } } return false;
-         */
     }
 
     @Override
     public boolean onBadHipOrShoulder() {
-        if (null != unit) {
-            for (int loc = 0; loc < unit.getEntity().locations(); loc++) {
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-
-                    // ignore empty & system slots
-                    if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
-                        continue;
-                    }
-                    Mounted equip = unit.getEntity().getEquipment(equipmentNum);
-                    Mounted m1 = slot.getMount();
-                    Mounted m2 = slot.getMount2();
-                    if (m1 == null && m2 == null) {
-                        continue;
-                    }
-                    if ((equip.equals(m1)) || (equip.equals(m2))) {
-                        if (unit.hasBadHipOrShoulder(loc)) {
-                            return true;
-                        }
-                    }
-                }
-            }
+        final Unit unit = getUnit();
+        final Mounted mounted = getMounted();
+        if ((unit != null) && (mounted != null)) {
+            return unit.hasBadHipOrShoulder(mounted.getLocation())
+                    || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
         }
+
         return false;
     }
 
@@ -569,8 +564,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING,
-                    "I don't know how much " + name + " costs.");
+            MekHQ.getLogger().debug("I don't know how much " + name + " costs.");
         }
         return varCost;
     }
@@ -584,8 +578,9 @@ public class EquipmentPart extends Part {
      * item tonnage
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
-        return (type instanceof MiscType && (type.hasFlag(MiscType.F_TARGCOMP) || type.hasFlag(MiscType.F_CLUB)
-                || type.hasFlag(MiscType.F_TALON)));
+        return (type instanceof MiscType)
+                && (type.hasFlag(MiscType.F_TARGCOMP) || type.hasFlag(MiscType.F_CLUB)
+                        || type.hasFlag(MiscType.F_TALON));
     }
 
     public static double getStartingTonnage(EquipmentType type) {
@@ -620,7 +615,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
-        return equipmentNum == index && loc == getLocation();
+        return (getEquipmentNum() == index) && (getLocation() == loc);
     }
 
     @Override
@@ -640,46 +635,24 @@ public class EquipmentPart extends Part {
 
     @Override
     public String getLocationName() {
-        if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if (null != mounted && mounted.getLocation() != -1) {
-                return unit.getEntity().getLocationName(mounted.getLocation());
-            }
+        final Mounted mounted = getMounted();
+        if ((mounted != null) && (mounted.getLocation() != Entity.LOC_NONE)) {
+            return getUnit().getEntity().getLocationName(mounted.getLocation());
         }
+
         return null;
     }
 
     @Override
     public boolean isInLocation(String loc) {
-        if (null == unit || null == unit.getEntity() || null == unit.getEntity().getEquipment(equipmentNum)) {
+        final Mounted mounted = getMounted();
+        if (mounted == null) {
             return false;
         }
 
-        Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-        if (null == mounted) {
-            return false;
-        }
         int location = unit.getEntity().getLocationFromAbbr(loc);
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(location); i++) {
-            CriticalSlot slot = unit.getEntity().getCritical(location, i);
-            // ignore empty & non-hittable slots
-            if ((slot == null) || !slot.isEverHittable() || slot.getType() != CriticalSlot.TYPE_EQUIPMENT
-                    || null == slot.getMount()) {
-                continue;
-            }
-            if (unit.getEntity().getEquipmentNum(slot.getMount()) == equipmentNum) {
-                return true;
-            }
-        }
-        // if we are still here, lets just double check by the mounted's location and
-        // secondary location
-        if (mounted.getLocation() == location) {
-            return true;
-        }
-        if (location != Entity.LOC_NONE && mounted.getSecondLocation() == location) {
-            return true;
-        }
-        return false;
+        return (mounted.getLocation() == location)
+                || (mounted.isSplit() && (mounted.getSecondLocation() == location));
     }
 
     /**
@@ -691,59 +664,65 @@ public class EquipmentPart extends Part {
      * designed to be used only by the fix and remove methods contained here in
      * order to properly update weapon bay mounts on the entity
      */
-    private void checkWeaponBay() {
+    private static void checkWeaponBay(Unit unit, EquipmentType type, int equipmentNum) {
+        if ((unit == null) || (unit.getEntity() == null)
+                || !unit.getEntity().usesWeaponBays()
+                || !(type instanceof WeaponType)) {
+            return;
+        }
 
-        if (type instanceof WeaponType && null != unit && null != unit.getEntity()
-                && unit.getEntity().usesWeaponBays()) {
-            Mounted weapon = unit.getEntity().getEquipment(equipmentNum);
-            if (null == weapon) {
-                return;
+        final Mounted weapon = unit.getEntity().getEquipment(equipmentNum);
+        if (weapon == null) {
+            return;
+        }
+
+        Mounted weaponBay = null;
+        for (Mounted m : unit.getEntity().getWeaponBayList()) {
+            if (m.getLocation() != weapon.getLocation()) {
+                continue;
             }
-            Mounted weaponBay = null;
-            for (Mounted m : unit.getEntity().getWeaponBayList()) {
-                if (m.getLocation() != weapon.getLocation()) {
-                    continue;
-                }
-                if (m.getType() instanceof BayWeapon && m.getBayWeapons().contains(equipmentNum)) {
-                    weaponBay = m;
-                    break;
-                }
+            if ((m.getType() instanceof BayWeapon) && m.getBayWeapons().contains(equipmentNum)) {
+                weaponBay = m;
+                break;
             }
-            if (null == weaponBay) {
-                return;
+        }
+
+        if (weaponBay == null) {
+            return;
+        }
+
+        int wBayIndex = unit.getEntity().getEquipmentNum(weaponBay);
+        // ok we found the weapons bay, now lets check first to see if the current
+        // weapon is fixed
+        if (!weapon.isDestroyed()) {
+            weaponBay.setHit(false);
+            weaponBay.setMissing(false);
+            weaponBay.setDestroyed(false);
+            unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
+            return;
+        }
+
+        // if we are still here then we need to check the other weapons, if any of them
+        // are usable then we should do the same thing. Otherwise all weapons are destroyed
+        // and we should mark the bay as unusuable.
+        for (int wId : weaponBay.getBayWeapons()) {
+            final Mounted m = unit.getEntity().getEquipment(wId);
+            if (m == null) {
+                continue;
             }
-            int wBayIndex = unit.getEntity().getEquipmentNum(weaponBay);
-            // ok we found the weapons bay, now lets check first to see if the current
-            // weapon is fixed
-            if (!weapon.isDestroyed()) {
+
+            if (!m.isDestroyed()) {
                 weaponBay.setHit(false);
                 weaponBay.setMissing(false);
                 weaponBay.setDestroyed(false);
                 unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
                 return;
             }
-            // if we are still here then we need to check the other weapons, if any of them
-            // are usable
-            // then we should do the same thing. Otherwise all weapons are destroyed and we
-            // should mark
-            // the bay as unusuable
-            for (int wId : weaponBay.getBayWeapons()) {
-                Mounted m = unit.getEntity().getEquipment(wId);
-                if (null == m) {
-                    continue;
-                }
-                if (!m.isDestroyed()) {
-                    weaponBay.setHit(false);
-                    weaponBay.setMissing(false);
-                    weaponBay.setDestroyed(false);
-                    unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
-                    return;
-                }
-            }
-            weaponBay.setHit(true);
-            weaponBay.setDestroyed(true);
-            weaponBay.setRepairable(true);
-            unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
         }
+
+        weaponBay.setHit(true);
+        weaponBay.setDestroyed(true);
+        weaponBay.setRepairable(true);
+        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
     }
 }

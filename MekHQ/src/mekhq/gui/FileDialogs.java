@@ -10,22 +10,24 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javax.swing.JFrame;
 
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;
@@ -63,9 +65,9 @@ public class FileDialogs {
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
         String fileName = String.format(
-                "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
+                "%s%s_ExportedPersonnel.prsx",
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
@@ -83,32 +85,62 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> openCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Campaign Options",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue());
+    public static Optional<File> openRankSystems(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame, "Load Rank Systems",
+                FileType.XML, MekHQ.getMekHQOptions().getRankSystemsPath());
 
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setRankSystemsPath(x.getParent()));
         return value;
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveCampaignOptions(JFrame frame) {
-        Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Campaign Options as Presets",
-                FileType.XML,
-                MekHQ.getCampaignOptionsDirectory().getValue(),
-                "myoptions.xml");
+    public static Optional<File> saveRankSystems(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Rank Systems", FileType.XML,
+                MekHQ.getMekHQOptions().getRankSystemsPath(), "rankSystem.xml");
 
-        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setRankSystemsPath(x.getParent()));
         return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openIndividualRankSystem(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame, "Load Individual Rank System",
+                FileType.XML, MekHQ.getMekHQOptions().getIndividualRankSystemPath());
+
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setIndividualRankSystemPath(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveIndividualRankSystem(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Individual Rank System",
+                FileType.XML, MekHQ.getMekHQOptions().getIndividualRankSystemPath(),
+                "individualRankSystem.xml");
+
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setIndividualRankSystemPath(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveCampaignPreset(final JFrame frame, final CampaignPreset preset) {
+        return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
+                MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
     }
 
     /**
@@ -134,9 +166,9 @@ public class FileDialogs {
      */
     public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
         String fileName = String.format(
-                "%s%s_ExportedParts.parts", //$NON-NLS-1$
+                "%s%s_ExportedParts.parts",
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value =  GUI.fileDialogSave(
                 frame,
@@ -204,18 +236,12 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
+        String fileName = String.format("%s%s.%s", campaign.getName(),
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)),
+                MekHQ.getMekHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
-        String fileName = String.format(
-                "%s%s.%s", //$NON-NLS-1$
-                campaign.getName(),
-                campaign.getShortDateAsString(),
-                campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
-
-        Optional<File> value = GUI.fileDialogSave( frame,
-                "Save Campaign",
-                FileType.CPNX,
-                MekHQ.getCampaignsDirectory().getValue(),
-                fileName);
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,
+                MekHQ.getCampaignsDirectory().getValue(), fileName);
 
         value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
         return value;

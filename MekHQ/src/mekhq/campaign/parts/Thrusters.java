@@ -1,22 +1,22 @@
 /*
  * Thrusters.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
@@ -38,14 +38,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Thrusters extends Part {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -336290094932539638L;
     private boolean isLeftThrusters;
 
@@ -63,6 +58,7 @@ public class Thrusters extends Part {
         this.name = "Thrusters";
     }
 
+    @Override
     public Thrusters clone() {
         Thrusters clone = new Thrusters(0, campaign, isLeftThrusters);
         clone.copyBaseData(this);
@@ -78,8 +74,8 @@ public class Thrusters extends Part {
             } else {
                 hits = ((Aero)unit.getEntity()).getRightThrustHits();
             }
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -89,19 +85,19 @@ public class Thrusters extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if(isSalvaging()) {
+            if (isSalvaging()) {
                 time = 600;
             } else {
                 time = 90;
             }
             if (hits == 1) {
                 time *= 1;
-            } 
+            }
             if (hits == 2) {
                 time *= 2;
             }
@@ -127,7 +123,7 @@ public class Thrusters extends Part {
             }
             if (hits == 1) {
                 return -1;
-            } 
+            }
             if (hits == 2) {
                 return 0;
             }
@@ -172,17 +168,17 @@ public class Thrusters extends Part {
             } else {
                 ((Aero)unit.getEntity()).setRightThrustHits(4);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -200,8 +196,8 @@ public class Thrusters extends Part {
 
     @Override
     public boolean needsFixing() {
-        if(null != getUnit() && null != getUnit().getEntity() && 
-                (getUnit().getEntity() instanceof Aero 
+        if(null != getUnit() && null != getUnit().getEntity() &&
+                (getUnit().getEntity() instanceof Aero
                         && !(getUnit().getEntity() instanceof SmallCraft
                                 || getUnit().getEntity() instanceof Jumpship))) {
             return false;
@@ -211,9 +207,9 @@ public class Thrusters extends Part {
 
     @Override
     public boolean isSalvaging() {
-        if(null != getUnit() && null != getUnit().getEntity() && 
-                (getUnit().getEntity() instanceof Aero 
-                        && !(getUnit().getEntity() instanceof SmallCraft 
+        if(null != getUnit() && null != getUnit().getEntity() &&
+                (getUnit().getEntity() instanceof Aero
+                        && !(getUnit().getEntity() instanceof SmallCraft
                                 || getUnit().getEntity() instanceof Jumpship))) {
             return false;
         }
@@ -256,7 +252,7 @@ public class Thrusters extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("isLeftThrusters")) {

@@ -1,29 +1,29 @@
 /*
  * AeroLifeSupport.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -39,14 +39,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AeroLifeSupport extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -717866644605314883L;
 
     private Money cost;
@@ -60,7 +55,7 @@ public class AeroLifeSupport extends Part {
     public AeroLifeSupport() {
         this(0, Money.zero(), false, null);
     }
-    
+
     public AeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
@@ -70,13 +65,13 @@ public class AeroLifeSupport extends Part {
             this.name = "Spacecraft Life Support";
         }
     }
-    
+
     public AeroLifeSupport clone() {
         AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
@@ -162,17 +157,17 @@ public class AeroLifeSupport extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setLifeSupport(false);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -270,10 +265,10 @@ public class AeroLifeSupport extends Part {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ELECTRONICS;
     }
 
     @Override

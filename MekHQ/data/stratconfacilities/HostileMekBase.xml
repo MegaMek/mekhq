@@ -1,0 +1,9 @@
+<StratconFacility>
+	<capturedDefinition>AlliedMekBase.xml</capturedDefinition>
+	<displayableName>Mech Base</displayableName>
+        <facilityType>MekBase</facilityType>
+        <localModifiers>EnemyMechGarrison.xml</localModifiers>
+        <owner>Opposing</owner>
+        <sharedModifiers>EnemyMechReinforcements.xml</sharedModifiers>
+        <visible>false</visible>
+</StratconFacility>

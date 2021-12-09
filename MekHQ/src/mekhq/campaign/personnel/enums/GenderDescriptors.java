@@ -71,7 +71,7 @@ public enum GenderDescriptors {
     GenderDescriptors(String masculine, String feminine, String other) {
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
-        this.other = other;
+        this.other = (other != null) ? resources.getString(other): "";
     }
     //endregion Constructors
 
@@ -90,7 +90,7 @@ public enum GenderDescriptors {
             case OTHER_FEMALE:
                 return (this.other != null) ? this.other : this.feminine;
             default:
-                return (this.other != null) ? this.other : "";
+                return this.other;
         }
     }
 

@@ -33,8 +33,8 @@ import megamek.common.util.EncodeControl;
  */
 public enum GuiTabType {
     //region Enum Declaration
-    COMMAND(0,  "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
-    TOE(1,  "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
+    COMMAND(0, "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
+    TOE(1, "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
     BRIEFING(2, "panBriefing.TabConstraints.tabTitle", KeyEvent.VK_B),
     MAP(3, "panMap.TabConstraints.tabTitle", KeyEvent.VK_S),
     PERSONNEL(4, "panPersonnel.TabConstraints.tabTitle", KeyEvent.VK_P),
@@ -44,7 +44,8 @@ public enum GuiTabType {
     INFIRMARY(8, "panInfirmary.TabConstraints.tabTitle", KeyEvent.VK_I),
     MEKLAB(9, "panMekLab.TabConstraints.tabTitle", KeyEvent.VK_L),
     FINANCES(10, "panFinances.TabConstraints.tabTitle", KeyEvent.VK_N),
-    CUSTOM(11, "panCustom.TabConstraints.tabTitle", KeyEvent.VK_UNDEFINED);
+    STRATCON(11, "panStratcon.TabConstraints.tabTitle", KeyEvent.VK_C),
+    CUSTOM(12, "panCustom.TabConstraints.tabTitle", KeyEvent.VK_UNDEFINED);
     //endregion Enum Declaration
 
     //region Variable Declarations
@@ -100,6 +101,8 @@ public enum GuiTabType {
                 return new MekLabTab(gui, name);
             case FINANCES:
                 return new FinancesTab(gui, name);
+            case STRATCON:
+                return new StratconTab(gui, name);
             default:
                 return null;
         }

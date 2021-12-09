@@ -1,7 +1,8 @@
 /*
  * Lance.java
  *
- * Copyright (c) 2011 Carl Spain. All rights reserved.
+ * Copyright (c) 2011 - Carl Spain. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,21 +13,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import megamek.common.Compute;
@@ -38,10 +36,11 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -57,22 +56,9 @@ import org.w3c.dom.NodeList;
  * to a mission role and what the assignment is on which contract.
  *
  * @author Neoancient
- *
  */
-
 public class Lance implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = -1197697940987478509L;
-
-    public static final int ROLE_UNASSIGNED = 0;
-    public static final int ROLE_FIGHT = 1;
-    public static final int ROLE_DEFEND = 2;
-    public static final int ROLE_SCOUT = 3;
-    public static final int ROLE_TRAINING = 4;
-    public static final int ROLE_NUM = 5;
-
-    public static final String[] roleNames = {
-        "Unassigned", "Fight", "Defend", "Scout", "Training"
-    };
 
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
@@ -86,7 +72,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     private int forceId;
     private int missionId;
-    private int role;
+    private AtBLanceRole role;
     private UUID commanderId;
 
     public static int getStdLanceSize(Faction f) {
@@ -103,19 +89,11 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public Lance(int fid, Campaign c) {
         forceId = fid;
-        role = ROLE_UNASSIGNED;
+        role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
-                break;
-            }
-            if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
-                    missionId = m.getId();
-                } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
-                }
-            }
+        for (AtBContract contract : c.getActiveAtBContracts()) {
+            missionId = ((contract.getParentContract() == null)
+                    ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }
@@ -140,11 +118,11 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public int getRole() {
+    public AtBLanceRole getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(AtBLanceRole role) {
         this.role = role;
     }
 
@@ -240,6 +218,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isEligible(Campaign c) {
+        // ensure the lance is marked as a combat force
+        final Force force = c.getForce(forceId);
+        if ((force == null) || !force.isCombatForce()) {
+            return false;
+        }
+
         /* Check that the number of units and weight are within the limits
          * and that the force contains at least one ground unit. */
         if (c.getCampaignOptions().getLimitLanceNumUnits()) {
@@ -256,7 +240,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
 
         boolean hasGround = false;
-        for (UUID id : c.getForce(forceId).getUnits()) {
+        for (UUID id : force.getUnits()) {
             Unit unit = c.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
@@ -277,206 +261,199 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     /* Code to find unit commander from ForceViewPanel */
 
     public static UUID findCommander(int forceId, Campaign c) {
-        ArrayList<Person> people = new ArrayList<Person>();
-        for(UUID uid : c.getForce(forceId).getAllUnits()) {
+        ArrayList<Person> people = new ArrayList<>();
+        for (UUID uid : c.getForce(forceId).getAllUnits(false)) {
             Unit u = c.getUnit(uid);
-            if(null != u) {
+            if (null != u) {
                 Person p = u.getCommander();
-                if(null != p) {
+                if (null != p) {
                     people.add(p);
                 }
             }
         }
         //sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if(people.size() > 0) {
+        if (people.size() > 0) {
             return people.get(0).getId();
         }
         return null;
     }
 
-    public static Date getBattleDate(GregorianCalendar c) {
-        GregorianCalendar calendar = (GregorianCalendar) c.clone();
-        calendar.add(Calendar.DATE, Compute.randomInt(7));
-        return calendar.getTime();
+    public static LocalDate getBattleDate(LocalDate today) {
+        return today.plusDays(Compute.randomInt(7));
     }
 
     public AtBScenario checkForBattle(Campaign c) {
-        double intensity = c.getCampaignOptions().getIntensity();
-        if (intensity < AtBContract.MINIMUM_INTENSITY) {
-            // AtB Battle Generation disabled
+        // Make sure there is a battle first
+        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0)
+                || (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role))) {
+            // No battle
             return null;
         }
 
-        int noBattle;
+        // if we are using StratCon, don't *also* generate legacy scenarios
+        if (c.getCampaignOptions().getUseStratCon() &&
+                (getContract(c).getStratconCampaignState() != null)) {
+            return null;
+        }
+
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
-        int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
+        int battleTypeMod = 1 + (AtBMoraleLevel.NORMAL.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular scenario.
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
+
         /*if (true) {
-            AtBScenario scenario = AtBScenarioFactory.createScenario(c, null, AtBScenario.CIVILIANHELP, true, getBattleDate(c.getCalendar()));
+            AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
             scenario.setMissionId(this.getMissionId());
             return scenario;
         }*/
 
         switch (role) {
-            case ROLE_FIGHT: {
-                noBattle = (int) (60.0 / intensity + 0.5);
-                roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
+            case FIGHTING: {
+                roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 9) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 9 + noBattle) {
-                    return null;
-                } else if (roll < 17 + noBattle) {
+                            getBattleDate(c.getLocalDate()));
+                } else if (roll < 17) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.STANDUP, true,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 25 + noBattle) {
+                            getBattleDate(c.getLocalDate()));
+                } else if (roll < 25) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.STANDUP, false,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 33 + noBattle) {
+                            getBattleDate(c.getLocalDate()));
+                } else if (roll < 33) {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     } else {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     }
-                } else if (roll < 41 + noBattle) {
+                } else if (roll < 41) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HOLDTHELINE, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_SCOUT: {
-                noBattle = (int) (40.0 / intensity + 0.5);
-                roll = Compute.randomInt(60 + noBattle) + battleTypeMod;
+            case SCOUTING: {
+                roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 11) {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     } else {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.HIDEANDSEEK, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     }
                 } else if (roll < 21) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 31) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.PROBE, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 41) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.PROBE, false,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 41 + noBattle) {
-                    return null;
-                } else if (roll < 51 + noBattle) {
+                            getBattleDate(c.getLocalDate()));
+                } else if (roll < 51) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.EXTRACTION, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.RECONRAID, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_DEFEND: {
-                noBattle = (int) (80.0 / intensity + 0.5);
-                roll = Compute.randomInt(20 + noBattle) + battleTypeMod;
+            case DEFENCE: {
+                roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 5) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 9) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.RECONRAID, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 13) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.EXTRACTION, false,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 13 + noBattle) {
-                    return null;
-                } else if (roll < 17 + noBattle) {
+                            getBattleDate(c.getLocalDate()));
+                } else if (roll < 17) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BREAKTHROUGH, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_TRAINING: {
-                noBattle = (int) (90.0 / intensity + 0.5);
-                roll = Compute.randomInt(10 + noBattle) + battleTypeMod;
+            case TRAINING: {
+                roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 3) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 5) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(c.getCalendar()));
+                            getBattleDate(c.getLocalDate()));
                 } else if (roll < 7) {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     } else {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.BREAKTHROUGH, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     }
                 } else if (roll < 9) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HIDEANDSEEK, false,
-                            getBattleDate(c.getCalendar()));
-                } else if (roll < 9 + noBattle) {
-                    return null;
+                            getBattleDate(c.getLocalDate()));
                 } else {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     } else {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(c.getCalendar()));
+                                getBattleDate(c.getLocalDate()));
                     }
                 }
             }
@@ -488,32 +465,15 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\""
-                +this.getClass().getName()
-                +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<forceId>"
-                + forceId
-                +"</forceId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionId>"
-                + missionId
-                +"</missionId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<role>"
-                + role
-                +"</role>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<commanderId>"
-                + commanderId
-                +"</commanderId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</lance>");
-
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\"" + getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId);
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -530,13 +490,13 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
                     retVal.missionId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
-                    retVal.role = Integer.parseInt(wn2.getTextContent());
+                    retVal.setRole(AtBLanceRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
                     retVal.commanderId = UUID.fromString(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
         return retVal;
     }

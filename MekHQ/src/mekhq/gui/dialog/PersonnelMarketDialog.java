@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2013, 2020  - The MegaMek Team
+ * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,104 +10,87 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SortOrder;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.PersonnelTab;
+import mekhq.gui.enums.PersonnelFilter;
+import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
- *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class PersonnelMarketDialog extends JDialog {
-	private static final long serialVersionUID = 707579637170575313L;
+    //region Variable Declarations
+    private static final long serialVersionUID = 707579637170575313L;
 
-	private PersonnelTableModel personnelModel;
-	private Campaign campaign;
-	private CampaignGUI hqView;
+    private PersonnelTableModel personnelModel;
+    private Campaign campaign;
+    private CampaignGUI hqView;
     private PersonnelMarket personnelMarket;
-    boolean addToCampaign;
-    Person selectedPerson = null;
-    @SuppressWarnings("unused")
-    private DirectoryItems portraits;
+    private Person selectedPerson = null;
     private Money unitCost = Money.zero();
 
-    private javax.swing.JComboBox<String> comboPersonType;
-    private javax.swing.JLabel lblPersonChoice;
-    private javax.swing.JRadioButton radioNormalRoll;
-    private javax.swing.JRadioButton radioPaidRecruitment;
-    private javax.swing.JComboBox<String> comboRecruitType;
-    private javax.swing.JPanel panelOKBtns;
-    private javax.swing.JPanel panelMain;
-    private javax.swing.JPanel panelFilterBtns;
-    private javax.swing.JTable tablePersonnel;
-    private javax.swing.JLabel lblUnitCost;
-    private javax.swing.JScrollPane scrollTablePersonnel;
-    private javax.swing.JScrollPane scrollPersonnelView;
+    private JComboBox<PersonnelFilter> comboPersonType;
+    private JLabel lblPersonChoice;
+    private JRadioButton radioNormalRoll;
+    private JRadioButton radioPaidRecruitment;
+    private JComboBox<PersonnelRole> comboRecruitRole;
+    private JPanel panelOKBtns;
+    private JPanel panelMain;
+    private JPanel panelFilterBtns;
+    private JTable tablePersonnel;
+    private JLabel lblUnitCost;
+    private JScrollPane scrollTablePersonnel;
+    private JScrollPane scrollPersonnelView;
     private TableRowSorter<PersonnelTableModel> sorter;
-    ArrayList <RowSorter.SortKey> sortKeys;
-    private javax.swing.JSplitPane splitMain;
+    private ArrayList<RowSorter.SortKey> sortKeys;
+    private JSplitPane splitMain;
+
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog", new EncodeControl());
+    //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
-    public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c, DirectoryItems portraits) {
+    public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c) {
         super(frame, true);
         hqView = view;
         campaign = c;
-        this.portraits = portraits;
         personnelMarket = c.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
@@ -129,39 +112,36 @@ public class PersonnelMarketDialog extends JDialog {
         comboPersonType = new javax.swing.JComboBox<>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
-        comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         lblPersonChoice = new javax.swing.JLabel();
-        //choicePersonView = new javax.swing.JComboBox();
-        //lblPersonView = new javax.swing.JLabel();
+        comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Personnel Market"); // NOI18N
-        setName("Form"); // NOI18N
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Personnel Market");
+        setName("Form");
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new java.awt.GridBagLayout());
 
-        lblPersonChoice.setText("Personnel Type:"); // NOI18N
-        lblPersonChoice.setName("lblPersonChoice"); // NOI18N
+        lblPersonChoice.setText("Personnel Type:");
+        lblPersonChoice.setName("lblPersonChoice");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
-        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
-        	personTypeModel.addElement(getPersonnelGroupName(i));
+        DefaultComboBoxModel<PersonnelFilter> personTypeModel = new DefaultComboBoxModel<>();
+        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+            personTypeModel.addElement(filter);
         }
         comboPersonType.setSelectedItem(0);
         comboPersonType.setModel(personTypeModel);
         comboPersonType.setMinimumSize(new java.awt.Dimension(200, 27));
-        comboPersonType.setName("comboUnitType"); // NOI18N
+        comboPersonType.setName("comboUnitType");
         comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
         comboPersonType.addActionListener(evt -> filterPersonnel());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -175,14 +155,14 @@ public class PersonnelMarketDialog extends JDialog {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
             radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
 
             ButtonGroup group = new ButtonGroup();
@@ -194,26 +174,33 @@ public class PersonnelMarketDialog extends JDialog {
                 radioNormalRoll.setSelected(true);
             }
 
-            for (int i = 1; i < Person.T_NUM; i++) {
-                comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
-            }
+            final boolean isClan = campaign.getFaction().isClan();
+            comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    return super.getListCellRendererComponent(list,
+                            (value instanceof PersonnelRole) ? ((PersonnelRole) value).getName(isClan) : value,
+                            index, isSelected, cellHasFocus);
+                }
+            });
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panelFilterBtns.add(comboRecruitType, gridBagConstraints);
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            panelFilterBtns.add(comboRecruitRole, gridBagConstraints);
 
             if (personnelMarket.getPaidRecruitment()) {
                 radioPaidRecruitment.setSelected(true);
-                comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
+                comboRecruitRole.setSelectedItem(personnelMarket.getPaidRecruitRole());
             } else {
                 radioNormalRoll.setSelected(true);
             }
         }
 
-        scrollTablePersonnel.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTablePersonnel.setName("srcTablePersonnel"); // NOI18N
-        scrollTablePersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
+        scrollTablePersonnel.setMinimumSize(new Dimension(500, 400));
+        scrollTablePersonnel.setName("srcTablePersonnel");
+        scrollTablePersonnel.setPreferredSize(new Dimension(500, 400));
 
         tablePersonnel.setModel(personnelModel);
         tablePersonnel.setName("tablePersonnel"); // NOI18N
@@ -233,7 +220,7 @@ public class PersonnelMarketDialog extends JDialog {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
-            column.setCellRenderer(personnelModel.getRenderer(false, null));
+            column.setCellRenderer(personnelModel.getRenderer(PersonnelTabView.GENERAL));
 
             if (i != PersonnelTableModel.COL_GIVEN_NAME
                     && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)
@@ -313,8 +300,8 @@ public class PersonnelMarketDialog extends JDialog {
         radioPaidRecruitment.setName("paidRecruitment");
         preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
 
-        comboRecruitType.setName("recruitType");
-        preferences.manage(new JComboBoxPreference(comboRecruitType));
+        comboRecruitRole.setName("recruitRole");
+        preferences.manage(new JComboBoxPreference(comboRecruitRole));
 
         tablePersonnel.setName("unitsTable");
         preferences.manage(new JTablePreference(tablePersonnel));
@@ -324,38 +311,38 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public Person getPerson() {
-	    return selectedPerson;
-	}
+        return selectedPerson;
+    }
 
-	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-	    if (null != selectedPerson) {
-	    	if (campaign.getFunds().isLessThan(
-                    (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
-                            .plus(unitCost))) {
-				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
-	    	} else {
-	    		/* Adding person to campaign changes pid; grab the old one to
-	    		 * use as a key to any attached entity
-	    		 */
-	    		UUID pid = selectedPerson.getId();
-	    		if (campaign.recruitPerson(selectedPerson)) {
-	    			Entity en = personnelMarket.getAttachedEntity(pid);
-	    			if (null != en) {
-	    				addUnit(en, true);
-	    				personnelMarket.removeAttachedEntity(pid);
-	    			}
-	    			personnelMarket.removePerson(selectedPerson);
-	    			personnelModel.setData(personnelMarket.getPersonnel());
-	    		}
-	    	}
-	    	refreshPersonView();
-	    }
-	}//GEN-LAST:event_btnHireActionPerformed
+    private void hirePerson(ActionEvent evt) {
+        if (null != selectedPerson) {
+            if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
+                            ? selectedPerson.getSalary().multipliedBy(2)
+                            : Money.zero()).plus(unitCost))) {
+                 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+            } else {
+                /* Adding person to campaign changes pid; grab the old one to
+                 * use as a key to any attached entity
+                 */
+                UUID pid = selectedPerson.getId();
+                if (campaign.recruitPerson(selectedPerson)) {
+                    Entity en = personnelMarket.getAttachedEntity(pid);
+                    if (null != en) {
+                        addUnit(en, true);
+                        personnelMarket.removeAttachedEntity(pid);
+                    }
+                    personnelMarket.removePerson(selectedPerson);
+                    personnelModel.setData(personnelMarket.getPersonnel());
+                }
+            }
+            refreshPersonView();
+        }
+    }
 
-	private void addPerson() {
-		if (selectedPerson != null) {
-			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
-			UUID pid = selectedPerson.getId();
+    private void addPerson() {
+        if (selectedPerson != null) {
+            Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+            UUID pid = selectedPerson.getId();
 
             if (campaign.recruitPerson(selectedPerson, true)) {
                 addUnit(en, false);
@@ -364,161 +351,122 @@ public class PersonnelMarketDialog extends JDialog {
                 personnelMarket.removeAttachedEntity(pid);
             }
             refreshPersonView();
-		}
-	}
-
-	private void addUnit(Entity en, boolean pay) {
-		if (null == en) {
-			return;
-		}
-		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
-				"Purchased " + en.getShortName(),
-				campaign.getCalendar().getTime())) {
-			return;
-		}
-		campaign.addUnit(en, false, 0);
-		Unit unit = null;
-		for (Unit u : campaign.getUnits()) {
-			if (u.getEntity() == en) {
-				unit = u;
-				break;
-			}
         }
+    }
+
+    private void addUnit(Entity en, boolean pay) {
+        if (null == en) {
+            return;
+        }
+
+        if (pay && !campaign.getFinances().debit(TransactionType.UNIT_PURCHASE, campaign.getLocalDate(),
+                unitCost, "Purchased " + en.getShortName())) {
+            return;
+        }
+        Unit unit = campaign.addNewUnit(en, false, 0);
         if (unit == null) {
             // No such unit matching the entity.
             return;
         }
 
-		if (unit.usesSoloPilot()) {
-			unit.addPilotOrSoldier(selectedPerson);
-			selectedPerson.setOriginalUnit(unit);
-		} else if (unit.usesSoldiers()) {
-			unit.addPilotOrSoldier(selectedPerson);
-		} else if (selectedPerson.canDrive(en)) {
-			unit.addDriver(selectedPerson);
-		} else if (selectedPerson.canGun(en)) {
-			unit.addGunner(selectedPerson);
-		} else if (selectedPerson.getPrimaryRole() == Person.T_NAVIGATOR) {
-			unit.setNavigator(selectedPerson);
-		} else {
-			unit.addVesselCrew(selectedPerson);
-		}
+        if (unit.usesSoloPilot()) {
+            unit.addPilotOrSoldier(selectedPerson);
+            selectedPerson.setOriginalUnit(unit);
+        } else if (unit.usesSoldiers()) {
+            unit.addPilotOrSoldier(selectedPerson);
+        } else if (selectedPerson.canDrive(en)) {
+            unit.addDriver(selectedPerson);
+        } else if (selectedPerson.canGun(en)) {
+            unit.addGunner(selectedPerson);
+        } else if (selectedPerson.getPrimaryRole().isVesselNavigator()) {
+            unit.setNavigator(selectedPerson);
+        } else {
+            unit.addVesselCrew(selectedPerson);
+        }
 
-		campaign.hirePersonnelFor(unit.getId(), !pay);
-	}
+        HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(!pay);
+        hireAction.execute(campaign, unit);
+    }
 
-	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-	    selectedPerson = null;
-    	personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
-    	if (radioPaidRecruitment.isSelected()) {
-    		personnelMarket.setPaidRecruitType(comboRecruitType.getSelectedIndex() + 1);
-    	}
-	    setVisible(false);
-	}//GEN-LAST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(ActionEvent evt) {
+        selectedPerson = null;
+        personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
+        if (radioPaidRecruitment.isSelected()) {
+            personnelMarket.setPaidRecruitRole((PersonnelRole) comboRecruitRole.getSelectedItem());
+        }
+        setVisible(false);
+    }
 
     private void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter;
-        final int nGroup = comboPersonType.getSelectedIndex();
-        //If current expression doesn't parse, don't update.
-        try {
-            personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
-                @Override
-                public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                    PersonnelTableModel personModel = entry.getModel();
-                	Person person = personModel.getPerson(entry.getIdentifier());
-                	int type = person.getPrimaryRole();
-                    if ((nGroup == PersonnelTab.PG_ACTIVE) ||
-                            (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
-                            (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
-                            (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
-                            (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER
-                                    || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT
-                                    || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW)) ||
-                            (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
-                            (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
-                            (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
-                            (nGroup == PersonnelTab.PG_BA && type == Person.T_BA) ||
-                            (nGroup == PersonnelTab.PG_SOLDIER && type == Person.T_INFANTRY) ||
-                            (nGroup == PersonnelTab.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
-                            (nGroup == PersonnelTab.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
-                            (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                            (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
-                            ) {
-                        return person.isActive();
-                    } else if(nGroup == PersonnelTab.PG_RETIRE) {
-                        return person.getStatus() == PersonnelStatus.RETIRED;
-                    } else if(nGroup == PersonnelTab.PG_MIA) {
-                        return person.getStatus() == PersonnelStatus.MIA;
-                    } else if(nGroup == PersonnelTab.PG_KIA) {
-                        return person.getStatus() == PersonnelStatus.KIA;
-                    }
-                    return false;
-                }
-            };
-        } catch (java.util.regex.PatternSyntaxException e) {
-            return;
-        }
-        sorter.setRowFilter(personTypeFilter);
+        PersonnelFilter nGroup = (comboPersonType.getSelectedItem() != null)
+                ? (PersonnelFilter) comboPersonType.getSelectedItem()
+                : PersonnelFilter.ACTIVE;
+        sorter.setRowFilter(new RowFilter<PersonnelTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
+                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()));
+            }
+        });
     }
 
     private void personChanged(javax.swing.event.ListSelectionEvent evt) {
         int view = tablePersonnel.getSelectedRow();
-        if(view < 0) {
+        if (view < 0) {
             //selection got filtered away
             selectedPerson = null;
             refreshPersonView();
             return;
         }
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
-    	Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
-    	if (null == en) {
-    		unitCost = Money.zero();
-    	} else {
-    		if (!campaign.getCampaignOptions().getUseShareSystem() &&
-    				(en instanceof megamek.common.Mech ||
-    						en instanceof megamek.common.Tank ||
-    						en instanceof megamek.common.Aero)) {
-    			unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
-    		} else {
-    			unitCost = Money.zero();
-    		}
-    	}
+        Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
+        if (null == en) {
+            unitCost = Money.zero();
+        } else {
+            if (!campaign.getCampaignOptions().getUseShareSystem() &&
+                    (en instanceof megamek.common.Mech ||
+                            en instanceof megamek.common.Tank ||
+                            en instanceof megamek.common.Aero)) {
+                unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
+            } else {
+                unitCost = Money.zero();
+            }
+        }
         refreshPersonView();
     }
 
      void refreshPersonView() {
-    	 lblUnitCost.setText("");
+         lblUnitCost.setText("");
 
-    	 int row = tablePersonnel.getSelectedRow();
+         int row = tablePersonnel.getSelectedRow();
 
-    	 if(row < 0) {
+         if (row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
 
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
          String unitText = "";
-    	 if (unitCost.isPositive()) {
-    		 unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
-    	 }
+         if (unitCost.isPositive()) {
+             unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
+         }
 
-		 if (null != en) {
-			 if (StringUtil.isNullOrEmpty(unitText)) {
-				 unitText = "Unit: ";
-			 } else {
-				 unitText += " - ";
-			 }
+         if (null != en) {
+             if (StringUtil.isNullOrEmpty(unitText)) {
+                 unitText = "Unit: ";
+             } else {
+                 unitText += " - ";
+             }
 
-			 unitText += en.getDisplayName();
-		 }
+             unitText += en.getDisplayName();
+         }
 
-    	 lblUnitCost.setText(unitText);
+         lblUnitCost.setText(unitText);
 
          if (null != en) {
              JTabbedPane tabUnit = new JTabbedPane();
              String name = "Commander";
              if (Compute.getFullCrewSize(en) == 1) {
-            	 name = "Pilot";
+                 name = "Pilot";
              }
              tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
              MechViewPanel mvp = new MechViewPanel();
@@ -526,70 +474,24 @@ public class PersonnelMarketDialog extends JDialog {
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
          } else {
-        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
+             scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
          }
- 		//This odd code is to make sure that the scrollbar stays at the top
- 		//I cant just call it here, because it ends up getting reset somewhere later
- 		javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+         //This odd code is to make sure that the scrollbar stays at the top
+         //I cant just call it here, because it ends up getting reset somewhere later
+         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-    public JComboBox<String> getComboUnitType() {
-        return comboPersonType;
-    }
-
-	@Override
+    @Override
     public void setVisible(boolean visible) {
         filterPersonnel();
         //changePersonnelView();
         super.setVisible(visible);
     }
 
-	public TableCellRenderer getRenderer() {
+    public TableCellRenderer getRenderer() {
         //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }
         return personnelModel.new Renderer();
     }
-
-	public static String getPersonnelGroupName(int group) {
-        switch(group) {
-        case PersonnelTab.PG_ACTIVE:
-            return "All Personnel";
-        case PersonnelTab.PG_COMBAT:
-            return "Combat Personnel";
-        case PersonnelTab.PG_MW:
-            return "Mechwarriors";
-        case PersonnelTab.PG_CREW:
-            return "Vehicle Crews";
-        case PersonnelTab.PG_PILOT:
-            return "Aerospace Pilots";
-        case PersonnelTab.PG_CPILOT:
-            return "Conventional Pilots";
-        case PersonnelTab.PG_PROTO:
-            return "Protomech Pilots";
-        case PersonnelTab.PG_BA:
-            return "Battle Armor Infantry";
-        case PersonnelTab.PG_SOLDIER:
-            return "Conventional Infantry";
-        case PersonnelTab.PG_SUPPORT:
-            return "Support Personnel";
-        case PersonnelTab.PG_VESSEL:
-            return "Large Vessel Crews";
-        case PersonnelTab.PG_TECH:
-            return "Techs";
-        case PersonnelTab.PG_DOC:
-            return "Medical Staff";
-        case PersonnelTab.PG_ADMIN:
-            return "Administrators";
-        case PersonnelTab.PG_RETIRE:
-            return "Retired Personnel";
-        case PersonnelTab.PG_MIA:
-            return "Personnel MIA";
-        case PersonnelTab.PG_KIA:
-            return "Rolls of Honor (KIA)";
-        default:
-            return "?";
-        }
-    }
-
 }

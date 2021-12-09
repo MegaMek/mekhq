@@ -2,7 +2,7 @@
  * ContractSummaryPanel.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,24 +13,23 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -38,6 +37,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.GuiTabType;
 
@@ -81,13 +81,13 @@ public class ContractSummaryPanel extends JPanel {
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
         if (allowRerolls) {
-            Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
+            Person admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_NEG, SkillType.S_ADMIN);
             cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_NEG, SkillType.S_ADMIN);
             logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_NEG, SkillType.S_ADMIN);
             tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
         }
@@ -121,11 +121,6 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        // TODO : LocalDate : Remove Inline date
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
-        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
 
@@ -205,7 +200,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblLocation, gridBagConstraintsLabels);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()))));
+                contract.getSystemName(campaign.getLocalDate())));
         txtLocation.setName("txtLocation");
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {
@@ -226,7 +221,8 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(lblDistance, gridBagConstraintsLabels);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-            int days = (int) Math.ceil(path.getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
+
+            int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
                     campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
@@ -246,7 +242,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblAllyRating, gridBagConstraintsLabels);
 
         if (contract instanceof AtBContract) {
-            JLabel txtAllyRating = new JLabel(skillNames[((AtBContract) contract).getAllySkill()]
+            JLabel txtAllyRating = new JLabel(((AtBContract) contract).getAllySkill()
                     + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             gridBagConstraintsText.gridy = y;
@@ -257,7 +253,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemyRating, gridBagConstraintsLabels);
 
-            JLabel txtEnemyRating = new JLabel(skillNames[((AtBContract) contract).getEnemySkill()]
+            JLabel txtEnemyRating = new JLabel(((AtBContract) contract).getEnemySkill()
                     + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
             gridBagConstraintsText.gridy = y;
@@ -269,7 +265,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
-        JLabel txtStartDate = new JLabel(shortDateFormat.format(contract.getStartDate()));
+        JLabel txtStartDate = new JLabel(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsText);
@@ -299,7 +295,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
-        txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand = new JLabel(contract.getCommandRights().toString());
+        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
         txtCommand.setName("txtCommand");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -328,7 +325,8 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             ContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
-                    txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+                    txtCommand.setText(contract.getCommandRights().toString());
+                    txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);

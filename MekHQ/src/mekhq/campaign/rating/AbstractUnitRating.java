@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -32,6 +32,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.Dropship;
+import megamek.common.ProtomechBay;
 import megamek.common.SpaceStation;
 import megamek.common.Entity;
 import megamek.common.HeavyVehicleBay;
@@ -44,8 +45,6 @@ import megamek.common.MechBay;
 import megamek.common.SmallCraftBay;
 import megamek.common.UnitType;
 
-import megamek.common.logging.LogLevel;
-import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -58,7 +57,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/15/2012
  */
-@SuppressWarnings("SameParameterValue")
+@SuppressWarnings(value = "SameParameterValue")
 public abstract class AbstractUnitRating implements IUnitRating {
 
     static final int HEADER_LENGTH = 19;
@@ -89,9 +88,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int infantryCount = 0;
     private int infantryUnitCount = 0;
     private int smallCraftCount = 0;
-    private int dropshipCount = 0;
-    private int warshipCount = 0;
-    private int jumpshipCount = 0;
+    private int dropShipCount = 0;
+    private int warShipCount = 0;
+    private int jumpShipCount = 0;
     private int mechBayCount = 0;
     private int protoBayCount = 0;
     private int fighterBayCount = 0;
@@ -102,9 +101,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int baBayCount = 0;
     private int infantryBayCount = 0;
     private int dockingCollarCount = 0;
-    private boolean warshipWithDocsOwner = false;
-    private boolean warshipOwner = false;
-    private boolean jumpshipOwner = false;
+    private boolean warShipWithDocsOwner = false;
+    private boolean warShipOwner = false;
+    private boolean jumpShipOwner = false;
     private Person commander = null;
     private int breachCount = 0;
     private int successCount = 0;
@@ -132,49 +131,47 @@ public abstract class AbstractUnitRating implements IUnitRating {
         AbstractUnitRating.initialized = initialized;
     }
 
+    @Override
     public void reInitialize() {
         setInitialized(false);
         initValues();
     }
 
+    @Override
     public String getAverageExperience() {
         return getExperienceLevelName(calcAverageExperience());
     }
 
+    @Override
     public int getCombatRecordValue() {
         setSuccessCount(0);
         setFailCount(0);
         setBreachCount(0);
-        for (Mission m : getCampaign().getMissions()) {
-
-            //Skip ongoing missions.
-            if (m.isActive()) {
-                continue;
-            }
-
-            if (m.getStatus() == Mission.S_SUCCESS) {
-                setSuccessCount(getSuccessCount() + 1);
-            } else if (m.getStatus() == Mission.S_FAILED) {
-                setFailCount(getFailCount() + 1);
-            } else if (m.getStatus() == Mission.S_BREACH) {
-                setBreachCount(getBreachCount() + 1);
+        for (Mission m : getCampaign().getCompletedMissions()) {
+            switch (m.getStatus()) {
+                case SUCCESS:
+                    setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case FAILED:
+                    setFailCount(getFailCount() + 1);
+                    break;
+                case BREACH:
+                    setBreachCount(getBreachCount() + 1);
+                    break;
+                default:
+                    break;
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) -
-               (getBreachCount() * 25);
+        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
      * Returns the average experience level for all combat personnel.
      */
     protected BigDecimal calcAverageExperience() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
-            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION,
-                                                HALF_EVEN);
-        }
-
-        return BigDecimal.ZERO;
+        return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
+                : BigDecimal.ZERO;
     }
 
     /**
@@ -191,6 +188,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the commander (highest ranking person) for this force.
      */
+    @Override
     public Person getCommander() {
         if ((commander == null)) {
 
@@ -212,9 +210,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
             // Whoever has the highest rank is the commander
             commanderList.sort((p1, p2) -> {
                 // Active personnel outrank inactive personnel
-                if (p1.isActive() && !p2.isActive()) {
+                if (p1.getStatus().isActive() && !p2.getStatus().isActive()) {
                     return -1;
-                } else if (!p1.isActive() && p2.isActive()) {
+                } else if (!p1.getStatus().isActive() && p2.getStatus().isActive()) {
                     return 1;
                 }
 
@@ -244,36 +242,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     *  Returns the Commander's Skill Level for the specified skill
-     */
-    int getCommanderSkill(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null) {
-            return 0;
-        }
-        return skill.getLevel();
-    }
-
-    /**
-     * Returns the Commander's Skill Bonus for the specified skill
-     */
-    int getCommanderBonus(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null){
-            return 0;
-        }
-        return skill.getBonus();
-    }
-
-    /**
      *  Returns the Commander's Skill Level with Bonus for the specified skill
      */
     int getCommanderSkillLevelWithBonus(String skillName) {
@@ -282,7 +250,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return 0;
         }
         Skill skill = commander.getSkill(skillName);
-        if (skill == null){
+        if (skill == null) {
             return 0;
         }
         return skill.getLevel() + skill.getBonus();
@@ -295,6 +263,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return failCount;
     }
 
+    @Override
     public int getTechValue() {
         return 0;
     }
@@ -309,12 +278,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the overall percentage of fully supported units.
      */
+    @Override
     public BigDecimal getSupportPercent() {
         return supportPercent;
     }
 
+    @Override
     public int getTransportValue() {
         int value = 0;
+
+        if (!hasUnits()) {
+            return 0;
+        }
 
         //Find the percentage of units that are transported.
         setTransportPercent(getTransportPercent());
@@ -335,17 +310,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         //Only the highest of these values should be used, regardless of how
         // many are actually owned.
-        if (isWarshipWithDocsOwner()) {
+        if (isWarShipWithDocsOwner()) {
             value += 30;
-        } else if (isWarshipOwner()) {
+        } else if (isWarShipOwner()) {
             value += 20;
-        } else if (isJumpshipOwner()) {
+        } else if (isJumpShipOwner()) {
             value += 10;
         }
 
         return value;
     }
 
+    @Override
     public int getUnitRating(int score) {
         if (score < 0) {
             return DRAGOON_F;
@@ -362,6 +338,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
+    @Override
     public String getUnitRatingName(int rating) {
         switch (rating) {
             case DRAGOON_F:
@@ -381,19 +358,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
+    @Override
     public String getUnitRating() {
         int score = calculateUnitRatingScore();
         return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
     }
 
+    @Override
     public int getUnitRatingAsInteger() {
         return getUnitRating(calculateUnitRatingScore());
     }
 
+    @Override
     public int getScore() {
         return calculateUnitRatingScore();
     }
 
+    @Override
     public int getModifier() {
         return (calculateUnitRatingScore() / 10);
     }
@@ -406,16 +387,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfantry(u) &&
-            (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
-    }
-
-    boolean isConventionalInfantry(Unit u) {
-        return (u.getEntity() instanceof Infantry) &&
-               !(u.getEntity() instanceof BattleArmor);
     }
 
     /**
@@ -444,6 +419,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return numberUnits;
     }
 
+    /**
+     * @return if the the unit has any units
+     */
+    protected boolean hasUnits() {
+        return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
+    }
+
     protected abstract String getExperienceLevelName(BigDecimal experience);
 
     /**
@@ -457,7 +439,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * and this method will immediately exit.
      */
     protected void initValues() {
-        MekHQ.getLogger().methodBegin(getClass(), "initValues()");
         setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -473,24 +454,24 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setNumberBaSquads(0);
         setInfantryCount(0);
         setInfantryUnitCount(0);
-        setDropshipCount(0);
-        setJumpshipCount(0);
-        setWarshipCount(0);
+        setDropShipCount(0);
+        setJumpShipCount(0);
+        setWarShipCount(0);
 
         setMechBayCount(0);
         setFighterBayCount(0);
         setSmallCraftBayCount(0);
         setProtoBayCount(0);
-        setBaBayCount(0);
-        setLightVeeBayCount(0);
-        setHeavyVeeBayCount(0);
         setSuperHeavyVeeBayCount(0);
+        setHeavyVeeBayCount(0);
+        setLightVeeBayCount(0);
+        setBaBayCount(0);
         setInfantryBayCount(0);
         setDockingCollarCount(0);
 
-        setWarshipWithDocsOwner(false);
-        setWarshipOwner(false);
-        setJumpshipOwner(false);
+        setWarShipWithDocsOwner(false);
+        setWarShipOwner(false);
+        setJumpShipOwner(false);
 
         setCommander(null);
         setBreachCount(0);
@@ -500,7 +481,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
         clearSkillRatingCounts();
-        MekHQ.getLogger().methodEnd(getClass(), "initValues()");
     }
 
     /**
@@ -512,29 +492,31 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
             for (Bay bay : e.getTransportBays()) {
                 if (bay instanceof MechBay) {
-                    setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
-                } else if (bay instanceof BattleArmorBay) {
-                    setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
-                } else if (bay instanceof InfantryBay) {
-                    setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
-                } else if (bay instanceof LightVehicleBay) {
-                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof HeavyVehicleBay) {
-                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof SuperHeavyVehicleBay) {
-                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                    setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof ASFBay) {
                     setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof SmallCraftBay) {
                     setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof ProtomechBay) {
+                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof SuperHeavyVehicleBay) {
+                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof HeavyVehicleBay) {
+                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof LightVehicleBay) {
+                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
+                }  else if (bay instanceof BattleArmorBay) {
+                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof InfantryBay) {
+                    setInfantryBayCount(getInfantryBayCount() + (int)
+                            Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
     }
 
-    void updateDockingCollarCount(Jumpship jumpship) {
-        setDockingCollarCount(getDockingCollarCount() +
-                              jumpship.getDockingCollars().size());
+    void updateDockingCollarCount(Jumpship jumpShip) {
+        setDockingCollarCount(getDockingCollarCount() + jumpShip.getDockingCollars().size());
     }
 
     protected Campaign getCampaign() {
@@ -712,16 +694,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return (int) Math.ceil((double) getInfantryCount() / 28);
     }
 
-    int getDropshipCount() {
-        return dropshipCount;
+    int getDropShipCount() {
+        return dropShipCount;
     }
 
-    void setDropshipCount(int dropshipCount) {
-        this.dropshipCount = dropshipCount;
+    void setDropShipCount(int dropShipCount) {
+        this.dropShipCount = dropShipCount;
     }
 
-    private void incrementDropshipCount() {
-        dropshipCount++;
+    private void incrementDropShipCount() {
+        dropShipCount++;
     }
 
     int getSmallCraftCount() {
@@ -736,28 +718,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
         smallCraftCount++;
     }
 
-    int getWarshipCount() {
-        return warshipCount;
+    int getWarShipCount() {
+        return warShipCount;
     }
 
-    private void setWarshipCount(int warshipCount) {
-        this.warshipCount = warshipCount;
+    private void setWarShipCount(int warShipCount) {
+        this.warShipCount = warShipCount;
     }
 
-    private void incrementWarshipCount() {
-        warshipCount++;
+    private void incrementWarShipCount() {
+        warShipCount++;
     }
 
-    int getJumpshipCount() {
-        return jumpshipCount;
+    int getJumpShipCount() {
+        return jumpShipCount;
     }
 
-    void setJumpshipCount(int jumpshipCount) {
-        this.jumpshipCount = jumpshipCount;
+    void setJumpShipCount(int jumpShipCount) {
+        this.jumpShipCount = jumpShipCount;
     }
 
-    private void incrementJumpshipCount() {
-        jumpshipCount++;
+    private void incrementJumpShipCount() {
+        jumpShipCount++;
     }
 
     int getMechBayCount() {
@@ -840,28 +822,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.dockingCollarCount = dockingCollarCount;
     }
 
-    boolean isWarshipWithDocsOwner() {
-        return warshipWithDocsOwner;
+    boolean isWarShipWithDocsOwner() {
+        return warShipWithDocsOwner;
     }
 
-    void setWarshipWithDocsOwner(boolean warshipWithDocsOwner) {
-        this.warshipWithDocsOwner = warshipWithDocsOwner;
+    void setWarShipWithDocsOwner(boolean warShipWithDocsOwner) {
+        this.warShipWithDocsOwner = warShipWithDocsOwner;
     }
 
-    boolean isWarshipOwner() {
-        return warshipOwner;
+    boolean isWarShipOwner() {
+        return warShipOwner;
     }
 
-    void setWarshipOwner(boolean warshipOwner) {
-        this.warshipOwner = warshipOwner;
+    void setWarShipOwner(boolean warShipOwner) {
+        this.warShipOwner = warShipOwner;
     }
 
-    boolean isJumpshipOwner() {
-        return jumpshipOwner;
+    boolean isJumpShipOwner() {
+        return jumpShipOwner;
     }
 
-    void setJumpshipOwner(boolean jumpshipOwner) {
-        this.jumpshipOwner = jumpshipOwner;
+    void setJumpShipOwner(boolean jumpShipOwner) {
+        this.jumpShipOwner = jumpShipOwner;
     }
 
     protected void setCommander(Person commander) {
@@ -894,27 +876,20 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     void updateUnitCounts(Unit u) {
-        final String METHOD_NAME = "updateUnitCounts(Unit)";
-
         if (u.isMothballed()) {
             return;
         }
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Adding " + u.getName() + " to unit counts.");
+        MekHQ.getLogger().debug("Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                            "Unit " + u.getName() +
-                            " is not an Entity.  Skipping.");
+            MekHQ.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = e.getUnitType();
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Unit " + u.getName() + " is a " +
-                        UnitType.getTypeDisplayableName(unitType));
-        //todo: Add Airship when Megamek supports it.
+        MekHQ.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
                 incrementMechCount();
@@ -925,9 +900,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                                "Unit " + u.getName() + " weight is " +
-                                e.getWeight());
+                MekHQ.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {
@@ -937,16 +910,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 }
                 break;
             case UnitType.DROPSHIP:
-                incrementDropshipCount();
+                incrementDropShipCount();
                 break;
             case UnitType.SMALL_CRAFT:
                 incrementSmallCraftCount();
                 break;
             case UnitType.WARSHIP:
-                incrementWarshipCount();
+                incrementWarShipCount();
                 break;
             case UnitType.JUMPSHIP:
-                incrementJumpshipCount();
+                incrementJumpShipCount();
                 break;
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:

@@ -21,13 +21,12 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,7 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Miguel Azevedo
  */
 @XmlRootElement(name="award")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializable {
     private static final long serialVersionUID = -3290927068079223579L;
 
@@ -215,7 +214,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @param people to be given the award
      * @return true if this award can be awarded to the selected people
      */
-    public boolean canBeAwarded(Person[] people) {
+    public boolean canBeAwarded(Person... people) {
         for (Person person : people) {
             if (!canBeAwarded(person)) {
                 return false;
@@ -266,14 +265,12 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     /**
      * Generates a list of strings of formatted dates
-     * @param campaign the campaign to get the date format from
      * @return a list of strings representing the dates in the input format
      */
-    public List<String> getFormattedDates(Campaign campaign) {
+    public List<String> getFormattedDates() {
         List<String> formattedDates = new ArrayList<>();
         for (LocalDate date : dates) {
-            formattedDates.add(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions()
-                    .getDisplayDateFormat())));
+            formattedDates.add(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
         return formattedDates;
     }
@@ -300,14 +297,13 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     }
 
     /**
-     * @param campaign the campaign to get the date format from
      * @return an html formatted string to be used as tooltip.
      */
-    public String getTooltip(Campaign campaign) {
+    public String getTooltip() {
         StringBuilder string = new StringBuilder();
         string.append("<html>").append(getName()).append("<br>").append(getDescription())
                 .append("<br>").append("<br>");
-        for (String date : getFormattedDates(campaign)) {
+        for (String date : getFormattedDates()) {
             string.append("(").append(date).append(")").append("<br>");
         }
 

@@ -1,0 +1,10 @@
+<StratconFacility>
+	<capturedDefinition>HostileBaseOfOperations.xml</capturedDefinition>
+	<displayableName>Base of Operations</displayableName>
+        <facilityType>BaseOfOperations</facilityType>
+        <owner>Allied</owner>
+	<localModifiers>Veterans.xml</localModifiers>
+	<localModifiers>GoodEquipment.xml</localModifiers>
+	<localModifiers>EnemyTurrets.xml</localModifiers>
+        <visible>true</visible>
+</StratconFacility>

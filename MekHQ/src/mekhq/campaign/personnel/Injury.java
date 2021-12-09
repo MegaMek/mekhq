@@ -10,17 +10,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author: Dylan Myers <ralgith@gmail.com>
  */
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -39,7 +40,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
 import mekhq.MekHQ;
@@ -49,7 +49,7 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.mod.am.InjuryTypes;
 
 // Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
-@XmlRootElement(name="injury")
+@XmlRootElement(name = "injury")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
@@ -66,8 +66,8 @@ public class Injury {
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
-        } catch(JAXBException e) {
-            MekHQ.getLogger().error(Injury.class, "<init>", e);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -79,8 +79,8 @@ public class Injury {
     public static Injury generateInstanceFromXML(Node wn) {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(Injury.class, "generateInstanceFromXML(Node)", ex); //$NON-NLS-1$
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
         }
         return null;
     }
@@ -89,7 +89,7 @@ public class Injury {
     private int days;
     private int originalDays;
     @XmlJavaTypeAdapter(DateAdapter.class)
-    private DateTime start;
+    private LocalDate start;
     /** 0 = past injury, for scars, 1 = default, max depends on type */
     private int hits;
     private BodyLocation location;
@@ -99,36 +99,36 @@ public class Injury {
     private boolean workedOn;
     private boolean extended;
     private InjuryHiding hidingState = InjuryHiding.DEFAULT;
-    @XmlElement(name="InjuryUUID")
+    @XmlElement(name = "InjuryUUID")
     private UUID id;
     /** Generic extra data, for use with plugins and mods */
     private ExtraData extraData = new ExtraData();
-    @XmlAttribute(name="v")
+    @XmlAttribute(name = "v")
     private int version;
 
     /**
      * This should never be used, but is required for the Unmarshaller
      */
     public Injury() {
-        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, new DateTime(), false, false, false);
+        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, LocalDate.now(), false, false, false);
     }
 
-    public Injury(DateTime start) {
+    public Injury(LocalDate start) {
         this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false, false);
     }
 
     // Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start, boolean perm) {
+    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm) {
         this(time, text, loc, type, num, start, perm, false, false);
     }
 
     // Constructor if this injury has been treated by a doctor, but without extended time
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start, boolean perm, boolean workedOn) {
+    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm, boolean workedOn) {
         this(time, text, loc, type, num, start, perm, workedOn, false);
     }
 
     // Constructor for when this injury has extended time, full options including worked on by a doctor
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start,
+    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start,
                   boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
@@ -154,11 +154,11 @@ public class Injury {
     // End UUID Control Methods
 
     // Time Control Methods
-    public DateTime getStart() {
+    public LocalDate getStart() {
         return start;
     }
 
-    public void setStart(DateTime start) {
+    public void setStart(LocalDate start) {
         this.start = Objects.requireNonNull(start);
     }
 
@@ -203,9 +203,9 @@ public class Injury {
     public void setHits(int num) {
         final int minSeverity = isPermanent() ? 1 : 0;
         final int maxSeverity = type.getMaxSeverity();
-        if(num < minSeverity) {
+        if (num < minSeverity) {
             num = minSeverity;
-        } else if(num > maxSeverity) {
+        } else if (num > maxSeverity) {
             num = maxSeverity;
         }
         hits = num;
@@ -292,18 +292,18 @@ public class Injury {
     public void writeToXml(PrintWriter pw1, int indent) {
         try {
             marshaller.marshal(this, pw1);
-        } catch(JAXBException ex) {
-            MekHQ.getLogger().error(getClass(), "writeToXml(PrintWriter,int)", ex); //$NON-NLS-1$
+        } catch (JAXBException ex) {
+            MekHQ.getLogger().error(ex);
         }
     }
 
     @SuppressWarnings({ "unused" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         // Fix old-style "hits" into "severity".
-        if(version < 1) {
-            if(type == InjuryTypes.CONCUSSION) {
+        if (version < 1) {
+            if (type == InjuryTypes.CONCUSSION) {
                 hits -= 1;
-            } else if(type == InjuryTypes.INTERNAL_BLEEDING) {
+            } else if (type == InjuryTypes.INTERNAL_BLEEDING) {
                 hits -= 2;
             } else {
                 hits = 1;
@@ -311,15 +311,15 @@ public class Injury {
         }
 
         // Fix hand/foot locations
-        if(fluff.endsWith(" hand")) {
-            switch(location) {
+        if (fluff.endsWith(" hand")) {
+            switch (location) {
                 case LEFT_ARM: location = BodyLocation.LEFT_HAND; break;
                 case RIGHT_ARM: location = BodyLocation.RIGHT_HAND; break;
                 default: // do nothing
             }
         }
-        if(fluff.endsWith(" foot")) {
-            switch(location) {
+        if (fluff.endsWith(" foot")) {
+            switch (location) {
                 case LEFT_LEG: location = BodyLocation.LEFT_FOOT; break;
                 case RIGHT_LEG: location = BodyLocation.RIGHT_FOOT; break;
                 default: // do nothing
@@ -330,7 +330,7 @@ public class Injury {
             id = UUID.randomUUID();
         }
 
-        if(null == extraData) {
+        if (null == extraData) {
             extraData = new ExtraData();
         }
 

@@ -1,20 +1,20 @@
 /*
  * MissingKFHeliumTank.java
- * 
+ *
  * Copyright (c) 2019 MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,7 +37,7 @@ import mekhq.campaign.Campaign;
 public class MissingKFHeliumTank extends MissingPart {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3672916192478319355L;
 
@@ -50,7 +50,7 @@ public class MissingKFHeliumTank extends MissingPart {
 
     //How many docking collars does this drive support?
     private int docks;
-    
+
     public int getDocks() {
         return docks;
     }
@@ -66,7 +66,7 @@ public class MissingKFHeliumTank extends MissingPart {
         this.name = "K-F Helium Tank";
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         //BattleSpace, p28, *10
         return 1800;
@@ -88,7 +88,7 @@ public class MissingKFHeliumTank extends MissingPart {
         return new KFHeliumTank(getUnitTonnage(), coreType, docks, campaign);
     }
 
-    @Override 
+    @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
@@ -104,17 +104,17 @@ public class MissingKFHeliumTank extends MissingPart {
                     js.setKFIntegrity(js.getOKFIntegrity());
                 }
             }
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            //assign the replacement part to the unit           
+            //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof KFHeliumTank 
+        return part instanceof KFHeliumTank
                 && coreType == ((KFHeliumTank)part).getCoreType()
                 && docks == ((KFHeliumTank)part).getDocks();
     }

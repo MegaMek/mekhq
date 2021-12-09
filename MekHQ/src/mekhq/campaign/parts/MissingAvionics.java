@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.util.StringJoiner;
+
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -30,6 +32,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -75,6 +78,29 @@ public class MissingAvionics extends MissingPart {
 
     @Override
     public String checkFixable() {
+        if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
+            // Avionics are installed in the Head and both Torsos,
+            // make sure they're not missing.
+            StringJoiner missingLocs = new StringJoiner(", ");
+            for (Part part : unit.getParts()) {
+                if (part instanceof MissingMekLocation) {
+                    switch (part.getLocation()) {
+                        case Mech.LOC_HEAD:
+                        case Mech.LOC_LT:
+                        case Mech.LOC_RT:
+                            missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+    
+            return missingLocs.length() == 0 
+                    ? null 
+                    : "Cannot reinstall avionics when missing: " + missingLocs;
+        }
+
         return null;
     }
 

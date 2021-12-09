@@ -53,6 +53,7 @@ public class MissingMASC extends MissingEquipmentPart {
         this.engineRating = rating;
     }
 
+    @Override
     public void setUnit(Unit u) {
     	super.setUnit(u);
     	if(null != unit && null != unit.getEntity().getEngine()) {
@@ -133,7 +134,7 @@ public class MissingMASC extends MissingEquipmentPart {
 	}
 
 	@Override
-	public Part getNewPart() {
+	public MASC getNewPart() {
 		MASC epart = new MASC(getUnitTonnage(), type, -1, campaign, engineRating, omniPodded);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;

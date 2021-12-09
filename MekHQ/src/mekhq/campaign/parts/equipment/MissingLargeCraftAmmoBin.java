@@ -19,15 +19,14 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -35,13 +34,8 @@ import mekhq.campaign.parts.Part;
 
 /**
  * @author cwspain
- *
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1327103853526962103L;
 
     private int bayEqNum;
@@ -52,8 +46,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         this(0, null, -1, 1.0, null);
     }
 
-    public MissingLargeCraftAmmoBin(int tonnage, EquipmentType et, int equipNum, double capacity,
-            Campaign c) {
+    public MissingLargeCraftAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, double capacity,
+            @Nullable Campaign c) {
         super(tonnage, et, equipNum, false, false, c);
         this.size = capacity;
     }
@@ -63,24 +57,27 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
     public @Nullable Mounted getBay() {
-        final String METHOD_NAME = "getBay()"; //$NON-NLS-1$
-        if ((null != bay) || (null == unit)) {
+        if (getUnit() == null) {
             return null;
+        } else if (bay != null) {
+            return bay;
         }
+
         if (bayEqNum >= 0) {
-            Mounted m = unit.getEntity().getEquipment(bayEqNum);
-            if (m.getBayAmmo().contains(equipmentNum)) {
+            Mounted m = getUnit().getEntity().getEquipment(bayEqNum);
+            if ((m != null) && m.getBayAmmo().contains(equipmentNum)) {
                 bay = m;
                 return bay;
             }
         }
-        for (Mounted m : unit.getEntity().getWeaponBayList()) {
+
+        for (Mounted m : getUnit().getEntity().getWeaponBayList()) {
             if (m.getBayAmmo().contains(equipmentNum)) {
                 return m;
             }
         }
-        MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
-                "Could not find weapon bay for " + typeName + " for " + unit.getName());
+
+        MekHQ.getLogger().warning("Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
@@ -100,8 +97,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
      * @param bayEqNum
      */
     public void setBay(int bayEqNum) {
+        this.bayEqNum = bayEqNum;
         if (null != unit) {
-            this.bayEqNum = bayEqNum;
             bay = unit.getEntity().getEquipment(bayEqNum);
         }
     }
@@ -121,32 +118,46 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (part instanceof LargeCraftAmmoBin) {
-            EquipmentPart eqpart = (EquipmentPart)part;
-            EquipmentType et = eqpart.getType();
-            return type.equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();
+        // Do not try to replace a MissingLargeCraftAmmoBin with anything other
+        // than an LargeCraftAmmoBin. Subclasses should use a similar check, which
+        // breaks Composability to a degree but in this case we've used
+        // subclasses where they're not truly composable.
+        if (Objects.equals(part.getClass(), LargeCraftAmmoBin.class)) {
+            LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) part;
+            return getType().equals(ammoBin.getType())
+                    && (getFullShots() == ammoBin.getFullShots());
         }
         return false;
     }
 
-    private int getFullShots() {
-        return (int) Math.floor(size * ((AmmoType) type).getShots() / type.getTonnage(null));
+    @Override
+    protected int getFullShots() {
+        return (int) Math.floor(getCapacity() * getType().getShots() / getType().getTonnage(null));
     }
 
     @Override
-    public Part getNewPart() {
-        return new LargeCraftAmmoBin(getUnitTonnage(), type, -1, getFullShots(), size, campaign);
+    public LargeCraftAmmoBin getNewPart() {
+        return new LargeCraftAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(), size, campaign);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", typeName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWait", daysToWait);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capacity", size);
+    public void fix() {
+        LargeCraftAmmoBin replacement = getNewPart();
+        unit.addPart(replacement);
+        campaign.getQuartermaster().addPart(replacement, 0);
+
+        remove(false);
+
+        // Add the replacement part to the unit
+        replacement.setEquipmentNum(getEquipmentNum());
+        replacement.setBay(bayEqNum);
+        replacement.updateConditionFromPart();
+    }
+
+    @Override
+    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
-        writeToXmlEnd(pw1, indent);
+        super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
@@ -154,14 +165,15 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
-                size = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
-                bayEqNum = Integer.parseInt(wn2.getTextContent());
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
+                    bayEqNum = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
-        restore();
     }
 }

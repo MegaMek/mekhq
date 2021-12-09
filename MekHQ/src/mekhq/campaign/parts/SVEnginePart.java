@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,18 +10,20 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -155,24 +157,28 @@ public class SVEnginePart extends Part {
         NodeList nl = node.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
-            switch (wn.getNodeName()) {
-                case NODE_ENGINE_TONNAGE:
-                    engineTonnage = Double.parseDouble(wn.getTextContent());
-                    break;
-                case NODE_ETYPE:
-                    etype = Integer.parseInt(wn.getTextContent());
-                    break;
-                case NODE_TECH_RATING:
-                    for (int i = 0; i < ratingNames.length; i++) {
-                        if (ratingNames[i].equals(wn.getTextContent())) {
-                            techRating = i;
-                            break;
+            try {
+                switch (wn.getNodeName()) {
+                    case NODE_ENGINE_TONNAGE:
+                        engineTonnage = Double.parseDouble(wn.getTextContent());
+                        break;
+                    case NODE_ETYPE:
+                        etype = Integer.parseInt(wn.getTextContent());
+                        break;
+                    case NODE_TECH_RATING:
+                        for (int i = 0; i < ratingNames.length; i++) {
+                            if (ratingNames[i].equals(wn.getTextContent())) {
+                                techRating = i;
+                                break;
+                            }
                         }
-                    }
-                    break;
-                case NODE_FUEL_TYPE:
-                    fuelType = FuelType.valueOf(wn.getTextContent());
-                    break;
+                        break;
+                    case NODE_FUEL_TYPE:
+                        fuelType = FuelType.valueOf(wn.getTextContent());
+                        break;
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -203,17 +209,17 @@ public class SVEnginePart extends Part {
             } else if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                campaign.removePart(this);
-            } else if(null != spare) {
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -221,7 +227,7 @@ public class SVEnginePart extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             int engineHits = 0;
             int engineCrits = 0;
             if (unit.getEntity() instanceof Tank) {
@@ -233,7 +239,7 @@ public class SVEnginePart extends Part {
                 engineHits = unit.getEntity().getEngineHits();
                 engineCrits = 3;
             }
-            if(engineHits >= engineCrits) {
+            if (engineHits >= engineCrits) {
                 remove(false);
             } else {
                 hits = Math.max(engineHits, 0);
@@ -335,7 +341,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ENGINE;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ENGINE;
     }
 }

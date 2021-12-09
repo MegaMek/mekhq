@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
 
 import mekhq.campaign.Campaign;
@@ -36,7 +35,8 @@ public class StripUnitAction implements IUnitAction {
      * @param campaign The campaign to add the parts to after removing them from the unit.
      * @param unit The unit to remove the parts from.
      */
-    public void Execute(Campaign campaign, Unit unit) {
+    @Override
+    public void execute(Campaign campaign, Unit unit) {
         unit.setSalvage(true);
         for (IPartWork partWork : unit.getSalvageableParts()) {
             if (partWork instanceof SpacecraftCoolingSystem) {

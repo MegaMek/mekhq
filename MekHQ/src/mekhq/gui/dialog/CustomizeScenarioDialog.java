@@ -1,7 +1,7 @@
 /*
  * CustomizeScenarioDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,33 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumn;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -60,49 +35,58 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import mekhq.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * @author  Taharqa
  */
-public class CustomizeScenarioDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+public class CustomizeScenarioDialog extends JDialog {
+	private static final long serialVersionUID = -8038099101234445018L;
+    private JFrame frame;
     private Scenario scenario;
     private Mission mission;
     private Campaign campaign;
     private boolean newScenario;
-    private Date date;
-    private SimpleDateFormat dateFormatter;
+    private LocalDate date;
 
     private LootTableModel lootModel;
 
-    private javax.swing.JButton btnAdd;
-    private javax.swing.JButton btnEdit;
-    private javax.swing.JButton btnDelete;
+    private JButton btnAdd;
+    private JButton btnEdit;
+    private JButton btnDelete;
     private ArrayList<Loot> loots;
     private JTable lootTable;
     private JPanel panLoot;
 
     private JComboBox<String> modifierBox;
 
-    private javax.swing.JPanel panMain;
-    private javax.swing.JPanel panBtn;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JTextField txtName;
+    private JPanel panMain;
+    private JPanel panBtn;
+    private JButton btnClose;
+    private JButton btnOK;
+    private JLabel lblName;
+    private JTextField txtName;
     private MarkdownEditorPanel txtDesc;
     private MarkdownEditorPanel txtReport;
-    private javax.swing.JComboBox<String> choiceStatus;
-    private javax.swing.JLabel lblStatus;
-    private javax.swing.JButton btnDate;
+    private JComboBox<ScenarioStatus> choiceStatus;
+    private JLabel lblStatus;
+    private JButton btnDate;
 
-    public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
+    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;
         this.mission = m;
@@ -114,11 +98,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             newScenario = false;
         }
         campaign = c;
-        date = scenario.getDate();
-        if (null == date) {
-            date = campaign.getCalendar().getTime();
+        if (scenario.getDate() == null) {
+            scenario.setDate(campaign.getLocalDate());
         }
-        dateFormatter = new SimpleDateFormat("MM/dd/yyyy"); // TODO : Remove inline date format
+        date = scenario.getDate();
+
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
@@ -172,28 +156,37 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtName, gridBagConstraints);
 
-        if (!scenario.isCurrent()) {
+        if (!scenario.getStatus().isCurrent()) {
             lblStatus.setText(resourceMap.getString("lblStatus.text"));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             panMain.add(lblStatus, gridBagConstraints);
 
-            DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
-            for (int i = 1; i < Scenario.S_NUM; i++) {
-                statusModel.addElement(Scenario.getStatusName(i));
-            }
-            choiceStatus.setModel(statusModel);
-            choiceStatus.setName("choiceStatus"); // NOI18N
-            choiceStatus.setSelectedIndex(scenario.getStatus()-1);
+            choiceStatus.setModel(new DefaultComboBoxModel<>(ScenarioStatus.values()));
+            choiceStatus.setName("choiceStatus");
+            choiceStatus.setSelectedItem(scenario.getStatus());
+            choiceStatus.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                              final int index, final boolean isSelected,
+                                                              final boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof ScenarioStatus) {
+                        list.setToolTipText(((ScenarioStatus) value).getToolTipText());
+                    }
+                    return this;
+                }
+            });
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             panMain.add(choiceStatus, gridBagConstraints);
         }
-        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
-            btnDate = new javax.swing.JButton();
-            btnDate.setText(dateFormatter.format(date));
+
+        if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
+            btnDate = new JButton();
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -204,9 +197,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             panMain.add(btnDate, gridBagConstraints);
-
         }
-        if (scenario.isCurrent()) {
+
+        if (scenario.getStatus().isCurrent()) {
             initLootPanel();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -219,8 +212,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                     BorderFactory.createTitledBorder("Potential Rewards"),
                     BorderFactory.createEmptyBorder(5,5,5,5)));
             panMain.add(panLoot, gridBagConstraints);
-
-
         }
 
         txtDesc = new MarkdownEditorPanel("Description");
@@ -237,7 +228,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
 
-        if (scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
+        if (scenario.getStatus().isCurrent() && (scenario instanceof AtBDynamicScenario)) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
             gridBagConstraints.gridwidth = 1;
@@ -259,7 +250,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             panMain.add(addEventButton, gridBagConstraints);
         }
 
-        if (!scenario.isCurrent()) {
+        if (!scenario.getStatus().isCurrent()) {
             txtReport = new MarkdownEditorPanel("After-Action Report");
             txtReport.setText(scenario.getReport());
             txtReport.setMinimumSize(new Dimension(400, 100));
@@ -279,7 +270,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
-        } else if (mission instanceof AtBContract && scenario instanceof AtBDynamicScenario) {
+        } else if ((mission instanceof AtBContract) && 
+                (scenario instanceof AtBDynamicScenario) &&
+                (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
 
             if (((AtBDynamicScenario) scenario).getNumBots() > 0) {
@@ -322,12 +315,16 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {
         scenario.setName(txtName.getText());
         scenario.setDesc(txtDesc.getText());
-        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
+        if (!scenario.getStatus().isCurrent()
+                || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
-
-            scenario.setStatus(choiceStatus.getSelectedIndex()+1);
+            
+            if (choiceStatus.getSelectedItem() != null) {
+                scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
+            }
+            
             scenario.setDate(date);
         }
         scenario.resetLoot();
@@ -354,6 +351,10 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
 
         AtBDynamicScenario scenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(scenarioTemplate, (AtBContract) mission, campaign);
+        if (scenario.getDate() == null) {
+            scenario.setDate(date);
+        }
+
         if (newScenario) {
             campaign.addScenario(scenario, mission);
         }
@@ -370,34 +371,26 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         return mission.getId();
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCloseActionPerformed(ActionEvent evt) {
         this.setVisible(false);
     }
 
     private void changeDate() {
         // show the date chooser
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal);
+        DateChooser dc = new DateChooser(frame, date);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            if (scenario.isCurrent()) {
-                if (dc.getDate().getTime().before(campaign.getCalendar().getTime())) {
+            if (scenario.getStatus().isCurrent()) {
+                if (dc.getDate().isBefore(campaign.getLocalDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    //Calendar math necessitated by variations in locales
-                    GregorianCalendar nextMonday = new GregorianCalendar();
-                    nextMonday.setTime(campaign.getDate());
-                    nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-                    while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
-                        nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-                    }
-                    //
-                    if (!dc.getDate().getTime().before(nextMonday.getTime())) {
+                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+
+                    if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
                                 "You cannot choose a date beyond the current week.",
                                 "Invalid date",
@@ -405,15 +398,15 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                         return;
                     }
                 }
-            } else if (dc.getDate().getTime().after(campaign.getDate())) {
+            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a date after the current date.",
                         "Invalid date",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            date = dc.getDate().getTime();
-            btnDate.setText(dateFormatter.format(date));
+            date = dc.getDate();
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }
 

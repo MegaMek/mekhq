@@ -1,101 +1,82 @@
 /*
  * Mission.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.joda.time.DateTime;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
+import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
- * 
+ *
  * The really cool stuff will happen when we subclass this into Contract
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Mission implements Serializable, MekHqXmlSerializable {
-
-    /**
-     * 
-     */
+    //region Variable Declarations
     private static final long serialVersionUID = -5692134027829715149L;
-
-    public static final int S_ACTIVE = 0;
-    public static final int S_SUCCESS = 1;
-    public static final int S_FAILED = 2;
-    public static final int S_BREACH = 3;
-    public static final int S_NUM = 4;
 
     private String name;
     protected String systemId;
-    private int status;
+    private MissionStatus status;
     private String desc;
     private String type;
-    private ArrayList<Scenario> scenarios;
+    private List<Scenario> scenarios;
     private int id = -1;
     private String legacyPlanetName;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Mission() {
         this(null);
     }
 
-    public Mission(String n) {
-        this.name = n;
+    public Mission(final @Nullable String name) {
+        this.name = name;
         this.systemId = "Unknown System";
         this.desc = "";
         this.type = "";
-        this.status = S_ACTIVE;
-        scenarios = new ArrayList<Scenario>();
+        this.status = MissionStatus.ACTIVE;
+        scenarios = new ArrayList<>();
     }
-
-    public static String getStatusName(int s) {
-
-        switch (s) {
-        case S_ACTIVE:
-            return "Active";
-        case S_SUCCESS:
-            return "Success";
-        case S_FAILED:
-            return "Failed";
-        case S_BREACH:
-            return "Contract Breach";
-        default:
-            return "?";
-        }
-    }
+    //endregion Constructors
 
     public String getName() {
         return name;
@@ -124,21 +105,21 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     public PlanetarySystem getSystem() {
         return Systems.getInstance().getSystemById(systemId);
     }
-    
+
     /**
-     * Convenience property to return the name of the current planet. 
+     * Convenience property to return the name of the current planet.
      * Sometimes, the "current planet" doesn't match up with an existing planet in our planet database,
      * in which case we return whatever was stored.
      * @return
      */
-    public String getSystemName(DateTime when) {
-        if(getSystem() == null) {
+    public String getSystemName(LocalDate when) {
+        if (getSystem() == null) {
             return legacyPlanetName;
         }
-        
+
         return getSystem().getName(when);
     }
-    
+
     public void setLegacyPlanetName(String name) {
         legacyPlanetName = name;
     }
@@ -151,32 +132,67 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.desc = d;
     }
 
-    public int getStatus() {
+    public MissionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int s) {
-        this.status = s;
+    public void setStatus(MissionStatus status) {
+        this.status = status;
     }
 
-    public String getStatusName() {
-        return getStatusName(getStatus());
+    public boolean isActiveOn(LocalDate date) {
+        return isActiveOn(date, false);
     }
 
-    public ArrayList<Scenario> getScenarios() {
+    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
+        return getStatus().isActive();
+    }
+
+    //region Scenarios
+    public List<Scenario> getScenarios() {
         return scenarios;
+    }
+
+    public List<Scenario> getVisibleScenarios() {
+        return getScenarios().stream().filter(scenario -> !scenario.isCloaked()).collect(Collectors.toList());
+    }
+
+    public List<Scenario> getCurrentScenarios() {
+        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent()).collect(Collectors.toList());
+    }
+
+    public List<AtBScenario> getCurrentAtBScenarios() {
+        return getScenarios().stream()
+                .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
+                .map(scenario -> (AtBScenario) scenario)
+                .collect(Collectors.toList());
+    }
+
+    public List<Scenario> getCompletedScenarios() {
+        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent()).collect(Collectors.toList());
     }
 
     /**
      * Don't use this method directly as it will not add an id to the added
      * scenario. Use Campaign#AddScenario instead
-     * 
-     * @param s
+     *
+     * @param scenario the scenario to add this this mission
      */
-    public void addScenario(Scenario s) {
-        s.setMissionId(getId());
-        scenarios.add(s);
+    public void addScenario(final Scenario scenario) {
+        scenario.setMissionId(getId());
+        getScenarios().add(scenario);
     }
+
+    public void clearScenarios() {
+        scenarios.clear();
+    }
+
+    public boolean hasPendingScenarios() {
+        // scenarios that are pending, but have not been revealed don't count
+        return getScenarios().stream().anyMatch(scenario ->
+            (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
+    }
+    //endregion Scenarios
 
     public int getId() {
         return id;
@@ -186,38 +202,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.id = i;
     }
 
-    public boolean isActive() {
-        return status == S_ACTIVE;
-    }
-
-    public void removeScenario(int id) {
-        int idx = 0;
-        boolean found = false;
-        for (Scenario s : getScenarios()) {
-            if (s.getId() == id) {
-                found = true;
-                break;
-            }
-            idx++;
-        }
-        if (found) {
-            scenarios.remove(idx);
-        }
-    }
-
-    public void clearScenarios() {
-        scenarios.clear();
-    }
-
-    public boolean hasPendingScenarios() {
-        for (Scenario s : scenarios) {
-            if (s.isCurrent()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -225,27 +210,26 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<name>" + MekHqXmlUtil.escape(name) + "</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + MekHqXmlUtil.escape(type) + "</type>");
-        
-        if(systemId != null) {         
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<systemId>" + MekHqXmlUtil.escape(systemId) + "</systemId>");
+        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", type);
+        if (systemId != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemId", systemId);
         } else {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetName>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetName>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "planetName", legacyPlanetName);
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<status>" + status + "</status>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<desc>" + MekHqXmlUtil.escape(desc) + "</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<id>" + id + "</id>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<scenarios>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "status", status.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", id);
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "scenarios");
         for (Scenario s : scenarios) {
-            s.writeToXml(pw1, indent + 2);
+            s.writeToXml(pw1, indent);
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</scenarios>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "scenarios");
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</mission>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "mission");
     }
 
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
@@ -253,8 +237,6 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public static Mission generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         Mission retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -274,18 +256,19 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") || wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")
+                        || wn2.getNodeName().equalsIgnoreCase("systemId")) {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
                     PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
-                    
-                    if(system != null) {
+
+                    if (system != null) {
                         retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = Integer.parseInt(wn2.getTextContent());
+                    retVal.setStatus(MissionStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
@@ -303,8 +286,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().log(Mission.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            MekHQ.getLogger().error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
 
                             continue;
                         }
@@ -317,13 +299,15 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Mission.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;
     }
+    //endregion File I/O
 
+    @Override
+    public String toString() {
+        return getStatus().isCompleted() ? name + " (Complete)" : name;
+    }
 }

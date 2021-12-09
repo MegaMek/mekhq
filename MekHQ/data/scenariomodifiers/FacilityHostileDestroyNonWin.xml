@@ -1,0 +1,29 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>This facility will be destroyed if all turret buildings are destroyed.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<modifierName>Destroy</modifierName>
+	<objectives>
+        <objective>
+            <associatedForceNames>
+                <associatedForceName>Base Turrets</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+		<successEffect>
+			<effectType>FacilityRemoved</effectType>
+			<effectScaling>Fixed</effectScaling>
+			<howMuch>1</howMuch>
+		</successEffect>
+            </successEffects>
+            <additionalDetails/>
+            <description>Destroy or cripple all of the following force(s) and unit(s) to render the facility inoperative:</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </objective>
+        </objectives>
+</AtBScenarioModifier>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,44 +10,36 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.module.atb;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.UUID;
-
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitGeneratorParameters;
+
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -55,7 +47,6 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
  * @author Neoancient
  */
 public class AtBEventProcessor {
-
     private final Campaign campaign;
 
     public AtBEventProcessor(Campaign campaign) {
@@ -72,8 +63,8 @@ public class AtBEventProcessor {
         // TODO: move code from Campaign here
         if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
                 && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", ev.getCampaign().getDate())) {
+            if (ev.getCampaign().getFinances().debit(TransactionType.RECRUITMENT,
+                    ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
@@ -83,18 +74,18 @@ public class AtBEventProcessor {
 
     private void doPaidRecruitment(Campaign campaign) {
         int mod;
-        switch (campaign.getPersonnelMarket().getPaidRecruitType()) {
-            case Person.T_MECHWARRIOR:
+        switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
+            case MECHWARRIOR:
                 mod = -2;
                 break;
-            case Person.T_INFANTRY:
+            case SOLDIER:
                 mod = 2;
                 break;
-            case Person.T_MECH_TECH:
-            case Person.T_AERO_TECH:
-            case Person.T_MECHANIC:
-            case Person.T_BA_TECH:
-            case Person.T_DOCTOR:
+            case MECH_TECH:
+            case MECHANIC:
+            case AERO_TECH:
+            case BA_TECH:
+            case DOCTOR:
                 mod = 1;
                 break;
             default:
@@ -107,7 +98,7 @@ public class AtBEventProcessor {
             mod -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+        Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
         int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         mod += adminHRExp - 2;
@@ -129,8 +120,7 @@ public class AtBEventProcessor {
         }
 
         for (int i = 0; i < q; i++) {
-            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitType());
-            p.setId(UUID.randomUUID());
+            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
             campaign.getPersonnelMarket().addPerson(p);
             addRecruitUnit(p);
         }
@@ -148,39 +138,32 @@ public class AtBEventProcessor {
     }
 
     private void addRecruitUnit(Person p) {
-        final String METHOD_NAME = "addRecruitUnit(Person)"; //$NON-NLS-1$
-        UnitGeneratorParameters params = new UnitGeneratorParameters();
-
+        final Collection<EntityMovementMode> movementModes = new ArrayList<>();
+        final Collection<MissionRole> missionRoles = new ArrayList<>();
         int unitType;
         switch (p.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
+            case MECHWARRIOR:
                 unitType = UnitType.MEK;
                 break;
-            case Person.T_GVEE_DRIVER:
-            case Person.T_VEE_GUNNER:
-            case Person.T_VTOL_PILOT:
-                return;
-            case Person.T_AERO_PILOT:
+            case AEROSPACE_PILOT:
                 if (!campaign.getCampaignOptions().getAeroRecruitsHaveUnits()) {
                     return;
                 }
                 unitType = UnitType.AERO;
                 break;
-            case Person.T_INFANTRY:
-                unitType = UnitType.INFANTRY;
-
-                // infantry will have a 1/3 chance of being field guns
-                if(Compute.d6() <= 2) {
-                    params.getMissionRoles().add(MissionRole.FIELD_GUN);
-                    params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
-                }
-
+            case PROTOMECH_PILOT:
+                unitType = UnitType.PROTOMEK;
                 break;
-            case Person.T_BA:
+            case BATTLE_ARMOUR:
                 unitType = UnitType.BATTLE_ARMOR;
                 break;
-            case Person.T_PROTO_PILOT:
-                unitType = UnitType.PROTOMEK;
+            case SOLDIER:
+                unitType = UnitType.INFANTRY;
+                // infantry will have a 1/3 chance of being field guns
+                if (Compute.d6() <= 2) {
+                    movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    missionRoles.add(MissionRole.FIELD_GUN);
+                }
                 break;
             default:
                 return;
@@ -202,36 +185,26 @@ public class AtBEventProcessor {
                 weight = EntityWeightClass.WEIGHT_HEAVY;
             }
         }
+        final String faction = getRecruitFaction(campaign);
+        MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
+                IUnitRating.DRAGOON_F, movementModes, missionRoles);
         Entity en;
-
-        String faction = getRecruitFaction(campaign);
-
-        params.setFaction(faction);
-        params.setUnitType(unitType);
-        params.setWeightClass(weight);
-        params.setYear(campaign.getGameYear());
-        params.setQuality(IUnitRating.DRAGOON_F);
-
-        MechSummary ms = campaign.getUnitGenerator().generate(params);
         if (null != ms) {
-            if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
+            if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MechSummaryCache.getInstance().getMech(name);
-                MekHQ.getLogger().info(getClass(), METHOD_NAME, "looking for Clan infantry " + name);
+                MekHQ.getLogger().info("looking for Clan infantry " + name);
             }
             try {
                 en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                        + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error("Unable to load entity: "
+                        + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
             }
         } else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Personnel market could not find " //$NON-NLS-1$
-                    + UnitType.getTypeName(unitType) + " for recruit from faction " + faction); //$NON-NLS-1$
+            MekHQ.getLogger().error("Personnel market could not find "
+                    + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
             return;
         }
 
@@ -243,33 +216,30 @@ public class AtBEventProcessor {
                         en.getMovementMode() == EntityMovementMode.WHEELED ||
                         en.getMovementMode() == EntityMovementMode.HOVER ||
                         en.getMovementMode() == EntityMovementMode.WIGE) {
-                    if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
+                    if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(Person.T_GVEE_DRIVER);
-                    }
-                    if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRole(Person.T_GVEE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.VTOL) {
-                    if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
+                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(Person.T_VTOL_PILOT);
-                    }
-                    if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
+                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRole(Person.T_VTOL_PILOT);
+                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
                         en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
                         en.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                    if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
+                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(Person.T_NVEE_DRIVER);
-                    }
-                    if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                    } else if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRole(Person.T_NVEE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     }
                 }
             }
@@ -296,7 +266,7 @@ public class AtBEventProcessor {
             if ((c.getGameYear() > 3055) && (Compute.randomInt(20) == 0)) {
                 ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
-                    if (Faction.getFaction(f).isClan()) {
+                    if (Factions.getInstance().getFaction(f).isClan()) {
                         clans.add(f);
                     }
                 }

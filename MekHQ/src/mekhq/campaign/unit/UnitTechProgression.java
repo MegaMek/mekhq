@@ -25,7 +25,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 
 /**
@@ -38,7 +37,6 @@ import mekhq.MekHQ;
  * needed before the task completes. There is also a non-blocking call.
  *
  * @author Neoancient
- *
  */
 public class UnitTechProgression {
 
@@ -118,23 +116,21 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            MekHQ.getLogger().error(UnitTechProgression.class, "getProgression(MechSummary,int,boolean)", e);
+            MekHQ.getLogger().error(e);
         }
         return null;
     }
 
     private static ITechnology calcTechProgression(MechSummary ms, int techFaction) {
-        final String METHOD_NAME = "calcTechProgression(MechSummary, int)"; // $NON-NLS-1$
         try {
             Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Entity was null: " + ms.getName());
+                MekHQ.getLogger().error("Entity was null: " + ms.getName());
                 return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Exception loading entity " + ms.getName());
-            MekHQ.getLogger().error(BuildMapTask.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error("Exception loading entity " + ms.getName(), ex);
             return null;
         }
     }
@@ -153,7 +149,7 @@ public class UnitTechProgression {
         // Load all the Entities in the MechSummaryCache and calculate the tech level for the given faction.
         @Override
         public Map<MechSummary, ITechnology> call() throws Exception {
-            Map<MechSummary,ITechnology> map = new HashMap<MechSummary,ITechnology>();
+            Map<MechSummary,ITechnology> map = new HashMap<>();
             for (MechSummary ms : MechSummaryCache.getInstance().getAllMechs()) {
                 map.put(ms, calcTechProgression(ms, techFaction));
             }

@@ -29,7 +29,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import mekhq.campaign.log.LogEntry;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqConstants;
+import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,8 +45,6 @@ import mekhq.campaign.AwardSet;
  * @author Miguel Azevedo
  */
 public class AwardsFactory {
-    private static final String AWARDS_XML_ROOT_PATH = "data/universe/awards/";
-
     private static AwardsFactory instance = null;
 
     /**
@@ -83,26 +83,28 @@ public class AwardsFactory {
     }
 
     /**
-     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates a copy of that
-     * award in order for it to be given to someone.
+     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates
+     * a copy of that award in order for it to be given to someone.
      * @param setName the name of the set
      * @param awardName the name of the award
-     * @return list with the awards belonging to that set
+     * @return the copied award, or null if one cannot be copied
      */
-    public Award generateNew(String setName, String awardName) {
-        Map<String, Award> awardSet = awardsMap.get(setName);
-        Award blueprintAward = awardSet.get(awardName);
-        return blueprintAward.createCopy();
+    public @Nullable Award generateNew(final String setName, final String awardName) {
+        final Map<String, Award> awardSet = awardsMap.get(setName);
+        if (awardSet == null) {
+            return null;
+        }
+        final Award award = awardSet.get(awardName);
+        return (award == null) ? null : award.createCopy();
     }
 
     /**
      * Generates a new award from an XML entry (when loading game, for example)
      * @param node xml node
+     * @param defaultSetMigration whether or not to check if the default set needs to be migrated
      * @return an award
      */
-    public Award generateNewFromXML(Node node) {
-        final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
-
+    public @Nullable Award generateNewFromXML(final Node node, final boolean defaultSetMigration) {
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -116,18 +118,28 @@ public class AwardsFactory {
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     dates.add(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    name = wn2.getTextContent();
+                    name = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")) {
-                    set = wn2.getTextContent();
+                    set = wn2.getTextContent().trim();
                 }
             }
         } catch (Exception ex) {
-            // Doh!
-            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
-        Award award = generateNew(set, name);
-        award.setDates(dates);
+        if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
+            name = (name == null) ? "" : name;
+            final String newName = PersonMigrator.awardDefaultSetMigrator(name);
+            if (newName != null) {
+                set = "standard";
+                name = newName;
+            }
+        }
+
+        final Award award = generateNew(set, name);
+        if (award != null) {
+            award.setDates(dates);
+        }
         return award;
     }
 
@@ -135,7 +147,7 @@ public class AwardsFactory {
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
     private void loadAwards() {
-        File dir = new File(AWARDS_XML_ROOT_PATH);
+        File dir = new File(MekHqConstants.AWARDS_DIRECTORY_PATH);
         File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {
@@ -146,7 +158,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
             } catch (IOException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -171,7 +183,7 @@ public class AwardsFactory {
             }
             awardsMap.put(currentSetName, tempAwardMap);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
+            MekHQ.getLogger().error("Error loading XML for awards", e);
         }
     }
 }

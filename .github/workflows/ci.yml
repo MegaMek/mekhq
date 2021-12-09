@@ -3,7 +3,7 @@
 #
 # Jobs:
 #
-#    - ci_cd: Build MekHQ for CI/CD on Ubuntu with Java 1.8
+#    - ci_cd: Build MekHQ for CI/CD on Ubuntu with Java 11
 #        - This job will use MM and MML source directly
 #          for the build.
 #
@@ -147,12 +147,12 @@ jobs:
         echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
     #
-    # Use Java 1.8
+    # Use Java 11
     #
-    - name: Set up JDK 1.8
+    - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 11
 
     #
     # Make sure we can execute the Gradle wrapper        
@@ -192,28 +192,47 @@ jobs:
         path: ./mekhq/MekHQ/build/reports/
 
     #
+    # Upload our Code Coverage Reports to CodeCov.io
+    #
+    - name: CodeCov.io Coverage Report
+      uses: codecov/codecov-action@v1
+      with:
+        directory: ./mekhq/MekHQ/build/reports/jacoco/test
+        fail_ci_if_error: false
+        verbose: true
+
+    #
     # If we have a buildScanUri comment on the PR
     #
     # NB: This only works if you're on the main MegaMek\mekhq repo
     #     for now due to a GitHub Actions limitation.
     #
-    - name: Comment on PR with Build Scan URI
-      uses: thollander/actions-comment-pull-request@master
-      if: always() && steps.gradle_build.outputs.buildScanUri != ''
-      with:
-        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# CAW: temporarily halted https://github.com/thollander/actions-comment-pull-request/issues/17
+#    - name: Comment on PR with Build Scan URI
+#      uses: thollander/actions-comment-pull-request@master
+#      if: always() && steps.gradle_build.outputs.buildScanUri != ''
+#      with:
+#        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     #
-    # Put the releases up in a single zip file called:
-    #
-    #     releases.zip
+    # Put the Windows Release up in an artifact
     #
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-    - name: Upload Releases
-      uses: actions/upload-artifact@v2-preview
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2
       with:
-        name: releases
-        path: ./mekhq/MekHQ/build/distributions/
+        name: release-win-java8
+        path: ./mekhq/MekHQ/build/distributions/*.zip
+
+    #
+    # Put the non-Windows release in an artifact
+    #
+    - name: Upload Nix/Mac Release
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-nix-mac-java8
+        path: ./mekhq/MekHQ/build/distributions/*.tar

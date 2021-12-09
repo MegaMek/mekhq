@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -17,17 +14,12 @@ import mekhq.campaign.Campaign;
 
 /**
  * Conversion gear for QuadVees
- * 
- * @author Neoancient
  *
+ * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    
-    /**
-     * 
-     */
     private static final long serialVersionUID = -382649905317675957L;
-    
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setTechRating(RATING_F)
             .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)
@@ -36,43 +28,43 @@ public class QuadVeeGear extends Part {
             .setProductionFactions(F_CHH)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-
     public QuadVeeGear() {
         this(0, null);
     }
-    
+
     public QuadVeeGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Conversion Gear";
     }
-    
+
+    @Override
     public QuadVeeGear clone() {
         QuadVeeGear clone = new QuadVeeGear(0, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
                         QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
-    
+
     @Override
     public int getBaseTime() {
         // Using value for 'Mech "weapons and other equipment"
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 120;
         }
-        if(hits == 1) {
+        if (hits == 1) {
             return 100;
-        } else if(hits == 2) {
+        } else if (hits == 2) {
             return 150;
-        } else if(hits == 3) {
+        } else if (hits == 3) {
             return 200;
-        } else if(hits > 3) {
+        } else if (hits > 3) {
             return 250;
         }
         return 0;
@@ -80,16 +72,16 @@ public class QuadVeeGear extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 0;
         }
-        if(hits == 1) {
+        if (hits == 1) {
             return -3;
-        } else if(hits == 2) {
+        } else if (hits == 2) {
             return -2;
-        } else if(hits == 3) {
+        } else if (hits == 3) {
             return 0;
-        } else if(hits > 3) {
+        } else if (hits > 3) {
             return 2;
         }
         return 0;
@@ -108,19 +100,19 @@ public class QuadVeeGear extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             unit.damageSystem(CriticalSlot.TYPE_SYSTEM, QuadVee.SYSTEM_CONVERSION_GEAR, 4);
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                campaign.removePart(this);
-            } else if(null != spare) {
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -138,10 +130,10 @@ public class QuadVeeGear extends Part {
 
     @Override
     public String checkFixable() {
-        if(null == unit) {
+        if (null == unit) {
             return null;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
@@ -183,7 +175,7 @@ public class QuadVeeGear extends Part {
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
     }
-    
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof QuadVeeGear && part.unitTonnage == unitTonnage;

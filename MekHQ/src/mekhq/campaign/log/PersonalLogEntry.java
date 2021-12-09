@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,23 +10,22 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * This class is a specific log entry related to personal.
  * @author Miguel Azevedo
  */
 public class PersonalLogEntry extends LogEntry {
-    public PersonalLogEntry(Date date, String desc){
+    public PersonalLogEntry(LocalDate date, String desc) {
         super(date, desc, LogEntryType.PERSONAL);
     }
 }

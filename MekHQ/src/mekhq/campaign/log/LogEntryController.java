@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,17 +10,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.personnel.Person;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -35,31 +33,15 @@ import java.util.regex.Pattern;
  * @author Miguel Azevedo
  */
 public class LogEntryController {
-
     private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
     private static final Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
     private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
     private static final Map<String, Pattern> patternCache = new HashMap<>();
 
-    /**
-     * Generates a string with the rank of the person
-     * @param person whose rank we want to generate the string
-     * @return string with the rank
-     */
-    public static String generateRankEntryString(Person person) {
-        String rankEntry = "";
-        if (person.getRankNumeric() > 0) {
-            String message = logEntriesResourceMap.getString("asA.text");
-            rankEntry = MessageFormat.format(message, person.getRankName());
-        }
-
-        return rankEntry;
-    }
-
     private static Pattern compilePattern(String key, Supplier<String> regex) {
         Pattern pattern = patternCache.get(key);
-        if (null == pattern) {
+        if (pattern == null) {
             pattern = Pattern.compile(regex.get());
             patternCache.put(key, pattern);
         }
@@ -73,7 +55,6 @@ public class LogEntryController {
      * @return type of the log entry.
      */
     public static LogEntryType determineTypeFromLogDescription(String description) {
-
         if (foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
                 foundExpressionWithOneVariable("madePrisonerBy.text", description) ||
                 foundExpressionWithOneVariable("joined.text", description) ||
@@ -100,7 +81,7 @@ public class LogEntryController {
         if (foundExpressionWithOneVariable("spouseKia.text", description) ||
                 foundExpressionWithOneVariable("divorcedFrom.text", description) ||
                 foundExpressionWithOneVariable("marries.text", description) ||
-                foundExpressionWithOneVariable("gained.text", description) ||
+                foundExpressionWithOneVariable("gainedSPA.text", description) ||
                 foundSingleExpression("spouseConceived.text", description) ||
                 foundExpressionWithOneVariable("spouseConceived.text", description) ||
                 foundSingleExpression("ourChildBorn.text", description) ||
@@ -183,7 +164,7 @@ public class LogEntryController {
     }
 
     /**
-     * Updates the description of an old log entry with a new one. This is used to maintain backward compatibilty,
+     * Updates the description of an old log entry with a new one. This is used to maintain backward compatibility,
      * by substituting old log entries with improved ones.
      * @param description to be changes
      * @return string with the new description.
@@ -203,7 +184,6 @@ public class LogEntryController {
     }
 
     private static String updatePrisonerDescription(String description) {
-
         Matcher matcher = madePrisonerPattern.matcher(description);
 
         if (matcher.matches()) {
@@ -218,7 +198,6 @@ public class LogEntryController {
     }
 
     private static String updateBondsmanDescription(String description) {
-
         Matcher matcher = madeBondsmanPattern.matcher(description);
 
         if (matcher.matches()) {

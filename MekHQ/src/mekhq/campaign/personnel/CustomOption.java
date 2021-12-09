@@ -18,30 +18,25 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.options.IOption;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.logging.LogLevel;
-import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
  * abilities are included.
  *
  * @author Neoancient
- *
  */
 public class CustomOption {
 
@@ -54,7 +49,7 @@ public class CustomOption {
 
     private CustomOption(String key) {
         this.name = key;
-        group = PilotOptions.LVL3_ADVANTAGES;
+        group = PersonnelOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;
     }
@@ -88,20 +83,18 @@ public class CustomOption {
     }
 
     private static void initCustomAbilities() {
-        final String METHOD_NAME = "initCustomAbilities()"; //$NON-NLS-1$
         customAbilities = new ArrayList<>();
 
         Document xmlDoc;
 
-
-        try (InputStream is = new FileInputStream("data/universe/customspa.xml")) {
+        try (InputStream is = new FileInputStream("data/universe/customspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newUnsafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CustomOption.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -116,7 +109,7 @@ public class CustomOption {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
-            if (wn.getParentNode() != spaEle)
+            if (!wn.getParentNode().equals(spaEle))
                 continue;
 
             int xc = wn.getNodeType();
@@ -139,12 +132,9 @@ public class CustomOption {
     }
 
     public static CustomOption generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
-                    "Custom ability does not have a 'name' attribute.");
+            MekHQ.getLogger().error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -178,8 +168,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
-                    "Error parsing custom ability " + retVal.name);
+            MekHQ.getLogger().error("Error parsing custom ability " + retVal.name, ex);
         }
 
         return retVal;

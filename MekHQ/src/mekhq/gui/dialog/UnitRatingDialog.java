@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -37,8 +37,8 @@ import javax.swing.JTextArea;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -46,10 +46,6 @@ import mekhq.preferences.PreferencesNode;
  * @since 3/15/2012
  */
 public class UnitRatingDialog extends JDialog implements ActionListener {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 5644262476831277348L;
 
     private static final String TITLE = "Dragoon's Rating";
@@ -121,11 +117,11 @@ public class UnitRatingDialog extends JDialog implements ActionListener {
         return panel;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
             this.setVisible(false);
-        }
-        if (aboutButton.equals(e.getSource())) {
+        } else if (aboutButton.equals(e.getSource())) {
             JOptionPane.showMessageDialog(this, rating.getHelpText(), "About Dragoons Rating", JOptionPane.INFORMATION_MESSAGE);
         }
     }

@@ -171,7 +171,7 @@ public class PartsStore implements Serializable {
             try {
                 newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
-                MekHQ.getLogger().error(getClass(), "stockBattleArmorSuits", e);
+                MekHQ.getLogger().error(e);
             }
             if(null != newEntity) {
                 BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
@@ -188,18 +188,15 @@ public class PartsStore implements Serializable {
                 continue;
             }
             //TODO: we are still adding a lot of non-hittable equipment
-            if(et instanceof AmmoType) {
-                if(((AmmoType)et).hasFlag(AmmoType.F_BATTLEARMOR)) {
-                    //BA ammo has one shot listed as the amount. Do it as 1 ton blocks
-                    int shots = (int) Math.floor(1000/((AmmoType)et).getKgPerShot());
-                    if(shots <= 0) {
-                        //FIXME: no idea what to do here, these really should be fixed on the MM side
-                        //because presumably this is happening because KgperShot is -1 or 0
-                        shots = 20;
-                    }
-                    parts.add(new AmmoStorage(0, et, shots, c));
+            if (et instanceof AmmoType) {
+                AmmoType ammoType = (AmmoType) et;
+                if (ammoType.hasFlag(AmmoType.F_BATTLEARMOR)
+                        && (ammoType.getKgPerShot() > 0)) {
+                    // BA ammo has one shot listed as the amount. Do it as 1 ton blocks if using kg/shot.
+                    int shots = (int) Math.floor(1000.0 / ammoType.getKgPerShot());
+                    parts.add(new AmmoStorage(0, ammoType, shots, c));
                 } else {
-                    parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+                    parts.add(new AmmoStorage(0, ammoType, ammoType.getShots(), c));
                 }
             } else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
                 Part p = new HeatSink(0, et, -1, false, c);
@@ -515,9 +512,9 @@ public class PartsStore implements Serializable {
     }
 
     private void stockMekLocations(Campaign c) {
-        for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
-            for(int ton = 20; ton <= 100; ton=ton+5) {
-                for(int type = 0; type < EquipmentType.structureNames.length; type++) {
+        for (int loc = Mech.LOC_HEAD; loc <= Mech.LOC_CLEG; loc++) {
+            for (int ton = 20; ton <= 100; ton = ton + 5) {
+                for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
                     // The only structure that differs between IS and Clan versions is Endo-Steel
                     if (EquipmentType.T_STRUCTURE_ENDO_STEEL == type) {

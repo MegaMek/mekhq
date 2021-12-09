@@ -1,28 +1,28 @@
 /*
  * KFBoom.java
- * 
- * Copyright (c) 2019 MegaMek Team
- * 
+ *
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,14 +37,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author MKerensky
  */
 public class KfBoom extends Part {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3211076278442082220L;
 
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TECH_BASE_ALL)
@@ -59,7 +54,7 @@ public class KfBoom extends Part {
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType = Dropship.BOOM_STANDARD;
-    
+
     public KfBoom() {
         this(0, null, Dropship.BOOM_STANDARD);
     }
@@ -67,12 +62,13 @@ public class KfBoom extends Part {
     public KfBoom(int tonnage, Campaign c, int boomType) {
         super(tonnage, c);
         this.boomType = boomType;
-        this.name = "Dropship K-F Boom";
+        this.name = "DropShip K-F Boom";
         if (boomType == Dropship.BOOM_PROTOTYPE) {
             name += " (Prototype)";
         }
     }
 
+    @Override
     public KfBoom clone() {
         KfBoom clone = new KfBoom(getUnitTonnage(), campaign, boomType);
         clone.copyBaseData(this);
@@ -86,13 +82,13 @@ public class KfBoom extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-             if(((Dropship)unit.getEntity()).isKFBoomDamaged()) {
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+             if (((Dropship) unit.getEntity()).isKFBoomDamaged()) {
                  hits = 1;
-             } else { 
+             } else {
                  hits = 0;
              }
-             if(checkForDestruction 
+             if (checkForDestruction
                      && hits > priorHits
                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                  remove(false);
@@ -100,9 +96,9 @@ public class KfBoom extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 3600;
         }
         return 360;
@@ -110,7 +106,7 @@ public class KfBoom extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 0;
         }
         return -1;
@@ -118,7 +114,7 @@ public class KfBoom extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
+        if (null != unit && unit.getEntity() instanceof Dropship) {
             ((Dropship) unit.getEntity()).setDamageKFBoom(hits > 0);
         }
     }
@@ -126,26 +122,26 @@ public class KfBoom extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageKFBoom(false);
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+            ((Dropship) unit.getEntity()).setDamageKFBoom(false);
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                campaign.removePart(this);
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+            ((Dropship) unit.getEntity()).setDamageKFBoom(true);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -199,10 +195,15 @@ public class KfBoom extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("boomType")) {
-                boomType = Integer.parseInt(wn2.getTextContent());
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("boomType")) {
+                    boomType = Integer.parseInt(wn2.getTextContent());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
             }
         }
     }

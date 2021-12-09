@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,47 +10,13 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
-
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import megamek.common.AmmoType;
 import megamek.common.UnitType;
@@ -61,7 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -75,10 +41,21 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * This class manages the GUI and logic for the campaign subset export wizard.
+ * May Knuth forgive me.
+ * @author NickAragua
+ */
 public class CampaignExportWizard extends JDialog {
-    /**
-     *
-     */
     private static final long serialVersionUID = -7171621116865584010L;
 
     private JList<Force> forceList;
@@ -149,7 +126,7 @@ public class CampaignExportWizard extends JDialog {
         gbc.gridy++;
 
         JScrollPane scrollPane = new JScrollPane();
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
                 scrollPane.setViewportView(forceList);
@@ -225,8 +202,7 @@ public class CampaignExportWizard extends JDialog {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error(getClass(), "display",
-                                    "Failed to export campaign to new campaign file");
+                            MekHQ.getLogger().error("Failed to export campaign to new campaign file");
                         }
                         setVisible(false);
                     }
@@ -237,10 +213,9 @@ public class CampaignExportWizard extends JDialog {
                 JButton btnExistingCampaign = new JButton(resourceMap.getString("btnExistingCampaign.text"));
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
-                    if(destinationCampaignFile.isPresent()) {
+                    if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error(getClass(), "display",
-                                    "Failed to export campaign to existing campaign file");
+                            MekHQ.getLogger().error("Failed to export campaign to existing campaign file");
                         }
                         setVisible(false);
                     }
@@ -278,7 +253,9 @@ public class CampaignExportWizard extends JDialog {
     private void setupPersonList() {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
-        for (Person person : sourceCampaign.getActivePersonnel()) {
+        List<Person> people = sourceCampaign.getActivePersonnel();
+        people.sort(Comparator.comparing(Person::getPrimaryRole));
+        for (Person person : people) {
             personListModel.addElement(person);
         }
         personList.setModel(personListModel);
@@ -292,9 +269,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupUnitList() {
         unitList = new JList<>();
         DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
-        for (Unit unit : sourceCampaign.getUnits()) {
-            unitListModel.addElement(unit);
-        }
+        sourceCampaign.getHangar().forEachUnit(unitListModel::addElement);
         unitList.setModel(unitListModel);
         unitList.addListSelectionListener(e -> {
             lblStatus.setText(getUnitSelectionStatus());
@@ -306,7 +281,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getSpareParts();
+        List<Part> parts = sourceCampaign.getWarehouse().getSpareParts();
         parts.sort(Comparator.comparing(Part::getName));
 
         for (Part part : parts) {
@@ -358,7 +333,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 for (Person person : unit.getActiveCrew()) {
@@ -406,7 +381,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 unitList.setSelectedValue(unit, false);
@@ -415,10 +390,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         for (Person person : personList.getSelectedValuesList()) {
-            if (person.getUnitId() != null) {
-                Unit unit = sourceCampaign.getUnit(person.getUnitId());
-
-                unitList.setSelectedValue(unit, false);
+            if (person.getUnit() != null) {
+                unitList.setSelectedValue(person.getUnit(), false);
                 selectedIndices.add(unitList.getSelectedIndex());
             }
         }
@@ -429,7 +402,7 @@ public class CampaignExportWizard extends JDialog {
     }
 
     private void nextButtonHandler(CampaignExportWizardState state) {
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 updatePersonList();
                 updateUnitList();
@@ -471,25 +444,21 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.cleanUp();
                 fis.close();
             } catch (NullEntityException ex) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
+                MekHQ.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "The campaign file could not be loaded.\nPlease check the log file for details.");
+                MekHQ.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");
                 return false;
             } catch (OutOfMemoryError e) {
-                MekHQ.getLogger().error(this.getClass(), "exportToCampaign",
-                        "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
+                MekHQ.getLogger().error("MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
                 return false;
             }
         }
 
         if (chkExportState.isSelected()) {
             destinationCampaign.setFactionCode(sourceCampaign.getFactionCode());
-            destinationCampaign.setCamoCategory(sourceCampaign.getCamoCategory());
-            destinationCampaign.setCamoFileName(sourceCampaign.getCamoFileName());
-            destinationCampaign.getCalendar().setTime(sourceCampaign.getDate());
+            destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
+            destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
             destinationCampaign.setLocation(sourceCampaign.getLocation());
         }
 
@@ -500,10 +469,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (Mission mission : sourceCampaign.getMissions()) {
-                if (!mission.isActive()) {
-                    destinationCampaign.importMission(mission);
-                }
+            for (Mission mission : sourceCampaign.getCompletedMissions()) {
+                destinationCampaign.importMission(mission);
             }
         }
 
@@ -511,8 +478,9 @@ public class CampaignExportWizard extends JDialog {
 
         try {
             money = Integer.parseInt(txtExportMoney.getText());
-            if(money > 0) {
-                destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
+            if (money > 0) {
+                destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL, Money.of(money),
+                        String.format("Transfer from %s", sourceCampaign.getName()));
             }
         } catch(Exception ignored) { }
 
@@ -520,25 +488,30 @@ public class CampaignExportWizard extends JDialog {
         // to be exported
 
         for (Unit unit : unitList.getSelectedValuesList()) {
+            int sourceForceID = unit.getForceId();
+
             if (destinationCampaign.getUnit(unit.getId()) != null) {
                 destinationCampaign.removeUnit(unit.getId());
             }
 
             destinationCampaign.importUnit(unit);
-            destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
+
             // Reset any transport assignments, as the export may not contain all transports and cargo units
-            if (unit.hasTransportShipId()) {
-                unit.getTransportShipId().clear();
-            }
-            if (!unit.getTransportedUnits().isEmpty()) {
+            unit.setTransportShipAssignment(null);
+
+            if (unit.hasTransportedUnits()) {
                 unit.unloadTransportShip();
             }
+
+            // make an attempt to re-construct the force structure in the destination campaign
+            // or assign the unit to the same force
+            attemptToAssignToForce(unit, sourceForceID, sourceCampaign, destinationCampaign);
         }
 
         // overwrite any people with the same ID.
         for (Person person : personList.getSelectedValuesList()) {
             if (destinationCampaign.getPerson(person.getId()) != null) {
-                destinationCampaign.removePerson(person.getId());
+                destinationCampaign.removePerson(person);
             }
 
             destinationCampaign.importPerson(person);
@@ -549,9 +522,7 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        for (Unit unit : destinationCampaign.getUnits()) {
-            unit.resetEngineer();
-        }
+        destinationCampaign.getHangar().forEachUnit(Unit::resetEngineer);
 
         // there's just no way to overwrite parts
         // so we simply add them to the destination
@@ -564,19 +535,19 @@ public class CampaignExportWizard extends JDialog {
             newPart.setCampaign(destinationCampaign);
             if (newPart instanceof AmmoStorage) {
                 ((AmmoStorage) newPart).setShots(partCount.count);
-                destinationCampaign.addPart(newPart, 0);
+                destinationCampaign.getQuartermaster().addPart(newPart, 0);
             } else if (newPart instanceof Armor) {
                 ((Armor) newPart).setAmount(partCount.count);
-                destinationCampaign.addPart(newPart, 0);
+                destinationCampaign.getQuartermaster().addPart(newPart, 0);
             } else {
                 // a work-around due to weirdness in "checkForExistingSparePart" -
                 // it comes back as null if the part we're looking for is there but has the same ID,
                 // which is likely to happen when exporting to a brand new campaign
                 newPart.setId(-1);
-                Part existingPart = destinationCampaign.checkForExistingSparePart(newPart);
+                Part existingPart = destinationCampaign.getWarehouse().checkForExistingSparePart(newPart);
                 if (existingPart == null) {
                     // addpart doesn't allow adding multiple parts, so we update it afterwards
-                    destinationCampaign.addPart(newPart, 0);
+                    destinationCampaign.getQuartermaster().addPart(newPart, 0);
                     newPart.setQuantity(partCount.count);
                 } else {
                     existingPart.setQuantity(existingPart.getQuantity() + partCount.count);
@@ -595,11 +566,12 @@ public class CampaignExportWizard extends JDialog {
             }
 
             for (Person person : personList.getSelectedValuesList()) {
-                sourceCampaign.removePerson(person.getId(), true);
+                sourceCampaign.removePerson(person, true);
             }
 
             if (money > 0) {
-                sourceCampaign.addFunds(Money.of(-money), "Transfer to exported campaign", Transaction.C_START);
+                sourceCampaign.addFunds(TransactionType.STARTING_CAPITAL, Money.of(-money),
+                        "Transfer to exported campaign");
             }
 
             // here, we update the quantity of the relevant part in the source campaign
@@ -612,20 +584,20 @@ public class CampaignExportWizard extends JDialog {
                     sourceAmmo.changeShots(-partCount.count);
 
                     if (sourceAmmo.getShots() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 } else if (partCount.part instanceof Armor) {
                     Armor sourceArmor = (Armor) partCount.part;
                     sourceArmor.setAmount(sourceArmor.getAmount() - partCount.count);
 
                     if (sourceArmor.getAmount() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 } else {
                     partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
 
-                    if(partCount.part.getQuantity() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                    if (partCount.part.getQuantity() <= 0) {
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 }
             }
@@ -637,6 +609,101 @@ public class CampaignExportWizard extends JDialog {
         SpecialAbility.replaceSpecialAbilities(spaPush);
 
         return saved;
+    }
+
+    private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign, Campaign destinationCampaign) {
+        Force sourceForce = sourceCampaign.getForce(sourceForceID);
+        if (sourceForce == null) {
+            return;
+        }
+
+        // this indicates a unit assigned to the root-level force
+        if (sourceForce.getParentForce() == null) {
+            destinationCampaign.getForces().addUnit(unit.getId());
+        }
+
+        // first thing we will try is to identify a force with the same name and tree structure in the destination campaign
+        // if we find one, add the unit to it
+        // otherwise, chain-add forces
+
+        // hack: the root forces are irrelevant, so we replace the source root force name with the destination root force name
+        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
+
+        Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
+        if (destForce != null) {
+            destForce.addUnit(unit.getId());
+        } else {
+            List<Force> parentForces = getForceAndParents(sourceForce);
+            Force currentDestinationForce = destinationCampaign.getForces();
+
+            for (int x = parentForces.size() - 1; x >= 0; x--) {
+                Force nextSourceForce = parentForces.get(x);
+                String nextSourceForceFullName = getDestinationFullName(nextSourceForce, sourceCampaign, destinationCampaign);
+                Force nextDestinationForce = findForce(nextSourceForceFullName, currentDestinationForce);
+
+                // if this level doesn't exist yet, add it to where we currently are
+                if (nextDestinationForce == null) {
+                    Force forceCopy = new Force(nextSourceForce.getName());
+                    destinationCampaign.addForce(forceCopy, currentDestinationForce);
+                    currentDestinationForce = forceCopy;
+                // otherwise, update current location and move to next level
+                } else {
+                    currentDestinationForce = nextDestinationForce;
+                }
+            }
+
+            currentDestinationForce.addUnit(unit.getId());
+        }
+    }
+
+    /**
+     * Helper function that returns a full force name with the
+     * source campaign root force name swapped out for the destination campaign root force name
+     */
+    private String getDestinationFullName(Force sourceForce, Campaign sourceCampaign, Campaign destinationCampaign) {
+        return sourceForce.getFullName().replace(sourceCampaign.getForces().getName(), destinationCampaign.getForces().getName());
+    }
+
+    /**
+     * Recurses through a Force structure to look for a force with the given "full force name"
+     */
+    private Force findForce(String forceName, Force force) {
+        if (force.getFullName().equals(forceName)) {
+            return force;
+        } else {
+            for (Force subForce : force.getSubForces()) {
+                Force foundForce = findForce(forceName, subForce);
+
+                if (foundForce != null) {
+                    return foundForce;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Moves through a force's ancestors and returns a flattened list of force names in order
+     * from me to furtherst ancestor.
+     */
+    private List<Force> getForceAndParents(Force force) {
+        List<Force> retval = new ArrayList<>();
+        retval.add(force);
+
+        Force ancestorForce;
+        while (force.getParentForce() != null) {
+            ancestorForce = force.getParentForce();
+
+            // we don't want the top-level force
+            if (ancestorForce.getParentForce() != null) {
+                retval.add(ancestorForce);
+            }
+
+            force = ancestorForce;
+        }
+
+        return retval;
     }
 
     private String getPersonSelectionStatus() {
@@ -709,7 +776,15 @@ public class CampaignExportWizard extends JDialog {
                                                       boolean isSelected, boolean cellHasFocus) {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Person person = (Person) value;
-            String cellValue = String.format("%s (%s)", person.getFullName(), person.getPrimaryRoleDesc());
+            String callsign = "";
+            if ((person.getCallsign() != null) && (person.getCallsign().trim().length() > 0)) {
+                callsign = String.format("\"%s\" ", person.getCallsign());
+            }
+
+            String cellValue = String.format("%s %s(%s)",
+                    person.getFullName(),
+                    callsign,
+                    person.getPrimaryRoleDesc());
             ((JLabel) cmp).setText(cellValue);
             return cmp;
         }
@@ -758,7 +833,7 @@ public class CampaignExportWizard extends JDialog {
                 return ((Armor) part).getArmorWeight(count);
             } else if (part instanceof AmmoStorage) {
                 AmmoStorage ammoPart = (AmmoStorage) part;
-                AmmoType ammoType = (AmmoType) ammoPart.getType();
+                AmmoType ammoType = ammoPart.getType();
                 return ammoType.getKgPerShot() * count / 1000.0;
             } else {
                 return count * part.getTonnage() * 1.0;

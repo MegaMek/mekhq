@@ -1,29 +1,29 @@
 /*
  * SpacecraftEngine.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,7 +43,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
@@ -68,6 +67,7 @@ public class SpacecraftEngine extends Part {
         this.name = "Spacecraft Engine";
     }
 
+    @Override
     public SpacecraftEngine clone() {
         SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
         clone.copyBaseData(this);
@@ -80,18 +80,17 @@ public class SpacecraftEngine extends Part {
     }
 
     public void calculateTonnage() {
-
-        if(null != unit) {
+        if (null != unit) {
             clan = unit.getEntity().isClan();
-            if(unit.getEntity() instanceof SmallCraft) {
+            if (unit.getEntity() instanceof SmallCraft) {
                 double moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
-                if(clan) {
+                if (clan) {
                     engineTonnage = Math.round(moveFactor * 0.061 * 2)/2f;
                 } else {
                     engineTonnage = Math.round(moveFactor * 0.065 * 2)/2f;
                 }
-            } else if(unit.getEntity() instanceof Jumpship) {
-                if(unit.getEntity() instanceof Warship) {
+            } else if (unit.getEntity() instanceof Jumpship) {
+                if (unit.getEntity() instanceof Warship) {
                     engineTonnage = Math.round(unit.getEntity().getWeight() * 0.06 *  unit.getEntity().getOriginalWalkMP() * 2)/2f;
                 } else {
                     engineTonnage = Math.round(unit.getEntity().getWeight() * 0.012 * 2)/2f;
@@ -100,18 +99,18 @@ public class SpacecraftEngine extends Part {
         }
     }
 
-    @Override 
+    @Override
     public Money getStickerPrice() {
         //Add engine cost from SO p158 for advanced aerospace
         //Drive Unit + Engine + Engine Control Unit
         if (unit != null) {
-            if(unit.getEntity() instanceof Warship) {
-                return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100)) 
+            if (unit.getEntity() instanceof Warship) {
+                return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100))
                         + (engineTonnage * 1000)
                         + 1000);
-            } else if(unit.getEntity() instanceof Jumpship) {
+            } else if (unit.getEntity() instanceof Jumpship) {
                 // If we're a space station or jumpship, need the station keeping thrust, which is always 0.2
-                return Money.of((500 * 0.2 * (unit.getEntity().getWeight() / 100)) 
+                return Money.of((500 * 0.2 * (unit.getEntity().getWeight() / 100))
                             + (engineTonnage * 1000)
                             + 1000);
             }
@@ -124,12 +123,12 @@ public class SpacecraftEngine extends Part {
     public boolean isSamePartType(Part part) {
         return part instanceof SpacecraftEngine
                 && getName().equals(part.getName())
-                && getTonnage() == ((SpacecraftEngine)part).getTonnage();
+                && getTonnage() == part.getTonnage();
     }
 
     @Override
     public int getTechLevel() {
-        if(clan) {
+        if (clan) {
             return TechConstants.T_CLAN_TW;
         } else {
             return TechConstants.T_IS_TW_NON_BOX;
@@ -157,23 +156,23 @@ public class SpacecraftEngine extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
                 engineTonnage = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                clan = wn2.getTextContent().equalsIgnoreCase("true");
-            } 
+                clan = Boolean.parseBoolean(wn2.getTextContent().trim());
+            }
         }
     }
 
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(0);
+        if (null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(0);
             }
         }
     }
@@ -185,22 +184,23 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                campaign.removePart(this);
-            } else if(null != spare) {
+
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -208,25 +208,22 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             int engineHits = 0;
             int engineCrits = 0;
-            if(unit.getEntity() instanceof Aero) {
-                engineHits = ((Aero)unit.getEntity()).getEngineHits();
+            if (unit.getEntity() instanceof Aero) {
+                engineHits = unit.getEntity().getEngineHits();
                 engineCrits = 6;
             }
-            if(engineHits >= engineCrits) {
+            if (engineHits >= engineCrits) {
                 remove(false);
-            }
-            else if(engineHits > 0) {
-                hits = engineHits;
             } else {
-                hits = 0;
+                hits = Math.max(engineHits, 0);
             }
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time = 0;
         //Per errata, small craft now use fighter engine times but still have the
@@ -246,10 +243,10 @@ public class SpacecraftEngine extends Part {
         }
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            time = 300; 
+            time = 300;
             //Light Damage
             if (hits > 0 && hits < 3) {
-                time *= (1 * hits);
+                time *= hits;
             //Moderate damage
             } else if (hits > 2 && hits < 5) {
                 time *= (2 * hits);
@@ -294,9 +291,9 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(hits);
+        if (null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(hits);
             }
         }
     }
@@ -344,7 +341,7 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ENGINE;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ENGINE;
     }
 }

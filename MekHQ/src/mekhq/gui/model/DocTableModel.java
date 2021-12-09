@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -27,6 +26,7 @@ public class DocTableModel extends DataTableModel {
         campaign = c;
     }
 
+    @Override
     public Object getValueAt(int row, int col) {
         return getDocDesc((Person) data.get(row));
     }
@@ -41,9 +41,9 @@ public class DocTableModel extends DataTableModel {
                     .append(" " + SkillType.S_DOCTOR);
         }
 
-        toReturn.append(String.format(" (%d XP)", doc.getXp()));
+        toReturn.append(String.format(" (%d XP)", doc.getXP()));
 
-        if (campaign.getMedicsPerDoctor() < 4) {
+        if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font size='2' color='red'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font size='2'><br/>");
@@ -64,20 +64,20 @@ public class DocTableModel extends DataTableModel {
         return campaign;
     }
 
-    public DocTableModel.Renderer getRenderer(IconPackage icons) {
-        return new DocTableModel.Renderer(icons);
+    public DocTableModel.Renderer getRenderer() {
+        return new DocTableModel.Renderer();
     }
 
     public class Renderer extends BasicInfo implements TableCellRenderer {
-        public Renderer(IconPackage icons) {
-            super(icons);
+        public Renderer() {
+            super();
         }
 
         private static final long serialVersionUID = -818080358678474607L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             setPortrait(getDoctorAt(row));
             setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {

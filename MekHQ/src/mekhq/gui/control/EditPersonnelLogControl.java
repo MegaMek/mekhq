@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.control;
 
 import megamek.common.util.EncodeControl;
@@ -32,7 +31,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 public class EditPersonnelLogControl extends JPanel {
-    private Frame parent;
+    private JFrame parent;
     private Campaign campaign;
     private Person person;
     private LogTableModel logModel;
@@ -43,18 +42,18 @@ public class EditPersonnelLogControl extends JPanel {
     private JTable logsTable;
     private JScrollPane scrollLogsTable;
 
-    public EditPersonnelLogControl(Frame parent, Campaign campaign, Person person) {
+    public EditPersonnelLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
         this.campaign = campaign;
         this.person = person;
 
-        this.logModel = new LogTableModel(this.person.getPersonnelLog());
+        this.logModel = new LogTableModel(person.getPersonnelLog());
 
         initComponents();
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl", new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());
@@ -108,19 +107,17 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign.getDate());
-        dialog.setVisible(true);
-        if (dialog.getEntry().isPresent()) {
-            person.addLogEntry(dialog.getEntry().get());
+        final AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, person, campaign.getLocalDate());
+        if (dialog.showDialog().isConfirmed()) {
+            person.addLogEntry(dialog.getEntry());
+            refreshTable();
         }
-        refreshTable();
     }
 
     private void editEntry() {
-        LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
-        if (null != entry) {
-            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, entry);
-            dialog.setVisible(true);
+        final LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
+        if (entry != null) {
+            new AddOrEditPersonnelEntryDialog(parent, person, entry).showDialog();
             refreshTable();
         }
     }
