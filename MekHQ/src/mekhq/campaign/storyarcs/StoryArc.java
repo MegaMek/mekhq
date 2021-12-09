@@ -20,15 +20,22 @@
  */
 package mekhq.campaign.storyarcs;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * The Story Arc class manages a given story arc campaign
@@ -62,17 +69,32 @@ public class StoryArc implements MekHqXmlSerializable {
     private Map<UUID, Integer> campaignMissionIds;
 
 
-    public StoryArc(Campaign c) {
-        this.campaign = c;
-        startNew = false;
+    public StoryArc() {
+        startNew = true;
         storyEvents =  new LinkedHashMap<>();
         storyMissions = new LinkedHashMap<>();
         storyScenarios = new LinkedHashMap<>();
         campaignMissionIds = new LinkedHashMap<>();
     }
 
+    public void setCampaign(Campaign c) {
+        this.campaign = c;
+    }
+
     protected Campaign getCampaign() {
         return campaign;
+    }
+
+    private void setTitle(String t) {
+        this.title = t;
+    }
+
+    private void setDescription(String d) {
+        this.description = d;
+    }
+
+    private void setStartNew(Boolean b) {
+        this.startNew = b;
     }
 
     public StoryEvent getStoryEvent(UUID id) {
@@ -105,8 +127,100 @@ public class StoryArc implements MekHqXmlSerializable {
         return c.getMission(campaignMissionId);
     }
 
+    //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-
+        writeToXmlBegin(pw1, indent);
+        writeToXmlEnd(pw1, indent);
     }
+
+    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<storyArc type=\"" + this.getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "title", title);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "description", description);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startNew", startNew);
+    }
+
+    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "storyArc");
+    }
+
+    public static @Nullable StoryArc parseFromXML(final NodeList nl) {
+        final StoryArc storyArc = new StoryArc();
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                switch (wn.getNodeName()) {
+                    case "title":
+                        storyArc.setTitle(wn.getTextContent().trim());
+                        break;
+                    case "description":
+                        storyArc.setDescription(wn.getTextContent().trim());
+                        break;
+                    case "startNew":
+                        storyArc.setStartNew(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+
+
+                    default:
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            return null;
+        }
+        return storyArc;
+    }
+
+    //endregion File I/O
+
+    /**
+     * @return a list of all of the story arcs in the default and userdata folders
+     */
+    public static List<StoryArc> getStoryArcs() {
+        final List<StoryArc> presets = loadStoryArcsFromDirectory(
+                new File(MekHqConstants.STORY_ARC_DIRECTORY));
+        presets.addAll(loadStoryArcsFromDirectory(
+                new File(MekHqConstants.USER_STORY_ARC_DIRECTORY)));
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
+        return presets;
+    }
+
+    public static List<StoryArc> loadStoryArcsFromDirectory(final @Nullable File directory) {
+        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
+            return new ArrayList<>();
+        }
+
+        final List<StoryArc> storyArcs = new ArrayList<>();
+        for (final File file : Objects.requireNonNull(directory.listFiles())) {
+            final StoryArc storyArc = parseFromFile(file);
+            if (storyArcs != null) {
+                storyArcs.add(storyArc);
+            }
+        }
+
+        return storyArcs;
+    }
+
+    public static @Nullable StoryArc parseFromFile(final @Nullable File file) {
+        final Document xmlDoc;
+        try (InputStream is = new FileInputStream(file)) {
+            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+            return null;
+        }
+
+        final Element element = xmlDoc.getDocumentElement();
+        element.normalize();
+
+        return parseFromXML(element.getChildNodes());
+    }
+
 }
