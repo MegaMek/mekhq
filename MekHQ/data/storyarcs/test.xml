@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StoryArc>
+<storyArc>
     <title>A Test Campaign</title>
     <description>Just Testing Stuff Out</description>
-    <startNew>false</startNew>
+    <startNew>true</startNew>
     <startingEventId></startingEventId>
     <storyMissions>
 
@@ -13,4 +13,4 @@
     <storyEvents>
 
     </storyEvents>
-</StoryArc>
+</storyArc>
