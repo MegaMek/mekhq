@@ -154,6 +154,25 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "storyArc");
     }
 
+    protected void parseStoryMissions(NodeList nl) {
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeType() != Node.ELEMENT_NODE ||
+                        wn.getNodeName()!="mission") {
+                    continue;
+                }
+                UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
+                Mission mission = Mission.generateInstanceFromXML(wn, getCampaign(), null);
+                if(null != mission) {
+                    storyMissions.put(id, mission);
+                }
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
+
     public static @Nullable StoryArc parseFromXML(final NodeList nl) {
         final StoryArc storyArc = new StoryArc();
         try {
@@ -173,6 +192,9 @@ public class StoryArc implements MekHqXmlSerializable {
                     case "startNew":
                         storyArc.setStartNew(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "storyMissions":
+                        storyArc.parseStoryMissions(wn.getChildNodes());
+                        break;
 
 
                     default:
@@ -185,6 +207,8 @@ public class StoryArc implements MekHqXmlSerializable {
         }
         return storyArc;
     }
+
+
 
     //endregion File I/O
 
