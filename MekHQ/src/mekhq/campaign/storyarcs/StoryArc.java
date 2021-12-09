@@ -47,24 +47,28 @@ public class StoryArc implements MekHqXmlSerializable {
     private UUID startingEventId;
 
     /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
-    private Map<UUID, StoryEvent> storyEvents = new LinkedHashMap<>();
+    private Map<UUID, StoryEvent> storyEvents;
 
     /** A hash of all possible Missions in this StoryArc, referenced by UUID **/
-    private Map<UUID, Mission> storyMissions = new LinkedHashMap<>();
+    private Map<UUID, Mission> storyMissions;
 
     /** A hash of all possible Scenarios in this StoryArc, referenced by UUID **/
-    private Map<UUID, Scenario> storyScenarios = new LinkedHashMap<>();
+    private Map<UUID, Scenario> storyScenarios;
 
     /**
      * We need to track a hash that relates active Story Missions to their actual integer id
      * in the Campaign in order to be able to add scenarios to the proper mission
      */
-    private Map<UUID, Integer> campaignMissionIds = new LinkedHashMap<>();
+    private Map<UUID, Integer> campaignMissionIds;
 
 
     public StoryArc(Campaign c) {
         this.campaign = c;
         startNew = false;
+        storyEvents =  new LinkedHashMap<>();
+        storyMissions = new LinkedHashMap<>();
+        storyScenarios = new LinkedHashMap<>();
+        campaignMissionIds = new LinkedHashMap<>();
     }
 
     protected Campaign getCampaign() {
