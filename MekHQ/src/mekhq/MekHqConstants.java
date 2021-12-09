@@ -188,5 +188,12 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     //endregion StratCon
+
+    //region StoryArcs
+    public static final String STORY_ARC_DIRECTORY = "data/storyarcs/";
+    public static final String USER_STORY_ARC_DIRECTORY = "userdata/storyarcs/";
+
+    //endregion StoryArcs
+
     //endregion File Paths
 }

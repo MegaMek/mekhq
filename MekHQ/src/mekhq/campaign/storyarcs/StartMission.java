@@ -51,7 +51,7 @@ public class StartMission extends StoryEvent {
     public void startEvent() {
         Mission m = arc.getStoryMission(missionId);
         if(null != m) {
-            campaignMissionId = arc.getCampaign().addMission(m);
+            //campaignMissionId = arc.getCampaign().addMission(m);
             //TODO: a pop-up dialog of the mission
         }
         super.startEvent();

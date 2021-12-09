@@ -40,7 +40,7 @@ public class CompleteMission extends StoryEvent {
         Mission m = arc.getCampaignMission(missionId, arc.getCampaign());
         if(null != m) {
             //TODO: review some criteria to determine status, but for now assume everyone wins
-            m.setStatus(Mission.S_SUCCESS);
+            //m.setStatus(Mission.S_SUCCESS);
             //TODO: a pop-up dialog of a description for missions end
         }
         //no need for this event to stick around
