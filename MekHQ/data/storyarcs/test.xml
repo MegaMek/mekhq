@@ -13,11 +13,18 @@
         </mission>
     </storyMissions>
     <storyScenarios>
-
+        <scenario uuid="0d0427ac-5979-11ec-bf63-0242ac130002" type="mekhq.campaign.mission.Scenario">
+            <name>Lorem Scenario</name>
+            <desc>Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn. F's'uhn ebunma h'kn'a sgn'wahlog naron tharanak, chtenff ph'ah mgor chtenffnyth wgah'n shtunggli s'uhn syha'h gotha mnahn' 'ai, ftaghu Azathoth ehye nog grah'n hlirgh Shub-Niggurath Dagon lw'nafh shogg. Sll'ha li'hee shagg geb ngmnahn' nnnAzathoth uh'eoth Shub-Niggurath kadishtu ron nali'hee tharanak sgn'wahl, r'luh ilyaa Tsathoggua cvulgtm ph'gof'nn h'nilgh'ri lloig ngr'luh athgoth 'ai. H'ftaghu li'hee mnahn' nilgh'ri nnnmnahn' nnnron R'lyeh nw ph'gotha gotha, vulgtlagln Dagon 'fhalma nnnR'lyeh nnnn'ghft nnngrah'n ehye lloig, hlirgh hupadgh nnnvulgtm cah Tsathoggua 'ai hlirgh h'lloig. Uln nilgh'ri Chaugnar Faugn hafh'drn Chaugnar Faugn nnnuh'e nilgh'ri, ee cNyarlathotep ftaghu n'gha csyha'h uln, ph'k'yarnak shagg n'ghft shagg Dagon.</desc>
+        </scenario>
     </storyScenarios>
     <storyEvents>
         <storyEvent uuid="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarcs.StartMission">
             <missionId>e78e8e90-5932-11ec-bf63-0242ac130002</missionId>
+            <nextEventId>5a333f88-597c-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent uuid="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarcs.AddScenario">
+            <scenarioId>0d0427ac-5979-11ec-bf63-0242ac130002</scenarioId>
         </storyEvent>
     </storyEvents>
 </storyArc>

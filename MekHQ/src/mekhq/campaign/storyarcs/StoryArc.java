@@ -186,6 +186,25 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
+    protected void parseStoryScenarios(NodeList nl) {
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeType() != Node.ELEMENT_NODE ||
+                        wn.getNodeName()!="scenario") {
+                    continue;
+                }
+                UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
+                Scenario scenario = Scenario.generateInstanceFromXML(wn, getCampaign(), null);
+                if(null != scenario) {
+                    storyScenarios.put(id, scenario);
+                }
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
+
     public static @Nullable StoryArc parseFromXML(final NodeList nl) {
         final StoryArc storyArc = new StoryArc();
         try {
@@ -213,6 +232,9 @@ public class StoryArc implements MekHqXmlSerializable {
                         break;
                     case "storyMissions":
                         storyArc.parseStoryMissions(wn.getChildNodes());
+                        break;
+                    case "storyScenarios":
+                        storyArc.parseStoryScenarios(wn.getChildNodes());
                         break;
 
 
