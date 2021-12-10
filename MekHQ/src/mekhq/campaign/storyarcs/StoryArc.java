@@ -62,6 +62,9 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of all possible Scenarios in this StoryArc, referenced by UUID **/
     private Map<UUID, Scenario> storyScenarios;
 
+    /** A UUID for the currently active event. May be null **/
+    private UUID currentEventId;
+
     /**
      * An integer that tracks the current mission id, so we know where to add new scenarios and complete the
      * mission. Eventually, I would like to allow multiple active missions, but figure that out later.
@@ -98,6 +101,8 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public int getCurrentMissionId() { return this.currentMissionId; }
 
+    public void setCurrentEventId(UUID id) { this.currentEventId = id; }
+
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
             return null;
@@ -125,6 +130,13 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public Mission getCurrentMission() {
         return getCampaign().getMission(getCurrentMissionId());
+    }
+
+    public StoryEvent getCurrentEvent() {
+        if(null == currentEventId) {
+            return null;
+        }
+        return storyEvents.get(currentEventId);
     }
 
     //region File I/O
@@ -159,6 +171,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 StoryEvent event = StoryEvent.generateInstanceFromXML(wn, getCampaign());
                 if(null != event) {
                     event.arc = this;
+                    event.id = id;
                     storyEvents.put(id, event);
                 }
             }

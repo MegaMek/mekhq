@@ -48,11 +48,10 @@ import java.util.UUID;
 public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     StoryArc arc;
-
-    boolean active;
+    UUID id;
 
     public StoryEvent() {
-        this.active = false;
+
     }
 
     public void setStoryArc(StoryArc a) {
@@ -77,14 +76,14 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
      * Do whatever needs to be done to start this event. Specific event types may need to override this
      */
     public void startEvent() {
-        active = true;
+        arc.setCurrentEventId(id);
     }
 
     /**
      * Complete the event. Specific event types may need to override this.
      */
     public void completeEvent() {
-        active = false;
+        arc.setCurrentEventId(null);
         proceedToNextStoryEvent();
     }
 
@@ -125,8 +124,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("active")) {
-                    retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    retVal.id = UUID.fromString(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
