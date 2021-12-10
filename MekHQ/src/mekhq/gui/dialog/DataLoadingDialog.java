@@ -61,19 +61,20 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private MekHQ app;
     private JFrame frame;
     private File fileCampaign;
+    private StoryArc storyArc;
     private ResourceBundle resourceMap;
-    private boolean storyArc;
+    private boolean useStoryArc;
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         this(app, frame, f, false);
     }
 
-    public DataLoadingDialog(MekHQ app, JFrame frame, File f, boolean storyArc) {
+    public DataLoadingDialog(MekHQ app, JFrame frame, File f, boolean useStoryArc) {
         super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        this.storyArc = storyArc;
+        this.useStoryArc = useStoryArc;
 
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl());
 
@@ -175,6 +176,20 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(3);
 
             Campaign campaign;
+
+            if(useStoryArc) {
+                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
+                if (storyArcSelectionDialog.showDialog().isCancelled()) {
+                    setVisible(false);
+                    cancelled = true;
+                    cancel(true);
+                    return null; // shouldn't be required, but this ensures no further code run
+                }
+                storyArc = storyArcSelectionDialog.getSelectedStoryArc();
+                //check for starting campaign
+                fileCampaign = storyArc.getInitCampaignFile();
+            }
+
             boolean newCampaign = false;
             if (fileCampaign == null) {
                 newCampaign = true;
@@ -198,30 +213,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             //region Progress 4
             setProgress(4);
-            if(storyArc) {
-                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
-                if (storyArcSelectionDialog.showDialog().isCancelled()) {
-                    setVisible(false);
-                    cancelled = true;
-                    cancel(true);
-                    return campaign; // shouldn't be required, but this ensures no further code runs
-                }
-                final StoryArc storyArc = storyArcSelectionDialog.getSelectedStoryArc();
-                campaign.initiateStoryArc(storyArc);
-
-                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
-                campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
-                // TODO : AbstractContractMarket : Uncomment
-                //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
-                if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
-                    campaign.getUnitMarket().generateUnitOffers(campaign);
-                }
-                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
-                campaign.reloadNews();
-                campaign.readNews();
-            }
-            else if (newCampaign) {
+            if (newCampaign) {
                 // Campaign Presets
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
                 if (presetSelectionDialog.showDialog().isCancelled()) {
@@ -283,6 +275,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } else {
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+            }
+
+            if(null != storyArc) {
+                campaign.initiateStoryArc(storyArc);
             }
             //endregion Progress 4
 

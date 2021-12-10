@@ -187,8 +187,8 @@ public class StartUpGUI extends JPanel {
         loadCampaign(f, false);
     }
 
-    private void loadCampaign(File f, boolean storyArc) {
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f, storyArc);
+    private void loadCampaign(File f, boolean useStoryArc) {
+        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f, useStoryArc);
         dataLoadingDialog.setVisible(true);
     }
 

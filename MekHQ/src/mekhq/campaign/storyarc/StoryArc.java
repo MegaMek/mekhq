@@ -57,6 +57,9 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
     private Map<UUID, StoryEvent> storyEvents;
 
+    /** directory path to the initial campaign data for this StoryArc - can be null **/
+    private String initCampaignPath;
+
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
@@ -79,6 +82,15 @@ public class StoryArc implements MekHqXmlSerializable {
     private void setStartingEventId(UUID u) { this.startingEventId = u; }
 
     private UUID getStartingEventId() { return startingEventId; }
+
+    private void setInitCampaignPath(String s) { this.initCampaignPath =s; }
+
+    public File getInitCampaignFile() {
+        if(null == initCampaignPath) {
+            return null;
+        }
+        return new File(initCampaignPath);
+    }
 
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
@@ -203,19 +215,18 @@ public class StoryArc implements MekHqXmlSerializable {
         for(String arcDirectoryName : arcDirectories) {
             //find the expected items within this story arc directory
             final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_FILE);
+            if(!storyArcFile.exists()) {
+                continue;
+            }
             final StoryArc storyArc = parseFromFile(storyArcFile);
-            if (storyArcs != null) {
+            final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_CAMPAIGN_FILE);
+            if (storyArc != null) {
+                if(initCampaignFile.exists()) {
+                    storyArc.setInitCampaignPath(initCampaignFile.getPath());
+                }
                 storyArcs.add(storyArc);
             }
         }
-
-        /*
-        for (final File file : Objects.requireNonNull(directory.listFiles())) {
-            final StoryArc storyArc = parseFromFile(file);
-            if (storyArcs != null) {
-                storyArcs.add(storyArc);
-            }
-        }*/
 
         return storyArcs;
     }
