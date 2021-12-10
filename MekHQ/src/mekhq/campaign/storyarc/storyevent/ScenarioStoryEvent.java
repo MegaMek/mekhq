@@ -57,7 +57,7 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
         if(null != missionEvent && missionEvent instanceof MissionStoryEvent) {
             Mission m = ((MissionStoryEvent) missionEvent).getMission();
             if (null != m & null != scenario) {
-                m.addScenario(scenario);
+                getStoryArc().getCampaign().addScenario(scenario, m);
             }
         }
     }
