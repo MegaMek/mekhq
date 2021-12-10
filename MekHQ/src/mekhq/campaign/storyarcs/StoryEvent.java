@@ -20,14 +20,9 @@
  */
 package mekhq.campaign.storyarcs;
 
-import megamek.Version;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.universe.PlanetarySystem;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -22,7 +22,6 @@ package mekhq.campaign.storyarcs;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
