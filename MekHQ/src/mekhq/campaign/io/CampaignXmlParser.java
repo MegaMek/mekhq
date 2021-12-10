@@ -48,6 +48,8 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
+import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -376,13 +378,16 @@ public class CampaignXmlParser {
                 unit.setForceId(-1);
             }
 
-            // Its annoying to have to do this, but this helps to ensure
+            // It's annoying to have to do this, but this helps to ensure
             // that equipment numbers correspond to the right parts - its
             // possible that these might have changed if changes were made to
-            // the
-            // ordering of equipment in the underlying data file for the unit
+            // the ordering of equipment in the underlying data file for the unit.
             // We're not checking for refit here.
-            Utilities.unscrambleEquipmentNumbers(unit, false);
+            final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
+            final EquipmentUnscramblerResult result = unscrambler.unscramble();
+            if (!result.succeeded()) {
+                MekHQ.getLogger().warning(result.getMessage());
+            }
 
             // some units might need to be assigned to scenarios
             Scenario s = retVal.getScenario(unit.getScenarioId());

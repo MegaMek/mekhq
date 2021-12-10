@@ -13,6 +13,10 @@ VERSION HISTORY:
 + Issue #2932, #2944: When assigning a vehicle gunner, don't assign them as a driver also.
 + Issue #2866: Actually replace VTOL rotors as opposed to just eating the part
 + MegaMek #3232, #3244: PersonnelOptions/PilotOptions Fix (Multiplayer Games and Saves should now work properly)
++ Issue #2962: AtB Campaigns Now Properly Load with Automatic or Tech Acquisition Skills
++ PR #2345: Refactor equipment unscrambling to make it testable
++ PR #2991: Updating Mockito to 4.1.0
++ PR #2986: Fixing Unit Market Preference Copy/Paste Error
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
