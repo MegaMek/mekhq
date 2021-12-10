@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -69,6 +70,13 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
                 scenarioEvent.startEvent();
             }
         }
+    }
+
+    @Override
+    public void completeEvent() {
+        //resolve the mission - for now everyone wins
+        mission.setStatus(MissionStatus.SUCCESS);
+        super.completeEvent();
     }
 
     @Override
