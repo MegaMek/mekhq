@@ -3,7 +3,7 @@
     <title>A Test Campaign</title>
     <description>Just Testing Stuff Out</description>
     <startNew>true</startNew>
-    <startingEventId></startingEventId>
+    <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
     <storyMissions>
         <mission uuid="e78e8e90-5932-11ec-bf63-0242ac130002" type="mekhq.campaign.mission.Mission">
             <name>Lorem Ipsum Mission</name>

@@ -101,6 +101,8 @@ public class StoryArc implements MekHqXmlSerializable {
         this.startNew = b;
     }
 
+    private void setStartingEventId(UUID u) { this.startingEventId = u; }
+
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
             return null;
@@ -132,8 +134,7 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     public void begin() {
-        //do nothing for the moment
-        //TODO: define and start first event
+
     }
 
     //region File I/O
@@ -148,6 +149,7 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "title", title);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "description", description);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startNew", startNew);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startingEventId", startingEventId);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -210,6 +212,9 @@ public class StoryArc implements MekHqXmlSerializable {
                         break;
                     case "startNew":
                         storyArc.setStartNew(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "startingEventId":
+                        storyArc.setStartingEventId(UUID.fromString(wn.getTextContent().trim()));
                         break;
                     case "storyEvents":
                         storyArc.parseStoryEvents(wn.getChildNodes());
