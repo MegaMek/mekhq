@@ -22,11 +22,13 @@ package mekhq.campaign.storyarc;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
@@ -53,6 +55,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     /** A basic linear next event id that may be used by the story event to determine next event **/
     private UUID nextEventId;
+
+    protected static final String NL = System.lineSeparator();
 
     public StoryEvent() {
         active = false;
@@ -105,6 +109,25 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     }
 
     //region I/O
+    @Override
+    public abstract void writeToXml(PrintWriter pw1, int indent);
+
+    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+        String level = MekHqXmlUtil.indentStr(indent),
+                level1 = MekHqXmlUtil.indentStr(indent + 1);
+
+        StringBuilder builder = new StringBuilder(256);
+        builder.append(level)
+                .append("<storyEvent id=\"")
+                .append(id)
+                .append("\" type=\"")
+                .append(this.getClass().getName())
+                .append("\">")
+                .append(NL);
+
+        pw1.print(builder.toString());
+
+    }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
 
@@ -118,6 +141,9 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
             // Instantiate the correct child class, and call its parsing
             // function.
             retVal = (StoryEvent) Class.forName(className).getDeclaredConstructor().newInstance();
+
+            retVal.id = UUID.fromString(wn.getAttributes().getNamedItem("id").getTextContent().trim());
+
             retVal.loadFieldsFromXmlNode(wn, c);
 
             // Okay, now load specific fields!
@@ -126,9 +152,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.id = UUID.fromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());

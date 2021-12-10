@@ -60,6 +60,8 @@ public class StoryArc implements MekHqXmlSerializable {
     /** directory path to the initial campaign data for this StoryArc - can be null **/
     private String initCampaignPath;
 
+    protected static final String NL = System.lineSeparator();
+
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
@@ -111,15 +113,38 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<storyArc type=\"" + this.getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "title", title);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "description", description);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startNew", startNew);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startingEventId", startingEventId);
+        String level = MekHqXmlUtil.indentStr(indent),
+                level1 = MekHqXmlUtil.indentStr(indent + 1);
+
+        StringBuilder builder = new StringBuilder(256);
+        builder.append(level)
+                .append("<storyArc>")
+                .append(NL);
+        builder.append(level1)
+                .append("<title>")
+                .append(title)
+                .append("</title>")
+                .append(NL)
+                .append(level1)
+                .append("<description>")
+                .append(description)
+                .append("</description>")
+                .append(NL)
+                .append(level1)
+                .append("<startNew>")
+                .append(startNew)
+                .append("</startNew>")
+                .append(NL)
+                .append(level1)
+                .append("<startingEventId>")
+                .append(startingEventId)
+                .append("</startingEventId>")
+                .append(NL);
+        pw1.print(builder.toString());
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "storyArc");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyArc>");
     }
 
     protected void parseStoryEvents(NodeList nl) {
@@ -130,12 +155,10 @@ public class StoryArc implements MekHqXmlSerializable {
                         wn.getNodeName()!="storyEvent") {
                     continue;
                 }
-                UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
                 StoryEvent event = StoryEvent.generateInstanceFromXML(wn, getCampaign());
                 if(null != event) {
                     event.setStoryArc(this);
-                    event.setId(id);
-                    storyEvents.put(id, event);
+                    storyEvents.put(event.getId(), event);
                 }
             }
         } catch (Exception e) {

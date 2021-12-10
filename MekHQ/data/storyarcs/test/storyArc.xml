@@ -5,7 +5,7 @@
     <startNew>true</startNew>
     <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>
-        <storyEvent uuid="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+        <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Lorem Ipsum Mission</name>
                 <type>Planetary Assault</type>
@@ -15,7 +15,7 @@
             <scenarioId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioId>
             <scenarioId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</scenarioId>
         </storyEvent>
-        <storyEvent uuid="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+        <storyEvent id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <nextEventId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextEventId>
             <scenario type="mekhq.campaign.mission.Scenario">
@@ -23,14 +23,14 @@
                 <desc>Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn. F's'uhn ebunma h'kn'a sgn'wahlog naron tharanak, chtenff ph'ah mgor chtenffnyth wgah'n shtunggli s'uhn syha'h gotha mnahn' 'ai, ftaghu Azathoth ehye nog grah'n hlirgh Shub-Niggurath Dagon lw'nafh shogg. Sll'ha li'hee shagg geb ngmnahn' nnnAzathoth uh'eoth Shub-Niggurath kadishtu ron nali'hee tharanak sgn'wahl, r'luh ilyaa Tsathoggua cvulgtm ph'gof'nn h'nilgh'ri lloig ngr'luh athgoth 'ai. H'ftaghu li'hee mnahn' nilgh'ri nnnmnahn' nnnron R'lyeh nw ph'gotha gotha, vulgtlagln Dagon 'fhalma nnnR'lyeh nnnn'ghft nnngrah'n ehye lloig, hlirgh hupadgh nnnvulgtm cah Tsathoggua 'ai hlirgh h'lloig. Uln nilgh'ri Chaugnar Faugn hafh'drn Chaugnar Faugn nnnuh'e nilgh'ri, ee cNyarlathotep ftaghu n'gha csyha'h uln, ph'k'yarnak shagg n'ghft shagg Dagon.</desc>
             </scenario>
         </storyEvent>
-        <storyEvent uuid="0d96f227-6c97-4cb1-ade5-578b2386c1a5" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+        <storyEvent id="0d96f227-6c97-4cb1-ade5-578b2386c1a5" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Another Scenario</name>
                 <desc>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</desc>
             </scenario>
         </storyEvent>
-        <storyEvent uuid="dbb7357c-59cd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+        <storyEvent id="dbb7357c-59cd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <nextEventId>3e6bd312-59ce-11ec-bf63-0242ac130002</nextEventId>
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <scenario type="mekhq.campaign.mission.Scenario">
