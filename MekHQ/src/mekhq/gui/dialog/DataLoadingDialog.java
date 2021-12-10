@@ -278,7 +278,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
 
             if(null != storyArc) {
-                campaign.initiateStoryArc(storyArc);
+                campaign.useStoryArc(storyArc, true);
             }
             //endregion Progress 4
 
