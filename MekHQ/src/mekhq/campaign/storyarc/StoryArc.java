@@ -56,9 +56,6 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
     private Map<UUID, StoryEvent> storyEvents;
 
-    /** A hash of all possible Missions in this StoryArc, referenced by UUID **/
-    private Map<UUID, Mission> storyMissions;
-
     /** A UUID for the currently active event. May be null **/
     private UUID currentEventId;
 
@@ -72,7 +69,6 @@ public class StoryArc implements MekHqXmlSerializable {
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
-        storyMissions = new LinkedHashMap<>();
     }
 
     public void setCampaign(Campaign c) { this.campaign = c; }
@@ -104,13 +100,6 @@ public class StoryArc implements MekHqXmlSerializable {
             return null;
         }
         return storyEvents.get(id);
-    }
-
-    public Mission getStoryMission(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return storyMissions.get(id);
     }
 
     public void begin() {
@@ -169,25 +158,6 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
-    protected void parseStoryMissions(NodeList nl) {
-        try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                final Node wn = nl.item(x);
-                if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        wn.getNodeName()!="mission") {
-                    continue;
-                }
-                UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
-                Mission mission = Mission.generateInstanceFromXML(wn, getCampaign(), null);
-                if(null != mission) {
-                    storyMissions.put(id, mission);
-                }
-            }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-    }
-
     public static @Nullable StoryArc parseFromXML(final NodeList nl) {
         final StoryArc storyArc = new StoryArc();
         try {
@@ -212,9 +182,6 @@ public class StoryArc implements MekHqXmlSerializable {
                         break;
                     case "storyEvents":
                         storyArc.parseStoryEvents(wn.getChildNodes());
-                        break;
-                    case "storyMissions":
-                        storyArc.parseStoryMissions(wn.getChildNodes());
                         break;
 
 

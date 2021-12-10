@@ -24,7 +24,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,31 +32,43 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
-public class CompleteMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
+/**
+ * A StoryEvent class to start a new mission. This will pull from hash of possible missions in StoryArc. Because
+ * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
+ * i.e. non-repeatable. Scenarios however can be repeatable.
+ */
+public class MissionStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    public CompleteMission() {
+    /* A mission object to track the mission */
+    private Mission mission;
+
+    /**
+     * A list of ScenarioStoryEvent ids to add to this mission when it is created. not all Scenarios
+     * need to be added at the start as ScenarioStoryEvents may also trigger further ScenarioStoryEvents
+     */
+    private List<UUID> scenarioIds;
+
+    public MissionStoryEvent() {
         super();
+        scenarioIds = new ArrayList<UUID>();
     }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = getStoryArc().getCurrentMission();
-        if(null != m) {
-            //TODO: review some criteria to determine status, but for now assume everyone wins!
-            m.setStatus(MissionStatus.SUCCESS);
-            //TODO: a pop-up dialog of a description for missions end
+        if(null != mission) {
+            getStoryArc().setCurrentMissionId(getStoryArc().getCampaign().addMission(mission));
         }
-        getStoryArc().setCurrentMissionId(0);
-        //no need for this event to stick around
-        super.completeEvent();
-    }
-
-    @Override
-    protected UUID getNextStoryEvent() {
-        //TODO: need some setup to decide next StoryEvent based on concluding status of this mission
-        return null;
+        StoryEvent scenarioEvent;
+        for(UUID scenarioId : scenarioIds) {
+            scenarioEvent = getStoryArc().getStoryEvent(scenarioId);
+            if(null != scenarioEvent) {
+                scenarioEvent.startEvent();
+            }
+        }
     }
 
     @Override
@@ -74,7 +85,11 @@ public class CompleteMission extends StoryEvent implements Serializable, MekHqXm
             Node wn2 = nl.item(x);
 
             try {
-
+                if (wn2.getNodeName().equalsIgnoreCase("mission")) {
+                    mission = Mission.generateInstanceFromXML(wn2, c, null);
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+                    scenarioIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
             }

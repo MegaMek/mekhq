@@ -41,9 +41,6 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
     String title;
     String narrative;
 
-    /** narratives are linear so should link directly to another event **/
-    UUID nextEventId;
-
     public StoryNarrative() {
         this(null, null);
     }
@@ -59,12 +56,6 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
         //TODO: create dialog and display
         completeEvent();
     }
-
-    @Override
-    protected UUID getNextStoryEvent() {
-        return nextEventId;
-    }
-
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -84,8 +75,6 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
                     title =wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
                     narrative =wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
-                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

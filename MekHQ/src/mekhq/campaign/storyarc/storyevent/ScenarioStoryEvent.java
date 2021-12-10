@@ -40,11 +40,8 @@ import java.util.UUID;
  */
 public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    /* track the scenario itself */
+    /** track the scenario itself **/
     private Scenario scenario;
-
-    /* for now we will force a linear narrative */
-    UUID nextEventId;
 
     public ScenarioStoryEvent() {
         super();
@@ -57,7 +54,6 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
         if (null != m & null != scenario) {
             m.addScenario(scenario);
         }
-        //this event should stick around until the scenario is completed so do not complete right away
     }
 
     private void setScenario(Scenario s) {
@@ -66,12 +62,6 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     }
 
     public Scenario getScenario() { return scenario; }
-
-    @Override
-    protected UUID getNextStoryEvent() {
-        //TODO: for now we go in linear fashion, but this could be changed to vary by ScenarioStatus
-        return nextEventId;
-    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -90,9 +80,10 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
                 if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
                     //TODO: we don't want to generate a new instance if loading a saved game where this scenario
                     //has already been added to a mission
-                    scenario = Scenario.generateInstanceFromXML(wn2, c, null);
-                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
-                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                    Scenario s = Scenario.generateInstanceFromXML(wn2, c, null);
+                    if(null != s) {
+                        this.setScenario(s);
+                    }
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

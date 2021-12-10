@@ -42,8 +42,14 @@ import java.util.UUID;
  **/
 public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
+    /** The story arc that this event is a part of **/
     private StoryArc arc;
+
+    /** The UUID id of this story event */
     private UUID id;
+
+    /** A basic linear next event id that may be used by the story event to determine next event **/
+    private UUID nextEventId;
 
     public StoryEvent() {
 
@@ -84,8 +90,14 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    /** determine the next story event in the story arc based on the event **/
-    protected abstract UUID getNextStoryEvent();
+    /**
+     * determine the next story event in the story arc based on the event.
+     * This may get overriden by more complex processes in specific event types, but
+     * the default will be to go to the next event it
+     **/
+    protected UUID getNextStoryEvent() {
+        return nextEventId;
+    }
 
     //region I/O
 
@@ -111,6 +123,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                    retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
