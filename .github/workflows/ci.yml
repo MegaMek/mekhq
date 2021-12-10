@@ -33,14 +33,13 @@ jobs:
   # any time a pull request is added or updated.
   #
   ci_cd:
-    
+    runs-on: ${{ matrix.os }}
+
     # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os:   [ubuntu-latest] # For CI/CD running on *nix is sufficient
+        os: [ ubuntu-latest ] # For CI/CD running on *nix is sufficient
         java: [ 11 ]
-
-    runs-on: ${{ matrix.os }}
 
     steps:
     #

@@ -31,14 +31,13 @@ jobs:
   # any time master updated.
   #
   code_coverage:
-    
+    runs-on: ${{ matrix.os }}
+
     # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os:   [ubuntu-latest] # For Code Coverage running on *nix is sufficient
+        os: [ ubuntu-latest ] # For Code Coverage running on *nix is sufficient
         java: [ 11 ]
-
-    runs-on: ${{ matrix.os }}
 
     steps:
     #
