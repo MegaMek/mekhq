@@ -80,10 +80,10 @@ public class StartUpGUI extends JPanel {
         // Determine if the splash screen image is "small"
         // and if so switch to shorter text and smaller buttons
         boolean shortText = false;
-        int buttonWidth = 200;
+        int buttonWidth = 160;
         if (imgSplash.getWidth(null) < 840) {
             shortText = true;
-            buttonWidth = 150;
+            buttonWidth = 100;
         }
 
         JButton btnNewGame = new JButton(resourceMap.getString(shortText ? "btnNewGame.text.short" : "btnNewGame.text"));
@@ -112,6 +112,12 @@ public class StartUpGUI extends JPanel {
             btnLastSave.setEnabled(false);
         }
 
+        JButton btnStoryArc = new JButton(resourceMap.getString(shortText ? "btnStoryArc.text.short" : "btnStoryArc.text"));
+        btnStoryArc.setMinimumSize(new Dimension(buttonWidth, 25));
+        btnStoryArc.setPreferredSize(new Dimension(buttonWidth, 25));
+        btnStoryArc.setMaximumSize(new Dimension(buttonWidth, 25));
+        btnStoryArc.addActionListener(evt -> newStoryArc());
+
         JButton btnQuit = new JButton(resourceMap.getString("btnQuit.text"));
         btnQuit.setMinimumSize(new Dimension(buttonWidth, 25));
         btnQuit.setPreferredSize(new Dimension(buttonWidth, 25));
@@ -130,6 +136,8 @@ public class StartUpGUI extends JPanel {
         buttonPanel.add(btnLoadGame);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnLastSave);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(btnStoryArc);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnQuit);
         add(buttonPanel, BorderLayout.PAGE_END);
@@ -171,8 +179,16 @@ public class StartUpGUI extends JPanel {
         loadCampaign(null);
     }
 
+    private void newStoryArc() {
+        loadCampaign(null, true);
+    }
+
     private void loadCampaign(File f) {
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f);
+        loadCampaign(f, false);
+    }
+
+    private void loadCampaign(File f, boolean storyArc) {
+        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f, storyArc);
         dataLoadingDialog.setVisible(true);
     }
 

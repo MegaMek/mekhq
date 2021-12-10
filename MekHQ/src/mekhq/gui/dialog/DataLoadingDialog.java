@@ -62,12 +62,18 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private JFrame frame;
     private File fileCampaign;
     private ResourceBundle resourceMap;
+    private boolean storyArc;
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
+        this(app, frame, f, false);
+    }
+
+    public DataLoadingDialog(MekHQ app, JFrame frame, File f, boolean storyArc) {
         super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
+        this.storyArc = storyArc;
 
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl());
 
@@ -192,7 +198,30 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             //region Progress 4
             setProgress(4);
-            if (newCampaign) {
+            if(storyArc) {
+                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
+                if (storyArcSelectionDialog.showDialog().isCancelled()) {
+                    setVisible(false);
+                    cancelled = true;
+                    cancel(true);
+                    return campaign; // shouldn't be required, but this ensures no further code runs
+                }
+                final StoryArc storyArc = storyArcSelectionDialog.getSelectedStoryArc();
+                campaign.initiateStoryArc(storyArc);
+
+                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
+                // TODO : AbstractContractMarket : Uncomment
+                //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
+                if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
+                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                    campaign.getUnitMarket().generateUnitOffers(campaign);
+                }
+                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
+                campaign.reloadNews();
+                campaign.readNews();
+            }
+            else if (newCampaign) {
                 // Campaign Presets
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
                 if (presetSelectionDialog.showDialog().isCancelled()) {
@@ -251,19 +280,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
-
-                //Story Arcs
-                //TODO: eventually this should get its own button, but putting it here for testing purposes
-                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
-                if (storyArcSelectionDialog.showDialog().isCancelled()) {
-                    setVisible(false);
-                    cancelled = true;
-                    cancel(true);
-                    return campaign; // shouldn't be required, but this ensures no further code runs
-                }
-                final StoryArc storyArc = storyArcSelectionDialog.getSelectedStoryArc();
-                campaign.initiateStoryArc(storyArc);
-
             } else {
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
