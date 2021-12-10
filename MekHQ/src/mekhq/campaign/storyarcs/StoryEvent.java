@@ -63,20 +63,6 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     protected UUID getId() { return id; }
 
     /**
-     * Determine whether the event should be triggered by some feature of the campaign
-     * @return boolean for whether the event is triggered
-     */
-    private boolean isTriggered() {
-        return false;
-    }
-
-    public void checkTriggered() {
-        if(isTriggered()) {
-            startEvent();
-        }
-    }
-
-    /**
      * Do whatever needs to be done to start this event. Specific event types may need to override this
      */
     public void startEvent() {
