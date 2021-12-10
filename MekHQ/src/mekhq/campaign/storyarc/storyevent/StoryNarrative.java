@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
@@ -59,7 +60,16 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<title>"
+                +title
+                +"</title>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<narrative>"
+                +narrative
+                +"</narrative>");
+        writeToXmlEnd(pw1, indent);
     }
 
     @Override

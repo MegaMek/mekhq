@@ -119,8 +119,8 @@ public class StoryArc implements MekHqXmlSerializable {
         StringBuilder builder = new StringBuilder(256);
         builder.append(level)
                 .append("<storyArc>")
-                .append(NL);
-        builder.append(level1)
+                .append(NL)
+                .append(level1)
                 .append("<title>")
                 .append(title)
                 .append("</title>")
@@ -141,6 +141,16 @@ public class StoryArc implements MekHqXmlSerializable {
                 .append("</startingEventId>")
                 .append(NL);
         pw1.print(builder.toString());
+
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<storyEvents>");
+        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+            entry.getValue().writeToXml(pw1, indent+2);
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"</storyEvents>");
+
+
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {

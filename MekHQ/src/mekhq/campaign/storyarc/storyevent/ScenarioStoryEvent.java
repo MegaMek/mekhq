@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -71,7 +72,15 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<missionEventId>"
+                +missionEventId
+                +"</missionEventId>");
+        if(null != scenario) {
+            scenario.writeToXml(pw1, indent+1);
+        }
+        writeToXmlEnd(pw1, indent);
     }
 
     @Override

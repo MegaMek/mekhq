@@ -4124,6 +4124,11 @@ public class Campaign implements Serializable, ITechManager {
 
         getGameOptions().writeToXML(pw1, indent);
 
+        //current story arc
+        if(null != storyArc) {
+            storyArc.writeToXml(pw1, indent);
+        }
+
         // Markets
         getPersonnelMarket().writeToXML(this, pw1, indent);
 

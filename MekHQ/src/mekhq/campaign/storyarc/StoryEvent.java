@@ -123,10 +123,23 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 .append("\" type=\"")
                 .append(this.getClass().getName())
                 .append("\">")
+                .append(NL)
+                .append(level1)
+                .append("<active>")
+                .append(active)
+                .append("</active>")
+                .append(NL)
+                .append(level1)
+                .append("<nextEventId>")
+                .append(nextEventId)
+                .append("</nextEventId>")
                 .append(NL);
 
         pw1.print(builder.toString());
+    }
 
+    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyEvent>");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
