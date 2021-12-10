@@ -81,7 +81,7 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     scenarioId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     nextEventId = UUID.fromString(wn2.getTextContent().trim());
