@@ -43,6 +43,9 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     /** track the scenario itself **/
     private Scenario scenario;
 
+    /** The UUID of the MissionStoryEvent that this ScenarioStoryEvent is a part of **/
+    private UUID missionEventId;
+
     public ScenarioStoryEvent() {
         super();
     }
@@ -50,9 +53,12 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = getStoryArc().getCurrentMission();
-        if (null != m & null != scenario) {
-            m.addScenario(scenario);
+        StoryEvent missionEvent = getStoryArc().getStoryEvent(missionEventId);
+        if(null != missionEvent && missionEvent instanceof MissionStoryEvent) {
+            Mission m = ((MissionStoryEvent) missionEvent).getMission();
+            if (null != m & null != scenario) {
+                m.addScenario(scenario);
+            }
         }
     }
 
@@ -84,6 +90,8 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
                     if(null != s) {
                         this.setScenario(s);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionEventId")) {
+                    missionEventId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

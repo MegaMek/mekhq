@@ -56,13 +56,6 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
     private Map<UUID, StoryEvent> storyEvents;
 
-    /**
-     * An integer that tracks the current mission id, so we know where to add new scenarios and complete the
-     * mission. Eventually, I would like to allow multiple active missions, but figure that out later.
-     */
-    private int currentMissionId;
-
-
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
@@ -86,10 +79,6 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private UUID getStartingEventId() { return startingEventId; }
 
-    public void setCurrentMissionId(int i) { this.currentMissionId = i; }
-
-    public int getCurrentMissionId() { return this.currentMissionId; }
-
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
             return null;
@@ -99,10 +88,6 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public void begin() {
         getStoryEvent(getStartingEventId()).startEvent();
-    }
-
-    public Mission getCurrentMission() {
-        return getCampaign().getMission(getCurrentMissionId());
     }
 
     //region File I/O
@@ -118,7 +103,6 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "description", description);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startNew", startNew);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startingEventId", startingEventId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "currentMissionId", currentMissionId);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
