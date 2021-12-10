@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.service.AutosaveService;

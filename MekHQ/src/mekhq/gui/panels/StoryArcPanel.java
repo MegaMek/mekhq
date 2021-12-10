@@ -18,10 +18,9 @@
  */
 package mekhq.gui.panels;
 
-import megamek.client.ui.baseComponents.MMButton;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 
 import javax.swing.*;

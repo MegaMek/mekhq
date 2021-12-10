@@ -21,7 +21,7 @@ package mekhq.gui.dialog;
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcPane;
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 
 import javax.swing.*;
 import java.awt.*;

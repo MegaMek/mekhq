@@ -18,7 +18,7 @@
  */
 package mekhq.gui.renderers;
 
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.gui.panels.StoryArcPanel;
 
 import javax.swing.*;

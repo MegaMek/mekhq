@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarcs;
+package mekhq.campaign.storyarc;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -81,7 +81,7 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public void setCampaign(Campaign c) { this.campaign = c; }
 
-    protected Campaign getCampaign() { return campaign; }
+    public Campaign getCampaign() { return campaign; }
 
     private void setTitle(String t) { this.title = t; }
 

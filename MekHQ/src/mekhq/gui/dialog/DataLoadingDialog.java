@@ -38,12 +38,11 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.storyarcs.StoryArc;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +51,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 

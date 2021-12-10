@@ -48,7 +48,7 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.storyarcs.AddScenario;
+import mekhq.campaign.storyarc.storyevent.AddScenario;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>

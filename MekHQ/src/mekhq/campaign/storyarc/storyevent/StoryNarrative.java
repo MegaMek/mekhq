@@ -18,12 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarcs;
+package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -32,33 +31,39 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
-public class CompleteMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
+/**
+ * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
+ * immediately.
+ */
+public class StoryNarrative extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    UUID missionId;
+    String title;
+    String narrative;
 
-    public CompleteMission() {
-        super();
+    /** narratives are linear so should link directly to another event **/
+    UUID nextEventId;
+
+    public StoryNarrative() {
+        this(null, null);
+    }
+
+    public StoryNarrative(String t, String n) {
+        this.title = t;
+        this.narrative = n;
     }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = getStoryArc().getCurrentMission();
-        if(null != m) {
-            //TODO: review some criteria to determine status, but for now assume everyone wins!
-            m.setStatus(MissionStatus.SUCCESS);
-            //TODO: a pop-up dialog of a description for missions end
-        }
-        getStoryArc().setCurrentMissionId(0);
-        //no need for this event to stick around
-        super.completeEvent();
+        //TODO: create dialog and display
+        completeEvent();
     }
 
     @Override
     protected UUID getNextStoryEvent() {
-        //TODO: need some setup to decide next StoryEvent based on concluding status of this mission
-        return null;
+        return nextEventId;
     }
+
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -74,8 +79,12 @@ public class CompleteMission extends StoryEvent implements Serializable, MekHqXm
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    missionId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("title")) {
+                    title =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
+                    narrative =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

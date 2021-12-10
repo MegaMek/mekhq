@@ -18,10 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarcs;
+package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -31,30 +33,33 @@ import java.text.ParseException;
 import java.util.UUID;
 
 /**
- * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
- * immediately.
+ * A StoryEvent class to start a new mission. This will pull from hash of possible missions in StoryArc. Because
+ * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
+ * i.e. non-repeatable. Scenarios however can be repeatable.
  */
-public class StoryNarrative extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class StartMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    String title;
-    String narrative;
+    UUID missionId;
 
-    /** narratives are linear so should link directly to another event **/
+    /**
+     * The StartMission event has no outcome variability so should choose a single next event,
+     * typically an AddScenario
+     **/
     UUID nextEventId;
 
-    public StoryNarrative() {
-        this(null, null);
-    }
-
-    public StoryNarrative(String t, String n) {
-        this.title = t;
-        this.narrative = n;
+    public StartMission() {
+        super();
     }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        //TODO: create dialog and display
+        Mission m = getStoryArc().getStoryMission(missionId);
+        if(null != m) {
+            getStoryArc().setCurrentMissionId(getStoryArc().getCampaign().addMission(m));
+            //TODO: a pop-up dialog of the mission
+        }
+        //no need for this event to stick around
         completeEvent();
     }
 
@@ -62,7 +67,6 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
     protected UUID getNextStoryEvent() {
         return nextEventId;
     }
-
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -78,10 +82,8 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("title")) {
-                    title =wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
-                    narrative =wn2.getTextContent().trim();
+                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    missionId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 }

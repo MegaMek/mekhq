@@ -24,7 +24,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
-import mekhq.campaign.storyarcs.StoryArc;
+import mekhq.campaign.storyarc.StoryArc;
 
 import javax.swing.*;
 import java.awt.*;

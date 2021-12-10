@@ -18,13 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarcs;
+package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -33,43 +33,30 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
-/**
- * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
- * that scenario will trigger completeEvent upon completion.
- */
-public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class CompleteMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    /* the storyScenario id for this scenario */
-    UUID scenarioId;
-
-    /* track the resolution of the scenario */
-    private ScenarioStatus status;
-
-    /* for now we will force a linear narrative */
-    UUID nextEventId;
-
-    public AddScenario() {
+    public CompleteMission() {
         super();
     }
-
-    public void setStatus(ScenarioStatus s) { this.status = s; }
 
     @Override
     public void startEvent() {
         super.startEvent();
         Mission m = getStoryArc().getCurrentMission();
-        Scenario s = getStoryArc().getStoryScenario(scenarioId);
-        s.setStoryArcId(getId());
-        if (null != m & null != s) {
-            m.addScenario(s);
+        if(null != m) {
+            //TODO: review some criteria to determine status, but for now assume everyone wins!
+            m.setStatus(MissionStatus.SUCCESS);
+            //TODO: a pop-up dialog of a description for missions end
         }
-        //this event should stick around until the scenario is completed so do not complete right away
+        getStoryArc().setCurrentMissionId(0);
+        //no need for this event to stick around
+        super.completeEvent();
     }
 
     @Override
     protected UUID getNextStoryEvent() {
-        //TODO: for now we go in linear fashion, but this could be changed to vary by ScenarioStatus
-        return nextEventId;
+        //TODO: need some setup to decide next StoryEvent based on concluding status of this mission
+        return null;
     }
 
     @Override
@@ -86,11 +73,7 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-                    scenarioId = UUID.fromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
-                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
-                }
+
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
             }
