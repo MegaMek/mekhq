@@ -42,25 +42,17 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
     /* the storyScenario id for this scenario */
     UUID scenarioId;
 
-    /* The mission id in the campaign that this scenario should be added to*/
-    int campaignMissionId;
-
     /* for now we will force a linear narrative */
     UUID nextEventId;
 
     public AddScenario() {
-        this(-1);
-    }
-
-    public AddScenario(int missionId) {
         super();
-        campaignMissionId = missionId;
     }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = arc.getCampaign().getMission(campaignMissionId);
+        Mission m = arc.getCurrentMission();
         Scenario s = arc.getStoryScenario(scenarioId);
         if (null != m & null != s) {
             m.addScenario(s);

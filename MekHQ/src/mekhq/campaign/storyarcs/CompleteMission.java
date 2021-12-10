@@ -43,12 +43,13 @@ public class CompleteMission extends StoryEvent implements Serializable, MekHqXm
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = arc.getCampaignMission(missionId, arc.getCampaign());
+        Mission m = arc.getCurrentMission();
         if(null != m) {
             //TODO: review some criteria to determine status, but for now assume everyone wins
             //m.setStatus(Mission.S_SUCCESS);
             //TODO: a pop-up dialog of a description for missions end
         }
+        arc.setCurrentMissionId(-1);
         //no need for this event to stick around
         super.completeEvent();
     }

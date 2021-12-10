@@ -39,7 +39,6 @@ import java.util.UUID;
 public class StartMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     UUID missionId;
-    int campaignMissionId;
 
     /**
      * The StartMission event has no outcome variability so should choose a single next event,
@@ -53,12 +52,12 @@ public class StartMission extends StoryEvent implements Serializable, MekHqXmlSe
 
     @Override
     public void startEvent() {
+        super.startEvent();
         Mission m = arc.getStoryMission(missionId);
         if(null != m) {
-            arc.getCampaign().addMission(m);
+            arc.setCurrentMissionId(arc.getCampaign().addMission(m));
             //TODO: a pop-up dialog of the mission
         }
-        super.startEvent();
         //no need for this event to stick around
         completeEvent();
     }

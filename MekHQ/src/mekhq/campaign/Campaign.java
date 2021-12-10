@@ -858,13 +858,15 @@ public class Campaign implements Serializable, ITechManager {
      * Add a mission to the campaign
      *
      * @param m The mission to be added
+     * @return the id of the mission
      */
-    public void addMission(Mission m) {
+    public int addMission(Mission m) {
         int id = lastMissionId + 1;
         m.setId(id);
         missions.put(id, m);
         lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
+        return(id);
     }
 
     /**

@@ -63,10 +63,10 @@ public class StoryArc implements MekHqXmlSerializable {
     private Map<UUID, Scenario> storyScenarios;
 
     /**
-     * We need to track a hash that relates active Story Missions to their actual integer id
-     * in the Campaign in order to be able to add scenarios to the proper mission
+     * An integer that tracks the current mission id, so we know where to add new scenarios and complete the
+     * mission. Eventually, I would like to allow multiple active missions, but figure that out later.
      */
-    private Map<UUID, Integer> campaignMissionIds;
+    private int currentMissionId;
 
 
     public StoryArc() {
@@ -74,36 +74,29 @@ public class StoryArc implements MekHqXmlSerializable {
         storyEvents =  new LinkedHashMap<>();
         storyMissions = new LinkedHashMap<>();
         storyScenarios = new LinkedHashMap<>();
-        campaignMissionIds = new LinkedHashMap<>();
     }
 
-    public void setCampaign(Campaign c) {
-        this.campaign = c;
-    }
+    public void setCampaign(Campaign c) { this.campaign = c; }
 
-    protected Campaign getCampaign() {
-        return campaign;
-    }
+    protected Campaign getCampaign() { return campaign; }
 
-    private void setTitle(String t) {
-        this.title = t;
-    }
+    private void setTitle(String t) { this.title = t; }
 
     public String getTitle() { return this.title; }
 
     public String getDescription() { return this.description; }
 
-    private void setDescription(String d) {
-        this.description = d;
-    }
+    private void setDescription(String d) { this.description = d; }
 
-    private void setStartNew(Boolean b) {
-        this.startNew = b;
-    }
+    private void setStartNew(Boolean b) { this.startNew = b; }
 
     private void setStartingEventId(UUID u) { this.startingEventId = u; }
 
     private UUID getStartingEventId() { return startingEventId; }
+
+    public void setCurrentMissionId(int i) { this.currentMissionId = i; }
+
+    public int getCurrentMissionId() { return this.currentMissionId; }
 
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
@@ -126,17 +119,12 @@ public class StoryArc implements MekHqXmlSerializable {
         return storyScenarios.get(id);
     }
 
-    public void addMissionId(UUID missionId, int campaignId) {
-        campaignMissionIds.put(missionId, campaignId);
-    }
-
-    public Mission getCampaignMission(UUID missionId, Campaign c) {
-        int campaignMissionId = campaignMissionIds.get(missionId);
-        return c.getMission(campaignMissionId);
-    }
-
     public void begin() {
         getStoryEvent(getStartingEventId()).startEvent();
+    }
+
+    public Mission getCurrentMission() {
+        return getCampaign().getMission(getCurrentMissionId());
     }
 
     //region File I/O
@@ -152,6 +140,7 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "description", description);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startNew", startNew);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startingEventId", startingEventId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "currentMissionId", currentMissionId);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
