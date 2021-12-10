@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.FilenameFilter;
 import java.util.*;
 
 /**
@@ -190,13 +191,31 @@ public class StoryArc implements MekHqXmlSerializable {
             return new ArrayList<>();
         }
 
+        //get all the story arc directory names
+        String[] arcDirectories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+
         final List<StoryArc> storyArcs = new ArrayList<>();
+        for(String arcDirectoryName : arcDirectories) {
+            //find the expected items within this story arc directory
+            final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_FILE);
+            final StoryArc storyArc = parseFromFile(storyArcFile);
+            if (storyArcs != null) {
+                storyArcs.add(storyArc);
+            }
+        }
+
+        /*
         for (final File file : Objects.requireNonNull(directory.listFiles())) {
             final StoryArc storyArc = parseFromFile(file);
             if (storyArcs != null) {
                 storyArcs.add(storyArc);
             }
-        }
+        }*/
 
         return storyArcs;
     }
