@@ -16,6 +16,8 @@
 
     </storyScenarios>
     <storyEvents>
-
+        <storyEvent uuid="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarcs.StartMission">
+            <missionId>e78e8e90-5932-11ec-bf63-0242ac130002</missionId>
+        </storyEvent>
     </storyEvents>
 </storyArc>

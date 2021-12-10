@@ -20,15 +20,22 @@
  */
 package mekhq.campaign.storyarcs;
 
+import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
 import java.util.UUID;
 
 /**
  * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
  * immediately.
  */
-public class StoryNarrative extends StoryEvent {
+public class StoryNarrative extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     String title;
     String narrative;
@@ -36,8 +43,11 @@ public class StoryNarrative extends StoryEvent {
     /** narratives are linear so should link directly to another event **/
     UUID nextEventId;
 
-    public StoryNarrative(StoryArc a, String t, String n) {
-        super(a);
+    public StoryNarrative() {
+        this(null, null);
+    }
+
+    public StoryNarrative(String t, String n) {
         this.title = t;
         this.narrative = n;
     }
@@ -58,5 +68,27 @@ public class StoryNarrative extends StoryEvent {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
 
+    }
+
+    @Override
+    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        // Okay, now load mission-specific fields!
+        NodeList nl = wn.getChildNodes();
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("title")) {
+                    title =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
+                    narrative =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
     }
 }

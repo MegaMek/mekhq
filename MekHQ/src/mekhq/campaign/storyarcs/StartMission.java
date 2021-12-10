@@ -20,11 +20,15 @@
  */
 package mekhq.campaign.storyarcs;
 
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
 import java.util.UUID;
 
 /**
@@ -32,7 +36,7 @@ import java.util.UUID;
  * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
  * i.e. non-repeatable. Scenarios however can be repeatable.
  */
-public class StartMission extends StoryEvent {
+public class StartMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     UUID missionId;
     int campaignMissionId;
@@ -43,15 +47,15 @@ public class StartMission extends StoryEvent {
      **/
     UUID nextEventId;
 
-    public StartMission(StoryArc a) {
-        super(a);
+    public StartMission() {
+        super();
     }
 
     @Override
     public void startEvent() {
         Mission m = arc.getStoryMission(missionId);
         if(null != m) {
-            //campaignMissionId = arc.getCampaign().addMission(m);
+            arc.getCampaign().addMission(m);
             //TODO: a pop-up dialog of the mission
         }
         super.startEvent();
@@ -67,5 +71,25 @@ public class StartMission extends StoryEvent {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
 
+    }
+
+    @Override
+    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        // Okay, now load mission-specific fields!
+        NodeList nl = wn.getChildNodes();
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    missionId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
     }
 }

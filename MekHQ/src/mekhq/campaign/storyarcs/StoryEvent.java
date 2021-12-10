@@ -20,8 +20,21 @@
  */
 package mekhq.campaign.storyarcs;
 
+import megamek.Version;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.Serializable;
+import java.text.ParseException;
+
 
 import java.util.UUID;
 
@@ -32,14 +45,17 @@ import java.util.UUID;
  *  - By being selected as the next event by a prior StoryEvent
  *  - By meeting the trigger conditions that are checked in various places in Campaign such as a specific date
  **/
-public abstract class StoryEvent implements MekHqXmlSerializable {
+public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     StoryArc arc;
 
     boolean active;
 
-    public StoryEvent(StoryArc a) {
-        active = false;
+    public StoryEvent() {
+        this.active = false;
+    }
+
+    public void setStoryArc(StoryArc a) {
         this.arc = a;
     }
 
@@ -86,5 +102,38 @@ public abstract class StoryEvent implements MekHqXmlSerializable {
 
     /** determine the next story event in the story arc based on the event **/
     protected abstract UUID getNextStoryEvent();
+
+    //region I/O
+
+    protected abstract void loadFieldsFromXmlNode(Node wn) throws ParseException;
+
+    public static StoryEvent generateInstanceFromXML(Node wn, Campaign c) {
+        StoryEvent retVal = null;
+        NamedNodeMap attrs = wn.getAttributes();
+        Node classNameNode = attrs.getNamedItem("type");
+        String className = classNameNode.getTextContent();
+
+        try {
+            // Instantiate the correct child class, and call its parsing
+            // function.
+            retVal = (StoryEvent) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal.loadFieldsFromXmlNode(wn);
+
+            // Okay, now load specific fields!
+            NodeList nl = wn.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("active")) {
+                    retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }
+            }
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(ex);
+        }
+
+        return retVal;
+    }
 
 }

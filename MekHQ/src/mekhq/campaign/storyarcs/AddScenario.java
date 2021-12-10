@@ -20,18 +20,24 @@
  */
 package mekhq.campaign.storyarcs;
 
+import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
 import java.util.UUID;
 
 /**
  * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
  * that scenario will trigger completeEvent upon completion.
  */
-public class AddScenario extends StoryEvent {
+public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     /* the storyScenario id for this scenario */
     UUID scenarioId;
@@ -42,8 +48,12 @@ public class AddScenario extends StoryEvent {
     /* for now we will force a linear narrative */
     UUID nextEventId;
 
-    public AddScenario(StoryArc a, int missionId) {
-        super(a);
+    public AddScenario() {
+        this(-1);
+    }
+
+    public AddScenario(int missionId) {
+        super();
         campaignMissionId = missionId;
     }
 
@@ -68,5 +78,25 @@ public class AddScenario extends StoryEvent {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
 
+    }
+
+    @Override
+    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        // Okay, now load mission-specific fields!
+        NodeList nl = wn.getChildNodes();
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    scenarioId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
+                    nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
     }
 }

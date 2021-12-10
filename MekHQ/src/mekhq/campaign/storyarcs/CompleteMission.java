@@ -20,18 +20,24 @@
  */
 package mekhq.campaign.storyarcs;
 
+import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
 import java.util.UUID;
 
-public class CompleteMission extends StoryEvent {
+public class CompleteMission extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     UUID missionId;
 
-    public CompleteMission(StoryArc a) {
-        super(a);
+    public CompleteMission() {
+        super();
     }
 
     @Override
@@ -56,5 +62,23 @@ public class CompleteMission extends StoryEvent {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
 
+    }
+
+    @Override
+    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        // Okay, now load mission-specific fields!
+        NodeList nl = wn.getChildNodes();
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            try {
+                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    missionId = UUID.fromString(wn2.getTextContent().trim());
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(e);
+            }
+        }
     }
 }
