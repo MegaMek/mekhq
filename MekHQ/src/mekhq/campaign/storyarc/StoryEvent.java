@@ -67,14 +67,13 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
      * Do whatever needs to be done to start this event. Specific event types may need to override this
      */
     public void startEvent() {
-        arc.setCurrentEventId(id);
+        //nothing at the moment
     }
 
     /**
      * Complete the event. Specific event types may need to override this.
      */
     public void completeEvent() {
-        arc.setCurrentEventId(null);
         proceedToNextStoryEvent();
     }
 
