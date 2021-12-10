@@ -47,16 +47,20 @@ import java.util.UUID;
  **/
 public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    StoryArc arc;
-    UUID id;
+    private StoryArc arc;
+    private UUID id;
 
     public StoryEvent() {
 
     }
 
-    public void setStoryArc(StoryArc a) {
-        this.arc = a;
-    }
+    public void setStoryArc(StoryArc a) { this.arc = a; }
+
+    protected StoryArc getStoryArc() { return arc; }
+
+    public void setId(UUID id) { this.id = id; }
+
+    protected UUID getId() { return id; }
 
     /**
      * Determine whether the event should be triggered by some feature of the campaign

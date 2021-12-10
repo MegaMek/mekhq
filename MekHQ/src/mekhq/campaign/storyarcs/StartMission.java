@@ -53,9 +53,9 @@ public class StartMission extends StoryEvent implements Serializable, MekHqXmlSe
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = arc.getStoryMission(missionId);
+        Mission m = getStoryArc().getStoryMission(missionId);
         if(null != m) {
-            arc.setCurrentMissionId(arc.getCampaign().addMission(m));
+            getStoryArc().setCurrentMissionId(getStoryArc().getCampaign().addMission(m));
             //TODO: a pop-up dialog of the mission
         }
         //no need for this event to stick around

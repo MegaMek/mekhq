@@ -52,8 +52,9 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = arc.getCurrentMission();
-        Scenario s = arc.getStoryScenario(scenarioId);
+        Mission m = getStoryArc().getCurrentMission();
+        Scenario s = getStoryArc().getStoryScenario(scenarioId);
+        s.setStoryArcId(getId());
         if (null != m & null != s) {
             m.addScenario(s);
             //TODO: need some way to add the scenario UUID to Scenario so Scenario can check for completion

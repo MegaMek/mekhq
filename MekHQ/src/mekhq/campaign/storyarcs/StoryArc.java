@@ -170,8 +170,8 @@ public class StoryArc implements MekHqXmlSerializable {
                 UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
                 StoryEvent event = StoryEvent.generateInstanceFromXML(wn, getCampaign());
                 if(null != event) {
-                    event.arc = this;
-                    event.id = id;
+                    event.setStoryArc(this);
+                    event.setId(id);
                     storyEvents.put(id, event);
                 }
             }

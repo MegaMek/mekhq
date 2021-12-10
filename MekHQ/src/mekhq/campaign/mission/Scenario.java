@@ -77,6 +77,11 @@ public class Scenario implements Serializable {
 
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
+
+    //for story arc tracking
+    private UUID storyArcId;
+
+
     //endregion Variable Declarations
 
     public Scenario() {
@@ -135,6 +140,10 @@ public class Scenario implements Serializable {
     public void setDate(final @Nullable LocalDate date) {
         this.date = date;
     }
+
+    public UUID getStoryArcId() { return storyArcId; }
+
+    public void setStoryArcId(UUID id) { this.storyArcId = id; }
 
     public boolean hasObjectives() {
         return scenarioObjectives != null &&
@@ -439,6 +448,8 @@ public class Scenario implements Serializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("storyArcId")) {
+                    retVal.storyArcId = UUID.fromString(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
