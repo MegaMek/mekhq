@@ -60,7 +60,7 @@ public class StartMission extends StoryEvent implements Serializable, MekHqXmlSe
         }
         super.startEvent();
         //no need for this event to stick around
-        super.completeEvent();
+        completeEvent();
     }
 
     @Override

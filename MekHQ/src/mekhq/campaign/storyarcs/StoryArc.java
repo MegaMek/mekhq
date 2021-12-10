@@ -103,6 +103,8 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private void setStartingEventId(UUID u) { this.startingEventId = u; }
 
+    private UUID getStartingEventId() { return startingEventId; }
+
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
             return null;
@@ -134,7 +136,7 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     public void begin() {
-
+        getStoryEvent(getStartingEventId()).startEvent();
     }
 
     //region File I/O
@@ -167,6 +169,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 UUID id = UUID.fromString(wn.getAttributes().getNamedItem("uuid").getTextContent().trim());
                 StoryEvent event = StoryEvent.generateInstanceFromXML(wn, getCampaign());
                 if(null != event) {
+                    event.arc = this;
                     storyEvents.put(id, event);
                 }
             }
