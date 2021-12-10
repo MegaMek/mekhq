@@ -23,6 +23,7 @@ package mekhq.campaign.storyarcs;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,11 +45,11 @@ public class CompleteMission extends StoryEvent implements Serializable, MekHqXm
         super.startEvent();
         Mission m = getStoryArc().getCurrentMission();
         if(null != m) {
-            //TODO: review some criteria to determine status, but for now assume everyone wins
-            //m.setStatus(Mission.S_SUCCESS);
+            //TODO: review some criteria to determine status, but for now assume everyone wins!
+            m.setStatus(MissionStatus.SUCCESS);
             //TODO: a pop-up dialog of a description for missions end
         }
-        getStoryArc().setCurrentMissionId(-1);
+        getStoryArc().setCurrentMissionId(0);
         //no need for this event to stick around
         super.completeEvent();
     }
