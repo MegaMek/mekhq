@@ -48,11 +48,14 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     /** The UUID id of this story event */
     private UUID id;
 
+    /** A boolean that tracks whether the event is currently active **/
+    private boolean active;
+
     /** A basic linear next event id that may be used by the story event to determine next event **/
     private UUID nextEventId;
 
     public StoryEvent() {
-
+        active = false;
     }
 
     public void setStoryArc(StoryArc a) { this.arc = a; }
@@ -63,17 +66,20 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     protected UUID getId() { return id; }
 
+    public Boolean isActive() { return active; }
+
     /**
      * Do whatever needs to be done to start this event. Specific event types may need to override this
      */
     public void startEvent() {
-        //nothing at the moment
+        active = true;
     }
 
     /**
      * Complete the event. Specific event types may need to override this.
      */
     public void completeEvent() {
+        active = false;
         proceedToNextStoryEvent();
     }
 
@@ -124,6 +130,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                     retVal.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
+                    retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
