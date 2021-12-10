@@ -89,7 +89,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     //region I/O
 
-    protected abstract void loadFieldsFromXmlNode(Node wn) throws ParseException;
+    protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
 
     public static StoryEvent generateInstanceFromXML(Node wn, Campaign c) {
         StoryEvent retVal = null;
@@ -101,7 +101,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
             // Instantiate the correct child class, and call its parsing
             // function.
             retVal = (StoryEvent) Class.forName(className).getDeclaredConstructor().newInstance();
-            retVal.loadFieldsFromXmlNode(wn);
+            retVal.loadFieldsFromXmlNode(wn, c);
 
             // Okay, now load specific fields!
             NodeList nl = wn.getChildNodes();

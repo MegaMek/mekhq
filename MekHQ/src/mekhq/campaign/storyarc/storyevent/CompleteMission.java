@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryEvent;
@@ -65,7 +66,7 @@ public class CompleteMission extends StoryEvent implements Serializable, MekHqXm
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 

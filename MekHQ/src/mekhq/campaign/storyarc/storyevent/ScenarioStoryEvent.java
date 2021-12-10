@@ -22,9 +22,9 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,34 +38,34 @@ import java.util.UUID;
  * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
  * that scenario will trigger completeEvent upon completion.
  */
-public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    /* the storyScenario id for this scenario */
-    UUID scenarioId;
-
-    /* track the resolution of the scenario */
-    private ScenarioStatus status;
+    /* track the scenario itself */
+    private Scenario scenario;
 
     /* for now we will force a linear narrative */
     UUID nextEventId;
 
-    public AddScenario() {
+    public ScenarioStoryEvent() {
         super();
     }
-
-    public void setStatus(ScenarioStatus s) { this.status = s; }
 
     @Override
     public void startEvent() {
         super.startEvent();
         Mission m = getStoryArc().getCurrentMission();
-        Scenario s = getStoryArc().getStoryScenario(scenarioId);
-        s.setStoryArcId(getId());
-        if (null != m & null != s) {
-            m.addScenario(s);
+        if (null != m & null != scenario) {
+            m.addScenario(scenario);
         }
         //this event should stick around until the scenario is completed so do not complete right away
     }
+
+    private void setScenario(Scenario s) {
+        s.setStoryEvent(this);
+        this.scenario = s;
+    }
+
+    public Scenario getScenario() { return scenario; }
 
     @Override
     protected UUID getNextStoryEvent() {
@@ -79,7 +79,7 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 
@@ -87,8 +87,10 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-                    scenarioId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
+                    //TODO: we don't want to generate a new instance if loading a saved game where this scenario
+                    //has already been added to a mission
+                    scenario = Scenario.generateInstanceFromXML(wn2, c, null);
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 }

@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,7 +49,6 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.storyarc.storyevent.AddScenario;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -80,7 +80,7 @@ public class Scenario implements Serializable {
     private Map<UUID, List<UUID>> playerTransportLinkages;
 
     //for story arc tracking
-    private UUID storyArcId;
+    private ScenarioStoryEvent storyEvent;
 
 
     //endregion Variable Declarations
@@ -142,9 +142,7 @@ public class Scenario implements Serializable {
         this.date = date;
     }
 
-    public UUID getStoryArcId() { return storyArcId; }
-
-    public void setStoryArcId(UUID id) { this.storyArcId = id; }
+    public void setStoryEvent(ScenarioStoryEvent storyEvent) {this.storyEvent = storyEvent; }
 
     public boolean hasObjectives() {
         return scenarioObjectives != null &&
@@ -449,8 +447,6 @@ public class Scenario implements Serializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("storyArcId")) {
-                    retVal.storyArcId = UUID.fromString(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
@@ -477,13 +473,9 @@ public class Scenario implements Serializable {
                 anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
     }
 
-    public void triggerStoryEvent(Campaign campaign) {
-        if(null != storyArcId) {
-            AddScenario event = (AddScenario) campaign.getStoryArc().getStoryEvent(storyArcId);
-            if(null != event) {
-                event.setStatus(this.getStatus());
-                event.completeEvent();
-            }
+    public void completeStoryEvent() {
+        if(null != storyEvent) {
+            storyEvent.completeEvent();
         }
     }
 }

@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -71,7 +72,7 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 

@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
@@ -43,7 +44,7 @@ public class StartMission extends StoryEvent implements Serializable, MekHqXmlSe
 
     /**
      * The StartMission event has no outcome variability so should choose a single next event,
-     * typically an AddScenario
+     * typically an ScenarioStoryEvent
      **/
     UUID nextEventId;
 
@@ -74,7 +75,7 @@ public class StartMission extends StoryEvent implements Serializable, MekHqXmlSe
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 
