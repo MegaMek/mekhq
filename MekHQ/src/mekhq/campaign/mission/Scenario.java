@@ -48,6 +48,7 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.storyarcs.AddScenario;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -474,5 +475,15 @@ public class Scenario implements Serializable {
     public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
         return getForces(campaign).getUnits().stream().
                 anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
+    }
+
+    public void triggerStoryEvent(Campaign campaign) {
+        if(null != storyArcId) {
+            AddScenario event = (AddScenario) campaign.getStoryArc().getStoryEvent(storyArcId);
+            if(null != event) {
+                event.setStatus(this.getStatus());
+                event.completeEvent();
+            }
+        }
     }
 }

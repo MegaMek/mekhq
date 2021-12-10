@@ -25,6 +25,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -42,12 +43,17 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
     /* the storyScenario id for this scenario */
     UUID scenarioId;
 
+    /* track the resolution of the scenario */
+    private ScenarioStatus status;
+
     /* for now we will force a linear narrative */
     UUID nextEventId;
 
     public AddScenario() {
         super();
     }
+
+    public void setStatus(ScenarioStatus s) { this.status = s; }
 
     @Override
     public void startEvent() {
@@ -57,14 +63,13 @@ public class AddScenario extends StoryEvent implements Serializable, MekHqXmlSer
         s.setStoryArcId(getId());
         if (null != m & null != s) {
             m.addScenario(s);
-            //TODO: need some way to add the scenario UUID to Scenario so Scenario can check for completion
         }
-        //this event should stick around until the scenario is completed
+        //this event should stick around until the scenario is completed so do not complete right away
     }
 
     @Override
     protected UUID getNextStoryEvent() {
-        //TODO: not yet properly implemented because we need logic here
+        //TODO: for now we go in linear fashion, but this could be changed to vary by ScenarioStatus
         return nextEventId;
     }
 

@@ -1604,6 +1604,7 @@ public class ResolveScenarioTracker {
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
+        scenario.triggerStoryEvent(campaign);
         client = null;
     }
 

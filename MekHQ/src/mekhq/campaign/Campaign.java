@@ -4006,6 +4006,8 @@ public class Campaign implements Serializable, ITechManager {
         campaignOptions = options;
     }
 
+    public StoryArc getStoryArc() { return storyArc; }
+
     public void initiateStoryArc(StoryArc arc) {
         arc.setCampaign(this);
         this.storyArc = arc;
