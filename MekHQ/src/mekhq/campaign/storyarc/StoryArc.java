@@ -109,22 +109,27 @@ public class StoryArc implements MekHqXmlSerializable {
         getStoryEvent(getStartingEventId()).startEvent();
     }
 
-    //region EventHandlers
-
-    @Subscribe
-    public void handleScenarioResolved(ScenarioResolvedEvent ev) {
-        //search through ScenarioStoryEvents for a match and if so complete it
+    private ScenarioStoryEvent findStoryEventByScenarioId(int scenarioId) {
         for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-            StoryEvent storyEvent = entry.getValue();
-            if(storyEvent instanceof ScenarioStoryEvent) {
-                if(((ScenarioStoryEvent) storyEvent).getScenario().getId() == ev.getScenario().getId()) {
-                    storyEvent.completeEvent();
-                    break;
+            if (entry.getValue() instanceof ScenarioStoryEvent) {
+                ScenarioStoryEvent storyEvent = (ScenarioStoryEvent) entry.getValue();
+                if (null != storyEvent.getScenario() && storyEvent.getScenario().getId() == scenarioId) {
+                    return storyEvent;
                 }
             }
         }
+        return null;
     }
 
+    //region EventHandlers
+    @Subscribe
+    public void handleScenarioResolved(ScenarioResolvedEvent ev) {
+        //search through ScenarioStoryEvents for a match and if so complete it
+        ScenarioStoryEvent storyEvent = findStoryEventByScenarioId(ev.getScenario().getId());
+        if(null != storyEvent) {
+            storyEvent.completeEvent();
+        }
+    }
     //endregion EventHandlers
 
     //region File I/O
