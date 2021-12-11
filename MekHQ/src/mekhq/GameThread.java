@@ -162,7 +162,7 @@ class GameThread extends Thread implements CloseClientListener {
 
         try {
             QuirksHandler.saveCustomQuirksList();
-        } catch (IOException e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error("Error saving quirks override!", e);
         }
 
