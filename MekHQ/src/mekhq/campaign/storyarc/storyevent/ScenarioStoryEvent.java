@@ -103,7 +103,10 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     int scenarioId = Integer.parseInt(wn2.getTextContent().trim());
-                    this.setScenario(c.getScenario(scenarioId));
+                    if(null != c) {
+                        Scenario s = c.getScenario(scenarioId);
+                        this.setScenario(s);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
                     Scenario s = Scenario.generateInstanceFromXML(wn2, c, null);
                     if(null != s) {

@@ -117,7 +117,9 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
                     int missionId = Integer.parseInt(wn2.getTextContent().trim());
-                    mission = c.getMission(missionId);
+                    if(null != c) {
+                        mission = c.getMission(missionId);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     mission = Mission.generateInstanceFromXML(wn2, c, null);
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioEventId")) {

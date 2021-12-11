@@ -157,7 +157,7 @@ public class StoryArc implements MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyArc>");
     }
 
-    protected void parseStoryEvents(NodeList nl) {
+    protected void parseStoryEvents(NodeList nl, Campaign c) {
         try {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
@@ -165,7 +165,7 @@ public class StoryArc implements MekHqXmlSerializable {
                         wn.getNodeName()!="storyEvent") {
                     continue;
                 }
-                StoryEvent event = StoryEvent.generateInstanceFromXML(wn, getCampaign());
+                StoryEvent event = StoryEvent.generateInstanceFromXML(wn, c);
                 if(null != event) {
                     event.setStoryArc(this);
                     storyEvents.put(event.getId(), event);
@@ -176,7 +176,7 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
-    public static @Nullable StoryArc parseFromXML(final NodeList nl) {
+    public static @Nullable StoryArc parseFromXML(final NodeList nl, Campaign c) {
         final StoryArc storyArc = new StoryArc();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -199,7 +199,7 @@ public class StoryArc implements MekHqXmlSerializable {
                         storyArc.setStartingEventId(UUID.fromString(wn.getTextContent().trim()));
                         break;
                     case "storyEvents":
-                        storyArc.parseStoryEvents(wn.getChildNodes());
+                        storyArc.parseStoryEvents(wn.getChildNodes(), c);
                         break;
 
 
@@ -276,7 +276,7 @@ public class StoryArc implements MekHqXmlSerializable {
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
 
-        return parseFromXML(element.getChildNodes());
+        return parseFromXML(element.getChildNodes(), null);
     }
 
 }
