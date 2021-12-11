@@ -25,15 +25,14 @@ import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
 import megameklab.com.MMLConstants;
-import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
 import megameklab.com.ui.tabs.FluffTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,7 +83,7 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
         CConfig.load();
         UnitUtil.loadFonts();
-        MekHQ.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
+        LogManager.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -182,7 +181,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -217,7 +216,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());

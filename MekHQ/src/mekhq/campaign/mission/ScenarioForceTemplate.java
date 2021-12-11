@@ -10,33 +10,26 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import megamek.common.Board;
+import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-
-import org.w3c.dom.Node;
-
-import megamek.common.Board;
-import megamek.common.UnitType;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
+import java.util.*;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
@@ -687,7 +680,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
             JAXBElement<ScenarioForceTemplate> templateElement = um.unmarshal(xmlNode, ScenarioForceTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error Deserializing Scenario Force Template", e);
+            LogManager.getLogger().error("Error Deserializing Scenario Force Template", e);
         }
 
         return resultingTemplate;

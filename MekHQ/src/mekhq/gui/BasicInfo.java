@@ -18,22 +18,14 @@
  */
 package mekhq.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.LineBorder;
-
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 
 /**
  * An extension of JPanel that is intended to be used for visual table renderers
@@ -135,7 +127,7 @@ public class BasicInfo extends JPanel {
                     force.getIconFileName(), force.getIconMap())
                     .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to build force icon", e);
+            LogManager.getLogger().error("Failed to build force icon", e);
             return null;
         }
     }

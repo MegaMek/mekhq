@@ -39,6 +39,7 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -571,16 +572,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            MekHQ.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
+            LogManager.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
             long time = System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            MekHQ.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
+            LogManager.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updateEnemies();
-            MekHQ.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
+            LogManager.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updatePlanets();
-            MekHQ.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
+            LogManager.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

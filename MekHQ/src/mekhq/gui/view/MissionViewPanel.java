@@ -18,27 +18,26 @@
  */
 package mekhq.gui.view;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
+
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
