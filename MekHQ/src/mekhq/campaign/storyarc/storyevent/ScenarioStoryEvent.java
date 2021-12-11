@@ -1,5 +1,5 @@
 /*
- * StoryArc.java
+ * ScenarioStoryEvent.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
