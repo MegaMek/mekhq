@@ -33,7 +33,6 @@ import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -78,10 +77,6 @@ public class Scenario implements Serializable {
 
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
-
-    //for story arc tracking
-    private ScenarioStoryEvent storyEvent;
-
 
     //endregion Variable Declarations
 
@@ -141,8 +136,6 @@ public class Scenario implements Serializable {
     public void setDate(final @Nullable LocalDate date) {
         this.date = date;
     }
-
-    public void setStoryEvent(ScenarioStoryEvent storyEvent) {this.storyEvent = storyEvent; }
 
     public boolean hasObjectives() {
         return scenarioObjectives != null &&
@@ -471,11 +464,5 @@ public class Scenario implements Serializable {
     public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
         return getForces(campaign).getUnits().stream().
                 anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
-    }
-
-    public void completeStoryEvent() {
-        if(null != storyEvent) {
-            storyEvent.completeEvent();
-        }
     }
 }

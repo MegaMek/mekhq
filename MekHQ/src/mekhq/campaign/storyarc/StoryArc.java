@@ -21,14 +21,17 @@
 package mekhq.campaign.storyarc;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.event.Subscribe;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import org.w3c.dom.*;
 
 import java.io.File;
@@ -65,6 +68,7 @@ public class StoryArc implements MekHqXmlSerializable {
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
+        MekHQ.registerHandler(this);
     }
 
     public void setCampaign(Campaign c) { this.campaign = c; }
@@ -104,6 +108,24 @@ public class StoryArc implements MekHqXmlSerializable {
     public void begin() {
         getStoryEvent(getStartingEventId()).startEvent();
     }
+
+    //region EventHandlers
+
+    @Subscribe
+    public void handleScenarioResolved(ScenarioResolvedEvent ev) {
+        //search through ScenarioStoryEvents for a match and if so complete it
+        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+            StoryEvent storyEvent = entry.getValue();
+            if(storyEvent instanceof ScenarioStoryEvent) {
+                if(((ScenarioStoryEvent) storyEvent).getScenario().getId() == ev.getScenario().getId()) {
+                    storyEvent.completeEvent();
+                    break;
+                }
+            }
+        }
+    }
+
+    //endregion EventHandlers
 
     //region File I/O
     @Override

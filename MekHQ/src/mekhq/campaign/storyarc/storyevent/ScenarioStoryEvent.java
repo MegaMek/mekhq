@@ -64,7 +64,6 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     }
 
     private void setScenario(Scenario s) {
-        s.setStoryEvent(this);
         this.scenario = s;
     }
 
