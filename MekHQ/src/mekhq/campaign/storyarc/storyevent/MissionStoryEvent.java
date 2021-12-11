@@ -51,11 +51,11 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
      * A list of ScenarioStoryEvent ids to add to this mission when it is created. not all Scenarios
      * need to be added at the start as ScenarioStoryEvents may also trigger further ScenarioStoryEvents
      */
-    private List<UUID> scenarioIds;
+    private List<UUID> scenarioEventIds;
 
     public MissionStoryEvent() {
         super();
-        scenarioIds = new ArrayList<UUID>();
+        scenarioEventIds = new ArrayList<UUID>();
     }
 
     @Override
@@ -65,8 +65,8 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
             getStoryArc().getCampaign().addMission(mission);
         }
         StoryEvent scenarioEvent;
-        for(UUID scenarioId : scenarioIds) {
-            scenarioEvent = getStoryArc().getStoryEvent(scenarioId);
+        for(UUID scenarioEventId : scenarioEventIds) {
+            scenarioEvent = getStoryArc().getStoryEvent(scenarioEventId);
             if(null != scenarioEvent) {
                 scenarioEvent.startEvent();
             }
@@ -85,14 +85,23 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        for(UUID scenarioId : scenarioIds) {
+        for(UUID scenarioEventId : scenarioEventIds) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<scenarioId>"
-                    +scenarioId
-                    +"</scenarioId>");
+                    +"<scenarioEventId>"
+                    +scenarioEventId
+                    +"</scenarioEventId>");
         }
         if(null != mission) {
-            mission.writeToXml(pw1, indent+1);
+            //if the mission has a valid id, then just save this because the mission is saved
+            //and loaded elsewhere so we need to link it
+            if(mission.getId() > 0) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                        +"<missionId>"
+                        +mission.getId()
+                        +"</missionId>");
+            } else {
+                mission.writeToXml(pw1, indent+1);
+            }
         }
         writeToXmlEnd(pw1, indent);
     }
@@ -106,10 +115,13 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("mission")) {
+                if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    int missionId = Integer.parseInt(wn2.getTextContent().trim());
+                    mission = c.getMission(missionId);
+                } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     mission = Mission.generateInstanceFromXML(wn2, c, null);
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-                    scenarioIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioEventId")) {
+                    scenarioEventIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

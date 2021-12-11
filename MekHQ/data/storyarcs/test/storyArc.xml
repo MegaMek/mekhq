@@ -12,8 +12,8 @@
                 <systemId>Terra</systemId>
                 <desc>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</desc>
             </mission>
-            <scenarioId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioId>
-            <scenarioId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</scenarioId>
+            <scenarioEventId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioEventId>
+            <scenarioEventId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</scenarioEventId>
         </storyEvent>
         <storyEvent id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>

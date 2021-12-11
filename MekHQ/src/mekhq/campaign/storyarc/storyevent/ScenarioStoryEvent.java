@@ -78,7 +78,16 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
                 +missionEventId
                 +"</missionEventId>");
         if(null != scenario) {
-            scenario.writeToXml(pw1, indent+1);
+            //if the scenario has a valid id, then just save this because the scenario is saved
+            //and loaded elsewhere so we need to link it
+            if (scenario.getId() > 0) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<scenarioId>"
+                        + scenario.getId()
+                        + "</scenarioId>");
+            } else {
+                scenario.writeToXml(pw1, indent + 1);
+            }
         }
         writeToXmlEnd(pw1, indent);
     }
@@ -92,9 +101,10 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
-                    //TODO: we don't want to generate a new instance if loading a saved game where this scenario
-                    //has already been added to a mission
+                if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+                    int scenarioId = Integer.parseInt(wn2.getTextContent().trim());
+                    this.setScenario(c.getScenario(scenarioId));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
                     Scenario s = Scenario.generateInstanceFromXML(wn2, c, null);
                     if(null != s) {
                         this.setScenario(s);
