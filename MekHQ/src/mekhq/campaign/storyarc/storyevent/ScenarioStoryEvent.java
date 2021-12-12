@@ -113,7 +113,6 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
 
     @Override
     public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
-        // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

@@ -28,8 +28,6 @@ import mekhq.MekHqConstants;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import org.w3c.dom.*;

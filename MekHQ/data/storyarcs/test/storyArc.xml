@@ -7,39 +7,73 @@
     <storyEvents>
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
-                <name>Lorem Ipsum Mission</name>
+                <name>First Mission</name>
                 <type>Planetary Assault</type>
                 <systemId>Terra</systemId>
-                <desc>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</desc>
+                <desc>If everything is working correctly, you should see this mission loaded when you begin the story arc.</desc>
             </mission>
             <scenarioEventId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioEventId>
+            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+        </storyEvent>
+        <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Second Mission</name>
+                <type>Objective Raid</type>
+                <systemId>Terra</systemId>
+                <desc>If everything is working correctly, you should see this mission once your complete the first mission. There is nothing more at this point.</desc>
+            </mission>
         </storyEvent>
         <storyEvent id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <nextEventId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextEventId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Lorem Scenario</name>
-                <desc>Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn. F's'uhn ebunma h'kn'a sgn'wahlog naron tharanak, chtenff ph'ah mgor chtenffnyth wgah'n shtunggli s'uhn syha'h gotha mnahn' 'ai, ftaghu Azathoth ehye nog grah'n hlirgh Shub-Niggurath Dagon lw'nafh shogg. Sll'ha li'hee shagg geb ngmnahn' nnnAzathoth uh'eoth Shub-Niggurath kadishtu ron nali'hee tharanak sgn'wahl, r'luh ilyaa Tsathoggua cvulgtm ph'gof'nn h'nilgh'ri lloig ngr'luh athgoth 'ai. H'ftaghu li'hee mnahn' nilgh'ri nnnmnahn' nnnron R'lyeh nw ph'gotha gotha, vulgtlagln Dagon 'fhalma nnnR'lyeh nnnn'ghft nnngrah'n ehye lloig, hlirgh hupadgh nnnvulgtm cah Tsathoggua 'ai hlirgh h'lloig. Uln nilgh'ri Chaugnar Faugn hafh'drn Chaugnar Faugn nnnuh'e nilgh'ri, ee cNyarlathotep ftaghu n'gha csyha'h uln, ph'k'yarnak shagg n'ghft shagg Dagon.</desc>
-            </scenario>
             <storyOutcomes>
               <storyOutcome result="Victory">
                 <nextEventId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</nextEventId>
               </storyOutcome>
             </storyOutcomes>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Initial Scenario</name>
+                <desc>If everything is working correctly, you should see this scenario as part of First mission when you begin the story arc. To see what happens next, try out the scenario and then select Victory or Defeat.</desc>
+            </scenario>
         </storyEvent>
         <storyEvent id="0d96f227-6c97-4cb1-ade5-578b2386c1a5" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+            <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
+            <storyOutcomes>
+                <storyOutcome result="Victory">
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
+                        <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+                    </storyTrigger>
+                </storyOutcome>
+            </storyOutcomes>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Victory Scenario</name>
-                <desc>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</desc>
+                <desc>If everything is working correctly, this scenario should be added to First mission when you are victorious in the initial scenario. Being victorious in this scenario should complete First Mission.</desc>
             </scenario>
         </storyEvent>
         <storyEvent id="dbb7357c-59cd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <nextEventId>3e6bd312-59ce-11ec-bf63-0242ac130002</nextEventId>
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+            <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
+            <storyOutcomes>
+                <storyOutcome result="Victory">
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
+                        <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+                    </storyTrigger>
+                </storyOutcome>
+            </storyOutcomes>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Defeat Scenario</name>
-                <desc>I'm baby copper mug church-key pop-up master cleanse, ethical typewriter mixtape raclette cold-pressed organic bespoke cliche. Prism woke direct trade palo santo farm-to-table echo park keytar pour-over austin street art fanny pack cliche VHS four dollar toast. Activated charcoal church-key polaroid, skateboard flannel af celiac aesthetic schlitz normcore vaporware asymmetrical austin prism. Four loko af air plant kombucha, retro cronut post-ironic ramps normcore. Tbh actually tattooed beard put a bird on it chillwave sriracha intelligentsia poutine offal humblebrag gentrify normcore mlkshk. Lyft hell of adaptogen polaroid, edison bulb lumbersexual wayfarers pug lomo aesthetic church-key air plant live-edge post-ironic 3 wolf moon. La croix cornhole blue bottle selvage, tbh salvia air plant pickled deep v banjo photo booth glossier small batch brooklyn franzen.</desc>
+                <desc>If everything is working correctly, this scenario should be added to First mission when you are defeated in the initial scenario. Being victorious in this scenario should complete First mission.</desc>
+            </scenario>
+        </storyEvent>
+        <storyEvent id="f6d7cc16-5afb-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
+                <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+            </storyTrigger>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Last Try Scenario</name>
+                <desc>If everything is working correctly, this scenario should be added to First mission if you are defeated in your second scenario. Completing it should finish First Mission.</desc>
             </scenario>
         </storyEvent>
     </storyEvents>

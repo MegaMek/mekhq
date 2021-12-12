@@ -24,7 +24,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,9 +33,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * The StoryEvent abstract class is the basic building block of a StoryArc. StoryEvents can do
@@ -48,7 +45,7 @@ import java.util.UUID;
 public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     /** The story arc that this event is a part of **/
-    private StoryArc arc;
+    private StoryArc storyArc;
 
     /** The UUID id of this story event */
     private UUID id;
@@ -56,22 +53,39 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     /** A boolean that tracks whether the event is currently active **/
     private boolean active;
 
-    /** A basic linear next event id that may be used by the story event to determine next event **/
+    /**
+     * The id of the next event to start when this one is completed. It can be null if a new event should not be
+     * triggered. It can also be overwritten by a StoryOutcome
+     * **/
     private UUID nextEventId;
 
     /** A map of all possible StoryOutcomes **/
     protected Map<String, StoryOutcome> storyOutcomes;
+
+    /** A list of StoryTriggers to execute on completion, can be overwritten by StoryOutcome */
+    List<StoryTrigger> storyTriggers;
 
     protected static final String NL = System.lineSeparator();
 
     public StoryEvent() {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
+        storyTriggers = new ArrayList<>();
     }
 
-    public void setStoryArc(StoryArc a) { this.arc = a; }
+    public void setStoryArc(StoryArc a) {
+        this.storyArc = a;
+        //also apply it to any triggers
+        for(StoryTrigger storyTrigger : storyTriggers) {
+            storyTrigger.setStoryArc(a);
+        }
+        //also might need to apply it to triggers in storyOutcomes
+        for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
+            entry.getValue().setStoryArc(a);
+        }
+    }
 
-    protected StoryArc getStoryArc() { return arc; }
+    protected StoryArc getStoryArc() { return storyArc; }
 
     public void setId(UUID id) { this.id = id; }
 
@@ -92,13 +106,21 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     public void completeEvent() {
         active = false;
         processOutcomes();
+        processTriggers();
         proceedToNextStoryEvent();
     }
 
-    protected void processOutcomes() {
+    private void processOutcomes() {
         StoryOutcome chosenOutcome = storyOutcomes.get(getResult());
         if(null != chosenOutcome) {
             nextEventId = chosenOutcome.getNextEventId();
+            storyTriggers = chosenOutcome.getStoryTriggers();
+        }
+    }
+
+    private void processTriggers() {
+        for(StoryTrigger storyTrigger : storyTriggers) {
+            storyTrigger.execute();
         }
     }
 
@@ -110,7 +132,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     protected void proceedToNextStoryEvent() {
         //get the next story event
         UUID nextStoryEventId = getNextStoryEvent();
-        StoryEvent nextStoryEvent = arc.getStoryEvent(nextStoryEventId);
+        StoryEvent nextStoryEvent = storyArc.getStoryEvent(nextStoryEventId);
         if(null != nextStoryEvent) {
             nextStoryEvent.startEvent();
         }
@@ -154,13 +176,21 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
         pw1.print(builder.toString());
 
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<storyOutcomes>");
-        for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
-            entry.getValue().writeToXml(pw1, indent+2);
+        if(!storyOutcomes.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<storyOutcomes>");
+            for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
+                entry.getValue().writeToXml(pw1, indent + 2);
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "</storyOutcomes>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"</storyOutcomes>");
+
+        if(!storyTriggers.isEmpty()) {
+            for (StoryTrigger trigger : storyTriggers) {
+                trigger.writeToXml(pw1, indent + 1);
+            }
+        }
 
     }
 
@@ -195,6 +225,9 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
+                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
+                    retVal.storyTriggers.add(trigger);
                 } else if (wn2.getNodeName().equalsIgnoreCase("storyOutcomes")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

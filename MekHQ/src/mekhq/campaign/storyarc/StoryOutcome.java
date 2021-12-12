@@ -1,7 +1,7 @@
 /*
  * StoryOutcome.java
  *
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -29,8 +29,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
 
 /**
  * This class governs what happens when a story event is completed. Every StoryEvent will have a StoryOutcome
@@ -44,17 +45,30 @@ public class StoryOutcome implements MekHqXmlSerializable {
     /** id of the next event to start. Can be null **/
     private UUID nextEventId;
 
+    /** A list of StoryTriggers to replace the defaults on this outcome */
+    List<StoryTrigger> storyTriggers;
+
     protected static final String NL = System.lineSeparator();
 
     StoryOutcome()  {
-        //nothing to assign in the constructor
+        storyTriggers = new ArrayList<>();
     }
 
     public String getResult() { return result; }
 
-    private void setNextEventId(UUID id) { this.nextEventId = id; }
-
     public UUID getNextEventId() { return nextEventId; }
+
+    public List<StoryTrigger> getStoryTriggers() { return storyTriggers; }
+
+    /**
+     * Set the StoryArc on all StoryTriggers here
+     * @param a
+     */
+    public void setStoryArc(StoryArc a) {
+        for(StoryTrigger storyTrigger : storyTriggers) {
+            storyTrigger.setStoryArc(a);
+        }
+    }
 
     //region File I/O
     @Override
@@ -74,6 +88,11 @@ public class StoryOutcome implements MekHqXmlSerializable {
                 .append("</nextEventId>")
                 .append(NL);
         pw1.print(builder.toString());
+        if(!storyTriggers.isEmpty()) {
+            for (StoryTrigger trigger : storyTriggers) {
+                trigger.writeToXml(pw1, indent + 1);
+            }
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyOutcome>");
     }
 
@@ -94,6 +113,9 @@ public class StoryOutcome implements MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
+                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
+                    retVal.storyTriggers.add(trigger);
                 }
             }
         } catch (Exception ex) {
