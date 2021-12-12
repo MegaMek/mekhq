@@ -22,12 +22,14 @@ package mekhq.campaign.storyarc;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -42,6 +44,8 @@ public class StoryOutcome implements MekHqXmlSerializable {
     /** id of the next event to start. Can be null **/
     private UUID nextEventId;
 
+    protected static final String NL = System.lineSeparator();
+
     StoryOutcome()  {
         //nothing to assign in the constructor
     }
@@ -55,7 +59,22 @@ public class StoryOutcome implements MekHqXmlSerializable {
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
+        String level = MekHqXmlUtil.indentStr(indent),
+                level1 = MekHqXmlUtil.indentStr(indent + 1);
 
+        StringBuilder builder = new StringBuilder(256);
+        builder.append(level)
+                .append("<storyOutcome result=\"")
+                .append(result)
+                .append("\">")
+                .append(NL)
+                .append(level1)
+                .append("<nextEventId>")
+                .append(nextEventId)
+                .append("</nextEventId>")
+                .append(NL);
+        pw1.print(builder.toString());
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyOutcome>");
     }
 
     public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c) {

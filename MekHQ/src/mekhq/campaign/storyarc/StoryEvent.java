@@ -153,6 +153,15 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 .append(NL);
 
         pw1.print(builder.toString());
+
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<storyOutcomes>");
+        for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
+            entry.getValue().writeToXml(pw1, indent+2);
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"</storyOutcomes>");
+
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
