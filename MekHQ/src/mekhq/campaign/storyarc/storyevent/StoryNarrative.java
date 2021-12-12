@@ -59,6 +59,12 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
     }
 
     @Override
+    public String getResult() {
+        //this one has no variation
+        return "";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)

@@ -83,6 +83,14 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
     public Mission getMission() { return mission; }
 
     @Override
+    public String getResult() {
+        if(null == mission || mission.getStatus().isActive()) {
+            return "";
+        }
+        return mission.getStatus().toString();
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         for(UUID scenarioEventId : scenarioEventIds) {

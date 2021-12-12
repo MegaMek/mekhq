@@ -27,13 +27,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.storyarc.StoryOutcome;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.EnumMap;
 
 /**
  * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
@@ -68,6 +72,22 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     }
 
     public Scenario getScenario() { return scenario; }
+
+    @Override
+    protected String getResult() {
+        if(null == scenario || scenario.getStatus().isCurrent()) {
+            return "";
+        }
+
+        //TODO: I may want to think about how to handle the shades of victory and defeat
+        if(scenario.getStatus().isOverallVictory()) {
+            return "Victory";
+        } else if(scenario.getStatus().isOverallDefeat()) {
+            return "Defeat";
+        } else {
+            return "Draw";
+        }
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

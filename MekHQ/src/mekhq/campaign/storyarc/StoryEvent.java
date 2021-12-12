@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Scenario;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,6 +34,8 @@ import java.io.Serializable;
 import java.text.ParseException;
 
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -56,10 +59,14 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     /** A basic linear next event id that may be used by the story event to determine next event **/
     private UUID nextEventId;
 
+    /** A map of all possible StoryOutcomes **/
+    protected Map<String, StoryOutcome> storyOutcomes;
+
     protected static final String NL = System.lineSeparator();
 
     public StoryEvent() {
         active = false;
+        storyOutcomes =  new LinkedHashMap<>();
     }
 
     public void setStoryArc(StoryArc a) { this.arc = a; }
@@ -84,8 +91,18 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
      */
     public void completeEvent() {
         active = false;
+        processOutcomes();
         proceedToNextStoryEvent();
     }
+
+    protected void processOutcomes() {
+        StoryOutcome chosenOutcome = storyOutcomes.get(getResult());
+        if(null != chosenOutcome) {
+            nextEventId = chosenOutcome.getNextEventId();
+        }
+    }
+
+    protected abstract String getResult();
 
     /**
      * Gets the next story event and if it is not null, starts it
@@ -169,6 +186,27 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("storyOutcomes")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                            continue;
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("storyOutcome")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.getLogger().error("Unknown node type not loaded in storyOutcomes nodes: " + wn3.getNodeName());
+
+                            continue;
+                        }
+                        StoryOutcome s = StoryOutcome.generateInstanceFromXML(wn3, c);
+
+                        if (null != s) {
+                            retVal.storyOutcomes.put(s.getResult(), s);
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {
