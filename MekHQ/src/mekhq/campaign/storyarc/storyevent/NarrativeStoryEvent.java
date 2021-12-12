@@ -28,6 +28,7 @@ import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -37,16 +38,16 @@ import java.util.UUID;
  * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
  * immediately.
  */
-public class StoryNarrative extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class NarrativeStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
     String title;
     String narrative;
 
-    public StoryNarrative() {
+    public NarrativeStoryEvent() {
         this(null, null);
     }
 
-    public StoryNarrative(String t, String n) {
+    public NarrativeStoryEvent(String t, String n) {
         this.title = t;
         this.narrative = n;
     }
@@ -54,7 +55,7 @@ public class StoryNarrative extends StoryEvent implements Serializable, MekHqXml
     @Override
     public void startEvent() {
         super.startEvent();
-        //TODO: create dialog and display
+        JOptionPane.showMessageDialog(null, narrative, title, JOptionPane.PLAIN_MESSAGE);
         completeEvent();
     }
 

@@ -3,8 +3,18 @@
     <title>A Test Campaign</title>
     <description>Just Testing Stuff Out</description>
     <startNew>true</startNew>
-    <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
+    <startingEventId>0807ee06-5b8f-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>
+        <storyEvent id="0807ee06-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>A Test Story Arc</title>
+            <narrative>Welcome to the test story arc! Check out the briefing tab to see what missions and scenarios are available. Have fun!</narrative>
+            <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>First mission complete!</title>
+            <narrative>Congratulations on completing your first mission! Now on to your second.</narrative>
+            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+        </storyEvent>
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>First Mission</name>
@@ -13,7 +23,7 @@
                 <desc>If everything is working correctly, you should see this mission loaded when you begin the story arc.</desc>
             </mission>
             <scenarioEventId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioEventId>
-            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+            <nextEventId>500511f2-5b8f-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
