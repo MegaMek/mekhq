@@ -81,12 +81,14 @@ public class StoryOutcome implements MekHqXmlSerializable {
                 .append("<storyOutcome result=\"")
                 .append(result)
                 .append("\">")
-                .append(NL)
-                .append(level1)
-                .append("<nextEventId>")
-                .append(nextEventId)
-                .append("</nextEventId>")
                 .append(NL);
+        if(null != nextEventId) {
+            builder.append(level1)
+                    .append("<nextEventId>")
+                    .append(nextEventId)
+                    .append("</nextEventId>")
+                    .append(NL);
+        }
         pw1.print(builder.toString());
         if(!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {

@@ -167,12 +167,14 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 .append("<active>")
                 .append(active)
                 .append("</active>")
-                .append(NL)
-                .append(level1)
-                .append("<nextEventId>")
-                .append(nextEventId)
-                .append("</nextEventId>")
                 .append(NL);
+        if(null != nextEventId) {
+                builder.append(level1)
+                        .append("<nextEventId>")
+                        .append(nextEventId)
+                        .append("</nextEventId>")
+                        .append(NL);
+        }
 
         pw1.print(builder.toString());
 
