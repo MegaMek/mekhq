@@ -59,6 +59,9 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
     private Map<UUID, StoryEvent> storyEvents;
 
+    /** A hash of possible personalities that the player might interact with in this story arc **/
+    private Map<UUID, Personality> personalities;
+
     /** directory path to the initial campaign data for this StoryArc - can be null **/
     private String initCampaignPath;
 
@@ -67,6 +70,7 @@ public class StoryArc implements MekHqXmlSerializable {
     public StoryArc() {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
+        personalities = new LinkedHashMap<>();
         MekHQ.registerHandler(this);
     }
 
@@ -106,6 +110,13 @@ public class StoryArc implements MekHqXmlSerializable {
             return null;
         }
         return storyEvents.get(id);
+    }
+
+    public Personality getPersonality(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return personalities.get(id);
     }
 
     public void begin() {
@@ -211,6 +222,24 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
+    protected void parsePersonalities(NodeList nl, Campaign c) {
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeType() != Node.ELEMENT_NODE ||
+                        wn.getNodeName()!="personality") {
+                    continue;
+                }
+                Personality personality = Personality.generateInstanceFromXML(wn, c);
+                if(null != personality) {
+                    personalities.put(personality.getId(), personality);
+                }
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
+        }
+    }
+
     public static @Nullable StoryArc parseFromXML(final NodeList nl, Campaign c) {
         final StoryArc storyArc = new StoryArc();
         try {
@@ -238,6 +267,9 @@ public class StoryArc implements MekHqXmlSerializable {
                         break;
                     case "storyEvents":
                         storyArc.parseStoryEvents(wn.getChildNodes(), c);
+                        break;
+                    case "personalities":
+                        storyArc.parsePersonalities(wn.getChildNodes(), c);
                         break;
 
 
