@@ -59,6 +59,14 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
     }
 
     @Override
+    public String getTitle() {
+        if(null != mission) {
+            return mission.getName();
+        }
+        return "";
+    }
+
+    @Override
     public void startEvent() {
         super.startEvent();
         if(null != mission) {

@@ -752,6 +752,15 @@ public class CampaignGUI extends JPanel {
         });
         menuRefresh.add(miRefreshAwards);
 
+        JMenuItem miRefreshStoryIcons = new JMenuItem(resourceMap.getString("miRefreshStoryIcons.text"));
+        miRefreshStoryIcons.setName("miRefreshAwards");
+        miRefreshStoryIcons.setMnemonic(KeyEvent.VK_A);
+        miRefreshStoryIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshStoryIcons();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshStoryIcons);
+
         JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
         miRefreshRanks.setName("miRefreshRanks");
         miRefreshRanks.setMnemonic(KeyEvent.VK_R);

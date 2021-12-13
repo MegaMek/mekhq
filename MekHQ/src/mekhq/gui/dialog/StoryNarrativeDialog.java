@@ -23,17 +23,12 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class StoryNarrativeDialog extends StoryDialog {
 
-    private NarrativeStoryEvent storyEvent;
-
     //region Constructors
     public StoryNarrativeDialog(final JFrame parent, NarrativeStoryEvent sEvent) {
-        super(parent, sEvent.getTitle());
-        this.storyEvent = sEvent;
+        super(parent, sEvent);
         initialize();
     }
     //endregion Constructors
@@ -58,7 +53,7 @@ public class StoryNarrativeDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(storyEvent.getNarrative()));
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(((NarrativeStoryEvent) getStoryEvent()).getNarrative()));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
         mainPanel.add(scrollPane, gbc);
 

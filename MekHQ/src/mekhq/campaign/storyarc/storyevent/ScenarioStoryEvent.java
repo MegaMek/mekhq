@@ -54,6 +54,14 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     }
 
     @Override
+    public String getTitle() {
+        if(null != scenario) {
+            return scenario.getName();
+        }
+        return "";
+    }
+
+    @Override
     public void startEvent() {
         super.startEvent();
         StoryEvent missionEvent = getStoryArc().getStoryEvent(missionEventId);

@@ -49,6 +49,7 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
         choices = new LinkedHashMap<>();
     }
 
+    @Override
     public String getTitle() { return title; }
 
     public String getQuestion() { return question; }

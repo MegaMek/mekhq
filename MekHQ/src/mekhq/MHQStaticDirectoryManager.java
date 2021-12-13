@@ -39,12 +39,14 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Variable Declarations
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
+    private static AbstractDirectory storyIconDirectory;
 
     // Re-parsing Prevention Variables: They are True at startup and when the specified directory
     // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's
     // an error.
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
+    private static boolean parseStoryIconDirectory = true;
     //endregion Variable Declarations
 
     //region Constructors
@@ -61,6 +63,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         MMStaticDirectoryManager.initialize();
         initializeForceIcons();
         initializeAwardIcons();
+        initializeStoryIcons();
     }
 
     /**
@@ -100,6 +103,25 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             }
         }
     }
+
+    /**
+     * Parses MekHQ's storyarcs icon folder when first called or when it was refreshed.
+     *
+     * @see #refreshStoryIcons()
+     */
+    private static void initializeStoryIcons() {
+        // Read in and parse MekHQ's force icon folder only when first called or when refreshed
+        if (parseStoryIconDirectory) {
+            // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
+            parseStoryIconDirectory = false;
+            try {
+                storyIconDirectory = new DirectoryItems(new File("data/images/storyarc"), // TODO : remove inline file path
+                        new ImageFileFactory());
+            } catch (Exception e) {
+                MegaMek.getLogger().error("Could not parse the storyarc icon directory!", e);
+            }
+        }
+    }
     //endregion Initialization
 
     //region Getters
@@ -123,6 +145,17 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     public static @Nullable AbstractDirectory getAwardIcons() {
         initializeAwardIcons();
         return awardIconDirectory;
+    }
+
+    /**
+     * Returns an AbstractDirectory object containing all story icon filenames found in MekHQ's
+     * storyarc icon folder.
+     * @return an AbstractDirectory object with the story icon folders and filenames.
+     * May be null if the directory cannot be parsed.
+     */
+    public static @Nullable AbstractDirectory getStoryIcons() {
+        initializeStoryIcons();
+        return storyIconDirectory;
     }
     //endregion Getters
 
@@ -149,6 +182,18 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     public static AbstractDirectory refreshAwardIcons() {
         parseAwardIconDirectory = true;
         return getAwardIcons();
+    }
+
+    /**
+     * Re-reads MekHQ's story icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the story icons (like added image
+     * files and folders) while MekHQ is running.
+     *
+     * @see #getStoryIcons()
+     */
+    public static AbstractDirectory refreshStoryIcons() {
+        parseStoryIconDirectory = true;
+        return getStoryIcons();
     }
     //endregion Refreshers
 

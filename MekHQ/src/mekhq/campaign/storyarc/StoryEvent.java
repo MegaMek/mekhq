@@ -1,7 +1,7 @@
 /*
  * StoryEvent.java
  *
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -28,12 +28,14 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
 
 import java.util.*;
+import java.util.List;
 
 /**
  * The StoryEvent abstract class is the basic building block of a StoryArc. StoryEvents can do
@@ -53,6 +55,9 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     /** A boolean that tracks whether the event is currently active **/
     private boolean active;
 
+    /** A StoryIcon image to display in a dialog. It can return a null image */
+    private StoryIcon storyIcon;
+
     /**
      * The id of the next event to start when this one is completed. It can be null if a new event should not be
      * triggered. It can also be overwritten by a StoryOutcome
@@ -71,6 +76,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
         storyTriggers = new ArrayList<>();
+        storyIcon = new StoryIcon();
     }
 
     public void setStoryArc(StoryArc a) {
@@ -92,6 +98,15 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     protected UUID getId() { return id; }
 
     public Boolean isActive() { return active; }
+
+    public abstract String getTitle();
+
+    public Image getImage() {
+        if(storyIcon.isDefault()) {
+            return null;
+        }
+        return storyIcon.getImage();
+    }
 
     /**
      * Do whatever needs to be done to start this event. Specific event types may need to override this
@@ -193,7 +208,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 trigger.writeToXml(pw1, indent + 1);
             }
         }
-
+        storyIcon.writeToXML(pw1, indent + 1);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -230,6 +245,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
                     retVal.storyTriggers.add(trigger);
+                } else if (wn2.getNodeName().equalsIgnoreCase(StoryIcon.XML_TAG)) {
+                    retVal.storyIcon = StoryIcon.parseFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("storyOutcomes")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

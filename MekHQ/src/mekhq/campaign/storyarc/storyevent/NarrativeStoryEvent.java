@@ -46,6 +46,7 @@ public class NarrativeStoryEvent extends StoryEvent implements Serializable, Mek
         super();
     }
 
+    @Override
     public String getTitle() { return title; }
 
     public String getNarrative() { return narrative; }

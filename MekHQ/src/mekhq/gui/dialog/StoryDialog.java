@@ -18,6 +18,8 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.campaign.storyarc.StoryEvent;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -36,10 +38,14 @@ import java.io.IOException;
 public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private JButton doneButton;
+
     private int imgWidth;
 
-    public StoryDialog(final JFrame parent, String title) {
-        super(parent, title, true);
+    private StoryEvent storyEvent;
+
+    public StoryDialog(final JFrame parent, StoryEvent sEvent) {
+        super(parent, sEvent.getTitle(), true);
+        this.storyEvent = sEvent;
     }
 
     //region initialization
@@ -68,29 +74,19 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     protected abstract Container getMainPanel();
     //endregion initialization
 
+    protected StoryEvent getStoryEvent() {
+        return storyEvent;
+    }
+
     protected JPanel getImagePanel() {
         JPanel imagePanel = new JPanel();
 
-        BufferedImage img = null;
         imgWidth = 0;
-
-        //for now just going to read in a default image manually to test out layout
-        //TODO: Each StoryEvent should have an optional image file that we can load
-        //but we should also have some default splash images to choose from
-        //It should also be possible to select a portrait image, but this may be
-        //tied to a Personality object that can be loaded into this dialog
-        try
-        {
-            img = ImageIO.read(new File("data/images/misc/mekhq-splash.png"));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        Image img = getStoryEvent().getImage();
 
         if(null != img) {
-            imgWidth = img.getWidth();
             ImageIcon icon = new ImageIcon(img);
+            imgWidth = icon.getIconWidth();
             JLabel imgLbl = new JLabel();
             imgLbl.setIcon(icon);
             imagePanel.add(imgLbl);

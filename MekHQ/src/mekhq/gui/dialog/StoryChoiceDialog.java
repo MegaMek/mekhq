@@ -23,20 +23,15 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
 
 public class StoryChoiceDialog extends StoryDialog {
-
-    private ChoiceStoryEvent storyEvent;
 
     private ButtonGroup choiceGroup;
 
     //region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryEvent sEvent) {
-        super(parent, sEvent.getTitle());
-        this.storyEvent = sEvent;
+        super(parent, sEvent);
         initialize();
     }
     //endregion Constructors
@@ -66,7 +61,7 @@ public class StoryChoiceDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(storyEvent.getQuestion()));
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(((ChoiceStoryEvent) getStoryEvent()).getQuestion()));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
         scrollPane.setPreferredSize(new Dimension(150, 150 ));
         mainPanel.add(scrollPane, gbc);
@@ -81,7 +76,7 @@ public class StoryChoiceDialog extends StoryDialog {
         choiceGroup = new ButtonGroup();
         JRadioButton radioBtn;
         boolean firstEntry = true;
-        for (Map.Entry<String, String> entry : storyEvent.getChoices().entrySet()) {
+        for (Map.Entry<String, String> entry : ((ChoiceStoryEvent) getStoryEvent()).getChoices().entrySet()) {
             radioBtn = new JRadioButton(entry.getValue());
             radioBtn.setActionCommand(entry.getKey());
             btnPanel.add(radioBtn);
