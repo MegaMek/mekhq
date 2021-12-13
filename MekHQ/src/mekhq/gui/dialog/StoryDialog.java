@@ -18,10 +18,14 @@
  */
 package mekhq.gui.dialog;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -32,6 +36,7 @@ import java.awt.event.ActionListener;
 public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private JButton doneButton;
+    private int imgWidth;
 
     public StoryDialog(final JFrame parent, String title) {
         super(parent, title, true);
@@ -64,13 +69,45 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     //endregion initialization
 
     protected JPanel getImagePanel() {
-        //TODO: implement. Each StoryEvent should have an optional image file that we
-        //we can grab and put here in an image panel
         JPanel imagePanel = new JPanel();
+
+        BufferedImage img = null;
+        imgWidth = 0;
+
+        //for now just going to read in a default image manually to test out layout
+        //TODO: Each StoryEvent should have an optional image file that we can load
+        //but we should also have some default splash images to choose from
+        //It should also be possible to select a portrait image, but this may be
+        //tied to a Personality object that can be loaded into this dialog
+        try
+        {
+            img = ImageIO.read(new File("data/images/misc/mekhq-splash.png"));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        if(null != img) {
+            imgWidth = img.getWidth();
+            ImageIcon icon = new ImageIcon(img);
+            JLabel imgLbl = new JLabel();
+            imgLbl.setIcon(icon);
+            imagePanel.add(imgLbl);
+        }
+
+        //we can grab and put here in an image panel
         return imagePanel;
     }
 
-    protected abstract void setDialogSize();
+    protected void setDialogSize() {
+
+        int width = 400+imgWidth;
+        int height = 400;
+        setMinimumSize(new Dimension(width, height));
+        setPreferredSize(new Dimension(width, height));
+        setMaximumSize(new Dimension(width, height));
+    }
 
     //region Listeners
     @Override

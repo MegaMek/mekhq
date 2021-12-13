@@ -97,14 +97,6 @@ public class StoryChoiceDialog extends StoryDialog {
     }
     //endregion Initialization
 
-
-    @Override
-    protected void setDialogSize() {
-        setMinimumSize(new Dimension(400, 400));
-        setPreferredSize(new Dimension(400, 400));
-        setMaximumSize(new Dimension(400, 400));
-    }
-
     public String getChoice() {
         return choiceGroup.getSelection().getActionCommand();
     }
