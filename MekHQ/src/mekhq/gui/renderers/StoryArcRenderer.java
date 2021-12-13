@@ -45,10 +45,10 @@ public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<
         setForeground(foreground);
         setBackground(background);
 
-        getTxtDescription().setForeground(foreground);
-        getTxtDescription().setBackground(background);
+        getTxtDetails().setForeground(foreground);
+        getTxtDetails().setBackground(background);
 
-        updateFromPreset(value);
+        updateFromStoryArc(value);
         this.revalidate();
 
         return this;
@@ -56,11 +56,11 @@ public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<
 
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(300, 100);
+        return new Dimension(250, 75);
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(400, 120);
+        return new Dimension(250, 75);
     }
 }

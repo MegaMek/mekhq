@@ -20,52 +20,88 @@ package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.panes.StoryArcPane;
+import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private StoryArcPane selectionPanel;
+    private StoryArcSelectionPane selectionPanel;
+    private JTextPane descriptionPane;
     //endregion Variable Declarations
 
     //region Constructors
     public StoryArcSelectionDialog(final JFrame parent) {
         super(parent, "StoryArcSelectionDialog", "StoryArcSelectionDialog.title");
         initialize();
+        refreshDescription();
+        selectionPanel.getStoryArcs().addListSelectionListener(ev -> refreshDescription());
+        setMinimumSize(new Dimension(700, 400));
+        setPreferredSize(new Dimension(700, 400));
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public StoryArcPane getSelectionPanel() {
+    public StoryArcSelectionPane getSelectionPanel() {
         return selectionPanel;
     }
 
-    public void setSelectionPanel(final StoryArcPane selectionPanel) {
+    public void setSelectionPanel(final StoryArcSelectionPane selectionPanel) {
         this.selectionPanel = selectionPanel;
     }
 
     /**
-     * @return the selected preset, or null if the dialog was cancelled or no preset was selected
+     * @return the selected story arc, or null if the dialog was cancelled or no preset was selected
      */
     public @Nullable StoryArc getSelectedStoryArc() {
         return getResult().isConfirmed() ? getSelectionPanel().getSelectedStoryArc() : null;
+    }
+
+    /**
+     * @return the currently selected story arc.
+     */
+    public @Nullable StoryArc getCurrentlySelectedStoryArc() {
+        return getSelectionPanel().getSelectedStoryArc();
     }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setSelectionPanel(new StoryArcPane(getFrame()));
-        return getSelectionPanel();
+        StoryArcSelectionPane selectionPane = new StoryArcSelectionPane(getFrame());
+        setSelectionPanel(selectionPane);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.LINE_AXIS));
+        mainPanel.add(selectionPane);
+
+        descriptionPane = new JTextPane();
+        descriptionPane.setEditable(false);
+        descriptionPane.setContentType("text/html");
+        descriptionPane.setMinimumSize(new Dimension(400, 400));
+        descriptionPane.setPreferredSize(new Dimension(400, 400));
+        descriptionPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        mainPanel.add(new JScrollPane(descriptionPane));
+
+        return mainPanel;
     }
     //endregion Initialization
 
     @Override
     public void setVisible(final boolean visible) {
         // Only show if there are presets to select from
-        super.setVisible(visible && (getSelectionPanel().getPresets().getModel().getSize() > 0));
+        super.setVisible(visible && (getSelectionPanel().getStoryArcs().getModel().getSize() > 0));
+    }
+
+    private void refreshDescription() {
+        if(null != getCurrentlySelectedStoryArc()) {
+            descriptionPane.setText(MarkdownRenderer.getRenderedHtml(getCurrentlySelectedStoryArc().getDescription()));
+            descriptionPane.setCaretPosition(0);
+        }
     }
 }

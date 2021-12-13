@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc>
     <title>Young Wolves</title>
-    <description>In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Far more than just a simple Trial of Refusal, the Refusal War would at some point involve most of the Touman of both clans. The outcome of the Refusal War would have long reaching implications for the Clans and the Inner Sphere for generations to come.
+    <details>Clan Invasion era; Mechs only</details>
+    <description># Young Wolves
 
-    This is the story of a Trinary of young Wolf warriors trying to find their own line in the Rememberance during the Refusal War and the difficult decisions that they were forced to make in this tumultous time.</description>
+In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Far more than just a simple Trial of Refusal, the Refusal War would at some point involve most of the Touman of both clans. The outcome of the Refusal War would have long reaching implications for the Clans and the Inner Sphere for generations to come.
+
+This is the story of a Trinary of young Wolf warriors trying to find their own line in the Rememberance during the Refusal War and the difficult decisions that they were forced to make in this tumultous time.
+    </description>
     <startNew>true</startNew>
     <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>

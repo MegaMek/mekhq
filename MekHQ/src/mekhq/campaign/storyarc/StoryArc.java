@@ -45,6 +45,7 @@ import java.util.*;
 public class StoryArc implements MekHqXmlSerializable {
 
     private String title;
+    private String details;
     private String description;
 
     private Campaign campaign;
@@ -76,6 +77,10 @@ public class StoryArc implements MekHqXmlSerializable {
     private void setTitle(String t) { this.title = t; }
 
     public String getTitle() { return this.title; }
+
+    public String getDetails() { return details; }
+
+    private void setDetails(String d) { this.details = d; }
 
     public String getDescription() { return this.description; }
 
@@ -151,6 +156,11 @@ public class StoryArc implements MekHqXmlSerializable {
                 .append("</title>")
                 .append(NL)
                 .append(level1)
+                .append("<details>")
+                .append(details)
+                .append("</details>")
+                .append(NL)
+                .append(level1)
                 .append("<description>")
                 .append(description)
                 .append("</description>")
@@ -213,6 +223,9 @@ public class StoryArc implements MekHqXmlSerializable {
                 switch (wn.getNodeName()) {
                     case "title":
                         storyArc.setTitle(wn.getTextContent().trim());
+                        break;
+                    case "details":
+                        storyArc.setDetails(wn.getTextContent().trim());
                         break;
                     case "description":
                         storyArc.setDescription(wn.getTextContent().trim());

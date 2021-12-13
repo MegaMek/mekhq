@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc>
     <title>A Test Campaign</title>
-    <description>Just Testing Stuff Out</description>
+    <details>Just for testing</details>
+    <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
     <startingEventId>0807ee06-5b8f-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>

@@ -34,13 +34,13 @@ public class StoryArcPanel extends AbstractMHQPanel {
     private final Campaign campaign;
     private StoryArc storyArc;
     private JLabel lblTitle;
-    private JTextArea txtDescription;
+    private JTextArea txtDetails;
     //endregion Variable Declarations
 
     //region Constructors
     public StoryArcPanel(final JFrame frame, final @Nullable Campaign campaign,
                                final @Nullable StoryArc arc) {
-        super(frame, "CampaignPresetPanel");
+        super(frame, "StoryArcPanel");
         this.campaign = campaign;
         setStoryArc(arc);
         initialize();
@@ -50,10 +50,6 @@ public class StoryArcPanel extends AbstractMHQPanel {
     //region Getters/Setters
     public @Nullable Campaign getCampaign() {
         return campaign;
-    }
-
-    public @Nullable StoryArc getStoryArc() {
-        return storyArc;
     }
 
     public void setStoryArc(final @Nullable StoryArc arc) {
@@ -68,75 +64,43 @@ public class StoryArcPanel extends AbstractMHQPanel {
         this.lblTitle = lblTitle;
     }
 
-    public JTextArea getTxtDescription() {
-        return txtDescription;
+    public JTextArea getTxtDetails() {
+        return txtDetails;
     }
 
-    public void setTxtDescription(final JTextArea txtDescription) {
-        this.txtDescription = txtDescription;
+    public void setTxtDetails(final JTextArea txtDetails) {
+        this.txtDetails = txtDetails;
     }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected void initialize() {
-        //TODO: eventually we can use this same selector to allow users to edit story arcs
-        //final boolean editStoryArc = (getCampaign() != null) && (getStoryArc() != null) && getStoryArc().isUserData();
-
         // Setup the Panel
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createLineBorder(Color.BLACK, 2)));
         setName("storyArcPanel");
-        setLayout(new GridBagLayout());
-
-        // Create the Constraints
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTH;
+        setLayout(new GridLayout(2,1));
 
         // Create Components and Layout
         setLblTitle(new JLabel(""));
         getLblTitle().setName("lblTitle");
-        getLblTitle().setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(getLblTitle(), gbc);
+        getLblTitle().setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        add(getLblTitle());
 
-        /*
-        if (editPreset) { // TODO : Add a way to access this
-            final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
-                    resources.getString("btnEditPreset.toolTipText"), evt -> {
-                final CreateCampaignPresetDialog dialog = new CreateCampaignPresetDialog(
-                        getFrame(), getCampaign(), getPreset());
-                if (dialog.showDialog().isConfirmed()) {
-                    updateFromPreset(getPreset());
-                }
-            });
-            gbc.gridx++;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            add(btnEditPreset, gbc);
-        }
-         */
-
-        setTxtDescription(new JTextArea(""));
-        getTxtDescription().setName("txtDescription");
-        getTxtDescription().setMinimumSize(new Dimension(400, 120));
-        getTxtDescription().setEditable(false);
-        getTxtDescription().setLineWrap(true);
-        getTxtDescription().setWrapStyleWord(true);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        //gbc.gridwidth = editPreset ? 2 : 1;
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        add(getTxtDescription(), gbc);
+        setTxtDetails(new JTextArea(""));
+        getTxtDetails().setName("txtDetails");
+        getTxtDetails().setEditable(false);
+        getTxtDetails().setLineWrap(true);
+        getTxtDetails().setWrapStyleWord(true);
+        getTxtDetails().setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        add(getTxtDetails());
     }
     //endregion Initialization
 
-    protected void updateFromPreset(final StoryArc arc) {
-        getLblTitle().setText(arc.getTitle());
-        getTxtDescription().setText(arc.getDescription());
+    protected void updateFromStoryArc(final StoryArc arc) {
+        getLblTitle().setText("<html><b>" + arc.getTitle() + "</b></html>");
+        getTxtDetails().setText(arc.getDetails());
     }
 }
