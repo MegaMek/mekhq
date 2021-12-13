@@ -26,43 +26,20 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class StoryNarrativeDialog extends JDialog implements ActionListener {
+public class StoryNarrativeDialog extends StoryDialog {
 
     private NarrativeStoryEvent storyEvent;
 
-    private JButton doneButton;
-
     //region Constructors
     public StoryNarrativeDialog(final JFrame parent, NarrativeStoryEvent sEvent) {
-        super(parent, sEvent.getTitle(), true);
+        super(parent, sEvent.getTitle());
         this.storyEvent = sEvent;
-        initGUI();
+        initialize();
     }
     //endregion Constructors
 
-    //region Initialization
-    private void initGUI() {
-        setLayout(new BorderLayout());
-        add(getButtonPanel(), BorderLayout.SOUTH);
-        add(getMainPanel(), BorderLayout.CENTER);
-
-        pack();
-        setLocationRelativeTo(getParent());
-        setResizable(false);
-    }
-
-    private JPanel getButtonPanel() {
-        JPanel buttonPanel = new JPanel(new BorderLayout());
-
-        doneButton = new JButton("Done");
-        //doneButton.setMnemonic('o');
-        doneButton.addActionListener(this);
-        buttonPanel.add(doneButton, BorderLayout.LINE_END);
-
-        return buttonPanel;
-    }
-
-    private JPanel getMainPanel() {
+    @Override
+    protected Container getMainPanel() {
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
 
@@ -75,18 +52,15 @@ public class StoryNarrativeDialog extends JDialog implements ActionListener {
         JScrollPane scrollPane = new JScrollPane(txtDesc);
         mainPanel.add(scrollPane);
 
-        mainPanel.setMinimumSize(new Dimension(400, 400));
-        mainPanel.setPreferredSize(new Dimension(400, 400));
-
         return mainPanel;
     }
     //endregion Initialization
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (doneButton.equals(e.getSource())) {
-            this.setVisible(false);
-        }
+    protected void setDialogSize() {
+        setMinimumSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 400));
+        setMaximumSize(new Dimension(400, 400));
     }
 
 }

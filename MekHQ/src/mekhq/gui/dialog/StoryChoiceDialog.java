@@ -27,44 +27,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
-public class StoryChoiceDialog extends JDialog implements ActionListener {
+public class StoryChoiceDialog extends StoryDialog {
 
     private ChoiceStoryEvent storyEvent;
 
     private ButtonGroup choiceGroup;
 
-    private JButton doneButton;
-
     //region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryEvent sEvent) {
-        super(parent, sEvent.getTitle(), true);
+        super(parent, sEvent.getTitle());
         this.storyEvent = sEvent;
-        initGUI();
+        initialize();
     }
     //endregion Constructors
 
     //region Initialization
-    private void initGUI() {
-        setLayout(new BorderLayout());
-        add(getButtonPanel(), BorderLayout.SOUTH);
-        add(getMainPanel(), BorderLayout.CENTER);
 
-        pack();
-        setLocationRelativeTo(getParent());
-        //setResizable(false);
-    }
-
-    private JPanel getButtonPanel() {
-        JPanel buttonPanel = new JPanel(new BorderLayout());
-
-        doneButton = new JButton("Done");
-        doneButton.addActionListener(this);
-        buttonPanel.add(doneButton, BorderLayout.LINE_END);
-
-        return buttonPanel;
-    }
-
-    private JPanel getMainPanel() {
+    @Override
+    protected Container getMainPanel() {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
@@ -96,21 +76,20 @@ public class StoryChoiceDialog extends JDialog implements ActionListener {
 
         mainPanel.add(btnPanel, BorderLayout.CENTER);
 
-        mainPanel.setMinimumSize(new Dimension(400, 400));
-        mainPanel.setPreferredSize(new Dimension(400, 400));
-
         return mainPanel;
     }
     //endregion Initialization
+
+
+    @Override
+    protected void setDialogSize() {
+        setMinimumSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 400));
+        setMaximumSize(new Dimension(400, 400));
+    }
 
     public String getChoice() {
         return choiceGroup.getSelection().getActionCommand();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (doneButton.equals(e.getSource())) {
-            this.setVisible(false);
-        }
-    }
 }
