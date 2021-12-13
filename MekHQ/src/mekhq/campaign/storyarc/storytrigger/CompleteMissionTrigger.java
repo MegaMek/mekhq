@@ -1,5 +1,5 @@
 /*
- * CompleteStoryEventTrigger.java
+ * CompleteMissionTrigger.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -24,8 +24,10 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.storyevent.MissionStoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -35,24 +37,35 @@ import java.text.ParseException;
 import java.util.UUID;
 
 /**
- * A trigger that completes another story event
+ * A trigger that completes a mission. It can optionally include information on the final victory
+ * status of the mission
  */
-public class CompleteStoryEventTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class CompleteMissionTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
-    UUID storyEventId;
+    UUID missionEventId;
+    MissionStatus missionStatus;
 
     @Override
     protected void execute() {
-        StoryEvent storyEvent = getStoryArc().getStoryEvent(storyEventId);
-        storyEvent.completeEvent();
+        StoryEvent storyEvent = getStoryArc().getStoryEvent(missionEventId);
+        if(storyEvent instanceof MissionStoryEvent) {
+            if(null != missionStatus) {
+                ((MissionStoryEvent) storyEvent).getMission().setStatus(missionStatus);
+            }
+            storyEvent.completeEvent();
+        }
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<storyEventId>"
-                +storyEventId
+                +missionEventId
                 +"</storyEventId>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<missionStatus>"
+                +missionStatus.name()
+                +"</missionStatus>");
         writeToXmlEnd(pw1, indent);
     }
 
@@ -64,8 +77,10 @@ public class CompleteStoryEventTrigger extends StoryTrigger implements Serializa
             Node wn2 = nl.item(x);
 
             try {
-               if (wn2.getNodeName().equalsIgnoreCase("storyEventId")) {
-                    storyEventId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("missionEventId")) {
+                    missionEventId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionStatus")) {
+                    missionStatus = MissionStatus.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

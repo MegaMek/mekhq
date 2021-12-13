@@ -74,8 +74,9 @@
             <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
             <storyOutcomes>
                 <storyOutcome result="Victory">
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
-                        <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                        <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                        <missionStatus>SUCCESS</missionStatus>
                     </storyTrigger>
                 </storyOutcome>
             </storyOutcomes>
@@ -89,8 +90,9 @@
             <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
             <storyOutcomes>
                 <storyOutcome result="Victory">
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
-                        <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                        <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                        <missionStatus>SUCCESS</missionStatus>
                     </storyTrigger>
                 </storyOutcome>
             </storyOutcomes>
@@ -101,8 +103,9 @@
         </storyEvent>
         <storyEvent id="f6d7cc16-5afb-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteStoryEventTrigger">
-                <storyEventId>35b5b068-5946-11ec-bf63-0242ac130002</storyEventId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Last Try Scenario</name>

@@ -75,8 +75,11 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
 
     @Override
     public void completeEvent() {
-        //resolve the mission - for now everyone wins
-        mission.setStatus(MissionStatus.SUCCESS);
+        //Its possible mission status has already changed, but if not then set to failed for now for testing
+        //TODO: create some logic for determining success of mission in cases where user does not specify
+        if(null != mission && mission.getStatus().isActive()) {
+            mission.setStatus(MissionStatus.FAILED);
+        }
         super.completeEvent();
     }
 
