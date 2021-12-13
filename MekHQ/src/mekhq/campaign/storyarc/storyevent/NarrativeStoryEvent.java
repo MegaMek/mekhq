@@ -25,6 +25,8 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.gui.dialog.CampaignPresetSelectionDialog;
+import mekhq.gui.dialog.StoryNarrativeDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -52,10 +54,15 @@ public class NarrativeStoryEvent extends StoryEvent implements Serializable, Mek
         this.narrative = n;
     }
 
+    public String getTitle() { return title; }
+
+    public String getNarrative() { return narrative; }
+
     @Override
     public void startEvent() {
         super.startEvent();
-        JOptionPane.showMessageDialog(null, narrative, title, JOptionPane.PLAIN_MESSAGE);
+        final StoryNarrativeDialog narrativeDialog = new StoryNarrativeDialog(null, this);
+        narrativeDialog.setVisible(true);
         completeEvent();
     }
 

@@ -7,7 +7,7 @@
     <storyEvents>
         <storyEvent id="0807ee06-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>A Test Story Arc</title>
-            <narrative>Welcome to the test story arc! Check out the briefing tab to see what missions and scenarios are available. Have fun!</narrative>
+            <narrative>Welcome to the test *story arc*! Check out the **briefing tab** to see what missions and scenarios are available. Have fun!</narrative>
             <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">

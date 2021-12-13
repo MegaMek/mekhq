@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<storyArc>
+    <title>Young Wolves</title>
+    <description>In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Far more than just a simple Trial of Refusal, the Refusal War would at some point involve most of the Touman of both clans. The outcome of the Refusal War would have long reaching implications for the Clans and the Inner Sphere for generations to come.
+
+    This is the story of a Trinary of young Wolf warriors trying to find their own line in the Rememberance during the Refusal War and the difficult decisions that they were forced to make in this tumultous time.</description>
+    <startNew>true</startNew>
+    <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
+    <storyEvents>
+        <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Colmar</name>
+                <type>Planetary Assault</type>
+                <systemId>Colmar</systemId>
+                <desc></desc>
+            </mission>
+            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+        </storyEvent>
+        <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Baker 3</name>
+                <type>Planetary Assault</type>
+                <systemId>Baker 3</systemId>
+                <desc></desc>
+            </mission>
+            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Devin</name>
+                <type>Planetary Assault</type>
+                <systemId>Devin</systemId>
+                <desc></desc>
+            </mission>
+            <nextEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="a5776ce4-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Denizli</name>
+                <type>Planetary Assault</type>
+                <systemId>Denizli</systemId>
+                <desc></desc>
+            </mission>
+            <nextEventId>bd808af0-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="bd808af0-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Twycross</name>
+                <type>Planetary Assault</type>
+                <systemId>Twycross</systemId>
+                <desc></desc>
+            </mission>
+        </storyEvent>
+        <storyEvent id="dbc0f96e-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Wotan</name>
+                <type>Planetary Assault</type>
+                <systemId>Wotan</systemId>
+                <desc></desc>
+            </mission>
+        </storyEvent>
+        <storyEvent id="ec09c184-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Morges</name>
+                <type>Planetary Assault</type>
+                <systemId>Morges</systemId>
+                <desc></desc>
+            </mission>
+        </storyEvent>
+    </storyEvents>
+</storyArc>
