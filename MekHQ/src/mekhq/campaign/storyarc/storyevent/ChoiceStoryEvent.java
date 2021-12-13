@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.gui.dialog.StoryChoiceDialog;
@@ -73,7 +74,24 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<title>"
+                +title
+                +"</title>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<question>"
+                +question
+                +"</question>");
+        for (Map.Entry<String, String> entry : choices.entrySet()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<choice id=\""
+                    +entry.getKey()
+                    +"\">"
+                    +entry.getValue()
+                    +"</choice>");
+        }
+        writeToXmlEnd(pw1, indent);
     }
 
     @Override
