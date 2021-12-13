@@ -4,27 +4,29 @@
     <details>Just for testing</details>
     <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
-    <startingEventId>3491b950-5bcd-11ec-bf63-0242ac130002</startingEventId>
+    <startingEventId>10700728-5c5b-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>
-        <storyEvent id="0807ee06-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        <storyEvent id="10700728-5c5b-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>A Test Story Arc</title>
             <narrative>Welcome to the test *story arc*! Check out the **briefing tab** to see what missions and scenarios are available. Have fun!</narrative>
+            <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
             <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
-            <storyIcon>
-                <category></category>
-                <filename>splash-mechbay.png</filename>
-            </storyIcon>
         </storyEvent>
         <storyEvent id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>First mission complete!</title>
             <narrative>Congratulations on completing your first mission!</narrative>
             <nextEventId>3491b950-5bcd-11ec-bf63-0242ac130002</nextEventId>
+            <storyIcon>
+                <category></category>
+                <filename>splash-guardduty.png</filename>
+            </storyIcon>
         </storyEvent>
         <storyEvent id="3491b950-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
             <title>What Next?</title>
             <question>Which mission would you like to go on now?</question>
             <choice id="mission2">Mission 2</choice>
             <choice id="mission3">Mission 3</choice>
+            <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
             <storyOutcomes>
                 <storyOutcome result="mission2">
                     <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
@@ -119,7 +121,7 @@
     </storyEvents>
     <personalities>
         <personality id="057e8ef4-5c59-11ec-bf63-0242ac130002">
-            <title>The Fucker in Charge of You Fucks</title>
+            <title>Captain Helperpants</title>
             <portrait>
                 <category>Female/Admin/Command</category>
                 <filename>Adm_Com_F_2.png</filename>

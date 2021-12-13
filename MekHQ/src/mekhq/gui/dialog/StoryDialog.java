@@ -18,10 +18,12 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.campaign.storyarc.Personality;
 import mekhq.campaign.storyarc.StoryEvent;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -79,17 +81,27 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     }
 
     protected JPanel getImagePanel() {
-        JPanel imagePanel = new JPanel();
+        JPanel imagePanel = new JPanel(new BorderLayout());
 
         imgWidth = 0;
         Image img = getStoryEvent().getImage();
+
+        //check for personality as this will override image
+        Personality p = getStoryEvent().getPersonality();
+        if(null != p) {
+            img = p.getImage();
+        }
 
         if(null != img) {
             ImageIcon icon = new ImageIcon(img);
             imgWidth = icon.getIconWidth();
             JLabel imgLbl = new JLabel();
             imgLbl.setIcon(icon);
-            imagePanel.add(imgLbl);
+            imagePanel.add(imgLbl, BorderLayout.CENTER);
+            if(null != p) {
+                //add a caption
+                imagePanel.add(new JLabel(p.getTitle(), SwingConstants.CENTER), BorderLayout.PAGE_END);
+            }
         }
 
         //we can grab and put here in an image panel

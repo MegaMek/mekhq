@@ -59,6 +59,11 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     private StoryIcon storyIcon;
 
     /**
+     * The id of a personality who is associated with this StoryEvent. May be null.
+     */
+    private UUID personalityId;
+
+    /**
      * The id of the next event to start when this one is completed. It can be null if a new event should not be
      * triggered. It can also be overwritten by a StoryOutcome
      * **/
@@ -154,12 +159,19 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * determine the next story event in the story arc based on the event.
-     * This may get overriden by more complex processes in specific event types, but
-     * the default will be to go to the next event it
+     * determine the next story event in the story arc based on the event. This could have been changed depending
+     * on StoryOutcome
      **/
     protected UUID getNextStoryEvent() {
         return nextEventId;
+    }
+
+
+    public Personality getPersonality() {
+        if(null == personalityId) {
+            return null;
+        }
+        return storyArc.getPersonality(personalityId);
     }
 
     //region I/O
@@ -183,13 +195,21 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 .append(active)
                 .append("</active>")
                 .append(NL);
-        if(null != nextEventId) {
-                builder.append(level1)
-                        .append("<nextEventId>")
-                        .append(nextEventId)
-                        .append("</nextEventId>")
-                        .append(NL);
+        if(null != personalityId) {
+            builder.append(level1)
+                    .append("<personalityId>")
+                    .append(personalityId)
+                    .append("</personalityId>")
+                    .append(NL);;
         }
+        if(null != nextEventId) {
+            builder.append(level1)
+                    .append("<nextEventId>")
+                    .append(nextEventId)
+                    .append("</nextEventId>")
+                    .append(NL);
+        }
+
 
         pw1.print(builder.toString());
 
@@ -240,6 +260,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
                     retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personalityId")) {
+                    retVal.personalityId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {

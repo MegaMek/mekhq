@@ -73,7 +73,7 @@ public class Personality implements MekHqXmlSerializable {
     protected UUID getId() { return id; }
 
     public Image getImage() {
-        return portrait.getImage();
+        return portrait.getBaseImage();
     }
     //endregion Getter/Setters
 
