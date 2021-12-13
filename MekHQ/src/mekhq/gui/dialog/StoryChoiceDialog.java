@@ -46,18 +46,36 @@ public class StoryChoiceDialog extends StoryDialog {
     @Override
     protected Container getMainPanel() {
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel mainPanel = new JPanel(new GridBagLayout());
 
-        //TODO: put images here
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0.0;
+        gbc.weighty = 1.0;
+        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        mainPanel.add(getImagePanel(), gbc);
 
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(storyEvent.getQuestion()));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
-        mainPanel.add(scrollPane, BorderLayout.PAGE_START);
+        scrollPane.setPreferredSize(new Dimension(150, 150 ));
+        mainPanel.add(scrollPane, gbc);
 
         //Create the radio buttons.
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.PAGE_AXIS));
         choiceGroup = new ButtonGroup();
@@ -73,8 +91,7 @@ public class StoryChoiceDialog extends StoryDialog {
             }
             firstEntry = false;
         }
-
-        mainPanel.add(btnPanel, BorderLayout.CENTER);
+        mainPanel.add(btnPanel, gbc);
 
         return mainPanel;
     }

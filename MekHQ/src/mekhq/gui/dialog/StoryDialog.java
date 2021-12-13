@@ -63,6 +63,13 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     protected abstract Container getMainPanel();
     //endregion initialization
 
+    protected JPanel getImagePanel() {
+        //TODO: implement. Each StoryEvent should have an optional image file that we
+        //we can grab and put here in an image panel
+        JPanel imagePanel = new JPanel();
+        return imagePanel;
+    }
+
     protected abstract void setDialogSize();
 
     //region Listeners

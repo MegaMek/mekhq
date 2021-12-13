@@ -41,16 +41,26 @@ public class StoryNarrativeDialog extends StoryDialog {
     @Override
     protected Container getMainPanel() {
 
-        JPanel mainPanel = new JPanel(new GridLayout(1, 2));
+        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel mainPanel = new JPanel(new GridBagLayout());
 
-        //TODO: put images here
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        mainPanel.add(getImagePanel(), gbc);
 
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(storyEvent.getNarrative()));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
-        mainPanel.add(scrollPane);
+        mainPanel.add(scrollPane, gbc);
 
         return mainPanel;
     }
