@@ -52,14 +52,13 @@ public class StoryChoiceDialog extends JDialog implements ActionListener {
 
         pack();
         setLocationRelativeTo(getParent());
-        setResizable(false);
+        //setResizable(false);
     }
 
     private JPanel getButtonPanel() {
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        //doneButton.setMnemonic('o');
         doneButton.addActionListener(this);
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
@@ -68,7 +67,7 @@ public class StoryChoiceDialog extends JDialog implements ActionListener {
 
     private JPanel getMainPanel() {
 
-        JPanel mainPanel = new JPanel(new FlowLayout());
+        JPanel mainPanel = new JPanel(new BorderLayout());
 
         //TODO: put images here
 
@@ -77,21 +76,26 @@ public class StoryChoiceDialog extends JDialog implements ActionListener {
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(storyEvent.getQuestion()));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
-        mainPanel.add(scrollPane);
+        mainPanel.add(scrollPane, BorderLayout.PAGE_START);
 
         //Create the radio buttons.
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.PAGE_AXIS));
         choiceGroup = new ButtonGroup();
         JRadioButton radioBtn;
+        boolean firstEntry = true;
         for (Map.Entry<String, String> entry : storyEvent.getChoices().entrySet()) {
             radioBtn = new JRadioButton(entry.getValue());
             radioBtn.setActionCommand(entry.getKey());
             btnPanel.add(radioBtn);
             choiceGroup.add(radioBtn);
+            if(firstEntry) {
+                radioBtn.setSelected(true);
+            }
+            firstEntry = false;
         }
 
-        mainPanel.add(btnPanel);
+        mainPanel.add(btnPanel, BorderLayout.CENTER);
 
         mainPanel.setMinimumSize(new Dimension(400, 400));
         mainPanel.setPreferredSize(new Dimension(400, 400));
