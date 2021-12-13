@@ -1,5 +1,5 @@
 /*
- * StoryEvent.java
+ * ChoiceStoryEvent.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -22,67 +22,62 @@ package mekhq.campaign.storyarc.storyevent;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
-import mekhq.gui.dialog.CampaignPresetSelectionDialog;
+import mekhq.gui.dialog.StoryChoiceDialog;
 import mekhq.gui.dialog.StoryNarrativeDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.UUID;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-/**
- * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
- * immediately.
- */
-public class NarrativeStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
-    String title;
-    String narrative;
+    private String title;
+    private String question;
 
-    public NarrativeStoryEvent() {
+    Map<String, String> choices;
+
+    private String chosen;
+
+    public ChoiceStoryEvent() {
         super();
+        choices = new LinkedHashMap<>();
     }
 
     public String getTitle() { return title; }
 
-    public String getNarrative() { return narrative; }
+    public String getQuestion() { return question; }
+
+    public Map<String, String> getChoices() {
+        return choices;
+    }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        final StoryNarrativeDialog narrativeDialog = new StoryNarrativeDialog(null, this);
-        narrativeDialog.setVisible(true);
+        final StoryChoiceDialog choiceDialog = new StoryChoiceDialog(null, this);
+        choiceDialog.setVisible(true);
+        chosen = choiceDialog.getChoice();
         completeEvent();
     }
 
     @Override
-    public String getResult() {
-        //this one has no variation
-        return "";
+    protected String getResult() {
+        return chosen;
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<title>"
-                +title
-                +"</title>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<narrative>"
-                +narrative
-                +"</narrative>");
-        writeToXmlEnd(pw1, indent);
+
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -91,8 +86,12 @@ public class NarrativeStoryEvent extends StoryEvent implements Serializable, Mek
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("title")) {
                     title =wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
-                    narrative =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("question")) {
+                    question =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("choice")) {
+                    String id = wn2.getAttributes().getNamedItem("id").getTextContent().trim();
+                    String choice =wn2.getTextContent().trim();
+                    choices.put(id, choice);
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

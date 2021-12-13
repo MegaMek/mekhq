@@ -13,8 +13,22 @@
         </storyEvent>
         <storyEvent id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>First mission complete!</title>
-            <narrative>Congratulations on completing your first mission! Now on to your second.</narrative>
-            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+            <narrative>Congratulations on completing your first mission!</narrative>
+            <nextEventId>3491b950-5bcd-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="3491b950-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+            <title>What Next?</title>
+            <question>Which mission would you like to go on now?</question>
+            <choice id="mission2">Mission 2</choice>
+            <choice id="mission3">Mission 3</choice>
+            <storyOutcomes>
+                <storyOutcome result="mission2">
+                    <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+                </storyOutcome>
+                <storyOutcome result="mission3">
+                    <nextEventId>d7617c74-5bcd-11ec-bf63-0242ac130002</nextEventId>
+                </storyOutcome>
+            </storyOutcomes>
         </storyEvent>
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -31,7 +45,15 @@
                 <name>Second Mission</name>
                 <type>Objective Raid</type>
                 <systemId>Terra</systemId>
-                <desc>If everything is working correctly, you should see this mission once your complete the first mission. There is nothing more at this point.</desc>
+                <desc>If everything is working correctly, you should see this mission once you select it from the choice dialog. There is nothing more at this point.</desc>
+            </mission>
+        </storyEvent>
+        <storyEvent id="d7617c74-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Third Mission</name>
+                <type>Riot Duty</type>
+                <systemId>Hall</systemId>
+                <desc>If everything is working correctly, you should see this mission once once you select it from the choice dialog. There is nothing more at this point.</desc>
             </mission>
         </storyEvent>
         <storyEvent id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
