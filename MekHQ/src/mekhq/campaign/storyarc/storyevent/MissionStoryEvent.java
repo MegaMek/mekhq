@@ -90,7 +90,7 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
         if(null == mission || mission.getStatus().isActive()) {
             return "";
         }
-        return mission.getStatus().toString();
+        return mission.getStatus().name();
     }
 
     @Override
