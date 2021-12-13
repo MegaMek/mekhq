@@ -116,7 +116,9 @@ public class StoryArc implements MekHqXmlSerializable {
         if (id == null) {
             return null;
         }
-        return personalities.get(id);
+        Personality p = personalities.get(id);
+        p.updatePersonalityFromCampaign(campaign);
+        return p;
     }
 
     public void begin() {

@@ -26,7 +26,7 @@
             <question>Which mission would you like to go on now?</question>
             <choice id="mission2">Mission 2</choice>
             <choice id="mission3">Mission 3</choice>
-            <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
+            <personalityId>9adeb0c8-69d0-4206-b455-bcca43144df3</personalityId>
             <storyOutcomes>
                 <storyOutcome result="mission2">
                     <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
@@ -126,6 +126,9 @@
                 <category>Female/Admin/Command</category>
                 <filename>Adm_Com_F_2.png</filename>
             </portrait>
+        </personality>
+        <personality id="9adeb0c8-69d0-4206-b455-bcca43144df3">
+            <personCampaignId>590dcabe-e9d9-43ec-8e24-0c3651f1a28c</personCampaignId>
         </personality>
     </personalities>
 </storyArc>

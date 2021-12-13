@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -49,6 +50,12 @@ public class Personality implements MekHqXmlSerializable {
     private Portrait portrait;
 
     private String title;
+
+    /**
+     * optionally a personality can be connected to a Person in the campaign. The personCampaignId identifies
+     * this person
+     */
+    private UUID personCampaignId;
 
     protected static final String NL = System.lineSeparator();
     //endregion Variable Declarations
@@ -77,6 +84,18 @@ public class Personality implements MekHqXmlSerializable {
     }
     //endregion Getter/Setters
 
+    public void updatePersonalityFromCampaign(Campaign c) {
+        if(null == personCampaignId) {
+            return;
+        }
+        Person p = c.getPerson(personCampaignId);
+        if(null == p) {
+            return;
+        }
+        setPortrait(p.getPortrait());
+        setTitle(p.getFullTitle());
+    }
+
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -94,6 +113,13 @@ public class Personality implements MekHqXmlSerializable {
                 .append(title)
                 .append("</title>")
                 .append(NL);
+        if(null != personCampaignId) {
+            builder.append(level1)
+                    .append("<personCampaignId>")
+                    .append(personCampaignId)
+                    .append("</personCampaignId>")
+                    .append(NL);
+        }
 
         pw1.print(builder.toString());
         portrait.writeToXML(pw1, indent + 1);
@@ -115,6 +141,8 @@ public class Personality implements MekHqXmlSerializable {
                     retVal.title = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
                     retVal.portrait = Portrait.parseFromXML(wn2);
+                } else if (wn2.getNodeName().equalsIgnoreCase("personCampaignId")) {
+                    retVal.personCampaignId = UUID.fromString(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
