@@ -26,7 +26,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.gui.dialog.StoryChoiceDialog;
-import mekhq.gui.dialog.StoryNarrativeDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

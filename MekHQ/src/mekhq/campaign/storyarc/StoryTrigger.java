@@ -26,7 +26,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;

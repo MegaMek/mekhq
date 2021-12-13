@@ -25,16 +25,13 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
-import mekhq.gui.dialog.CampaignPresetSelectionDialog;
 import mekhq.gui.dialog.StoryNarrativeDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.UUID;
 
 /**
  * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
