@@ -60,7 +60,7 @@
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <nextEventId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextEventId>
             <storyOutcomes>
-              <storyOutcome result="Victory">
+              <storyOutcome result="PYRRHIC_VICTORY">
                 <nextEventId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</nextEventId>
               </storyOutcome>
             </storyOutcomes>
@@ -73,7 +73,7 @@
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
             <storyOutcomes>
-                <storyOutcome result="Victory">
+                <storyOutcome result="PYRRHIC_VICTORY">
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                         <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
                         <missionStatus>SUCCESS</missionStatus>
@@ -89,7 +89,7 @@
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
             <storyOutcomes>
-                <storyOutcome result="Victory">
+                <storyOutcome result="PYRRHIC_VICTORY">
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                         <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
                         <missionStatus>SUCCESS</missionStatus>

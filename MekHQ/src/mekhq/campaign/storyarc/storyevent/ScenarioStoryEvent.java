@@ -26,6 +26,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryEvent;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,6 +34,7 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -74,15 +76,33 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
         if(null == scenario || scenario.getStatus().isCurrent()) {
             return "";
         }
+        ScenarioStatus status = scenario.getStatus();
 
-        //TODO: I may want to think about how to handle the shades of victory and defeat
-        if(scenario.getStatus().isOverallVictory()) {
-            return "Victory";
-        } else if(scenario.getStatus().isOverallDefeat()) {
-            return "Defeat";
-        } else {
-            return "Draw";
+        //the StoryOutcomes may not include this particular outcome so if this is the case we want to find the next
+        //highest enum that is present.
+
+        //if storyOutcomes are empty, then it doesn't really matter. Also if this status has an entry
+        //in storyOutcomes then return it
+        if(storyOutcomes.isEmpty() || null != storyOutcomes.get(status.name())) {
+            return status.name();
         }
+
+        //ok if we are here then we have storyOutcomes but not an exact match. We want to compare ordinals to get
+        //the next best choice
+        for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
+            if(nextStatus == ScenarioStatus.CURRENT) {
+                //shouldn't happen, but ok
+                continue;
+            }
+            if(null != storyOutcomes.get(nextStatus.name())) {
+                if(status.ordinal() <= nextStatus.ordinal()) {
+                    return nextStatus.name();
+                }
+            }
+        }
+
+        //if we are still here, return nothing because we probably want defaults
+        return "";
     }
 
     @Override
