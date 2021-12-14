@@ -62,7 +62,7 @@ public class Personality implements MekHqXmlSerializable {
 
     //region Constructors
     public Personality() {
-
+        portrait = new Portrait();
     }
     //endregion Constructors
 

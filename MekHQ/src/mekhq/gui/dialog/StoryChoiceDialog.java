@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -49,35 +50,31 @@ public class StoryChoiceDialog extends StoryDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0.0;
         gbc.weighty = 1.0;
-        gbc.gridheight = 2;
         gbc.fill = GridBagConstraints.NONE;
         mainPanel.add(getImagePanel(), gbc);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.0;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.BOTH;
+        JScrollablePanel rightPanel = new JScrollablePanel(new GridBagLayout());
+
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(((ChoiceStoryEvent) getStoryEvent()).getQuestion()));
-        JScrollPane scrollPane = new JScrollPane(txtDesc);
-        scrollPane.setPreferredSize(new Dimension(150, 150 ));
-        mainPanel.add(scrollPane, gbc);
-
-        //Create the radio buttons.
-        gbc.gridy = 1;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.BOTH;
+        rightPanel.add(txtDesc, gbc);
+
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.PAGE_AXIS));
         choiceGroup = new ButtonGroup();
         JRadioButton radioBtn;
         boolean firstEntry = true;
         for (Map.Entry<String, String> entry : ((ChoiceStoryEvent) getStoryEvent()).getChoices().entrySet()) {
-            radioBtn = new JRadioButton(entry.getValue());
+            radioBtn = new JRadioButton("<html>" + entry.getValue() + "</html>");
             radioBtn.setActionCommand(entry.getKey());
             btnPanel.add(radioBtn);
             choiceGroup.add(radioBtn);
@@ -86,7 +83,28 @@ public class StoryChoiceDialog extends StoryDialog {
             }
             firstEntry = false;
         }
-        mainPanel.add(btnPanel, gbc);
+        gbc.gridy = 1;
+        gbc.weighty = 1.0;
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        rightPanel.add(btnPanel, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        JScrollPane scrollPane = new JScrollPane(rightPanel);
+        scrollPane.setMinimumSize(new Dimension(200, 150 ));
+        scrollPane.setPreferredSize(new Dimension(200, 150 ));
+        mainPanel.add(scrollPane, gbc);
+
+        //Create the radio buttons.
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
 
         return mainPanel;
     }

@@ -4,13 +4,90 @@
     <details>Clan Invasion era; Mechs only</details>
     <description># Young Wolves
 
-In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Far more than just a simple Trial of Refusal, the Refusal War would at some point involve most of the Touman of both clans. The outcome of the Refusal War would have long reaching implications for the Clans and the Inner Sphere for generations to come.
+In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Critchell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. Khan Ulric Kerensky fought it to destroy the fighting ability of two of the most powerful clans and thus safeguard Terra a little longer. Far more than just a simple Trial of Refusal, the Refusal War would at some point involve virtually the entire Touman of two clans and its outcome would have far reaching implications for the Clans and the Inner Sphere for generations to come.
 
-This is the story of a Trinary of young Wolf warriors trying to find their own line in the Rememberance during the Refusal War and the difficult decisions that they were forced to make in this tumultous time.
+This is the story of a Trinary of young Wolf warriors trying through glory and sacrifice to write their own line in the Remembrance. The Refusal War will test their nerves, skill, and, most importantly, their loyalty.
     </description>
     <startNew>true</startNew>
-    <startingEventId>35b5b068-5946-11ec-bf63-0242ac130002</startingEventId>
+    <startingEventId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</startingEventId>
     <storyEvents>
+        <storyEvent id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+            <title>A Khan's Greeting</title>
+            <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
+
+                Greetings, Star Captain. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your geneparents and tainted by the Inner Sphere?</question>
+            <choice id="honor">No, My Khan. I consider it a great honor.</choice>
+            <choice id="duty">It would not have been my first choice, but I will do my duty.</choice>
+            <choice id="farce">Your khanship is a farce.</choice>
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <storyOutcomes>
+                <storyOutcome result="honor">
+                    <nextEventId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextEventId>
+                </storyOutcome>
+                <storyOutcome result="duty">
+                    <nextEventId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextEventId>
+                </storyOutcome>
+                <storyOutcome result="farce">
+                    <nextEventId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextEventId>
+                </storyOutcome>
+            </storyOutcomes>
+        </storyEvent>
+        <storyEvent id="e8c9803c-3bda-47f7-9609-176ca461bf88" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>A Khan's Greeting</title>
+            <narrative>
+                *(A slight smile creases her lips)*
+
+                Ulric told me there might be more to you than I thought. Let us hope you can whip those young warriors into something that matters when the time is right.
+
+                 I was planning on holding you in reserve today, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
+            </narrative>
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
+        </storyEvent>
+        <storyEvent id="8e3f8bc0-1625-4901-9bd3-fbf3408eefcb" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>A Khan's Greeting</title>
+            <narrative>
+                *(Kerensky gives you a quizzical look)*
+
+                Spoken like a true soldier. But this is Clan Wolf and I need warriors, not soldiers. You will be sure to let me know if you have problem with my leadership in the future.
+
+                I was planning on holding you in reserve today, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
+            </narrative>
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
+        </storyEvent>
+        <storyEvent id="bbd099bd-f0a2-4323-8d70-ed02b98e1de5" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>A Khan's Greeting</title>
+            <narrative>
+                *(Kerensky's eyes narrow dangerously)*
+
+                I appreciate your honesty if nothing less. Some have died for speaking to me that rudely. But I have no time today.
+
+
+                I was planning on holding you in reserve today, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
+            </narrative>            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
+        </storyEvent>
+        <storyEvent id="276345a4-6168-4999-9381-de5ac56a3d2f" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>Welcome to the LZ!</title>
+            <narrative>Hello, Star Captain. I am Star Commander Louisa and I will be commanding your transport Dropship for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
+
+                ...
+
+                Stravag, someone deal with that flak!
+
+                ...
+
+                Touchdown. Prepare bays for disembarking. Star Captain, you should be good to go. All the information you need should be available in the on-board briefing room. Good hunting, Star Captain!</narrative>
+            <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+            <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>Post-Mission Report</title>
+            <narrative>It looks like your pups cut those teeth today, Star Captain. I am happy to report that the Falcon presence on Colmar have been utterly destroyed. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. Our next date with the Falcons is on Baker 3 and I need you ready to dance.</narrative>
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Colmar</name>
@@ -18,7 +95,8 @@ This is the story of a Trinary of young Wolf warriors trying to find their own l
                 <systemId>Colmar</systemId>
                 <desc></desc>
             </mission>
-            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+            <nextEventId></nextEventId>
+            <scenarioEventId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioEventId>
         </storyEvent>
         <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -27,7 +105,7 @@ This is the story of a Trinary of young Wolf warriors trying to find their own l
                 <systemId>Baker 3</systemId>
                 <desc></desc>
             </mission>
-            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
+            <nextEventId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextEventId>
         </storyEvent>
         <storyEvent id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -71,5 +149,53 @@ This is the story of a Trinary of young Wolf warriors trying to find their own l
                 <desc></desc>
             </mission>
         </storyEvent>
+        <storyEvent id="fd7158c2-1d1b-48e6-8eb3-8a72d580c172" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Cutting Teeth</name>
+                <desc></desc>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyEvent>
     </storyEvents>
+    <personalities>
+        <personality id="c788dea8-35d8-40b2-9fae-78c9f2215120">
+            <title>Former ilKhan Ulric Kerensky</title>
+            <portrait>
+                <category>YoungWolves</category>
+                <filename>UlricKerensky.jpg</filename>
+            </portrait>
+        </personality>
+        <personality id="7147f4c4-176f-4f9a-8081-a36956b49414">
+            <title>Khan Natasha Kerensky</title>
+            <portrait>
+                <category>YoungWolves</category>
+                <filename>NatashaKerensky.jpg</filename>
+            </portrait>
+        </personality>
+        <personality id="e5ab5d97-2483-4358-85bd-cce8aa732e61">
+            <title>saKhan Phelan Ward</title>
+            <portrait>
+                <category>YoungWolves</category>
+                <filename>PhelanWard.jpg</filename>
+            </portrait>
+        </personality>
+        <personality id="f0814fab-9845-497a-bc99-f1f4ecb247eb">
+            <title>Star Captain Vlad</title>
+            <portrait>
+                <category>YoungWolves</category>
+                <filename>Vlad.jpg</filename>
+            </portrait>
+        </personality>
+        <personality id="7abdf95e-bbac-4419-a7bc-9b7542ee9e87">
+            <title>Star Commander Louisa</title>
+            <portrait>
+                <category>Female/Vessel Crewmember</category>
+                <filename>VesCrew_F_6.png</filename>
+            </portrait>
+        </personality>
+    </personalities>
 </storyArc>
