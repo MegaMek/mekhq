@@ -174,7 +174,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
     /**
      * Don't use this method directly as it will not add an id to the added
-     * scenario. Use Campaign#ScenarioStoryEvent instead
+     * scenario. Use Campaign#AddScenario instead
      *
      * @param scenario the scenario to add this this mission
      */
