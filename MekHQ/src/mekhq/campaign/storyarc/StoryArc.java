@@ -23,10 +23,7 @@ package mekhq.campaign.storyarc;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
-import mekhq.MekHqConstants;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
+import mekhq.*;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
@@ -64,6 +61,9 @@ public class StoryArc implements MekHqXmlSerializable {
 
     /** directory path to the initial campaign data for this StoryArc - can be null **/
     private String initCampaignPath;
+
+    /** directory path to this story arc **/
+    private String directoryPath;
 
     protected static final String NL = System.lineSeparator();
 
@@ -105,6 +105,10 @@ public class StoryArc implements MekHqXmlSerializable {
         return new File(initCampaignPath);
     }
 
+    public void setDirectoryPath(String p) { this.directoryPath = p; }
+
+    public String getDirectoryPath() { return directoryPath; }
+
     public StoryEvent getStoryEvent(UUID id) {
         if (id == null) {
             return null;
@@ -123,6 +127,10 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public void begin() {
         getStoryEvent(getStartingEventId()).startEvent();
+    }
+
+    public void initializeDataDirectories() {
+        MHQStaticDirectoryManager.initializeStoryPortraits(getDirectoryPath() + "/data/images/portraits");
     }
 
     private ScenarioStoryEvent findStoryEventByScenarioId(int scenarioId) {
@@ -192,6 +200,11 @@ public class StoryArc implements MekHqXmlSerializable {
                 .append("<startingEventId>")
                 .append(startingEventId)
                 .append("</startingEventId>")
+                .append(NL)
+                .append(level1)
+                .append("<directoryPath>")
+                .append(directoryPath)
+                .append("</directoryPath>")
                 .append(NL);
         pw1.print(builder.toString());
 
@@ -272,6 +285,9 @@ public class StoryArc implements MekHqXmlSerializable {
                     case "startingEventId":
                         storyArc.setStartingEventId(UUID.fromString(wn.getTextContent().trim()));
                         break;
+                    case "directoryPath":
+                        storyArc.setDirectoryPath(wn.getTextContent().trim());
+                        break;
                     case "storyEvents":
                         storyArc.parseStoryEvents(wn.getChildNodes(), c);
                         break;
@@ -329,6 +345,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 continue;
             }
             final StoryArc storyArc = parseFromFile(storyArcFile);
+            storyArc.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
             final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArc != null) {
                 if(initCampaignFile.exists()) {

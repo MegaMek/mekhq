@@ -47,7 +47,7 @@ public class Personality implements MekHqXmlSerializable {
     /** The UUID id of this personality */
     private UUID id;
 
-    private Portrait portrait;
+    private StoryPortrait portrait;
 
     private String title;
 
@@ -62,7 +62,7 @@ public class Personality implements MekHqXmlSerializable {
 
     //region Constructors
     public Personality() {
-        portrait = new Portrait();
+        portrait = new StoryPortrait();
     }
     //endregion Constructors
 
@@ -71,7 +71,7 @@ public class Personality implements MekHqXmlSerializable {
 
     public String getTitle() { return title; }
 
-    public void setPortrait(Portrait p) { this.portrait = p; }
+    public void setPortrait(StoryPortrait p) { this.portrait = p; }
 
     public Portrait getPortrait() { return portrait; }
 
@@ -92,7 +92,8 @@ public class Personality implements MekHqXmlSerializable {
         if(null == p) {
             return;
         }
-        setPortrait(p.getPortrait());
+        portrait.setCategory(p.getPortrait().getCategory());
+        portrait.setFilename(p.getPortrait().getFilename());
         setTitle(p.getFullTitle());
     }
 
@@ -140,7 +141,7 @@ public class Personality implements MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("title")) {
                     retVal.title = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
-                    retVal.portrait = Portrait.parseFromXML(wn2);
+                    retVal.portrait = StoryPortrait.parseFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personCampaignId")) {
                     retVal.personCampaignId = UUID.fromString(wn2.getTextContent().trim());
                 }

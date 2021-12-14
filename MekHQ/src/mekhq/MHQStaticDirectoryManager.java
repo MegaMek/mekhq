@@ -40,6 +40,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
     private static AbstractDirectory storyIconDirectory;
+    private static AbstractDirectory storyPortraitDirectory;
+
 
     // Re-parsing Prevention Variables: They are True at startup and when the specified directory
     // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's
@@ -47,6 +49,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
     private static boolean parseStoryIconDirectory = true;
+    private static boolean parseStoryPortraitDirectory = true;
     //endregion Variable Declarations
 
     //region Constructors
@@ -122,6 +125,24 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             }
         }
     }
+    /**
+     * Parses the user's Story Arc portraits directory when first called or when it was refreshed
+     *
+     * @see #refreshStoryIcons()
+     */
+    public static void initializeStoryPortraits(String path) {
+        // Read in and parse MekHQ's force icon folder only when first called or when refreshed
+        if (parseStoryPortraitDirectory) {
+            // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
+            parseStoryPortraitDirectory = false;
+            try {
+                storyPortraitDirectory = new DirectoryItems(new File(path),
+                        new ImageFileFactory());
+            } catch (Exception e) {
+                MegaMek.getLogger().error("Could not parse the storyarc portrait directory!", e);
+            }
+        }
+    }
     //endregion Initialization
 
     //region Getters
@@ -156,6 +177,17 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     public static @Nullable AbstractDirectory getStoryIcons() {
         initializeStoryIcons();
         return storyIconDirectory;
+    }
+
+    /**
+     * Returns an AbstractDirectory object containing all story portrait filenames found in the user's
+     * storyarc portraits folder.
+     * @return an AbstractDirectory object with the story portrait folders and filenames.
+     * May be null if the directory cannot be parsed.
+     */
+    public static @Nullable AbstractDirectory getStoryPortraits() {
+        //we do not initialize here because initialization requires a specific path
+        return storyPortraitDirectory;
     }
     //endregion Getters
 

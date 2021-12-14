@@ -164,28 +164,28 @@ This is the story of a Trinary of young Wolf warriors trying through glory and s
         <personality id="c788dea8-35d8-40b2-9fae-78c9f2215120">
             <title>Former ilKhan Ulric Kerensky</title>
             <portrait>
-                <category>YoungWolves</category>
+                <category></category>
                 <filename>UlricKerensky.jpg</filename>
             </portrait>
         </personality>
         <personality id="7147f4c4-176f-4f9a-8081-a36956b49414">
             <title>Khan Natasha Kerensky</title>
             <portrait>
-                <category>YoungWolves</category>
+                <category></category>
                 <filename>NatashaKerensky.jpg</filename>
             </portrait>
         </personality>
         <personality id="e5ab5d97-2483-4358-85bd-cce8aa732e61">
             <title>saKhan Phelan Ward</title>
             <portrait>
-                <category>YoungWolves</category>
+                <category></category>
                 <filename>PhelanWard.jpg</filename>
             </portrait>
         </personality>
         <personality id="f0814fab-9845-497a-bc99-f1f4ecb247eb">
             <title>Star Captain Vlad</title>
             <portrait>
-                <category>YoungWolves</category>
+                <category></category>
                 <filename>Vlad.jpg</filename>
             </portrait>
         </personality>

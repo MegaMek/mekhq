@@ -4009,6 +4009,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void useStoryArc(StoryArc arc, boolean initiate) {
         arc.setCampaign(this);
+        arc.initializeDataDirectories();
         this.storyArc = arc;
         if(initiate) {
             storyArc.begin();
