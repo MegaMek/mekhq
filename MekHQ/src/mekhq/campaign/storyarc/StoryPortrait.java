@@ -65,8 +65,8 @@ public class StoryPortrait extends Portrait {
             portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem(category, filename);
             if (portrait == null) {
                 //ok lets see if this portrait is in the story arc data
-                if(null != MHQStaticDirectoryManager.getStoryPortraits()) {
-                    portrait = (Image) MHQStaticDirectoryManager.getStoryPortraits().getItem(category, filename);
+                if(null != MHQStaticDirectoryManager.getUserStoryPortraits()) {
+                    portrait = (Image) MHQStaticDirectoryManager.getUserStoryPortraits().getItem(category, filename);
                 }
                 if(portrait == null) {
                     //if its still null, then try the default image

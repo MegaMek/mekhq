@@ -56,13 +56,21 @@ public class StoryIcon extends AbstractIcon {
         final String category = hasDefaultCategory() ? "" : getCategory();
         final String filename = hasDefaultFilename() ? DEFAULT_ICON_FILENAME : getFilename();
 
-        // Try to get the player's portrait file.
+        // Try to get the player's storyarc file.
         Image storyIcon = null;
         try {
             storyIcon = (Image) MHQStaticDirectoryManager.getStoryIcons().getItem(category, filename);
             if (storyIcon == null) {
-                storyIcon = (Image) MHQStaticDirectoryManager.getStoryIcons().getItem("",
-                        DEFAULT_ICON_FILENAME);
+                //ok lets see if this image is in the story arc data
+                if(null != MHQStaticDirectoryManager.getUserStoryIcons()) {
+                    storyIcon = (Image) MHQStaticDirectoryManager.getUserStoryIcons().getItem(category, filename);
+                }
+
+                if (storyIcon == null) {
+                    //if still null, then try default
+                    storyIcon = (Image) MHQStaticDirectoryManager.getStoryIcons().getItem("",
+                            DEFAULT_ICON_FILENAME);
+                }
             }
         } catch (Exception e) {
             MegaMek.getLogger().error(e);

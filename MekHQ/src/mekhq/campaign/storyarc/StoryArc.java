@@ -130,7 +130,9 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     public void initializeDataDirectories() {
-        MHQStaticDirectoryManager.initializeStoryPortraits(getDirectoryPath() + "/data/images/portraits");
+        MHQStaticDirectoryManager.initializeUserStoryPortraits(getDirectoryPath() + "/data/images/portraits");
+        MHQStaticDirectoryManager.initializeUserStoryIcons(getDirectoryPath() + "/data/images/storyarc");
+
     }
 
     private ScenarioStoryEvent findStoryEventByScenarioId(int scenarioId) {
