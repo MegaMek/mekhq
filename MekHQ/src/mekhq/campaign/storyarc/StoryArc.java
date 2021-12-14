@@ -26,7 +26,9 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
+import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
 import org.w3c.dom.*;
 
 import java.io.File;
@@ -159,6 +161,22 @@ public class StoryArc implements MekHqXmlSerializable {
         ScenarioStoryEvent storyEvent = findStoryEventByScenarioId(ev.getScenario().getId());
         if(null != storyEvent) {
             storyEvent.completeEvent();
+        }
+    }
+
+    @Subscribe
+    public void handleTransitComplete(TransitCompleteEvent ev) {
+        //search through StoryEvents for a matching TravelStoryEvent
+        TravelStoryEvent storyEvent;
+        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+            if (entry.getValue() instanceof TravelStoryEvent) {
+                 storyEvent = (TravelStoryEvent) entry.getValue();
+                 if(ev.getLocation().getCurrentSystem().getId().equals(storyEvent.getDestinationId())) {
+                     storyEvent.completeEvent();
+                     break;
+                }
+
+            }
         }
     }
     //endregion EventHandlers
