@@ -159,7 +159,7 @@ public class StoryArc implements MekHqXmlSerializable {
     public void handleScenarioResolved(ScenarioResolvedEvent ev) {
         //search through ScenarioStoryEvents for a match and if so complete it
         ScenarioStoryEvent storyEvent = findStoryEventByScenarioId(ev.getScenario().getId());
-        if(null != storyEvent) {
+        if(null != storyEvent && storyEvent.isActive()) {
             storyEvent.completeEvent();
         }
     }
@@ -171,7 +171,8 @@ public class StoryArc implements MekHqXmlSerializable {
         for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
             if (entry.getValue() instanceof TravelStoryEvent) {
                  storyEvent = (TravelStoryEvent) entry.getValue();
-                 if(ev.getLocation().getCurrentSystem().getId().equals(storyEvent.getDestinationId())) {
+                 if(ev.getLocation().getCurrentSystem().getId().equals(storyEvent.getDestinationId()) &&
+                         storyEvent.isActive()) {
                      storyEvent.completeEvent();
                      break;
                 }
