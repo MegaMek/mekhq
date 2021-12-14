@@ -74,8 +74,6 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
         StoryArcSelectionPane selectionPane = new StoryArcSelectionPane(getFrame());
         setSelectionPanel(selectionPane);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.LINE_AXIS));
         mainPanel.add(selectionPane);

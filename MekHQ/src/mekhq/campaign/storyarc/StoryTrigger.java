@@ -61,8 +61,7 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
+        String level = MekHqXmlUtil.indentStr(indent);
 
         StringBuilder builder = new StringBuilder(256);
         builder.append(level)

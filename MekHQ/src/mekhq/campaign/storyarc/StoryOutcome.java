@@ -100,7 +100,6 @@ public class StoryOutcome implements MekHqXmlSerializable {
 
     public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c) {
         StoryOutcome retVal = null;
-        NamedNodeMap attrs = wn.getAttributes();
 
         try {
             retVal = new StoryOutcome();

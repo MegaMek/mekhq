@@ -56,6 +56,7 @@ public class CompleteMissionTrigger extends StoryTrigger implements Serializable
         }
     }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)

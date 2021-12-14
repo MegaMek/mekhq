@@ -137,6 +137,11 @@ public class StoryArc implements MekHqXmlSerializable {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return getTitle();
+    }
+
     //region EventHandlers
     @Subscribe
     public void handleScenarioResolved(ScenarioResolvedEvent ev) {
@@ -210,7 +215,7 @@ public class StoryArc implements MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        wn.getNodeName()!="storyEvent") {
+                        !wn.getNodeName().equals("storyEvent")) {
                     continue;
                 }
                 StoryEvent event = StoryEvent.generateInstanceFromXML(wn, c);
@@ -229,7 +234,7 @@ public class StoryArc implements MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        wn.getNodeName()!="personality") {
+                        !wn.getNodeName().equals("personality")) {
                     continue;
                 }
                 Personality personality = Personality.generateInstanceFromXML(wn, c);
@@ -294,13 +299,13 @@ public class StoryArc implements MekHqXmlSerializable {
      * @return a list of all of the story arcs in the default and userdata folders
      */
     public static List<StoryArc> getStoryArcs() {
-        final List<StoryArc> presets = loadStoryArcsFromDirectory(
+        final List<StoryArc> arcs = loadStoryArcsFromDirectory(
                 new File(MekHqConstants.STORY_ARC_DIRECTORY));
-        presets.addAll(loadStoryArcsFromDirectory(
+        arcs.addAll(loadStoryArcsFromDirectory(
                 new File(MekHqConstants.USER_STORY_ARC_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
-        presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
-        return presets;
+        arcs.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
+        return arcs;
     }
 
     public static List<StoryArc> loadStoryArcsFromDirectory(final @Nullable File directory) {
