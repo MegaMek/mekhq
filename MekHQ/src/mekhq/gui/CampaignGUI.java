@@ -756,7 +756,7 @@ public class CampaignGUI extends JPanel {
         miRefreshStoryIcons.setName("miRefreshAwards");
         miRefreshStoryIcons.setMnemonic(KeyEvent.VK_A);
         miRefreshStoryIcons.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshStoryIcons();
+            MHQStaticDirectoryManager.refreshStorySplash();
             refreshAllTabs();
         });
         menuRefresh.add(miRefreshStoryIcons);

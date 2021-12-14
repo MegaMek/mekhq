@@ -55,8 +55,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     /** A boolean that tracks whether the event is currently active **/
     private boolean active;
 
-    /** A StoryIcon image to display in a dialog. It can return a null image */
-    private StoryIcon storyIcon;
+    /** A StorySplash image to display in a dialog. It can return a null image */
+    private StorySplash storySplash;
 
     /**
      * The id of a personality who is associated with this StoryEvent. May be null.
@@ -81,7 +81,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
         storyTriggers = new ArrayList<>();
-        storyIcon = new StoryIcon();
+        storySplash = new StorySplash();
     }
 
     public void setStoryArc(StoryArc a) {
@@ -107,10 +107,10 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     public abstract String getTitle();
 
     public Image getImage() {
-        if(storyIcon.isDefault()) {
+        if(storySplash.isDefault()) {
             return null;
         }
-        return storyIcon.getImage();
+        return storySplash.getImage();
     }
 
     /**
@@ -228,7 +228,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 trigger.writeToXml(pw1, indent + 1);
             }
         }
-        storyIcon.writeToXML(pw1, indent + 1);
+        storySplash.writeToXML(pw1, indent + 1);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -267,8 +267,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
                     retVal.storyTriggers.add(trigger);
-                } else if (wn2.getNodeName().equalsIgnoreCase(StoryIcon.XML_TAG)) {
-                    retVal.storyIcon = StoryIcon.parseFromXML(wn2);
+                } else if (wn2.getNodeName().equalsIgnoreCase(StorySplash.XML_TAG)) {
+                    retVal.storySplash = StorySplash.parseFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("storyOutcomes")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

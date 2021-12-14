@@ -4,7 +4,7 @@
     <details>Just for testing</details>
     <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
-    <startingEventId>500511f2-5b8f-11ec-bf63-0242ac130002</startingEventId>
+    <startingEventId>10700728-5c5b-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>
         <storyEvent id="10700728-5c5b-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>A Test Story Arc</title>
@@ -16,10 +16,10 @@
             <title>First mission complete!</title>
             <narrative>Congratulations on completing your first mission!</narrative>
             <nextEventId>3491b950-5bcd-11ec-bf63-0242ac130002</nextEventId>
-            <storyIcon>
+            <StorySplash>
                 <category></category>
                 <filename>splash-guardduty.png</filename>
-            </storyIcon>
+            </StorySplash>
         </storyEvent>
         <storyEvent id="3491b950-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
             <title>What Next?</title>

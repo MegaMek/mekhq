@@ -39,8 +39,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Variable Declarations
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
-    private static AbstractDirectory storyIconDirectory;
-    private static AbstractDirectory userStoryIconDirectory;
+    private static AbstractDirectory storySplashDirectory;
+    private static AbstractDirectory userStorySplashDirectory;
     private static AbstractDirectory userStoryPortraitDirectory;
 
     // Re-parsing Prevention Variables: They are True at startup and when the specified directory
@@ -48,8 +48,8 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // an error.
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
-    private static boolean parseStoryIconDirectory = true;
-    private static boolean parseUserStoryIconDirectory = true;
+    private static boolean parseStorySplashDirectory = true;
+    private static boolean parseUserStorySplashDirectory = true;
     private static boolean parseUserStoryPortraitDirectory = true;
     //endregion Variable Declarations
 
@@ -67,7 +67,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         MMStaticDirectoryManager.initialize();
         initializeForceIcons();
         initializeAwardIcons();
-        initializeStoryIcons();
+        initializeStorySplash();
     }
 
     /**
@@ -111,15 +111,15 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     /**
      * Parses MekHQ's storyarcs icon folder when first called or when it was refreshed.
      *
-     * @see #refreshStoryIcons()
+     * @see #refreshStorySplash()
      */
-    private static void initializeStoryIcons() {
+    private static void initializeStorySplash() {
         // Read in and parse MekHQ's force icon folder only when first called or when refreshed
-        if (parseStoryIconDirectory) {
+        if (parseStorySplashDirectory) {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
-            parseStoryIconDirectory = false;
+            parseStorySplashDirectory = false;
             try {
-                storyIconDirectory = new DirectoryItems(new File("data/images/storyarc"), // TODO : remove inline file path
+                storySplashDirectory = new DirectoryItems(new File("data/images/storysplash"), // TODO : remove inline file path
                         new ImageFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the storyarc icon directory!", e);
@@ -130,7 +130,6 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     /**
      * Parses the user's Story Arc portraits directory when first called or when it was refreshed
      *
-     * @see #refreshStoryIcons()
      */
     public static void initializeUserStoryPortraits(String path) {
         // Read in and parse MekHQ's force icon folder only when first called or when refreshed
@@ -149,15 +148,14 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     /**
      * Parses the user's Story Arc storyarcs directory when first called or when it was refreshed
      *
-     * @see #refreshStoryIcons()
      */
-    public static void initializeUserStoryIcons(String path) {
+    public static void initializeUserStorySplash(String path) {
         // Read in and parse MekHQ's force icon folder only when first called or when refreshed
-        if (parseUserStoryIconDirectory) {
+        if (parseUserStorySplashDirectory) {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
-            parseUserStoryIconDirectory = false;
+            parseUserStorySplashDirectory = false;
             try {
-                userStoryIconDirectory = new DirectoryItems(new File(path),
+                userStorySplashDirectory = new DirectoryItems(new File(path),
                         new ImageFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the storyarc directory!", e);
@@ -195,9 +193,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * @return an AbstractDirectory object with the story icon folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable AbstractDirectory getStoryIcons() {
-        initializeStoryIcons();
-        return storyIconDirectory;
+    public static @Nullable AbstractDirectory getStorySplash() {
+        initializeStorySplash();
+        return storySplashDirectory;
     }
 
     /**
@@ -217,9 +215,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * @return an AbstractDirectory object with the story portrait folders and filenames.
      * May be null if the directory cannot be parsed.
      */
-    public static @Nullable AbstractDirectory getUserStoryIcons() {
+    public static @Nullable AbstractDirectory getUserStorySplash() {
         //we do not initialize here because initialization requires a specific path
-        return userStoryIconDirectory;
+        return userStorySplashDirectory;
     }
     //endregion Getters
 
@@ -253,11 +251,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * will update the AbstractDirectory object with changes to the story icons (like added image
      * files and folders) while MekHQ is running.
      *
-     * @see #getStoryIcons()
+     * @see #getStorySplash()
      */
-    public static AbstractDirectory refreshStoryIcons() {
-        parseStoryIconDirectory = true;
-        return getStoryIcons();
+    public static AbstractDirectory refreshStorySplash() {
+        parseStorySplashDirectory = true;
+        return getStorySplash();
     }
     //endregion Refreshers
 

@@ -131,7 +131,7 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public void initializeDataDirectories() {
         MHQStaticDirectoryManager.initializeUserStoryPortraits(getDirectoryPath() + "/data/images/portraits");
-        MHQStaticDirectoryManager.initializeUserStoryIcons(getDirectoryPath() + "/data/images/storyarc");
+        MHQStaticDirectoryManager.initializeUserStorySplash(getDirectoryPath() + "/data/images/storysplash");
 
     }
 
