@@ -277,9 +277,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
 
-            if(null != storyArc) {
-                campaign.useStoryArc(storyArc, true);
-            }
             //endregion Progress 4
 
             return campaign;
@@ -339,6 +336,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 frame.setVisible(false);
                 frame.dispose();
                 app.showNewView();
+                if(null != storyArc) {
+                    campaign.useStoryArc(storyArc, true);
+                }
             }
         }
     }
