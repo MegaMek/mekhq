@@ -83,6 +83,12 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
                 +"<question>"
                 +question
                 +"</question>");
+        if(null != chosen) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<chosen>"
+                    +chosen
+                    +"</chosen>");
+        }
         for (Map.Entry<String, String> entry : choices.entrySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<choice id=\""
@@ -110,6 +116,8 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
                     String id = wn2.getAttributes().getNamedItem("id").getTextContent().trim();
                     String choice =wn2.getTextContent().trim();
                     choices.put(id, choice);
+                } else if (wn2.getNodeName().equalsIgnoreCase("chosen")) {
+                    chosen =wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
