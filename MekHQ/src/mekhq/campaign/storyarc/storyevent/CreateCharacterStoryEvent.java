@@ -24,10 +24,12 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
@@ -38,6 +40,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 public class CreateCharacterStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
 
@@ -59,6 +62,10 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
 
     private String instructions;
     private boolean editOrigin;
+
+    /** ids to assign person to unit and force **/
+    private UUID assignedUnitId;
+    private int assignedForceId;
 
 
     public CreateCharacterStoryEvent() {
@@ -113,6 +120,17 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         Person person = createPerson();
         final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, instructions, editOrigin);
         getCampaign().importPerson(person);
+        if(null != assignedUnitId) {
+            Unit u = getCampaign().getUnit(assignedUnitId);
+            if (null != u && u.isUnmanned()) {
+                u.addPilotOrSoldier(person, false);
+                //only assign to force if properly assigned to a unit
+                Force force = getCampaign().getForce(assignedForceId);
+                if(null != force && null != person.getUnit()) {
+                    getCampaign().addUnitToForce(u, force.getId());
+                }
+            }
+        }
         personDialog.setVisible(true);
         completeEvent();
     }
@@ -163,6 +181,10 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                     editOrigin = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }  else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
                     instructions = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignedUnitId")) {
+                    assignedUnitId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignedForceId")) {
+                    assignedForceId = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
