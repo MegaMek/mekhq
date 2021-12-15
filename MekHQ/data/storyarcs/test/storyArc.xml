@@ -4,8 +4,19 @@
     <details>Just for testing</details>
     <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
-    <startingEventId>10700728-5c5b-11ec-bf63-0242ac130002</startingEventId>
+    <startingEventId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingEventId>
     <storyEvents>
+        <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
+            <xpPool>25</xpPool>
+            <rank>34</rank>
+            <firstname>Harry</firstname>
+            <bloodname>Christu</bloodname>
+            <age>35</age>
+            <clan>true</clan>
+            <phenotype>MECHWARRIOR</phenotype>
+            <primaryRole>MECHWARRIOR</primaryRole>
+            <nextEventId>10700728-5c5b-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
         <storyEvent id="6116e791-ea40-4435-8f45-e2c696f4da2b" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
             <destinationId>Acamar</destinationId>
             <nextEventId>10700728-5c5b-11ec-bf63-0242ac130002</nextEventId>
