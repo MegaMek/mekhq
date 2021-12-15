@@ -30,8 +30,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.dialog.CustomizePersonDialog;
-import mekhq.gui.dialog.StoryCreateCharacterDialog;
+import mekhq.gui.dialog.CreateCharacterDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -107,7 +106,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     public void startEvent() {
         super.startEvent();
         Person person = createPerson();
-        final StoryCreateCharacterDialog personDialog = new StoryCreateCharacterDialog(null, true, person, getCampaign(), xpPool, "Just a test Just a **test** Just a test Just a test Just a test Just a test Just a test Just a test", false);
+        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, "Just a test Just a **test** Just a test Just a test Just a test Just a test Just a test Just a test", false);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         completeEvent();

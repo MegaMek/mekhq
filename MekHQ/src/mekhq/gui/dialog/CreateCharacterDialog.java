@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
  * This dialog is used to create a character in story arcs from a pool of XP
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class StoryCreateCharacterDialog extends JDialog implements DialogOptionListener {
+public class CreateCharacterDialog extends JDialog implements DialogOptionListener {
 
     private Person person;
     private boolean editOrigin;
@@ -106,8 +106,8 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
     //endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
-    public StoryCreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign,
-                                      int xpPool, String instructions, boolean editOrigin) {
+    public CreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign,
+                                 int xpPool, String instructions, boolean editOrigin) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
