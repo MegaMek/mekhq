@@ -18,20 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -42,46 +28,33 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.event.GMModeEvent;
-import mekhq.campaign.event.MissionChangedEvent;
-import mekhq.campaign.event.MissionCompletedEvent;
-import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.MissionRemovedEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
-import mekhq.campaign.event.ScenarioNewEvent;
-import mekhq.campaign.event.ScenarioRemovedEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.dialog.ChooseMulFilesDialog;
-import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
-import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -425,10 +398,10 @@ public final class BriefingTab extends CampaignGuiTab {
     private void deleteMission() {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
-            MekHQ.getLogger().error("Cannot remove null mission");
+            LogManager.getLogger().error("Cannot remove null mission");
             return;
         }
-        MekHQ.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
+        LogManager.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
@@ -777,7 +750,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         if (undeployed.length() > 0) {
