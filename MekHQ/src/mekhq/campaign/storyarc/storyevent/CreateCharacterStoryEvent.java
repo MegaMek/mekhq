@@ -31,6 +31,7 @@ import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CustomizePersonDialog;
+import mekhq.gui.dialog.StoryCreateCharacterDialog;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -106,7 +107,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     public void startEvent() {
         super.startEvent();
         Person person = createPerson();
-        final CustomizePersonDialog personDialog = new CustomizePersonDialog(null, true, person,getCampaign());
+        final StoryCreateCharacterDialog personDialog = new StoryCreateCharacterDialog(null, true, person,getCampaign());
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         completeEvent();
