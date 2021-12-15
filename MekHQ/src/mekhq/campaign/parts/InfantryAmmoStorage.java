@@ -18,13 +18,15 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import megamek.common.AmmoType;
+import megamek.common.EquipmentType;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -62,7 +64,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
                 this.name = weaponType.getShortName() + " Ammo";
             }
         } else {
-            MekHQ.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
+            LogManager.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 

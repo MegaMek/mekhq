@@ -20,19 +20,18 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 public class UnitStub implements Serializable {
     //region Variable Declarations
@@ -120,7 +119,7 @@ public class UnitStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
         return retVal;
     }

@@ -19,10 +19,10 @@
 package mekhq.campaign.personnel.ranks;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.util.HashSet;
@@ -69,11 +69,11 @@ public class RankValidator {
 
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
-                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    LogManager.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
                             + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
                             + " is duplicated by userData Rank System " + rankSystem);
                 } else {
-                    MekHQ.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    LogManager.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
                             + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
                             + " is duplicated by " + rankSystem);
                 }
@@ -90,7 +90,7 @@ public class RankValidator {
         // First, let's check the size, as we currently require a size equal to the total number of
         // rank tiers
         if (rankSystem.getRanks().size() != Rank.RC_NUM) {
-            MekHQ.getLogger().error(String.format("Illegal number of ranks of %d when %d is required",
+            LogManager.getLogger().error(String.format("Illegal number of ranks of %d when %d is required",
                     rankSystem.getRanks().size(), Rank.RC_NUM));
             return false;
         }
@@ -102,7 +102,7 @@ public class RankValidator {
         final Set<Profession> defaultProfessions = new HashSet<>(); // Professions with legal level 1 names
         for (final Profession profession : professions) {
             if (initialRank.isEmpty(profession)) {
-                MekHQ.getLogger().error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
+                LogManager.getLogger().error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
                 return false;
             } else if (!initialRank.indicatesAlternativeSystem(profession)) {
                 defaultProfessions.add(profession);
@@ -111,7 +111,7 @@ public class RankValidator {
 
         // We do require a single default profession
         if (defaultProfessions.isEmpty()) {
-            MekHQ.getLogger().error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
+            LogManager.getLogger().error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
         }
 
         // Now, we need to check each profession
@@ -155,10 +155,10 @@ public class RankValidator {
     private boolean validateRankAlternatives(final Rank rank, final Profession profession,
                                              final int maxRecursions, final int recursion) {
         if (recursion > maxRecursions) {
-            MekHQ.getLogger().error("Hit max recursions, rank system contains an infinite loop");
+            LogManager.getLogger().error("Hit max recursions, rank system contains an infinite loop");
             return false;
         } else if (rank.isEmpty(profession)) {
-            MekHQ.getLogger().error("Cannot have an empty value as an alternative");
+            LogManager.getLogger().error("Cannot have an empty value as an alternative");
             return false;
         } else if (rank.indicatesAlternativeSystem(profession)) {
             return validateRankAlternatives(rank, profession.getAlternateProfession(rank),

@@ -19,11 +19,11 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import megamek.Version;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.Profession;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -133,7 +133,7 @@ public class Rank implements Serializable {
                 try {
                     level = Integer.parseInt(split[1].trim());
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
             getRankNames().put(profession, name);
@@ -222,7 +222,7 @@ public class Rank implements Serializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
 

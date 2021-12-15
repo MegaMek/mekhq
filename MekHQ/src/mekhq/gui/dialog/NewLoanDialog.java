@@ -30,6 +30,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.rating.IUnitRating;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -550,7 +551,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
