@@ -828,8 +828,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
             spnLevel.setEnabled(chkSkill.isSelected());
             spnBonus = new JSpinner(new SpinnerNumberModel(bonus, -8, 8, 1));
-            spnBonus.addChangeListener(evt -> changeSkillValue(type));
-            spnBonus.setEnabled(chkSkill.isSelected());
+            //spnBonus.addChangeListener(evt -> changeSkillValue(type));
+            //the bonus should be disabled that comes from phenotype
+            spnBonus.setEnabled(false);
             skillLvls.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
 
@@ -1095,7 +1096,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void changeValueEnabled(String type) {
         skillLvls.get(type).setEnabled(skillChks.get(type).isSelected());
-        skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
+        //skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {
