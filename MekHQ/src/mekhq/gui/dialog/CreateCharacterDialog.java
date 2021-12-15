@@ -20,6 +20,8 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.GBC;
+import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
@@ -27,6 +29,7 @@ import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
@@ -63,6 +66,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private boolean editOrigin;
     private String instructions;
     private int xpPool;
+
+    private Portrait portrait;
 
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
     private Map<String, JSpinner> skillLvls = new Hashtable<>();
@@ -124,6 +129,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         birthdate = person.getBirthday();
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
+        portrait = person.getPortrait();
         if(null == instructions) {
             instructions = resourceMap.getString("instructions.text");
         }
@@ -591,20 +597,37 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
+        JButton portraitButton = new JButton();
+        portraitButton.setMinimumSize(new Dimension(72, 72));
+        portraitButton.setPreferredSize(new Dimension(72, 72));
+        portraitButton.setName("portrait");
+        portraitButton.addActionListener(e -> {
+            final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(
+                    null, portrait);
+            portraitDialog.setAlwaysOnTop(true);
+            if (portraitDialog.showDialog().isConfirmed()) {
+                portrait = portraitDialog.getSelectedItem();
+                portraitButton.setIcon(portraitDialog.getSelectedItem().getImageIcon());
+            }
+        });
+
+        portraitButton.setIcon(portrait.getImageIcon());
+        topPanel.add(portraitButton, BorderLayout.LINE_START);
+
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(instructions));
-        txtDesc.setPreferredSize(new Dimension(200, 50));
+        txtDesc.setPreferredSize(new Dimension(150, 72));
         txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")));
         topPanel.add(txtDesc, BorderLayout.CENTER);
 
         JPanel panXpLeft = new JPanel();
         panXpLeft.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panXpLeft.title")));
         lblXpLeft = new JLabel("0", JLabel.CENTER);
-        lblXpLeft.setMinimumSize(new Dimension(100, 50));
-        lblXpLeft.setPreferredSize(new Dimension(100, 50));
-        lblXpLeft.setFont(new Font("Sans-Serif", Font.BOLD, 24));
+        lblXpLeft.setMinimumSize(new Dimension(100, 72));
+        lblXpLeft.setPreferredSize(new Dimension(100, 72));
+        lblXpLeft.setFont(new Font("Sans-Serif", Font.BOLD, 32));
         panXpLeft.add(lblXpLeft);
         topPanel.add(panXpLeft, BorderLayout.LINE_END);
 
@@ -1212,6 +1235,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
+        person.setPortrait(portrait);
         setSkills();
         setOptions();
         setVisible(false);
