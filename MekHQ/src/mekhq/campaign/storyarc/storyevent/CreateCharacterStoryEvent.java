@@ -59,6 +59,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     private boolean clan;
     private Phenotype phenotype;
     private boolean commander;
+    private int edge;
 
     private String instructions;
     private boolean editOrigin;
@@ -108,6 +109,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         p.setBloodname(bloodname);
         p.setBiography(biography);
         p.setRank(rank);
+        p.changeEdge(edge);
 
         p.setBirthday(getCampaign().getLocalDate().minus(age, ChronoUnit.YEARS));
 
@@ -185,6 +187,8 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                     assignedUnitId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignedForceId")) {
                     assignedForceId = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
+                    edge = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

@@ -23,6 +23,7 @@ This is a story arc in active development. Try at your own risk!
             <clan>true</clan>
             <phenotype>MECHWARRIOR</phenotype>
             <primaryRole>MECHWARRIOR</primaryRole>
+            <edge>3</edge>
             <instructions>
                 Use this form to create a new Clan Wolf mechwarrior for the story arc. You have a pool of XP that you can use to buy skills and special abilities. Any leftover XP will be added to your character.
             </instructions>

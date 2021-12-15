@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.GBC;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -653,8 +652,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
-        if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
-                || campaign.getCampaignOptions().useImplants()) {
+        if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useImplants()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
 
@@ -911,8 +909,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 continue;
             }
 
-            if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useEdge()) {
+            if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)) {
                 continue;
             }
 
