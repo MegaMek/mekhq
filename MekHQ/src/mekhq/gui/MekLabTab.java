@@ -27,7 +27,7 @@ import megamek.common.verifier.*;
 import megameklab.com.MMLConstants;
 import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
-import megameklab.com.ui.generalunit.FluffTab;
+import megameklab.com.ui.generalUnit.FluffTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
