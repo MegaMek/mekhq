@@ -20,12 +20,15 @@
  */
 package mekhq.campaign.storyarc.storyevent;
 
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.storyarc.StoryEvent;
@@ -40,6 +43,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Enumeration;
 import java.util.UUID;
 
 public class CreateCharacterStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
@@ -109,7 +113,10 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         p.setBloodname(bloodname);
         p.setBiography(biography);
         p.setRank(rank);
-        p.changeEdge(edge);
+        if(edge > 0) {
+            p.changeEdge(edge);
+            setEdgeTriggers(p);
+        }
 
         p.setBirthday(getCampaign().getLocalDate().minus(age, ChronoUnit.YEARS));
 
@@ -135,6 +142,28 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         }
         personDialog.setVisible(true);
         completeEvent();
+    }
+
+    private void setEdgeTriggers(Person p) {
+        //just check them all to be sure - no good way to separate these by primary role at the moment
+        PersonnelOptions options = p.getOptions();
+
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i
+                .hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+
+            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)) {
+                continue;
+            }
+
+            IOption option;
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                option = j.nextElement();
+                if(null != option && option.getType() == IOption.BOOLEAN) {
+                    p.setEdgeTrigger(option.getName(), true);
+                }
+            }
+        }
     }
 
     @Override
