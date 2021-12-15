@@ -174,6 +174,10 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
         return storyArc.getPersonality(personalityId);
     }
 
+    public Campaign getCampaign() {
+        return getStoryArc().getCampaign();
+    }
+
     //region I/O
     @Override
     public abstract void writeToXml(PrintWriter pw1, int indent);
