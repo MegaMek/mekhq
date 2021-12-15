@@ -42,11 +42,11 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -57,9 +57,13 @@ import java.util.stream.Collectors;
  * This dialog is used to create a character in story arcs from a pool of XP
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class StoryCreateCharacterDialog extends JDialog implements DialogOptionListener, ActionListener {
+public class StoryCreateCharacterDialog extends JDialog implements DialogOptionListener {
 
     private Person person;
+    private boolean editOrigin;
+    private String instructions;
+    private int xpPool;
+
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
     private Map<String, JSpinner> skillLvls = new Hashtable<>();
     private Map<String, JSpinner> skillBonus = new Hashtable<>();
@@ -91,6 +95,8 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
     private JComboBox<Phenotype> choicePhenotype;
     private Phenotype selectedPhenotype;
 
+    private JLabel lblXpLeft;
+
     private JButton doneButton;
 
     private Campaign campaign;
@@ -100,11 +106,15 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
     //endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
-    public StoryCreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign) {
+    public StoryCreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign,
+                                      int xpPool, String instructions, boolean editOrigin) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
         this.person = person;
+        this.editOrigin = editOrigin;
+        this.instructions = instructions;
+        this.xpPool = xpPool;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -112,7 +122,6 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
 
     private void initializePilotAndOptions () {
         birthdate = person.getBirthday();
-
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
         initComponents();
@@ -128,8 +137,10 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         getContentPane().setLayout(new BorderLayout());
 
         getContentPane().add(getDemogPanel(), BorderLayout.CENTER);
-        getContentPane().add(getStatsPanel(), BorderLayout.LINE_END);
+        getContentPane().add(getRightPanel(), BorderLayout.LINE_END);
         getContentPane().add(getButtonPanel(), BorderLayout.PAGE_END);
+
+        refreshXpSpent();
 
         pack();
     }
@@ -354,6 +365,7 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         demogPanel.add(choiceFaction, gridBagConstraints);
+        choiceFaction.setEnabled(editOrigin);
 
         y++;
 
@@ -485,6 +497,7 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(choicePhenotype, gridBagConstraints);
+        choicePhenotype.setEnabled(editOrigin);
 
         chkClan = new JCheckBox("Clanner");
         chkClan.setSelected(person.isClanner());
@@ -497,6 +510,7 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         demogPanel.add(chkClan, gridBagConstraints);
+        chkClan.setEnabled(editOrigin);
 
         y++;
 
@@ -568,7 +582,29 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         return demogPanel;
     }
 
-    private JTabbedPane getStatsPanel() {
+    private JPanel getRightPanel() {
+
+        JPanel rightPanel = new JPanel(new BorderLayout());
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+
+        JTextPane txtDesc = new JTextPane();
+        txtDesc.setEditable(false);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(instructions));
+        txtDesc.setBorder(BorderFactory.createTitledBorder("Instructions"));
+        topPanel.add(txtDesc, BorderLayout.CENTER);
+
+        JPanel panXpLeft = new JPanel();
+        panXpLeft.setBorder(BorderFactory.createTitledBorder("XP remaining"));
+        lblXpLeft = new JLabel("0", JLabel.CENTER);
+        lblXpLeft.setMinimumSize(new Dimension(100, 50));
+        lblXpLeft.setPreferredSize(new Dimension(100, 50));
+        lblXpLeft.setFont(new Font("Sans-Serif", Font.BOLD, 24));
+        panXpLeft.add(lblXpLeft);
+        topPanel.add(panXpLeft, BorderLayout.LINE_END);
+
+        rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
         JScrollPane scrOptions = new JScrollPane();
         panOptions = new javax.swing.JPanel();
@@ -595,14 +631,18 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
 
-        return tabStats;
+        rightPanel.add(tabStats, BorderLayout.CENTER);
+
+        return rightPanel;
     }
 
     private JPanel getButtonPanel() {
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        doneButton.addActionListener(this);
+        doneButton.addActionListener(e -> {
+            done();
+        });
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
         return buttonPanel;
@@ -708,60 +748,6 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         }
     }
 
-    private void btnCloseActionPerformed(ActionEvent evt) {
-        setVisible(false);
-    }
-
-    private void btnOkActionPerformed(ActionEvent evt) {
-        person.setPreNominal(textPreNominal.getText());
-        person.setGivenName(textGivenName.getText());
-        person.setSurname(textSurname.getText());
-        person.setPostNominal(textPostNominal.getText());
-        person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
-                ? "" : textBloodname.getText());
-        person.setBiography(txtBio.getText());
-        if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
-        }
-        person.setBirthday(birthdate);
-        person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
-        if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
-            person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
-        } else {
-            person.setOriginPlanet(null);
-        }
-        person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
-        person.setClanner(chkClan.isSelected());
-        try {
-            person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
-        setSkills();
-        setOptions();
-        setVisible(false);
-    }
-
-    private void randomName() {
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
-                ? person.getOriginFaction().getShortName()
-                : RandomNameGenerator.getInstance().getChosenFaction();
-
-        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                (Gender) choiceGender.getSelectedItem(), person.isClanner(), factionCode);
-        textGivenName.setText(name[0]);
-        textSurname.setText(name[1]);
-    }
-
-    private void randomBloodname() {
-        Faction faction = campaign.getFaction().isClan() ? campaign.getFaction()
-                : (Faction) choiceFaction.getSelectedItem();
-        faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
-        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), selectedPhenotype, campaign.getGameYear());
-        textBloodname.setText((bloodname != null) ? bloodname.getName() : resourceMap.getString("textBloodname.error"));
-    }
-
     public void refreshSkills() {
         panSkills.removeAll();
 
@@ -782,10 +768,12 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         c.insets = new java.awt.Insets(0, 10, 0, 0);
         c.gridx = 0;
 
+        SkillType stype;
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             c.gridy = i;
             c.gridx = 0;
             final String type = SkillType.getSkillList()[i];
+            stype = SkillType.getType(type);
             chkSkill = new JCheckBox();
             chkSkill.setSelected(person.hasSkill(type));
             skillChks.put(type, chkSkill);
@@ -809,7 +797,7 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
                 level = person.getSkill(type).getLevel();
                 bonus = person.getSkill(type).getBonus();
             }
-            spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, 10, 1));
+            spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, stype.getMaxLevel(), 1));
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
             spnLevel.setEnabled(chkSkill.isSelected());
             spnBonus = new JSpinner(new SpinnerNumberModel(bonus, -8, 8, 1));
@@ -907,8 +895,13 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
 
             addGroup(group, gridBag, c);
 
+            IOption option;
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                addOption(j.nextElement(), gridBag, c);
+                //only add the option if it is in the campaign's list of SPAs.
+                option = j.nextElement();
+                if(null != SpecialAbility.getOption(option.getName())) {
+                    addOption(option, gridBag, c);
+                }
             }
         }
     }
@@ -991,9 +984,74 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         }
     }
 
+    private int getSkillXpSpent() {
+        int totalCost = 0;
+
+        //first figure out skills
+        SkillType stype;
+        for (Map.Entry<String, JSpinner> entry : skillLvls.entrySet()) {
+            stype = SkillType.getType(entry.getKey());
+            if(skillChks.get(stype.getName()).isSelected()) {
+                int lvl = (Integer) entry.getValue().getModel().getValue();
+                totalCost = totalCost + stype.getTotalCost(lvl);
+            }
+        }
+
+        //now figure out SPA costs
+        for (final Object newVar : optionComps) {
+            DialogOptionComponent comp = (DialogOptionComponent) newVar;
+            if (!comp.isDefaultValue()) {
+                SpecialAbility spa = SpecialAbility.getOption(comp.getOption().getName());
+                totalCost = totalCost + spa.getCost();
+            }
+        }
+
+        return totalCost;
+    }
+
+    private void refreshXpSpent() {
+        int xpLeft = xpPool - getSkillXpSpent();
+        lblXpLeft.setText(Integer.toString(xpLeft));
+        if(xpLeft > 0) {
+            lblXpLeft.setForeground(new Color(0, 100, 0));
+            doneButton.setEnabled(true);
+        } else if(xpLeft == 0) {
+            lblXpLeft.setForeground(Color.BLACK);
+            doneButton.setEnabled(true);
+        } else {
+            lblXpLeft.setForeground(Color.RED);
+            doneButton.setEnabled(false);
+        }
+    }
+
+    public int getAge() {
+        // Get age based on year
+        return Period.between(birthdate, campaign.getLocalDate()).getYears();
+    }
+
+    private void increasePhenotypeBonus(String skillType) {
+        final int value = Math.min((Integer) skillBonus.get(skillType).getValue() + 1, 8);
+        skillBonus.get(skillType).setValue(value);
+    }
+
+    private void decreasePhenotypeBonus(String skillType) {
+        final int value = Math.max((Integer) skillBonus.get(skillType).getValue() - 1, -8);
+        skillBonus.get(skillType).setValue(value);
+    }
+
+
+
+    //region Listeners
+    @Override
+    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
+        refreshXpSpent();
+    }
+
     private void changeSkillValue(String type) {
+        refreshXpSpent();
         if (!skillChks.get(type).isSelected()) {
             skillValues.get(type).setText("-");
+            skillLvls.get(type).getModel().setValue(0);
             return;
         }
         SkillType stype = SkillType.getType(type);
@@ -1022,11 +1080,6 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(birthdate));
             lblAge.setText(getAge() + " " + resourceMap.getString("age"));
         }
-    }
-
-    public int getAge() {
-        // Get age based on year
-        return Period.between(birthdate, campaign.getLocalDate()).getYears();
     }
 
     private void backgroundChanged() {
@@ -1110,27 +1163,54 @@ public class StoryCreateCharacterDialog extends JDialog implements DialogOptionL
         choicePhenotype.setEnabled(chkClan.isSelected());
     }
 
-    private void increasePhenotypeBonus(String skillType) {
-        final int value = Math.min((Integer) skillBonus.get(skillType).getValue() + 1, 8);
-        skillBonus.get(skillType).setValue(value);
+    private void randomName() {
+        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                (Gender) choiceGender.getSelectedItem(), person.isClanner(), factionCode);
+        textGivenName.setText(name[0]);
+        textSurname.setText(name[1]);
     }
 
-    private void decreasePhenotypeBonus(String skillType) {
-        final int value = Math.max((Integer) skillBonus.get(skillType).getValue() - 1, -8);
-        skillBonus.get(skillType).setValue(value);
+    private void randomBloodname() {
+        Faction faction = campaign.getFaction().isClan() ? campaign.getFaction()
+                : (Faction) choiceFaction.getSelectedItem();
+        faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
+        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), selectedPhenotype, campaign.getGameYear());
+        textBloodname.setText((bloodname != null) ? bloodname.getName() : resourceMap.getString("textBloodname.error"));
     }
 
-    @Override
-    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
-        //Implement me!!
-    }
-
-    //region Listeners
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (doneButton.equals(e.getSource())) {
-            this.setVisible(false);
+    private void done() {
+        person.setPreNominal(textPreNominal.getText());
+        person.setGivenName(textGivenName.getText());
+        person.setSurname(textSurname.getText());
+        person.setPostNominal(textPostNominal.getText());
+        person.setCallsign(textNickname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
+                ? "" : textBloodname.getText());
+        person.setBiography(txtBio.getText());
+        if (choiceGender.getSelectedItem() != null) {
+            person.setGender(person.getGender().isInternal()
+                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
+                    : (Gender) choiceGender.getSelectedItem());
         }
+        person.setBirthday(birthdate);
+        person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
+        if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
+            person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
+        } else {
+            person.setOriginPlanet(null);
+        }
+        person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
+        person.setClanner(chkClan.isSelected());
+        try {
+            person.setToughness(Integer.parseInt(textToughness.getText()));
+        } catch (NumberFormatException ignored) { }
+        setSkills();
+        setOptions();
+        setVisible(false);
     }
     //endregion Listeners
 }
