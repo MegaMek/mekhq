@@ -106,7 +106,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     public void startEvent() {
         super.startEvent();
         Person person = createPerson();
-        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, "Just a test Just a **test** Just a test Just a test Just a test Just a test Just a test Just a test", false);
+        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, "Just a test Just a **test** Just a test Just a test Just a test Just a test Just a test Just a test Just a test", false);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         completeEvent();

@@ -101,7 +101,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private Campaign campaign;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CreateCharacterDialog",
             new EncodeControl());
     //endregion Variable declarations
 
@@ -592,11 +592,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(instructions));
-        txtDesc.setBorder(BorderFactory.createTitledBorder("Instructions"));
+        txtDesc.setPreferredSize(new Dimension(200, 50));
+        txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")));
         topPanel.add(txtDesc, BorderLayout.CENTER);
 
         JPanel panXpLeft = new JPanel();
-        panXpLeft.setBorder(BorderFactory.createTitledBorder("XP remaining"));
+        panXpLeft.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panXpLeft.title")));
         lblXpLeft = new JLabel("0", JLabel.CENTER);
         lblXpLeft.setMinimumSize(new Dimension(100, 50));
         lblXpLeft.setPreferredSize(new Dimension(100, 50));
