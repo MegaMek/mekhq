@@ -618,15 +618,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(instructions));
-        txtDesc.setPreferredSize(new Dimension(150, 72));
+        txtDesc.setPreferredSize(new Dimension(150, 100));
         txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")));
         topPanel.add(txtDesc, BorderLayout.CENTER);
 
         JPanel panXpLeft = new JPanel();
         panXpLeft.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panXpLeft.title")));
         lblXpLeft = new JLabel("0", JLabel.CENTER);
-        lblXpLeft.setMinimumSize(new Dimension(100, 72));
-        lblXpLeft.setPreferredSize(new Dimension(100, 72));
+        lblXpLeft.setMinimumSize(new Dimension(100, 100));
+        lblXpLeft.setPreferredSize(new Dimension(100, 100));
         lblXpLeft.setFont(new Font("Sans-Serif", Font.BOLD, 32));
         panXpLeft.add(lblXpLeft);
         topPanel.add(panXpLeft, BorderLayout.LINE_END);
@@ -1237,6 +1237,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
         person.setPortrait(portrait);
+        int xpSpent = xpPool - getSkillXpSpent();
+        if(xpSpent > 0) {
+            person.setXP(campaign, xpSpent);
+        }
         setSkills();
         setOptions();
         setVisible(false);
