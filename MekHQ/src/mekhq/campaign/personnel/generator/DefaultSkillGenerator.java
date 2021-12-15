@@ -42,7 +42,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         PersonnelRole secondaryRole = person.getSecondaryRole();
         RandomSkillPreferences rskillPrefs = getSkillPreferences();
 
-        int bonus = 0;
+        int bonus = getPhenotypeBonus(person);
         int mod = 0;
 
         if (primaryRole.isLAMPilot()) {
@@ -55,7 +55,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             generateDefaultSkills(person, secondaryRole, expLvl, bonus, mod);
         }
 
-        bonus = getPhenotypeBonus(person);
+        // apply phenotype bonus only to primary skills
+        bonus = 0;
 
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
