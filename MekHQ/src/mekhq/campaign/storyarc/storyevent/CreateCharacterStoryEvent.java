@@ -57,6 +57,9 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     private Phenotype phenotype;
     private boolean commander;
 
+    private String instructions;
+    private boolean editOrigin;
+
 
     public CreateCharacterStoryEvent() {
         super();
@@ -65,6 +68,8 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         bloodname = "";
         biography = "";
         commander = true;
+
+        editOrigin = false;
     }
 
     @Override
@@ -106,7 +111,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     public void startEvent() {
         super.startEvent();
         Person person = createPerson();
-        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, "Just a test Just a **test** Just a test Just a test Just a test Just a test Just a test Just a test Just a test", false);
+        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, instructions, editOrigin);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         completeEvent();
@@ -154,6 +159,10 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                     phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                     faction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("editOrigin")) {
+                    editOrigin = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
+                    instructions = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);

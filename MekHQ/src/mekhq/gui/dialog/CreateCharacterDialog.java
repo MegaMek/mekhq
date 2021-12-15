@@ -124,6 +124,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         birthdate = person.getBirthday();
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
+        if(null == instructions) {
+            instructions = resourceMap.getString("instructions.text");
+        }
         initComponents();
     }
 
