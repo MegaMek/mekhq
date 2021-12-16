@@ -52,6 +52,10 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
 
     protected StoryArc getStoryArc() { return arc; }
 
+    protected Campaign getCampaign() {
+        return getStoryArc().getCampaign();
+    }
+
     /**
      * Execute whatever the trigger does
      */

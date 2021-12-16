@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * Identifies the standard tabs and provides a factory method.
@@ -106,5 +107,15 @@ public enum GuiTabType {
             default:
                 return null;
         }
+    }
+
+    public static GuiTabType parseFromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        return COMMAND;
     }
 }

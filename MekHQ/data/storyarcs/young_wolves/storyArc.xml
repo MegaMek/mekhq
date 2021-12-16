@@ -104,6 +104,9 @@ This is a story arc in active development. Try at your own risk!
                 @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
+                <tab>BRIEFING</tab>
+            </storyTrigger>
         </storyEvent>
         <storyEvent id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Post-Mission Report</title>
@@ -132,6 +135,9 @@ This is a story arc in active development. Try at your own risk!
             </narrative>
             <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
             <nextEventId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextEventId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
+                <tab>REPAIR</tab>
+            </storyTrigger>
         </storyEvent>
         <storyEvent id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Welcome to Baker 3</title>
