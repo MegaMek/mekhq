@@ -3461,6 +3461,24 @@ public class Campaign implements Serializable, ITechManager {
         return null;
     }
 
+    /**
+     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person
+     * with most senior rank. Ties go to the first in the queue.
+     * @return Person object of the commander
+     */
+    public Person getSeniorCommander() {
+        Person commander = null;
+        for (Person p : getPersonnel()) {
+            if(p.isCommander()) {
+                return p;
+            }
+            if(null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
+                commander = p;
+            }
+        }
+        return commander;
+    }
+
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
 
