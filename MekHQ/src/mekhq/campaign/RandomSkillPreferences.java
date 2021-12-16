@@ -20,17 +20,16 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-
 import megamek.Version;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 /**
  * @author Jay Lawson
@@ -201,7 +200,7 @@ public class RandomSkillPreferences implements Serializable {
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
-        MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
+        LogManager.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
         RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -216,7 +215,7 @@ public class RandomSkillPreferences implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().debug(wn2.getNodeName() + ": " + wn2.getTextContent());
+            LogManager.getLogger().debug(wn2.getNodeName() + ": " + wn2.getTextContent());
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
                     retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
@@ -261,11 +260,11 @@ public class RandomSkillPreferences implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
-        MekHQ.getLogger().debug("Load Random Skill Preferences Complete!");
+        LogManager.getLogger().debug("Load Random Skill Preferences Complete!");
 
         return retVal;
     }

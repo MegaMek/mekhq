@@ -24,6 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 import mekhq.campaign.log.PersonalLogger;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ public class PersonAwardController {
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
             if (award == null) {
-                MekHQ.getLogger().error("Cannot award a null award, returning.");
+                LogManager.getLogger().error("Cannot award a null award, returning.");
                 return;
             }
             awards.add(award);

@@ -28,6 +28,7 @@ import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
 import mekhq.io.AwardFileFactory;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -84,7 +85,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : remove inline file path
                         new ImageFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the force icon directory!", e);
+                LogManager.getLogger().error("Could not parse the force icon directory!", e);
             }
         }
     }
@@ -103,7 +104,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 awardIconDirectory = new DirectoryItems(new File("data/images/awards"), // TODO : remove inline file path
                         new AwardFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the award icon directory!", e);
+                LogManager.getLogger().error("Could not parse the award icon directory!", e);
             }
         }
     }
@@ -312,7 +313,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             } finally {
                 if (null != g2d) {
                     g2d.dispose();
@@ -321,7 +322,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     try {
                         base = (BufferedImage) getForceIcons().getItem("", "empty.png");
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(e);
+                        LogManager.getLogger().error(e);
                     }
                 }
                 retVal = base;
@@ -336,7 +337,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 }
                 retVal = scaledImage;
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 

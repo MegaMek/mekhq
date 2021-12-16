@@ -19,7 +19,7 @@
 package mekhq.campaign.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -97,7 +97,7 @@ public enum PlanetaryAcquisitionFactionLimit {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse a PlanetaryAcquisitionFactionLimit from " + text
+        LogManager.getLogger().error("Unable to parse a PlanetaryAcquisitionFactionLimit from " + text
                 + ". Returning NEUTRAL");
 
         return NEUTRAL;

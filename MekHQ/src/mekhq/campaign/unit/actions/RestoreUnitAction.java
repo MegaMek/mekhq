@@ -16,10 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
-
-import java.util.*;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -27,9 +24,17 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.parts.*;
-import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MissingThrusters;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Restores a unit to an undamaged state.
@@ -139,7 +144,7 @@ public class RestoreUnitAction implements IUnitAction {
      * @param unit The unit to restore.
      */
     private void oldUnitRestoration(Campaign campaign, Unit unit) {
-        MekHQ.getLogger().warning("Falling back to old unit restoration logic");
+        LogManager.getLogger().warn("Falling back to old unit restoration logic");
 
         unit.setSalvage(false);
 
@@ -242,7 +247,7 @@ public class RestoreUnitAction implements IUnitAction {
                     return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                 }
             } catch (EntityLoadingException e) {
-                MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
+                LogManager.getLogger().error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
             }
 
             return null;

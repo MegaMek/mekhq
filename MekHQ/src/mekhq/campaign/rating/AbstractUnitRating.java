@@ -20,6 +20,14 @@
  */
 package mekhq.campaign.rating;
 
+import megamek.common.*;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -27,34 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.ASFBay;
-import megamek.common.BattleArmor;
-import megamek.common.BattleArmorBay;
-import megamek.common.Bay;
-import megamek.common.Dropship;
-import megamek.common.ProtomechBay;
-import megamek.common.SpaceStation;
-import megamek.common.Entity;
-import megamek.common.HeavyVehicleBay;
-import megamek.common.SuperHeavyVehicleBay;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.Jumpship;
-import megamek.common.LightVehicleBay;
-import megamek.common.MechBay;
-import megamek.common.SmallCraftBay;
-import megamek.common.UnitType;
-
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.unit.Unit;
-
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %Id%
  * @since 3/15/2012
  */
 @SuppressWarnings(value = "SameParameterValue")
@@ -879,16 +861,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        MekHQ.getLogger().debug("Adding " + u.getName() + " to unit counts.");
+        LogManager.getLogger().debug("Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            MekHQ.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            LogManager.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = e.getUnitType();
-        MekHQ.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        LogManager.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -900,7 +882,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                MekHQ.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
+                LogManager.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {

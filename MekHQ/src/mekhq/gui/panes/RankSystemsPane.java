@@ -23,7 +23,6 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
@@ -36,16 +35,14 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
     //region Variable Declarations
@@ -394,7 +391,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Then update the selected rank system, with null protection (although it shouldn't be null)
         setSelectedRankSystem(getRankSystemModel().getSelectedItem());
         if (getSelectedRankSystem() == null) {
-            MekHQ.getLogger().error("The selected rank system is null. Not changing the ranks, just returning.");
+            LogManager.getLogger().error("The selected rank system is null. Not changing the ranks, just returning.");
             getComboRankSystemType().setEnabled(false);
             return;
         }

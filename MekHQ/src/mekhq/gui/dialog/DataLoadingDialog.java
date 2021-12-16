@@ -43,6 +43,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -199,7 +200,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 InjuryTypes.registerAll();
                 campaign.setApp(app);
             } else {
-                MekHQ.getLogger().info(String.format("Loading campaign file from XML %s", fileCampaign));
+                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", fileCampaign));
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(fileCampaign)) {
@@ -294,7 +295,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException e) {
-                MekHQ.getLogger().error(e.getCause());
+                LogManager.getLogger().error(e.getCause());
                 if (e.getCause() instanceof NullEntityException) {
                     NullEntityException nee = (NullEntityException) e.getCause();
                     JOptionPane.showMessageDialog(null,
