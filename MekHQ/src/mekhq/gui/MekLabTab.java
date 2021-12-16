@@ -28,7 +28,7 @@ import megameklab.com.MMLConstants;
 import megameklab.com.ui.EntitySource;
 import megameklab.com.ui.generalUnit.FluffTab;
 import megameklab.com.util.CConfig;
-import megameklab.com.util.RefreshListener;
+import megameklab.com.ui.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
@@ -243,16 +243,16 @@ public class MekLabTab extends CampaignGuiTab {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);
         } else if (entity instanceof Jumpship) {
             testEntity = new TestAdvancedAerospace((Jumpship) entity, entityVerifier.aeroOption, null);
-        } else if (entity.issupportVehicle()) {
-            testEntity = new TestsupportVehicle(entity, entityVerifier.tankOption, null);
+        } else if (entity.isSupportVehicle()) {
+            testEntity = new TestSupportVehicle(entity, entityVerifier.tankOption, null);
         } else if (entity instanceof Aero) {
             testEntity = new TestAero((Aero) entity, entityVerifier.aeroOption, null);
         } else if (entity instanceof Mech) {
             testEntity = new TestMech((Mech) entity, entityVerifier.mechOption, null);
         } else if (entity instanceof Tank) {
             testEntity = new TestTank((Tank) entity, entityVerifier.tankOption, null);
-        } else if (entity instanceof battleArmor) {
-            testEntity = new TestbattleArmor((battleArmor) entity, entityVerifier.baOption, null);
+        } else if (entity instanceof BattleArmor) {
+            testEntity = new TestBattleArmor((BattleArmor) entity, entityVerifier.baOption, null);
         } else if (entity instanceof Infantry) {
             testEntity = new TestInfantry((Infantry) entity, entityVerifier.tankOption, null);
         } else if (entity instanceof Protomech) {
@@ -277,8 +277,8 @@ public class MekLabTab extends CampaignGuiTab {
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
-        if (entity instanceof battleArmor) {
-            tonnage = ((battleArmor)entity).getTrooperWeight() * ((battleArmor)entity).getTroopers();
+        if (entity instanceof BattleArmor) {
+            tonnage = ((BattleArmor)entity).getTrooperWeight() * ((BattleArmor)entity).getTroopers();
         }
 
         if (entity.getWeight() < testEntity.calculateWeight()) {
@@ -410,7 +410,7 @@ public class MekLabTab extends CampaignGuiTab {
             return new DropshipPanel((SmallCraft) en);
         } else if (en instanceof Jumpship) {
             return new AdvancedAeroPanel((Jumpship) en);
-        } else if (en.issupportVehicle()) {
+        } else if (en.isSupportVehicle()) {
             return new supportVehiclePanel(en);
         } else if (en instanceof Aero) {
             return new AeroPanel((Aero) en);
@@ -418,8 +418,8 @@ public class MekLabTab extends CampaignGuiTab {
             return new MekPanel((Mech) en);
         } else if (en instanceof Tank) {
             return new TankPanel((Tank) en);
-        } else if (en instanceof battleArmor) {
-            return new battleArmorPanel((battleArmor) en);
+        } else if (en instanceof BattleArmor) {
+            return new BattleArmorPanel((BattleArmor) en);
         } else if (en instanceof Infantry) {
             return new InfantryPanel((Infantry) en);
         } else if (en instanceof Protomech) {
@@ -1090,16 +1090,16 @@ public class MekLabTab extends CampaignGuiTab {
         }
     }
 
-    private class battleArmorPanel extends EntityPanel {
+    private class BattleArmorPanel extends EntityPanel {
 
         private static final long serialVersionUID = 6894731868670529166L;
 
-        private battleArmor entity;
+        private BattleArmor entity;
         private megameklab.com.ui.battleArmor.BAStructureTab structureTab;
         private megameklab.com.ui.battleArmor.BAEquipmentTab equipmentTab;
         private megameklab.com.ui.battleArmor.BABuildTab buildTab;
 
-        public battleArmorPanel(battleArmor ba) {
+        public BattleArmorPanel(BattleArmor ba) {
             entity = ba;
             reloadTabs();
         }
