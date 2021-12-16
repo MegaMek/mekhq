@@ -35,7 +35,7 @@ This is a story arc in active development. Try at your own risk!
             <title>A Khan's Greeting</title>
             <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
 
-                Greetings, Star Captain. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?</question>
+                Greetings, @commander. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?</question>
             <choice id="honor">No, My Khan. I consider it a great honor.</choice>
             <choice id="duty">It would not have been my first choice, but I will do my duty.</choice>
             <choice id="farce">Your khanship is a farce.</choice>
@@ -89,7 +89,7 @@ This is a story arc in active development. Try at your own risk!
         </storyEvent>
         <storyEvent id="276345a4-6168-4999-9381-de5ac56a3d2f" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Welcome to the LZ!</title>
-            <narrative>Hello, Star Captain. I am Star Commander Louisa and I will be commanding your transport Dropship for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
+            <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
                 *G-forces hit you hard as you hear the roar of the engines from outside*
 
@@ -101,20 +101,20 @@ This is a story arc in active development. Try at your own risk!
 
                 *You hear the distance sound of hydraulic motors*
 
-                Star Captain, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, Star Captain!</narrative>
+                @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Post-Mission Report</title>
-            <narrative>It looks like your pups cut some teeth today, Star Captain. I am happy to report that the Falcon presence on Colmar have been utterly destroyed. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
+            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been utterly destroyed. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextEventId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextEventId>
         </storyEvent>
         <storyEvent id="0f3caf49-3b53-4ed5-8f55-690fb7356fc3" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Back on board</title>
             <narrative>
-              Welcome back, Star Captain. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Baker 3. Thats going to take us a few weeks so it should be time to deal with any battle damage and injuries.
+              Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Baker 3. Thats going to take us a few weeks so it should be time to deal with any battle damage and injuries.
 
               When you get back on board, Tech Larine said she would like a word.
             </narrative>
@@ -124,7 +124,7 @@ This is a story arc in active development. Try at your own risk!
         <storyEvent id="c3b2acb9-f91f-4704-9dc2-6fb16a82f272" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Tech Chat</title>
             <narrative>
-              Hello, Star Captain. I am the chief tech on board here. I see you have been out busting up my machines? Do not worry, my team can make them like brand new again. Just head over to the repair bay to check on our progress.
+              Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines? Do not worry, my team can make them like brand new again. Just head over to the repair bay to check on our progress.
 
               We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once that is used up, we do not really have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
 
@@ -136,7 +136,7 @@ This is a story arc in active development. Try at your own risk!
         <storyEvent id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Welcome to Baker 3</title>
             <narrative>
-              Welcome to Baker 3. Star Captain! I hope you got all the dents out of your mechs.
+              Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>

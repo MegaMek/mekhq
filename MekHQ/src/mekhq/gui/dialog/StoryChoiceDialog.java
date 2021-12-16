@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -58,7 +59,8 @@ public class StoryChoiceDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(((ChoiceStoryEvent) getStoryEvent()).getQuestion()));
+        String text = StoryArc.replaceTokens(((ChoiceStoryEvent) getStoryEvent()).getQuestion(), getStoryEvent().getCampaign());
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;

@@ -27,6 +27,7 @@ import mekhq.*;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.FilenameFilter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The Story Arc class manages a given story arc campaign
@@ -67,6 +70,9 @@ public class StoryArc implements MekHqXmlSerializable {
 
     /** directory path to this story arc **/
     private String directoryPath;
+
+    /** a hash map of replacements for tokens in the narrative strings */
+    private static Map<String, String> replacementTokens;
 
     protected static final String NL = System.lineSeparator();
 
@@ -329,10 +335,6 @@ public class StoryArc implements MekHqXmlSerializable {
         return storyArc;
     }
 
-
-
-    //endregion File I/O
-
     /**
      * @return a list of all of the story arcs in the default and userdata folders
      */
@@ -393,6 +395,44 @@ public class StoryArc implements MekHqXmlSerializable {
         element.normalize();
 
         return parseFromXML(element.getChildNodes(), null);
+    }
+
+    //endregion File I/O
+
+    private static void updateReplacementTokens(Campaign c) {
+        if(null == replacementTokens) {
+            replacementTokens = new LinkedHashMap<>();
+        }
+        Person commander = c.getSeniorCommander();
+        if(null == commander) {
+            //shouldn't happen unless there are no personnel, but just in case
+            replacementTokens.put("@commanderRank", "rank(?)");
+            replacementTokens.put("@commander", "commander(?)");
+
+        } else {
+            replacementTokens.put("@commanderRank", commander.getRankName());
+            replacementTokens.put("@commander", commander.getFullTitle());
+        }
+    }
+
+    /**
+     * This will replace tokens in narrative text
+     * @param text
+     * @return
+     */
+    public static String replaceTokens(String text, Campaign c) {
+
+        updateReplacementTokens(c);
+
+        Pattern pattern;
+        Matcher matcher;
+        for (Map.Entry<String, String> replacement : replacementTokens.entrySet()) {
+            pattern = Pattern.compile(replacement.getKey());
+            matcher = pattern.matcher(text);
+            text = matcher.replaceAll(replacement.getValue());
+        }
+
+        return text;
     }
 
 }

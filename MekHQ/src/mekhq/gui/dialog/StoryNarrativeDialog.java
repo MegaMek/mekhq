@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -53,7 +54,8 @@ public class StoryNarrativeDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(((NarrativeStoryEvent) getStoryEvent()).getNarrative()));
+        String text = StoryArc.replaceTokens(((NarrativeStoryEvent) getStoryEvent()).getNarrative(), getStoryEvent().getCampaign());
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         JScrollPane scrollPane = new JScrollPane(txtDesc);
         mainPanel.add(scrollPane, gbc);
 
