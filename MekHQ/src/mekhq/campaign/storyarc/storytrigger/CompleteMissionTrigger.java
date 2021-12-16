@@ -28,6 +28,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.campaign.storyarc.storyevent.MissionStoryEvent;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -84,7 +85,7 @@ public class CompleteMissionTrigger extends StoryTrigger implements Serializable
                     missionStatus = MissionStatus.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                 LogManager.getLogger().error(e);
             }
         }
     }

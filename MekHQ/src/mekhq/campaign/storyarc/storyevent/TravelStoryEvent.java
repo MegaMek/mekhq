@@ -29,6 +29,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -124,7 +125,7 @@ public class TravelStoryEvent extends StoryEvent implements Serializable, MekHqX
                     autoStart = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

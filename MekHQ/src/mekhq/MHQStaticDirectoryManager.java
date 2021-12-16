@@ -123,7 +123,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 storySplashDirectory = new DirectoryItems(new File("data/images/storysplash"), // TODO : remove inline file path
                         new ImageFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the storyarc icon directory!", e);
+                LogManager.getLogger().error("Could not parse the storyarc icon directory!", e);
             }
         }
     }
@@ -141,7 +141,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 userStoryPortraitDirectory = new DirectoryItems(new File(path),
                         new ImageFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the storyarc portrait directory!", e);
+                LogManager.getLogger().error("Could not parse the storyarc portrait directory!", e);
             }
         }
     }
@@ -159,7 +159,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 userStorySplashDirectory = new DirectoryItems(new File(path),
                         new ImageFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the storyarc directory!", e);
+                LogManager.getLogger().error("Could not parse the storyarc directory!", e);
             }
         }
     }

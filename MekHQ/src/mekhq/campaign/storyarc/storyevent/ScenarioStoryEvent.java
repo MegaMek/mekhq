@@ -28,6 +28,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryEvent;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -158,7 +159,7 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
                     missionEventId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

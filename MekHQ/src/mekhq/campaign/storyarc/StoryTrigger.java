@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -93,7 +94,7 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
             retVal.loadFieldsFromXmlNode(wn, c);
 
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         return retVal;

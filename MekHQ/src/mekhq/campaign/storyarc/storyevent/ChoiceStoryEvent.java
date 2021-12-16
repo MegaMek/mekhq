@@ -26,6 +26,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryEvent;
 import mekhq.gui.dialog.StoryChoiceDialog;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -120,7 +121,7 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
                     chosen =wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

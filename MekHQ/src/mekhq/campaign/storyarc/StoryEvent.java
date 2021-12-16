@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -284,7 +285,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("storyOutcome")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error("Unknown node type not loaded in storyOutcomes nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in storyOutcomes nodes: " + wn3.getNodeName());
 
                             continue;
                         }
@@ -297,7 +298,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         return retVal;

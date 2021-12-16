@@ -29,6 +29,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
 
 import java.io.File;
@@ -259,7 +260,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -277,7 +278,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -322,7 +323,7 @@ public class StoryArc implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
         return storyArc;
@@ -384,7 +385,7 @@ public class StoryArc implements MekHqXmlSerializable {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
 

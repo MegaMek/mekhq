@@ -20,11 +20,11 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.awt.*;
@@ -75,7 +75,7 @@ public class StoryPortrait extends Portrait {
                 }
             }
         } catch (Exception e) {
-            MegaMek.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         return portrait;
@@ -91,7 +91,7 @@ public class StoryPortrait extends Portrait {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MegaMek.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new StoryPortrait();
         }
         return icon;

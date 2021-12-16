@@ -24,6 +24,7 @@ import megamek.MegaMek;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.awt.*;
@@ -76,7 +77,7 @@ public class StorySplash extends AbstractIcon {
                 }
             }
         } catch (Exception e) {
-            MegaMek.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         return storyIcon;
@@ -93,7 +94,7 @@ public class StorySplash extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MegaMek.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new StorySplash();
         }
         return icon;
