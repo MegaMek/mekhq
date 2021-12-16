@@ -66,6 +66,12 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     private boolean commander;
     private int edge;
 
+    /**
+     * The id of the person in the campaign. This will otherwise be set randomly. By setting it manually we can
+     * reference it later.
+     */
+    private UUID personId;
+
     private String instructions;
     private boolean editOrigin;
 
@@ -117,6 +123,10 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         if(edge > 0) {
             p.changeEdge(edge);
             setEdgeTriggers(p);
+        }
+
+        if(null != personId) {
+            p.setId(personId);
         }
 
         p.setBirthday(getCampaign().getLocalDate().minus(age, ChronoUnit.YEARS));
@@ -312,6 +322,8 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                     assignedForceId = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                    personId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

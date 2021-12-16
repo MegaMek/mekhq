@@ -29,6 +29,7 @@ This is a story arc in active development. Try at your own risk!
             </instructions>
             <assignedUnitId>b08958b8-28e2-4086-a980-82772b4fc987</assignedUnitId>
             <assignedForceId>2</assignedForceId>
+            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
             <nextEventId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextEventId>
         </storyEvent>
         <storyEvent id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
