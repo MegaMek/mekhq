@@ -1382,6 +1382,9 @@ public class CampaignGUI extends JPanel {
         if (null == f) {
             return;
         }
+        if (null != getCampaign().getStoryArc()) {
+            MekHQ.unregisterHandler(getCampaign().getStoryArc());
+        }
         boolean hadAtB = getCampaign().getCampaignOptions().getUseAtB();
         DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(
                 getApplication(), getFrame(), f);
