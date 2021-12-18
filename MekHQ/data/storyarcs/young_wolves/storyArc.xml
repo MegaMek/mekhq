@@ -14,6 +14,12 @@ This is a story arc in active development. Try at your own risk!
     </description>
     <startNew>true</startNew>
     <startingEventId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingEventId>
+    <customStringVariables>
+        <customStringVariable>
+            <key>first_impressions</key>
+            <value>none</value>
+        </customStringVariable>
+    </customStringVariables>
     <storyEvents>
         <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
             <xpPool>50</xpPool>
@@ -47,12 +53,24 @@ This is a story arc in active development. Try at your own risk!
             <storyOutcomes>
                 <storyOutcome result="honor">
                     <nextEventId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextEventId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>first_impressions</key>
+                        <value>honor</value>
+                    </storyTrigger>
                 </storyOutcome>
                 <storyOutcome result="duty">
                     <nextEventId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextEventId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>first_impressions</key>
+                        <value>duty</value>
+                    </storyTrigger>
                 </storyOutcome>
                 <storyOutcome result="farce">
                     <nextEventId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextEventId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>first_impressions</key>
+                        <value>farce</value>
+                    </storyTrigger>
                 </storyOutcome>
             </storyOutcomes>
         </storyEvent>

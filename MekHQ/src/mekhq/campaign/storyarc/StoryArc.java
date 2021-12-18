@@ -69,6 +69,11 @@ public class StoryArc implements MekHqXmlSerializable {
     /** A hash of possible personalities that the player might interact with in this story arc **/
     private Map<UUID, Personality> personalities;
 
+    /**
+     * a hash of custom string variables that the creator might specify with a string key
+     */
+    private Map<String, String> customStringVariables;
+
     /** directory path to the initial campaign data for this StoryArc - can be null **/
     private String initCampaignPath;
 
@@ -84,6 +89,7 @@ public class StoryArc implements MekHqXmlSerializable {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
         personalities = new LinkedHashMap<>();
+        customStringVariables = new LinkedHashMap<>();
     }
 
     public void setCampaign(Campaign c) { this.campaign = c; }
@@ -135,6 +141,14 @@ public class StoryArc implements MekHqXmlSerializable {
         Personality p = personalities.get(id);
         p.updatePersonalityFromCampaign(campaign);
         return p;
+    }
+
+    public void addCustomStringVariable(String key, String value) {
+        customStringVariables.put(key, value);
+    }
+
+    public String getCustomStringVariable(String key) {
+        return customStringVariables.get(key);
     }
 
     public void begin() {
@@ -282,6 +296,37 @@ public class StoryArc implements MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"</storyEvents>");
 
+        if(!personalities.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<personalities>");
+            for (Map.Entry<UUID, Personality> entry : personalities.entrySet()) {
+                entry.getValue().writeToXml(pw1, indent + 2);
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "</personalities>");
+        }
+
+        if(!customStringVariables.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<customStringVariables>");
+            for (Map.Entry<String, String> entry : customStringVariables.entrySet()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 2)
+                        + "<customStringVariable>");
+                pw1.println(MekHqXmlUtil.indentStr(indent + 3)
+                        + "<key>"
+                        + entry.getKey()
+                        + "</key>");
+                pw1.println(MekHqXmlUtil.indentStr(indent + 3)
+                        + "<value>"
+                        + entry.getValue()
+                        + "</value>");
+                pw1.println(MekHqXmlUtil.indentStr(indent + 2)
+                        + "</customStringVariable>");
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "</customStringVariables>");
+        }
+
 
     }
 
@@ -326,6 +371,41 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
+    protected void parseCustomStringVariables(NodeList nl, Campaign c) {
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeType() != Node.ELEMENT_NODE ||
+                        !wn.getNodeName().equals("customStringVariable")) {
+                    continue;
+                }
+                parseCustomStringVariable(wn.getChildNodes(), c);
+            }
+        } catch (Exception e) {
+            LogManager.getLogger().error(e);
+        }
+    }
+
+    protected void parseCustomStringVariable(NodeList nl, Campaign c) {
+        String key = null;
+        String value = null;
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                final Node wn = nl.item(x);
+                if (wn.getNodeName().equals("key")) {
+                    key = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equals("value")) {
+                    value = wn.getTextContent().trim();
+                }
+            }
+        } catch (Exception e) {
+            LogManager.getLogger().error(e);
+        }
+        if(null != key && null != value) {
+            addCustomStringVariable(key, value);
+        }
+    }
+
     public static @Nullable StoryArc parseFromXML(final NodeList nl, Campaign c) {
         final StoryArc storyArc = new StoryArc();
         try {
@@ -359,6 +439,9 @@ public class StoryArc implements MekHqXmlSerializable {
                         break;
                     case "personalities":
                         storyArc.parsePersonalities(wn.getChildNodes(), c);
+                        break;
+                    case "customStringVariables":
+                        storyArc.parseCustomStringVariables(wn.getChildNodes(), c);
                         break;
 
 
