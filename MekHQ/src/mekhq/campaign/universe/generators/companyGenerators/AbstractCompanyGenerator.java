@@ -1309,46 +1309,43 @@ public abstract class AbstractCompanyGenerator {
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         if (getOptions().isPayForSetup()) {
-            final Money initialContractPayment = (contract == null) ? Money.zero() : contract.getTotalAdvanceAmount();
-            startingCash = startingCash.plus(initialContractPayment);
-            minimumStartingFloat = minimumStartingFloat.plus(initialContractPayment);
+            final Money costs = calculateHiringCosts(trackers)
+                    .plus(calculateUnitCosts(units))
+                    .plus(calculatePartCosts(parts))
+                    .plus(calculateArmourCosts(armour))
+                    .plus(calculateAmmunitionCosts(ammunition));
 
-            Money maximumPreLoanCost = startingCash.minus(minimumStartingFloat);
+            final Money maximumPreLoanCosts = startingCash.minus(minimumStartingFloat);
             Money loan = Money.zero();
-
-            final Money hiringCosts = calculateHiringCosts(trackers);
-            if (maximumPreLoanCost.isGreaterOrEqualThan(hiringCosts)) {
-                maximumPreLoanCost = maximumPreLoanCost.minus(hiringCosts);
-            } else if (getOptions().isStartingLoan()) {
-                loan = loan.plus(hiringCosts);
+            if (maximumPreLoanCosts.isGreaterOrEqualThan(costs)) {
+                startingCash = startingCash.minus(costs);
+            } else {
+                startingCash = minimumStartingFloat;
+                if (getOptions().isStartingLoan()) {
+                    loan = costs.minus(maximumPreLoanCosts);
+                }
             }
 
-            final Money unitCosts = calculateUnitCosts(units);
-            if (maximumPreLoanCost.isGreaterOrEqualThan(unitCosts)) {
-                maximumPreLoanCost = maximumPreLoanCost.minus(unitCosts);
-            } else if (getOptions().isStartingLoan()) {
-                loan = loan.plus(unitCosts);
-            }
+            if (startingCash.isPositive()) {
+                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL, campaign.getLocalDate(), startingCash,
+                        resources.getString(""));
+                if (loan.isZero()) {
+                    campaign.addReport("");
+                } else {
 
-            final Money partCosts = calculatePartCosts(parts);
-            if (maximumPreLoanCost.isGreaterOrEqualThan(partCosts)) {
-                maximumPreLoanCost = maximumPreLoanCost.minus(partCosts);
-            } else if (getOptions().isStartingLoan()) {
-                loan = loan.plus(partCosts);
-            }
+                }
+            } else if (startingCash.isZero()) {
+                if (loan.isZero()) {
+                    campaign.addReport("");
+                } else {
 
-            final Money armourCosts = calculateArmourCosts(armour);
-            if (maximumPreLoanCost.isGreaterOrEqualThan(armourCosts)) {
-                maximumPreLoanCost = maximumPreLoanCost.minus(armourCosts);
-            } else if (getOptions().isStartingLoan()) {
-                loan = loan.plus(armourCosts);
-            }
+                }
+            } else {
+                if (loan.isZero()) {
 
-            final Money ammunitionCosts = calculateAmmunitionCosts(ammunition);
-            if (maximumPreLoanCost.isGreaterOrEqualThan(ammunitionCosts)) {
-                maximumPreLoanCost = maximumPreLoanCost.minus(ammunitionCosts);
-            } else if (getOptions().isStartingLoan()) {
-                loan = loan.plus(ammunitionCosts);
+                } else {
+
+                }
             }
         } else {
             campaign.addReport("");
@@ -1499,16 +1496,16 @@ public abstract class AbstractCompanyGenerator {
      * Phase One: Starting Planet and Finalizing Personnel, Unit, and Units
      *
      * @param campaign the campaign to apply the generation to
-     * @param trackers the trackers containing all of the data required for Phase One
+     * @param trackers the trackers containing all the data required for Phase One
      * @return a list of the newly created units to add to the campaign
      */
     public List<Unit> applyPhaseOneToCampaign(final Campaign campaign,
                                               final List<CompanyGenerationPersonTracker> trackers) {
         // Process Personnel
-        // If we aren't using the pool, generate all of the Astechs and Medics required
+        // If we aren't using the pool, generate all the Astechs and Medics required
         generateAssistants(campaign, trackers);
 
-        // This does all of the final personnel processing, including recruitment and running random
+        // This does all the final personnel processing, including recruitment and running random
         // marriages
         finalizePersonnel(campaign, trackers);
 
