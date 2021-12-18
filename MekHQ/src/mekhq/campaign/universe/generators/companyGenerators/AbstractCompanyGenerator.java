@@ -231,12 +231,12 @@ public abstract class AbstractCompanyGenerator {
         Comparator<CompanyGenerationPersonTracker> personnelSorter = Comparator.comparing(
                 t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
         if (getOptions().isAssignBestOfficers()) {
-            personnelSorter = personnelSorter.thenComparingInt(t -> t.getPerson().getExperienceLevel(false))
-                    .reversed()
+            personnelSorter = personnelSorter
                     .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
                             .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
-                    .reversed();
+                    .thenComparingInt(t -> t.getPerson().getExperienceLevel(false));
         }
+        personnelSorter = personnelSorter.reversed();
         trackers.sort(personnelSorter);
 
         generateCommandingOfficer(campaign, trackers.get(0), numMechWarriors);
