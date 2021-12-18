@@ -19,6 +19,7 @@
 package mekhq.campaign.universe.companyGeneration;
 
 import megamek.Version;
+import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -36,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 public class CompanyGenerationOptions implements Serializable {
     //region Variable Declarations
@@ -88,6 +90,8 @@ public class CompanyGenerationOptions implements Serializable {
     // Unit
     private ForceNamingMethod forceNamingMethod;
     private boolean generateForceIcons; // Very Buggy
+    private boolean generateOriginNodeForceIcon;
+    private TreeMap<Integer, Integer> forceWeightLimits;
 
     // Spares
     private boolean generateMothballedSpareUnits;
@@ -196,6 +200,13 @@ public class CompanyGenerationOptions implements Serializable {
         // Unit
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
         setGenerateForceIcons(true);
+        setGenerateOriginNodeForceIcon(true);
+        setForceWeightLimits(new TreeMap<>());
+        getForceWeightLimits().put(390, EntityWeightClass.WEIGHT_ASSAULT);
+        getForceWeightLimits().put(280, EntityWeightClass.WEIGHT_HEAVY);
+        getForceWeightLimits().put(200, EntityWeightClass.WEIGHT_MEDIUM);
+        getForceWeightLimits().put(130, EntityWeightClass.WEIGHT_LIGHT);
+        getForceWeightLimits().put(60, EntityWeightClass.WEIGHT_ULTRA_LIGHT);
 
         // Spares
         setGenerateMothballedSpareUnits(false);
@@ -532,6 +543,22 @@ public class CompanyGenerationOptions implements Serializable {
     public void setGenerateForceIcons(final boolean generateForceIcons) {
         this.generateForceIcons = generateForceIcons;
     }
+
+    public boolean isGenerateOriginNodeForceIcon() {
+        return generateOriginNodeForceIcon;
+    }
+
+    public void setGenerateOriginNodeForceIcon(final boolean generateOriginNodeForceIcon) {
+        this.generateOriginNodeForceIcon = generateOriginNodeForceIcon;
+    }
+
+    public TreeMap<Integer, Integer> getForceWeightLimits() {
+        return forceWeightLimits;
+    }
+
+    public void setForceWeightLimits(final TreeMap<Integer, Integer> forceWeightLimits) {
+        this.forceWeightLimits = forceWeightLimits;
+    }
     //endregion Unit
 
     //region Spares
@@ -819,6 +846,12 @@ public class CompanyGenerationOptions implements Serializable {
         // Unit
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
+        for (final Map.Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
 
         // Spares
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMothballedSpareUnits", isGenerateMothballedSpareUnits());
@@ -1045,6 +1078,24 @@ public class CompanyGenerationOptions implements Serializable {
                     case "generateForceIcons":
                         options.setGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "generateOriginNodeForceIcon":
+                        options.setGenerateOriginNodeForceIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "forceWeightLimits": {
+                        options.setForceWeightLimits(new TreeMap<>());
+                        final NodeList nl2 = wn.getChildNodes();
+                        for (int y = 0; y < nl2.getLength(); y++) {
+                            final Node wn2 = nl2.item(y);
+                            try {
+                                options.getForceWeightLimits().put(
+                                        Integer.parseInt(wn2.getNodeName().trim()),
+                                        Integer.parseInt(wn2.getTextContent().trim()));
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                        break;
+                    }
                     //endregion Units
 
                     //region Spares

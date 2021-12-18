@@ -902,45 +902,43 @@ public abstract class AbstractCompanyGenerator {
         final Alphabet[] alphabet = Alphabet.values();
         String background = "";
 
-        if (getOptions().isGenerateForceIcons() && (MHQStaticDirectoryManager.getForceIcons() != null)) {
-            // FIXME : We need a new way to handle this form of search... just default to CSR for now
-            background = "CSR.png";
-            /*
-            if (MHQStaticDirectoryManager.getForceIcons().getItems().keySet().stream()
-                    .anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getFullName(campaign.getGameYear())))) {
-                background = getOptions().getFaction().getFullName(campaign.getGameYear());
+        if (getOptions().isGenerateForceIcons()) {
+            if (MHQStaticDirectoryManager.getForceIcons() != null) {
+                // FIXME : We need a new way to handle this form of search... just default to CSR for now
+                background = "CSR.png";
+                /*
+                if (MHQStaticDirectoryManager.getForceIcons().getItems().keySet().stream()
+                        .anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getFullName(campaign.getGameYear())))) {
+                    background = getOptions().getFaction().getFullName(campaign.getGameYear());
+                }
+
+                if (background.isBlank() && (MHQStaticDirectoryManager.getForceIcons().getItems().keySet()
+                        .stream().anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getShortName())))) {
+                    background = getOptions().getFaction().getShortName();
+                }
+                */
             }
 
-            if (background.isBlank() && (MHQStaticDirectoryManager.getForceIcons().getItems().keySet()
-                    .stream().anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getShortName())))) {
-                background = getOptions().getFaction().getShortName();
+            // Create the Origin Force Icon
+            if (getOptions().isGenerateOriginNodeForceIcon()) {
+                final LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
+
+                // Type
+                iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
+                iconMap.get(LayeredForceIcon.TYPE.getLayerPath()).add("BattleMech.png");
+
+                // Background
+                if (!background.isBlank()) {
+                    iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
+                    iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
+                }
+
+                // Frame
+                iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), new Vector<>());
+                iconMap.get(LayeredForceIcon.FRAME.getLayerPath()).add("Frame.png");
+
+                originForce.setIconMap(iconMap);
             }
-            */
-        }
-
-        // Create the Origin Force Icon, if we are generating force icons and the origin icon has
-        // not been set
-        if (getOptions().isGenerateForceIcons()
-                && Force.ROOT_LAYERED.equals(originForce.getIconCategory())
-                && (originForce.getIconMap().entrySet().size() == 1)
-                && (originForce.getIconMap().containsKey(LayeredForceIcon.FRAME.getLayerPath()))) {
-            final LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
-
-            // Type
-            iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
-            iconMap.get(LayeredForceIcon.TYPE.getLayerPath()).add("BattleMech.png");
-
-            // Background
-            if (!background.isBlank()) {
-                iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
-                iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
-            }
-
-            // Frame
-            iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), new Vector<>());
-            iconMap.get(LayeredForceIcon.FRAME.getLayerPath()).add("Frame.png");
-
-            originForce.setIconMap(iconMap);
         }
 
         // Generate the Mercenary Company Command Lance
@@ -1070,19 +1068,8 @@ public abstract class AbstractCompanyGenerator {
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
                 .mapToDouble(unit -> unit.getEntity().getWeight()).sum();
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));
-        if (weight > 390) {
-            return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-        } else if (weight > 280) {
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        } else if (weight > 200) {
-            return EntityWeightClass.WEIGHT_HEAVY;
-        } else if (weight > 130) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        } else if (weight >= 40) {
-            return EntityWeightClass.WEIGHT_LIGHT;
-        } else {
-            return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-        }
+        final Map.Entry<Integer, Integer> entry = getOptions().getForceWeightLimits().ceilingEntry((int) Math.round(weight));
+        return (entry == null) ? EntityWeightClass.WEIGHT_SUPER_HEAVY : entry.getValue();
     }
     //endregion Unit
 

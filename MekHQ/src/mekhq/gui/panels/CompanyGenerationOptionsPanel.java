@@ -20,6 +20,7 @@ package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
+import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -38,6 +39,7 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
@@ -94,6 +96,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     // Unit
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
     private JCheckBox chkGenerateForceIcons;
+    private JCheckBox chkGenerateOriginNodeForceIcon;
+    private Map<Integer, JSpinner> spnForceWeightLimits;
 
     // Spares
     private JCheckBox chkGenerateMothballedSpareUnits;
@@ -499,6 +503,22 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setChkGenerateForceIcons(final JCheckBox chkGenerateForceIcons) {
         this.chkGenerateForceIcons = chkGenerateForceIcons;
+    }
+
+    public JCheckBox getChkGenerateOriginNodeForceIcon() {
+        return chkGenerateOriginNodeForceIcon;
+    }
+
+    public void setChkGenerateOriginNodeForceIcon(final JCheckBox chkGenerateOriginNodeForceIcon) {
+        this.chkGenerateOriginNodeForceIcon = chkGenerateOriginNodeForceIcon;
+    }
+
+    public Map<Integer, JSpinner> getSpnForceWeightLimits() {
+        return spnForceWeightLimits;
+    }
+
+    public void setSpnForceWeightLimits(final Map<Integer, JSpinner> spnForceWeightLimits) {
+        this.spnForceWeightLimits = spnForceWeightLimits;
     }
     //endregion Unit
 
@@ -1356,6 +1376,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     }
 
     private JPanel createUnitPanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel forceWeightLimitsPanel = new JDisableablePanel("forceWeightLimitsPanel");
+
         // Create Panel Components
         final JLabel lblForceNamingMethod = new JLabel(resources.getString("lblForceNamingMethod.text"));
         lblForceNamingMethod.setToolTipText(resources.getString("lblForceNamingMethod.toolTipText"));
@@ -1379,6 +1402,17 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         setChkGenerateForceIcons(new JCheckBox(resources.getString("chkGenerateForceIcons.text")));
         getChkGenerateForceIcons().setToolTipText(resources.getString("chkGenerateForceIcons.toolTipText"));
         getChkGenerateForceIcons().setName("chkGenerateForceIcons");
+        getChkGenerateForceIcons().addActionListener(evt -> {
+            final boolean selected = getChkGenerateForceIcons().isSelected();
+            getChkGenerateOriginNodeForceIcon().setEnabled(selected);
+            forceWeightLimitsPanel.setEnabled(selected);
+        });
+
+        setChkGenerateOriginNodeForceIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeForceIcon.text")));
+        getChkGenerateOriginNodeForceIcon().setToolTipText(resources.getString("chkGenerateOriginNodeForceIcon.toolTipText"));
+        getChkGenerateOriginNodeForceIcon().setName("chkGenerateOriginNodeForceIcon");
+
+        createForceWeightLimitsPanel(forceWeightLimitsPanel);
 
         // Programmatically Assign Accessibility Labels
         lblForceNamingMethod.setLabelFor(getComboForceNamingMethod());
@@ -1399,6 +1433,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblForceNamingMethod)
                                 .addComponent(getComboForceNamingMethod(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkGenerateForceIcons())
+                        .addComponent(getChkGenerateOriginNodeForceIcon())
+                        .addComponent(forceWeightLimitsPanel)
         );
 
         layout.setHorizontalGroup(
@@ -1407,8 +1443,33 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblForceNamingMethod)
                                 .addComponent(getComboForceNamingMethod()))
                         .addComponent(getChkGenerateForceIcons())
+                        .addComponent(getChkGenerateOriginNodeForceIcon())
+                        .addComponent(forceWeightLimitsPanel)
         );
         return panel;
+    }
+
+    private void createForceWeightLimitsPanel(final JPanel panel) {
+        // Create Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("forceWeightLimitsPanel.title")));
+        panel.setToolTipText(resources.getString("forceWeightLimitsPanel.toolTipText"));
+        panel.setLayout(new GridLayout(0, 2));
+
+        // Create Panel Components
+        setSpnForceWeightLimits(new HashMap<>());
+        for (int i = EntityWeightClass.WEIGHT_ULTRA_LIGHT; i <= EntityWeightClass.WEIGHT_ASSAULT; i++) {
+            final String weightClass = EntityWeightClass.getClassName(i);
+
+            final JLabel label = new JLabel(weightClass);
+            label.setToolTipText(resources.getString("forceWeightLimitsPanel.toolTipText"));
+            label.setName("lbl" + weightClass);
+            panel.add(label);
+
+            getSpnForceWeightLimits().put(i, new JSpinner(new SpinnerNumberModel(0, 0, 10000, 10)));
+            getSpnForceWeightLimits().get(i).setToolTipText(resources.getString("forceWeightLimitsPanel.toolTipText"));
+            getSpnForceWeightLimits().get(i).setName("spn" + weightClass);
+            panel.add(getSpnForceWeightLimits().get(i));
+        }
     }
 
     private JPanel createSparesPanel() {
@@ -1893,6 +1954,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         // Unit
         getComboForceNamingMethod().setSelectedItem(options.getForceNamingMethod());
         getChkGenerateForceIcons().setSelected(options.isGenerateForceIcons());
+        getChkGenerateOriginNodeForceIcon().setSelected(options.isGenerateOriginNodeForceIcon());
+        for (final Map.Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
+            getSpnForceWeightLimits().get(entry.getValue()).setValue(entry.getKey());
+        }
 
         // Spares
         if (getChkGenerateMothballedSpareUnits().isSelected() != options.isGenerateMothballedSpareUnits()) {
@@ -2002,6 +2067,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         // Unit
         options.setForceNamingMethod(getComboForceNamingMethod().getSelectedItem());
         options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
+        options.setGenerateOriginNodeForceIcon(getChkGenerateOriginNodeForceIcon().isSelected());
+        options.setForceWeightLimits(new TreeMap<>());
+        for (final Map.Entry<Integer, JSpinner> entry : getSpnForceWeightLimits().entrySet()) {
+            options.getForceWeightLimits().put((int) entry.getValue().getValue(), entry.getKey());
+        }
 
         // Spares
         options.setGenerateMothballedSpareUnits(getChkGenerateMothballedSpareUnits().isSelected());
