@@ -190,7 +190,8 @@ This is a story arc in active development. Try at your own risk!
                 <systemId>Baker 3</systemId>
                 <desc></desc>
             </mission>
-            <nextEventId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextEventId>
+            <scenarioEventId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioEventId>
+            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -199,6 +200,7 @@ This is a story arc in active development. Try at your own risk!
                 <systemId>Devin</systemId>
                 <desc></desc>
             </mission>
+            <scenarioEventId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioEventId>
             <nextEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="a5776ce4-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
@@ -208,6 +210,7 @@ This is a story arc in active development. Try at your own risk!
                 <systemId>Denizli</systemId>
                 <desc></desc>
             </mission>
+            <scenarioEventId>512d07d4-b311-4339-9924-d6158b52464c</scenarioEventId>
             <nextEventId>bd808af0-5b16-11ec-bf63-0242ac130002</nextEventId>
         </storyEvent>
         <storyEvent id="bd808af0-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
@@ -217,6 +220,7 @@ This is a story arc in active development. Try at your own risk!
                 <systemId>Twycross</systemId>
                 <desc></desc>
             </mission>
+            <scenarioEventId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioEventId>
         </storyEvent>
         <storyEvent id="dbc0f96e-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -244,6 +248,54 @@ This is a story arc in active development. Try at your own risk!
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                 <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyEvent>
+        <storyEvent id="d4db6ca7-6e54-4188-81c0-3b578b944435" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>bf41db33-2683-459f-855b-0632eedb807e</missionEventId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Hide and Seek</name>
+                <desc>
+                </desc>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>bf41db33-2683-459f-855b-0632eedb807e</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyEvent>
+        <storyEvent id="d8bdc8c9-8057-4cc2-a933-e8534d410200" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionEventId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Into the Storm</name>
+                <desc>
+                </desc>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyEvent>
+        <storyEvent id="512d07d4-b311-4339-9924-d6158b52464c" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionEventId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>A Cool Scenario Name</name>
+                <desc>
+                </desc>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionEventId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyEvent>
+        <storyEvent id="93c31ab2-50ef-44ce-8241-5cfcb5d3b378" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
+            <missionEventId>bd808af0-5b16-11ec-bf63-0242ac130002</missionEventId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Blood and Sand</name>
+                <desc>
+                </desc>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionEventId>bd808af0-5b16-11ec-bf63-0242ac130002</missionEventId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
         </storyEvent>
