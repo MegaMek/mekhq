@@ -1953,7 +1953,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Unit
         getComboForceNamingMethod().setSelectedItem(options.getForceNamingMethod());
-        getChkGenerateForceIcons().setSelected(options.isGenerateForceIcons());
+        if (getChkGenerateForceIcons().isSelected() != options.isGenerateForceIcons()) {
+            getChkGenerateForceIcons().doClick();
+        }
         getChkGenerateOriginNodeForceIcon().setSelected(options.isGenerateOriginNodeForceIcon());
         for (final Map.Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
             getSpnForceWeightLimits().get(entry.getValue()).setValue(entry.getKey());
