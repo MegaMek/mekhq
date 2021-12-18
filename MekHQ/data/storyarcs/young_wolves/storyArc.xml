@@ -32,13 +32,16 @@ This is a story arc in active development. Try at your own risk!
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
             <nextEventId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextEventId>
         </storyEvent>
+        <storyEvent id="84832d14-3c74-4ef8-8dfb-52a265c60b0f" type="mekhq.campaign.storyarc.storyevent.PersonKilledStoryEvent">
+            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+        </storyEvent>
         <storyEvent id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
             <title>A Khan's Greeting</title>
             <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
 
                 Greetings, @commander. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?</question>
             <choice id="honor">No, My Khan. I consider it a great honor.</choice>
-            <choice id="duty">It would not have been my first choice, but I will do my duty.</choice>
+            <choice id="duty">I will do my duty regardless of any personal feelings.</choice>
             <choice id="farce">Your khanship is a farce.</choice>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <storyOutcomes>
@@ -58,7 +61,7 @@ This is a story arc in active development. Try at your own risk!
             <narrative>
                 *(A slight smile creases her lips)*
 
-                 I thought there might be reason Ulric chose you to whip these young warriors into shape.
+                 I thought there must be a reason Ulric chose you to whip these young warriors into shape.
 
                  I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>
@@ -70,7 +73,7 @@ This is a story arc in active development. Try at your own risk!
             <narrative>
                 *(Kerensky gives you a quizzical look)*
 
-                Spoken like a true soldier. Most in the clans would not consider that a compliment, but perhaps more soldiers is exactly what we need. We shall see.
+                Spoken like a true soldier...but not a warrior. Whose been tainted by the Inner Sphere now? No matter, perhaps we will have more need of soldiers to survive.
 
                 I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>
@@ -82,7 +85,7 @@ This is a story arc in active development. Try at your own risk!
             <narrative>
                 *(Kerensky's eyes narrow dangerously)*
 
-                I appreciate your honesty, but may have died for saying less to me. You are lucky I have no time today to deal with you.
+                I appreciate your honesty, but may have died for saying less to me. You are lucky I do not have the time today.
 
                 I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -100,7 +103,7 @@ This is a story arc in active development. Try at your own risk!
 
                 And that is touchdown. Prepare bays for egress.
 
-                *You hear the distance sound of hydraulic motors*
+                *You hear the distant sound of hydraulic motors*
 
                 @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -128,9 +131,9 @@ This is a story arc in active development. Try at your own risk!
         <storyEvent id="c3b2acb9-f91f-4704-9dc2-6fb16a82f272" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>Tech Chat</title>
             <narrative>
-              Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines? Do not worry, my team can make them like brand new again. Just head over to the repair bay to check on our progress.
+              Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
 
-              We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once that is used up, we do not really have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
+              We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once those supplies are used up, we do not have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
 
               We also have some second-line mechs mothballed in the cargo bay. These mechs can be used to replace units that have been completely destroyed. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
             </narrative>
@@ -157,7 +160,7 @@ This is a story arc in active development. Try at your own risk!
                 <name>Colmar</name>
                 <type>Planetary Assault</type>
                 <systemId>Colmar</systemId>
-                <desc></desc>
+                <desc>Colmar was notable as the first battlefield of the Refusal War. The main fighting occurred in the Marakaa Valley, where the 352 Wolf Assault Cluster used the dry river bed to position themselves advantageously against the defending 12th Falcon Regulars.</desc>
             </mission>
             <nextEventId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextEventId>
             <scenarioEventId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioEventId>
@@ -217,7 +220,9 @@ This is a story arc in active development. Try at your own risk!
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Cutting Teeth</name>
-                <desc></desc>
+                <desc>
+                  While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a small group of units about a trinary in size has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your trinary to deal with these units.
+                </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                 <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>

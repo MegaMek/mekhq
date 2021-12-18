@@ -25,11 +25,13 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.storyevent.DateReachedStoryEvent;
+import mekhq.campaign.storyarc.storyevent.PersonKilledStoryEvent;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
 import org.apache.logging.log4j.LogManager;
@@ -82,7 +84,6 @@ public class StoryArc implements MekHqXmlSerializable {
         startNew = true;
         storyEvents =  new LinkedHashMap<>();
         personalities = new LinkedHashMap<>();
-        MekHQ.registerHandler(this);
     }
 
     public void setCampaign(Campaign c) { this.campaign = c; }
@@ -191,8 +192,8 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     @Subscribe
-    public void handlNewDay(NewDayEvent ev) {
-        //search through StoryEvents for a matching TravelStoryEvent
+    public void handleNewDay(NewDayEvent ev) {
+        //search through StoryEvents for a matching DateReachedStoryEvent
         DateReachedStoryEvent storyEvent;
         for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
             if (entry.getValue() instanceof DateReachedStoryEvent) {
@@ -204,6 +205,24 @@ public class StoryArc implements MekHqXmlSerializable {
 
             }
         }
+    }
+
+    @Subscribe
+    public void handlePersonChanged(PersonChangedEvent ev) {
+        Person p = ev.getPerson();
+        if(null != p && p.getStatus().isDead()) {
+            PersonKilledStoryEvent storyEvent;
+            for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+                if (entry.getValue() instanceof PersonKilledStoryEvent) {
+                    storyEvent = (PersonKilledStoryEvent) entry.getValue();
+                    if(p.getId().equals(storyEvent.getPersonId())) {
+                        storyEvent.startEvent();
+                        break;
+                    }
+                }
+            }
+        }
+
     }
     //endregion EventHandlers
 
