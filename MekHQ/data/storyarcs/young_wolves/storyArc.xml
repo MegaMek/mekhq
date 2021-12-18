@@ -21,6 +21,7 @@ This is a story arc in active development. Try at your own risk!
         </customStringVariable>
     </customStringVariables>
     <storyEvents>
+        <!-- Initial story event -->
         <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
             <xpPool>50</xpPool>
             <rank>34</rank>
@@ -38,9 +39,21 @@ This is a story arc in active development. Try at your own risk!
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
             <nextEventId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextEventId>
         </storyEvent>
+        <!-- Checks on Game Over events -->
         <storyEvent id="84832d14-3c74-4ef8-8dfb-52a265c60b0f" type="mekhq.campaign.storyarc.storyevent.PersonKilledStoryEvent">
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
         </storyEvent>
+        <!-- variable checks -->
+        <storyEvent id="948f6baa-7079-48e7-aec5-4989832a6c2a" type="mekhq.campaign.storyarc.storyevent.CheckStringVariableStoryEvent">
+           <key>first_impressions</key>
+            <storyOutcomes>
+                <storyOutcome result="farce">
+                    <nextEventId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextEventId>
+                </storyOutcome>
+            </storyOutcomes>
+            <nextEventId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextEventId>
+        </storyEvent>
+        <!-- Choice story events -->
         <storyEvent id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
             <title>A Khan's Greeting</title>
             <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
@@ -74,6 +87,24 @@ This is a story arc in active development. Try at your own risk!
                 </storyOutcome>
             </storyOutcomes>
         </storyEvent>
+        <storyEvent id="14a73d17-9527-4ddf-93ec-e8904905b89d" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+            <title>Sad Tidings</title>
+            <question>
+                I know you had little respect for Khan Kerensky, but surely after her sacrifice on Twycross, you must have a better appreciation for her honor?
+            </question>
+            <choice id="yes">She died a warrior's death and earned a place in the Remberance.</choice>
+            <choice id="no">She failed in her mission and reaped her reward.</choice>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <storyOutcomes>
+                <storyOutcome result="yes">
+                    <nextEventId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextEventId>
+                </storyOutcome>
+                <storyOutcome result="no">
+                    <nextEventId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextEventId>
+                </storyOutcome>
+            </storyOutcomes>
+        </storyEvent>
+        <!-- Narrative story events -->
         <storyEvent id="e8c9803c-3bda-47f7-9609-176ca461bf88" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
             <title>A Khan's Greeting</title>
             <narrative>
@@ -169,10 +200,26 @@ This is a story arc in active development. Try at your own risk!
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
         </storyEvent>
+        <storyEvent id="832c8261-48af-4bea-bc6a-05f9bbf79fc8" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>Sad Tidings</title>
+            <narrative>
+                Khan Kerensky's death is a loss to our entire clan but we must push on. Now, it is time for you to make a choice.
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+        </storyEvent>
+        <storyEvent id="e66a373c-9b4c-406d-9171-859a9e8c72ce" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>Sad Tidings</title>
+            <narrative>
+                Stubborn to your Crusader's creed until the last. No matter. You will join me on Wotan for our final assault on the Jade Falcons. It is unlikely we will survive but we will make them pay for our deaths dearly.
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+        </storyEvent>
+        <!-- Travel Story Events -->
         <storyEvent id="2c6f5703-3a86-43b8-b7d7-e8cf04f06417" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
             <destinationId>Baker 3</destinationId>
             <nextEventId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextEventId>
         </storyEvent>
+        <!-- Missions -->
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Colmar</name>
@@ -221,6 +268,7 @@ This is a story arc in active development. Try at your own risk!
                 <desc></desc>
             </mission>
             <scenarioEventId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioEventId>
+            <nextEventId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextEventId>
         </storyEvent>
         <storyEvent id="dbc0f96e-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -238,6 +286,7 @@ This is a story arc in active development. Try at your own risk!
                 <desc></desc>
             </mission>
         </storyEvent>
+        <!-- Scenarios -->
         <storyEvent id="fd7158c2-1d1b-48e6-8eb3-8a72d580c172" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
             <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
             <scenario type="mekhq.campaign.mission.Scenario">
@@ -302,7 +351,7 @@ This is a story arc in active development. Try at your own risk!
     </storyEvents>
     <personalities>
         <personality id="c788dea8-35d8-40b2-9fae-78c9f2215120">
-            <title>Former ilKhan Ulric Kerensky</title>
+            <title>Star Colonel Ulric Kerensky</title>
             <portrait>
                 <category></category>
                 <filename>UlricKerensky.jpg</filename>
