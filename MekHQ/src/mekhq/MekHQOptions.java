@@ -79,7 +79,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public boolean getShowCompanyGenerator() {
-        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, false);
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, true);
     }
 
     public void setShowCompanyGenerator(final boolean value) {
