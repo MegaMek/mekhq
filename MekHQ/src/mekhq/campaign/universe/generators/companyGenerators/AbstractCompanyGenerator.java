@@ -590,16 +590,18 @@ public abstract class AbstractCompanyGenerator {
         Comparator<AtBRandomMechParameters> parametersComparator = (p1, p2) -> 0;
 
         if (getOptions().isSortStarLeagueUnitsFirst()) {
-            parametersComparator = parametersComparator.thenComparing(AtBRandomMechParameters::isStarLeague).reversed();
+            parametersComparator = parametersComparator.thenComparing(AtBRandomMechParameters::isStarLeague);
         }
 
         if (getOptions().isGroupByWeight()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getWeight).reversed();
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getWeight);
         }
 
         if (getOptions().isGroupByQuality()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getQuality).reversed();
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getQuality);
         }
+
+        parametersComparator = parametersComparator.reversed();
 
         if (getOptions().isKeepOfficerRollsSeparate()) {
             final int firstNonOfficer = determineNumberOfLances();
@@ -943,7 +945,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Generate the Mercenary Company Command Lance
         if (getOptions().isGenerateMercenaryCompanyCommandLance()) {
-            Force commandLance = createLance(campaign, originForce, trackers, campaign.getName()
+            final Force commandLance = createLance(campaign, originForce, trackers, campaign.getName()
                     + resources.getString("AbstractCompanyGenerator.commandLance.text"), background);
             commandLance.getIconMap().put(LayeredForceIcon.SPECIAL_MODIFIER.getLayerPath(), new Vector<>());
             commandLance.getIconMap().get(LayeredForceIcon.SPECIAL_MODIFIER.getLayerPath()).add("HQ indicator.png");
@@ -997,7 +999,7 @@ public abstract class AbstractCompanyGenerator {
     private Force createLance(final Campaign campaign, final Force head,
                               final List<CompanyGenerationPersonTracker> trackers,
                               final String name, final String background) {
-        Force lance = new Force(name);
+        final Force lance = new Force(name);
         campaign.addForce(lance, head);
         for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
             campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
