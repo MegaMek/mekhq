@@ -30,10 +30,7 @@ import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.storyarc.storyevent.DateReachedStoryEvent;
-import mekhq.campaign.storyarc.storyevent.PersonKilledStoryEvent;
-import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
-import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
+import mekhq.campaign.storyarc.storyevent.*;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
 
@@ -213,7 +210,7 @@ public class StoryArc implements MekHqXmlSerializable {
         for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
             if (entry.getValue() instanceof DateReachedStoryEvent) {
                 storyEvent = (DateReachedStoryEvent) entry.getValue();
-                if(null != storyEvent.getDate() && ev.getCampaign().getLocalDate().equals(storyEvent.getDate())) {
+                if (null != storyEvent.getDate() && ev.getCampaign().getLocalDate().equals(storyEvent.getDate())) {
                     storyEvent.startEvent();
                     break;
                 }
@@ -225,12 +222,23 @@ public class StoryArc implements MekHqXmlSerializable {
     @Subscribe
     public void handlePersonChanged(PersonChangedEvent ev) {
         Person p = ev.getPerson();
-        if(null != p && p.getStatus().isDead()) {
+        if (null != p && p.getStatus().isDead()) {
             PersonKilledStoryEvent storyEvent;
             for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
                 if (entry.getValue() instanceof PersonKilledStoryEvent) {
                     storyEvent = (PersonKilledStoryEvent) entry.getValue();
-                    if(p.getId().equals(storyEvent.getPersonId())) {
+                    if (p.getId().equals(storyEvent.getPersonId())) {
+                        storyEvent.startEvent();
+                        break;
+                    }
+                }
+            }
+        } else if (null != p && p.getStatus().isMIA()) {
+            PersonMiaStoryEvent storyEvent;
+            for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+                if (entry.getValue() instanceof PersonMiaStoryEvent) {
+                    storyEvent = (PersonMiaStoryEvent) entry.getValue();
+                    if (p.getId().equals(storyEvent.getPersonId())) {
                         storyEvent.startEvent();
                         break;
                     }
