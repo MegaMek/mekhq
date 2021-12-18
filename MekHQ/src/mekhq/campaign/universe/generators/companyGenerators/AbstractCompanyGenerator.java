@@ -1314,8 +1314,9 @@ public abstract class AbstractCompanyGenerator {
             }
 
             if (startingCash.isPositive()) {
-                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL, campaign.getLocalDate(), startingCash,
-                        resources.getString(""));
+                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
+                        campaign.getLocalDate(), startingCash,
+                        resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
                 if (loan.isZero()) {
                     campaign.addReport("");
                 } else {
@@ -1335,12 +1336,15 @@ public abstract class AbstractCompanyGenerator {
                 }
             }
         } else {
-            campaign.addReport("");
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
                     : minimumStartingFloat;
-            if (!startingCash.isZero()) {
-                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL, campaign.getLocalDate(), startingCash,
-                        resources.getString(""));
+            if (startingCash.isPositive()) {
+                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
+                        campaign.getLocalDate(), startingCash,
+                        resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
+                //campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.report"));
+            } else {
+                //campaign.addReport(resources.getString(""));
             }
         }
     }
