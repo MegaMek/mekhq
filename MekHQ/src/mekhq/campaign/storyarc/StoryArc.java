@@ -30,7 +30,7 @@ import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.storyarc.storyevent.*;
+import mekhq.campaign.storyarc.storypoint.*;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
 
@@ -57,11 +57,11 @@ public class StoryArc implements MekHqXmlSerializable {
     /** Can this story arc be added to existing campaign or does it need to start fresh? **/
     private boolean startNew;
 
-    /** A UUID for the initial event in this track  - can be null **/
-    private UUID startingEventId;
+    /** A UUID for the initial StoryPoint in this track  - can be null **/
+    private UUID startingPointId;
 
-    /** A hash of all possible StoryEvents in this StoryArc, referenced by UUID **/
-    private Map<UUID, StoryEvent> storyEvents;
+    /** A hash of all possible StoryPoints in this StoryArc, referenced by UUID **/
+    private Map<UUID, StoryPoint> storyPoints;
 
     /** A hash of possible personalities that the player might interact with in this story arc **/
     private Map<UUID, Personality> personalities;
@@ -84,7 +84,7 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public StoryArc() {
         startNew = true;
-        storyEvents =  new LinkedHashMap<>();
+        storyPoints =  new LinkedHashMap<>();
         personalities = new LinkedHashMap<>();
         customStringVariables = new LinkedHashMap<>();
     }
@@ -107,9 +107,9 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private void setStartNew(Boolean b) { this.startNew = b; }
 
-    private void setStartingEventId(UUID u) { this.startingEventId = u; }
+    private void setStartingPointId(UUID u) { this.startingPointId = u; }
 
-    private UUID getStartingEventId() { return startingEventId; }
+    private UUID getStartingPointId() { return startingPointId; }
 
     private void setInitCampaignPath(String s) { this.initCampaignPath =s; }
 
@@ -124,11 +124,11 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public String getDirectoryPath() { return directoryPath; }
 
-    public StoryEvent getStoryEvent(UUID id) {
+    public StoryPoint getStoryPoint(UUID id) {
         if (id == null) {
             return null;
         }
-        return storyEvents.get(id);
+        return storyPoints.get(id);
     }
 
     public Personality getPersonality(UUID id) {
@@ -150,7 +150,7 @@ public class StoryArc implements MekHqXmlSerializable {
 
     public void begin() {
         MekHQ.registerHandler(this);
-        getStoryEvent(getStartingEventId()).startEvent();
+        getStoryPoint(getStartingPointId()).start();
     }
 
     public void initializeDataDirectories() {
@@ -159,12 +159,12 @@ public class StoryArc implements MekHqXmlSerializable {
 
     }
 
-    private ScenarioStoryEvent findStoryEventByScenarioId(int scenarioId) {
-        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-            if (entry.getValue() instanceof ScenarioStoryEvent) {
-                ScenarioStoryEvent storyEvent = (ScenarioStoryEvent) entry.getValue();
-                if (null != storyEvent.getScenario() && storyEvent.getScenario().getId() == scenarioId) {
-                    return storyEvent;
+    private ScenarioStoryPoint findStoryPointByScenarioId(int scenarioId) {
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            if (entry.getValue() instanceof ScenarioStoryPoint) {
+                ScenarioStoryPoint storyPoint = (ScenarioStoryPoint) entry.getValue();
+                if (null != storyPoint.getScenario() && storyPoint.getScenario().getId() == scenarioId) {
+                    return storyPoint;
                 }
             }
         }
@@ -179,23 +179,23 @@ public class StoryArc implements MekHqXmlSerializable {
     //region EventHandlers
     @Subscribe
     public void handleScenarioResolved(ScenarioResolvedEvent ev) {
-        //search through ScenarioStoryEvents for a match and if so complete it
-        ScenarioStoryEvent storyEvent = findStoryEventByScenarioId(ev.getScenario().getId());
-        if(null != storyEvent && storyEvent.isActive()) {
-            storyEvent.completeEvent();
+        // search through ScenarioStoryPoints for a match and if so complete it
+        ScenarioStoryPoint storyPoint = findStoryPointByScenarioId(ev.getScenario().getId());
+        if(null != storyPoint && storyPoint.isActive()) {
+            storyPoint.complete();
         }
     }
 
     @Subscribe
     public void handleTransitComplete(TransitCompleteEvent ev) {
-        //search through StoryEvents for a matching TravelStoryEvent
-        TravelStoryEvent storyEvent;
-        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-            if (entry.getValue() instanceof TravelStoryEvent) {
-                 storyEvent = (TravelStoryEvent) entry.getValue();
-                 if(ev.getLocation().getCurrentSystem().getId().equals(storyEvent.getDestinationId()) &&
-                         storyEvent.isActive()) {
-                     storyEvent.completeEvent();
+        //search through StoryPoints for a matching TravelStoryPoint
+        TravelStoryPoint storyPoint;
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            if (entry.getValue() instanceof TravelStoryPoint) {
+                 storyPoint = (TravelStoryPoint) entry.getValue();
+                 if(ev.getLocation().getCurrentSystem().getId().equals(storyPoint.getDestinationId()) &&
+                         storyPoint.isActive()) {
+                     storyPoint.complete();
                      break;
                 }
 
@@ -205,13 +205,13 @@ public class StoryArc implements MekHqXmlSerializable {
 
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
-        //search through StoryEvents for a matching DateReachedStoryEvent
-        DateReachedStoryEvent storyEvent;
-        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-            if (entry.getValue() instanceof DateReachedStoryEvent) {
-                storyEvent = (DateReachedStoryEvent) entry.getValue();
-                if (null != storyEvent.getDate() && ev.getCampaign().getLocalDate().equals(storyEvent.getDate())) {
-                    storyEvent.startEvent();
+        //search through StoryPoints for a matching DateReachedStoryPoint
+        DateReachedStoryPoint storyPoint;
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            if (entry.getValue() instanceof DateReachedStoryPoint) {
+                storyPoint = (DateReachedStoryPoint) entry.getValue();
+                if (null != storyPoint.getDate() && ev.getCampaign().getLocalDate().equals(storyPoint.getDate())) {
+                    storyPoint.start();
                     break;
                 }
 
@@ -223,23 +223,23 @@ public class StoryArc implements MekHqXmlSerializable {
     public void handlePersonChanged(PersonChangedEvent ev) {
         Person p = ev.getPerson();
         if (null != p && p.getStatus().isDead()) {
-            PersonKilledStoryEvent storyEvent;
-            for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-                if (entry.getValue() instanceof PersonKilledStoryEvent) {
-                    storyEvent = (PersonKilledStoryEvent) entry.getValue();
-                    if (p.getId().equals(storyEvent.getPersonId())) {
-                        storyEvent.startEvent();
+            PersonKilledStoryPoint storyPoint;
+            for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+                if (entry.getValue() instanceof PersonKilledStoryPoint) {
+                    storyPoint = (PersonKilledStoryPoint) entry.getValue();
+                    if (p.getId().equals(storyPoint.getPersonId())) {
+                        storyPoint.start();
                         break;
                     }
                 }
             }
         } else if (null != p && p.getStatus().isMIA()) {
-            PersonMiaStoryEvent storyEvent;
-            for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
-                if (entry.getValue() instanceof PersonMiaStoryEvent) {
-                    storyEvent = (PersonMiaStoryEvent) entry.getValue();
-                    if (p.getId().equals(storyEvent.getPersonId())) {
-                        storyEvent.startEvent();
+            PersonMiaStoryPoint storyPoint;
+            for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+                if (entry.getValue() instanceof PersonMiaStoryPoint) {
+                    storyPoint = (PersonMiaStoryPoint) entry.getValue();
+                    if (p.getId().equals(storyPoint.getPersonId())) {
+                        storyPoint.start();
                         break;
                     }
                 }
@@ -285,9 +285,9 @@ public class StoryArc implements MekHqXmlSerializable {
                 .append("</startNew>")
                 .append(NL)
                 .append(level1)
-                .append("<startingEventId>")
-                .append(startingEventId)
-                .append("</startingEventId>")
+                .append("<startingPointId>")
+                .append(startingPointId)
+                .append("</startingPointId>")
                 .append(NL)
                 .append(level1)
                 .append("<directoryPath>")
@@ -297,12 +297,12 @@ public class StoryArc implements MekHqXmlSerializable {
         pw1.print(builder.toString());
 
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<storyEvents>");
-        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+                +"<storyPoints>");
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             entry.getValue().writeToXml(pw1, indent+2);
         }
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"</storyEvents>");
+                +"</storyPoints>");
 
         if(!personalities.isEmpty()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -342,18 +342,18 @@ public class StoryArc implements MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyArc>");
     }
 
-    protected void parseStoryEvents(NodeList nl, Campaign c) {
+    protected void parseStoryPoints(NodeList nl, Campaign c) {
         try {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        !wn.getNodeName().equals("storyEvent")) {
+                        !wn.getNodeName().equals("storyPoint")) {
                     continue;
                 }
-                StoryEvent event = StoryEvent.generateInstanceFromXML(wn, c);
-                if(null != event) {
-                    event.setStoryArc(this);
-                    storyEvents.put(event.getId(), event);
+                StoryPoint storyPoint = StoryPoint.generateInstanceFromXML(wn, c);
+                if(null != storyPoint) {
+                    storyPoint.setStoryArc(this);
+                    storyPoints.put(storyPoint.getId(), storyPoint);
                 }
             }
         } catch (Exception e) {
@@ -436,14 +436,14 @@ public class StoryArc implements MekHqXmlSerializable {
                     case "startNew":
                         storyArc.setStartNew(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "startingEventId":
-                        storyArc.setStartingEventId(UUID.fromString(wn.getTextContent().trim()));
+                    case "startingPointId":
+                        storyArc.setStartingPointId(UUID.fromString(wn.getTextContent().trim()));
                         break;
                     case "directoryPath":
                         storyArc.setDirectoryPath(wn.getTextContent().trim());
                         break;
-                    case "storyEvents":
-                        storyArc.parseStoryEvents(wn.getChildNodes(), c);
+                    case "storyPoints":
+                        storyArc.parseStoryPoints(wn.getChildNodes(), c);
                         break;
                     case "personalities":
                         storyArc.parsePersonalities(wn.getChildNodes(), c);

@@ -1,7 +1,7 @@
 /*
- * DateReachedStoryEvent.java
+ * PersonMiaStoryPoint.java
  *
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,21 +31,21 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.time.LocalDate;
+import java.util.UUID;
 
-public class DateReachedStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class PersonMiaStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    LocalDate date;
+    UUID personId;
 
-    public DateReachedStoryEvent() {
+    public PersonMiaStoryPoint() {
         super();
     }
 
-    public LocalDate getDate() { return date; }
+    public UUID getPersonId() { return personId; }
 
     @Override
     public String getTitle() {
-        return "Date reached";
+        return "Person mia";
     }
 
     @Override
@@ -54,18 +54,18 @@ public class DateReachedStoryEvent extends StoryEvent implements Serializable, M
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
-        completeEvent();
+    public void start() {
+        super.start();
+        complete();
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<date>"
-                +MekHqXmlUtil.saveFormattedDate(date)
-                +"</date>");
+                +"<personId>"
+                +personId
+                +"</personId>");
 
         writeToXmlEnd(pw1, indent);
     }
@@ -78,8 +78,8 @@ public class DateReachedStoryEvent extends StoryEvent implements Serializable, M
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                    personId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

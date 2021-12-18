@@ -33,9 +33,9 @@ import java.io.Serializable;
 import java.text.ParseException;
 
 /**
- * A Story Trigger can be added to a StoryEvent or a StoryOutcome and when the StoryEvent is completed the StoryTrigger
- * will be executed and will do some things. This is a way to have StoryEvents affect things other than just the
- * next event
+ * A Story Trigger can be added to a StoryPoint or a StoryOutcome and when the StoryPoint is completed the StoryTrigger
+ * will be executed and will do some things. This is a way to have StoryPoints affect things other than just the
+ * next story point
  */
 public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable {
 

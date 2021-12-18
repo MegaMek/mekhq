@@ -1,5 +1,5 @@
 /*
- * MissionStoryEvent.java
+ * MissionStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,15 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,24 +38,24 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * A StoryEvent class to start a new mission. This will pull from hash of possible missions in StoryArc. Because
+ * A StoryPoint class to start a new mission. This will pull from hash of possible missions in StoryArc. Because
  * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
  * i.e. non-repeatable. Scenarios however can be repeatable.
  */
-public class MissionStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class MissionStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     /* A mission object to track the mission */
     private Mission mission;
 
     /**
-     * A list of ScenarioStoryEvent ids to add to this mission when it is created. not all Scenarios
-     * need to be added at the start as ScenarioStoryEvents may also trigger further ScenarioStoryEvents
+     * A list of ScenarioStoryPoint ids to add to this mission when it is created. not all Scenarios
+     * need to be added at the start as ScenarioStoryPoints may also trigger further ScenarioStoryPoints
      */
-    private List<UUID> scenarioEventIds;
+    private List<UUID> scenarioStoryPointIds;
 
-    public MissionStoryEvent() {
+    public MissionStoryPoint() {
         super();
-        scenarioEventIds = new ArrayList<UUID>();
+        scenarioStoryPointIds = new ArrayList<UUID>();
     }
 
     @Override
@@ -68,28 +67,28 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
+    public void start() {
+        super.start();
         if(null != mission) {
             getStoryArc().getCampaign().addMission(mission);
         }
-        StoryEvent scenarioEvent;
-        for(UUID scenarioEventId : scenarioEventIds) {
-            scenarioEvent = getStoryArc().getStoryEvent(scenarioEventId);
-            if(null != scenarioEvent) {
-                scenarioEvent.startEvent();
+        StoryPoint scenarioStoryPoint;
+        for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
+            scenarioStoryPoint = getStoryArc().getStoryPoint(scenarioStoryPointId);
+            if(null != scenarioStoryPoint) {
+                scenarioStoryPoint.start();
             }
         }
     }
 
     @Override
-    public void completeEvent() {
+    public void complete() {
         //Its possible mission status has already changed, but if not then set to failed for now for testing
         //TODO: create some logic for determining success of mission in cases where user does not specify
         if(null != mission && mission.getStatus().isActive()) {
             mission.setStatus(MissionStatus.FAILED);
         }
-        super.completeEvent();
+        super.complete();
     }
 
     public Mission getMission() { return mission; }
@@ -105,11 +104,11 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        for(UUID scenarioEventId : scenarioEventIds) {
+        for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<scenarioEventId>"
-                    +scenarioEventId
-                    +"</scenarioEventId>");
+                    +"<scenarioStoryPointId>"
+                    +scenarioStoryPointId
+                    +"</scenarioStoryPointId>");
         }
         if(null != mission) {
             //if the mission has a valid id, then just save this because the mission is saved
@@ -142,8 +141,8 @@ public class MissionStoryEvent extends StoryEvent implements Serializable, MekHq
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                     mission = Mission.generateInstanceFromXML(wn2, c, null);
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioEventId")) {
-                    scenarioEventIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioStoryPointId")) {
+                    scenarioStoryPointIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

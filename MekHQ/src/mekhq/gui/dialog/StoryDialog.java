@@ -19,17 +19,12 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.Personality;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -43,11 +38,11 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private int imgWidth;
 
-    private StoryEvent storyEvent;
+    private StoryPoint storyPoint;
 
-    public StoryDialog(final JFrame parent, StoryEvent sEvent) {
+    public StoryDialog(final JFrame parent, StoryPoint sEvent) {
         super(parent, sEvent.getTitle(), true);
-        this.storyEvent = sEvent;
+        this.storyPoint = sEvent;
     }
 
     //region initialization
@@ -76,18 +71,18 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     protected abstract Container getMainPanel();
     //endregion initialization
 
-    protected StoryEvent getStoryEvent() {
-        return storyEvent;
+    protected StoryPoint getStoryPoint() {
+        return storyPoint;
     }
 
     protected JPanel getImagePanel() {
         JPanel imagePanel = new JPanel(new BorderLayout());
 
         imgWidth = 0;
-        Image img = getStoryEvent().getImage();
+        Image img = getStoryPoint().getImage();
 
         //check for personality as this will override image
-        Personality p = getStoryEvent().getPersonality();
+        Personality p = getStoryPoint().getPersonality();
         if(null != p) {
             img = p.getImage();
         }

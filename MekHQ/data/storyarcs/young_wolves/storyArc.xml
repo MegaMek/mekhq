@@ -13,16 +13,16 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
     </description>
     <startNew>true</startNew>
-    <startingEventId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</startingEventId>
+    <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
     <customStringVariables>
         <customStringVariable>
             <key>first_impressions</key>
             <value>none</value>
         </customStringVariable>
     </customStringVariables>
-    <storyEvents>
+    <storyPoints>
         <!-- Initial story event -->
-        <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
+        <storyPoint id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
             <xpPool>50</xpPool>
             <rank>34</rank>
             <firstname>Julius</firstname>
@@ -37,24 +37,24 @@ This is a story arc in active development. Try at your own risk!
             <assignedUnitId>b08958b8-28e2-4086-a980-82772b4fc987</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <nextEventId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextEventId>
-        </storyEvent>
+            <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+        </storyPoint>
         <!-- Checks on Game Over events -->
-        <storyEvent id="84832d14-3c74-4ef8-8dfb-52a265c60b0f" type="mekhq.campaign.storyarc.storyevent.PersonKilledStoryEvent">
+        <storyPoint id="84832d14-3c74-4ef8-8dfb-52a265c60b0f" type="mekhq.campaign.storyarc.storypoint.PersonKilledStoryPoint">
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-        </storyEvent>
+        </storyPoint>
         <!-- variable checks -->
-        <storyEvent id="948f6baa-7079-48e7-aec5-4989832a6c2a" type="mekhq.campaign.storyarc.storyevent.CheckStringVariableStoryEvent">
+        <storyPoint id="948f6baa-7079-48e7-aec5-4989832a6c2a" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
            <key>first_impressions</key>
             <storyOutcomes>
                 <storyOutcome result="farce">
-                    <nextEventId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextEventId>
+                    <nextStoryPointId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <nextEventId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextEventId>
-        </storyEvent>
+            <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
+        </storyPoint>
         <!-- Choice story events -->
-        <storyEvent id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+        <storyPoint id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <title>A Khan's Greeting</title>
             <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
 
@@ -65,29 +65,29 @@ This is a story arc in active development. Try at your own risk!
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <storyOutcomes>
                 <storyOutcome result="honor">
-                    <nextEventId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextEventId>
+                    <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
                         <key>first_impressions</key>
                         <value>honor</value>
                     </storyTrigger>
                 </storyOutcome>
                 <storyOutcome result="duty">
-                    <nextEventId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextEventId>
+                    <nextStoryPointId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextStoryPointId>
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
                         <key>first_impressions</key>
                         <value>duty</value>
                     </storyTrigger>
                 </storyOutcome>
                 <storyOutcome result="farce">
-                    <nextEventId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextEventId>
+                    <nextStoryPointId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextStoryPointId>
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
                         <key>first_impressions</key>
                         <value>farce</value>
                     </storyTrigger>
                 </storyOutcome>
             </storyOutcomes>
-        </storyEvent>
-        <storyEvent id="14a73d17-9527-4ddf-93ec-e8904905b89d" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+        </storyPoint>
+        <storyPoint id="14a73d17-9527-4ddf-93ec-e8904905b89d" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <title>Sad Tidings</title>
             <question>
                 I know you had little respect for Khan Kerensky, but surely after her sacrifice on Twycross, you must have a better appreciation for her honor?
@@ -97,15 +97,15 @@ This is a story arc in active development. Try at your own risk!
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
             <storyOutcomes>
                 <storyOutcome result="yes">
-                    <nextEventId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextEventId>
+                    <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
                 </storyOutcome>
                 <storyOutcome result="no">
-                    <nextEventId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextEventId>
+                    <nextStoryPointId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-        </storyEvent>
+        </storyPoint>
         <!-- Narrative story events -->
-        <storyEvent id="e8c9803c-3bda-47f7-9609-176ca461bf88" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        <storyPoint id="e8c9803c-3bda-47f7-9609-176ca461bf88" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
                 *(A slight smile creases her lips)*
@@ -115,9 +115,9 @@ This is a story arc in active development. Try at your own risk!
                  I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
-        </storyEvent>
-        <storyEvent id="8e3f8bc0-1625-4901-9bd3-fbf3408eefcb" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="8e3f8bc0-1625-4901-9bd3-fbf3408eefcb" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
                 *(Kerensky gives you a quizzical look)*
@@ -127,9 +127,9 @@ This is a story arc in active development. Try at your own risk!
                 I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
-        </storyEvent>
-        <storyEvent id="bbd099bd-f0a2-4323-8d70-ed02b98e1de5" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="bbd099bd-f0a2-4323-8d70-ed02b98e1de5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
                 *(Kerensky's eyes narrow dangerously)*
@@ -138,9 +138,9 @@ This is a story arc in active development. Try at your own risk!
 
                 I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
             </narrative>            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextEventId>276345a4-6168-4999-9381-de5ac56a3d2f</nextEventId>
-        </storyEvent>
-        <storyEvent id="276345a4-6168-4999-9381-de5ac56a3d2f" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="276345a4-6168-4999-9381-de5ac56a3d2f" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to the LZ!</title>
             <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
@@ -156,18 +156,18 @@ This is a story arc in active development. Try at your own risk!
 
                 @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-            <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
+            <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
                 <tab>BRIEFING</tab>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        </storyPoint>
+        <storyPoint id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Post-Mission Report</title>
             <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been utterly destroyed. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextEventId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextEventId>
-        </storyEvent>
-        <storyEvent id="0f3caf49-3b53-4ed5-8f55-690fb7356fc3" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="0f3caf49-3b53-4ed5-8f55-690fb7356fc3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Back on board</title>
             <narrative>
               Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Baker 3. Thats going to take us a few weeks so it should be time to deal with any battle damage and injuries.
@@ -175,9 +175,9 @@ This is a story arc in active development. Try at your own risk!
               When you get back on board, Tech Larine said she would like a word.
             </narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-            <nextEventId>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</nextEventId>
-        </storyEvent>
-        <storyEvent id="c3b2acb9-f91f-4704-9dc2-6fb16a82f272" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="c3b2acb9-f91f-4704-9dc2-6fb16a82f272" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Tech Chat</title>
             <narrative>
               Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
@@ -187,120 +187,120 @@ This is a story arc in active development. Try at your own risk!
               We also have some second-line mechs mothballed in the cargo bay. These mechs can be used to replace units that have been completely destroyed. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
             </narrative>
             <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-            <nextEventId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextEventId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
                 <tab>REPAIR</tab>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        </storyPoint>
+        <storyPoint id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to Baker 3</title>
             <narrative>
               Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
-        </storyEvent>
-        <storyEvent id="832c8261-48af-4bea-bc6a-05f9bbf79fc8" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="832c8261-48af-4bea-bc6a-05f9bbf79fc8" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Sad Tidings</title>
             <narrative>
                 Khan Kerensky's death is a loss to our entire clan but we must push on. Now, it is time for you to make a choice.
             </narrative>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-        </storyEvent>
-        <storyEvent id="e66a373c-9b4c-406d-9171-859a9e8c72ce" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        </storyPoint>
+        <storyPoint id="e66a373c-9b4c-406d-9171-859a9e8c72ce" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Sad Tidings</title>
             <narrative>
                 Stubborn to your Crusader's creed until the last. No matter. You will join me on Wotan for our final assault on the Jade Falcons. It is unlikely we will survive but we will make them pay for our deaths dearly.
             </narrative>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-        </storyEvent>
+        </storyPoint>
         <!-- Travel Story Events -->
-        <storyEvent id="2c6f5703-3a86-43b8-b7d7-e8cf04f06417" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+        <storyPoint id="2c6f5703-3a86-43b8-b7d7-e8cf04f06417" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Baker 3</destinationId>
-            <nextEventId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextEventId>
-        </storyEvent>
-        <storyEvent id="686cf4a5-a65d-4d3f-8ae9-84a06875ec91" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <nextStoryPointId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="686cf4a5-a65d-4d3f-8ae9-84a06875ec91" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Devin</destinationId>
-            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="93148f93-b026-44aa-8f53-a14f58471858" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="93148f93-b026-44aa-8f53-a14f58471858" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Denizli</destinationId>
-            <nextEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="ed31a322-18a0-4754-87d4-3a664035e14f" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="ed31a322-18a0-4754-87d4-3a664035e14f" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Twycross</destinationId>
-            <nextEventId>bd808af0-5b16-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
+            <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
         <!-- Missions -->
-        <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+        <storyPoint id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Colmar</name>
                 <type>Planetary Assault</type>
                 <systemId>Colmar</systemId>
                 <desc>Colmar was notable as the first battlefield of the Refusal War. The main fighting occurred in the Marakaa Valley, where the 352 Wolf Assault Cluster used the dry river bed to position themselves advantageously against the defending 12th Falcon Regulars.</desc>
             </mission>
-            <nextEventId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextEventId>
-            <scenarioEventId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioEventId>
-        </storyEvent>
-        <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <nextStoryPointId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextStoryPointId>
+            <scenarioStoryPointId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioStoryPointId>
+        </storyPoint>
+        <storyPoint id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Baker 3</name>
                 <type>Planetary Assault</type>
                 <systemId>Baker 3</systemId>
                 <desc></desc>
             </mission>
-            <scenarioEventId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioEventId>
-            <nextEventId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextEventId>
-        </storyEvent>
-        <storyEvent id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <scenarioStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioStoryPointId>
+            <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Devin</name>
                 <type>Planetary Assault</type>
                 <systemId>Devin</systemId>
                 <desc></desc>
             </mission>
-            <scenarioEventId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioEventId>
-            <nextEventId>93148f93-b026-44aa-8f53-a14f58471858</nextEventId>
-        </storyEvent>
-        <storyEvent id="a5776ce4-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
+            <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="a5776ce4-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Denizli</name>
                 <type>Planetary Assault</type>
                 <systemId>Denizli</systemId>
                 <desc></desc>
             </mission>
-            <scenarioEventId>512d07d4-b311-4339-9924-d6158b52464c</scenarioEventId>
-            <nextEventId>ed31a322-18a0-4754-87d4-3a664035e14f</nextEventId>
-        </storyEvent>
-        <storyEvent id="bd808af0-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
+            <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="bd808af0-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Twycross</name>
                 <type>Planetary Assault</type>
                 <systemId>Twycross</systemId>
                 <desc></desc>
             </mission>
-            <scenarioEventId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioEventId>
-            <nextEventId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextEventId>
-        </storyEvent>
-        <storyEvent id="dbc0f96e-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
+            <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="dbc0f96e-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Wotan</name>
                 <type>Planetary Assault</type>
                 <systemId>Wotan</systemId>
                 <desc></desc>
             </mission>
-        </storyEvent>
-        <storyEvent id="ec09c184-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+        </storyPoint>
+        <storyPoint id="ec09c184-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Morges</name>
                 <type>Planetary Assault</type>
                 <systemId>Morges</systemId>
                 <desc></desc>
             </mission>
-        </storyEvent>
+        </storyPoint>
         <!-- Scenarios -->
-        <storyEvent id="fd7158c2-1d1b-48e6-8eb3-8a72d580c172" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+        <storyPoint id="fd7158c2-1d1b-48e6-8eb3-8a72d580c172" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Cutting Teeth</name>
                 <desc>
@@ -308,59 +308,59 @@ This is a story arc in active development. Try at your own risk!
                 </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="d4db6ca7-6e54-4188-81c0-3b578b944435" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>bf41db33-2683-459f-855b-0632eedb807e</missionEventId>
+        </storyPoint>
+        <storyPoint id="d4db6ca7-6e54-4188-81c0-3b578b944435" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Hide and Seek</name>
                 <desc>
                 </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>bf41db33-2683-459f-855b-0632eedb807e</missionEventId>
+                <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="d8bdc8c9-8057-4cc2-a933-e8534d410200" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionEventId>
+        </storyPoint>
+        <storyPoint id="d8bdc8c9-8057-4cc2-a933-e8534d410200" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Into the Storm</name>
                 <desc>
                 </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionEventId>
+                <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="512d07d4-b311-4339-9924-d6158b52464c" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionEventId>
+        </storyPoint>
+        <storyPoint id="512d07d4-b311-4339-9924-d6158b52464c" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>A Cool Scenario Name</name>
                 <desc>
                 </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionEventId>
+                <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
-        </storyEvent>
-        <storyEvent id="93c31ab2-50ef-44ce-8241-5cfcb5d3b378" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>bd808af0-5b16-11ec-bf63-0242ac130002</missionEventId>
+        </storyPoint>
+        <storyPoint id="93c31ab2-50ef-44ce-8241-5cfcb5d3b378" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Blood and Sand</name>
                 <desc>
                 </desc>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>bd808af0-5b16-11ec-bf63-0242ac130002</missionEventId>
+                <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
-        </storyEvent>
-    </storyEvents>
+        </storyPoint>
+    </storyPoints>
     <personalities>
         <personality id="c788dea8-35d8-40b2-9fae-78c9f2215120">
             <title>Star Colonel Ulric Kerensky</title>

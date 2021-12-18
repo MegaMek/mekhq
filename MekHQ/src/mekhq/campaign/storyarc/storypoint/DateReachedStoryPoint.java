@@ -1,5 +1,5 @@
 /*
- * StoryEvent.java
+ * DateReachedStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,14 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryEvent;
-import mekhq.gui.dialog.StoryNarrativeDialog;
+import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,65 +31,55 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalDate;
 
-/**
- * Extends the StoryEvent class and implements a simple narrative description that will be made visible to the player
- * immediately.
- */
-public class NarrativeStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class DateReachedStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    String title;
-    String narrative;
+    LocalDate date;
 
-    public NarrativeStoryEvent() {
+    public DateReachedStoryPoint() {
         super();
     }
 
-    @Override
-    public String getTitle() { return title; }
-
-    public String getNarrative() { return narrative; }
+    public LocalDate getDate() { return date; }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
-        final StoryNarrativeDialog narrativeDialog = new StoryNarrativeDialog(null, this);
-        narrativeDialog.setVisible(true);
-        completeEvent();
+    public String getTitle() {
+        return "Date reached";
     }
 
     @Override
-    public String getResult() {
-        //this one has no variation
-        return "";
+    protected String getResult() {
+        return null;
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        complete();
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<title>"
-                +title
-                +"</title>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<narrative>"
-                +narrative
-                +"</narrative>");
+                +"<date>"
+                +MekHqXmlUtil.saveFormattedDate(date)
+                +"</date>");
+
         writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("title")) {
-                    title =wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
-                    narrative =wn2.getTextContent().trim();
+                if (wn2.getNodeName().equalsIgnoreCase("date")) {
+                    date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

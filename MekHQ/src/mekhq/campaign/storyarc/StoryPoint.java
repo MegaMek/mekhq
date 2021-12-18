@@ -1,5 +1,5 @@
 /*
- * StoryEvent.java
+ * StoryPoint.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.storyarc;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -39,36 +38,36 @@ import java.util.*;
 import java.util.List;
 
 /**
- * The StoryEvent abstract class is the basic building block of a StoryArc. StoryEvents can do
- * different things when they are started. When they are completed they may start other events as
- * determined by the specific class and user input. StoryEvents are started in one of the following ways:
- *  - By being selected as the next event by a prior StoryEvent
+ * The StoryPoint abstract class is the basic building block of a StoryArc. StoryPoints can do
+ * different things when they are started. When they are completed they may start other story points as
+ * determined by the specific class and user input. StoryPoints are started in one of the following ways:
+ *  - By being selected as the next story point by a prior StoryPoint
  *  - By meeting the trigger conditions that are checked in various places in Campaign such as a specific date
  **/
-public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
+public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    /** The story arc that this event is a part of **/
+    /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
 
-    /** The UUID id of this story event */
+    /** The UUID id of this story point */
     private UUID id;
 
-    /** A boolean that tracks whether the event is currently active **/
+    /** A boolean that tracks whether the story point is currently active **/
     private boolean active;
 
     /** A StorySplash image to display in a dialog. It can return a null image */
     private StorySplash storySplash;
 
     /**
-     * The id of a personality who is associated with this StoryEvent. May be null.
+     * The id of a personality who is associated with this StoryPoint. May be null.
      */
     private UUID personalityId;
 
     /**
-     * The id of the next event to start when this one is completed. It can be null if a new event should not be
+     * The id of the next story point to start when this one is completed. It can be null if a new story point should not be
      * triggered. It can also be overwritten by a StoryOutcome
      * **/
-    private UUID nextEventId;
+    private UUID nextStoryPointId;
 
     /** A map of all possible StoryOutcomes **/
     protected Map<String, StoryOutcome> storyOutcomes;
@@ -78,7 +77,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
     protected static final String NL = System.lineSeparator();
 
-    public StoryEvent() {
+    public StoryPoint() {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
         storyTriggers = new ArrayList<>();
@@ -115,26 +114,26 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * Do whatever needs to be done to start this event. Specific event types may need to override this
+     * Do whatever needs to be done to start this story point. Specific story point types may need to override this
      */
-    public void startEvent() {
+    public void start() {
         active = true;
     }
 
     /**
-     * Complete the event. Specific event types may need to override this.
+     * Complete the storyp point. Specific story point types may need to override this.
      */
-    public void completeEvent() {
+    public void complete() {
         active = false;
         processOutcomes();
         processTriggers();
-        proceedToNextStoryEvent();
+        proceedToNextStoryPoint();
     }
 
     private void processOutcomes() {
         StoryOutcome chosenOutcome = storyOutcomes.get(getResult());
         if(null != chosenOutcome) {
-            nextEventId = chosenOutcome.getNextEventId();
+            nextStoryPointId = chosenOutcome.getNextStoryPointId();
             storyTriggers = chosenOutcome.getStoryTriggers();
         }
     }
@@ -148,23 +147,22 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     protected abstract String getResult();
 
     /**
-     * Gets the next story event and if it is not null, starts it
+     * Gets the next story point and if it is not null, starts it
      */
-    protected void proceedToNextStoryEvent() {
-        //get the next story event
-        UUID nextStoryEventId = getNextStoryEvent();
-        StoryEvent nextStoryEvent = storyArc.getStoryEvent(nextStoryEventId);
-        if(null != nextStoryEvent) {
-            nextStoryEvent.startEvent();
+    protected void proceedToNextStoryPoint() {
+        // get the next story point
+        StoryPoint nextStoryPoint = getNextStoryPoint();
+        if(null != nextStoryPoint) {
+            nextStoryPoint.start();
         }
     }
 
     /**
-     * determine the next story event in the story arc based on the event. This could have been changed depending
+     * determine the next story point in the story arc based on the point. This could have been changed depending
      * on StoryOutcome
      **/
-    protected UUID getNextStoryEvent() {
-        return nextEventId;
+    protected StoryPoint getNextStoryPoint() {
+        return storyArc.getStoryPoint(nextStoryPointId);
     }
 
 
@@ -189,7 +187,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
 
         StringBuilder builder = new StringBuilder(256);
         builder.append(level)
-                .append("<storyEvent id=\"")
+                .append("<storyPoint id=\"")
                 .append(id)
                 .append("\" type=\"")
                 .append(this.getClass().getName())
@@ -207,11 +205,11 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
                     .append("</personalityId>")
                     .append(NL);;
         }
-        if(null != nextEventId) {
+        if(null != nextStoryPointId) {
             builder.append(level1)
-                    .append("<nextEventId>")
-                    .append(nextEventId)
-                    .append("</nextEventId>")
+                    .append("<nextStoryPointId>")
+                    .append(nextStoryPointId)
+                    .append("</nextStoryPointId>")
                     .append(NL);
         }
 
@@ -237,13 +235,13 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyEvent>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyPoint>");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
 
-    public static StoryEvent generateInstanceFromXML(Node wn, Campaign c) {
-        StoryEvent retVal = null;
+    public static StoryPoint generateInstanceFromXML(Node wn, Campaign c) {
+        StoryPoint retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
@@ -251,7 +249,7 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
         try {
             // Instantiate the correct child class, and call its parsing
             // function.
-            retVal = (StoryEvent) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal = (StoryPoint) Class.forName(className).getDeclaredConstructor().newInstance();
 
             retVal.id = UUID.fromString(wn.getAttributes().getNamedItem("id").getTextContent().trim());
 
@@ -263,8 +261,8 @@ public abstract class StoryEvent implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
-                    retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
+                    retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityId")) {
                     retVal.personalityId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {

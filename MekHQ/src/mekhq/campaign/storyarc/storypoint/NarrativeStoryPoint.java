@@ -1,7 +1,7 @@
 /*
- * PersonKilledStoryEvent.java
+ * StoryPoint.java
  *
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -18,12 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.gui.dialog.StoryNarrativeDialog;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,55 +32,65 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.UUID;
 
-public class PersonKilledStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+/**
+ * Extends the StoryPoint class and implements a simple narrative description that will be made visible to the player
+ * immediately.
+ */
+public class NarrativeStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    UUID personId;
+    String title;
+    String narrative;
 
-    public PersonKilledStoryEvent() {
+    public NarrativeStoryPoint() {
         super();
     }
 
-    public UUID getPersonId() { return personId; }
+    @Override
+    public String getTitle() { return title; }
+
+    public String getNarrative() { return narrative; }
 
     @Override
-    public String getTitle() {
-        return "Person killed";
+    public void start() {
+        super.start();
+        final StoryNarrativeDialog narrativeDialog = new StoryNarrativeDialog(null, this);
+        narrativeDialog.setVisible(true);
+        complete();
     }
 
     @Override
-    protected String getResult() {
-        return null;
-    }
-
-    @Override
-    public void startEvent() {
-        super.startEvent();
-        completeEvent();
+    public String getResult() {
+        //this one has no variation
+        return "";
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<personId>"
-                +personId
-                +"</personId>");
-
+                +"<title>"
+                +title
+                +"</title>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<narrative>"
+                +narrative
+                +"</narrative>");
         writeToXmlEnd(pw1, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("personId")) {
-                    personId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("title")) {
+                    title =wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
+                    narrative =wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

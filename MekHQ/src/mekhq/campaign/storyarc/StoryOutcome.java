@@ -20,12 +20,10 @@
  */
 package mekhq.campaign.storyarc;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -35,16 +33,16 @@ import java.util.UUID;
 import java.util.ArrayList;
 
 /**
- * This class governs what happens when a story event is completed. Every StoryEvent will have a StoryOutcome
- * associated with it.
+ * This class governs what happens when a story point is completed. It will override the default outcomes for that
+ * story point
  */
 public class StoryOutcome implements MekHqXmlSerializable {
 
     /** result this outcome is tied too **/
     String result;
 
-    /** id of the next event to start. Can be null **/
-    private UUID nextEventId;
+    /** id of the next story point to start. Can be null **/
+    private UUID nextStoryPointId;
 
     /** A list of StoryTriggers to replace the defaults on this outcome */
     List<StoryTrigger> storyTriggers;
@@ -57,7 +55,7 @@ public class StoryOutcome implements MekHqXmlSerializable {
 
     public String getResult() { return result; }
 
-    public UUID getNextEventId() { return nextEventId; }
+    public UUID getNextStoryPointId() { return nextStoryPointId; }
 
     public List<StoryTrigger> getStoryTriggers() { return storyTriggers; }
 
@@ -83,11 +81,11 @@ public class StoryOutcome implements MekHqXmlSerializable {
                 .append(result)
                 .append("\">")
                 .append(NL);
-        if(null != nextEventId) {
+        if(null != nextStoryPointId) {
             builder.append(level1)
-                    .append("<nextEventId>")
-                    .append(nextEventId)
-                    .append("</nextEventId>")
+                    .append("<nextStoryPointId>")
+                    .append(nextStoryPointId)
+                    .append("</nextStoryPointId>")
                     .append(NL);
         }
         pw1.print(builder.toString());
@@ -113,8 +111,8 @@ public class StoryOutcome implements MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("nextEventId")) {
-                    retVal.nextEventId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
+                    retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
                     retVal.storyTriggers.add(trigger);

@@ -1,5 +1,5 @@
 /*
- * ChoiceStoryEvent.java
+ * ChoiceStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.dialog.StoryChoiceDialog;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -36,7 +35,7 @@ import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class ChoiceStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     private String title;
     private String question;
@@ -45,7 +44,7 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
 
     private String chosen;
 
-    public ChoiceStoryEvent() {
+    public ChoiceStoryPoint() {
         super();
         choices = new LinkedHashMap<>();
     }
@@ -60,12 +59,12 @@ public class ChoiceStoryEvent extends StoryEvent implements Serializable, MekHqX
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
+    public void start() {
+        super.start();
         final StoryChoiceDialog choiceDialog = new StoryChoiceDialog(null, this);
         choiceDialog.setVisible(true);
         chosen = choiceDialog.getChoice();
-        completeEvent();
+        complete();
     }
 
     @Override

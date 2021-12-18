@@ -20,14 +20,13 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.campaign.storyarc.StoryEvent;
-import mekhq.campaign.storyarc.storyevent.MissionStoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.storypoint.MissionStoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,17 +42,17 @@ import java.util.UUID;
  */
 public class CompleteMissionTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
-    UUID missionEventId;
+    UUID missionStoryPointId;
     MissionStatus missionStatus;
 
     @Override
     protected void execute() {
-        StoryEvent storyEvent = getStoryArc().getStoryEvent(missionEventId);
-        if(storyEvent instanceof MissionStoryEvent) {
+        StoryPoint storyPoint = getStoryArc().getStoryPoint(missionStoryPointId);
+        if(storyPoint instanceof MissionStoryPoint) {
             if(null != missionStatus) {
-                ((MissionStoryEvent) storyEvent).getMission().setStatus(missionStatus);
+                ((MissionStoryPoint) storyPoint).getMission().setStatus(missionStatus);
             }
-            storyEvent.completeEvent();
+            storyPoint.complete();
         }
     }
 
@@ -61,9 +60,9 @@ public class CompleteMissionTrigger extends StoryTrigger implements Serializable
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<storyEventId>"
-                +missionEventId
-                +"</storyEventId>");
+                +"<missionStoryPointId>"
+                + missionStoryPointId
+                +"</missionStoryPointId>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<missionStatus>"
                 +missionStatus.name()
@@ -79,8 +78,8 @@ public class CompleteMissionTrigger extends StoryTrigger implements Serializable
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("missionEventId")) {
-                    missionEventId = UUID.fromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("missionStoryPointId")) {
+                    missionStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionStatus")) {
                     missionStatus = MissionStatus.parseFromString(wn2.getTextContent().trim());
                 }

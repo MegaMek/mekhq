@@ -1,5 +1,5 @@
 /*
- * CreateCharacterStoryEvent.java
+ * CreateCharacterStoryPoint.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -18,11 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -31,7 +30,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -47,7 +46,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Enumeration;
 import java.util.UUID;
 
-public class CreateCharacterStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class CreateCharacterStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     /** how much XP does the player have to spend on the character **/
     int xpPool;
@@ -80,7 +79,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     private int assignedForceId;
 
 
-    public CreateCharacterStoryEvent() {
+    public CreateCharacterStoryPoint() {
         super();
         firstname = "Bob";
         surname = "";
@@ -138,8 +137,8 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
+    public void start() {
+        super.start();
         Person person = createPerson();
         final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, instructions, editOrigin);
         getCampaign().importPerson(person);
@@ -155,7 +154,7 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
             }
         }
         personDialog.setVisible(true);
-        completeEvent();
+        complete();
     }
 
     private void setEdgeTriggers(Person p) {

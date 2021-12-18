@@ -1,5 +1,5 @@
 /*
- * CheckStringVariableStoryEvent.java
+ * CheckStringVariableStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,11 +32,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
-public class CheckStringVariableStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class CheckStringVariableStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     String key;
 
-    public CheckStringVariableStoryEvent() {
+    public CheckStringVariableStoryPoint() {
         super();
         key = "";
     }
@@ -52,9 +52,9 @@ public class CheckStringVariableStoryEvent extends StoryEvent implements Seriali
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
-        completeEvent();
+    public void start() {
+        super.start();
+        complete();
     }
 
     @Override

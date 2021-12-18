@@ -1,5 +1,5 @@
 /*
- * ScenarioStoryEvent.java
+ * ScenarioStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,16 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,22 +34,21 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Iterator;
 import java.util.UUID;
 
 /**
  * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
- * that scenario will trigger completeEvent upon completion.
+ * that scenario will trigger complete upon completion.
  */
-public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     /** track the scenario itself **/
     private Scenario scenario;
 
-    /** The UUID of the MissionStoryEvent that this ScenarioStoryEvent is a part of **/
-    private UUID missionEventId;
+    /** The UUID of the MissionStoryPoint that this ScenarioStoryPoint is a part of **/
+    private UUID missionStoryPointId;
 
-    public ScenarioStoryEvent() {
+    public ScenarioStoryPoint() {
         super();
     }
 
@@ -63,11 +61,11 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     }
 
     @Override
-    public void startEvent() {
-        super.startEvent();
-        StoryEvent missionEvent = getStoryArc().getStoryEvent(missionEventId);
-        if(null != missionEvent && missionEvent instanceof MissionStoryEvent) {
-            Mission m = ((MissionStoryEvent) missionEvent).getMission();
+    public void start() {
+        super.start();
+        StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
+        if(null != missionStoryPoint && missionStoryPoint instanceof MissionStoryPoint) {
+            Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 getStoryArc().getCampaign().addScenario(scenario, m);
             }
@@ -118,9 +116,9 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionEventId>"
-                +missionEventId
-                +"</missionEventId>");
+                +"<missionStoryPointId>"
+                + missionStoryPointId
+                +"</missionStoryPointId>");
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so we need to link it
@@ -155,8 +153,8 @@ public class ScenarioStoryEvent extends StoryEvent implements Serializable, MekH
                     if(null != s) {
                         this.setScenario(s);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionEventId")) {
-                    missionEventId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionStoryPointId")) {
+                    missionStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

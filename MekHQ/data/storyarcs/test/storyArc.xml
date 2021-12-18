@@ -4,9 +4,9 @@
     <details>Just for testing</details>
     <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
-    <startingEventId>10700728-5c5b-11ec-bf63-0242ac130002</startingEventId>
-    <storyEvents>
-        <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
+    <startingPointId>10700728-5c5b-11ec-bf63-0242ac130002</startingPointId>
+    <storyPoints>
+        <storyPoint id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
             <xpPool>25</xpPool>
             <rank>34</rank>
             <firstname>Harry</firstname>
@@ -15,40 +15,40 @@
             <clan>true</clan>
             <phenotype>MECHWARRIOR</phenotype>
             <primaryRole>MECHWARRIOR</primaryRole>
-            <nextEventId>10700728-5c5b-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="d01587c6-5473-4d62-ba2e-9a015368db40" type="mekhq.campaign.storyarc.storyevent.DateReachedStoryEvent">
+            <nextStoryPointId>10700728-5c5b-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="d01587c6-5473-4d62-ba2e-9a015368db40" type="mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint">
             <date>3071-05-15</date>
-            <nextEventId>dedcb5e7-dc7d-40d1-b45e-b97002c60334</nextEventId>
-        </storyEvent>
-        <storyEvent id="6116e791-ea40-4435-8f45-e2c696f4da2b" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <nextStoryPointId>dedcb5e7-dc7d-40d1-b45e-b97002c60334</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="6116e791-ea40-4435-8f45-e2c696f4da2b" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Acamar</destinationId>
-            <nextEventId>10700728-5c5b-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="10700728-5c5b-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>10700728-5c5b-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="10700728-5c5b-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Test Story Arc</title>
             <narrative>Welcome to the test *story arc*! Check out the **briefing tab** to see what missions and scenarios are available. Have fun!</narrative>
             <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
-            <nextEventId>35b5b068-5946-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="500511f2-5b8f-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>First mission complete!</title>
             <narrative>Congratulations on completing your first mission!</narrative>
-            <nextEventId>3491b950-5bcd-11ec-bf63-0242ac130002</nextEventId>
+            <nextStoryPointId>3491b950-5bcd-11ec-bf63-0242ac130002</nextStoryPointId>
             <StorySplash>
                 <category></category>
                 <filename>splash-guardduty.png</filename>
             </StorySplash>
-        </storyEvent>
-        <storyEvent id="dedcb5e7-dc7d-40d1-b45e-b97002c60334" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+        </storyPoint>
+        <storyPoint id="dedcb5e7-dc7d-40d1-b45e-b97002c60334" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Date reached</title>
             <narrative>Its May 15th, 3071. Just thought you should know. Its probably a holiday somewhere.</narrative>
             <StorySplash>
                 <category></category>
                 <filename>splash-guardduty.png</filename>
             </StorySplash>
-        </storyEvent>
-        <storyEvent id="3491b950-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent">
+        </storyPoint>
+        <storyPoint id="3491b950-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <title>What Next?</title>
             <question>Which mission would you like to go on now?</question>
             <choice id="mission2">Mission 2</choice>
@@ -56,59 +56,59 @@
             <personalityId>9adeb0c8-69d0-4206-b455-bcca43144df3</personalityId>
             <storyOutcomes>
                 <storyOutcome result="mission2">
-                    <nextEventId>bf41db33-2683-459f-855b-0632eedb807e</nextEventId>
+                    <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
                 </storyOutcome>
                 <storyOutcome result="mission3">
-                    <nextEventId>d7617c74-5bcd-11ec-bf63-0242ac130002</nextEventId>
+                    <nextStoryPointId>d7617c74-5bcd-11ec-bf63-0242ac130002</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-        </storyEvent>
-        <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+        </storyPoint>
+        <storyPoint id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>First Mission</name>
                 <type>Planetary Assault</type>
                 <systemId>Terra</systemId>
                 <desc>If everything is working correctly, you should see this mission loaded when you begin the story arc.</desc>
             </mission>
-            <scenarioEventId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioEventId>
-            <nextEventId>500511f2-5b8f-11ec-bf63-0242ac130002</nextEventId>
-        </storyEvent>
-        <storyEvent id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+            <scenarioStoryPointId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioStoryPointId>
+            <nextStoryPointId>500511f2-5b8f-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="bf41db33-2683-459f-855b-0632eedb807e" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Second Mission</name>
                 <type>Objective Raid</type>
                 <systemId>Terra</systemId>
                 <desc>If everything is working correctly, you should see this mission once you select it from the choice dialog. There is nothing more at this point.</desc>
             </mission>
-        </storyEvent>
-        <storyEvent id="d7617c74-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
+        </storyPoint>
+        <storyPoint id="d7617c74-5bcd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <mission type="mekhq.campaign.mission.Mission">
                 <name>Third Mission</name>
                 <type>Riot Duty</type>
                 <systemId>Hall</systemId>
                 <desc>If everything is working correctly, you should see this mission once once you select it from the choice dialog. There is nothing more at this point.</desc>
             </mission>
-        </storyEvent>
-        <storyEvent id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
-            <nextEventId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextEventId>
+        </storyPoint>
+        <storyPoint id="5a333f88-597c-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <nextStoryPointId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextStoryPointId>
             <storyOutcomes>
               <storyOutcome result="PYRRHIC_VICTORY">
-                <nextEventId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</nextEventId>
+                <nextStoryPointId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</nextStoryPointId>
               </storyOutcome>
             </storyOutcomes>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Initial Scenario</name>
                 <desc>If everything is working correctly, you should see this scenario as part of First mission when you begin the story arc. To see what happens next, try out the scenario and then select Victory or Defeat.</desc>
             </scenario>
-        </storyEvent>
-        <storyEvent id="0d96f227-6c97-4cb1-ade5-578b2386c1a5" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
-            <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
+        </storyPoint>
+        <storyPoint id="0d96f227-6c97-4cb1-ade5-578b2386c1a5" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
             <storyOutcomes>
                 <storyOutcome result="PYRRHIC_VICTORY">
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                        <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                        <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
                         <missionStatus>SUCCESS</missionStatus>
                     </storyTrigger>
                 </storyOutcome>
@@ -117,14 +117,14 @@
                 <name>Victory Scenario</name>
                 <desc>If everything is working correctly, this scenario should be added to First mission when you are victorious in the initial scenario. Being victorious in this scenario should complete First Mission.</desc>
             </scenario>
-        </storyEvent>
-        <storyEvent id="dbb7357c-59cd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
-            <nextEventId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextEventId>
+        </storyPoint>
+        <storyPoint id="dbb7357c-59cd-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
             <storyOutcomes>
                 <storyOutcome result="PYRRHIC_VICTORY">
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                        <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                        <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
                         <missionStatus>SUCCESS</missionStatus>
                     </storyTrigger>
                 </storyOutcome>
@@ -133,19 +133,19 @@
                 <name>Defeat Scenario</name>
                 <desc>If everything is working correctly, this scenario should be added to First mission when you are defeated in the initial scenario. Being victorious in this scenario should complete First mission.</desc>
             </scenario>
-        </storyEvent>
-        <storyEvent id="f6d7cc16-5afb-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent">
-            <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+        </storyPoint>
+        <storyPoint id="f6d7cc16-5afb-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionEventId>35b5b068-5946-11ec-bf63-0242ac130002</missionEventId>
+                <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Last Try Scenario</name>
                 <desc>If everything is working correctly, this scenario should be added to First mission if you are defeated in your second scenario. Completing it should finish First Mission.</desc>
             </scenario>
-        </storyEvent>
-    </storyEvents>
+        </storyPoint>
+    </storyPoints>
     <personalities>
         <personality id="057e8ef4-5c59-11ec-bf63-0242ac130002">
             <title>Captain Helperpants</title>

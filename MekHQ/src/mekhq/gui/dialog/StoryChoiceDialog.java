@@ -19,7 +19,7 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.storyarc.storyevent.ChoiceStoryEvent;
+import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -32,7 +32,7 @@ public class StoryChoiceDialog extends StoryDialog {
     private ButtonGroup choiceGroup;
 
     //region Constructors
-    public StoryChoiceDialog(final JFrame parent, ChoiceStoryEvent sEvent) {
+    public StoryChoiceDialog(final JFrame parent, ChoiceStoryPoint sEvent) {
         super(parent, sEvent);
         initialize();
     }
@@ -59,7 +59,7 @@ public class StoryChoiceDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        String text = StoryArc.replaceTokens(((ChoiceStoryEvent) getStoryEvent()).getQuestion(), getStoryEvent().getCampaign());
+        String text = StoryArc.replaceTokens(((ChoiceStoryPoint) getStoryPoint()).getQuestion(), getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -75,7 +75,7 @@ public class StoryChoiceDialog extends StoryDialog {
         choiceGroup = new ButtonGroup();
         JRadioButton radioBtn;
         boolean firstEntry = true;
-        for (Map.Entry<String, String> entry : ((ChoiceStoryEvent) getStoryEvent()).getChoices().entrySet()) {
+        for (Map.Entry<String, String> entry : ((ChoiceStoryPoint) getStoryPoint()).getChoices().entrySet()) {
             radioBtn = new JRadioButton("<html>" + entry.getValue() + "</html>");
             radioBtn.setActionCommand(entry.getKey());
             btnPanel.add(radioBtn);

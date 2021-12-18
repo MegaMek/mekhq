@@ -1,5 +1,5 @@
 /*
- * TravelStoryEvent.java
+ * TravelStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -18,15 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.storyarc.storyevent;
+package mekhq.campaign.storyarc.storypoint;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.storyarc.StoryEvent;
+import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
@@ -37,14 +36,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
-public class TravelStoryEvent extends StoryEvent implements Serializable, MekHqXmlSerializable {
+public class TravelStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     //region Variable Declarations
     /** The id of the planetary system that is the destination */
     private String destinationId;
 
     /**
-     * Should travel automatically begin to this system when the event starts?
+     * Should travel automatically begin to this system when the story point starts?
      * For the time being, this will be yes. Once we implement a graphical display of story objectives
      * then we can give creators the option of letting players arrange travel themselves
      * */
@@ -52,7 +51,7 @@ public class TravelStoryEvent extends StoryEvent implements Serializable, MekHqX
     //endregion Variable Declarations
 
     //region Constructors
-    public TravelStoryEvent() {
+    public TravelStoryPoint() {
         super();
         autoStart = true;
     }
@@ -83,11 +82,11 @@ public class TravelStoryEvent extends StoryEvent implements Serializable, MekHqX
 
 
     @Override
-    public void startEvent() {
-        super.startEvent();
+    public void start() {
+        super.start();
         if(null == getDestination()) {
-            //if we don't have a valid destination, then complete the event
-            completeEvent();
+            //if we don't have a valid destination, then complete the story point
+            complete();
         }
         else if(autoStart) {
             CurrentLocation location = getStoryArc().getCampaign().getLocation();
