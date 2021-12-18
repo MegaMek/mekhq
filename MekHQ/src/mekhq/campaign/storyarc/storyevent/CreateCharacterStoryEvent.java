@@ -87,6 +87,9 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
         bloodname = "";
         biography = "";
         commander = true;
+        clan = false;
+        phenotype = Phenotype.NONE;
+        primaryRole = PersonnelRole.MECHWARRIOR;
 
         editOrigin = false;
     }
@@ -246,16 +249,6 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                 .append("</instructions>")
                 .append(NL)
                 .append(level1)
-                .append("<assignedUnitId>")
-                .append(assignedUnitId)
-                .append("</assignedUnitId>")
-                .append(NL)
-                .append(level1)
-                .append("<assignedForceId>")
-                .append(assignedForceId)
-                .append("</assignedForceId>")
-                .append(NL)
-                .append(level1)
                 .append("<edge>")
                 .append(edge)
                 .append("</edge>")
@@ -271,10 +264,33 @@ public class CreateCharacterStoryEvent extends StoryEvent implements Serializabl
                 .append("</phenotype>")
                 .append(NL)
                 .append(level1)
-                .append("<faction>")
-                .append(faction.getShortName())
-                .append("</faction>")
-                .append(NL);
+                .append("<assignedForceId>")
+                .append(assignedForceId)
+                .append("</assignedForceId>")
+                .append(NL);;
+
+        if(null != assignedUnitId) {
+            builder.append(level1)
+                    .append("<assignedUnitId>")
+                    .append(assignedUnitId)
+                    .append("</assignedUnitId>")
+                    .append(NL);
+        }
+        if(null != faction) {
+            builder.append(level1)
+                    .append("<faction>")
+                    .append(faction.getShortName())
+                    .append("</faction>")
+                    .append(NL);
+        }
+        if(null != instructions) {
+            builder.append(level1)
+                    .append("<instructions>")
+                    .append(instructions)
+                    .append("</instructions>")
+                    .append(NL);
+        }
+
         pw1.print(builder.toString());
 
         writeToXmlEnd(pw1, indent);
