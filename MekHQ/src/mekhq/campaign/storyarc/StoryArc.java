@@ -138,6 +138,7 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     public void begin() {
+        MekHQ.registerHandler(this);
         getStoryEvent(getStartingEventId()).startEvent();
     }
 
