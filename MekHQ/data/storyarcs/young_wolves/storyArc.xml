@@ -13,7 +13,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
     </description>
     <startNew>true</startNew>
-    <startingEventId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingEventId>
+    <startingEventId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</startingEventId>
     <customStringVariables>
         <customStringVariable>
             <key>first_impressions</key>
@@ -219,6 +219,18 @@ This is a story arc in active development. Try at your own risk!
             <destinationId>Baker 3</destinationId>
             <nextEventId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextEventId>
         </storyEvent>
+        <storyEvent id="686cf4a5-a65d-4d3f-8ae9-84a06875ec91" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <destinationId>Devin</destinationId>
+            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="93148f93-b026-44aa-8f53-a14f58471858" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <destinationId>Denizli</destinationId>
+            <nextEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="ed31a322-18a0-4754-87d4-3a664035e14f" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
+            <destinationId>Twycross</destinationId>
+            <nextEventId>bd808af0-5b16-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
         <!-- Missions -->
         <storyEvent id="35b5b068-5946-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -238,7 +250,7 @@ This is a story arc in active development. Try at your own risk!
                 <desc></desc>
             </mission>
             <scenarioEventId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioEventId>
-            <nextEventId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextEventId>
+            <nextEventId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextEventId>
         </storyEvent>
         <storyEvent id="7f10d61c-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -248,7 +260,7 @@ This is a story arc in active development. Try at your own risk!
                 <desc></desc>
             </mission>
             <scenarioEventId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioEventId>
-            <nextEventId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextEventId>
+            <nextEventId>93148f93-b026-44aa-8f53-a14f58471858</nextEventId>
         </storyEvent>
         <storyEvent id="a5776ce4-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
@@ -258,7 +270,7 @@ This is a story arc in active development. Try at your own risk!
                 <desc></desc>
             </mission>
             <scenarioEventId>512d07d4-b311-4339-9924-d6158b52464c</scenarioEventId>
-            <nextEventId>bd808af0-5b16-11ec-bf63-0242ac130002</nextEventId>
+            <nextEventId>ed31a322-18a0-4754-87d4-3a664035e14f</nextEventId>
         </storyEvent>
         <storyEvent id="bd808af0-5b16-11ec-bf63-0242ac130002" type="mekhq.campaign.storyarc.storyevent.MissionStoryEvent">
             <mission type="mekhq.campaign.mission.Mission">
