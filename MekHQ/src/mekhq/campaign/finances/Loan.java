@@ -22,10 +22,10 @@
 package mekhq.campaign.finances;
 
 import megamek.common.Compute;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -387,7 +387,7 @@ public class Loan implements Serializable {
                     loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         return loan;

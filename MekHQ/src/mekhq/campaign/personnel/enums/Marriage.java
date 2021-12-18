@@ -26,6 +26,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -181,7 +182,7 @@ public enum Marriage {
                 break;
             case WEIGHTED:
             default:
-                MekHQ.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                LogManager.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
                         origin.getFullName(), spouse.getFullName()));
                 break;
         }

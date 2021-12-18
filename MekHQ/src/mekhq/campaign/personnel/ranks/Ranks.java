@@ -21,33 +21,21 @@
  */
 package mekhq.campaign.personnel.ranks;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank
@@ -116,12 +104,12 @@ public class Ranks {
             }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
     public static void initializeRankSystems() {
-        MekHQ.getLogger().info("Starting Rank Systems XML load...");
+        LogManager.getLogger().info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystemType type : RankSystemType.values()) {
@@ -137,12 +125,12 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            MekHQ.getLogger().fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
+            LogManager.getLogger().fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
                     + " system. Initialization failure, shutting MekHQ down.");
             System.exit(-1);
         }
 
-        MekHQ.getLogger().info("Completed Rank System XML Load");
+        LogManager.getLogger().info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
@@ -165,7 +153,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new ArrayList<>();
         }
 

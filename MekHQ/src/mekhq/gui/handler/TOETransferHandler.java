@@ -18,6 +18,15 @@
  */
 package mekhq.gui.handler;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGUI;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -25,17 +34,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
-
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.TransferHandler;
-import javax.swing.tree.TreePath;
-
-import mekhq.MekHQ;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
 
 public class TOETransferHandler extends TransferHandler {
     private static final long serialVersionUID = -1276891849078287710L;
@@ -130,9 +128,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            MekHQ.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
+            LogManager.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            MekHQ.getLogger().error("I/O error: " + ioe.getMessage());
+            LogManager.getLogger().error("I/O error: " + ioe.getMessage());
         }
 
         if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
@@ -162,9 +160,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            MekHQ.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
+            LogManager.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            MekHQ.getLogger().error("I/O error: " + ioe.getMessage());
+            LogManager.getLogger().error("I/O error: " + ioe.getMessage());
         }
 
         // Get drop location info.

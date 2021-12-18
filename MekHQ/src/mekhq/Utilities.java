@@ -33,8 +33,6 @@ import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -44,6 +42,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
@@ -56,7 +55,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Utilities {
     private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl());
@@ -351,7 +349,7 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().warning("Could not determine tech progression for " + summary.getName()
+                LogManager.getLogger().warn("Could not determine tech progression for " + summary.getName()
                                 + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
@@ -1074,290 +1072,12 @@ public class Utilities {
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info("File copied.");
+            LogManager.getLogger().info("File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(e.getMessage() + " in the specified directory.");
+            LogManager.getLogger().error(e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
-    }
-
-    public static void unscrambleEquipmentNumbers(Unit unit, boolean refit) {
-        //BA has one part per equipment entry per suit and may need to have trooper fields set following
-        //a refit
-        if (unit.getEntity() instanceof BattleArmor) {
-            assignTroopersAndEquipmentNums(unit);
-            return;
-        }
-
-        Map<Integer, Part> partMap = new HashMap<>();
-        List<Integer> equipNums = new ArrayList<>();
-        for (Mounted m : unit.getEntity().getEquipment()) {
-            equipNums.add(unit.getEntity().getEquipmentNum(m));
-        }
-
-        // Handle exact matches first
-        List<Part> remaining = new ArrayList<>();
-        for (Part part : unit.getParts()) {
-            int eqnum = -1;
-            EquipmentType etype = null;
-            if (part instanceof EquipmentPart) {
-                eqnum = ((EquipmentPart) part).getEquipmentNum();
-                etype = ((EquipmentPart) part).getType();
-            } else if (part instanceof MissingEquipmentPart) {
-                eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
-                etype = ((MissingEquipmentPart) part).getType();
-            }
-
-            if (etype != null) {
-                Mounted mounted = unit.getEntity().getEquipment(eqnum);
-                if (equipNums.contains(eqnum)
-                        && (mounted != null)
-                        && etype.equals(mounted.getType())) {
-                    equipNums.remove((Integer) eqnum);
-                    partMap.put(eqnum, part);
-                } else {
-                    remaining.add(part);
-                }
-            }
-        }
-
-        // Handle approximate matches (AmmoBins with munition or bomb type changes)
-        List<Part> notFound = new ArrayList<>();
-        for (Part part : remaining) {
-            int eqnum = -1;
-            EquipmentType etype = null;
-            if (part instanceof EquipmentPart) {
-                eqnum = ((EquipmentPart) part).getEquipmentNum();
-                etype = ((EquipmentPart) part).getType();
-            } else if (part instanceof MissingEquipmentPart) {
-                eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
-                etype = ((MissingEquipmentPart) part).getType();
-            } else {
-                continue;
-            }
-
-            // Invalid equipment or already found
-            if ((etype == null) || partMap.containsKey(eqnum)) {
-                notFound.add(part);
-                continue;
-            }
-
-            Mounted mounted = unit.getEntity().getEquipment(eqnum);
-            if ((part instanceof AmmoBin)
-                    && (etype instanceof AmmoType)
-                    && (mounted != null)
-                    && (mounted.getType() instanceof AmmoType)) {
-                // Handle AmmoBins which had their AmmoType changed but did not get reloaded yet.
-                AmmoBin ammoBin = (AmmoBin) part;
-                AmmoType mountedType = (AmmoType) mounted.getType();
-                if (mountedType.equalsAmmoTypeOnly(ammoBin.getType())
-                        && (mountedType.getRackSize() == ammoBin.getType().getRackSize())) {
-                    equipNums.remove((Integer) eqnum);
-                    partMap.put(eqnum, part);
-                    continue;
-                }
-            }
-
-            notFound.add(part);
-        }
-
-        remaining = new ArrayList<>(notFound);
-        notFound.clear();
-
-        // For ammo types we want to match the same munition type if possible to avoid
-        // imposing unnecessary ammo swaps.
-        // However, if we've just done a refit we may very well have changed ammo types,
-        // so we need to set the equipment numbers in this case.
-        for (Part part : remaining) {
-            boolean found = false;
-            int i = -1;
-
-            if (part instanceof EquipmentPart) {
-                EquipmentPart epart = (EquipmentPart) part;
-                for (int equipNum : equipNums) {
-                    i++;
-                    Mounted m = unit.getEntity().getEquipment(equipNum);
-                    if (part instanceof AmmoBin) {
-                        if (!(m.getType() instanceof AmmoType)) {
-                            continue;
-                        }
-
-                        AmmoBin ammoBin = (AmmoBin) part;
-                        AmmoType ammoType = (AmmoType) m.getType();
-
-                        // If this is a refit, we want to update our ammo bin parts to match
-                        // the munitions specified in the refit, then reassign the equip number
-                        if (refit) {
-                            if (ammoBin.getType().equalsAmmoTypeOnly(ammoType)
-                                    && (ammoType.getRackSize() == ammoBin.getType().getRackSize())
-                                    && !m.isDestroyed()) {
-                                ammoBin.setEquipmentNum(equipNum);
-                                // Ensure Entity is synch'd with part
-                                ammoBin.updateConditionFromPart();
-                                // Unload bin before munition change
-                                ammoBin.unload();
-                                ammoBin.changeMunition(ammoType);
-                                partMap.put(equipNum, part);
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                        epart.setEquipmentNum(equipNum);
-                        partMap.put(equipNum, part);
-                        found = true;
-                        break;
-                    }
-                }
-            } else if (part instanceof MissingEquipmentPart) {
-                MissingEquipmentPart epart = (MissingEquipmentPart)part;
-                for (int equipNum : equipNums) {
-                    i++;
-                    Mounted m = unit.getEntity().getEquipment(equipNum);
-                    if (part instanceof MissingAmmoBin
-                            && !(m.getType() instanceof AmmoType)) {
-                        continue;
-                    }
-                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
-                        epart.setEquipmentNum(equipNum);
-                        partMap.put(equipNum, part);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (found) {
-                equipNums.remove(i);
-            } else {
-                notFound.add(part);
-            }
-        }
-
-        remaining = new ArrayList<>(notFound);
-        notFound.clear();
-
-        if (remaining.size() > 0) {
-            StringBuilder builder = new StringBuilder();
-            builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n", unit.getName(), unit.getId()));
-            for (Part part : remaining) {
-                builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ");
-                if (part instanceof EquipmentPart) {
-                    builder.append(((EquipmentPart) part).getEquipmentNum()).append("\r\n");
-                }
-                else if (part instanceof MissingEquipmentPart) {
-                    builder.append(((MissingEquipmentPart) part).getEquipmentNum()).append("\r\n");
-                }
-            }
-
-            builder.append("\r\nEquipment Parts:\r\n");
-            for (Part p : unit.getParts()) {
-                if (!(p instanceof EquipmentPart) &&
-                        (!(p instanceof MissingEquipmentPart))) {
-                    continue;
-                }
-                int equipNum;
-                if (p instanceof EquipmentPart) {
-                    EquipmentPart ePart = (EquipmentPart) p;
-                    equipNum = ePart.getEquipmentNum();
-                } else {
-                    MissingEquipmentPart mePart = (MissingEquipmentPart) p;
-                    equipNum = mePart.getEquipmentNum();
-                }
-                boolean isMissing = remaining.contains(p);
-                String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";
-                if (isMissing) {
-                    eName = "<Incorrect>";
-
-                    // Break the incorrect equipment number linkage if there is already a valid part at the location.
-                    // This ensures only one part is mapped to each equipment number, avoiding crashes and other
-                    // problems when these parts get out of sync.
-                    if ((equipNum >= 0) && partMap.containsKey(equipNum)) {
-                        if (p instanceof EquipmentPart) {
-                            EquipmentPart ePart = (EquipmentPart) p;
-                            ePart.setEquipmentNum(-1);
-                        } else {
-                            MissingEquipmentPart mePart = (MissingEquipmentPart) p;
-                            mePart.setEquipmentNum(-1);
-                        }
-                    }
-                }
-                builder.append(String.format(" %d: %s %s %s %s\r\n", equipNum, p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
-            }
-
-            builder.append("\r\nEquipment:\r\n");
-            for (Mounted m : unit.getEntity().getEquipment()) {
-                int equipNum = unit.getEntity().getEquipmentNum(m);
-                EquipmentType mType = m.getType();
-                boolean isAvailable = equipNums.contains(equipNum);
-                builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
-            }
-            MekHQ.getLogger().warning(builder.toString());
-        }
-    }
-
-    public static void assignTroopersAndEquipmentNums(Unit unit) {
-        if (!(unit.getEntity() instanceof BattleArmor)) {
-            throw new IllegalArgumentException("Attempting to assign trooper values to parts for non-BA unit");
-        }
-
-        //Create a list that we can remove parts from as we match them
-        List<EquipmentPart> tempParts = unit.getParts().stream()
-                .filter(p -> p instanceof EquipmentPart)
-                .map(p -> (EquipmentPart)p)
-                .collect(Collectors.toList());
-
-        for (Mounted m : unit.getEntity().getEquipment()) {
-            final int eqNum = unit.getEntity().getEquipmentNum(m);
-            //Look for parts of the same type with the equipment number already set correctly
-            List<EquipmentPart> parts = tempParts.stream()
-                    .filter(p -> p.getType().getInternalName().equals(m.getType().getInternalName())
-                            && p.getEquipmentNum() == eqNum)
-                    .collect(Collectors.toList());
-            //If we don't find any, just match the internal name and set the equipment number.
-            if (parts.isEmpty()) {
-                parts = tempParts.stream()
-                        .filter(p -> p.getType().getInternalName().equals(m.getType().getInternalName()))
-                        .collect(Collectors.toList());
-                parts.forEach(p -> p.setEquipmentNum(eqNum));
-            }
-            if (parts.stream().allMatch(p -> p instanceof BattleArmorEquipmentPart)) {
-                //Try to find one for each trooper; if the Entity has multiple pieces of equipment of this
-                //type this will make sure we're only setting one group to this eq number.
-                Part[] perTrooper = new Part[unit.getEntity().locations() - 1];
-                for (EquipmentPart p : parts) {
-                    int trooper = ((BattleArmorEquipmentPart)p).getTrooper();
-                    if (trooper > 0) {
-                        perTrooper[trooper - 1] = p;
-                    }
-                }
-                //Assign a part to any empty position and set the trooper field
-                for (int t = 0; t < perTrooper.length; t++) {
-                    if (null == perTrooper[t]) {
-                        for (Part p : parts) {
-                            if (((BattleArmorEquipmentPart)p).getTrooper() < 1) {
-                                ((BattleArmorEquipmentPart)p).setTrooper(t + 1);
-                                perTrooper[t] = p;
-                                break;
-                            }
-                        }
-                    }
-                }
-                //Normally there should be a part in each position, but we will leave open the possibility
-                //of equipment missing equipment for some troopers in the case of modular/AP mounts or DWPs
-                for (Part p : perTrooper) {
-                    if (null != p) {
-                        tempParts.remove(p);
-                    }
-                }
-            } else {
-                //Ammo Bin
-                tempParts.removeAll(parts);
-            }
-        }
-        //TODO: Is it necessary to update armor?
     }
 
     /**
@@ -1390,7 +1110,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {
-            MekHQ.getLogger().error("Error exporting JTable", ioe);
+            LogManager.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1523,7 +1243,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
+                            LogManager.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
                         }
                     }
                 }
@@ -1609,7 +1329,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1617,7 +1337,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
         }

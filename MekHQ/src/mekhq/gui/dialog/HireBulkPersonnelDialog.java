@@ -30,6 +30,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -265,7 +266,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         int number = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
-            MekHQ.getLogger().error("Attempted to bulk hire for null PersonnelType!");
+            LogManager.getLogger().error("Attempted to bulk hire for null PersonnelType!");
             return;
         }
 

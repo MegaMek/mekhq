@@ -20,21 +20,16 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.Mounted;
-import megamek.common.Tank;
-import megamek.common.WeaponType;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -125,7 +120,7 @@ public class Turret extends TankLocation {
                     damage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

@@ -21,9 +21,9 @@
  */
 package mekhq.campaign.finances;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -118,7 +118,7 @@ public class Asset implements Serializable {
                     asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         return asset;

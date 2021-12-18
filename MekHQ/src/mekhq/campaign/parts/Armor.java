@@ -20,28 +20,21 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.util.Objects;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.ITechnology;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.util.Objects;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -337,7 +330,7 @@ public class Armor extends Part implements IAcquisitionWork {
                     clan = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

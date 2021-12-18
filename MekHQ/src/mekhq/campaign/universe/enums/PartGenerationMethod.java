@@ -19,11 +19,11 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.campaign.universe.generators.partGenerators.AbstractPartGenerator;
 import mekhq.campaign.universe.generators.partGenerators.MishraPartGenerator;
 import mekhq.campaign.universe.generators.partGenerators.MultiplePartGenerator;
 import mekhq.campaign.universe.generators.partGenerators.WindchildPartGenerator;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -93,7 +93,7 @@ public enum PartGenerationMethod {
             case TRIPLE:
                 return new MultiplePartGenerator(this, 3);
             case DISABLED:
-                MekHQ.getLogger().error("Attempted to get a generator when the part generator is Disabled. Returning Windchild");
+                LogManager.getLogger().error("Attempted to get a generator when the part generator is Disabled. Returning Windchild");
             case WINDCHILD:
             default:
                 return new WindchildPartGenerator();

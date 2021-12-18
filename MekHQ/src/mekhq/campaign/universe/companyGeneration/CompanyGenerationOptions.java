@@ -20,13 +20,13 @@ package mekhq.campaign.universe.companyGeneration;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.*;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -749,7 +749,7 @@ public class CompanyGenerationOptions implements Serializable {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writeToXML(pw, 0, ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version"));
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -867,7 +867,7 @@ public class CompanyGenerationOptions implements Serializable {
     public static CompanyGenerationOptions parseFromXML(final Campaign campaign,
                                                         final @Nullable File file) {
         if (file == null) {
-            MekHQ.getLogger().error("Received a null file, returning the default Windchild options");
+            LogManager.getLogger().error("Received a null file, returning the default Windchild options");
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
         }
         final Element element;
@@ -876,7 +876,7 @@ public class CompanyGenerationOptions implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to open file, returning the default Windchild options", e);
+            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
         }
         element.normalize();
@@ -892,7 +892,7 @@ public class CompanyGenerationOptions implements Serializable {
                 }
             }
         }
-        MekHQ.getLogger().error("Failed to parse file, returning the default Windchild options");
+        LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
         return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
     }
 
@@ -1142,7 +1142,7 @@ public class CompanyGenerationOptions implements Serializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
 

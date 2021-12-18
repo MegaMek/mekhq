@@ -38,6 +38,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -302,7 +303,7 @@ public class CampaignPreset implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
@@ -396,7 +397,7 @@ public class CampaignPreset implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
 
@@ -472,7 +473,7 @@ public class CampaignPreset implements Serializable {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
-                                MekHQ.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
+                                LogManager.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
                                 continue;
                             }
                             SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills());
@@ -487,7 +488,7 @@ public class CampaignPreset implements Serializable {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                                MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                                LogManager.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                                 continue;
                             }
                             SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
@@ -501,7 +502,7 @@ public class CampaignPreset implements Serializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
         return preset;

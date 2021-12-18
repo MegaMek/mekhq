@@ -23,7 +23,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -52,6 +51,7 @@ import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBa
 import mekhq.campaign.universe.generators.battleMechWeightClassGenerators.AbstractBattleMechWeightClassGenerator;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -320,7 +320,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateOfficer(final Person officer, final CompanyGenerationPersonType type) {
         if (!type.isOfficer()) {
-            MekHQ.getLogger().error(officer.getFullTitle()
+            LogManager.getLogger().error(officer.getFullTitle()
                     + " is not a valid officer for the officer generation, cannot generate them as an officer.");
             return;
         }
@@ -691,7 +691,7 @@ public abstract class AbstractCompanyGenerator {
                 return 0;
             default:
                 // Shouldn't be hit, but a safety for attempting non-combat generation
-                MekHQ.getLogger().error("Attempting to generate a unit for a " + tracker.getPersonType() + ", returning a -20 modifier");
+                LogManager.getLogger().error("Attempting to generate a unit for a " + tracker.getPersonType() + ", returning a -20 modifier");
                 return -20;
         }
     }
@@ -801,7 +801,7 @@ public abstract class AbstractCompanyGenerator {
         try {
             return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
         } catch (Exception ignored) {
-            MekHQ.getLogger().error("Failed to generate entity");
+            LogManager.getLogger().error("Failed to generate entity");
         }
 
         return null;
@@ -1032,7 +1032,7 @@ public abstract class AbstractCompanyGenerator {
                 filename = "BattleMech.png";
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             filename = "BattleMech.png";
         }
         iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
@@ -1121,7 +1121,7 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < numberMothballedEntities; i++) {
             final Faction faction = factionSelector.selectFaction(campaign);
             if (faction == null) {
-                MekHQ.getLogger().error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mech");
+                LogManager.getLogger().error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mech");
                 continue;
             }
 
