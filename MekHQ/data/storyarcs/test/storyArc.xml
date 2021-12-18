@@ -4,7 +4,7 @@
     <details>Just for testing</details>
     <description>This campaign is used for testing out features.</description>
     <startNew>true</startNew>
-    <startingEventId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingEventId>
+    <startingEventId>10700728-5c5b-11ec-bf63-0242ac130002</startingEventId>
     <storyEvents>
         <storyEvent id="9b068c99-c2ef-4a35-b59b-b923f4ddbdce" type="mekhq.campaign.storyarc.storyevent.CreateCharacterStoryEvent">
             <xpPool>25</xpPool>
@@ -16,6 +16,10 @@
             <phenotype>MECHWARRIOR</phenotype>
             <primaryRole>MECHWARRIOR</primaryRole>
             <nextEventId>10700728-5c5b-11ec-bf63-0242ac130002</nextEventId>
+        </storyEvent>
+        <storyEvent id="d01587c6-5473-4d62-ba2e-9a015368db40" type="mekhq.campaign.storyarc.storyevent.DateReachedStoryEvent">
+            <date>3071-05-15</date>
+            <nextEventId>dedcb5e7-dc7d-40d1-b45e-b97002c60334</nextEventId>
         </storyEvent>
         <storyEvent id="6116e791-ea40-4435-8f45-e2c696f4da2b" type="mekhq.campaign.storyarc.storyevent.TravelStoryEvent">
             <destinationId>Acamar</destinationId>
@@ -31,6 +35,14 @@
             <title>First mission complete!</title>
             <narrative>Congratulations on completing your first mission!</narrative>
             <nextEventId>3491b950-5bcd-11ec-bf63-0242ac130002</nextEventId>
+            <StorySplash>
+                <category></category>
+                <filename>splash-guardduty.png</filename>
+            </StorySplash>
+        </storyEvent>
+        <storyEvent id="dedcb5e7-dc7d-40d1-b45e-b97002c60334" type="mekhq.campaign.storyarc.storyevent.NarrativeStoryEvent">
+            <title>Date reached</title>
+            <narrative>Its May 15th, 3071. Just thought you should know. Its probably a holiday somewhere.</narrative>
             <StorySplash>
                 <category></category>
                 <filename>splash-guardduty.png</filename>

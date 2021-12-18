@@ -24,10 +24,12 @@ import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
+import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.storyarc.storyevent.DateReachedStoryEvent;
 import mekhq.campaign.storyarc.storyevent.ScenarioStoryEvent;
 import mekhq.campaign.storyarc.storyevent.TravelStoryEvent;
 import org.apache.logging.log4j.LogManager;
@@ -182,6 +184,22 @@ public class StoryArc implements MekHqXmlSerializable {
                          storyEvent.isActive()) {
                      storyEvent.completeEvent();
                      break;
+                }
+
+            }
+        }
+    }
+
+    @Subscribe
+    public void handlNewDay(NewDayEvent ev) {
+        //search through StoryEvents for a matching TravelStoryEvent
+        DateReachedStoryEvent storyEvent;
+        for (Map.Entry<UUID, StoryEvent> entry : storyEvents.entrySet()) {
+            if (entry.getValue() instanceof DateReachedStoryEvent) {
+                storyEvent = (DateReachedStoryEvent) entry.getValue();
+                if(null != storyEvent.getDate() && ev.getCampaign().getLocalDate().equals(storyEvent.getDate())) {
+                    storyEvent.startEvent();
+                    break;
                 }
 
             }
