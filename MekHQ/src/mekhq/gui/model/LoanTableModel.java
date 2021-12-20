@@ -18,17 +18,13 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import mekhq.MekHQ;
-import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table model for displaying active loans

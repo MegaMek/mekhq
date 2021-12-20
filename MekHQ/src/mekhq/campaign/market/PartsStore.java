@@ -12,13 +12,28 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
+
+import megamek.common.*;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.verifier.TestEntity;
+import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.Weapon;
+import megamek.common.weapons.bayweapons.BayWeapon;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.equipment.MASC;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,70 +41,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BayType;
-import megamek.common.Dropship;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Protomech;
-import megamek.common.TechConstants;
-import megamek.common.WeaponType;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.verifier.TestEntity;
-import megamek.common.weapons.InfantryAttack;
-import megamek.common.weapons.Weapon;
-import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.AeroHeatSink;
-import mekhq.campaign.parts.AeroSensor;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Avionics;
-import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.BattleArmorSuit;
-import mekhq.campaign.parts.BayDoor;
-import mekhq.campaign.parts.Cubicle;
-import mekhq.campaign.parts.DropshipDockingCollar;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.FireControlSystem;
-import mekhq.campaign.parts.GravDeck;
-import mekhq.campaign.parts.JumpshipDockingCollar;
-import mekhq.campaign.parts.KfBoom;
-import mekhq.campaign.parts.LandingGear;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekCockpit;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.ProtomekArmActuator;
-import mekhq.campaign.parts.ProtomekArmor;
-import mekhq.campaign.parts.ProtomekJumpJet;
-import mekhq.campaign.parts.ProtomekLegActuator;
-import mekhq.campaign.parts.ProtomekLocation;
-import mekhq.campaign.parts.ProtomekSensor;
-import mekhq.campaign.parts.QuadVeeGear;
-import mekhq.campaign.parts.Rotor;
-import mekhq.campaign.parts.Turret;
-import mekhq.campaign.parts.VeeSensor;
-import mekhq.campaign.parts.VeeStabiliser;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.JumpJet;
-import mekhq.campaign.parts.equipment.MASC;
 
 /**
  * This is a parts store which will contain one copy of every possible
@@ -102,10 +53,6 @@ import mekhq.campaign.parts.equipment.MASC;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PartsStore implements Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1686222527383868364L;
 
     private static int EXPECTED_SIZE = 50000;
@@ -171,7 +118,7 @@ public class PartsStore implements Serializable {
             try {
                 newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
             if(null != newEntity) {
                 BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);

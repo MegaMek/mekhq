@@ -22,10 +22,9 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -150,7 +149,7 @@ public enum ROMDesignation {
         }
 
         // Could not parse based on either method, so return NONE
-        MekHQ.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
+        LogManager.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
 
         return ROMDesignation.NONE;
     }

@@ -18,9 +18,9 @@
  */
 package mekhq.campaign.io.Migration;
 
-import megamek.common.icons.Camouflage;
-import mekhq.MekHQ;
 import megamek.Version;
+import megamek.common.icons.Camouflage;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * This migrates Camouflage from SeaBee's Pack to Deadborder's Pack.
@@ -48,7 +48,7 @@ public class CamouflageMigrator {
                 default:
                     break;
             }
-            MekHQ.getLogger().warning("Migrated to " + camouflage.toString());
+            LogManager.getLogger().warn("Migrated to " + camouflage.toString());
         }
     }
 

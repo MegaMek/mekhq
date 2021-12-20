@@ -18,17 +18,18 @@
  */
 package mekhq.module;
 
-import java.io.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import mekhq.module.api.MekHQModule;
+import org.apache.logging.log4j.LogManager;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-
-import mekhq.MekHQ;
-import mekhq.module.api.MekHQModule;
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Manages plugins requiring interpretation by a scripting engine. As scripts are encountered while
@@ -74,7 +75,7 @@ public class ScriptPluginManager {
     private void addModule(File script, String extension) {
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            MekHQ.getLogger().warning("Could not find script engine for extension " + extension);
+            LogManager.getLogger().warn("Could not find script engine for extension " + extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -86,7 +87,7 @@ public class ScriptPluginManager {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("While parsing script " + script.getName(), e);
+            LogManager.getLogger().error("While parsing script " + script.getName(), e);
         }
     }
 
@@ -94,10 +95,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            MekHQ.getLogger().info("Engine: " + engine.getEngineName());
-            MekHQ.getLogger().info("\tVersion: " + engine.getEngineVersion());
-            MekHQ.getLogger().info("\tAlias: " + engine.getNames());
-            MekHQ.getLogger().info("\tLanguage name: " + engine.getLanguageName() + "\n");
+            LogManager.getLogger().info("Engine: " + engine.getEngineName());
+            LogManager.getLogger().info("\tVersion: " + engine.getEngineVersion());
+            LogManager.getLogger().info("\tAlias: " + engine.getNames());
+            LogManager.getLogger().info("\tLanguage name: " + engine.getLanguageName() + "\n");
         }
     }
 }

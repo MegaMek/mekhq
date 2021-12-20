@@ -20,26 +20,17 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Hashtable;
-
+import megamek.Version;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.ConvFighter;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Hashtable;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -54,7 +45,7 @@ public class SkillType implements Serializable {
     public static final String REGULAR_NM = "Regular";
     public static final String VETERAN_NM = "Veteran";
     public static final String ELITE_NM = "Elite";
-    public static final String[] SKILL_LEVEL_NAMES = {ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM};
+    public static final String[] SKILL_LEVEL_NAMES = { ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM };
 
     //combat skills
     public static final String S_PILOT_MECH  = "Piloting/Mech";
@@ -429,7 +420,7 @@ public class SkillType implements Serializable {
 
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
@@ -464,7 +455,7 @@ public class SkillType implements Serializable {
 
             hash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 

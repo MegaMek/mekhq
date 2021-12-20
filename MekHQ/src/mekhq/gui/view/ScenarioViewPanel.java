@@ -20,22 +20,7 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTree;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -43,10 +28,19 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.util.Vector;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
@@ -294,7 +288,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                         force.getIconFileName(), force.getIconMap())
                         .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
                 return null;
             }
         }

@@ -29,6 +29,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.*;
 
 /**
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ImageChoiceDialog extends JDialog {
     //region Variable Declarations
@@ -604,7 +605,7 @@ public class ImageChoiceDialog extends JDialog {
                     lblImage.setIcon(new ImageIcon(image));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

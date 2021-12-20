@@ -21,41 +21,6 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -63,17 +28,25 @@ import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.*;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -907,7 +880,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                         force.getIconFileName(), force.getIconMap())
                         .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
                 return null;
             }
        }

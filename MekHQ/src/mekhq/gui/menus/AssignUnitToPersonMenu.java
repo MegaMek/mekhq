@@ -19,7 +19,6 @@
 package mekhq.gui.menus;
 
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -28,6 +27,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -184,7 +184,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             ? PersonnelRole.SOLDIER : PersonnelRole.BATTLE_ARMOUR))
                     .collect(Collectors.toList());
         } else {
-            MekHQ.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
+            LogManager.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
             return;
         }
 
@@ -226,7 +226,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             .filter(person -> person.hasRole(PersonnelRole.VTOL_PILOT))
                             .collect(Collectors.toList());
                 } else {
-                    MekHQ.getLogger().warning("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
+                    LogManager.getLogger().warn("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
                     filteredPersonnel = new ArrayList<>();
                 }
 

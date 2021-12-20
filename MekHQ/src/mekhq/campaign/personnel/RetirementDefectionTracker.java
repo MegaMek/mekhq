@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -34,6 +33,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -701,7 +701,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         if (retVal != null) {
