@@ -438,7 +438,7 @@ public class Scenario implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

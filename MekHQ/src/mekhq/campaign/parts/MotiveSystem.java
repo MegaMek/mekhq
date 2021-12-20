@@ -105,7 +105,7 @@ public class MotiveSystem extends Part {
                     penalty = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

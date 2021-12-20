@@ -62,7 +62,7 @@ public class Systems {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class Systems {
             planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             planetUnmarshaller = jContext.createUnmarshaller();
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -321,9 +321,9 @@ public class Systems {
                 }
             }
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -459,7 +459,7 @@ public class Systems {
         try {
             planetMarshaller.marshal(event, out);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -472,7 +472,7 @@ public class Systems {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -486,7 +486,7 @@ public class Systems {
         try {
             return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }
@@ -501,7 +501,7 @@ public class Systems {
         try {
             return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }

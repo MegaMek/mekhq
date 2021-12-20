@@ -351,7 +351,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         retVal.initializeParts(false);

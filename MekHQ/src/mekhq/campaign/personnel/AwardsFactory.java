@@ -125,7 +125,7 @@ public class AwardsFactory {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
@@ -159,7 +159,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
             } catch (IOException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

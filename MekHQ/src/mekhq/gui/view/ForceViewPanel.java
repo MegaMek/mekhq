@@ -151,7 +151,7 @@ public class ForceViewPanel extends JScrollablePanel {
                     force.getIconFileName(), force.getIconMap())
                     .getScaledInstance(scale, -1, Image.SCALE_SMOOTH));
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         lbl.setIcon(icon);

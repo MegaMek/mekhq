@@ -390,7 +390,7 @@ public class BattleArmorSuit extends Part {
                     alternateTon = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -599,7 +599,7 @@ public class BattleArmorSuit extends Part {
         try {
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         Unit newUnit = null;
         if (null != newEntity) {

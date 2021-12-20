@@ -89,12 +89,12 @@ public class MedicalViewDialog extends JDialog {
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file path
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         setPreferredSize(new Dimension(1024, 840));

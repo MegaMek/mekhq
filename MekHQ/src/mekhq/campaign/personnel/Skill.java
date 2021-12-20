@@ -218,7 +218,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

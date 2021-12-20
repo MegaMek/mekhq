@@ -377,7 +377,7 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         } finally {
             client.die();
             client = null;
@@ -427,7 +427,7 @@ public class AtBGameThread extends GameThread {
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

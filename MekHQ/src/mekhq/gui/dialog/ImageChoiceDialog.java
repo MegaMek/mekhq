@@ -605,7 +605,7 @@ public class ImageChoiceDialog extends JDialog {
                     lblImage.setIcon(new ImageIcon(image));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

@@ -143,7 +143,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -1050,7 +1050,7 @@ public class ResolveScenarioTracker {
                 // Read a Vector from the file.
                 parser.parse(listStream);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
 
             // Was there any error in parsing?
@@ -1911,7 +1911,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
         }

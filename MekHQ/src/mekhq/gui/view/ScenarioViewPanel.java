@@ -288,7 +288,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                         force.getIconFileName(), force.getIconMap())
                         .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 return null;
             }
         }

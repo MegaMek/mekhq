@@ -198,7 +198,7 @@ public class Finances implements Serializable {
                     retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

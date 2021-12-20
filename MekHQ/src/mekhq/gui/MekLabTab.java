@@ -181,7 +181,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -216,7 +216,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());

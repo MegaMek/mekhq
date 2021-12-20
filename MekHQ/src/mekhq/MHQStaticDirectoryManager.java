@@ -206,7 +206,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             } finally {
                 if (null != g2d) {
                     g2d.dispose();
@@ -215,7 +215,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     try {
                         base = (BufferedImage) getForceIcons().getItem("", "empty.png");
                     } catch (Exception e) {
-                        LogManager.getLogger().error(e);
+                        LogManager.getLogger().error("", e);
                     }
                 }
                 retVal = base;
@@ -230,7 +230,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 }
                 retVal = scaledImage;
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
