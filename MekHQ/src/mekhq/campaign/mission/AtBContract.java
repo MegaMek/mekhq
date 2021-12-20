@@ -23,23 +23,19 @@ package mekhq.campaign.mission;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -50,6 +46,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -526,7 +523,7 @@ public class AtBContract extends Contract implements Serializable {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    MekHQ.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
+                    LogManager.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
                             + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
                 }
             }
@@ -706,31 +703,34 @@ public class AtBContract extends Contract implements Serializable {
         return LocalDate.of(today.getYear(), today.getMonth(), Compute.randomInt(today.getMonth().length(today.isLeapYear())) + 1);
     }
 
-    public boolean contractExtended (Campaign campaign) {
-        if (!getContractType().isPirateHunting() && !getContractType().isRiotDuty()) {
-            String warName = RandomFactionGenerator.getInstance()
-                    .getFactionHints().getCurrentWar(Factions.getInstance().getFaction(getEmployerCode()),
-                    Factions.getInstance().getFaction(getEnemyCode()), campaign.getLocalDate());
-            if (null != warName) {
-                int extension = 0;
-                int roll = Compute.d6();
-                if (roll == 1) {
-                    extension = Math.max(1, getLength() / 2);
-                }
-                if (roll == 2) {
-                    extension = 1;
-                }
-                if (extension > 0) {
-                    campaign.addReport("Due to the " + warName +
-                            " crisis your employer has invoked the emergency clause and extended the contract " +
-                            extension + ((extension == 1) ? " month" : " months"));
-                    setEndDate(getEndingDate().plusMonths(extension));
-                    extensionLength += extension;
-                    return true;
-                }
-            }
+    public boolean contractExtended(final Campaign campaign) {
+        if (getContractType().isPirateHunting() || getContractType().isRiotDuty()) {
+            return false;
         }
-        return false;
+
+        final String warName = RandomFactionGenerator.getInstance().getFactionHints().getCurrentWar(
+                getEmployerFaction(), getEnemy(), campaign.getLocalDate());
+        if (warName == null) {
+            return false;
+        }
+
+        final int extension;
+        final int roll = Compute.d6();
+        if (roll == 1) {
+            extension = Math.max(1, getLength() / 2);
+        } else if (roll == 2) {
+            extension = 1;
+        } else {
+            return false;
+        }
+
+        campaign.addReport(String.format(
+                "Due to the %s crisis your employer has invoked the emergency clause and extended the contract %d %s",
+                warName, extension, ((extension == 1) ? " month" : " months")));
+        setEndDate(getEndingDate().plusMonths(extension));
+        extensionLength += extension;
+        MekHQ.triggerEvent(new MissionChangedEvent(this));
+        return true;
     }
 
     @Override
@@ -914,7 +914,7 @@ public class AtBContract extends Contract implements Serializable {
                     parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }
@@ -930,12 +930,12 @@ public class AtBContract extends Contract implements Serializable {
                 if (m instanceof AtBContract) {
                     setParentContract((AtBContract) m);
                 } else {
-                    MekHQ.getLogger().warning(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
+                    LogManager.getLogger().warn(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
                             parentContract.getId(), getName()));
                     setParentContract(null);
                 }
             } else {
-                MekHQ.getLogger().warning(String.format("Parent Contract #%d reference was not found for contract %s",
+                LogManager.getLogger().warn(String.format("Parent Contract #%d reference was not found for contract %s",
                         parentContract.getId(), getName()));
                 setParentContract(null);
             }
@@ -1224,42 +1224,6 @@ public class AtBContract extends Contract implements Serializable {
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
         allyBotName = getEmployerName(campaign.getGameYear());
         enemyBotName = getEnemyName(campaign.getGameYear());
-    }
-
-    public static AtBContract getContractExtension(AtBContract c, int length, Campaign campaign) {
-        AtBContract retVal = new AtBContract(c.getName() + " (Ext)");
-        retVal.setType(c.getType());
-        retVal.setSystemId(c.getSystemId());
-        retVal.setDesc(c.getDescription());
-        retVal.setStatus(MissionStatus.ACTIVE);
-        retVal.setLength(length);
-        retVal.setStartDate(campaign.getLocalDate());
-        /*Set ending date; the other calculated values will be replaced
-         * from the original contract */
-        retVal.calculateContract(campaign);
-        retVal.setMultiplier(c.getMultiplier() * 1.5);
-        retVal.setTransportComp(c.getTransportComp());
-        retVal.setStraightSupport(c.getStraightSupport());
-        retVal.setOverheadComp(c.getOverheadComp());
-        retVal.setCommandRights(c.getCommandRights());
-        retVal.setBattleLossComp(c.getBattleLossComp());
-        retVal.setSalvagePct(c.getSalvagePct());
-        retVal.setSalvageExchange(c.isSalvageExchange());
-        retVal.setSalvagedByUnit(c.getSalvagedByUnit());
-        retVal.setSalvagedByEmployer(c.getSalvagedByEmployer());
-        retVal.setSigningBonusPct(c.getSigningBonusPct());
-        retVal.setAdvancePct(c.getAdvancePct());
-        retVal.setMRBCFee(c.payMRBCFee());
-
-        retVal.setContractType(c.getContractType());
-        retVal.setEmployerCode(c.getEmployerCode(), campaign.getGameYear());
-        retVal.setEnemyCode(c.getEnemyCode());
-        retVal.requiredLances = c.getRequiredLances();
-        retVal.setPartsAvailabilityLevel(retVal.getContractType().calculatePartsAvailabilityLevel());
-        retVal.setAllyBotName(c.getAllyBotName());
-        retVal.setEnemyBotName(c.getEnemyBotName());
-
-        return retVal;
     }
 
     /**

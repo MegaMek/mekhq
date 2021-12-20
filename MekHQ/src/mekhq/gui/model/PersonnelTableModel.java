@@ -18,24 +18,8 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
@@ -43,6 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
@@ -50,6 +35,14 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * A table Model for displaying information about personnel
@@ -318,10 +311,8 @@ public class PersonnelTableModel extends DataTableModel {
     public String getTooltip(int row, int col) {
         Person p = getPerson(row);
         switch (col) {
-            case COL_NABIL:
-                return p.getAbilityListAsString(PilotOptions.LVL3_ADVANTAGES);
-            case COL_NIMP:
-                return p.getAbilityListAsString(PilotOptions.MD_ADVANTAGES);
+            case COL_STATUS:
+                return p.getStatus().getToolTipText();
             case COL_ASSIGN: {
                 if ((p.getTechUnits().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");
@@ -334,6 +325,10 @@ public class PersonnelTableModel extends DataTableModel {
                     return null;
                 }
             }
+            case COL_NABIL:
+                return p.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
+            case COL_NIMP:
+                return p.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
             default:
                 return null;
         }
@@ -582,9 +577,9 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_EDGE:
                 return Integer.toString(p.getEdge());
             case COL_NABIL:
-                return Integer.toString(p.countOptions(PilotOptions.LVL3_ADVANTAGES));
+                return Integer.toString(p.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
             case COL_NIMP:
-                return Integer.toString(p.countOptions(PilotOptions.MD_ADVANTAGES));
+                return Integer.toString(p.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case COL_HITS:
                 return Integer.toString(p.getHits());
             case COL_SKILL:

@@ -4,7 +4,7 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,12 +24,12 @@ public class ChatServer {
         // thread that broadcasts messages to clients
         connectionListener.start();
 
-        MekHQ.getLogger().error("ChatServer started");
+        LogManager.getLogger().error("ChatServer started");
 
         while (true) {
             // wait for next client connection request
             Socket clientSocket = serverSocket.accept();
-            MekHQ.getLogger().error("Created socket with client");
+            LogManager.getLogger().error("Created socket with client");
 
             // listen to client in a separate thread
             Connection connection = new Connection(clientSocket);

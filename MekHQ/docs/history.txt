@@ -1,6 +1,32 @@
 VERSION HISTORY:
 ----------------
-0.49.4-SNAPSHOT
+0.49.6-SNAPSHOT
++ PR #2857: Personnel Status: Expansions for Random Death
++ PR #2933: Startup: Rename Origin Force Node With Campaign Name
++ PR #2951: AssignUnitToPersonMenu: Adding Missing Personnel Filters
++ Increased base RAM assignment to 2 GB
++ PR #2474: Copy C3 Master on Restore
++ PR #2952: Personnel Assignment Menus Performance Improvements
++ PR #2959: Finances: Fixing Various Property Issues
++ PR #2960: Campaign Options Dialog: Fixing Portrait Generation Property Issue
++ Issue #476: Log Entry for Personnel Moved In/Out of a ToE Force
++ Issue #2932, #2944: When assigning a vehicle gunner, don't assign them as a driver also.
++ Issue #2866: Actually replace VTOL rotors as opposed to just eating the part
++ MegaMek #3232, #3244: PersonnelOptions/PilotOptions Fix (Multiplayer Games and Saves should now work properly)
++ Issue #2962: AtB Campaigns Now Properly Load with Automatic or Tech Acquisition Skills
++ PR #2345: Refactor equipment unscrambling to make it testable
++ PR #2991: Updating Mockito to 4.1.0
++ PR #2986: Fixing Unit Market Preference Copy/Paste Error
++ PR #3002: Log4j2 2.17.0 Swapover From Log4j1 1.2.17
++ PR #3004: JUnit Update to 4.13.2 from 4.12
+
+0.49.5 (2021-11-06 1800 UTC)
++ PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
++ PR #2493: Procreation: Modularization, Expanded Options, and Bulk Manual Assignment/Removal
++ Documentation: Windchild Docs folder, Updating Existing Docs
++ PR #2937: Fixing Finances Inline Date Format
+
+0.49.4 (2021-10-30 1800 UTC)
 + Issue #274: Moving Era Definitions to Data
 + PR #2793: Expanded Finances Transaction Types
 + Issue #2798: Adding Total XP Earnings Tracking
@@ -9,7 +35,7 @@ VERSION HISTORY:
 + Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
 + Issue #2838: Turrets now generate with the proper faction and thus names
 + Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
-+ Issue #2747: Fixing StratOps Scenario Template Path Capitalization
++ Issue #2747: Fixing StratCon Scenario Template Path Capitalization
 + PR #2847: Preventing Null Force Template Addition
 + PR #2849, 2846: Addressed multiple errors resulting in failure to generate aerospace scenarios
 + PR #2860: Unit Market properly initializes for new campaigns
@@ -36,6 +62,14 @@ VERSION HISTORY:
 + Issue #1793: Reports: AbstractDialog Swapover, GUI Code Isolation, Preference Bugfixes, and Code Standardization
 + Issues #1092, #1105, #1950, and #2695: Person/Tech to Unit and Unit to Person/Tech Assignment Menu Standardization
 + PR #2855: New Campaign Project: Campaign Preset Rework
++ PR #2912: Fixing an NPE in Personnel Filter Style
++ PR #2916: Dependents cannot have an assigned unit
++ PR #2915: AtB Dynamic Scenario: Fixing missing serialization on all non-map values
++ Issue #2918: AtBContract End Date Display Does Not Update on Contract Extension
++ Issue #2920: Full Swapover to MekHQ's PersonnelOptions over MegaMek's PilotOptions
++ PR #2921: Main GUI Bottom Line Formatting Issues: Missing Space and Standardizing Colon Bolding
++ PR #2924: SelectAbilitiesDialog: Adding SPA Display Name Sorting
++ PR #2930: Improving Client Unknown Phase Logging During Initial Connection
 
 0.49.3 (2021-08-23 2000 UTC)
 + Issue #2679: Correctly show and apply overtime mod to multi-day rolls

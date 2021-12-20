@@ -19,8 +19,8 @@
 package mekhq.gui.sorter;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -87,7 +87,7 @@ public class PersonTitleStringSorter implements Comparator<String>, Serializable
             return getPersonTitleSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
                     getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
-            MekHQ.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
+            LogManager.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
             return 0;
         }
     }

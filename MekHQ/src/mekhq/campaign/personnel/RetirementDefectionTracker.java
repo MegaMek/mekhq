@@ -23,8 +23,6 @@ package mekhq.campaign.personnel;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -35,6 +33,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -187,7 +186,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
-                for (Enumeration<IOption> i = p.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                for (Enumeration<IOption> i = p.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                     IOption ability = i.nextElement();
                     if (ability.booleanValue()) {
                         if (ability.getName().equals("tactical_genius")) {
@@ -699,7 +698,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         if (retVal != null) {

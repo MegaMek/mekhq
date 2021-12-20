@@ -19,7 +19,6 @@
 package mekhq.campaign.universe;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +29,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 public class FactionBordersTest {
 
@@ -55,7 +55,7 @@ public class FactionBordersTest {
         when(system.getY()).thenReturn(y);
         String id = String.format("%f, %f", x, y);
         when(system.getId()).thenReturn(id);
-        when(system.getFactionSet(any())).thenReturn(Collections.singleton(owner));
+        when(system.getFactionSet(ArgumentMatchers.any())).thenReturn(Collections.singleton(owner));
         return system;
     }
 

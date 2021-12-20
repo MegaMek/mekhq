@@ -18,22 +18,11 @@
  */
 package mekhq.gui.view;
 
-import java.awt.*;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -41,10 +30,18 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
@@ -154,7 +151,7 @@ public class ForceViewPanel extends JScrollablePanel {
                     force.getIconFileName(), force.getIconMap())
                     .getScaledInstance(scale, -1, Image.SCALE_SMOOTH));
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         lbl.setIcon(icon);

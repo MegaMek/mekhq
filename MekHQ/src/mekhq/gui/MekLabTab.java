@@ -1,7 +1,8 @@
 /*
  * MMLMekUICustom.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,42 +13,30 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
-
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.io.File;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
-import megameklab.com.MegaMekLab;
+import megameklab.com.MMLConstants;
 import megameklab.com.ui.EntitySource;
-import megameklab.com.ui.tabs.FluffTab;
+import megameklab.com.ui.generalUnit.FluffTab;
 import megameklab.com.util.CConfig;
-import megameklab.com.util.RefreshListener;
+import megameklab.com.ui.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 
 public class MekLabTab extends CampaignGuiTab {
 
@@ -94,7 +83,7 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
         CConfig.load();
         UnitUtil.loadFonts();
-        MekHQ.getLogger().info("Starting MegaMekLab version: " + MegaMekLab.VERSION);
+        LogManager.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -192,7 +181,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -227,7 +216,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -422,7 +411,7 @@ public class MekLabTab extends CampaignGuiTab {
         } else if (en instanceof Jumpship) {
             return new AdvancedAeroPanel((Jumpship) en);
         } else if (en.isSupportVehicle()) {
-            return new SupportVehiclePanel(en);
+            return new supportVehiclePanel(en);
         } else if (en instanceof Aero) {
             return new AeroPanel((Aero) en);
         } else if (en instanceof Mech) {
@@ -453,10 +442,10 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Aero entity;
-        private megameklab.com.ui.Aero.tabs.StructureTab structureTab;
-        private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.fighterAero.ASStructureTab structureTab;
+        private megameklab.com.ui.generalUnit.AeroEquipmentTab equipmentTab;
+        private megameklab.com.ui.fighterAero.ASBuildTab buildTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         public AeroPanel(Aero a) {
             entity = a;
@@ -471,11 +460,11 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.Aero.tabs.StructureTab(this);
+            structureTab = new megameklab.com.ui.fighterAero.ASStructureTab(this);
             structureTab.setAsCustomization();
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
-            equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
+            equipmentTab = new megameklab.com.ui.generalUnit.AeroEquipmentTab(this);
+            buildTab = new megameklab.com.ui.fighterAero.ASBuildTab(this, equipmentTab);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -581,11 +570,11 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 4348862352101110686L;
 
         private SmallCraft entity;
-        private megameklab.com.ui.aerospace.DropshipStructureTab structureTab;
-        private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.aerospace.DropshipBuildTab buildTab;
-        private megameklab.com.ui.tabs.TransportTab transportTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.largeAero.DSStructureTab structureTab;
+        private megameklab.com.ui.generalUnit.AeroEquipmentTab equipmentTab;
+        private megameklab.com.ui.largeAero.LABuildTab buildTab;
+        private megameklab.com.ui.generalUnit.TransportTab transportTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         public DropshipPanel(SmallCraft a) {
             entity = a;
@@ -600,13 +589,13 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.aerospace.DropshipStructureTab(this);
+            structureTab = new megameklab.com.ui.largeAero.DSStructureTab(this);
             structureTab.setAsCustomization();
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
-            equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.aerospace.DropshipBuildTab(this, equipmentTab);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
+            equipmentTab = new megameklab.com.ui.generalUnit.AeroEquipmentTab(this);
+            buildTab = new megameklab.com.ui.largeAero.LABuildTab(this, equipmentTab);
             FluffTab fluffTab = new FluffTab(this);
-            transportTab = new megameklab.com.ui.tabs.TransportTab(this);
+            transportTab = new megameklab.com.ui.generalUnit.TransportTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
@@ -714,10 +703,10 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Mech entity;
-        private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
-        private megameklab.com.ui.Mek.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.Mek.tabs.BuildTab buildTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.mek.BMStructureTab structureTab;
+        private megameklab.com.ui.mek.BMEquipmentTab equipmentTab;
+        private megameklab.com.ui.mek.BMBuildTab buildTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         public MekPanel(Mech m) {
             entity = m;
@@ -732,11 +721,11 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(this);
+            structureTab = new megameklab.com.ui.mek.BMStructureTab(this);
             structureTab.setAsCustomization();
-            equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(this);
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
-            buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(this, equipmentTab);
+            equipmentTab = new megameklab.com.ui.mek.BMEquipmentTab(this);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
+            buildTab = new megameklab.com.ui.mek.BMBuildTab(this, equipmentTab);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -840,10 +829,10 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Tank entity;
-        private megameklab.com.ui.Vehicle.tabs.StructureTab structureTab;
-        private megameklab.com.ui.Vehicle.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.Vehicle.tabs.BuildTab buildTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.combatVeh.CVStructureTab structureTab;
+        private megameklab.com.ui.combatVeh.CVEquipmentTab equipmentTab;
+        private megameklab.com.ui.combatVeh.CVBuildTab buildTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         public TankPanel(Tank t) {
             entity = t;
@@ -858,11 +847,11 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(this);
+            structureTab = new megameklab.com.ui.combatVeh.CVStructureTab(this);
             structureTab.setAsCustomization();
-            equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(this, equipmentTab.getEquipmentList());
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
+            equipmentTab = new megameklab.com.ui.combatVeh.CVEquipmentTab(this);
+            buildTab = new megameklab.com.ui.combatVeh.CVBuildTab(this, equipmentTab.getEquipmentList());
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -962,19 +951,19 @@ public class MekLabTab extends CampaignGuiTab {
         }
     }
 
-    private class SupportVehiclePanel extends EntityPanel {
+    private class supportVehiclePanel extends EntityPanel {
 
         private static final long serialVersionUID = -2209864752115049947L;
 
         private Entity entity;
-        private megameklab.com.ui.supportvehicle.SVStructureTab structureTab;
-        private megameklab.com.ui.supportvehicle.SVArmorTab armorTab;
-        private megameklab.com.ui.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.supportvehicle.SVBuildTab buildTab;
-        private megameklab.com.ui.tabs.TransportTab transportTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.supportVeh.SVStructureTab structureTab;
+        private megameklab.com.ui.supportVeh.SVArmorTab armorTab;
+        private megameklab.com.ui.generalUnit.EquipmentTab equipmentTab;
+        private megameklab.com.ui.supportVeh.SVBuildTab buildTab;
+        private megameklab.com.ui.generalUnit.TransportTab transportTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
-        SupportVehiclePanel(Entity en) {
+        supportVehiclePanel(Entity en) {
             entity = en;
             reloadTabs();
         }
@@ -987,13 +976,13 @@ public class MekLabTab extends CampaignGuiTab {
         void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.supportvehicle.SVStructureTab(this);
+            structureTab = new megameklab.com.ui.supportVeh.SVStructureTab(this);
             structureTab.setAsCustomization();
-            armorTab = new megameklab.com.ui.supportvehicle.SVArmorTab(this, getTechManager());
-            equipmentTab = new megameklab.com.ui.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.supportvehicle.SVBuildTab(this, equipmentTab);
-            transportTab = new megameklab.com.ui.tabs.TransportTab(this);
-            previewTab = new megameklab.com.ui.tabs.PreviewTab((this));
+            armorTab = new megameklab.com.ui.supportVeh.SVArmorTab(this, getTechManager());
+            equipmentTab = new megameklab.com.ui.generalUnit.EquipmentTab(this);
+            buildTab = new megameklab.com.ui.supportVeh.SVBuildTab(this, equipmentTab);
+            transportTab = new megameklab.com.ui.generalUnit.TransportTab(this);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab((this));
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             armorTab.addRefreshedListener(this);
@@ -1106,9 +1095,9 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 6894731868670529166L;
 
         private BattleArmor entity;
-        private megameklab.com.ui.BattleArmor.tabs.StructureTab structureTab;
-        private megameklab.com.ui.BattleArmor.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.BattleArmor.tabs.BuildTab buildTab;
+        private megameklab.com.ui.battleArmor.BAStructureTab structureTab;
+        private megameklab.com.ui.battleArmor.BAEquipmentTab equipmentTab;
+        private megameklab.com.ui.battleArmor.BABuildTab buildTab;
 
         public BattleArmorPanel(BattleArmor ba) {
             entity = ba;
@@ -1123,10 +1112,10 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.BattleArmor.tabs.StructureTab(this);
+            structureTab = new megameklab.com.ui.battleArmor.BAStructureTab(this);
             structureTab.setAsCustomization();
-            equipmentTab = new megameklab.com.ui.BattleArmor.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.BattleArmor.tabs.BuildTab(this);
+            equipmentTab = new megameklab.com.ui.battleArmor.BAEquipmentTab(this);
+            buildTab = new megameklab.com.ui.battleArmor.BABuildTab(this);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -1229,8 +1218,8 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Infantry entity;
-        private megameklab.com.ui.Infantry.tabs.StructureTab structureTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.convInfantry.CIStructureTab structureTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         public InfantryPanel(Infantry inf) {
             entity = inf;
@@ -1245,10 +1234,10 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(this);
+            structureTab = new megameklab.com.ui.convInfantry.CIStructureTab(this);
             structureTab.setAsCustomization();
             structureTab.addRefreshedListener(this);
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
             FluffTab fluffTab = new FluffTab(this);
             fluffTab.setRefreshedListener(this);
 
@@ -1343,10 +1332,10 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = -4649180495358483182L;
 
         private Protomech entity;
-        private megameklab.com.ui.protomek.ProtomekStructureTab structureTab;
-        private megameklab.com.ui.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.protomek.ProtomekBuildTab buildTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.protoMek.PMStructureTab structureTab;
+        private megameklab.com.ui.generalUnit.EquipmentTab equipmentTab;
+        private megameklab.com.ui.protoMek.PMBuildTab buildTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         ProtomechPanel(Protomech m) {
             entity = m;
@@ -1361,11 +1350,11 @@ public class MekLabTab extends CampaignGuiTab {
         void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.protomek.ProtomekStructureTab(this);
+            structureTab = new megameklab.com.ui.protoMek.PMStructureTab(this);
             structureTab.setAsCustomization();
-            equipmentTab = new megameklab.com.ui.tabs.EquipmentTab(this);
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
-            buildTab = new megameklab.com.ui.protomek.ProtomekBuildTab(this, equipmentTab, this);
+            equipmentTab = new megameklab.com.ui.generalUnit.EquipmentTab(this);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
+            buildTab = new megameklab.com.ui.protoMek.PMBuildTab(this, equipmentTab, this);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -1471,11 +1460,11 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 4031380495472570820L;
 
         private Jumpship entity;
-        private megameklab.com.ui.aerospace.AdvancedAeroStructureTab structureTab;
-        private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.aerospace.DropshipBuildTab buildTab;
-        private megameklab.com.ui.tabs.TransportTab transportTab;
-        private megameklab.com.ui.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.largeAero.WSStructureTab structureTab;
+        private megameklab.com.ui.generalUnit.AeroEquipmentTab equipmentTab;
+        private megameklab.com.ui.largeAero.LABuildTab buildTab;
+        private megameklab.com.ui.generalUnit.TransportTab transportTab;
+        private megameklab.com.ui.generalUnit.PreviewTab previewTab;
 
         AdvancedAeroPanel(Jumpship a) {
             entity = a;
@@ -1490,12 +1479,12 @@ public class MekLabTab extends CampaignGuiTab {
         void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.aerospace.AdvancedAeroStructureTab(this);
+            structureTab = new megameklab.com.ui.largeAero.WSStructureTab(this);
             structureTab.setAsCustomization();
-            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
-            equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.aerospace.DropshipBuildTab(this, equipmentTab);
-            transportTab = new megameklab.com.ui.tabs.TransportTab(this);
+            previewTab = new megameklab.com.ui.generalUnit.PreviewTab(this);
+            equipmentTab = new megameklab.com.ui.generalUnit.AeroEquipmentTab(this);
+            buildTab = new megameklab.com.ui.largeAero.LABuildTab(this, equipmentTab);
+            transportTab = new megameklab.com.ui.generalUnit.TransportTab(this);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);

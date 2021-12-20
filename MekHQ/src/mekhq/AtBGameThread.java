@@ -20,38 +20,30 @@
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.*;
-
-import javax.swing.JOptionPane;
-
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Entity;
-import megamek.common.IGame;
-import megamek.common.IAero;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
-import megamek.common.PlanetaryConditions;
-import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
+import megamek.common.*;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Neoancient
  *
- * Enhanced version of GameThread which imports settings and non-player
- * units into the MM game
+ * Enhanced version of GameThread which imports settings and non-player units into the MM game
  */
 public class AtBGameThread extends GameThread {
 
@@ -95,7 +87,7 @@ public class AtBGameThread extends GameThread {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("MegaMek client failed to connect to server", ex);
+            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -104,15 +96,14 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
 
-            // if game is running, shouldn't do the following, so detect the
-            // phase
-            for (int i = 0; (i < CLIENT_RETRY_COUNT) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            // if game is running, shouldn't do the following, so detect the phase
+            for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage");
+                LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
-            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info("Thread in lounge");
+            if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
+                LogManager.getLogger().info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
@@ -125,9 +116,8 @@ public class AtBGameThread extends GameThread {
 
                 MapSettings mapSettings = MapSettings.getInstance();
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1, 1); 
+                mapSettings.setMapSize(1, 1);
                 mapSettings.getBoardsSelectedVector().clear();
-                
 
                 // if the scenario is taking place in space, do space settings instead
                 if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
@@ -135,7 +125,7 @@ public class AtBGameThread extends GameThread {
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
                     mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
-                    
+
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
@@ -144,19 +134,19 @@ public class AtBGameThread extends GameThread {
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
-                        MekHQ.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
                     }
 
                     if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
-                    
+
                     // duplicate code, but getting a new instance of map settings resets the size parameters
                     mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                    mapSettings.setMapSize(1, 1); 
+                    mapSettings.setMapSize(1, 1);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 }
-                
+
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
@@ -321,12 +311,12 @@ public class AtBGameThread extends GameThread {
                         }
                         name += append;
                     }
-                    Princess botClient = new Princess(name, client.getHost(), client.getPort(), LogLevel.ERROR);
+                    Princess botClient = new Princess(name, client.getHost(), client.getPort());
                     botClient.setBehaviorSettings(bf.getBehaviorSettings());
                     try {
                         botClient.connect();
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                        LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
                     }
                     swingGui.getBots().put(name, botClient);
 
@@ -387,7 +377,7 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         } finally {
             client.die();
             client = null;
@@ -414,7 +404,7 @@ public class AtBGameThread extends GameThread {
                 sleep(50);
             }
             if (null == botClient.getLocalPlayer()) {
-                MekHQ.getLogger().error("Could not configure bot " + botClient.getName());
+                LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
@@ -437,7 +427,7 @@ public class AtBGameThread extends GameThread {
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -499,7 +489,7 @@ public class AtBGameThread extends GameThread {
         destination.setStartingPos(source.getStartingPos(false));
         destination.setAltitude(source.getAltitude());
         destination.setElevation(source.getElevation());
-        
+
         if (destination.isAirborne() && (destination.getAltitude() == 0)) {
             ((IAero) destination).land();
         }

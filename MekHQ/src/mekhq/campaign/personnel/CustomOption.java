@@ -18,29 +18,25 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.options.IOption;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
  * abilities are included.
  *
  * @author Neoancient
- *
  */
 public class CustomOption {
 
@@ -53,7 +49,7 @@ public class CustomOption {
 
     private CustomOption(String key) {
         this.name = key;
-        group = PilotOptions.LVL3_ADVANTAGES;
+        group = PersonnelOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;
     }
@@ -98,7 +94,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
 
@@ -138,7 +134,7 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            MekHQ.getLogger().error("Custom ability does not have a 'name' attribute.");
+            LogManager.getLogger().error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -172,7 +168,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Error parsing custom ability " + retVal.name, ex);
+            LogManager.getLogger().error("Error parsing custom ability " + retVal.name, ex);
         }
 
         return retVal;

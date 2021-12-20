@@ -18,24 +18,22 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Vector;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Vector;
 
 public class RankTableModel extends DefaultTableModel {
     //region Variable Declarations
@@ -78,7 +76,7 @@ public class RankTableModel extends DefaultTableModel {
      */
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
         if (rankSystem == null) {
-            MekHQ.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
+            LogManager.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
             return;
         }
 
@@ -202,7 +200,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_PAYMULT:
                 return resources.getString("RankTableModel.COL_PAYMULT.toolTipText");
             default:
-                MekHQ.getLogger().error("Unknown column in RankTableModel of " + column);
+                LogManager.getLogger().error("Unknown column in RankTableModel of " + column);
                 return resources.getString("RankTableModel.defaultToolTip.toolTipText");
         }
     }
@@ -228,7 +226,7 @@ public class RankTableModel extends DefaultTableModel {
             }
             return ranks;
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new ArrayList<>();
         }
     }
