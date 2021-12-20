@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
