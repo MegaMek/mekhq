@@ -19,10 +19,10 @@
 package mekhq.campaign;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -236,8 +236,8 @@ public class RandomOriginOptions implements Serializable {
                         break;
                 }
             }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
 

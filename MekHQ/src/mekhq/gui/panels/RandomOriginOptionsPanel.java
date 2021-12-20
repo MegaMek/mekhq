@@ -20,7 +20,6 @@ package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
@@ -28,6 +27,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -397,8 +397,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             options.setOriginDistanceScale((Double) getSpnOriginDistanceScale().getValue());
             options.setAllowClanOrigins(getChkAllowClanOrigins().isSelected());
             options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
         return options;
     }
