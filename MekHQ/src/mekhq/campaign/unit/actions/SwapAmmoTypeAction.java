@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.unit.actions;
 
-import java.util.Objects;
-
 import megamek.common.AmmoType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -27,6 +25,8 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
+
+import java.util.Objects;
 
 /**
  * Swaps the {@code AmmoType} for an {@code AmmoBin} on a {@code Unit}.

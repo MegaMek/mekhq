@@ -13,38 +13,29 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import mekhq.MekHQ;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingEquipmentPart extends MissingPart {
@@ -122,7 +113,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
+            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
         }
     }
 
@@ -214,7 +205,7 @@ public class MissingEquipmentPart extends MissingPart {
                 return mounted;
             }
 
-            MekHQ.getLogger().warning("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;

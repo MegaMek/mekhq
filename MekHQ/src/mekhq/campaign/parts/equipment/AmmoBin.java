@@ -20,36 +20,25 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.unit.Unit;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.Jumpship;
-import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -193,7 +182,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return ammoTypeChanged() ? getFullShots() : shotsNeeded;
     }
 
-    public void changeMunition(AmmoType type) {
+    public boolean canChangeMunitions(final AmmoType type) {
+        return getType().equalsAmmoTypeOnly(type)
+                && (getType().getRackSize() == type.getRackSize());
+    }
+
+    public void changeMunition(final AmmoType type) {
         this.type = type;
         this.name = type.getName();
         this.typeName = type.getInternalName();
@@ -234,7 +228,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -301,7 +295,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 return mounted;
             }
 
-            MekHQ.getLogger().warning("Missing valid equipment for " + getName() + " to manage ammo on unit " + getUnit().getName());
+            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " to manage ammo on unit " + getUnit().getName());
         }
 
         return null;

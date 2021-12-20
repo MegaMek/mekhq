@@ -18,27 +18,25 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.FileInputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import megamek.common.util.StringUtil;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
-
-import megamek.common.util.StringUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import java.io.FileInputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Instead of making this a static like Planets, we are just going to reload a years
@@ -62,7 +60,7 @@ public class News {
             // For debugging only!
             //unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -94,7 +92,7 @@ public class News {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
-            MekHQ.getLogger().debug("Starting load of news data for " + year + " from XML...");
+            LogManager.getLogger().debug("Starting load of news data for " + year + " from XML...");
 
             // Initialize variables.
             Document xmlDoc;
@@ -106,7 +104,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error(ex);
                 return;
             }
 
@@ -139,17 +137,17 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch (JAXBException e) {
-                            MekHQ.getLogger().error(e);
+                            LogManager.getLogger().error(e);
                             continue;
                         }
                         if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {
-                            MekHQ.getLogger().error("Null or empty headline for a news item");
+                            LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
-                            MekHQ.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
+                            LogManager.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
                             continue;
                         } else if (StringUtil.isNullOrEmpty(newsItem.getDescription())) {
-                            MekHQ.getLogger().error("Null or empty headline for a news item");
+                            LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (!newsItem.isInYear(year)) {
                             continue;
@@ -168,7 +166,7 @@ public class News {
                     }
                 }
             }
-            MekHQ.getLogger().debug("Loaded " + archive.size() + " days of news items for " + year);
+            LogManager.getLogger().debug("Loaded " + archive.size() + " days of news items for " + year);
         }
     }
 }

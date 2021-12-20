@@ -18,19 +18,19 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -264,7 +264,7 @@ public abstract class AbstractUnitMarket implements Serializable {
                 parseXMLNode(wn2, campaign, version);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", e);
+            LogManager.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", e);
         }
     }
 

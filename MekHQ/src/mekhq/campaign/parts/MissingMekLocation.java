@@ -20,27 +20,19 @@
  */
 package mekhq.campaign.parts;
 
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MiscType;
-import megamek.common.TechAdvancement;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -199,7 +191,7 @@ public class MissingMekLocation extends MissingPart {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }
