@@ -41,6 +41,7 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+import org.apache.logging.log4j.LogManager;
 
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
@@ -307,7 +308,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
 
             i++;
@@ -352,7 +353,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -384,7 +385,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         return pnlMiscAwards;

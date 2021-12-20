@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,8 +19,11 @@
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -75,25 +78,21 @@ public class ServiceLogger {
                 MessageFormat.format(message, name) + rankEntry));
     }
 
-    public static void kia(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("kia.text")));
-    }
-
-    public static void mia(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("mia.text")));
-    }
-
-    public static void passedAway(Person person, LocalDate date, String cause) {
-        String message = logEntriesResourceMap.getString("passedAway.text");
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, cause)));
-    }
-
-    public static void retired(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
+    public static void changedStatus(final Person person, final LocalDate date,
+                                     final PersonnelStatus status) {
+        person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
+    }
+
+    public static void returnedFromLeave(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
+    }
+
+    public static void returnedFromAWOL(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromAWOL.text")));
     }
 
     public static void resurrected(Person person, LocalDate date) {
@@ -102,6 +101,10 @@ public class ServiceLogger {
 
     public static void rehired(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("rehired.text")));
+    }
+
+    public static void retired(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
     }
 
     public static void promotedTo(Person person, LocalDate date) {
@@ -148,5 +151,38 @@ public class ServiceLogger {
     public static void removedFrom(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("removedFrom.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, unitName)));
+    }
+
+    public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
+        if (force != null) {
+            String message = logEntriesResourceMap.getString("addToTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+        }
+    }
+
+    public static void reassignedTOEForce(Campaign campaign, Person person, LocalDate date, Force oldForce, Force newForce) {
+        if ((oldForce == null) && (newForce == null)) {
+            return;
+        }
+
+        if ((oldForce != null) && (newForce != null)) {
+            String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? oldForce.getFullName() : oldForce.getName(),
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? newForce.getFullName() : newForce.getName())));
+        } else if (oldForce == null) {
+            addedToTOEForce(campaign, person, date, newForce);
+        } else {
+            removedFromTOEForce(campaign, person, date, oldForce);
+        }
+    }
+
+    public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
+        if (force != null) {
+            String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+        }
     }
 }

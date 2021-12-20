@@ -23,6 +23,7 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.*;
 import java.io.IOException;
@@ -89,7 +90,7 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("MegaMek client failed to connect to server", ex);
+            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -101,11 +102,11 @@ class GameThread extends Thread implements CloseClientListener {
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < 1000) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
+                LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                MekHQ.getLogger().info("Thread in lounge");
+                LogManager.getLogger().info("Thread in lounge");
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
@@ -132,7 +133,7 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
         finally {
             client.die();
@@ -157,13 +158,13 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
-            MekHQ.getLogger().error("Error saving custom weapon orders!", e);
+            LogManager.getLogger().error("Error saving custom weapon orders!", e);
         }
 
         try {
             QuirksHandler.saveCustomQuirksList();
-        } catch (IOException e) {
-            MekHQ.getLogger().error("Error saving quirks override!", e);
+        } catch (Exception e) {
+            LogManager.getLogger().error("Error saving quirks override!", e);
         }
 
         stop = true;

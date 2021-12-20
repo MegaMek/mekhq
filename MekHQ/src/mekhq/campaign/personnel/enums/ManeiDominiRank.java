@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -72,7 +72,7 @@ public enum ManeiDominiRank {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
+        LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
 
         return NONE;
     }

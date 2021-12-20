@@ -323,10 +323,8 @@ public class PersonnelTableModel extends DataTableModel {
     public String getTooltip(int row, int col) {
         Person p = getPerson(row);
         switch (col) {
-            case COL_NABIL:
-                return p.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
-            case COL_NIMP:
-                return p.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+            case COL_STATUS:
+                return p.getStatus().getToolTipText();
             case COL_ASSIGN: {
                 if ((p.getTechUnits().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");
@@ -339,6 +337,10 @@ public class PersonnelTableModel extends DataTableModel {
                     return null;
                 }
             }
+            case COL_NABIL:
+                return p.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
+            case COL_NIMP:
+                return p.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
             default:
                 return null;
         }

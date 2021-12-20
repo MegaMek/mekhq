@@ -18,19 +18,27 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Window;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.ExtraData;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryType;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.gui.view.Paperdoll;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,43 +46,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Period;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import megamek.common.util.EncodeControl;
-
-import mekhq.campaign.log.LogEntryType;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.view.Paperdoll;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.ExtraData;
-import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.InjuryLevel;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
@@ -113,12 +89,12 @@ public class MedicalViewDialog extends JDialog {
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file path
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         setPreferredSize(new Dimension(1024, 840));
