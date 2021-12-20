@@ -23,6 +23,7 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.util.Map;
@@ -120,7 +121,7 @@ public enum SplittingSurnameStyle {
                 final String message = String.format(resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.text"),
                         origin.getFullTitle(), spouse.getFullTitle());
                 // We want the full stacktrace, as otherwise how this could happen is bloody painful to track down.
-                MekHQ.getLogger().error(message, new Exception());
+                LogManager.getLogger().error(message, new Exception());
                 JOptionPane.showMessageDialog(null, message,
                         resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.title"), JOptionPane.ERROR_MESSAGE);
                 return;
