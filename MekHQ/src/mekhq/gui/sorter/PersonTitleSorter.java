@@ -20,15 +20,10 @@ package mekhq.gui.sorter;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PersonTitleSorter implements Comparator<Person>, Serializable {
     //region Variable Declarations

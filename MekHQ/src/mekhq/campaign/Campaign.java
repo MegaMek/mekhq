@@ -95,6 +95,7 @@ import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.MassRepairService;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.io.PrintWriter;
@@ -466,7 +467,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -603,7 +604,7 @@ public class Campaign implements Serializable, ITechManager {
     public void purchaseShipSearchResult() {
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().error("Cannot find entry for " + getShipSearchResult());
+            LogManager.getLogger().error("Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -618,7 +619,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
             return;
         }
         Entity en = mechFileParser.getEntity();
@@ -647,7 +648,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
+                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
@@ -762,20 +763,24 @@ public class Campaign implements Serializable, ITechManager {
      * @param id
      */
     public void addUnitToForce(Unit u, int id) {
+        Force force = forceIds.get(id);
         Force prevForce = forceIds.get(u.getForceId());
+        boolean useTransfers = false;
+        boolean transferLog = !getCampaignOptions().useTransfers();
+
         if (null != prevForce) {
-            prevForce.removeUnit(u.getId());
-            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
             if (null != prevForce.getTechID()) {
                 u.removeTech();
             }
+            // We log removal if we don't use transfers or if it can't be assigned to a new force
+            prevForce.removeUnit(this, u.getId(), transferLog || (force == null));
+            useTransfers = !transferLog;
+            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
         }
-        Force force = forceIds.get(id);
+
         if (null != force) {
             u.setForceId(id);
-            force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
-            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
             if (null != force.getTechID()) {
                 Person forceTech = getPerson(force.getTechID());
                 if (forceTech.canTech(u.getEntity())) {
@@ -790,6 +795,8 @@ public class Campaign implements Serializable, ITechManager {
                     JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
+            force.addUnit(this, u.getId(), useTransfers, prevForce);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
         }
 
         if (campaignOptions.getUseAtB()) {
@@ -1000,7 +1007,7 @@ public class Campaign implements Serializable, ITechManager {
     public void importUnit(Unit u) {
         Objects.requireNonNull(u);
 
-        MekHQ.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
+        LogManager.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
 
         getHangar().addUnit(u);
 
@@ -1027,7 +1034,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
-        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
+        LogManager.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
 
         transportShips.add(Objects.requireNonNull(unit));
     }
@@ -1851,36 +1858,22 @@ public class Campaign implements Serializable, ITechManager {
         return getTechs(false);
     }
 
-    public List<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, false);
+    public List<Person> getTechs(final boolean noZeroMinute) {
+        return getTechs(noZeroMinute, false);
     }
 
     /**
      * Returns a list of active technicians.
      *
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
-     * @param firstTechId The ID of the tech that should appear first in the list (assuming
-     *                    active and satisfies the noZeroMinute argument)
      * @param eliteFirst If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public List<Person> getTechs(final boolean noZeroMinute, final @Nullable UUID firstTechId,
-                                 final boolean eliteFirst) {
-        List<Person> techs = new ArrayList<>();
+    public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
+        final List<Person> techs = getActivePersonnel().stream()
+                .filter(person -> person.isTech() && (!noZeroMinute || (person.getMinutesLeft() > 0)))
+                .collect(Collectors.toList());
 
-        // Get the first tech.
-        Person firstTech = getPerson(firstTechId);
-        if ((firstTech != null) && firstTech.isTech() && firstTech.getStatus().isActive()
-                && (!noZeroMinute || (firstTech.getMinutesLeft() > 0))) {
-            techs.add(firstTech);
-        }
-
-        for (final Person person : getActivePersonnel()) {
-            if (person.isTech() && !person.equals(firstTech)
-                    && (!noZeroMinute || (person.getMinutesLeft() > 0))) {
-                techs.add(person);
-            }
-        }
         // also need to loop through and collect engineers on self-crewed vessels
         for (final Unit unit : getUnits()) {
             if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) && (unit.getEngineer() != null)) {
@@ -1903,11 +1896,10 @@ public class Campaign implements Serializable, ITechManager {
 
         techSorter = techSorter.thenComparing(new PersonTitleSorter());
 
-        if (firstTechId == null) {
-            techs.sort(techSorter);
-        } else if (techs.size() > 1) {
+        if (techs.size() > 1) {
             techs.subList(1, techs.size()).sort(techSorter);
         }
+
         return techs;
     }
 
@@ -2036,7 +2028,7 @@ public class Campaign implements Serializable, ITechManager {
         return target;
     }
 
-    public Person getLogisticsPerson() {
+    public @Nullable Person getLogisticsPerson() {
         int bestSkill = -1;
         int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
         Person admin = null;
@@ -2520,7 +2512,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void mothball(Unit u) {
         if (u.isMothballed()) {
-            MekHQ.getLogger().warning("Unit is already mothballed, cannot mothball.");
+            LogManager.getLogger().warn("Unit is already mothballed, cannot mothball.");
             return;
         }
 
@@ -2567,7 +2559,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void activate(Unit u) {
         if (!u.isMothballed()) {
-            MekHQ.getLogger().warning("Unit is already activated, cannot activate.");
+            LogManager.getLogger().warn("Unit is already activated, cannot activate.");
             return;
         }
 
@@ -3241,7 +3233,7 @@ public class Campaign implements Serializable, ITechManager {
 
                 doMaintenance(u);
             } catch (Exception e) {
-                MekHQ.getLogger().error(String.format(
+                LogManager.getLogger().error(String.format(
                         "Unable to perform maintenance on %s (%s) due to an error",
                         u.getName(), u.getId().toString()), e);
                 addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
@@ -3293,7 +3285,7 @@ public class Campaign implements Serializable, ITechManager {
                     try {
                         fixPart(part, tech);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(String.format(
+                        LogManager.getLogger().error(String.format(
                                 "Could not perform overnight maintenance on %s (%d) due to an error",
                                 part.getName(), part.getId()), e);
                         addReport(String.format("ERROR: an error occurred performing overnight maintenance on %s, check the log",
@@ -3342,7 +3334,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 MassRepairService.massRepairSalvageAllUnits(this);
             } catch (Exception e) {
-                MekHQ.getLogger().error("Could not perform mass repair/salvage on units due to an error", e);
+                LogManager.getLogger().error("Could not perform mass repair/salvage on units due to an error", e);
                 addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
             }
         }
@@ -3664,7 +3656,7 @@ public class Campaign implements Serializable, ITechManager {
     public void removeUnitFromForce(Unit u) {
         Force force = getForce(u.getForceId());
         if (null != force) {
-            force.removeUnit(u.getId());
+            force.removeUnit(this, u.getId(), true);
             u.setForceId(Force.FORCE_NONE);
             u.setScenarioId(-1);
             if (u.getEntity().hasNavalC3()
@@ -3813,7 +3805,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             for (UUID unitID : orphanForceUnitIDs) {
-                force.removeUnit(unitID);
+                force.removeUnit(this, unitID, false);
             }
         }
 
@@ -4213,7 +4205,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error(ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -4815,7 +4807,7 @@ public class Campaign implements Serializable, ITechManager {
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
         if (minutes <= 0) {
-            MekHQ.getLogger().error("Attempting to get the target number for a part with zero time left.");
+            LogManager.getLogger().error("Attempting to get the target number for a part with zero time left.");
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
         }
 
@@ -5091,7 +5083,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if (contract == null) {
-                MekHQ.getLogger().error("AtB: used bonus part but no contract has bonus parts available.");
+                LogManager.getLogger().error("AtB: used bonus part but no contract has bonus parts available.");
             } else {
                 addReport(resources.getString("bonusPartLog.text") + " " + targetWork.getAcquisitionPart().getPartName());
                 contract.useBonusPart();
@@ -5125,9 +5117,16 @@ public class Campaign implements Serializable, ITechManager {
 
         /* If contract is still null, the unit is not in a contract. */
         final Person person = getLogisticsPerson();
-        int experienceLevel = (person == null) ? SkillType.EXP_ULTRA_GREEN
-                : person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
-        int modifier = experienceLevel - SkillType.EXP_REGULAR;
+        final int experienceLevel;
+        if (person == null) {
+            experienceLevel = SkillType.EXP_ULTRA_GREEN;
+        } else if (CampaignOptions.S_TECH.equals(getCampaignOptions().getAcquisitionSkill())) {
+            experienceLevel = person.getBestTechSkill().getExperienceLevel();
+        } else {
+            experienceLevel = person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
+        }
+
+        final int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
@@ -5245,7 +5244,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
         if (minutes == 0) {
-            MekHQ.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
+            LogManager.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
             return 0;
         }
 
@@ -6290,7 +6289,7 @@ public class Campaign implements Serializable, ITechManager {
                         maintenanceReport.append(partReport).append("<br>");
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(String.format(
+                    LogManager.getLogger().error(String.format(
                             "Could not perform maintenance on part %s (%d) for %s (%s) due to an error",
                             p.getName(), p.getId(), u.getName(), u.getId().toString()), e);
                     addReport(String.format("ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
@@ -6314,7 +6313,7 @@ public class Campaign implements Serializable, ITechManager {
             u.setLastMaintenanceReport(maintenanceReport.toString());
 
             if (getCampaignOptions().logMaintenance()) {
-                MekHQ.getLogger().info(maintenanceReport.toString());
+                LogManager.getLogger().info(maintenanceReport.toString());
             }
 
             int quality = u.getQuality();

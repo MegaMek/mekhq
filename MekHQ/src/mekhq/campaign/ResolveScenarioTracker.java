@@ -42,6 +42,7 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -142,7 +143,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -474,7 +475,7 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            MekHQ.getLogger().error(
+                            LogManager.getLogger().error(
                                     "A null person status was found for person id " + p.getId().toString()
                                     + " when trying to assign kills");
                             continue;
@@ -684,7 +685,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    MekHQ.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    LogManager.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
                     continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
@@ -1049,12 +1050,12 @@ public class ResolveScenarioTracker {
                 // Read a Vector from the file.
                 parser.parse(listStream);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(parser.getWarningMessage());
+                LogManager.getLogger().warn(parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();
@@ -1389,9 +1390,9 @@ public class ResolveScenarioTracker {
                 campaign.addKill(k);
             }
             if (status.isMissing()) {
-                person.changeStatus(getCampaign(), PersonnelStatus.MIA);
+                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                person.changeStatus(getCampaign(), PersonnelStatus.KIA);
+                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
                 if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person, true,
                             campaign, (AtBContract) mission);
@@ -1910,7 +1911,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
         }

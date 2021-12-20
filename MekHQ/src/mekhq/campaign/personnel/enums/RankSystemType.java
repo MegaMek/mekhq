@@ -19,8 +19,8 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MekHqConstants;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -73,7 +73,7 @@ public enum RankSystemType {
                 return MekHqConstants.USER_RANKS_FILE_PATH;
             case CAMPAIGN:
             default:
-                MekHQ.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
+                LogManager.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
                 return "";
         }
     }

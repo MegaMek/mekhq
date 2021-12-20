@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
@@ -50,7 +51,13 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setForeground(foreground);
         setBackground(background);
 
-        setText(String.format("%s (BV: %d)", value.getName(), value.getTotalBV(campaign)));
+        Lance lance = campaign.getLances().get(value.getId());
+        String roleString = "";
+        if (lance != null) {
+            roleString = lance.getRole().toString() + ", ";
+        }
+        
+        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign)));
 
         return this;
     }

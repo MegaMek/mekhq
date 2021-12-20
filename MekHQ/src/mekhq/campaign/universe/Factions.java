@@ -18,31 +18,20 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Factions {
     //region Variable Declarations
@@ -137,7 +126,7 @@ public class Factions {
             }
 
             if (fRec == null) {
-                MekHQ.getLogger().error("Could not locate faction record for " + faction);
+                LogManager.getLogger().error("Could not locate faction record for " + faction);
             }
         }
 
@@ -154,11 +143,11 @@ public class Factions {
      */
     public static Factions loadDefault()
             throws DOMException, SAXException, IOException, ParserConfigurationException {
-        MekHQ.getLogger().info("Starting load of faction data from XML...");
+        LogManager.getLogger().info("Starting load of faction data from XML...");
 
         Factions factions = load("data/universe/factions.xml");
 
-        MekHQ.getLogger().info("Loaded a total of " + factions.factions.size() + " factions");
+        LogManager.getLogger().info("Loaded a total of " + factions.factions.size() + " factions");
 
         return factions;
     }
@@ -212,7 +201,7 @@ public class Factions {
                     if (!retVal.factions.containsKey(faction.getShortName())) {
                         retVal.factions.put(faction.getShortName(), faction);
                     } else {
-                        MekHQ.getLogger().error(
+                        LogManager.getLogger().error(
                                 String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
                                         faction.getShortName(), retVal.factions.get(faction.getShortName()).getFullName(0), faction.getFullName(0)));
                     }

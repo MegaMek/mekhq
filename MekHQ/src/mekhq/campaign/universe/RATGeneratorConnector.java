@@ -21,19 +21,15 @@
  */
 package mekhq.campaign.universe;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-
 import megamek.client.ratgenerator.*;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Provides access to RATGenerator through the AbstractUnitGenerator and thus the IUnitGenerator interface.
@@ -48,7 +44,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         RATGenerator.getInstance().loadYear(year);

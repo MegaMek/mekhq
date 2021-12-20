@@ -19,7 +19,7 @@
 package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -112,7 +112,7 @@ public enum AtBMoraleLevel {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
 
         return NORMAL;
     }

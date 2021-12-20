@@ -21,33 +21,26 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
-
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.LayeredForceIcon;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * This is a hierarchical object to define forces for TO&E. Each Force
@@ -280,7 +273,26 @@ public class Force implements Serializable {
      * @param uid
      */
     public void addUnit(UUID uid) {
+        addUnit(null, uid, false, null);
+    }
+
+    public void addUnit(Campaign campaign, UUID uid, boolean useTransfers, Force oldForce) {
         units.add(uid);
+
+        if (campaign == null) {
+            return;
+        }
+
+        Unit unit = campaign.getUnit(uid);
+        if (unit != null) {
+            for (Person person : unit.getCrew()) {
+                if (useTransfers) {
+                    ServiceLogger.reassignedTOEForce(campaign, person, campaign.getLocalDate(), oldForce, this);
+                } else {
+                    ServiceLogger.addedToTOEForce(campaign, person, campaign.getLocalDate(), this);
+                }
+            }
+        }
     }
 
     /**
@@ -288,7 +300,7 @@ public class Force implements Serializable {
      * instead
      * @param id
      */
-    public void removeUnit(UUID id) {
+    public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
         boolean found = false;
         for (UUID uid : getUnits()) {
@@ -300,6 +312,15 @@ public class Force implements Serializable {
         }
         if (found) {
             units.remove(idx);
+
+            if (log) {
+                Unit unit = campaign.getUnit(id);
+                if (unit != null) {
+                    for (Person person : unit.getCrew()) {
+                        ServiceLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                    }
+                }
+            }
         }
     }
 
@@ -504,7 +525,7 @@ public class Force implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -514,7 +535,7 @@ public class Force implements Serializable {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return null;
         }
 

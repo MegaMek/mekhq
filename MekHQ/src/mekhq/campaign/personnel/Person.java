@@ -42,7 +42,6 @@ import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
-import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
@@ -58,6 +57,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -921,66 +921,50 @@ public class Person implements Serializable {
     /**
      * This is used to change the person's PersonnelStatus
      * @param campaign the campaign the person is part of
+     * @param today the current date
      * @param status the person's new PersonnelStatus
      */
-    public void changeStatus(Campaign campaign, PersonnelStatus status) {
+    public void changeStatus(final Campaign campaign, final LocalDate today,
+                             final PersonnelStatus status) {
         if (status == getStatus()) { // no change means we don't need to process anything
             return;
-        } else if (getStatus().isKIA()) {
+        } else if (getStatus().isDead() && !status.isDead()) {
             // remove date of death for resurrection
             setDateOfDeath(null);
+            ServiceLogger.resurrected(this, today);
         }
 
         switch (status) {
             case ACTIVE:
                 if (getStatus().isMIA()) {
-                    ServiceLogger.recoveredMia(this, campaign.getLocalDate());
-                } else if (getStatus().isDead()) {
-                    ServiceLogger.resurrected(this, campaign.getLocalDate());
+                    ServiceLogger.recoveredMia(this, today);
+                } else if (getStatus().isOnLeave()) {
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isAWOL()) {
+                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
                 } else {
-                    ServiceLogger.rehired(this, campaign.getLocalDate());
+                    ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
                 break;
             case RETIRED:
-                ServiceLogger.retired(this, campaign.getLocalDate());
+                ServiceLogger.retired(this, today);
                 if (campaign.getCampaignOptions().useRetirementDateTracking()) {
-                    setRetirement(campaign.getLocalDate());
+                    setRetirement(today);
                 }
-                break;
-            case MIA:
-                ServiceLogger.mia(this, campaign.getLocalDate());
-                break;
-            case KIA:
-                ServiceLogger.kia(this, campaign.getLocalDate());
-                break;
-            case NATURAL_CAUSES:
-                MedicalLogger.diedOfNaturalCauses(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case WOUNDS:
-                MedicalLogger.diedFromWounds(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case DISEASE:
-                MedicalLogger.diedFromDisease(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
-                break;
-            case OLD_AGE:
-                MedicalLogger.diedOfOldAge(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
-                MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
-                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                // purposeful fall through
+            default:
+                ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
                 break;
         }
 
         setStatus(status);
 
         if (status.isDead()) {
-            setDateOfDeath(campaign.getLocalDate());
+            setDateOfDeath(today);
             // Don't forget to tell the spouse
             if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
@@ -1541,7 +1525,7 @@ public class Person implements Serializable {
                 extraData.writeToXml(pw1);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
+            LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
             throw e; // we want to rethrow to ensure that that the save fails
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
@@ -1733,7 +1717,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -1748,7 +1732,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -1777,7 +1761,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
@@ -1794,7 +1778,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -1812,7 +1796,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -1854,7 +1838,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring advantage: " + adv);
+                        LogManager.getLogger().error("Error restoring advantage: " + adv);
                     }
                 }
             }
@@ -1868,7 +1852,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring edge: " + adv);
+                        LogManager.getLogger().error("Error restoring edge: " + adv);
                     }
                 }
             }
@@ -1882,7 +1866,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring implants: " + adv);
+                        LogManager.getLogger().error("Error restoring implants: " + adv);
                     }
                 }
             }
@@ -1895,7 +1879,7 @@ public class Person implements Serializable {
                 retVal.setRank(0);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
+            LogManager.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
             retVal = null;
         }
 
@@ -3333,7 +3317,7 @@ public class Person implements Serializable {
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Person %s ('%s') references missing unit %s",
                         getId(), getFullName(), id));
             }
@@ -3345,7 +3329,7 @@ public class Person implements Serializable {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Person %s ('%s') techs missing unit %s",
                             getId(), getFullName(), techUnit.getId()));
                     techUnits.remove(ii);

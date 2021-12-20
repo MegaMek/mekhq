@@ -68,6 +68,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -198,6 +199,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseExtendedTOEForceName;
     private JCheckBox chkPersonnelLogSkillGain;
     private JCheckBox chkPersonnelLogAbilityGain;
     private JCheckBox chkPersonnelLogEdgeGain;
@@ -3238,6 +3240,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
 
+        chkUseExtendedTOEForceName = new JCheckBox(resources.getString("chkUseExtendedTOEForceName.text"));
+        chkUseExtendedTOEForceName.setToolTipText(resources.getString("chkUseExtendedTOEForceName.toolTipText"));
+        chkUseExtendedTOEForceName.setName("chkUseExtendedTOEForceName ");
+
         chkPersonnelLogSkillGain = new JCheckBox(resources.getString("chkPersonnelLogSkillGain.text"));
         chkPersonnelLogSkillGain.setToolTipText(resources.getString("chkPersonnelLogSkillGain.toolTipText"));
         chkPersonnelLogSkillGain.setName("chkPersonnelLogSkillGain");
@@ -3272,6 +3278,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
@@ -3289,6 +3296,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkUseImplants)
                         .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
+                        .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
@@ -5456,6 +5464,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseImplants.setSelected(options.useImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
+        chkUseExtendedTOEForceName.setSelected(options.isUseExtendedTOEForceName());
         chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
         chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
         chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
@@ -5821,6 +5830,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private void updateOptions() {
         try {
             campaign.setName(txtName.getText());
+            if (isStartup()) {
+                getCampaign().getForces().setName(getCampaign().getName());
+            }
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
@@ -5997,6 +6009,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
             options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
             options.setUseTransfers(chkUseTransfers.isSelected());
+            options.setUseExtendedTOEForceName(chkUseExtendedTOEForceName.isSelected());
             options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
             options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
             options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
@@ -6204,7 +6217,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
@@ -6250,7 +6263,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    LogManager.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }

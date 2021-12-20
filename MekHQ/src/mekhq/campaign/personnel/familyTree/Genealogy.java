@@ -20,24 +20,18 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
@@ -162,7 +156,7 @@ public class Genealogy implements Serializable {
                 }
             }
         } else if (getFamily().get(relationshipType) == null) {
-            MekHQ.getLogger().error("Could not remove unknown family member of relationship "
+            LogManager.getLogger().error("Could not remove unknown family member of relationship "
                     + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId() + ".");
         } else {
             List<Person> familyTypeMembers = getFamily().get(relationshipType);
@@ -460,7 +454,7 @@ public class Genealogy implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId());
+                LogManager.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId());
             }
         }
     }
@@ -479,7 +473,7 @@ public class Genealogy implements Serializable {
             }
 
             if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                MekHQ.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
+                LogManager.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
                         + wn.getNodeName());
                 continue;
             }

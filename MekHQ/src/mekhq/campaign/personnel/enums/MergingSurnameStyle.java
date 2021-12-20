@@ -21,10 +21,10 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -243,7 +243,7 @@ public enum MergingSurnameStyle {
                 break;
             case WEIGHTED:
             default:
-                MekHQ.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
                         origin.getFullName(), spouse.getFullName()));
                 break;
         }
