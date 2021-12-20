@@ -20,27 +20,29 @@
  */
 package mekhq.campaign;
 
-import mekhq.MekHQ;
+import megamek.common.Dropship;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
-
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import megamek.common.Dropship;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -53,8 +55,8 @@ public class CampaignTest {
         Ranks.initializeRankSystems();
         try {
             Systems.setInstance(Systems.loadDefault());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
