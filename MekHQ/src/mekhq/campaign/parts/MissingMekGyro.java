@@ -20,19 +20,18 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.parts.enums.PartRepairType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -105,7 +104,7 @@ public class MissingMekGyro extends MissingPart {
                     walkMP = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
 
             if (walkMP > -1) {

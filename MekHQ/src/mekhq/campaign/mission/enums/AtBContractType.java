@@ -20,11 +20,11 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -549,7 +549,7 @@ public enum AtBContractType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }

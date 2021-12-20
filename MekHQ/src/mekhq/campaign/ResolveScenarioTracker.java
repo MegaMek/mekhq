@@ -21,29 +21,7 @@
 package mekhq.campaign;
 
 import megamek.client.Client;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.CriticalSlot;
-import megamek.common.EjectedCrew;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.IArmorState;
-import megamek.common.IEntityRemovalConditions;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MechWarrior;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
@@ -65,11 +43,9 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -165,7 +141,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -497,7 +473,7 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            MekHQ.getLogger().error(
+                            LogManager.getLogger().error(
                                     "A null person status was found for person id " + p.getId().toString()
                                     + " when trying to assign kills");
                             continue;
@@ -707,7 +683,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    MekHQ.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    LogManager.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
                     continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
@@ -1071,8 +1047,8 @@ public class ResolveScenarioTracker {
         final MULParser parser;
         try {
             parser = new MULParser(unitFile, campaign.getGameOptions());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return;
         }
 
@@ -1928,7 +1904,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
         }

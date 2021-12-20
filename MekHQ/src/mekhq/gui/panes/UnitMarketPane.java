@@ -27,7 +27,6 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -36,6 +35,7 @@ import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -393,7 +393,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Entity entity = offer.getEntity();
             if (entity == null) {
-                MekHQ.getLogger().error("Cannot purchase a null entity");
+                LogManager.getLogger().error("Cannot purchase a null entity");
                 offersIterator.remove();
                 continue;
             }

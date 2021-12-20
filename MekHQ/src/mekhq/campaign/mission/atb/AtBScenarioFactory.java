@@ -10,50 +10,24 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission.atb;
 
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.scenario.AceDuelBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.AlliedTraitorsBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.AllyRescueBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.AmbushBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.BaseAttackBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.BreakthroughBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ChaseBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.CivilianHelpBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.CivilianRiotBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ConvoyAttackBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ConvoyRescueBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ExtractionBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.HideAndSeekBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.HoldTheLineBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.OfficerDualBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.PirateFreeForAllBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.PrisonBreakBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ProbeBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.ReconRaidBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.StandUpBuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.StarLeagueCache1BuiltInScenario;
-import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
+import mekhq.campaign.mission.atb.scenario.*;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class AtBScenarioFactory {
     private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
@@ -112,7 +86,7 @@ public class AtBScenarioFactory {
 
             return s;
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         return null;
@@ -121,7 +95,7 @@ public class AtBScenarioFactory {
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
         if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-            MekHQ.getLogger().error(String.format(
+            LogManager.getLogger().error(String.format(
                     "Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
                     scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
         } else {
@@ -294,10 +268,10 @@ public class AtBScenarioFactory {
                             assignedLances.add(lance.getForceId());
                         }
                     } else {
-                        MekHQ.getLogger().error("Unable to generate Base Attack scenario.");
+                        LogManager.getLogger().error("Unable to generate Base Attack scenario.");
                     }
                 } else {
-                    MekHQ.getLogger().warning("No lances assigned to mission " + contract.getName()
+                    LogManager.getLogger().warn("No lances assigned to mission " + contract.getName()
                             + ". Can't generate an Invincible Morale base defence mission for this force.");
                 }
             }

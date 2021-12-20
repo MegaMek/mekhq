@@ -40,6 +40,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.service.MassRepairService;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -496,7 +497,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 }
                 lblIcon.setIcon(new ImageIcon(icon));
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

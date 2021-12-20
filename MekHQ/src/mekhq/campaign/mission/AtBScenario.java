@@ -29,7 +29,9 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
-import mekhq.*;
+import mekhq.MekHqConstants;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -43,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -716,7 +719,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     en.setCamouflage(camouflage.clone());
                 }
             } else {
-                MekHQ.getLogger().error("Entity for player-controlled allies is null");
+                LogManager.getLogger().error("Entity for player-controlled allies is null");
             }
         }
 
@@ -730,7 +733,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                MekHQ.getLogger().error("Entity for ally bot is null");
+                LogManager.getLogger().error("Entity for ally bot is null");
             }
         }
 
@@ -1773,7 +1776,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             try {
                                 en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
-                                MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
                             if (en != null) {
                                 alliesPlayer.add(en);
@@ -1792,7 +1795,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             try {
                                 en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
-                                MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
                             if (en != null) {
                                 bigBattleAllies.add(en);
@@ -1819,7 +1822,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                     try {
                                         en = MekHqXmlUtil.parseSingleEntityMul((Element) wn4, campaign.getGameOptions());
                                     } catch (Exception e) {
-                                        MekHQ.getLogger().error("Error loading enemy unit in scenario", e);
+                                        LogManager.getLogger().error("Error loading enemy unit in scenario", e);
                                     }
                                     if (null != en) {
                                         specMissionEnemies.get(weightClass).add(en);
@@ -1835,7 +1838,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     try {
                         bf.setFieldsFromXmlNode(wn2, version, campaign);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error loading bot force in scenario", e);
+                        LogManager.getLogger().error("Error loading bot force in scenario", e);
                         bf = null;
                     }
 
@@ -1862,17 +1865,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     try {
                         transportLinkages = loadTransportLinkages(wn2);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
+                        LogManager.getLogger().error("Error loading transport linkages in scenario", e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefields")) {
                     try {
                         loadMinefieldCounts(wn2);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error loading minefield counts in scenario", e);
+                        LogManager.getLogger().error("Error loading minefield counts in scenario", e);
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         /* In the event a discrepancy occurs between a RAT entry and the unit lookup name,

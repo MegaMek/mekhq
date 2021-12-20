@@ -20,21 +20,20 @@
  */
 package mekhq.campaign.force;
 
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
 
 /**
  * this is a hierarchical object that represents forces from the TO&E using
@@ -195,7 +194,7 @@ public class ForceStub implements Serializable {
                             continue;
 
                         if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -210,7 +209,7 @@ public class ForceStub implements Serializable {
                             continue;
 
                         if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -219,7 +218,7 @@ public class ForceStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         return retVal;

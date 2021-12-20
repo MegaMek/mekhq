@@ -28,33 +28,21 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -758,7 +746,7 @@ public class StratconRulesManager {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierName);
 
             if (modifier == null) {
-                MekHQ.getLogger().error(String.format("Modifier %s not found; ignoring", modifierName));
+                LogManager.getLogger().error(String.format("Modifier %s not found; ignoring", modifierName));
                 continue;
             }
 
@@ -790,7 +778,7 @@ public class StratconRulesManager {
             for (String modifierID : modifierIDs) {
                 AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
                 if (modifier == null) {
-                    MekHQ.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID,
+                    LogManager.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID,
                             facility.getFormattedDisplayableName()));
                     continue;
                 }

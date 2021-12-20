@@ -22,11 +22,11 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
@@ -193,7 +193,7 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

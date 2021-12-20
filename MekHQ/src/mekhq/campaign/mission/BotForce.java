@@ -29,12 +29,11 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.UnitNameTracker;
 import megamek.common.icons.Camouflage;
-import megamek.common.logging.LogLevel;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -64,7 +63,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
+            LogManager.getLogger().error("Error getting Princess default behaviors", ex);
         }
     }
 
@@ -91,7 +90,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
+            LogManager.getLogger().error("Error getting Princess default behaviors", ex);
         }
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
@@ -210,7 +209,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
         for (Entity entity : getEntityList()) {
             if (entity == null) {
-                MekHQ.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -246,14 +245,13 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
-                MekHQ.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
+                LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
             }
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "verbosity", behaviorSettings.getVerbosity().toString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
@@ -302,7 +300,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                             try {
                                 en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
-                                MekHQ.getLogger().error("Error loading allied unit in scenario", e);
+                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
 
                             if (en != null) {
@@ -314,9 +312,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
-                        if (wn3.getNodeName().equalsIgnoreCase("verbosity")) {
-                            behaviorSettings.setVerbosity(LogLevel.getLogLevel(wn3.getTextContent()));
-                        } else if (wn3.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
+                        if (wn3.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
                             behaviorSettings.setForcedWithdrawal(Boolean.parseBoolean(wn3.getTextContent()));
                         } else if (wn3.getNodeName().equalsIgnoreCase("autoFlee")) {
                             behaviorSettings.setAutoFlee(Boolean.parseBoolean(wn3.getTextContent()));
@@ -338,7 +334,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 

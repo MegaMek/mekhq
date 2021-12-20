@@ -22,6 +22,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.utils.MegaMekXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -466,7 +467,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return null;
             case 1:
                 final Entity entity = entities.get(0);
-                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                LogManager.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException(

@@ -28,15 +28,11 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OptionsChangedEvent;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -238,7 +234,7 @@ public class RandomFactionGenerator {
     public String getEnemy(String employer, boolean useRebels) {
         Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
-            MekHQ.getLogger().error("Could not find enemy for " + employer); //$NON-NLS-1$
+            LogManager.getLogger().error("Could not find enemy for " + employer); //$NON-NLS-1$
             return "PIR";
         } else {
             return getEnemy(employerFaction, useRebels);
@@ -290,7 +286,7 @@ public class RandomFactionGenerator {
             return enemy.getShortName();
         }
 
-        MekHQ.getLogger().error("Could not find enemy for " + employerName);
+        LogManager.getLogger().error("Could not find enemy for " + employerName);
 
         // Fallback; there are always pirates.
         return "PIR";
@@ -378,7 +374,7 @@ public class RandomFactionGenerator {
     public List<String> getEnemyList(String employerName) {
         Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
-            MekHQ.getLogger().warning("Unknown faction key: " + employerName); //$NON-NLS-1$
+            LogManager.getLogger().warn("Unknown faction key: " + employerName); //$NON-NLS-1$
             return Collections.emptyList();
         }
         return getEnemyList(Factions.getInstance().getFaction(employerName));
@@ -481,11 +477,11 @@ public class RandomFactionGenerator {
         Faction f1 = Factions.getInstance().getFaction(attacker);
         Faction f2 = Factions.getInstance().getFaction(defender);
         if (null == f1) {
-            MekHQ.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
         if (null == f2) {
-            MekHQ.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
@@ -507,10 +503,10 @@ public class RandomFactionGenerator {
         Faction attacker = Factions.getInstance().getFaction(attackerKey);
         Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
-            MekHQ.getLogger().error("Non-existent faction key: " + attackerKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attackerKey); //$NON-NLS-1$
         }
         if (null == defender) {
-            MekHQ.getLogger().error("Non-existent faction key: " + defenderKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + defenderKey); //$NON-NLS-1$
         }
         if ((null != attacker) && (null != defender)) {
             return getMissionTargetList(attacker, defender);

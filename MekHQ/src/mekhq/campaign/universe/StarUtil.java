@@ -18,23 +18,15 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-
 import megamek.common.EquipmentType;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
+import org.apache.logging.log4j.LogManager;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.*;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
@@ -636,12 +628,12 @@ public final class StarUtil {
                 }
                 planetIconDataLoaded = true;
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
         if (!PLANET_ICON_DATA.containsKey(Utilities.nonNull(planet.getIcon(), "default"))) {
-            MekHQ.getLogger().error("no planet icon " + planet.getIcon());
+            LogManager.getLogger().error("no planet icon " + planet.getIcon());
         }
         return PLANET_ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
     }
@@ -662,7 +654,7 @@ public final class StarUtil {
                 }
                 starIconDataLoaded = true;
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
         return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));
