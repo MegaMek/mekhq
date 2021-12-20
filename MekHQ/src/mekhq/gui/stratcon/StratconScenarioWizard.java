@@ -18,35 +18,10 @@
  */
 package mekhq.gui.stratcon;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-
 import megamek.common.Minefield;
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.Unit;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -55,6 +30,17 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.

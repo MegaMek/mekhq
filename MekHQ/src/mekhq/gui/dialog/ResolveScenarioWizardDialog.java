@@ -46,22 +46,13 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.awt.event.*;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Taharqa
@@ -1698,7 +1689,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
                 : tracker.getCampaign().getPerson(status.getId());
         if (person == null) {
-            MekHQ.getLogger().error("Failed to show person after selecting view personnel for a "
+            LogManager.getLogger().error("Failed to show person after selecting view personnel for a "
                     + (isPrisoner ? "Prisoner" : "member of the force") +
                     " because the person could not be found.");
             return;

@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +117,7 @@ public enum Phenotype {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse the phenotype from string " + text
+        LogManager.getLogger().error("Unable to parse the phenotype from string " + text
                 + ". Returning Phenotype.NONE");
 
         return NONE;

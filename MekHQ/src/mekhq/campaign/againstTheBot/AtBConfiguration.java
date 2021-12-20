@@ -21,42 +21,32 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.common.*;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Neoancient
@@ -112,14 +102,14 @@ public class AtBConfiguration implements Serializable {
      */
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
-            MekHQ.getLogger().error("Default force tables don't support negative weights, limiting to 0");
+            LogManager.getLogger().error("Default force tables don't support negative weights, limiting to 0");
             index = 0;
         }
         String property = defaultProperties.getString(key);
         String[] fields = property.split("\\|");
         if (index >= fields.length) {
             // Deal with too short field lengths
-            MekHQ.getLogger().error(String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
+            LogManager.getLogger().error(String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -137,7 +127,7 @@ public class AtBConfiguration implements Serializable {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error(ex);
             }
         }
         return retVal;
@@ -235,20 +225,20 @@ public class AtBConfiguration implements Serializable {
             int weightClassIndex = weightClassIndex(weightClass);
             WeightedTable<String> table;
             if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                MekHQ.getLogger().error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+                LogManager.getLogger().error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
                 weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
             }
             table = botForceTable.get(weightClassIndex);
             if (null == table) {
                 table = getDefaultForceTable("botForce." + org, weightClassIndex);
                 if (null == table) {
-                    MekHQ.getLogger().error(String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
+                    LogManager.getLogger().error(String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
                     return null;
                 }
             }
             return table.select(rollMod);
         } else {
-            MekHQ.getLogger().error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
+            LogManager.getLogger().error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
     }
@@ -395,7 +385,7 @@ public class AtBConfiguration implements Serializable {
     public static AtBConfiguration loadFromXml() {
         AtBConfiguration retVal = new AtBConfiguration();
 
-        MekHQ.getLogger().info("Starting load of AtB configuration data from XML...");
+        LogManager.getLogger().info("Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) { // TODO : Remove inline file path
@@ -403,11 +393,11 @@ public class AtBConfiguration implements Serializable {
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
-            MekHQ.getLogger().info("File data/universe/atbconfig.xml not found. Loading defaults.");
+            LogManager.getLogger().info("File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return retVal;
         }
 
@@ -482,7 +472,7 @@ public class AtBConfiguration implements Serializable {
                     }
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
-                    MekHQ.getLogger().error("Could not parse weight class attribute for enemy forces table", ex);
+                    LogManager.getLogger().error("Could not parse weight class attribute for enemy forces table", ex);
                 }
             }
         }

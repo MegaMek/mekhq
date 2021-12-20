@@ -52,6 +52,7 @@ import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -254,7 +255,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -351,7 +352,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         } catch (EntityLoadingException ex) {
-                            MekHQ.getLogger().error(ex);
+                            LogManager.getLogger().error(ex);
                         }
                     }
                 }
@@ -477,7 +478,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }
@@ -994,7 +995,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         File customsDir = new File(MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Unable to create directory "
+                LogManager.getLogger().error("Unable to create directory "
                         + MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
                         + " to hold custom units, cannot assign custom unit tag");
                 return;
@@ -1003,7 +1004,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Unable to create directory " + sCustomsDirCampaign
+                LogManager.getLogger().error("Unable to create directory " + sCustomsDirCampaign
                         + "to hold custom units, cannot assign custom unit tag");
                 return;
             }
@@ -1027,7 +1028,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     p.println(((Mech) unit.getEntity()).getMtf());
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             } else {
                 // if this file already exists then don't overwrite

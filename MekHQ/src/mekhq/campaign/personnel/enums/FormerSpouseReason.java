@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -61,7 +62,7 @@ public enum FormerSpouseReason {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse the former spouse reason from string " + text
+        LogManager.getLogger().error("Unable to parse the former spouse reason from string " + text
                 + ". Returning FormerSpouseReason.WIDOWED");
         return WIDOWED;
     }

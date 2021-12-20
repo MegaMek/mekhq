@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -131,7 +132,7 @@ public enum ScenarioStatus {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a ScenarioStatus, returning CURRENT.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into a ScenarioStatus, returning CURRENT.");
 
         return CURRENT;
     }

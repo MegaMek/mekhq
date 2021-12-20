@@ -20,6 +20,7 @@ package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -137,7 +138,7 @@ public enum FinancialTerm {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse the FinancialTerm from text " + text + ", returning ANNUALLY.");
+        LogManager.getLogger().error("Failed to parse the FinancialTerm from text " + text + ", returning ANNUALLY.");
 
         return ANNUALLY;
     }

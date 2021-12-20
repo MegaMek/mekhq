@@ -20,6 +20,7 @@ package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -124,7 +125,7 @@ public enum FinancialYearDuration {
             return BIENNIAL;
         }
 
-        MekHQ.getLogger().error("Failed to parse the FinancialYearDuration from text " + text + ", returning ANNUAL.");
+        LogManager.getLogger().error("Failed to parse the FinancialYearDuration from text " + text + ", returning ANNUAL.");
 
         return ANNUAL;
     }

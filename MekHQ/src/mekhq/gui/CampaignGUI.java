@@ -66,6 +66,7 @@ import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -1164,7 +1165,7 @@ public class CampaignGUI extends JPanel {
             Method method = clazz.getMethod(methodName, Window.class, boolean.class);
             method.invoke(null, window, true);
         } catch (Throwable t) {
-            MekHQ.getLogger().error("Full screen mode is not supported", t);
+            LogManager.getLogger().error("Full screen mode is not supported", t);
         }
     }
 
@@ -1279,7 +1280,7 @@ public class CampaignGUI extends JPanel {
 
     public void showUnitMarket() {
         if (getCampaign().getUnitMarket().getMethod().isNone()) {
-            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+            LogManager.getLogger().error("Attempted to show the unit market while it is disabled");
         } else {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         }
@@ -1291,7 +1292,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean saveCampaign(ActionEvent evt) {
-        MekHQ.getLogger().info("Saving campaign...");
+        LogManager.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -1340,9 +1341,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info("Campaign saved to " + file);
+            LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -1546,7 +1547,7 @@ public class CampaignGUI extends JPanel {
                                     .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
@@ -1558,7 +1559,7 @@ public class CampaignGUI extends JPanel {
                                     .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
@@ -1570,7 +1571,7 @@ public class CampaignGUI extends JPanel {
                                     .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
@@ -1582,7 +1583,7 @@ public class CampaignGUI extends JPanel {
                                     .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                             + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
     }
 
@@ -1935,12 +1936,12 @@ public class CampaignGUI extends JPanel {
             try (InputStream is = new FileInputStream(unitFile)) {
                 parser.parse(is);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(parser.getWarningMessage());
+                LogManager.getLogger().warn(parser.getWarningMessage());
             }
 
             // Add the units from the file.
@@ -1962,7 +1963,7 @@ public class CampaignGUI extends JPanel {
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            MekHQ.getLogger().info("Starting load of personnel file from XML...");
+            LogManager.getLogger().info("Starting load of personnel file from XML...");
             // Initialize variables.
             Document xmlDoc;
 
@@ -1974,7 +1975,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error("Cannot load person XML", ex);
+                LogManager.getLogger().error("Cannot load person XML", ex);
                 return; // otherwise we NPE out in the next line
             }
 
@@ -1998,13 +1999,13 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
-                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
+                    LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
                             + p.getFullName() + ", Id " + p.getId() + ")");
                     p = null;
                 }
@@ -2044,7 +2045,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            MekHQ.getLogger().info("Finished load of personnel file");
+            LogManager.getLogger().info("Finished load of personnel file");
         }
     }
 
@@ -2075,7 +2076,7 @@ public class CampaignGUI extends JPanel {
             PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
-                MekHQ.getLogger().warning("ERROR: Cannot export person if no one is selected! Ignoring.");
+                LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
                 return;
             }
             Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
@@ -2107,9 +2108,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info("Personnel saved to " + file);
+            LogManager.getLogger().info("Personnel saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your personnel. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2134,7 +2135,7 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        MekHQ.getLogger().info("Starting load of parts file from XML...");
+        LogManager.getLogger().info("Starting load of parts file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2146,7 +2147,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return;
         }
 
@@ -2173,7 +2174,7 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
                 continue;
             }
 
@@ -2184,7 +2185,7 @@ public class CampaignGUI extends JPanel {
         }
 
         getCampaign().importParts(parts);
-        MekHQ.getLogger().info("Finished load of parts file");
+        LogManager.getLogger().info("Finished load of parts file");
     }
 
     private void savePartsFile() {
@@ -2217,7 +2218,7 @@ public class CampaignGUI extends JPanel {
                 PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
-                    MekHQ.getLogger().warning("ERROR: Cannot export parts if none are selected! Ignoring.");
+                    LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
                     return;
                 }
                 Part selectedPart = partsModel.getPartAt(partsTable
@@ -2253,9 +2254,9 @@ public class CampaignGUI extends JPanel {
                 if (backupFile.exists()) {
                     backupFile.delete();
                 }
-                MekHQ.getLogger().info("Parts saved to " + file);
+                LogManager.getLogger().info("Parts saved to " + file);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error(ex);
                 JOptionPane.showMessageDialog(getFrame(),
                         "Oh no! The program was unable to correctly export your parts. We know this\n"
                                 + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2309,7 +2310,7 @@ public class CampaignGUI extends JPanel {
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
     }

@@ -18,24 +18,19 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class PersonnelEventLogModel extends DataTableModel {
     private static final long serialVersionUID = 2930826794853379580L;

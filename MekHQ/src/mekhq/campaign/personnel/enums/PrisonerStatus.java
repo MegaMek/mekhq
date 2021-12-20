@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -115,7 +116,7 @@ public enum PrisonerStatus {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+        LogManager.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
 
         return FREE;
     }

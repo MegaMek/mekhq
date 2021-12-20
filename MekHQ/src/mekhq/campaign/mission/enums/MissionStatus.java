@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -107,7 +108,7 @@ public enum MissionStatus {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
 
         return ACTIVE;
     }

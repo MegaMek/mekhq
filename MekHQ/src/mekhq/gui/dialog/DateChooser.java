@@ -1,27 +1,18 @@
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import java.awt.*;
+import java.awt.event.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-
-import mekhq.MekHQ;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -242,7 +233,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
                 yearLabel.setText(String.valueOf(--y));
                 updateDayGrid(false);
@@ -253,7 +244,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
                 yearLabel.setText(String.valueOf(++y));
                 updateDayGrid(false);
@@ -267,7 +258,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
                 date = LocalDate.of(y, m, d);
                 ready = true;
@@ -309,7 +300,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         // decide what day of the week is the first day of this month
@@ -398,7 +389,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         return LocalDate.of(y, m, 1).lengthOfMonth();

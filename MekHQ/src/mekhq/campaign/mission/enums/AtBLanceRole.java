@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -101,7 +102,7 @@ public enum AtBLanceRole {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
+        LogManager.getLogger().error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
 
         return FIGHTING;
     }

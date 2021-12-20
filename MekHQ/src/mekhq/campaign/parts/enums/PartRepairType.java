@@ -20,6 +20,7 @@ package mekhq.campaign.parts.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +112,10 @@ public enum PartRepairType {
                     return POD_SPACE;
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
-        MekHQ.getLogger().error("Unknown part repair type, returning GENERAL_LOCATION");
+        LogManager.getLogger().error("Unknown part repair type, returning GENERAL_LOCATION");
 
         return GENERAL_LOCATION;
     }

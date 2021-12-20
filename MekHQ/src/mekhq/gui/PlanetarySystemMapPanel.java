@@ -18,22 +18,22 @@
  */
 package mekhq.gui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import megamek.common.Dropship;
+import megamek.common.Jumpship;
+import megamek.common.util.ImageUtil;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.StarUtil;
+import org.apache.logging.log4j.LogManager;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.AffineTransformOp;
@@ -43,29 +43,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-
-import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.common.Dropship;
-import megamek.common.Jumpship;
-import megamek.common.util.ImageUtil;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.StarUtil;
 
 /**
  * This panel displays a particular star system with suns and planets and information about
@@ -113,41 +90,41 @@ public class PlanetarySystemMapPanel extends JPanel {
             imgSpace = ImageIO.read(new File("data/images/universe/space.jpg")); // TODO : Remove inline file path
         } catch (IOException e1) {
             imgSpace = null;
-            MekHQ.getLogger().error("missing default space image");
+            LogManager.getLogger().error("missing default space image");
         }
         try {
             imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgZenithPoint = null;
-            MekHQ.getLogger().error("missing default zenith point image");
+            LogManager.getLogger().error("missing default zenith point image");
         }
 
         try {
             imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgNadirPoint = null;
-            MekHQ.getLogger().error("missing default nadir point image");
+            LogManager.getLogger().error("missing default nadir point image");
         }
 
         try {
             imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgRechargeStation = null;
-            MekHQ.getLogger().error("missing default recharge station image");
+            LogManager.getLogger().error("missing default recharge station image");
         }
 
         try {
             imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            MekHQ.getLogger().error("missing default dropship fleet image");
+            LogManager.getLogger().error("missing default dropship fleet image");
         }
 
         try {
             imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            MekHQ.getLogger().error("missing default jumpship fleet image");
+            LogManager.getLogger().error("missing default jumpship fleet image");
         }
 
         pane = new JLayeredPane();

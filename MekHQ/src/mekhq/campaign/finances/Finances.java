@@ -19,6 +19,25 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.event.LoanDefaultedEvent;
+import mekhq.campaign.event.TransactionCreditEvent;
+import mekhq.campaign.event.TransactionDebitEvent;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
+import mekhq.io.FileType;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,26 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
-import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.io.FileType;
-import mekhq.campaign.personnel.Person;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.event.LoanDefaultedEvent;
-import mekhq.campaign.event.TransactionCreditEvent;
-import mekhq.campaign.event.TransactionDebitEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -200,7 +199,7 @@ public class Finances implements Serializable {
                     retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -400,7 +399,7 @@ public class Finances implements Serializable {
                  * payment that has just been made.
                  */
                 campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                MekHQ.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
+                LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
     }
@@ -499,7 +498,7 @@ public class Finances implements Serializable {
 
             report = transactions.size() + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
-            MekHQ.getLogger().info("Error exporting finances to " + format);
+            LogManager.getLogger().info("Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
 

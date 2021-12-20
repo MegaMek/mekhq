@@ -18,30 +18,12 @@
  */
 package mekhq.service;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Mech;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingMekLocation;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -51,6 +33,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
+import org.apache.logging.log4j.LogManager;
+
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.*;
 
 public class MassRepairService {
     private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
@@ -1150,7 +1137,7 @@ public class MassRepairService {
             msg = String.format(msg, replacements);
         }
 
-        MekHQ.getLogger().debug(msg);
+        LogManager.getLogger().debug(msg);
     }
 
     private static class WorkTimeCalculation {

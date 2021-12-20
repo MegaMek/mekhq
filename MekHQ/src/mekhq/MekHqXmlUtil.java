@@ -20,6 +20,7 @@ package mekhq;
 
 import megamek.common.*;
 import megamek.utils.MegaMekXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -475,7 +476,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace("Executing getEntityFromXmlString(Node)...");
+        LogManager.getLogger().trace("Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -486,7 +487,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return null;
             case 1:
                 final Entity entity = entities.get(0);
-                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                LogManager.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException(

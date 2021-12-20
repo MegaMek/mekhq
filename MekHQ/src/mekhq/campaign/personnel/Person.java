@@ -57,6 +57,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1598,7 +1599,7 @@ public class Person implements Serializable {
                 extraData.writeToXml(pw1);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
+            LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
             throw e; // we want to rethrow to ensure that that the save fails
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
@@ -1790,7 +1791,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -1805,7 +1806,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -1834,7 +1835,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
@@ -1851,7 +1852,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -1869,7 +1870,7 @@ public class Person implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -1909,7 +1910,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring advantage: " + adv);
+                        LogManager.getLogger().error("Error restoring advantage: " + adv);
                     }
                 }
             }
@@ -1923,7 +1924,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring edge: " + adv);
+                        LogManager.getLogger().error("Error restoring edge: " + adv);
                     }
                 }
             }
@@ -1937,7 +1938,7 @@ public class Person implements Serializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Error restoring implants: " + adv);
+                        LogManager.getLogger().error("Error restoring implants: " + adv);
                     }
                 }
             }
@@ -1950,7 +1951,7 @@ public class Person implements Serializable {
                 retVal.setRank(0);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
+            LogManager.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
             retVal = null;
         }
 
@@ -3388,7 +3389,7 @@ public class Person implements Serializable {
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Person %s ('%s') references missing unit %s",
                         getId(), getFullName(), id));
             }
@@ -3400,7 +3401,7 @@ public class Person implements Serializable {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Person %s ('%s') techs missing unit %s",
                             getId(), getFullName(), techUnit.getId()));
                     techUnits.remove(ii);
