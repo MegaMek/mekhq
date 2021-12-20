@@ -20,31 +20,8 @@
  */
 package mekhq.campaign.unit;
 
-
-import java.io.PrintWriter;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.ConvFighter;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Protomech;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -52,6 +29,12 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -137,13 +120,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         name = name.trim();
         MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if (null == summary) {
-            MekHQ.getLogger().error("Could not find a mech summary for " + name);
+            LogManager.getLogger().error("Could not find a mech summary for " + name);
             return null;
         }
         try {
             return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error("Could not load " + summary.getEntryName());
+            LogManager.getLogger().error("Could not load " + summary.getEntryName());
             return null;
         }
     }
@@ -368,7 +351,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         retVal.initializeParts(false);

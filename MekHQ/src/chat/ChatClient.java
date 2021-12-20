@@ -4,18 +4,13 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Socket;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 public class ChatClient extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7447573101863923187L;
@@ -41,7 +36,7 @@ public class ChatClient extends JPanel implements ActionListener {
             out    = new Out(socket);
             in     = new In(socket);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
         this.screenName = screenName;
 
@@ -53,7 +48,7 @@ public class ChatClient extends JPanel implements ActionListener {
 //                    in.close();
 //                    try                   { socket.close();        }
 //                    catch (Exception e) {
-//                        MekHQ.getLogger().error(getClass(), "windowClosing", e);
+//                        LogManager.getLogger().error(getClass(), "windowClosing", e);
 //                    }
                 }
             }
@@ -97,8 +92,8 @@ public class ChatClient extends JPanel implements ActionListener {
         try {
             socket.close();
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
-        MekHQ.getLogger().error("Closed client socket");
+        LogManager.getLogger().error("Closed client socket");
     }
 }

@@ -23,9 +23,9 @@ package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.Phenotype;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -214,7 +214,7 @@ public class Bloodname implements Serializable {
                     retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -249,12 +249,12 @@ public class Bloodname implements Serializable {
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
         if (faction == null) {
-            MekHQ.getLogger().error("Random Bloodname attempted for a clan that does not exist."
+            LogManager.getLogger().error("Random Bloodname attempted for a clan that does not exist."
                     + System.lineSeparator()
                     + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
             return null;
         } else if (phenotype == null) {
-            MekHQ.getLogger().error("Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
+            LogManager.getLogger().error("Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
 
@@ -422,7 +422,7 @@ public class Bloodname implements Serializable {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error("Cannot find file bloodnames.xml");
+            LogManager.getLogger().error("Cannot find file bloodnames.xml");
             return;
         }
 
@@ -433,7 +433,7 @@ public class Bloodname implements Serializable {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Could not parse bloodnames.xml", ex);
+            LogManager.getLogger().error("Could not parse bloodnames.xml", ex);
             return;
         }
 
@@ -449,7 +449,7 @@ public class Bloodname implements Serializable {
                 }
             }
         }
-        MekHQ.getLogger().info("Loaded " + bloodnames.size() + " Bloodname records.");
+        LogManager.getLogger().info("Loaded " + bloodnames.size() + " Bloodname records.");
     }
 
     private static class NameAcquired {

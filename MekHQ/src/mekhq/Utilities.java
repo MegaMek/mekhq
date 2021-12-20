@@ -42,6 +42,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
@@ -352,7 +353,7 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().warning("Could not determine tech progression for " + summary.getName()
+                LogManager.getLogger().warn("Could not determine tech progression for " + summary.getName()
                                 + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
@@ -1075,11 +1076,11 @@ public class Utilities {
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info("File copied.");
+            LogManager.getLogger().info("File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(e.getMessage() + " in the specified directory.");
+            LogManager.getLogger().error(e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -1113,7 +1114,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {
-            MekHQ.getLogger().error("Error exporting JTable", ioe);
+            LogManager.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1246,7 +1247,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
+                            LogManager.getLogger().error("Exception trying to parse " + file.getPath() + " - ignoring.", ex);
                         }
                     }
                 }
@@ -1332,7 +1333,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1340,7 +1341,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
             }
         }

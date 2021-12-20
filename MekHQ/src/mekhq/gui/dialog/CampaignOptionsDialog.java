@@ -68,6 +68,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -6331,7 +6332,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
@@ -6377,7 +6378,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    LogManager.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }

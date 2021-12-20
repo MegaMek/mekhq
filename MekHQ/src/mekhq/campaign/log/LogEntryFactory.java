@@ -18,8 +18,8 @@
  */
 package mekhq.campaign.log;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -97,7 +97,7 @@ public class LogEntryFactory {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return null;
         }
 

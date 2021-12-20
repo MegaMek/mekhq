@@ -36,6 +36,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -193,17 +194,17 @@ public class AtBEventProcessor {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MechSummaryCache.getInstance().getMech(name);
-                MekHQ.getLogger().info("looking for Clan infantry " + name);
+                LogManager.getLogger().info("looking for Clan infantry " + name);
             }
             try {
                 en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                MekHQ.getLogger().error("Unable to load entity: "
+                LogManager.getLogger().error("Unable to load entity: "
                         + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
             }
         } else {
-            MekHQ.getLogger().error("Personnel market could not find "
+            LogManager.getLogger().error("Personnel market could not find "
                     + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
             return;
         }
