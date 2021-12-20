@@ -47,20 +47,12 @@ import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
@@ -1105,7 +1097,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(e);
+                        LogManager.getLogger().error(e);
                         continue;
                     }
 
@@ -1136,7 +1128,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(e);
+                        LogManager.getLogger().error(e);
                         continue;
                     }
 
@@ -1189,7 +1181,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(e);
+                            LogManager.getLogger().error(e);
                             continue;
                         }
 
@@ -1242,7 +1234,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(e);
+                            LogManager.getLogger().error(e);
                             continue;
                         }
 

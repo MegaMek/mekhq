@@ -1,6 +1,6 @@
 package chat;
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -58,7 +58,7 @@ public final class In {
             scanner = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error("Could not open " + socket);
+            LogManager.getLogger().error("Could not open " + socket);
         }
     }
 
@@ -72,7 +72,7 @@ public final class In {
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error("Could not open " + url);
+            LogManager.getLogger().error("Could not open " + url);
         }
     }
 
@@ -84,7 +84,7 @@ public final class In {
             scanner = new Scanner(file, charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error("Could not open " + file);
+            LogManager.getLogger().error("Could not open " + file);
         }
     }
 
@@ -114,7 +114,7 @@ public final class In {
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
         } catch (IOException e) {
-            MekHQ.getLogger().error("Could not open " + s);
+            LogManager.getLogger().error("Could not open " + s);
         }
     }
 

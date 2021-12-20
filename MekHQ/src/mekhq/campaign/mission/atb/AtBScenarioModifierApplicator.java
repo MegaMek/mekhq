@@ -10,43 +10,32 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb;
-
-import java.util.UUID;
 
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.HitData;
-import megamek.common.Mounted;
-import megamek.common.ToHitData;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.UUID;
 
 /**
  * Class that handles the application of scenario modifier actions to AtBDynamicScenarios
@@ -215,7 +204,7 @@ public class AtBScenarioModifierApplicator {
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
         if (eventRecipient != ForceAlignment.Opposing) {
-            MekHQ.getLogger().warning( "Can only adjust opfor unit quality");
+            LogManager.getLogger().warn( "Can only adjust opfor unit quality");
             return;
         }
 
@@ -354,7 +343,7 @@ public class AtBScenarioModifierApplicator {
         scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(),
                 (Boolean) goodEvent));
     }
-    
+
     /**
      * Applies a flat reduction to the reinforcement arrival times, either of player/allied forces or hostile forces.
      */

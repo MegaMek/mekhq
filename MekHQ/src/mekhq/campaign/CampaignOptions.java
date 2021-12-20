@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -172,6 +173,7 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useTransfers;
+    private boolean useExtendedTOEForceName;
     private boolean personnelLogSkillGain;
     private boolean personnelLogAbilityGain;
     private boolean personnelLogEdgeGain;
@@ -557,6 +559,7 @@ public class CampaignOptions implements Serializable {
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseTransfers(true);
+        setUseExtendedTOEForceName(false);
         setPersonnelLogSkillGain(false);
         setPersonnelLogAbilityGain(false);
         setPersonnelLogEdgeGain(false);
@@ -1052,6 +1055,14 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
+    }
+
+    public boolean isUseExtendedTOEForceName() {
+        return useExtendedTOEForceName;
+    }
+
+    public void setUseExtendedTOEForceName(final boolean useExtendedTOEForceName) {
+        this.useExtendedTOEForceName = useExtendedTOEForceName;
     }
 
     public boolean isPersonnelLogSkillGain() {
@@ -3483,6 +3494,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
@@ -3760,7 +3772,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
-        MekHQ.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
+        LogManager.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3775,7 +3787,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().debug(String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            LogManager.getLogger().debug(String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
             try {
                 //region Repair and Maintenance Tab
                 if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -3975,6 +3987,8 @@ public class CampaignOptions implements Serializable {
                     retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                     retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedTOEForceName")) {
+                    retVal.setUseExtendedTOEForceName(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogSkillGain")) {
                     retVal.setPersonnelLogSkillGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogAbilityGain")) {
@@ -4104,7 +4118,7 @@ public class CampaignOptions implements Serializable {
                     } else if (values.length == 9) {
                         migrateMarriageSurnameWeights(retVal, values);
                     } else {
-                        MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
+                        LogManager.getLogger().error("Unknown length of randomMarriageSurnameWeights");
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                     retVal.setUseRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -4526,7 +4540,7 @@ public class CampaignOptions implements Serializable {
                 }
                 //endregion Legacy
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -4536,7 +4550,7 @@ public class CampaignOptions implements Serializable {
             retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
 
-        MekHQ.getLogger().debug("Load Campaign Options Complete!");
+        LogManager.getLogger().debug("Load Campaign Options Complete!");
 
         return retVal;
     }
@@ -4555,7 +4569,7 @@ public class CampaignOptions implements Serializable {
             try {
                 weights[i] = Integer.parseInt(values[i]);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
                 weights[i] = 0;
             }
         }

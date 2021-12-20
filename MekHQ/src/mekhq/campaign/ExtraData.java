@@ -18,30 +18,20 @@
  */
 package mekhq.campaign;
 
-import java.io.OutputStream;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.w3c.dom.Node;
-
-import mekhq.MekHQ;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Class for holding extra data/properties with free-form strings as keys.
@@ -88,7 +78,7 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
         } catch(Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -106,7 +96,7 @@ public class ExtraData {
                 try {
                     return Integer.valueOf(str);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                     return 0;
                 }
             }
@@ -117,7 +107,7 @@ public class ExtraData {
                 try {
                     return Double.valueOf(str);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                     return 0.0;
                 }
             }
@@ -128,7 +118,7 @@ public class ExtraData {
                 try {
                     return Boolean.valueOf(str);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                     return false;
                 }
             }
@@ -209,7 +199,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, writer);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -217,7 +207,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, os);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
     }
 
@@ -225,7 +215,7 @@ public class ExtraData {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
     }

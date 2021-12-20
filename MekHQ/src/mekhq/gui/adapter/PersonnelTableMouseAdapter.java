@@ -55,6 +55,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -226,7 +227,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.changeRank(gui.getCampaign(), rank, level, true);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error(e);
                 }
                 break;
             }
@@ -237,7 +238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign Manei Domini Class", e);
+                    LogManager.getLogger().error("Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -255,7 +256,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign ROM designator", e);
+                    LogManager.getLogger().error("Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -266,7 +267,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign ROM secondary designator", e);
+                    LogManager.getLogger().error("Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -339,7 +340,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Could not remove award.", e);
+                        LogManager.getLogger().error("Could not remove award.", e);
                     }
                 }
                 break;
@@ -480,7 +481,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resources.getString("confirmRetireQ.format"), person.getFullTitle()),
                             status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
-                        person.changeStatus(gui.getCampaign(), status);
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), status);
                     }
                 }
                 break;
@@ -494,7 +495,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
+                    LogManager.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
@@ -1136,9 +1137,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("changeStatus.text"));
         for (PersonnelStatus status : PersonnelStatus.values()) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
-            if (person.getStatus() == status) {
-                cbMenuItem.setSelected(true);
-            }
+            cbMenuItem.setToolTipText(status.getToolTipText());
+            cbMenuItem.setSelected(person.getStatus() == status);
             cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
