@@ -473,22 +473,22 @@ public class Force implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
-        if (units.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "units");
+        if (!units.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
                 pw1.println(MekHqXmlUtil.indentStr(indent) + "<unit id=\"" + uid + "\"/>");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "units");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "units");
         }
 
-        if (subForces.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "subforces");
+        if (!subForces.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
                 sub.writeToXml(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "force");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
 
     public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -561,7 +561,7 @@ public class Force implements Serializable {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
-        if (version.isLowerThan("0.49.4")) {
+        if (version.isLowerThan("0.49.6")) {
             retVal.setForceIcon(ForceIconMigrator.migrateForceIcon(retVal.getForceIcon()));
         }
 

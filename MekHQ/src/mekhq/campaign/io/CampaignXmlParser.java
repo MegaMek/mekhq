@@ -292,7 +292,7 @@ public class CampaignXmlParser {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
-        if (version.isLowerThan("0.49.4")) {
+        if (version.isLowerThan("0.49.6")) {
             retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon(retVal.getUnitIcon()));
         }
 
@@ -620,10 +620,10 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
                     retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
-                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
+                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     final String value = wn.getTextContent().trim();
                     retVal.getUnitIcon().setCategory(value.equals("null") ? null : value);
-                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
+                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
                     final String value = wn.getTextContent().trim();
                     if (value.equals("null") || value.equals(AbstractIcon.DEFAULT_ICON_FILENAME)) {
                         retVal.getUnitIcon().setFilename(null);
